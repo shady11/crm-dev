@@ -1,0 +1,205 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  COMPANY_ADMIN
+  SALES_MANAGER
+  SALES_HEAD
+  FINANCE
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  MEETING_SCHEDULED
+  NEGOTIATION
+  BOOKING
+  CONTRACT
+  SOLD
+  REJECTED
+}
+
+enum ApartmentStatus {
+  AVAILABLE
+  BOOKED
+  SOLD
+  INSTALLMENT
+  MORTGAGE
+}
+
+enum DealStatus {
+  BOOKED
+  CONTRACT
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  MBANK
+  OPTIMA
+  ELKART
+  OTHER
+}
+
+model Company {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users    User[]
+  leads    Lead[]
+  clients  Client[]
+  projects Project[]
+}
+
+model User {
+  id           String   @id @default(uuid())
+  fullName     String
+  email        String   @unique
+  phone        String?
+  passwordHash String
+  role         UserRole
+  isActive     Boolean  @default(true)
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  leads     Lead[]   @relation("LeadManager")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Lead {
+  id       String     @id @default(uuid())
+  source   String?
+  status   LeadStatus @default(NEW)
+  fullName String
+  phone    String
+  email    String?
+  comment  String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  managerId String?
+  manager   User?   @relation("LeadManager", fields: [managerId], references: [id])
+
+  clientId String?
+  client   Client? @relation(fields: [clientId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Client {
+  id       String  @id @default(uuid())
+  fullName String
+  phone    String
+  whatsapp String?
+  email    String?
+  passport String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  leads Lead[]
+  deals Deal[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id      String  @id @default(uuid())
+  name    String
+  address String?
+  status  String  @default("active")
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  blocks     Block[]
+  apartments Apartment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Block {
+  id   String @id @default(uuid())
+  name String
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  apartments Apartment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Apartment {
+  id     String          @id @default(uuid())
+  number String
+  floor  Int
+  rooms  Int?
+  square Decimal
+  price  Decimal
+  status ApartmentStatus @default(AVAILABLE)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  blockId String?
+  block   Block?  @relation(fields: [blockId], references: [id])
+
+  deals Deal[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Deal {
+  id           String     @id @default(uuid())
+  status       DealStatus @default(BOOKED)
+  amount       Decimal
+  bookingUntil DateTime?
+
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id])
+
+  apartmentId String
+  apartment   Apartment @relation(fields: [apartmentId], references: [id])
+
+  payments Payment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id      String        @id @default(uuid())
+  amount  Decimal
+  paidAt  DateTime
+  method  PaymentMethod
+  comment String?
+
+  dealId String
+  deal   Deal   @relation(fields: [dealId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
