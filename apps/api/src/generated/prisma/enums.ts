@@ -34,15 +34,26 @@ export const LeadStatus = {
 export type LeadStatus = (typeof LeadStatus)[keyof typeof LeadStatus]
 
 
-export const ApartmentStatus = {
+export const UnitType = {
+  APARTMENT: 'APARTMENT',
+  COMMERCIAL: 'COMMERCIAL',
+  PARKING: 'PARKING',
+  STORAGE: 'STORAGE'
+} as const
+
+export type UnitType = (typeof UnitType)[keyof typeof UnitType]
+
+
+export const UnitStatus = {
   AVAILABLE: 'AVAILABLE',
   BOOKED: 'BOOKED',
   SOLD: 'SOLD',
   INSTALLMENT: 'INSTALLMENT',
-  MORTGAGE: 'MORTGAGE'
+  MORTGAGE: 'MORTGAGE',
+  UNAVAILABLE: 'UNAVAILABLE'
 } as const
 
-export type ApartmentStatus = (typeof ApartmentStatus)[keyof typeof ApartmentStatus]
+export type UnitStatus = (typeof UnitStatus)[keyof typeof UnitStatus]
 
 
 export const DealStatus = {

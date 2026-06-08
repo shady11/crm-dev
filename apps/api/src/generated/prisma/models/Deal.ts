@@ -40,7 +40,7 @@ export type DealMinAggregateOutputType = {
   amount: runtime.Decimal | null
   bookingUntil: Date | null
   clientId: string | null
-  apartmentId: string | null
+  unitId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -51,7 +51,7 @@ export type DealMaxAggregateOutputType = {
   amount: runtime.Decimal | null
   bookingUntil: Date | null
   clientId: string | null
-  apartmentId: string | null
+  unitId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -62,7 +62,7 @@ export type DealCountAggregateOutputType = {
   amount: number
   bookingUntil: number
   clientId: number
-  apartmentId: number
+  unitId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -83,7 +83,7 @@ export type DealMinAggregateInputType = {
   amount?: true
   bookingUntil?: true
   clientId?: true
-  apartmentId?: true
+  unitId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -94,7 +94,7 @@ export type DealMaxAggregateInputType = {
   amount?: true
   bookingUntil?: true
   clientId?: true
-  apartmentId?: true
+  unitId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -105,7 +105,7 @@ export type DealCountAggregateInputType = {
   amount?: true
   bookingUntil?: true
   clientId?: true
-  apartmentId?: true
+  unitId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -203,7 +203,7 @@ export type DealGroupByOutputType = {
   amount: runtime.Decimal
   bookingUntil: Date | null
   clientId: string
-  apartmentId: string
+  unitId: string
   createdAt: Date
   updatedAt: Date
   _count: DealCountAggregateOutputType | null
@@ -237,11 +237,11 @@ export type DealWhereInput = {
   amount?: Prisma.DecimalFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   bookingUntil?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
   clientId?: Prisma.StringFilter<"Deal"> | string
-  apartmentId?: Prisma.StringFilter<"Deal"> | string
+  unitId?: Prisma.StringFilter<"Deal"> | string
   createdAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
   client?: Prisma.XOR<Prisma.ClientScalarRelationFilter, Prisma.ClientWhereInput>
-  apartment?: Prisma.XOR<Prisma.ApartmentScalarRelationFilter, Prisma.ApartmentWhereInput>
+  unit?: Prisma.XOR<Prisma.UnitScalarRelationFilter, Prisma.UnitWhereInput>
   payments?: Prisma.PaymentListRelationFilter
 }
 
@@ -251,11 +251,11 @@ export type DealOrderByWithRelationInput = {
   amount?: Prisma.SortOrder
   bookingUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   clientId?: Prisma.SortOrder
-  apartmentId?: Prisma.SortOrder
+  unitId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   client?: Prisma.ClientOrderByWithRelationInput
-  apartment?: Prisma.ApartmentOrderByWithRelationInput
+  unit?: Prisma.UnitOrderByWithRelationInput
   payments?: Prisma.PaymentOrderByRelationAggregateInput
 }
 
@@ -268,11 +268,11 @@ export type DealWhereUniqueInput = Prisma.AtLeast<{
   amount?: Prisma.DecimalFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   bookingUntil?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
   clientId?: Prisma.StringFilter<"Deal"> | string
-  apartmentId?: Prisma.StringFilter<"Deal"> | string
+  unitId?: Prisma.StringFilter<"Deal"> | string
   createdAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
   client?: Prisma.XOR<Prisma.ClientScalarRelationFilter, Prisma.ClientWhereInput>
-  apartment?: Prisma.XOR<Prisma.ApartmentScalarRelationFilter, Prisma.ApartmentWhereInput>
+  unit?: Prisma.XOR<Prisma.UnitScalarRelationFilter, Prisma.UnitWhereInput>
   payments?: Prisma.PaymentListRelationFilter
 }, "id">
 
@@ -282,7 +282,7 @@ export type DealOrderByWithAggregationInput = {
   amount?: Prisma.SortOrder
   bookingUntil?: Prisma.SortOrderInput | Prisma.SortOrder
   clientId?: Prisma.SortOrder
-  apartmentId?: Prisma.SortOrder
+  unitId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.DealCountOrderByAggregateInput
@@ -301,7 +301,7 @@ export type DealScalarWhereWithAggregatesInput = {
   amount?: Prisma.DecimalWithAggregatesFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   bookingUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"Deal"> | Date | string | null
   clientId?: Prisma.StringWithAggregatesFilter<"Deal"> | string
-  apartmentId?: Prisma.StringWithAggregatesFilter<"Deal"> | string
+  unitId?: Prisma.StringWithAggregatesFilter<"Deal"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Deal"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Deal"> | Date | string
 }
@@ -314,7 +314,7 @@ export type DealCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   client: Prisma.ClientCreateNestedOneWithoutDealsInput
-  apartment: Prisma.ApartmentCreateNestedOneWithoutDealsInput
+  unit: Prisma.UnitCreateNestedOneWithoutDealsInput
   payments?: Prisma.PaymentCreateNestedManyWithoutDealInput
 }
 
@@ -324,7 +324,7 @@ export type DealUncheckedCreateInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   bookingUntil?: Date | string | null
   clientId: string
-  apartmentId: string
+  unitId: string
   createdAt?: Date | string
   updatedAt?: Date | string
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutDealInput
@@ -338,7 +338,7 @@ export type DealUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.ClientUpdateOneRequiredWithoutDealsNestedInput
-  apartment?: Prisma.ApartmentUpdateOneRequiredWithoutDealsNestedInput
+  unit?: Prisma.UnitUpdateOneRequiredWithoutDealsNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutDealNestedInput
 }
 
@@ -348,7 +348,7 @@ export type DealUncheckedUpdateInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
-  apartmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutDealNestedInput
@@ -360,7 +360,7 @@ export type DealCreateManyInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   bookingUntil?: Date | string | null
   clientId: string
-  apartmentId: string
+  unitId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -380,7 +380,7 @@ export type DealUncheckedUpdateManyInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
-  apartmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -401,7 +401,7 @@ export type DealCountOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   bookingUntil?: Prisma.SortOrder
   clientId?: Prisma.SortOrder
-  apartmentId?: Prisma.SortOrder
+  unitId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -416,7 +416,7 @@ export type DealMaxOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   bookingUntil?: Prisma.SortOrder
   clientId?: Prisma.SortOrder
-  apartmentId?: Prisma.SortOrder
+  unitId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -427,7 +427,7 @@ export type DealMinOrderByAggregateInput = {
   amount?: Prisma.SortOrder
   bookingUntil?: Prisma.SortOrder
   clientId?: Prisma.SortOrder
-  apartmentId?: Prisma.SortOrder
+  unitId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -483,45 +483,45 @@ export type DealUncheckedUpdateManyWithoutClientNestedInput = {
   deleteMany?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
 }
 
-export type DealCreateNestedManyWithoutApartmentInput = {
-  create?: Prisma.XOR<Prisma.DealCreateWithoutApartmentInput, Prisma.DealUncheckedCreateWithoutApartmentInput> | Prisma.DealCreateWithoutApartmentInput[] | Prisma.DealUncheckedCreateWithoutApartmentInput[]
-  connectOrCreate?: Prisma.DealCreateOrConnectWithoutApartmentInput | Prisma.DealCreateOrConnectWithoutApartmentInput[]
-  createMany?: Prisma.DealCreateManyApartmentInputEnvelope
+export type DealCreateNestedManyWithoutUnitInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutUnitInput, Prisma.DealUncheckedCreateWithoutUnitInput> | Prisma.DealCreateWithoutUnitInput[] | Prisma.DealUncheckedCreateWithoutUnitInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutUnitInput | Prisma.DealCreateOrConnectWithoutUnitInput[]
+  createMany?: Prisma.DealCreateManyUnitInputEnvelope
   connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
 }
 
-export type DealUncheckedCreateNestedManyWithoutApartmentInput = {
-  create?: Prisma.XOR<Prisma.DealCreateWithoutApartmentInput, Prisma.DealUncheckedCreateWithoutApartmentInput> | Prisma.DealCreateWithoutApartmentInput[] | Prisma.DealUncheckedCreateWithoutApartmentInput[]
-  connectOrCreate?: Prisma.DealCreateOrConnectWithoutApartmentInput | Prisma.DealCreateOrConnectWithoutApartmentInput[]
-  createMany?: Prisma.DealCreateManyApartmentInputEnvelope
+export type DealUncheckedCreateNestedManyWithoutUnitInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutUnitInput, Prisma.DealUncheckedCreateWithoutUnitInput> | Prisma.DealCreateWithoutUnitInput[] | Prisma.DealUncheckedCreateWithoutUnitInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutUnitInput | Prisma.DealCreateOrConnectWithoutUnitInput[]
+  createMany?: Prisma.DealCreateManyUnitInputEnvelope
   connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
 }
 
-export type DealUpdateManyWithoutApartmentNestedInput = {
-  create?: Prisma.XOR<Prisma.DealCreateWithoutApartmentInput, Prisma.DealUncheckedCreateWithoutApartmentInput> | Prisma.DealCreateWithoutApartmentInput[] | Prisma.DealUncheckedCreateWithoutApartmentInput[]
-  connectOrCreate?: Prisma.DealCreateOrConnectWithoutApartmentInput | Prisma.DealCreateOrConnectWithoutApartmentInput[]
-  upsert?: Prisma.DealUpsertWithWhereUniqueWithoutApartmentInput | Prisma.DealUpsertWithWhereUniqueWithoutApartmentInput[]
-  createMany?: Prisma.DealCreateManyApartmentInputEnvelope
+export type DealUpdateManyWithoutUnitNestedInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutUnitInput, Prisma.DealUncheckedCreateWithoutUnitInput> | Prisma.DealCreateWithoutUnitInput[] | Prisma.DealUncheckedCreateWithoutUnitInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutUnitInput | Prisma.DealCreateOrConnectWithoutUnitInput[]
+  upsert?: Prisma.DealUpsertWithWhereUniqueWithoutUnitInput | Prisma.DealUpsertWithWhereUniqueWithoutUnitInput[]
+  createMany?: Prisma.DealCreateManyUnitInputEnvelope
   set?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
   disconnect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
   delete?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
   connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
-  update?: Prisma.DealUpdateWithWhereUniqueWithoutApartmentInput | Prisma.DealUpdateWithWhereUniqueWithoutApartmentInput[]
-  updateMany?: Prisma.DealUpdateManyWithWhereWithoutApartmentInput | Prisma.DealUpdateManyWithWhereWithoutApartmentInput[]
+  update?: Prisma.DealUpdateWithWhereUniqueWithoutUnitInput | Prisma.DealUpdateWithWhereUniqueWithoutUnitInput[]
+  updateMany?: Prisma.DealUpdateManyWithWhereWithoutUnitInput | Prisma.DealUpdateManyWithWhereWithoutUnitInput[]
   deleteMany?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
 }
 
-export type DealUncheckedUpdateManyWithoutApartmentNestedInput = {
-  create?: Prisma.XOR<Prisma.DealCreateWithoutApartmentInput, Prisma.DealUncheckedCreateWithoutApartmentInput> | Prisma.DealCreateWithoutApartmentInput[] | Prisma.DealUncheckedCreateWithoutApartmentInput[]
-  connectOrCreate?: Prisma.DealCreateOrConnectWithoutApartmentInput | Prisma.DealCreateOrConnectWithoutApartmentInput[]
-  upsert?: Prisma.DealUpsertWithWhereUniqueWithoutApartmentInput | Prisma.DealUpsertWithWhereUniqueWithoutApartmentInput[]
-  createMany?: Prisma.DealCreateManyApartmentInputEnvelope
+export type DealUncheckedUpdateManyWithoutUnitNestedInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutUnitInput, Prisma.DealUncheckedCreateWithoutUnitInput> | Prisma.DealCreateWithoutUnitInput[] | Prisma.DealUncheckedCreateWithoutUnitInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutUnitInput | Prisma.DealCreateOrConnectWithoutUnitInput[]
+  upsert?: Prisma.DealUpsertWithWhereUniqueWithoutUnitInput | Prisma.DealUpsertWithWhereUniqueWithoutUnitInput[]
+  createMany?: Prisma.DealCreateManyUnitInputEnvelope
   set?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
   disconnect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
   delete?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
   connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
-  update?: Prisma.DealUpdateWithWhereUniqueWithoutApartmentInput | Prisma.DealUpdateWithWhereUniqueWithoutApartmentInput[]
-  updateMany?: Prisma.DealUpdateManyWithWhereWithoutApartmentInput | Prisma.DealUpdateManyWithWhereWithoutApartmentInput[]
+  update?: Prisma.DealUpdateWithWhereUniqueWithoutUnitInput | Prisma.DealUpdateWithWhereUniqueWithoutUnitInput[]
+  updateMany?: Prisma.DealUpdateManyWithWhereWithoutUnitInput | Prisma.DealUpdateManyWithWhereWithoutUnitInput[]
   deleteMany?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
 }
 
@@ -554,7 +554,7 @@ export type DealCreateWithoutClientInput = {
   bookingUntil?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  apartment: Prisma.ApartmentCreateNestedOneWithoutDealsInput
+  unit: Prisma.UnitCreateNestedOneWithoutDealsInput
   payments?: Prisma.PaymentCreateNestedManyWithoutDealInput
 }
 
@@ -563,7 +563,7 @@ export type DealUncheckedCreateWithoutClientInput = {
   status?: $Enums.DealStatus
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   bookingUntil?: Date | string | null
-  apartmentId: string
+  unitId: string
   createdAt?: Date | string
   updatedAt?: Date | string
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutDealInput
@@ -604,12 +604,12 @@ export type DealScalarWhereInput = {
   amount?: Prisma.DecimalFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   bookingUntil?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
   clientId?: Prisma.StringFilter<"Deal"> | string
-  apartmentId?: Prisma.StringFilter<"Deal"> | string
+  unitId?: Prisma.StringFilter<"Deal"> | string
   createdAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
 }
 
-export type DealCreateWithoutApartmentInput = {
+export type DealCreateWithoutUnitInput = {
   id?: string
   status?: $Enums.DealStatus
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -620,7 +620,7 @@ export type DealCreateWithoutApartmentInput = {
   payments?: Prisma.PaymentCreateNestedManyWithoutDealInput
 }
 
-export type DealUncheckedCreateWithoutApartmentInput = {
+export type DealUncheckedCreateWithoutUnitInput = {
   id?: string
   status?: $Enums.DealStatus
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -631,30 +631,30 @@ export type DealUncheckedCreateWithoutApartmentInput = {
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutDealInput
 }
 
-export type DealCreateOrConnectWithoutApartmentInput = {
+export type DealCreateOrConnectWithoutUnitInput = {
   where: Prisma.DealWhereUniqueInput
-  create: Prisma.XOR<Prisma.DealCreateWithoutApartmentInput, Prisma.DealUncheckedCreateWithoutApartmentInput>
+  create: Prisma.XOR<Prisma.DealCreateWithoutUnitInput, Prisma.DealUncheckedCreateWithoutUnitInput>
 }
 
-export type DealCreateManyApartmentInputEnvelope = {
-  data: Prisma.DealCreateManyApartmentInput | Prisma.DealCreateManyApartmentInput[]
+export type DealCreateManyUnitInputEnvelope = {
+  data: Prisma.DealCreateManyUnitInput | Prisma.DealCreateManyUnitInput[]
   skipDuplicates?: boolean
 }
 
-export type DealUpsertWithWhereUniqueWithoutApartmentInput = {
+export type DealUpsertWithWhereUniqueWithoutUnitInput = {
   where: Prisma.DealWhereUniqueInput
-  update: Prisma.XOR<Prisma.DealUpdateWithoutApartmentInput, Prisma.DealUncheckedUpdateWithoutApartmentInput>
-  create: Prisma.XOR<Prisma.DealCreateWithoutApartmentInput, Prisma.DealUncheckedCreateWithoutApartmentInput>
+  update: Prisma.XOR<Prisma.DealUpdateWithoutUnitInput, Prisma.DealUncheckedUpdateWithoutUnitInput>
+  create: Prisma.XOR<Prisma.DealCreateWithoutUnitInput, Prisma.DealUncheckedCreateWithoutUnitInput>
 }
 
-export type DealUpdateWithWhereUniqueWithoutApartmentInput = {
+export type DealUpdateWithWhereUniqueWithoutUnitInput = {
   where: Prisma.DealWhereUniqueInput
-  data: Prisma.XOR<Prisma.DealUpdateWithoutApartmentInput, Prisma.DealUncheckedUpdateWithoutApartmentInput>
+  data: Prisma.XOR<Prisma.DealUpdateWithoutUnitInput, Prisma.DealUncheckedUpdateWithoutUnitInput>
 }
 
-export type DealUpdateManyWithWhereWithoutApartmentInput = {
+export type DealUpdateManyWithWhereWithoutUnitInput = {
   where: Prisma.DealScalarWhereInput
-  data: Prisma.XOR<Prisma.DealUpdateManyMutationInput, Prisma.DealUncheckedUpdateManyWithoutApartmentInput>
+  data: Prisma.XOR<Prisma.DealUpdateManyMutationInput, Prisma.DealUncheckedUpdateManyWithoutUnitInput>
 }
 
 export type DealCreateWithoutPaymentsInput = {
@@ -665,7 +665,7 @@ export type DealCreateWithoutPaymentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   client: Prisma.ClientCreateNestedOneWithoutDealsInput
-  apartment: Prisma.ApartmentCreateNestedOneWithoutDealsInput
+  unit: Prisma.UnitCreateNestedOneWithoutDealsInput
 }
 
 export type DealUncheckedCreateWithoutPaymentsInput = {
@@ -674,7 +674,7 @@ export type DealUncheckedCreateWithoutPaymentsInput = {
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   bookingUntil?: Date | string | null
   clientId: string
-  apartmentId: string
+  unitId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -703,7 +703,7 @@ export type DealUpdateWithoutPaymentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   client?: Prisma.ClientUpdateOneRequiredWithoutDealsNestedInput
-  apartment?: Prisma.ApartmentUpdateOneRequiredWithoutDealsNestedInput
+  unit?: Prisma.UnitUpdateOneRequiredWithoutDealsNestedInput
 }
 
 export type DealUncheckedUpdateWithoutPaymentsInput = {
@@ -712,7 +712,7 @@ export type DealUncheckedUpdateWithoutPaymentsInput = {
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
-  apartmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -722,7 +722,7 @@ export type DealCreateManyClientInput = {
   status?: $Enums.DealStatus
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
   bookingUntil?: Date | string | null
-  apartmentId: string
+  unitId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -734,7 +734,7 @@ export type DealUpdateWithoutClientInput = {
   bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  apartment?: Prisma.ApartmentUpdateOneRequiredWithoutDealsNestedInput
+  unit?: Prisma.UnitUpdateOneRequiredWithoutDealsNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutDealNestedInput
 }
 
@@ -743,7 +743,7 @@ export type DealUncheckedUpdateWithoutClientInput = {
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  apartmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutDealNestedInput
@@ -754,12 +754,12 @@ export type DealUncheckedUpdateManyWithoutClientInput = {
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  apartmentId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type DealCreateManyApartmentInput = {
+export type DealCreateManyUnitInput = {
   id?: string
   status?: $Enums.DealStatus
   amount: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -769,7 +769,7 @@ export type DealCreateManyApartmentInput = {
   updatedAt?: Date | string
 }
 
-export type DealUpdateWithoutApartmentInput = {
+export type DealUpdateWithoutUnitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -780,7 +780,7 @@ export type DealUpdateWithoutApartmentInput = {
   payments?: Prisma.PaymentUpdateManyWithoutDealNestedInput
 }
 
-export type DealUncheckedUpdateWithoutApartmentInput = {
+export type DealUncheckedUpdateWithoutUnitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -791,7 +791,7 @@ export type DealUncheckedUpdateWithoutApartmentInput = {
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutDealNestedInput
 }
 
-export type DealUncheckedUpdateManyWithoutApartmentInput = {
+export type DealUncheckedUpdateManyWithoutUnitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -838,11 +838,11 @@ export type DealSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   amount?: boolean
   bookingUntil?: boolean
   clientId?: boolean
-  apartmentId?: boolean
+  unitId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
-  apartment?: boolean | Prisma.ApartmentDefaultArgs<ExtArgs>
+  unit?: boolean | Prisma.UnitDefaultArgs<ExtArgs>
   payments?: boolean | Prisma.Deal$paymentsArgs<ExtArgs>
   _count?: boolean | Prisma.DealCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["deal"]>
@@ -853,11 +853,11 @@ export type DealSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   amount?: boolean
   bookingUntil?: boolean
   clientId?: boolean
-  apartmentId?: boolean
+  unitId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
-  apartment?: boolean | Prisma.ApartmentDefaultArgs<ExtArgs>
+  unit?: boolean | Prisma.UnitDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["deal"]>
 
 export type DealSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -866,11 +866,11 @@ export type DealSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   amount?: boolean
   bookingUntil?: boolean
   clientId?: boolean
-  apartmentId?: boolean
+  unitId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
-  apartment?: boolean | Prisma.ApartmentDefaultArgs<ExtArgs>
+  unit?: boolean | Prisma.UnitDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["deal"]>
 
 export type DealSelectScalar = {
@@ -879,32 +879,32 @@ export type DealSelectScalar = {
   amount?: boolean
   bookingUntil?: boolean
   clientId?: boolean
-  apartmentId?: boolean
+  unitId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type DealOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "status" | "amount" | "bookingUntil" | "clientId" | "apartmentId" | "createdAt" | "updatedAt", ExtArgs["result"]["deal"]>
+export type DealOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "status" | "amount" | "bookingUntil" | "clientId" | "unitId" | "createdAt" | "updatedAt", ExtArgs["result"]["deal"]>
 export type DealInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
-  apartment?: boolean | Prisma.ApartmentDefaultArgs<ExtArgs>
+  unit?: boolean | Prisma.UnitDefaultArgs<ExtArgs>
   payments?: boolean | Prisma.Deal$paymentsArgs<ExtArgs>
   _count?: boolean | Prisma.DealCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DealIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
-  apartment?: boolean | Prisma.ApartmentDefaultArgs<ExtArgs>
+  unit?: boolean | Prisma.UnitDefaultArgs<ExtArgs>
 }
 export type DealIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
-  apartment?: boolean | Prisma.ApartmentDefaultArgs<ExtArgs>
+  unit?: boolean | Prisma.UnitDefaultArgs<ExtArgs>
 }
 
 export type $DealPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Deal"
   objects: {
     client: Prisma.$ClientPayload<ExtArgs>
-    apartment: Prisma.$ApartmentPayload<ExtArgs>
+    unit: Prisma.$UnitPayload<ExtArgs>
     payments: Prisma.$PaymentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -913,7 +913,7 @@ export type $DealPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     amount: runtime.Decimal
     bookingUntil: Date | null
     clientId: string
-    apartmentId: string
+    unitId: string
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["deal"]>
@@ -1311,7 +1311,7 @@ readonly fields: DealFieldRefs;
 export interface Prisma__DealClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   client<T extends Prisma.ClientDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientDefaultArgs<ExtArgs>>): Prisma.Prisma__ClientClient<runtime.Types.Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  apartment<T extends Prisma.ApartmentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ApartmentDefaultArgs<ExtArgs>>): Prisma.Prisma__ApartmentClient<runtime.Types.Result.GetResult<Prisma.$ApartmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  unit<T extends Prisma.UnitDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UnitDefaultArgs<ExtArgs>>): Prisma.Prisma__UnitClient<runtime.Types.Result.GetResult<Prisma.$UnitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   payments<T extends Prisma.Deal$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Deal$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1347,7 +1347,7 @@ export interface DealFieldRefs {
   readonly amount: Prisma.FieldRef<"Deal", 'Decimal'>
   readonly bookingUntil: Prisma.FieldRef<"Deal", 'DateTime'>
   readonly clientId: Prisma.FieldRef<"Deal", 'String'>
-  readonly apartmentId: Prisma.FieldRef<"Deal", 'String'>
+  readonly unitId: Prisma.FieldRef<"Deal", 'String'>
   readonly createdAt: Prisma.FieldRef<"Deal", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Deal", 'DateTime'>
 }

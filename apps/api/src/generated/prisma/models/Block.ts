@@ -20,13 +20,24 @@ export type BlockModel = runtime.Types.Result.DefaultSelection<Prisma.$BlockPayl
 
 export type AggregateBlock = {
   _count: BlockCountAggregateOutputType | null
+  _avg: BlockAvgAggregateOutputType | null
+  _sum: BlockSumAggregateOutputType | null
   _min: BlockMinAggregateOutputType | null
   _max: BlockMaxAggregateOutputType | null
+}
+
+export type BlockAvgAggregateOutputType = {
+  order: number | null
+}
+
+export type BlockSumAggregateOutputType = {
+  order: number | null
 }
 
 export type BlockMinAggregateOutputType = {
   id: string | null
   name: string | null
+  order: number | null
   projectId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -35,6 +46,7 @@ export type BlockMinAggregateOutputType = {
 export type BlockMaxAggregateOutputType = {
   id: string | null
   name: string | null
+  order: number | null
   projectId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -43,6 +55,7 @@ export type BlockMaxAggregateOutputType = {
 export type BlockCountAggregateOutputType = {
   id: number
   name: number
+  order: number
   projectId: number
   createdAt: number
   updatedAt: number
@@ -50,9 +63,18 @@ export type BlockCountAggregateOutputType = {
 }
 
 
+export type BlockAvgAggregateInputType = {
+  order?: true
+}
+
+export type BlockSumAggregateInputType = {
+  order?: true
+}
+
 export type BlockMinAggregateInputType = {
   id?: true
   name?: true
+  order?: true
   projectId?: true
   createdAt?: true
   updatedAt?: true
@@ -61,6 +83,7 @@ export type BlockMinAggregateInputType = {
 export type BlockMaxAggregateInputType = {
   id?: true
   name?: true
+  order?: true
   projectId?: true
   createdAt?: true
   updatedAt?: true
@@ -69,6 +92,7 @@ export type BlockMaxAggregateInputType = {
 export type BlockCountAggregateInputType = {
   id?: true
   name?: true
+  order?: true
   projectId?: true
   createdAt?: true
   updatedAt?: true
@@ -113,6 +137,18 @@ export type BlockAggregateArgs<ExtArgs extends runtime.Types.Extensions.Internal
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: BlockAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: BlockSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: BlockMinAggregateInputType
@@ -143,6 +179,8 @@ export type BlockGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   _count?: BlockCountAggregateInputType | true
+  _avg?: BlockAvgAggregateInputType
+  _sum?: BlockSumAggregateInputType
   _min?: BlockMinAggregateInputType
   _max?: BlockMaxAggregateInputType
 }
@@ -150,10 +188,13 @@ export type BlockGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type BlockGroupByOutputType = {
   id: string
   name: string
+  order: number
   projectId: string
   createdAt: Date
   updatedAt: Date
   _count: BlockCountAggregateOutputType | null
+  _avg: BlockAvgAggregateOutputType | null
+  _sum: BlockSumAggregateOutputType | null
   _min: BlockMinAggregateOutputType | null
   _max: BlockMaxAggregateOutputType | null
 }
@@ -179,21 +220,27 @@ export type BlockWhereInput = {
   NOT?: Prisma.BlockWhereInput | Prisma.BlockWhereInput[]
   id?: Prisma.StringFilter<"Block"> | string
   name?: Prisma.StringFilter<"Block"> | string
+  order?: Prisma.IntFilter<"Block"> | number
   projectId?: Prisma.StringFilter<"Block"> | string
   createdAt?: Prisma.DateTimeFilter<"Block"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Block"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
-  apartments?: Prisma.ApartmentListRelationFilter
+  entrances?: Prisma.EntranceListRelationFilter
+  floors?: Prisma.FloorListRelationFilter
+  units?: Prisma.UnitListRelationFilter
 }
 
 export type BlockOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  order?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   project?: Prisma.ProjectOrderByWithRelationInput
-  apartments?: Prisma.ApartmentOrderByRelationAggregateInput
+  entrances?: Prisma.EntranceOrderByRelationAggregateInput
+  floors?: Prisma.FloorOrderByRelationAggregateInput
+  units?: Prisma.UnitOrderByRelationAggregateInput
 }
 
 export type BlockWhereUniqueInput = Prisma.AtLeast<{
@@ -202,22 +249,28 @@ export type BlockWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.BlockWhereInput[]
   NOT?: Prisma.BlockWhereInput | Prisma.BlockWhereInput[]
   name?: Prisma.StringFilter<"Block"> | string
+  order?: Prisma.IntFilter<"Block"> | number
   projectId?: Prisma.StringFilter<"Block"> | string
   createdAt?: Prisma.DateTimeFilter<"Block"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Block"> | Date | string
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
-  apartments?: Prisma.ApartmentListRelationFilter
+  entrances?: Prisma.EntranceListRelationFilter
+  floors?: Prisma.FloorListRelationFilter
+  units?: Prisma.UnitListRelationFilter
 }, "id">
 
 export type BlockOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  order?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.BlockCountOrderByAggregateInput
+  _avg?: Prisma.BlockAvgOrderByAggregateInput
   _max?: Prisma.BlockMaxOrderByAggregateInput
   _min?: Prisma.BlockMinOrderByAggregateInput
+  _sum?: Prisma.BlockSumOrderByAggregateInput
 }
 
 export type BlockScalarWhereWithAggregatesInput = {
@@ -226,6 +279,7 @@ export type BlockScalarWhereWithAggregatesInput = {
   NOT?: Prisma.BlockScalarWhereWithAggregatesInput | Prisma.BlockScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Block"> | string
   name?: Prisma.StringWithAggregatesFilter<"Block"> | string
+  order?: Prisma.IntWithAggregatesFilter<"Block"> | number
   projectId?: Prisma.StringWithAggregatesFilter<"Block"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Block"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Block"> | Date | string
@@ -234,42 +288,55 @@ export type BlockScalarWhereWithAggregatesInput = {
 export type BlockCreateInput = {
   id?: string
   name: string
+  order?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutBlocksInput
-  apartments?: Prisma.ApartmentCreateNestedManyWithoutBlockInput
+  entrances?: Prisma.EntranceCreateNestedManyWithoutBlockInput
+  floors?: Prisma.FloorCreateNestedManyWithoutBlockInput
+  units?: Prisma.UnitCreateNestedManyWithoutBlockInput
 }
 
 export type BlockUncheckedCreateInput = {
   id?: string
   name: string
+  order?: number
   projectId: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  apartments?: Prisma.ApartmentUncheckedCreateNestedManyWithoutBlockInput
+  entrances?: Prisma.EntranceUncheckedCreateNestedManyWithoutBlockInput
+  floors?: Prisma.FloorUncheckedCreateNestedManyWithoutBlockInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutBlockInput
 }
 
 export type BlockUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutBlocksNestedInput
-  apartments?: Prisma.ApartmentUpdateManyWithoutBlockNestedInput
+  entrances?: Prisma.EntranceUpdateManyWithoutBlockNestedInput
+  floors?: Prisma.FloorUpdateManyWithoutBlockNestedInput
+  units?: Prisma.UnitUpdateManyWithoutBlockNestedInput
 }
 
 export type BlockUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  apartments?: Prisma.ApartmentUncheckedUpdateManyWithoutBlockNestedInput
+  entrances?: Prisma.EntranceUncheckedUpdateManyWithoutBlockNestedInput
+  floors?: Prisma.FloorUncheckedUpdateManyWithoutBlockNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutBlockNestedInput
 }
 
 export type BlockCreateManyInput = {
   id?: string
   name: string
+  order?: number
   projectId: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -278,6 +345,7 @@ export type BlockCreateManyInput = {
 export type BlockUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -285,6 +353,7 @@ export type BlockUpdateManyMutationInput = {
 export type BlockUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -303,14 +372,20 @@ export type BlockOrderByRelationAggregateInput = {
 export type BlockCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  order?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
+export type BlockAvgOrderByAggregateInput = {
+  order?: Prisma.SortOrder
+}
+
 export type BlockMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  order?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -319,14 +394,19 @@ export type BlockMaxOrderByAggregateInput = {
 export type BlockMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  order?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
-export type BlockNullableScalarRelationFilter = {
-  is?: Prisma.BlockWhereInput | null
-  isNot?: Prisma.BlockWhereInput | null
+export type BlockSumOrderByAggregateInput = {
+  order?: Prisma.SortOrder
+}
+
+export type BlockScalarRelationFilter = {
+  is?: Prisma.BlockWhereInput
+  isNot?: Prisma.BlockWhereInput
 }
 
 export type BlockCreateNestedManyWithoutProjectInput = {
@@ -371,36 +451,76 @@ export type BlockUncheckedUpdateManyWithoutProjectNestedInput = {
   deleteMany?: Prisma.BlockScalarWhereInput | Prisma.BlockScalarWhereInput[]
 }
 
-export type BlockCreateNestedOneWithoutApartmentsInput = {
-  create?: Prisma.XOR<Prisma.BlockCreateWithoutApartmentsInput, Prisma.BlockUncheckedCreateWithoutApartmentsInput>
-  connectOrCreate?: Prisma.BlockCreateOrConnectWithoutApartmentsInput
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type BlockCreateNestedOneWithoutEntrancesInput = {
+  create?: Prisma.XOR<Prisma.BlockCreateWithoutEntrancesInput, Prisma.BlockUncheckedCreateWithoutEntrancesInput>
+  connectOrCreate?: Prisma.BlockCreateOrConnectWithoutEntrancesInput
   connect?: Prisma.BlockWhereUniqueInput
 }
 
-export type BlockUpdateOneWithoutApartmentsNestedInput = {
-  create?: Prisma.XOR<Prisma.BlockCreateWithoutApartmentsInput, Prisma.BlockUncheckedCreateWithoutApartmentsInput>
-  connectOrCreate?: Prisma.BlockCreateOrConnectWithoutApartmentsInput
-  upsert?: Prisma.BlockUpsertWithoutApartmentsInput
-  disconnect?: Prisma.BlockWhereInput | boolean
-  delete?: Prisma.BlockWhereInput | boolean
+export type BlockUpdateOneRequiredWithoutEntrancesNestedInput = {
+  create?: Prisma.XOR<Prisma.BlockCreateWithoutEntrancesInput, Prisma.BlockUncheckedCreateWithoutEntrancesInput>
+  connectOrCreate?: Prisma.BlockCreateOrConnectWithoutEntrancesInput
+  upsert?: Prisma.BlockUpsertWithoutEntrancesInput
   connect?: Prisma.BlockWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.BlockUpdateToOneWithWhereWithoutApartmentsInput, Prisma.BlockUpdateWithoutApartmentsInput>, Prisma.BlockUncheckedUpdateWithoutApartmentsInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BlockUpdateToOneWithWhereWithoutEntrancesInput, Prisma.BlockUpdateWithoutEntrancesInput>, Prisma.BlockUncheckedUpdateWithoutEntrancesInput>
+}
+
+export type BlockCreateNestedOneWithoutFloorsInput = {
+  create?: Prisma.XOR<Prisma.BlockCreateWithoutFloorsInput, Prisma.BlockUncheckedCreateWithoutFloorsInput>
+  connectOrCreate?: Prisma.BlockCreateOrConnectWithoutFloorsInput
+  connect?: Prisma.BlockWhereUniqueInput
+}
+
+export type BlockUpdateOneRequiredWithoutFloorsNestedInput = {
+  create?: Prisma.XOR<Prisma.BlockCreateWithoutFloorsInput, Prisma.BlockUncheckedCreateWithoutFloorsInput>
+  connectOrCreate?: Prisma.BlockCreateOrConnectWithoutFloorsInput
+  upsert?: Prisma.BlockUpsertWithoutFloorsInput
+  connect?: Prisma.BlockWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BlockUpdateToOneWithWhereWithoutFloorsInput, Prisma.BlockUpdateWithoutFloorsInput>, Prisma.BlockUncheckedUpdateWithoutFloorsInput>
+}
+
+export type BlockCreateNestedOneWithoutUnitsInput = {
+  create?: Prisma.XOR<Prisma.BlockCreateWithoutUnitsInput, Prisma.BlockUncheckedCreateWithoutUnitsInput>
+  connectOrCreate?: Prisma.BlockCreateOrConnectWithoutUnitsInput
+  connect?: Prisma.BlockWhereUniqueInput
+}
+
+export type BlockUpdateOneRequiredWithoutUnitsNestedInput = {
+  create?: Prisma.XOR<Prisma.BlockCreateWithoutUnitsInput, Prisma.BlockUncheckedCreateWithoutUnitsInput>
+  connectOrCreate?: Prisma.BlockCreateOrConnectWithoutUnitsInput
+  upsert?: Prisma.BlockUpsertWithoutUnitsInput
+  connect?: Prisma.BlockWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.BlockUpdateToOneWithWhereWithoutUnitsInput, Prisma.BlockUpdateWithoutUnitsInput>, Prisma.BlockUncheckedUpdateWithoutUnitsInput>
 }
 
 export type BlockCreateWithoutProjectInput = {
   id?: string
   name: string
+  order?: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  apartments?: Prisma.ApartmentCreateNestedManyWithoutBlockInput
+  entrances?: Prisma.EntranceCreateNestedManyWithoutBlockInput
+  floors?: Prisma.FloorCreateNestedManyWithoutBlockInput
+  units?: Prisma.UnitCreateNestedManyWithoutBlockInput
 }
 
 export type BlockUncheckedCreateWithoutProjectInput = {
   id?: string
   name: string
+  order?: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  apartments?: Prisma.ApartmentUncheckedCreateNestedManyWithoutBlockInput
+  entrances?: Prisma.EntranceUncheckedCreateNestedManyWithoutBlockInput
+  floors?: Prisma.FloorUncheckedCreateNestedManyWithoutBlockInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutBlockInput
 }
 
 export type BlockCreateOrConnectWithoutProjectInput = {
@@ -435,62 +555,196 @@ export type BlockScalarWhereInput = {
   NOT?: Prisma.BlockScalarWhereInput | Prisma.BlockScalarWhereInput[]
   id?: Prisma.StringFilter<"Block"> | string
   name?: Prisma.StringFilter<"Block"> | string
+  order?: Prisma.IntFilter<"Block"> | number
   projectId?: Prisma.StringFilter<"Block"> | string
   createdAt?: Prisma.DateTimeFilter<"Block"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Block"> | Date | string
 }
 
-export type BlockCreateWithoutApartmentsInput = {
+export type BlockCreateWithoutEntrancesInput = {
   id?: string
   name: string
+  order?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   project: Prisma.ProjectCreateNestedOneWithoutBlocksInput
+  floors?: Prisma.FloorCreateNestedManyWithoutBlockInput
+  units?: Prisma.UnitCreateNestedManyWithoutBlockInput
 }
 
-export type BlockUncheckedCreateWithoutApartmentsInput = {
+export type BlockUncheckedCreateWithoutEntrancesInput = {
   id?: string
   name: string
+  order?: number
   projectId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  floors?: Prisma.FloorUncheckedCreateNestedManyWithoutBlockInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutBlockInput
 }
 
-export type BlockCreateOrConnectWithoutApartmentsInput = {
+export type BlockCreateOrConnectWithoutEntrancesInput = {
   where: Prisma.BlockWhereUniqueInput
-  create: Prisma.XOR<Prisma.BlockCreateWithoutApartmentsInput, Prisma.BlockUncheckedCreateWithoutApartmentsInput>
+  create: Prisma.XOR<Prisma.BlockCreateWithoutEntrancesInput, Prisma.BlockUncheckedCreateWithoutEntrancesInput>
 }
 
-export type BlockUpsertWithoutApartmentsInput = {
-  update: Prisma.XOR<Prisma.BlockUpdateWithoutApartmentsInput, Prisma.BlockUncheckedUpdateWithoutApartmentsInput>
-  create: Prisma.XOR<Prisma.BlockCreateWithoutApartmentsInput, Prisma.BlockUncheckedCreateWithoutApartmentsInput>
+export type BlockUpsertWithoutEntrancesInput = {
+  update: Prisma.XOR<Prisma.BlockUpdateWithoutEntrancesInput, Prisma.BlockUncheckedUpdateWithoutEntrancesInput>
+  create: Prisma.XOR<Prisma.BlockCreateWithoutEntrancesInput, Prisma.BlockUncheckedCreateWithoutEntrancesInput>
   where?: Prisma.BlockWhereInput
 }
 
-export type BlockUpdateToOneWithWhereWithoutApartmentsInput = {
+export type BlockUpdateToOneWithWhereWithoutEntrancesInput = {
   where?: Prisma.BlockWhereInput
-  data: Prisma.XOR<Prisma.BlockUpdateWithoutApartmentsInput, Prisma.BlockUncheckedUpdateWithoutApartmentsInput>
+  data: Prisma.XOR<Prisma.BlockUpdateWithoutEntrancesInput, Prisma.BlockUncheckedUpdateWithoutEntrancesInput>
 }
 
-export type BlockUpdateWithoutApartmentsInput = {
+export type BlockUpdateWithoutEntrancesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   project?: Prisma.ProjectUpdateOneRequiredWithoutBlocksNestedInput
+  floors?: Prisma.FloorUpdateManyWithoutBlockNestedInput
+  units?: Prisma.UnitUpdateManyWithoutBlockNestedInput
 }
 
-export type BlockUncheckedUpdateWithoutApartmentsInput = {
+export type BlockUncheckedUpdateWithoutEntrancesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  floors?: Prisma.FloorUncheckedUpdateManyWithoutBlockNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutBlockNestedInput
+}
+
+export type BlockCreateWithoutFloorsInput = {
+  id?: string
+  name: string
+  order?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  project: Prisma.ProjectCreateNestedOneWithoutBlocksInput
+  entrances?: Prisma.EntranceCreateNestedManyWithoutBlockInput
+  units?: Prisma.UnitCreateNestedManyWithoutBlockInput
+}
+
+export type BlockUncheckedCreateWithoutFloorsInput = {
+  id?: string
+  name: string
+  order?: number
+  projectId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  entrances?: Prisma.EntranceUncheckedCreateNestedManyWithoutBlockInput
+  units?: Prisma.UnitUncheckedCreateNestedManyWithoutBlockInput
+}
+
+export type BlockCreateOrConnectWithoutFloorsInput = {
+  where: Prisma.BlockWhereUniqueInput
+  create: Prisma.XOR<Prisma.BlockCreateWithoutFloorsInput, Prisma.BlockUncheckedCreateWithoutFloorsInput>
+}
+
+export type BlockUpsertWithoutFloorsInput = {
+  update: Prisma.XOR<Prisma.BlockUpdateWithoutFloorsInput, Prisma.BlockUncheckedUpdateWithoutFloorsInput>
+  create: Prisma.XOR<Prisma.BlockCreateWithoutFloorsInput, Prisma.BlockUncheckedCreateWithoutFloorsInput>
+  where?: Prisma.BlockWhereInput
+}
+
+export type BlockUpdateToOneWithWhereWithoutFloorsInput = {
+  where?: Prisma.BlockWhereInput
+  data: Prisma.XOR<Prisma.BlockUpdateWithoutFloorsInput, Prisma.BlockUncheckedUpdateWithoutFloorsInput>
+}
+
+export type BlockUpdateWithoutFloorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.ProjectUpdateOneRequiredWithoutBlocksNestedInput
+  entrances?: Prisma.EntranceUpdateManyWithoutBlockNestedInput
+  units?: Prisma.UnitUpdateManyWithoutBlockNestedInput
+}
+
+export type BlockUncheckedUpdateWithoutFloorsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  entrances?: Prisma.EntranceUncheckedUpdateManyWithoutBlockNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutBlockNestedInput
+}
+
+export type BlockCreateWithoutUnitsInput = {
+  id?: string
+  name: string
+  order?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  project: Prisma.ProjectCreateNestedOneWithoutBlocksInput
+  entrances?: Prisma.EntranceCreateNestedManyWithoutBlockInput
+  floors?: Prisma.FloorCreateNestedManyWithoutBlockInput
+}
+
+export type BlockUncheckedCreateWithoutUnitsInput = {
+  id?: string
+  name: string
+  order?: number
+  projectId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  entrances?: Prisma.EntranceUncheckedCreateNestedManyWithoutBlockInput
+  floors?: Prisma.FloorUncheckedCreateNestedManyWithoutBlockInput
+}
+
+export type BlockCreateOrConnectWithoutUnitsInput = {
+  where: Prisma.BlockWhereUniqueInput
+  create: Prisma.XOR<Prisma.BlockCreateWithoutUnitsInput, Prisma.BlockUncheckedCreateWithoutUnitsInput>
+}
+
+export type BlockUpsertWithoutUnitsInput = {
+  update: Prisma.XOR<Prisma.BlockUpdateWithoutUnitsInput, Prisma.BlockUncheckedUpdateWithoutUnitsInput>
+  create: Prisma.XOR<Prisma.BlockCreateWithoutUnitsInput, Prisma.BlockUncheckedCreateWithoutUnitsInput>
+  where?: Prisma.BlockWhereInput
+}
+
+export type BlockUpdateToOneWithWhereWithoutUnitsInput = {
+  where?: Prisma.BlockWhereInput
+  data: Prisma.XOR<Prisma.BlockUpdateWithoutUnitsInput, Prisma.BlockUncheckedUpdateWithoutUnitsInput>
+}
+
+export type BlockUpdateWithoutUnitsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.ProjectUpdateOneRequiredWithoutBlocksNestedInput
+  entrances?: Prisma.EntranceUpdateManyWithoutBlockNestedInput
+  floors?: Prisma.FloorUpdateManyWithoutBlockNestedInput
+}
+
+export type BlockUncheckedUpdateWithoutUnitsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  entrances?: Prisma.EntranceUncheckedUpdateManyWithoutBlockNestedInput
+  floors?: Prisma.FloorUncheckedUpdateManyWithoutBlockNestedInput
 }
 
 export type BlockCreateManyProjectInput = {
   id?: string
   name: string
+  order?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -498,22 +752,29 @@ export type BlockCreateManyProjectInput = {
 export type BlockUpdateWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  apartments?: Prisma.ApartmentUpdateManyWithoutBlockNestedInput
+  entrances?: Prisma.EntranceUpdateManyWithoutBlockNestedInput
+  floors?: Prisma.FloorUpdateManyWithoutBlockNestedInput
+  units?: Prisma.UnitUpdateManyWithoutBlockNestedInput
 }
 
 export type BlockUncheckedUpdateWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  apartments?: Prisma.ApartmentUncheckedUpdateManyWithoutBlockNestedInput
+  entrances?: Prisma.EntranceUncheckedUpdateManyWithoutBlockNestedInput
+  floors?: Prisma.FloorUncheckedUpdateManyWithoutBlockNestedInput
+  units?: Prisma.UnitUncheckedUpdateManyWithoutBlockNestedInput
 }
 
 export type BlockUncheckedUpdateManyWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -524,11 +785,15 @@ export type BlockUncheckedUpdateManyWithoutProjectInput = {
  */
 
 export type BlockCountOutputType = {
-  apartments: number
+  entrances: number
+  floors: number
+  units: number
 }
 
 export type BlockCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  apartments?: boolean | BlockCountOutputTypeCountApartmentsArgs
+  entrances?: boolean | BlockCountOutputTypeCountEntrancesArgs
+  floors?: boolean | BlockCountOutputTypeCountFloorsArgs
+  units?: boolean | BlockCountOutputTypeCountUnitsArgs
 }
 
 /**
@@ -544,25 +809,43 @@ export type BlockCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
 /**
  * BlockCountOutputType without action
  */
-export type BlockCountOutputTypeCountApartmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.ApartmentWhereInput
+export type BlockCountOutputTypeCountEntrancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.EntranceWhereInput
+}
+
+/**
+ * BlockCountOutputType without action
+ */
+export type BlockCountOutputTypeCountFloorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.FloorWhereInput
+}
+
+/**
+ * BlockCountOutputType without action
+ */
+export type BlockCountOutputTypeCountUnitsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UnitWhereInput
 }
 
 
 export type BlockSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  order?: boolean
   projectId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
-  apartments?: boolean | Prisma.Block$apartmentsArgs<ExtArgs>
+  entrances?: boolean | Prisma.Block$entrancesArgs<ExtArgs>
+  floors?: boolean | Prisma.Block$floorsArgs<ExtArgs>
+  units?: boolean | Prisma.Block$unitsArgs<ExtArgs>
   _count?: boolean | Prisma.BlockCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["block"]>
 
 export type BlockSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  order?: boolean
   projectId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -572,6 +855,7 @@ export type BlockSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type BlockSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  order?: boolean
   projectId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -581,15 +865,18 @@ export type BlockSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type BlockSelectScalar = {
   id?: boolean
   name?: boolean
+  order?: boolean
   projectId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type BlockOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "projectId" | "createdAt" | "updatedAt", ExtArgs["result"]["block"]>
+export type BlockOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "order" | "projectId" | "createdAt" | "updatedAt", ExtArgs["result"]["block"]>
 export type BlockInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
-  apartments?: boolean | Prisma.Block$apartmentsArgs<ExtArgs>
+  entrances?: boolean | Prisma.Block$entrancesArgs<ExtArgs>
+  floors?: boolean | Prisma.Block$floorsArgs<ExtArgs>
+  units?: boolean | Prisma.Block$unitsArgs<ExtArgs>
   _count?: boolean | Prisma.BlockCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type BlockIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -603,11 +890,14 @@ export type $BlockPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   name: "Block"
   objects: {
     project: Prisma.$ProjectPayload<ExtArgs>
-    apartments: Prisma.$ApartmentPayload<ExtArgs>[]
+    entrances: Prisma.$EntrancePayload<ExtArgs>[]
+    floors: Prisma.$FloorPayload<ExtArgs>[]
+    units: Prisma.$UnitPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string
+    order: number
     projectId: string
     createdAt: Date
     updatedAt: Date
@@ -1006,7 +1296,9 @@ readonly fields: BlockFieldRefs;
 export interface Prisma__BlockClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   project<T extends Prisma.ProjectDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectDefaultArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  apartments<T extends Prisma.Block$apartmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Block$apartmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApartmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  entrances<T extends Prisma.Block$entrancesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Block$entrancesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EntrancePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  floors<T extends Prisma.Block$floorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Block$floorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FloorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  units<T extends Prisma.Block$unitsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Block$unitsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UnitPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1038,6 +1330,7 @@ export interface Prisma__BlockClient<T, Null = never, ExtArgs extends runtime.Ty
 export interface BlockFieldRefs {
   readonly id: Prisma.FieldRef<"Block", 'String'>
   readonly name: Prisma.FieldRef<"Block", 'String'>
+  readonly order: Prisma.FieldRef<"Block", 'Int'>
   readonly projectId: Prisma.FieldRef<"Block", 'String'>
   readonly createdAt: Prisma.FieldRef<"Block", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Block", 'DateTime'>
@@ -1442,27 +1735,75 @@ export type BlockDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
 }
 
 /**
- * Block.apartments
+ * Block.entrances
  */
-export type Block$apartmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Block$entrancesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Apartment
+   * Select specific fields to fetch from the Entrance
    */
-  select?: Prisma.ApartmentSelect<ExtArgs> | null
+  select?: Prisma.EntranceSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Apartment
+   * Omit specific fields from the Entrance
    */
-  omit?: Prisma.ApartmentOmit<ExtArgs> | null
+  omit?: Prisma.EntranceOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.ApartmentInclude<ExtArgs> | null
-  where?: Prisma.ApartmentWhereInput
-  orderBy?: Prisma.ApartmentOrderByWithRelationInput | Prisma.ApartmentOrderByWithRelationInput[]
-  cursor?: Prisma.ApartmentWhereUniqueInput
+  include?: Prisma.EntranceInclude<ExtArgs> | null
+  where?: Prisma.EntranceWhereInput
+  orderBy?: Prisma.EntranceOrderByWithRelationInput | Prisma.EntranceOrderByWithRelationInput[]
+  cursor?: Prisma.EntranceWhereUniqueInput
   take?: number
   skip?: number
-  distinct?: Prisma.ApartmentScalarFieldEnum | Prisma.ApartmentScalarFieldEnum[]
+  distinct?: Prisma.EntranceScalarFieldEnum | Prisma.EntranceScalarFieldEnum[]
+}
+
+/**
+ * Block.floors
+ */
+export type Block$floorsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Floor
+   */
+  select?: Prisma.FloorSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Floor
+   */
+  omit?: Prisma.FloorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.FloorInclude<ExtArgs> | null
+  where?: Prisma.FloorWhereInput
+  orderBy?: Prisma.FloorOrderByWithRelationInput | Prisma.FloorOrderByWithRelationInput[]
+  cursor?: Prisma.FloorWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.FloorScalarFieldEnum | Prisma.FloorScalarFieldEnum[]
+}
+
+/**
+ * Block.units
+ */
+export type Block$unitsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Unit
+   */
+  select?: Prisma.UnitSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Unit
+   */
+  omit?: Prisma.UnitOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UnitInclude<ExtArgs> | null
+  where?: Prisma.UnitWhereInput
+  orderBy?: Prisma.UnitOrderByWithRelationInput | Prisma.UnitOrderByWithRelationInput[]
+  cursor?: Prisma.UnitWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UnitScalarFieldEnum | Prisma.UnitScalarFieldEnum[]
 }
 
 /**

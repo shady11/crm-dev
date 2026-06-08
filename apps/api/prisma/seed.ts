@@ -1,5 +1,10 @@
 import "dotenv/config";
-import { PrismaClient, UserRole, ApartmentStatus } from "../src/generated/prisma/client";
+import {
+    PrismaClient,
+    UserRole,
+    UnitStatus,
+    UnitType,
+} from "@/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import * as bcrypt from "bcrypt";
 
@@ -21,7 +26,7 @@ async function main() {
         update: {},
         create: {
             id: "local-company-id",
-            name: "BishkekStroy",
+            name: "Bishkek Dev",
             phone: "+996700000000",
             address: "Bishkek",
         },
@@ -53,27 +58,49 @@ async function main() {
     const block = await prisma.block.create({
         data: {
             name: "Блок A",
+            order: 1,
             projectId: project.id,
         },
     });
 
-    for (let floor = 1; floor <= 9; floor++) {
-        for (let number = 1; number <= 6; number++) {
-            await prisma.apartment.create({
+    const entrance = await prisma.entrance.create({
+        data: {
+            name: "Подъезд 1",
+            order: 1,
+            projectId: project.id,
+            blockId: block.id,
+        },
+    });
+
+    for (let floorNumber = 1; floorNumber <= 9; floorNumber++) {
+        const floor = await prisma.floor.create({
+            data: {
+                number: floorNumber,
+                order: floorNumber,
+                projectId: project.id,
+                blockId: block.id,
+                entranceId: entrance.id,
+            },
+        });
+
+        for (let unitIndex = 1; unitIndex <= 6; unitIndex++) {
+            await prisma.unit.create({
                 data: {
-                    number: `${floor}${number.toString().padStart(2, "0")}`,
-                    floor,
-                    rooms: number % 3 === 0 ? 3 : number % 2 === 0 ? 2 : 1,
-                    square: 42 + number * 4,
-                    price: 42000 + number * 3500,
+                    number: `${floorNumber}${unitIndex.toString().padStart(2, "0")}`,
+                    type: UnitType.APARTMENT,
                     status:
-                        number === 2
-                            ? ApartmentStatus.BOOKED
-                            : number === 4
-                                ? ApartmentStatus.SOLD
-                                : ApartmentStatus.AVAILABLE,
+                        unitIndex === 2
+                            ? UnitStatus.BOOKED
+                            : unitIndex === 4
+                                ? UnitStatus.SOLD
+                                : UnitStatus.AVAILABLE,
+                    rooms: unitIndex % 3 === 0 ? 3 : unitIndex % 2 === 0 ? 2 : 1,
+                    square: 42 + unitIndex * 4,
+                    price: 42000 + unitIndex * 3500,
                     projectId: project.id,
                     blockId: block.id,
+                    entranceId: entrance.id,
+                    floorId: floor.id,
                 },
             });
         }

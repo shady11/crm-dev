@@ -57,7 +57,9 @@ export const ModelName = {
   Client: 'Client',
   Project: 'Project',
   Block: 'Block',
-  Apartment: 'Apartment',
+  Entrance: 'Entrance',
+  Floor: 'Floor',
+  Unit: 'Unit',
   Deal: 'Deal',
   Payment: 'Payment'
 } as const
@@ -155,6 +157,7 @@ export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeo
 export const BlockScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  order: 'order',
   projectId: 'projectId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -163,21 +166,50 @@ export const BlockScalarFieldEnum = {
 export type BlockScalarFieldEnum = (typeof BlockScalarFieldEnum)[keyof typeof BlockScalarFieldEnum]
 
 
-export const ApartmentScalarFieldEnum = {
+export const EntranceScalarFieldEnum = {
   id: 'id',
-  number: 'number',
-  floor: 'floor',
-  rooms: 'rooms',
-  square: 'square',
-  price: 'price',
-  status: 'status',
+  name: 'name',
+  order: 'order',
   projectId: 'projectId',
   blockId: 'blockId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
-export type ApartmentScalarFieldEnum = (typeof ApartmentScalarFieldEnum)[keyof typeof ApartmentScalarFieldEnum]
+export type EntranceScalarFieldEnum = (typeof EntranceScalarFieldEnum)[keyof typeof EntranceScalarFieldEnum]
+
+
+export const FloorScalarFieldEnum = {
+  id: 'id',
+  number: 'number',
+  order: 'order',
+  projectId: 'projectId',
+  blockId: 'blockId',
+  entranceId: 'entranceId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type FloorScalarFieldEnum = (typeof FloorScalarFieldEnum)[keyof typeof FloorScalarFieldEnum]
+
+
+export const UnitScalarFieldEnum = {
+  id: 'id',
+  number: 'number',
+  type: 'type',
+  status: 'status',
+  rooms: 'rooms',
+  square: 'square',
+  price: 'price',
+  projectId: 'projectId',
+  blockId: 'blockId',
+  entranceId: 'entranceId',
+  floorId: 'floorId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UnitScalarFieldEnum = (typeof UnitScalarFieldEnum)[keyof typeof UnitScalarFieldEnum]
 
 
 export const DealScalarFieldEnum = {
@@ -186,7 +218,7 @@ export const DealScalarFieldEnum = {
   amount: 'amount',
   bookingUntil: 'bookingUntil',
   clientId: 'clientId',
-  apartmentId: 'apartmentId',
+  unitId: 'unitId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

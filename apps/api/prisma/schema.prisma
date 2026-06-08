@@ -26,12 +26,20 @@ enum LeadStatus {
   REJECTED
 }
 
-enum ApartmentStatus {
+enum UnitType {
+  APARTMENT
+  COMMERCIAL
+  PARKING
+  STORAGE
+}
+
+enum UnitStatus {
   AVAILABLE
   BOOKED
   SOLD
   INSTALLMENT
   MORTGAGE
+  UNAVAILABLE
 }
 
 enum DealStatus {
@@ -131,45 +139,101 @@ model Project {
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  blocks     Block[]
-  apartments Apartment[]
+  blocks Block[]
+  units  Unit[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  entrances Entrance[]
+  floors    Floor[]
 }
 
 model Block {
-  id   String @id @default(uuid())
-  name String
+  id    String @id @default(uuid())
+  name  String
+  order Int    @default(0)
 
   projectId String
   project   Project @relation(fields: [projectId], references: [id])
 
-  apartments Apartment[]
+  entrances Entrance[]
+  floors    Floor[]
+  units     Unit[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model Apartment {
-  id     String          @id @default(uuid())
-  number String
-  floor  Int
-  rooms  Int?
-  square Decimal
-  price  Decimal
-  status ApartmentStatus @default(AVAILABLE)
+model Entrance {
+  id    String @id @default(uuid())
+  name  String
+  order Int    @default(0)
 
   projectId String
   project   Project @relation(fields: [projectId], references: [id])
 
-  blockId String?
-  block   Block?  @relation(fields: [blockId], references: [id])
+  blockId String
+  block   Block  @relation(fields: [blockId], references: [id])
+
+  floors Floor[]
+  units  Unit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([blockId, name])
+}
+
+model Floor {
+  id     String @id @default(uuid())
+  number Int
+  order  Int    @default(0)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  blockId String
+  block   Block  @relation(fields: [blockId], references: [id])
+
+  entranceId String
+  entrance   Entrance @relation(fields: [entranceId], references: [id])
+
+  units Unit[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([entranceId, number])
+}
+
+model Unit {
+  id     String     @id @default(uuid())
+  number String
+  type   UnitType   @default(APARTMENT)
+  status UnitStatus @default(AVAILABLE)
+
+  rooms  Int?
+  square Decimal
+  price  Decimal
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  blockId String
+  block   Block  @relation(fields: [blockId], references: [id])
+
+  entranceId String
+  entrance   Entrance @relation(fields: [entranceId], references: [id])
+
+  floorId String
+  floor   Floor  @relation(fields: [floorId], references: [id])
 
   deals Deal[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([blockId, number])
 }
 
 model Deal {
@@ -181,8 +245,8 @@ model Deal {
   clientId String
   client   Client @relation(fields: [clientId], references: [id])
 
-  apartmentId String
-  apartment   Apartment @relation(fields: [apartmentId], references: [id])
+  unitId String
+  unit   Unit   @relation(fields: [unitId], references: [id])
 
   payments Payment[]
 

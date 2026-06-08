@@ -70,10 +70,20 @@ export type Project = Prisma.ProjectModel
  */
 export type Block = Prisma.BlockModel
 /**
- * Model Apartment
+ * Model Entrance
  * 
  */
-export type Apartment = Prisma.ApartmentModel
+export type Entrance = Prisma.EntranceModel
+/**
+ * Model Floor
+ * 
+ */
+export type Floor = Prisma.FloorModel
+/**
+ * Model Unit
+ * 
+ */
+export type Unit = Prisma.UnitModel
 /**
  * Model Deal
  * 
