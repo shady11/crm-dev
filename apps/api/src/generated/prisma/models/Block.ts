@@ -245,6 +245,7 @@ export type BlockOrderByWithRelationInput = {
 
 export type BlockWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  projectId_name?: Prisma.BlockProjectIdNameCompoundUniqueInput
   AND?: Prisma.BlockWhereInput | Prisma.BlockWhereInput[]
   OR?: Prisma.BlockWhereInput[]
   NOT?: Prisma.BlockWhereInput | Prisma.BlockWhereInput[]
@@ -257,7 +258,7 @@ export type BlockWhereUniqueInput = Prisma.AtLeast<{
   entrances?: Prisma.EntranceListRelationFilter
   floors?: Prisma.FloorListRelationFilter
   units?: Prisma.UnitListRelationFilter
-}, "id">
+}, "id" | "projectId_name">
 
 export type BlockOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -367,6 +368,11 @@ export type BlockListRelationFilter = {
 
 export type BlockOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
+}
+
+export type BlockProjectIdNameCompoundUniqueInput = {
+  projectId: string
+  name: string
 }
 
 export type BlockCountOrderByAggregateInput = {

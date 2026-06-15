@@ -7,11 +7,11 @@ export class HealthController {
 
     @Get()
     async check() {
-        const result = await this.prisma.$queryRaw`SELECT 1 as ok`;
+        await this.prisma.$queryRaw`SELECT 1`;
 
         return {
-            status: "ok1",
-            database: result,
+            status: "ok",
+            database: "ok",
         };
     }
 }

@@ -110,6 +110,11 @@ model Lead {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([companyId, status])
+  @@index([companyId, managerId])
+  @@index([phone])
 }
 
 model Client {
@@ -128,6 +133,9 @@ model Client {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([companyId, phone])
 }
 
 model Project {
@@ -146,6 +154,8 @@ model Project {
   updatedAt DateTime   @updatedAt
   entrances Entrance[]
   floors    Floor[]
+
+  @@index([companyId])
 }
 
 model Block {
@@ -162,6 +172,9 @@ model Block {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@unique([projectId, name])
+  @@index([projectId])
 }
 
 model Entrance {
@@ -182,6 +195,8 @@ model Entrance {
   updatedAt DateTime @updatedAt
 
   @@unique([blockId, name])
+  @@index([blockId])
+  @@index([projectId])
 }
 
 model Floor {
@@ -204,6 +219,9 @@ model Floor {
   updatedAt DateTime @updatedAt
 
   @@unique([entranceId, number])
+  @@index([entranceId])
+  @@index([blockId])
+  @@index([projectId])
 }
 
 model Unit {
@@ -234,6 +252,14 @@ model Unit {
   updatedAt DateTime @updatedAt
 
   @@unique([blockId, number])
+  @@index([projectId])
+  @@index([blockId])
+  @@index([entranceId])
+  @@index([floorId])
+  @@index([status])
+  @@index([type])
+  @@index([blockId, status])
+  @@index([blockId, type])
 }
 
 model Deal {

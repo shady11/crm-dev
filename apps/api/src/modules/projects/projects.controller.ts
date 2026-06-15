@@ -59,4 +59,15 @@ export class ProjectsController {
     remove(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.projectsService.remove(user, id);
     }
+
+    @Roles(
+        UserRole.COMPANY_ADMIN,
+        UserRole.SALES_HEAD,
+        UserRole.SALES_MANAGER,
+        UserRole.FINANCE,
+    )
+    @Get(":id/tree")
+    getTree(@CurrentUser() user: AuthUser, @Param("id") id: string) {
+        return this.projectsService.getTree(user, id);
+    }
 }

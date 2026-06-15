@@ -200,6 +200,63 @@ export class ProjectsService {
         };
     }
 
+    async getTree(user: AuthUser, id: string) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const project = await this.prisma.project.findFirst({
+            where: {
+                id,
+                companyId: user.companyId,
+            },
+            select: {
+                id: true,
+                name: true,
+                address: true,
+                blocks: {
+                    orderBy: [
+                        { order: "asc" },
+                        { name: "asc" },
+                    ],
+                    select: {
+                        id: true,
+                        name: true,
+                        order: true,
+                        entrances: {
+                            orderBy: [
+                                { order: "asc" },
+                                { name: "asc" },
+                            ],
+                            select: {
+                                id: true,
+                                name: true,
+                                order: true,
+                                floors: {
+                                    orderBy: [
+                                        { order: "asc" },
+                                        { number: "asc" },
+                                    ],
+                                    select: {
+                                        id: true,
+                                        number: true,
+                                        order: true,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        if (!project) {
+            throw new NotFoundException("Project not found");
+        }
+
+        return project;
+    }
+
     private async ensureProjectNameIsUniqueInsideCompany(
         name: string,
         companyId: string,
