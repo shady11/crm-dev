@@ -1346,6 +1346,9 @@ export const BlockScalarFieldEnum = {
   name: 'name',
   order: 'order',
   projectId: 'projectId',
+  entrancesCount: 'entrancesCount',
+  floorsCount: 'floorsCount',
+  unitsCount: 'unitsCount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -1386,7 +1389,7 @@ export const UnitScalarFieldEnum = {
   type: 'type',
   status: 'status',
   rooms: 'rooms',
-  square: 'square',
+  area: 'area',
   price: 'price',
   projectId: 'projectId',
   blockId: 'blockId',

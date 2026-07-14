@@ -73,6 +73,12 @@ export class BlocksController {
     }
 
     @Roles(UserRole.COMPANY_ADMIN)
+    @Post("blocks/:id/duplicate")
+    duplicate(@CurrentUser() user: AuthUser, @Param("id") id: string) {
+        return this.blocksService.duplicate(user, id);
+    }
+
+    @Roles(UserRole.COMPANY_ADMIN)
     @Delete("blocks/:id")
     remove(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.blocksService.remove(user, id);

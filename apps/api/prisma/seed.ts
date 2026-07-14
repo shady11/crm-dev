@@ -95,7 +95,7 @@ async function main() {
                                 ? UnitStatus.SOLD
                                 : UnitStatus.AVAILABLE,
                     rooms: unitIndex % 3 === 0 ? 3 : unitIndex % 2 === 0 ? 2 : 1,
-                    square: 42 + unitIndex * 4,
+                    area: 42 + unitIndex * 4,
                     price: 42000 + unitIndex * 3500,
                     projectId: project.id,
                     blockId: block.id,

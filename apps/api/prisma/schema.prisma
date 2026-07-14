@@ -166,6 +166,10 @@ model Block {
   projectId String
   project   Project @relation(fields: [projectId], references: [id])
 
+  entrancesCount Int @default(0)
+  floorsCount    Int @default(0)
+  unitsCount     Int @default(0)
+
   entrances Entrance[]
   floors    Floor[]
   units     Unit[]
@@ -230,9 +234,9 @@ model Unit {
   type   UnitType   @default(APARTMENT)
   status UnitStatus @default(AVAILABLE)
 
-  rooms  Int?
-  square Decimal
-  price  Decimal
+  rooms Int?
+  area  Decimal
+  price Decimal
 
   projectId String
   project   Project @relation(fields: [projectId], references: [id])

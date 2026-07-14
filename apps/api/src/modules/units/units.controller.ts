@@ -21,6 +21,7 @@ import { CreateUnitDto } from "./dto/create-unit.dto";
 import { UpdateUnitDto } from "./dto/update-unit.dto";
 import { QueryUnitsDto } from "./dto/query-units.dto";
 import {UpdateUnitStatusDto} from "@/modules/units/dto/update-unit-status.dto";
+import {CreateUnitsBulkDto} from "@/modules/units/dto/create-units-bulk.dto";
 
 @UseGuards(JwtAuthGuard, CompanyGuard, RolesGuard)
 @Controller()
@@ -74,6 +75,16 @@ export class UnitsController {
         return this.unitsService.create(user, floorId, dto);
     }
 
+    @Roles(UserRole.COMPANY_ADMIN)
+    @Post("floors/:floorId/units/bulk")
+    createBulk(
+        @CurrentUser() user: AuthUser,
+        @Param("floorId") floorId: string,
+        @Body() dto: CreateUnitsBulkDto,
+    ) {
+        return this.unitsService.createBulk(user, floorId, dto);
+    }
+
     @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD)
     @Patch("units/:id")
     update(
@@ -92,6 +103,12 @@ export class UnitsController {
         @Body() dto: UpdateUnitStatusDto,
     ) {
         return this.unitsService.updateStatus(user, id, dto.status);
+    }
+
+    @Roles(UserRole.COMPANY_ADMIN)
+    @Post("units/:id/duplicate")
+    duplicate(@CurrentUser() user: AuthUser, @Param("id") id: string) {
+        return this.unitsService.duplicate(user, id);
     }
 
     @Roles(UserRole.COMPANY_ADMIN)

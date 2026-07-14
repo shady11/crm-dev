@@ -130,7 +130,7 @@ export class ClientsService {
                                 type: true,
                                 status: true,
                                 rooms: true,
-                                square: true,
+                                area: true,
                                 price: true,
                                 floor: {
                                     select: {

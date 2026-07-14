@@ -1,0 +1,59 @@
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Pen } from "lucide-react";
+import { Button } from "@/components/ui/button.tsx";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet.tsx";
+import { updateFloor } from "@/features/floors/api/floors.api.ts";
+import type { Floor } from "@/features/floors/types/floor.types.ts";
+import { FloorForm } from "./floor-form.tsx";
+
+interface EditFloorButtonProps {
+    floor: Floor;
+}
+
+export function EditFloorButton({ floor }: EditFloorButtonProps) {
+    const queryClient = useQueryClient();
+    const [isOpen, setIsOpen] = useState(false);
+
+    const updateFloorMutation = useMutation({
+        mutationFn: (payload: { number: number; order?: number }) =>
+            updateFloor(floor.id, payload),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
+            setIsOpen(false);
+        },
+    });
+
+    return (
+        <>
+            <Button
+                size="icon-sm"
+                variant="secondary"
+                onClick={() => setIsOpen(true)}
+            >
+                <Pen className="size-3" />
+            </Button>
+
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
+                <SheetContent className="sm:max-w-md">
+                    <SheetHeader>
+                        <SheetTitle>Edit floor</SheetTitle>
+                    </SheetHeader>
+                    <FloorForm
+                        key={`floor-${floor.id}-${isOpen ? "open" : "closed"}`}
+                        floor={floor}
+                        errorMessage={
+                            updateFloorMutation.isError
+                                ? "Floor could not be saved. Check the details and try again."
+                                : undefined
+                        }
+                        isSubmitting={updateFloorMutation.isPending}
+                        submitLabel="Save changes"
+                        onCancel={() => setIsOpen(false)}
+                        onSubmit={(payload) => updateFloorMutation.mutate(payload)}
+                    />
+                </SheetContent>
+            </Sheet>
+        </>
+    );
+}

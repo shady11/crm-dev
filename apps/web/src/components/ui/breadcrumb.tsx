@@ -1,122 +1,116 @@
-import * as React from "react"
-import { Slot } from "radix-ui"
+"use client";
 
-import { cn } from "@/lib/utils"
-import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
+import { ark } from "@ark-ui/react/factory";
+import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react";
+import type React from "react";
+import { cn } from "@/lib/utils";
 
-function Breadcrumb({ className, ...props }: React.ComponentProps<"nav">) {
-  return (
-    <nav
-      aria-label="breadcrumb"
-      data-slot="breadcrumb"
-      className={cn(className)}
-      {...props}
-    />
-  )
+interface BreadcrumbProps extends React.ComponentProps<typeof ark.nav> {
+  /**
+   * Accessible label for the breadcrumb navigation landmark.
+   *
+   * @default "Breadcrumb"
+   */
+  "aria-label"?: string;
 }
 
-function BreadcrumbList({ className, ...props }: React.ComponentProps<"ol">) {
+export const Breadcrumb = (props: BreadcrumbProps) => {
+  const { "aria-label": ariaLabel = "Breadcrumb", ...rest } = props;
+
+  return <ark.nav aria-label={ariaLabel} data-slot="breadcrumb" {...rest} />;
+};
+
+export const BreadcrumbList = (props: React.ComponentProps<typeof ark.ol>) => {
+  const { className, ...rest } = props;
+
   return (
-    <ol
-      data-slot="breadcrumb-list"
+    <ark.ol
       className={cn(
-        "flex flex-wrap items-center gap-1.5 text-sm wrap-break-word text-muted-foreground",
+        "flex flex-wrap items-center gap-1.5 sm:gap-2.5",
+        "wrap-break-word text-muted-foreground text-sm",
         className
       )}
-      {...props}
+      data-slot="breadcrumb-list"
+      role="list"
+      {...rest}
     />
-  )
-}
+  );
+};
 
-function BreadcrumbItem({ className, ...props }: React.ComponentProps<"li">) {
+export const BreadcrumbItem = (props: React.ComponentProps<typeof ark.li>) => {
+  const { className, ...rest } = props;
+
   return (
-    <li
+    <ark.li
+      className={cn("inline-flex items-center gap-1.5", className)}
       data-slot="breadcrumb-item"
-      className={cn("inline-flex items-center gap-1", className)}
-      {...props}
+      {...rest}
     />
-  )
-}
+  );
+};
 
-function BreadcrumbLink({
-  asChild,
-  className,
-  ...props
-}: React.ComponentProps<"a"> & {
-  asChild?: boolean
-}) {
-  const Comp = asChild ? Slot.Root : "a"
+export const BreadcrumbLink = (props: React.ComponentProps<typeof ark.a>) => {
+  const { className, ...rest } = props;
 
   return (
-    <Comp
+    <ark.a
+      className={cn(
+        "text-nowrap",
+        "rounded-md border border-transparent",
+        "transition-colors",
+        "hover:text-foreground",
+        "outline-none focus-visible:border-primary focus-visible:ring-[3px] focus-visible:ring-ring/32 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "motion-reduce:transition-none!",
+        className
+      )}
       data-slot="breadcrumb-link"
-      className={cn("transition-colors hover:text-foreground", className)}
-      {...props}
+      {...rest}
     />
-  )
-}
+  );
+};
 
-function BreadcrumbPage({ className, ...props }: React.ComponentProps<"span">) {
+export const BreadcrumbPage = (
+  props: React.ComponentProps<typeof ark.span>
+) => {
+  const { className, ...rest } = props;
+
   return (
-    <span
-      data-slot="breadcrumb-page"
-      role="link"
-      aria-disabled="true"
+    <ark.span
       aria-current="page"
       className={cn("font-normal text-foreground", className)}
-      {...props}
+      data-slot="breadcrumb-page"
+      {...rest}
     />
-  )
-}
+  );
+};
 
-function BreadcrumbSeparator({
-  children,
-  className,
-  ...props
-}: React.ComponentProps<"li">) {
+export const BreadcrumbSeparator = (
+  props: React.ComponentProps<typeof ark.li>
+) => {
+  const { children, className, ...rest } = props;
+
   return (
-    <li
+    <ark.li
+      aria-hidden="true"
+      className={cn("opacity-64 [&_svg]:size-4", className)}
       data-slot="breadcrumb-separator"
       role="presentation"
-      aria-hidden="true"
-      className={cn("[&>svg]:size-3.5", className)}
-      {...props}
+      {...rest}
     >
-      {children ?? (
-        <ChevronRightIcon />
-      )}
-    </li>
-  )
-}
+      {children ?? <ChevronRightIcon />}
+    </ark.li>
+  );
+};
 
-function BreadcrumbEllipsis({
-  className,
-  ...props
-}: React.ComponentProps<"span">) {
-  return (
-    <span
-      data-slot="breadcrumb-ellipsis"
-      role="presentation"
-      aria-hidden="true"
-      className={cn(
-        "flex size-5 items-center justify-center [&>svg]:size-4",
-        className
-      )}
-      {...props}
-    >
-      <MoreHorizontalIcon
-      />
-      <span className="sr-only">More</span>
-    </span>
-  )
-}
-
-export {
-  Breadcrumb,
-  BreadcrumbList,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-  BreadcrumbEllipsis,
-}
+export const BreadcrumbEllipsis = (
+  props: React.ComponentProps<typeof ark.span>
+) => (
+  <ark.span
+    aria-hidden="true"
+    data-slot="breadcrumb-ellipsis"
+    role="presentation"
+    {...props}
+  >
+    <MoreHorizontalIcon className="size-4" />
+  </ark.span>
+);

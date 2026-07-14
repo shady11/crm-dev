@@ -73,6 +73,12 @@ export class EntrancesController {
     }
 
     @Roles(UserRole.COMPANY_ADMIN)
+    @Post("entrances/:id/duplicate")
+    duplicate(@CurrentUser() user: AuthUser, @Param("id") id: string) {
+        return this.entrancesService.duplicate(user, id);
+    }
+
+    @Roles(UserRole.COMPANY_ADMIN)
     @Delete("entrances/:id")
     remove(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.entrancesService.remove(user, id);

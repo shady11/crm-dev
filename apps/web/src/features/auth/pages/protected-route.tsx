@@ -1,31 +1,26 @@
-import { useQuery } from "@tanstack/react-query";
 import { Navigate, Outlet } from "react-router-dom";
-import { getMe } from "../api/auth.api";
 import { authStorage } from "@/lib/auth-storage";
+import { useAuth } from "../hooks/useAuth";
+import {Loader} from "lucide-react";
 
 export function ProtectedRoute() {
     const token = authStorage.getToken();
 
-    const meQuery = useQuery({
-        queryKey: ["auth", "me"],
-        queryFn: getMe,
-        enabled: Boolean(token),
-        retry: false,
-    });
+    const { isLoading, isAuthenticated } = useAuth();
 
     if (!token) {
         return <Navigate to="/login" replace />;
     }
 
-    if (meQuery.isLoading) {
+    if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
-                Loading...
+                <Loader size={32} className="animate-spin"/>
             </div>
         );
     }
 
-    if (meQuery.isError) {
+    if (!isAuthenticated) {
         authStorage.clear();
         return <Navigate to="/login" replace />;
     }

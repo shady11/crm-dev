@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { Navigate, Outlet } from "react-router-dom";
-import { getAccessToken } from "@/lib/auth-storage.ts";
-import { getMe } from "@/features/auth/api/auth-api.ts";
+import { getMe } from "@/features/auth/api/auth.api";
 import { LoadingScreen } from "../shared/loading-screen";
+import {authStorage} from "@/lib/auth-storage.ts";
 
 export function ProtectedRoute() {
-    const token = getAccessToken();
+    const token = authStorage.getToken();
 
     const meQuery = useQuery({
         queryKey: ["auth", "me"],

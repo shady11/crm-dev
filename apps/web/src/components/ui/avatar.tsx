@@ -1,110 +1,157 @@
-import * as React from "react"
-import { Avatar as AvatarPrimitive } from "radix-ui"
+"use client";
 
-import { cn } from "@/lib/utils"
+import { Avatar as ArkAvatar, useAvatarContext } from "@ark-ui/react/avatar";
+import { ark } from "@ark-ui/react/factory";
+import type React from "react";
+import { tv, type VariantProps } from "tailwind-variants";
+import { cn } from "@/lib/utils";
+import {
+  Status,
+  type statusVariants,
+} from "@/components/ui/status";
 
-function Avatar({
-  className,
-  size = "default",
-  ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Root> & {
-  size?: "default" | "sm" | "lg"
-}) {
+export const useAvatar = useAvatarContext;
+
+const avatarVariants = tv({
+  base: [
+    "group/avatar",
+    "relative",
+    "size-8",
+    "inline-flex shrink-0 items-center justify-center",
+    "bg-background",
+    "select-none font-medium text-xs",
+    "rounded-full",
+    "after:absolute after:inset-0 after:rounded-[inherit] after:border after:border-border after:mix-blend-darken dark:after:mix-blend-lighten",
+  ],
+  variants: {
+    size: {
+      sm: "size-6",
+      md: "size-8",
+      lg: "size-10",
+    },
+  },
+  defaultVariants: {
+    size: "md",
+  },
+});
+
+interface AvatarProps
+  extends React.ComponentProps<typeof ArkAvatar.Root>,
+    VariantProps<typeof avatarVariants> {}
+
+export const Avatar = (props: AvatarProps) => {
+  const { size = "md", className, ...rest } = props;
+
   return (
-    <AvatarPrimitive.Root
-      data-slot="avatar"
+    <ArkAvatar.Root
+      className={cn(avatarVariants({ size }), className)}
       data-size={size}
+      data-slot="avatar"
+      {...rest}
+    />
+  );
+};
+
+export const AvatarImage = (
+  props: React.ComponentProps<typeof ArkAvatar.Image>
+) => {
+  const { className, ...rest } = props;
+
+  return (
+    <ArkAvatar.Image
       className={cn(
-        "group/avatar relative flex size-8 shrink-0 rounded-full select-none after:absolute after:inset-0 after:rounded-full after:border after:border-border after:mix-blend-darken data-[size=lg]:size-10 data-[size=sm]:size-6 dark:after:mix-blend-lighten",
+        "size-full",
+        "aspect-square object-cover",
+        "rounded-[inherit]",
         className
       )}
-      {...props}
-    />
-  )
-}
-
-function AvatarImage({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Image>) {
-  return (
-    <AvatarPrimitive.Image
       data-slot="avatar-image"
+      {...rest}
+    />
+  );
+};
+
+export const AvatarFallback = (
+  props: React.ComponentProps<typeof ArkAvatar.Fallback>
+) => {
+  const { className, ...rest } = props;
+
+  return (
+    <ArkAvatar.Fallback
       className={cn(
-        "aspect-square size-full rounded-full object-cover",
+        "size-full",
+        "flex items-center justify-center",
+        "bg-muted",
+        "rounded-[inherit]",
+        "[&_svg]:size-4 group-data-[size=lg]/avatar:[&_svg]:size-4.5 group-data-[size=sm]/avatar:[&_svg]:size-3",
         className
       )}
-      {...props}
-    />
-  )
-}
-
-function AvatarFallback({
-  className,
-  ...props
-}: React.ComponentProps<typeof AvatarPrimitive.Fallback>) {
-  return (
-    <AvatarPrimitive.Fallback
       data-slot="avatar-fallback"
+      {...rest}
+    />
+  );
+};
+
+interface AvatarBadgeProps
+  extends React.ComponentProps<typeof ark.span>,
+    Pick<VariantProps<typeof statusVariants>, "variant"> {}
+
+export const AvatarBadge = (props: AvatarBadgeProps) => {
+  const { variant, className, ...rest } = props;
+
+  return (
+    <Status
       className={cn(
-        "flex size-full items-center justify-center rounded-full bg-muted text-sm text-muted-foreground group-data-[size=sm]/avatar:text-xs",
+        "absolute inset-e-0 bottom-0 z-10",
+        "flex items-center justify-center",
+        "group-data-[size=sm]/avatar:size-2 group-data-[size=sm]/avatar:[&_svg]:hidden",
+        "group-data-[size=default]/avatar:size-2.5 group-data-[size=default]/avatar:[&_svg]:size-2",
+        "group-data-[size=lg]/avatar:size-3 group-data-[size=lg]/avatar:[&_svg]:size-2",
         className
       )}
-      {...props}
-    />
-  )
-}
-
-function AvatarBadge({ className, ...props }: React.ComponentProps<"span">) {
-  return (
-    <span
       data-slot="avatar-badge"
+      variant={variant}
+      {...rest}
+    />
+  );
+};
+
+export const AvatarGroup = (props: React.ComponentProps<typeof ark.div>) => {
+  const { className, ...rest } = props;
+
+  return (
+    <ark.div
       className={cn(
-        "absolute right-0 bottom-0 z-10 inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground bg-blend-color ring-2 ring-background select-none",
-        "group-data-[size=sm]/avatar:size-2 group-data-[size=sm]/avatar:[&>svg]:hidden",
-        "group-data-[size=default]/avatar:size-2.5 group-data-[size=default]/avatar:[&>svg]:size-2",
-        "group-data-[size=lg]/avatar:size-3 group-data-[size=lg]/avatar:[&>svg]:size-2",
+        "flex -space-x-2",
+        "**:data-[slot=avatar]:ring-2 **:data-[slot=avatar]:ring-background",
         className
       )}
-      {...props}
-    />
-  )
-}
-
-function AvatarGroup({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
       data-slot="avatar-group"
-      className={cn(
-        "group/avatar-group flex -space-x-2 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:ring-background",
-        className
-      )}
-      {...props}
+      {...rest}
     />
-  )
-}
+  );
+};
 
-function AvatarGroupCount({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export const AvatarGroupCount = (
+  props: React.ComponentProps<typeof ark.div>
+) => {
+  const { className, ...rest } = props;
+
   return (
-    <div
-      data-slot="avatar-group-count"
+    <ark.div
       className={cn(
-        "relative flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-sm text-muted-foreground ring-2 ring-background group-has-data-[size=lg]/avatar-group:size-10 group-has-data-[size=sm]/avatar-group:size-6 [&>svg]:size-4 group-has-data-[size=lg]/avatar-group:[&>svg]:size-5 group-has-data-[size=sm]/avatar-group:[&>svg]:size-3",
+        "relative",
+        "size-8",
+        "flex shrink-0 items-center justify-center",
+        "bg-muted",
+        "select-none text-muted-foreground text-sm",
+        "rounded-full",
+        "ring-2 ring-background",
+        "[&_svg]:size-4",
         className
       )}
-      {...props}
+      data-slot="avatar-group-count"
+      {...rest}
     />
-  )
-}
-
-export {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-  AvatarGroup,
-  AvatarGroupCount,
-  AvatarBadge,
-}
+  );
+};

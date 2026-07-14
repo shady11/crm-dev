@@ -1,76 +1,128 @@
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+"use client";
 
-import { cn } from "@/lib/utils"
+import { ark } from "@ark-ui/react/factory";
+import type React from "react";
+import { tv, type VariantProps } from "tailwind-variants";
+import { cn } from "@/lib/utils";
 
-const alertVariants = cva(
-  "group/alert relative grid w-full gap-0.5 rounded-lg border px-2.5 py-2 text-left text-sm has-data-[slot=alert-action]:relative has-data-[slot=alert-action]:pr-18 has-[>svg]:grid-cols-[auto_1fr] has-[>svg]:gap-x-2 *:[svg]:row-span-2 *:[svg]:translate-y-0.5 *:[svg]:text-current *:[svg:not([class*='size-'])]:size-4",
-  {
-    variants: {
-      variant: {
-        default: "bg-card text-card-foreground",
-        destructive:
-          "bg-card text-destructive *:data-[slot=alert-description]:text-destructive/90 *:[svg]:text-current",
-      },
+export const alertVariants = tv({
+  base: [
+    "relative",
+    "px-3.5 py-3",
+    "grid w-full items-start gap-x-2 gap-y-0.5",
+    "text-card-foreground text-sm",
+    "rounded-xl border",
+    "has-[>svg]:has-data-[slot=alert-action]:grid-cols-[--spacing(4)_1fr_auto] has-[>svg]:grid-cols-[--spacing(4)_1fr]",
+    "has-[>svg]:gap-x-2 [&_svg]:h-lh [&_svg]:w-4",
+    "has-data-[slot=alert-action]:grid-cols-[1fr_auto]",
+  ],
+  variants: {
+    variant: {
+      default: [
+        "bg-input/4",
+        "[&_svg]:text-muted-foreground",
+        "[&_[data-slot=alert-action]_[data-variant=ghost]]:hover:bg-muted",
+      ],
+      destructive: [
+        "bg-destructive/4",
+        "border-destructive/32",
+        "[&_svg]:text-destructive",
+        "[&_[data-slot=alert-action]_[data-variant=ghost]]:hover:bg-destructive/10",
+      ],
+      info: [
+        "bg-info/4",
+        "border-info/32",
+        "[&_svg]:text-info",
+        "[&_[data-slot=alert-action]_[data-variant=ghost]]:hover:bg-info/10",
+      ],
+      warning: [
+        "bg-warning/4",
+        "border-warning/32",
+        "[&_svg]:text-warning",
+        "[&_[data-slot=alert-action]_[data-variant=ghost]]:hover:bg-warning/10",
+      ],
+      success: [
+        "bg-success/4",
+        "border-success/32",
+        "[&_svg]:text-success",
+        "[&_[data-slot=alert-action]_[data-variant=ghost]]:hover:bg-success/10",
+      ],
     },
-    defaultVariants: {
-      variant: "default",
-    },
-  }
-)
+  },
+  defaultVariants: {
+    variant: "default",
+  },
+});
 
-function Alert({
-  className,
-  variant,
-  ...props
-}: React.ComponentProps<"div"> & VariantProps<typeof alertVariants>) {
+interface AlertProps
+  extends React.ComponentProps<typeof ark.div>,
+    VariantProps<typeof alertVariants> {}
+
+export const Alert = (props: AlertProps) => {
+  const { variant, className, ...rest } = props;
+
   return (
-    <div
-      data-slot="alert"
-      role="alert"
+    <ark.div
       className={cn(alertVariants({ variant }), className)}
-      {...props}
+      data-slot="alert"
+      {...rest}
     />
-  )
-}
+  );
+};
 
-function AlertTitle({ className, ...props }: React.ComponentProps<"div">) {
+export const AlertTitle = (props: React.ComponentProps<typeof ark.div>) => {
+  const { className, ...rest } = props;
+
   return (
-    <div
+    <ark.div
+      className={cn(
+        "font-heading font-medium",
+        "[svg~&]:col-start-2",
+        className
+      )}
       data-slot="alert-title"
+      {...rest}
+    />
+  );
+};
+
+export const AlertDescription = (
+  props: React.ComponentProps<typeof ark.div>
+) => {
+  const { className, ...rest } = props;
+
+  return (
+    <ark.div
       className={cn(
-        "font-medium group-has-[>svg]/alert:col-start-2 [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground",
+        "flex flex-col gap-2.5",
+        "text-muted-foreground",
+        "[svg~&]:col-start-2",
         className
       )}
-      {...props}
-    />
-  )
-}
-
-function AlertDescription({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
-  return (
-    <div
       data-slot="alert-description"
+      {...rest}
+    />
+  );
+};
+
+export const AlertAction = (props: React.ComponentProps<typeof ark.div>) => {
+  const { className, ...rest } = props;
+
+  return (
+    <ark.div
       className={cn(
-        "text-sm text-balance text-muted-foreground md:text-pretty [&_a]:underline [&_a]:underline-offset-3 [&_a]:hover:text-foreground [&_p:not(:last-child)]:mb-4",
+        "flex gap-1",
+        "max-sm:col-start-2 max-sm:mt-2",
+        "sm:[svg~[data-slot=alert-title]~&]:col-start-3",
+        "sm:row-start-1 sm:row-end-3 sm:self-center",
+        "sm:[[data-slot=alert-description]~&]:col-start-2",
+        "sm:[[data-slot=alert-title]~&]:col-start-2",
+        "sm:[svg~&]:col-start-2",
+        "sm:[svg~[data-slot=alert-description]~&]:col-start-3",
         className
       )}
-      {...props}
-    />
-  )
-}
-
-function AlertAction({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
       data-slot="alert-action"
-      className={cn("absolute top-2 right-2", className)}
-      {...props}
+      {...rest}
     />
-  )
-}
-
-export { Alert, AlertTitle, AlertDescription, AlertAction }
+  );
+};

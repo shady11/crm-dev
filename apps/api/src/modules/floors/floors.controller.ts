@@ -20,6 +20,7 @@ import { FloorsService } from "./floors.service";
 import { CreateFloorDto } from "./dto/create-floor.dto";
 import { UpdateFloorDto } from "./dto/update-floor.dto";
 import { QueryFloorsDto } from "./dto/query-floors.dto";
+import {CreateFloorsBulkDto} from "@/modules/floors/dto/create-floors-bulk.dto";
 
 @UseGuards(JwtAuthGuard, CompanyGuard, RolesGuard)
 @Controller()
@@ -63,6 +64,16 @@ export class FloorsController {
     }
 
     @Roles(UserRole.COMPANY_ADMIN)
+    @Post("entrances/:entranceId/floors/bulk")
+    createBulk(
+        @CurrentUser() user: AuthUser,
+        @Param("entranceId") entranceId: string,
+        @Body() dto: CreateFloorsBulkDto,
+    ) {
+        return this.floorsService.createBulk(user, entranceId, dto);
+    }
+
+    @Roles(UserRole.COMPANY_ADMIN)
     @Patch("floors/:id")
     update(
         @CurrentUser() user: AuthUser,
@@ -70,6 +81,12 @@ export class FloorsController {
         @Body() dto: UpdateFloorDto,
     ) {
         return this.floorsService.update(user, id, dto);
+    }
+
+    @Roles(UserRole.COMPANY_ADMIN)
+    @Post("floors/:id/duplicate")
+    duplicate(@CurrentUser() user: AuthUser, @Param("id") id: string) {
+        return this.floorsService.duplicate(user, id);
     }
 
     @Roles(UserRole.COMPANY_ADMIN)

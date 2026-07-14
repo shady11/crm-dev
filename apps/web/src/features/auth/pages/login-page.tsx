@@ -6,7 +6,7 @@ export function LoginPage() {
     const token = authStorage.getToken();
 
     if (token) {
-        return <Navigate to="/app/projects" replace />;
+        return <Navigate to="/projects" replace />;
     }
 
     return (

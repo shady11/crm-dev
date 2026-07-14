@@ -95,6 +95,8 @@ export class ProjectsService {
                     include: {
                         _count: {
                             select: {
+                                entrances: true,
+                                floors: true,
                                 units: true,
                             },
                         },
@@ -102,6 +104,7 @@ export class ProjectsService {
                 },
                 _count: {
                     select: {
+                        blocks: true,
                         units: true,
                     },
                 },
@@ -210,10 +213,7 @@ export class ProjectsService {
                 id,
                 companyId: user.companyId,
             },
-            select: {
-                id: true,
-                name: true,
-                address: true,
+            include: {
                 blocks: {
                     orderBy: [
                         { order: "asc" },
@@ -234,13 +234,18 @@ export class ProjectsService {
                                 order: true,
                                 floors: {
                                     orderBy: [
-                                        { order: "asc" },
-                                        { number: "asc" },
+                                        { order: "desc" },
+                                        { number: "desc" },
                                     ],
                                     select: {
                                         id: true,
                                         number: true,
                                         order: true,
+                                        units: {
+                                            orderBy: {
+                                                number: "asc",
+                                            },
+                                        },
                                     },
                                 },
                             },

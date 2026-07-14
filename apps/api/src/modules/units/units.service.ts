@@ -1,15 +1,11 @@
-import {
-    BadRequestException,
-    ForbiddenException,
-    Injectable,
-    NotFoundException,
-} from "@nestjs/common";
-import { Prisma, UnitStatus } from "@/generated/prisma/client";
-import { PrismaService } from "@/database/prisma.service";
-import { AuthUser } from "@/common/types/auth-user.type";
-import { CreateUnitDto } from "./dto/create-unit.dto";
-import { UpdateUnitDto } from "./dto/update-unit.dto";
-import { QueryUnitsDto } from "./dto/query-units.dto";
+import {BadRequestException, ForbiddenException, Injectable, NotFoundException,} from "@nestjs/common";
+import {Prisma, UnitStatus} from "@/generated/prisma/client";
+import {PrismaService} from "@/database/prisma.service";
+import {AuthUser} from "@/common/types/auth-user.type";
+import {CreateUnitDto} from "./dto/create-unit.dto";
+import {UpdateUnitDto} from "./dto/update-unit.dto";
+import {QueryUnitsDto} from "./dto/query-units.dto";
+import {CreateUnitsBulkDto} from "@/modules/units/dto/create-units-bulk.dto";
 
 @Injectable()
 export class UnitsService {
@@ -347,7 +343,7 @@ export class UnitsService {
                 type: dto.type,
                 status: dto.status ?? UnitStatus.AVAILABLE,
                 rooms: dto.rooms,
-                square: dto.square,
+                area: dto.area,
                 price: dto.price,
                 projectId: floor.projectId,
                 blockId: floor.blockId,
@@ -381,6 +377,33 @@ export class UnitsService {
                 },
             },
         });
+    }
+
+    async createBulk(user: AuthUser, floorId: string, dto: CreateUnitsBulkDto) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const floor = await this.ensureFloorBelongsToCompany(floorId, user.companyId);
+
+        return await Promise.all(
+            dto.units.map((unit) =>
+                this.prisma.unit.create({
+                    data: {
+                        number: unit.number,
+                        type: unit.type,
+                        status: UnitStatus.AVAILABLE,
+                        rooms: unit.rooms,
+                        area: unit.area,
+                        price: unit.price,
+                        projectId: floor.projectId,
+                        blockId: floor.blockId,
+                        entranceId: floor.entranceId,
+                        floorId,
+                    },
+                })
+            )
+        );
     }
 
     async update(user: AuthUser, id: string, dto: UpdateUnitDto) {
@@ -418,7 +441,7 @@ export class UnitsService {
                 type: dto.type,
                 status: dto.status,
                 rooms: dto.rooms,
-                square: dto.square,
+                area: dto.area,
                 price: dto.price,
             },
             include: {
@@ -446,6 +469,51 @@ export class UnitsService {
                         number: true,
                     },
                 },
+            },
+        });
+    }
+
+    async duplicate(user: AuthUser, id: string) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const unit = await this.prisma.unit.findFirst({
+            where: {
+                id,
+                project: {
+                    companyId: user.companyId,
+                },
+            },
+        });
+
+        if (!unit) {
+            throw new NotFoundException("Unit not found");
+        }
+
+        // Get global max unit number
+        const allUnits = await this.prisma.unit.findMany({
+            where: { blockId: unit.blockId },
+            select: { number: true },
+        });
+
+        const maxUnitNumber = allUnits.reduce((max, u) => {
+            const num = parseInt(u.number);
+            return !isNaN(num) && num > max ? num : max;
+        }, 0);
+
+        return this.prisma.unit.create({
+            data: {
+                number: String(maxUnitNumber + 1),
+                type: unit.type,
+                status: UnitStatus.AVAILABLE,
+                rooms: unit.rooms,
+                area: unit.area,
+                price: unit.price,
+                projectId: unit.projectId,
+                blockId: unit.blockId,
+                entranceId: unit.entranceId,
+                floorId: unit.floorId,
             },
         });
     }

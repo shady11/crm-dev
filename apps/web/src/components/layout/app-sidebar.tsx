@@ -1,75 +1,97 @@
+import * as React from "react"
+
+import { NavMain } from "@/components/layout/sidebar/nav-main"
+import { NavUser } from "@/components/layout/sidebar/nav-user"
 import {
-    Building2,
-    LayoutDashboard,
-    Users,
-    UserRound,
-    Boxes,
-} from "lucide-react";
-import { NavLink } from "react-router-dom";
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+    SidebarRail,
+} from "@/components/ui/sidebar.tsx"
+import {useAuth} from "@/features/auth/hooks/useAuth.ts";
+import {Box, Building2, GalleryVerticalEnd, LayoutDashboard, SettingsIcon, UsersRound} from "lucide-react";
 
-const navItems = [
-    {
-        title: "Dashboard",
-        href: "/app/dashboard",
-        icon: LayoutDashboard,
-    },
-    {
-        title: "Leads",
-        href: "/app/leads",
-        icon: UserRound,
-    },
-    {
-        title: "Clients",
-        href: "/app/clients",
-        icon: Users,
-    },
-    {
-        title: "Projects",
-        href: "/app/projects",
-        icon: Building2,
-    },
-    {
-        title: "Units",
-        href: "/app/units",
-        icon: Boxes,
-    },
-];
+const data = {
+    navMain: [
+        {
+            title: "Dashboard",
+            url: "/dashboard",
+            icon: LayoutDashboard,
+        },
+        {
+            title: "Leads",
+            url: "/leads",
+            icon: GalleryVerticalEnd,
+        },
+        {
+            title: "Clients",
+            url: "/clients",
+            icon: UsersRound,
+        },
+        {
+            title: "Projects",
+            url: "/projects",
+            icon: Building2,
+        },
+        {
+            title: "Administration",
+            url: "#",
+            icon: SettingsIcon,
+            items: [
+                {
+                    title: "Users",
+                    url: "/users",
+                },
+                {
+                    title: "Settings",
+                    url: "/settings",
+                },
+            ],
+        },
+    ],
+};
 
-export function AppSidebar() {
+export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+
+    const { user } = useAuth();
+
     return (
-        <aside className="hidden w-64 shrink-0 border-r bg-muted/20 md:block">
-            <div className="h-16 border-b px-6 flex items-center">
-                <div>
-                    <div className="font-semibold">CRM Dev</div>
-                    <div className="text-xs text-muted-foreground">
-                        Real Estate SaaS
-                    </div>
-                </div>
-            </div>
+        <Sidebar collapsible="icon" {...props}>
+            <SidebarHeader>
+                <SidebarMenu>
+                    <SidebarMenuItem>
+                        <SidebarMenuButton size="lg" asChild>
+                            <a href="/dashboard">
+                                <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                                    <Box />
+                                </div>
 
-            <nav className="p-3 space-y-1">
-                {navItems.map((item) => {
-                    const Icon = item.icon;
+                                <div className="grid flex-1 text-left text-sm leading-tight">
+                                    <span className="font-medium">CRM Dev</span>
+                                    <span className="text-xs text-muted-foreground">
+                                        Real Estate CRM
+                                      </span>
+                                </div>
+                            </a>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                </SidebarMenu>
+            </SidebarHeader>
 
-                    return (
-                        <NavLink
-                            key={item.href}
-                            to={item.href}
-                            className={({ isActive }) =>
-                                [
-                                    "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors",
-                                    isActive
-                                        ? "bg-primary text-primary-foreground"
-                                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                                ].join(" ")
-                            }
-                        >
-                            <Icon className="h-4 w-4" />
-                            {item.title}
-                        </NavLink>
-                    );
-                })}
-            </nav>
-        </aside>
-    );
+            <SidebarContent>
+                <NavMain items={data.navMain} />
+            </SidebarContent>
+
+            <SidebarFooter>
+                <NavUser user={{
+                    name: user?.name ?? "Loading...",
+                    email: user?.email ?? "",
+                    avatar: "/"
+                }} />
+            </SidebarFooter>
+
+            <SidebarRail />
+        </Sidebar>
+    )
 }

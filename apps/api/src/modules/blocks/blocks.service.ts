@@ -4,7 +4,7 @@ import {
     Injectable,
     NotFoundException,
 } from "@nestjs/common";
-import { Prisma } from "@/generated/prisma/client";
+import {Prisma, UnitStatus} from "@/generated/prisma/client";
 import { PrismaService } from "@/database/prisma.service";
 import { AuthUser } from "@/common/types/auth-user.type";
 import { CreateBlockDto } from "./dto/create-block.dto";
@@ -143,6 +143,23 @@ export class BlocksService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
+        const lastBlock =
+            await this.prisma.block.findFirst({
+                where: {
+                    projectId,
+                },
+                orderBy: {
+                    order: "desc",
+                },
+                select: {
+                    order: true,
+                },
+            });
+
+        const nextOrder =
+            dto.order ??
+            ((lastBlock?.order ?? 0) + 1);
+
         await this.ensureProjectBelongsToCompany(projectId, user.companyId);
 
         await this.ensureBlockNameIsUniqueInsideProject(dto.name, projectId);
@@ -150,7 +167,7 @@ export class BlocksService {
         return this.prisma.block.create({
             data: {
                 name: dto.name,
-                order: dto.order ?? 0,
+                order: nextOrder,
                 projectId,
             },
         });
@@ -189,6 +206,138 @@ export class BlocksService {
             data: {
                 name: dto.name,
                 order: dto.order,
+            },
+        });
+    }
+
+    async duplicate(user: AuthUser, id: string) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const block = await this.prisma.block.findFirst({
+            where: {
+                id,
+                project: {
+                    companyId: user.companyId,
+                },
+            },
+            include: {
+                entrances: {
+                    include: {
+                        floors: {
+                            include: {
+                                units: true,
+                            },
+                        },
+                    },
+                },
+            },
+        });
+
+        if (!block) {
+            throw new NotFoundException("Block not found");
+        }
+
+        // Find unique name
+        const existingNames = await this.prisma.block.findMany({
+            where: { projectId: block.projectId },
+            select: { name: true },
+        });
+
+        let newName = `${block.name} (copy)`;
+        let counter = 2;
+        while (existingNames.some(b => b.name === newName)) {
+            newName = `${block.name} (copy ${counter})`;
+            counter++;
+        }
+
+        // Get next order
+        const lastBlock = await this.prisma.block.findFirst({
+            where: { projectId: block.projectId },
+            orderBy: { order: "desc" },
+            select: { order: true },
+        });
+        const nextOrder = (lastBlock?.order ?? 0) + 1;
+
+        let unitCounter = 1;
+
+        // First create the block
+        const newBlock = await this.prisma.block.create({
+            data: {
+                name: newName,
+                order: nextOrder,
+                project: {
+                    connect: { id: block.projectId },
+                },
+            },
+        });
+
+        // Then create entrances one by one (or use transactions)
+        for (const entrance of block.entrances) {
+            const newEntrance = await this.prisma.entrance.create({
+                data: {
+                    name: entrance.name,
+                    order: entrance.order,
+                    project: {
+                        connect: { id: block.projectId },
+                    },
+                    block: {
+                        connect: { id: newBlock.id },
+                    },
+                },
+            });
+
+            for (const floor of entrance.floors) {
+                const newFloor = await this.prisma.floor.create({
+                    data: {
+                        number: floor.number,
+                        order: floor.order,
+                        project: {
+                            connect: { id: block.projectId },
+                        },
+                        block: {
+                            connect: { id: newBlock.id },
+                        },
+                        entrance: {
+                            connect: { id: newEntrance.id },
+                        },
+                    },
+                });
+
+                // Create units for this floor
+                if (floor.units.length > 0) {
+                    await this.prisma.unit.createMany({
+                        data: floor.units.map(unit => ({
+                            number: String(unitCounter++),
+                            type: unit.type,
+                            status: UnitStatus.AVAILABLE,
+                            rooms: unit.rooms ?? null,
+                            area: unit.area,
+                            price: unit.price,
+                            projectId: block.projectId,
+                            blockId: newBlock.id,
+                            entranceId: newEntrance.id,
+                            floorId: newFloor.id,
+                        })),
+                    });
+                }
+            }
+        }
+
+        // Return the complete duplicated block
+        return this.prisma.block.findUnique({
+            where: { id: newBlock.id },
+            include: {
+                entrances: {
+                    include: {
+                        floors: {
+                            include: {
+                                units: true,
+                            },
+                        },
+                    },
+                },
             },
         });
     }

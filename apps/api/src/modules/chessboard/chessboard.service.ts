@@ -15,7 +15,7 @@ type ChessboardUnit = {
     type: UnitType;
     status: UnitStatus;
     rooms: number | null;
-    square: Prisma.Decimal;
+    area: Prisma.Decimal;
     price: Prisma.Decimal;
 };
 
@@ -137,7 +137,7 @@ export class ChessboardService {
                 type: true,
                 status: true,
                 rooms: true,
-                square: true,
+                area: true,
                 price: true,
                 block: {
                     select: {
@@ -215,7 +215,7 @@ export class ChessboardService {
                 type: unit.type,
                 status: unit.status,
                 rooms: unit.rooms,
-                square: unit.square,
+                area: unit.area,
                 price: unit.price,
             });
         }

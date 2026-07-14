@@ -31,7 +31,7 @@ export class CreateUnitDto {
     @Type(() => Number)
     @IsNumber()
     @Min(0)
-    square!: number;
+    area!: number;
 
     @Type(() => Number)
     @IsNumber()

@@ -28,13 +28,13 @@ export type AggregateUnit = {
 
 export type UnitAvgAggregateOutputType = {
   rooms: number | null
-  square: runtime.Decimal | null
+  area: runtime.Decimal | null
   price: runtime.Decimal | null
 }
 
 export type UnitSumAggregateOutputType = {
   rooms: number | null
-  square: runtime.Decimal | null
+  area: runtime.Decimal | null
   price: runtime.Decimal | null
 }
 
@@ -44,7 +44,7 @@ export type UnitMinAggregateOutputType = {
   type: $Enums.UnitType | null
   status: $Enums.UnitStatus | null
   rooms: number | null
-  square: runtime.Decimal | null
+  area: runtime.Decimal | null
   price: runtime.Decimal | null
   projectId: string | null
   blockId: string | null
@@ -60,7 +60,7 @@ export type UnitMaxAggregateOutputType = {
   type: $Enums.UnitType | null
   status: $Enums.UnitStatus | null
   rooms: number | null
-  square: runtime.Decimal | null
+  area: runtime.Decimal | null
   price: runtime.Decimal | null
   projectId: string | null
   blockId: string | null
@@ -76,7 +76,7 @@ export type UnitCountAggregateOutputType = {
   type: number
   status: number
   rooms: number
-  square: number
+  area: number
   price: number
   projectId: number
   blockId: number
@@ -90,13 +90,13 @@ export type UnitCountAggregateOutputType = {
 
 export type UnitAvgAggregateInputType = {
   rooms?: true
-  square?: true
+  area?: true
   price?: true
 }
 
 export type UnitSumAggregateInputType = {
   rooms?: true
-  square?: true
+  area?: true
   price?: true
 }
 
@@ -106,7 +106,7 @@ export type UnitMinAggregateInputType = {
   type?: true
   status?: true
   rooms?: true
-  square?: true
+  area?: true
   price?: true
   projectId?: true
   blockId?: true
@@ -122,7 +122,7 @@ export type UnitMaxAggregateInputType = {
   type?: true
   status?: true
   rooms?: true
-  square?: true
+  area?: true
   price?: true
   projectId?: true
   blockId?: true
@@ -138,7 +138,7 @@ export type UnitCountAggregateInputType = {
   type?: true
   status?: true
   rooms?: true
-  square?: true
+  area?: true
   price?: true
   projectId?: true
   blockId?: true
@@ -241,7 +241,7 @@ export type UnitGroupByOutputType = {
   type: $Enums.UnitType
   status: $Enums.UnitStatus
   rooms: number | null
-  square: runtime.Decimal
+  area: runtime.Decimal
   price: runtime.Decimal
   projectId: string
   blockId: string
@@ -280,7 +280,7 @@ export type UnitWhereInput = {
   type?: Prisma.EnumUnitTypeFilter<"Unit"> | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFilter<"Unit"> | $Enums.UnitStatus
   rooms?: Prisma.IntNullableFilter<"Unit"> | number | null
-  square?: Prisma.DecimalFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId?: Prisma.StringFilter<"Unit"> | string
   blockId?: Prisma.StringFilter<"Unit"> | string
@@ -301,7 +301,7 @@ export type UnitOrderByWithRelationInput = {
   type?: Prisma.SortOrder
   status?: Prisma.SortOrder
   rooms?: Prisma.SortOrderInput | Prisma.SortOrder
-  square?: Prisma.SortOrder
+  area?: Prisma.SortOrder
   price?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   blockId?: Prisma.SortOrder
@@ -326,7 +326,7 @@ export type UnitWhereUniqueInput = Prisma.AtLeast<{
   type?: Prisma.EnumUnitTypeFilter<"Unit"> | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFilter<"Unit"> | $Enums.UnitStatus
   rooms?: Prisma.IntNullableFilter<"Unit"> | number | null
-  square?: Prisma.DecimalFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId?: Prisma.StringFilter<"Unit"> | string
   blockId?: Prisma.StringFilter<"Unit"> | string
@@ -347,7 +347,7 @@ export type UnitOrderByWithAggregationInput = {
   type?: Prisma.SortOrder
   status?: Prisma.SortOrder
   rooms?: Prisma.SortOrderInput | Prisma.SortOrder
-  square?: Prisma.SortOrder
+  area?: Prisma.SortOrder
   price?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   blockId?: Prisma.SortOrder
@@ -371,7 +371,7 @@ export type UnitScalarWhereWithAggregatesInput = {
   type?: Prisma.EnumUnitTypeWithAggregatesFilter<"Unit"> | $Enums.UnitType
   status?: Prisma.EnumUnitStatusWithAggregatesFilter<"Unit"> | $Enums.UnitStatus
   rooms?: Prisma.IntNullableWithAggregatesFilter<"Unit"> | number | null
-  square?: Prisma.DecimalWithAggregatesFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalWithAggregatesFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalWithAggregatesFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId?: Prisma.StringWithAggregatesFilter<"Unit"> | string
   blockId?: Prisma.StringWithAggregatesFilter<"Unit"> | string
@@ -387,7 +387,7 @@ export type UnitCreateInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -404,7 +404,7 @@ export type UnitUncheckedCreateInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId: string
   blockId: string
@@ -421,7 +421,7 @@ export type UnitUpdateInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -438,7 +438,7 @@ export type UnitUncheckedUpdateInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   blockId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -455,7 +455,7 @@ export type UnitCreateManyInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId: string
   blockId: string
@@ -471,7 +471,7 @@ export type UnitUpdateManyMutationInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -483,7 +483,7 @@ export type UnitUncheckedUpdateManyInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   blockId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -514,7 +514,7 @@ export type UnitCountOrderByAggregateInput = {
   type?: Prisma.SortOrder
   status?: Prisma.SortOrder
   rooms?: Prisma.SortOrder
-  square?: Prisma.SortOrder
+  area?: Prisma.SortOrder
   price?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   blockId?: Prisma.SortOrder
@@ -526,7 +526,7 @@ export type UnitCountOrderByAggregateInput = {
 
 export type UnitAvgOrderByAggregateInput = {
   rooms?: Prisma.SortOrder
-  square?: Prisma.SortOrder
+  area?: Prisma.SortOrder
   price?: Prisma.SortOrder
 }
 
@@ -536,7 +536,7 @@ export type UnitMaxOrderByAggregateInput = {
   type?: Prisma.SortOrder
   status?: Prisma.SortOrder
   rooms?: Prisma.SortOrder
-  square?: Prisma.SortOrder
+  area?: Prisma.SortOrder
   price?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   blockId?: Prisma.SortOrder
@@ -552,7 +552,7 @@ export type UnitMinOrderByAggregateInput = {
   type?: Prisma.SortOrder
   status?: Prisma.SortOrder
   rooms?: Prisma.SortOrder
-  square?: Prisma.SortOrder
+  area?: Prisma.SortOrder
   price?: Prisma.SortOrder
   projectId?: Prisma.SortOrder
   blockId?: Prisma.SortOrder
@@ -564,7 +564,7 @@ export type UnitMinOrderByAggregateInput = {
 
 export type UnitSumOrderByAggregateInput = {
   rooms?: Prisma.SortOrder
-  square?: Prisma.SortOrder
+  area?: Prisma.SortOrder
   price?: Prisma.SortOrder
 }
 
@@ -785,7 +785,7 @@ export type UnitCreateWithoutProjectInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -801,7 +801,7 @@ export type UnitUncheckedCreateWithoutProjectInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   blockId: string
   entranceId: string
@@ -846,7 +846,7 @@ export type UnitScalarWhereInput = {
   type?: Prisma.EnumUnitTypeFilter<"Unit"> | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFilter<"Unit"> | $Enums.UnitStatus
   rooms?: Prisma.IntNullableFilter<"Unit"> | number | null
-  square?: Prisma.DecimalFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId?: Prisma.StringFilter<"Unit"> | string
   blockId?: Prisma.StringFilter<"Unit"> | string
@@ -862,7 +862,7 @@ export type UnitCreateWithoutBlockInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -878,7 +878,7 @@ export type UnitUncheckedCreateWithoutBlockInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId: string
   entranceId: string
@@ -920,7 +920,7 @@ export type UnitCreateWithoutEntranceInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -936,7 +936,7 @@ export type UnitUncheckedCreateWithoutEntranceInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId: string
   blockId: string
@@ -978,7 +978,7 @@ export type UnitCreateWithoutFloorInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -994,7 +994,7 @@ export type UnitUncheckedCreateWithoutFloorInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId: string
   blockId: string
@@ -1036,7 +1036,7 @@ export type UnitCreateWithoutDealsInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1052,7 +1052,7 @@ export type UnitUncheckedCreateWithoutDealsInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId: string
   blockId: string
@@ -1084,7 +1084,7 @@ export type UnitUpdateWithoutDealsInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1100,7 +1100,7 @@ export type UnitUncheckedUpdateWithoutDealsInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   blockId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1116,7 +1116,7 @@ export type UnitCreateManyProjectInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   blockId: string
   entranceId: string
@@ -1131,7 +1131,7 @@ export type UnitUpdateWithoutProjectInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1147,7 +1147,7 @@ export type UnitUncheckedUpdateWithoutProjectInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   blockId?: Prisma.StringFieldUpdateOperationsInput | string
   entranceId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1163,7 +1163,7 @@ export type UnitUncheckedUpdateManyWithoutProjectInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   blockId?: Prisma.StringFieldUpdateOperationsInput | string
   entranceId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1178,7 +1178,7 @@ export type UnitCreateManyBlockInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId: string
   entranceId: string
@@ -1193,7 +1193,7 @@ export type UnitUpdateWithoutBlockInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1209,7 +1209,7 @@ export type UnitUncheckedUpdateWithoutBlockInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   entranceId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1225,7 +1225,7 @@ export type UnitUncheckedUpdateManyWithoutBlockInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   entranceId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1240,7 +1240,7 @@ export type UnitCreateManyEntranceInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId: string
   blockId: string
@@ -1255,7 +1255,7 @@ export type UnitUpdateWithoutEntranceInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1271,7 +1271,7 @@ export type UnitUncheckedUpdateWithoutEntranceInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   blockId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1287,7 +1287,7 @@ export type UnitUncheckedUpdateManyWithoutEntranceInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   blockId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1302,7 +1302,7 @@ export type UnitCreateManyFloorInput = {
   type?: $Enums.UnitType
   status?: $Enums.UnitStatus
   rooms?: number | null
-  square: runtime.Decimal | runtime.DecimalJsLike | number | string
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId: string
   blockId: string
@@ -1317,7 +1317,7 @@ export type UnitUpdateWithoutFloorInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1333,7 +1333,7 @@ export type UnitUncheckedUpdateWithoutFloorInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   blockId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1349,7 +1349,7 @@ export type UnitUncheckedUpdateManyWithoutFloorInput = {
   type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
   status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
   rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  square?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   blockId?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1395,7 +1395,7 @@ export type UnitSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   type?: boolean
   status?: boolean
   rooms?: boolean
-  square?: boolean
+  area?: boolean
   price?: boolean
   projectId?: boolean
   blockId?: boolean
@@ -1417,7 +1417,7 @@ export type UnitSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   type?: boolean
   status?: boolean
   rooms?: boolean
-  square?: boolean
+  area?: boolean
   price?: boolean
   projectId?: boolean
   blockId?: boolean
@@ -1437,7 +1437,7 @@ export type UnitSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   type?: boolean
   status?: boolean
   rooms?: boolean
-  square?: boolean
+  area?: boolean
   price?: boolean
   projectId?: boolean
   blockId?: boolean
@@ -1457,7 +1457,7 @@ export type UnitSelectScalar = {
   type?: boolean
   status?: boolean
   rooms?: boolean
-  square?: boolean
+  area?: boolean
   price?: boolean
   projectId?: boolean
   blockId?: boolean
@@ -1467,7 +1467,7 @@ export type UnitSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UnitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "number" | "type" | "status" | "rooms" | "square" | "price" | "projectId" | "blockId" | "entranceId" | "floorId" | "createdAt" | "updatedAt", ExtArgs["result"]["unit"]>
+export type UnitOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "number" | "type" | "status" | "rooms" | "area" | "price" | "projectId" | "blockId" | "entranceId" | "floorId" | "createdAt" | "updatedAt", ExtArgs["result"]["unit"]>
 export type UnitInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   block?: boolean | Prisma.BlockDefaultArgs<ExtArgs>
@@ -1504,7 +1504,7 @@ export type $UnitPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     type: $Enums.UnitType
     status: $Enums.UnitStatus
     rooms: number | null
-    square: runtime.Decimal
+    area: runtime.Decimal
     price: runtime.Decimal
     projectId: string
     blockId: string
@@ -1945,7 +1945,7 @@ export interface UnitFieldRefs {
   readonly type: Prisma.FieldRef<"Unit", 'UnitType'>
   readonly status: Prisma.FieldRef<"Unit", 'UnitStatus'>
   readonly rooms: Prisma.FieldRef<"Unit", 'Int'>
-  readonly square: Prisma.FieldRef<"Unit", 'Decimal'>
+  readonly area: Prisma.FieldRef<"Unit", 'Decimal'>
   readonly price: Prisma.FieldRef<"Unit", 'Decimal'>
   readonly projectId: Prisma.FieldRef<"Unit", 'String'>
   readonly blockId: Prisma.FieldRef<"Unit", 'String'>
