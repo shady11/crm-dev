@@ -1,19 +1,22 @@
-import { Outlet } from "react-router-dom";
-import { AppHeader } from "./app-header";
-import { AppSidebar } from "./app-sidebar";
+import {Outlet} from "react-router-dom";
+import {AppHeader} from "./header/app-header.tsx";
+import {AppSidebar} from "./sidebar/app-sidebar.tsx";
 import {SidebarProvider} from "@/components/ui/sidebar.tsx";
+import {ScrollArea} from "@/components/ui/scroll-area.tsx";
 
 export function AppLayout() {
     return (
         <SidebarProvider>
             <AppSidebar />
 
-            <div className="flex min-h-screen flex-1 flex-col">
+            <div className="flex flex-1 flex-col bg-background rounded-lg overflow-hidden">
                 <AppHeader />
 
-                <main className="flex-1 p-6">
-                    <Outlet />
-                </main>
+                <ScrollArea className="h-[calc(100vh-var(--spacing)*16)]">
+                    <div className="flex-1 p-6">
+                        <Outlet />
+                    </div>
+                </ScrollArea>
             </div>
         </SidebarProvider>
     );

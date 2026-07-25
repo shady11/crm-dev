@@ -1,8 +1,8 @@
-import { PrismaService } from "@/database/prisma.service";
+import {PrismaService} from "@/database/prisma.service";
 import {BadRequestException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {QueryClientsDto} from "@/modules/clients/dto/query-clients.dto";
-import { Prisma } from "@/generated/prisma/client";
+import {Prisma} from "@/generated/prisma/client";
 import {CreateClientDto} from "@/modules/clients/dto/create-client.dto";
 import {UpdateClientDto} from "@/modules/clients/dto/update-client.dto";
 
@@ -21,40 +21,20 @@ export class ClientsService {
 
         const where: Prisma.ClientWhereInput = {
             companyId: user.companyId,
+            deletedAt: null,
         };
+
+        if (query.projectId) {
+            where.deals = { some: { projectId: query.projectId } };
+        }
 
         if (query.search) {
             where.OR = [
-                {
-                    fullName: {
-                        contains: query.search,
-                        mode: "insensitive",
-                    },
-                },
-                {
-                    phone: {
-                        contains: query.search,
-                        mode: "insensitive",
-                    },
-                },
-                {
-                    whatsapp: {
-                        contains: query.search,
-                        mode: "insensitive",
-                    },
-                },
-                {
-                    email: {
-                        contains: query.search,
-                        mode: "insensitive",
-                    },
-                },
-                {
-                    passport: {
-                        contains: query.search,
-                        mode: "insensitive",
-                    },
-                },
+                { fullName: { contains: query.search, mode: "insensitive" } },
+                { phone: { contains: query.search, mode: "insensitive" } },
+                { whatsapp: { contains: query.search, mode: "insensitive" } },
+                { email: { contains: query.search, mode: "insensitive" } },
+                { passport: { contains: query.search, mode: "insensitive" } },
             ];
         }
 
@@ -63,31 +43,17 @@ export class ClientsService {
                 where,
                 skip,
                 take: limit,
-                orderBy: {
-                    createdAt: "desc",
-                },
+                orderBy: { createdAt: "desc" },
                 include: {
-                    _count: {
-                        select: {
-                            leads: true,
-                            deals: true,
-                        },
-                    },
+                    _count: { select: { leads: true, deals: true } },
                 },
             }),
-            this.prisma.client.count({
-                where,
-            }),
+            this.prisma.client.count({ where }),
         ]);
 
         return {
             items,
-            meta: {
-                page,
-                limit,
-                total,
-                pages: Math.ceil(total / limit),
-            },
+            meta: { page, limit, total, pages: Math.ceil(total / limit) },
         };
     }
 
@@ -97,32 +63,17 @@ export class ClientsService {
         }
 
         const client = await this.prisma.client.findFirst({
-            where: {
-                id,
-                companyId: user.companyId,
-            },
+            where: { id, companyId: user.companyId, deletedAt: null },
             include: {
                 leads: {
-                    orderBy: {
-                        createdAt: "desc",
-                    },
-                    select: {
-                        id: true,
-                        fullName: true,
-                        phone: true,
-                        source: true,
-                        status: true,
-                        createdAt: true,
-                    },
+                    orderBy: { createdAt: "desc" },
+                    select: { id: true, fullName: true, phone: true, source: true, status: true, createdAt: true },
                 },
                 deals: {
-                    orderBy: {
-                        createdAt: "desc",
-                    },
+                    orderBy: { createdAt: "desc" },
                     select: {
                         id: true,
                         status: true,
-                        amount: true,
                         unit: {
                             select: {
                                 id: true,
@@ -132,30 +83,10 @@ export class ClientsService {
                                 rooms: true,
                                 area: true,
                                 price: true,
-                                floor: {
-                                    select: {
-                                        id: true,
-                                        number: true,
-                                    },
-                                },
-                                entrance: {
-                                    select: {
-                                        id: true,
-                                        name: true,
-                                    },
-                                },
-                                block: {
-                                    select: {
-                                        id: true,
-                                        name: true,
-                                    },
-                                },
-                                project: {
-                                    select: {
-                                        id: true,
-                                        name: true,
-                                    },
-                                },
+                                floor: { select: { id: true, number: true } },
+                                entrance: { select: { id: true, name: true } },
+                                block: { select: { id: true, name: true } },
+                                project: { select: { id: true, name: true } },
                             },
                         },
                         createdAt: true,
@@ -185,6 +116,7 @@ export class ClientsService {
                 whatsapp: dto.whatsapp,
                 email: dto.email,
                 passport: dto.passport,
+                pin: dto.pin,
                 companyId: user.companyId,
             },
         });
@@ -202,15 +134,14 @@ export class ClientsService {
         }
 
         return this.prisma.client.update({
-            where: {
-                id,
-            },
+            where: { id },
             data: {
                 fullName: dto.fullName,
                 phone: dto.phone,
                 whatsapp: dto.whatsapp,
                 email: dto.email,
                 passport: dto.passport,
+                pin: dto.pin,
             },
         });
     }
@@ -221,62 +152,33 @@ export class ClientsService {
         }
 
         const client = await this.prisma.client.findFirst({
-            where: {
-                id,
-                companyId: user.companyId,
-            },
-            include: {
-                _count: {
-                    select: {
-                        deals: true,
-                        leads: true,
-                    },
-                },
-            },
+            where: { id, companyId: user.companyId, deletedAt: null },
         });
 
         if (!client) {
             throw new NotFoundException("Client not found");
         }
 
-        if (client._count.deals > 0) {
-            throw new BadRequestException(
-                "Client has deals and cannot be deleted",
-            );
-        }
-
-        await this.prisma.client.delete({
-            where: {
-                id,
-            },
+        await this.prisma.client.update({
+            where: { id },
+            data: { deletedAt: new Date() },
         });
 
-        return {
-            success: true,
-        };
+        return { success: true };
     }
 
-    private async ensurePhoneIsUniqueInsideCompany(
-        phone: string,
-        companyId: string,
-        exceptClientId?: string,
-    ) {
+    private async ensurePhoneIsUniqueInsideCompany(phone: string, companyId: string, exceptClientId?: string) {
         const existingClient = await this.prisma.client.findFirst({
             where: {
                 phone,
                 companyId,
-                id: exceptClientId
-                    ? {
-                        not: exceptClientId,
-                    }
-                    : undefined,
+                deletedAt: null,
+                id: exceptClientId ? { not: exceptClientId } : undefined,
             },
         });
 
         if (existingClient) {
-            throw new BadRequestException(
-                "Client with this phone already exists",
-            );
+            throw new BadRequestException("Client with this phone already exists");
         }
     }
 }

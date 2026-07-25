@@ -23,15 +23,27 @@ export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 export const LeadStatus = {
   NEW: 'NEW',
   CONTACTED: 'CONTACTED',
-  MEETING_SCHEDULED: 'MEETING_SCHEDULED',
+  QUALIFIED: 'QUALIFIED',
+  MEETING: 'MEETING',
   NEGOTIATION: 'NEGOTIATION',
-  BOOKING: 'BOOKING',
-  CONTRACT: 'CONTRACT',
-  SOLD: 'SOLD',
-  REJECTED: 'REJECTED'
+  CONVERTED: 'CONVERTED',
+  LOST: 'LOST'
 } as const
 
 export type LeadStatus = (typeof LeadStatus)[keyof typeof LeadStatus]
+
+
+export const ProjectStatus = {
+  DRAFT: 'DRAFT',
+  PLANNING: 'PLANNING',
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  SOLDOUT: 'SOLDOUT',
+  COMPLETED: 'COMPLETED',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus]
 
 
 export const UnitType = {
@@ -46,10 +58,8 @@ export type UnitType = (typeof UnitType)[keyof typeof UnitType]
 
 export const UnitStatus = {
   AVAILABLE: 'AVAILABLE',
-  BOOKED: 'BOOKED',
+  RESERVED: 'RESERVED',
   SOLD: 'SOLD',
-  INSTALLMENT: 'INSTALLMENT',
-  MORTGAGE: 'MORTGAGE',
   UNAVAILABLE: 'UNAVAILABLE'
 } as const
 
@@ -57,8 +67,8 @@ export type UnitStatus = (typeof UnitStatus)[keyof typeof UnitStatus]
 
 
 export const DealStatus = {
-  BOOKED: 'BOOKED',
-  CONTRACT: 'CONTRACT',
+  RESERVED: 'RESERVED',
+  CONTRACT_SIGNED: 'CONTRACT_SIGNED',
   ACTIVE: 'ACTIVE',
   COMPLETED: 'COMPLETED',
   CANCELLED: 'CANCELLED'
@@ -77,3 +87,113 @@ export const PaymentMethod = {
 } as const
 
 export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
+
+
+export const FinancingType = {
+  CASH: 'CASH',
+  INSTALLMENT: 'INSTALLMENT',
+  MORTGAGE: 'MORTGAGE'
+} as const
+
+export type FinancingType = (typeof FinancingType)[keyof typeof FinancingType]
+
+
+export const PaymentType = {
+  DEPOSIT: 'DEPOSIT',
+  INSTALLMENT: 'INSTALLMENT',
+  FINAL: 'FINAL',
+  REFUND: 'REFUND'
+} as const
+
+export type PaymentType = (typeof PaymentType)[keyof typeof PaymentType]
+
+
+export const PaymentScheduleStatus = {
+  PENDING: 'PENDING',
+  PARTIAL: 'PARTIAL',
+  PAID: 'PAID',
+  OVERDUE: 'OVERDUE'
+} as const
+
+export type PaymentScheduleStatus = (typeof PaymentScheduleStatus)[keyof typeof PaymentScheduleStatus]
+
+
+export const ActivityType = {
+  LEAD_CREATED: 'LEAD_CREATED',
+  LEAD_UPDATED: 'LEAD_UPDATED',
+  CLIENT_CREATED: 'CLIENT_CREATED',
+  CLIENT_UPDATED: 'CLIENT_UPDATED',
+  DEAL_CREATED: 'DEAL_CREATED',
+  DEAL_UPDATED: 'DEAL_UPDATED',
+  UNIT_RESERVED: 'UNIT_RESERVED',
+  RESERVATION_EXTENDED: 'RESERVATION_EXTENDED',
+  RESERVATION_CANCELLED: 'RESERVATION_CANCELLED',
+  CONTRACT_SIGNED: 'CONTRACT_SIGNED',
+  PAYMENT_RECEIVED: 'PAYMENT_RECEIVED',
+  PAYMENT_REFUNDED: 'PAYMENT_REFUNDED',
+  NOTE_ADDED: 'NOTE_ADDED',
+  TASK_CREATED: 'TASK_CREATED',
+  TASK_COMPLETED: 'TASK_COMPLETED',
+  CALL: 'CALL',
+  MEETING: 'MEETING',
+  EMAIL: 'EMAIL'
+} as const
+
+export type ActivityType = (typeof ActivityType)[keyof typeof ActivityType]
+
+
+export const ActivityAction = {
+  CREATED: 'CREATED',
+  UPDATED: 'UPDATED',
+  DELETED: 'DELETED',
+  RESERVED_UNIT: 'RESERVED_UNIT',
+  CANCELLED_RESERVATION: 'CANCELLED_RESERVATION',
+  CREATED_DEAL: 'CREATED_DEAL',
+  UPDATED_DEAL: 'UPDATED_DEAL',
+  CHANGED_DEAL_STATUS: 'CHANGED_DEAL_STATUS',
+  CREATED_PAYMENT: 'CREATED_PAYMENT',
+  RECEIVED_PAYMENT: 'RECEIVED_PAYMENT',
+  GENERATED_CONTRACT: 'GENERATED_CONTRACT',
+  CREATED_TASK: 'CREATED_TASK',
+  COMPLETED_TASK: 'COMPLETED_TASK',
+  NOTE_ADDED: 'NOTE_ADDED'
+} as const
+
+export type ActivityAction = (typeof ActivityAction)[keyof typeof ActivityAction]
+
+
+export const TaskStatus = {
+  TODO: 'TODO',
+  IN_PROGRESS: 'IN_PROGRESS',
+  DONE: 'DONE',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
+
+
+export const DocumentOwnerType = {
+  LEAD: 'LEAD',
+  CLIENT: 'CLIENT',
+  DEAL: 'DEAL',
+  PROJECT: 'PROJECT',
+  UNIT: 'UNIT'
+} as const
+
+export type DocumentOwnerType = (typeof DocumentOwnerType)[keyof typeof DocumentOwnerType]
+
+
+export const DocumentType = {
+  PASSPORT: 'PASSPORT',
+  CONTRACT: 'CONTRACT',
+  RESERVATION: 'RESERVATION',
+  PAYMENT_RECEIPT: 'PAYMENT_RECEIPT',
+  PAYMENT_SCHEDULE: 'PAYMENT_SCHEDULE',
+  INVOICE: 'INVOICE',
+  AGREEMENT: 'AGREEMENT',
+  POWER_OF_ATTORNEY: 'POWER_OF_ATTORNEY',
+  FLOOR_PLAN: 'FLOOR_PLAN',
+  OTHER: 'OTHER'
+} as const
+
+export type DocumentType = (typeof DocumentType)[keyof typeof DocumentType]

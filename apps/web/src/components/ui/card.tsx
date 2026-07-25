@@ -1,6 +1,6 @@
-import { ark } from "@ark-ui/react/factory";
-import { tv, type VariantProps } from "tailwind-variants";
-import { cn } from "@/lib/utils";
+import {ark} from "@ark-ui/react/factory";
+import {tv, type VariantProps} from "tailwind-variants";
+import {cn} from "@/lib/utils";
 
 export const Card = (props: React.ComponentProps<typeof ark.div>) => {
   const { className, ...rest } = props;
@@ -15,7 +15,7 @@ export const Card = (props: React.ComponentProps<typeof ark.div>) => {
         "bg-card",
         "text-foreground",
         "has-data-[variant=image]:pt-0 has-data-[slot=card-footer]:pb-0",
-        "rounded-xl border shadow-xs/5",
+        "rounded-lg border shadow-none",
         className
       )}
       data-slot="card"

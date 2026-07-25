@@ -27,87 +27,187 @@ export type AggregateDeal = {
 }
 
 export type DealAvgAggregateOutputType = {
-  amount: runtime.Decimal | null
+  listPrice: runtime.Decimal | null
+  salePrice: runtime.Decimal | null
+  discountAmount: runtime.Decimal | null
+  discountPercent: runtime.Decimal | null
+  deposit: runtime.Decimal | null
 }
 
 export type DealSumAggregateOutputType = {
-  amount: runtime.Decimal | null
+  listPrice: runtime.Decimal | null
+  salePrice: runtime.Decimal | null
+  discountAmount: runtime.Decimal | null
+  discountPercent: runtime.Decimal | null
+  deposit: runtime.Decimal | null
 }
 
 export type DealMinAggregateOutputType = {
   id: string | null
-  status: $Enums.DealStatus | null
-  amount: runtime.Decimal | null
-  bookingUntil: Date | null
-  clientId: string | null
+  companyId: string | null
+  projectId: string | null
   unitId: string | null
+  clientId: string | null
+  managerId: string | null
+  status: $Enums.DealStatus | null
+  financingType: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | null
+  salePrice: runtime.Decimal | null
+  discountAmount: runtime.Decimal | null
+  discountPercent: runtime.Decimal | null
+  deposit: runtime.Decimal | null
+  reservedAt: Date | null
+  reservationExpiresAt: Date | null
+  reservedById: string | null
+  contractNumber: string | null
+  contractDate: Date | null
+  note: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  deletedAt: Date | null
 }
 
 export type DealMaxAggregateOutputType = {
   id: string | null
-  status: $Enums.DealStatus | null
-  amount: runtime.Decimal | null
-  bookingUntil: Date | null
-  clientId: string | null
+  companyId: string | null
+  projectId: string | null
   unitId: string | null
+  clientId: string | null
+  managerId: string | null
+  status: $Enums.DealStatus | null
+  financingType: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | null
+  salePrice: runtime.Decimal | null
+  discountAmount: runtime.Decimal | null
+  discountPercent: runtime.Decimal | null
+  deposit: runtime.Decimal | null
+  reservedAt: Date | null
+  reservationExpiresAt: Date | null
+  reservedById: string | null
+  contractNumber: string | null
+  contractDate: Date | null
+  note: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  deletedAt: Date | null
 }
 
 export type DealCountAggregateOutputType = {
   id: number
-  status: number
-  amount: number
-  bookingUntil: number
-  clientId: number
+  companyId: number
+  projectId: number
   unitId: number
+  clientId: number
+  managerId: number
+  status: number
+  financingType: number
+  listPrice: number
+  salePrice: number
+  discountAmount: number
+  discountPercent: number
+  deposit: number
+  reservedAt: number
+  reservationExpiresAt: number
+  reservedById: number
+  contractNumber: number
+  contractDate: number
+  note: number
   createdAt: number
   updatedAt: number
+  deletedAt: number
   _all: number
 }
 
 
 export type DealAvgAggregateInputType = {
-  amount?: true
+  listPrice?: true
+  salePrice?: true
+  discountAmount?: true
+  discountPercent?: true
+  deposit?: true
 }
 
 export type DealSumAggregateInputType = {
-  amount?: true
+  listPrice?: true
+  salePrice?: true
+  discountAmount?: true
+  discountPercent?: true
+  deposit?: true
 }
 
 export type DealMinAggregateInputType = {
   id?: true
-  status?: true
-  amount?: true
-  bookingUntil?: true
-  clientId?: true
+  companyId?: true
+  projectId?: true
   unitId?: true
+  clientId?: true
+  managerId?: true
+  status?: true
+  financingType?: true
+  listPrice?: true
+  salePrice?: true
+  discountAmount?: true
+  discountPercent?: true
+  deposit?: true
+  reservedAt?: true
+  reservationExpiresAt?: true
+  reservedById?: true
+  contractNumber?: true
+  contractDate?: true
+  note?: true
   createdAt?: true
   updatedAt?: true
+  deletedAt?: true
 }
 
 export type DealMaxAggregateInputType = {
   id?: true
-  status?: true
-  amount?: true
-  bookingUntil?: true
-  clientId?: true
+  companyId?: true
+  projectId?: true
   unitId?: true
+  clientId?: true
+  managerId?: true
+  status?: true
+  financingType?: true
+  listPrice?: true
+  salePrice?: true
+  discountAmount?: true
+  discountPercent?: true
+  deposit?: true
+  reservedAt?: true
+  reservationExpiresAt?: true
+  reservedById?: true
+  contractNumber?: true
+  contractDate?: true
+  note?: true
   createdAt?: true
   updatedAt?: true
+  deletedAt?: true
 }
 
 export type DealCountAggregateInputType = {
   id?: true
-  status?: true
-  amount?: true
-  bookingUntil?: true
-  clientId?: true
+  companyId?: true
+  projectId?: true
   unitId?: true
+  clientId?: true
+  managerId?: true
+  status?: true
+  financingType?: true
+  listPrice?: true
+  salePrice?: true
+  discountAmount?: true
+  discountPercent?: true
+  deposit?: true
+  reservedAt?: true
+  reservationExpiresAt?: true
+  reservedById?: true
+  contractNumber?: true
+  contractDate?: true
+  note?: true
   createdAt?: true
   updatedAt?: true
+  deletedAt?: true
   _all?: true
 }
 
@@ -199,13 +299,27 @@ export type DealGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 
 export type DealGroupByOutputType = {
   id: string
-  status: $Enums.DealStatus
-  amount: runtime.Decimal
-  bookingUntil: Date | null
-  clientId: string
+  companyId: string
+  projectId: string
   unitId: string
+  clientId: string
+  managerId: string | null
+  status: $Enums.DealStatus
+  financingType: $Enums.FinancingType | null
+  listPrice: runtime.Decimal
+  salePrice: runtime.Decimal
+  discountAmount: runtime.Decimal | null
+  discountPercent: runtime.Decimal | null
+  deposit: runtime.Decimal | null
+  reservedAt: Date | null
+  reservationExpiresAt: Date | null
+  reservedById: string | null
+  contractNumber: string | null
+  contractDate: Date | null
+  note: string | null
   createdAt: Date
   updatedAt: Date
+  deletedAt: Date | null
   _count: DealCountAggregateOutputType | null
   _avg: DealAvgAggregateOutputType | null
   _sum: DealSumAggregateOutputType | null
@@ -233,30 +347,72 @@ export type DealWhereInput = {
   OR?: Prisma.DealWhereInput[]
   NOT?: Prisma.DealWhereInput | Prisma.DealWhereInput[]
   id?: Prisma.StringFilter<"Deal"> | string
-  status?: Prisma.EnumDealStatusFilter<"Deal"> | $Enums.DealStatus
-  amount?: Prisma.DecimalFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
-  clientId?: Prisma.StringFilter<"Deal"> | string
+  companyId?: Prisma.StringFilter<"Deal"> | string
+  projectId?: Prisma.StringFilter<"Deal"> | string
   unitId?: Prisma.StringFilter<"Deal"> | string
+  clientId?: Prisma.StringFilter<"Deal"> | string
+  managerId?: Prisma.StringNullableFilter<"Deal"> | string | null
+  status?: Prisma.EnumDealStatusFilter<"Deal"> | $Enums.DealStatus
+  financingType?: Prisma.EnumFinancingTypeNullableFilter<"Deal"> | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.DecimalNullableFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.DecimalNullableFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.DecimalNullableFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  reservationExpiresAt?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  reservedById?: Prisma.StringNullableFilter<"Deal"> | string | null
+  contractNumber?: Prisma.StringNullableFilter<"Deal"> | string | null
+  contractDate?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  note?: Prisma.StringNullableFilter<"Deal"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
-  client?: Prisma.XOR<Prisma.ClientScalarRelationFilter, Prisma.ClientWhereInput>
+  deletedAt?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
+  project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
   unit?: Prisma.XOR<Prisma.UnitScalarRelationFilter, Prisma.UnitWhereInput>
+  client?: Prisma.XOR<Prisma.ClientScalarRelationFilter, Prisma.ClientWhereInput>
+  manager?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  reservedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  paymentSchedules?: Prisma.PaymentScheduleListRelationFilter
   payments?: Prisma.PaymentListRelationFilter
+  activities?: Prisma.ActivityListRelationFilter
+  tasks?: Prisma.TaskListRelationFilter
 }
 
 export type DealOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  status?: Prisma.SortOrder
-  amount?: Prisma.SortOrder
-  bookingUntil?: Prisma.SortOrderInput | Prisma.SortOrder
-  clientId?: Prisma.SortOrder
+  companyId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   unitId?: Prisma.SortOrder
+  clientId?: Prisma.SortOrder
+  managerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
+  financingType?: Prisma.SortOrderInput | Prisma.SortOrder
+  listPrice?: Prisma.SortOrder
+  salePrice?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  discountPercent?: Prisma.SortOrderInput | Prisma.SortOrder
+  deposit?: Prisma.SortOrderInput | Prisma.SortOrder
+  reservedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  reservationExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  reservedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  contractNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  contractDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  note?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  client?: Prisma.ClientOrderByWithRelationInput
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  company?: Prisma.CompanyOrderByWithRelationInput
+  project?: Prisma.ProjectOrderByWithRelationInput
   unit?: Prisma.UnitOrderByWithRelationInput
+  client?: Prisma.ClientOrderByWithRelationInput
+  manager?: Prisma.UserOrderByWithRelationInput
+  reservedBy?: Prisma.UserOrderByWithRelationInput
+  paymentSchedules?: Prisma.PaymentScheduleOrderByRelationAggregateInput
   payments?: Prisma.PaymentOrderByRelationAggregateInput
+  activities?: Prisma.ActivityOrderByRelationAggregateInput
+  tasks?: Prisma.TaskOrderByRelationAggregateInput
 }
 
 export type DealWhereUniqueInput = Prisma.AtLeast<{
@@ -264,27 +420,62 @@ export type DealWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.DealWhereInput | Prisma.DealWhereInput[]
   OR?: Prisma.DealWhereInput[]
   NOT?: Prisma.DealWhereInput | Prisma.DealWhereInput[]
-  status?: Prisma.EnumDealStatusFilter<"Deal"> | $Enums.DealStatus
-  amount?: Prisma.DecimalFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
-  clientId?: Prisma.StringFilter<"Deal"> | string
+  companyId?: Prisma.StringFilter<"Deal"> | string
+  projectId?: Prisma.StringFilter<"Deal"> | string
   unitId?: Prisma.StringFilter<"Deal"> | string
+  clientId?: Prisma.StringFilter<"Deal"> | string
+  managerId?: Prisma.StringNullableFilter<"Deal"> | string | null
+  status?: Prisma.EnumDealStatusFilter<"Deal"> | $Enums.DealStatus
+  financingType?: Prisma.EnumFinancingTypeNullableFilter<"Deal"> | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.DecimalNullableFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.DecimalNullableFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.DecimalNullableFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  reservationExpiresAt?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  reservedById?: Prisma.StringNullableFilter<"Deal"> | string | null
+  contractNumber?: Prisma.StringNullableFilter<"Deal"> | string | null
+  contractDate?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  note?: Prisma.StringNullableFilter<"Deal"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
-  client?: Prisma.XOR<Prisma.ClientScalarRelationFilter, Prisma.ClientWhereInput>
+  deletedAt?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
+  project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
   unit?: Prisma.XOR<Prisma.UnitScalarRelationFilter, Prisma.UnitWhereInput>
+  client?: Prisma.XOR<Prisma.ClientScalarRelationFilter, Prisma.ClientWhereInput>
+  manager?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  reservedBy?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  paymentSchedules?: Prisma.PaymentScheduleListRelationFilter
   payments?: Prisma.PaymentListRelationFilter
+  activities?: Prisma.ActivityListRelationFilter
+  tasks?: Prisma.TaskListRelationFilter
 }, "id">
 
 export type DealOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  status?: Prisma.SortOrder
-  amount?: Prisma.SortOrder
-  bookingUntil?: Prisma.SortOrderInput | Prisma.SortOrder
-  clientId?: Prisma.SortOrder
+  companyId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   unitId?: Prisma.SortOrder
+  clientId?: Prisma.SortOrder
+  managerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
+  financingType?: Prisma.SortOrderInput | Prisma.SortOrder
+  listPrice?: Prisma.SortOrder
+  salePrice?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  discountPercent?: Prisma.SortOrderInput | Prisma.SortOrder
+  deposit?: Prisma.SortOrderInput | Prisma.SortOrder
+  reservedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  reservationExpiresAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  reservedById?: Prisma.SortOrderInput | Prisma.SortOrder
+  contractNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  contractDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  note?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.DealCountOrderByAggregateInput
   _avg?: Prisma.DealAvgOrderByAggregateInput
   _max?: Prisma.DealMaxOrderByAggregateInput
@@ -297,92 +488,212 @@ export type DealScalarWhereWithAggregatesInput = {
   OR?: Prisma.DealScalarWhereWithAggregatesInput[]
   NOT?: Prisma.DealScalarWhereWithAggregatesInput | Prisma.DealScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Deal"> | string
-  status?: Prisma.EnumDealStatusWithAggregatesFilter<"Deal"> | $Enums.DealStatus
-  amount?: Prisma.DecimalWithAggregatesFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.DateTimeNullableWithAggregatesFilter<"Deal"> | Date | string | null
-  clientId?: Prisma.StringWithAggregatesFilter<"Deal"> | string
+  companyId?: Prisma.StringWithAggregatesFilter<"Deal"> | string
+  projectId?: Prisma.StringWithAggregatesFilter<"Deal"> | string
   unitId?: Prisma.StringWithAggregatesFilter<"Deal"> | string
+  clientId?: Prisma.StringWithAggregatesFilter<"Deal"> | string
+  managerId?: Prisma.StringNullableWithAggregatesFilter<"Deal"> | string | null
+  status?: Prisma.EnumDealStatusWithAggregatesFilter<"Deal"> | $Enums.DealStatus
+  financingType?: Prisma.EnumFinancingTypeNullableWithAggregatesFilter<"Deal"> | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalWithAggregatesFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalWithAggregatesFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.DecimalNullableWithAggregatesFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.DecimalNullableWithAggregatesFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.DecimalNullableWithAggregatesFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Deal"> | Date | string | null
+  reservationExpiresAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Deal"> | Date | string | null
+  reservedById?: Prisma.StringNullableWithAggregatesFilter<"Deal"> | string | null
+  contractNumber?: Prisma.StringNullableWithAggregatesFilter<"Deal"> | string | null
+  contractDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Deal"> | Date | string | null
+  note?: Prisma.StringNullableWithAggregatesFilter<"Deal"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Deal"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Deal"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Deal"> | Date | string | null
 }
 
 export type DealCreateInput = {
   id?: string
   status?: $Enums.DealStatus
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Date | string | null
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  client: Prisma.ClientCreateNestedOneWithoutDealsInput
+  deletedAt?: Date | string | null
+  company: Prisma.CompanyCreateNestedOneWithoutDealsInput
+  project: Prisma.ProjectCreateNestedOneWithoutDealsInput
   unit: Prisma.UnitCreateNestedOneWithoutDealsInput
+  client: Prisma.ClientCreateNestedOneWithoutDealsInput
+  manager?: Prisma.UserCreateNestedOneWithoutDealsInput
+  reservedBy?: Prisma.UserCreateNestedOneWithoutReservedDealsInput
+  paymentSchedules?: Prisma.PaymentScheduleCreateNestedManyWithoutDealInput
   payments?: Prisma.PaymentCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutDealInput
 }
 
 export type DealUncheckedCreateInput = {
   id?: string
-  status?: $Enums.DealStatus
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Date | string | null
-  clientId: string
+  companyId: string
+  projectId: string
   unitId: string
+  clientId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedCreateNestedManyWithoutDealInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutDealInput
 }
 
 export type DealUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  client?: Prisma.ClientUpdateOneRequiredWithoutDealsNestedInput
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  company?: Prisma.CompanyUpdateOneRequiredWithoutDealsNestedInput
+  project?: Prisma.ProjectUpdateOneRequiredWithoutDealsNestedInput
   unit?: Prisma.UnitUpdateOneRequiredWithoutDealsNestedInput
+  client?: Prisma.ClientUpdateOneRequiredWithoutDealsNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDealsNestedInput
+  reservedBy?: Prisma.UserUpdateOneWithoutReservedDealsNestedInput
+  paymentSchedules?: Prisma.PaymentScheduleUpdateManyWithoutDealNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutDealNestedInput
 }
 
 export type DealUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedUpdateManyWithoutDealNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutDealNestedInput
 }
 
 export type DealCreateManyInput = {
   id?: string
-  status?: $Enums.DealStatus
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Date | string | null
-  clientId: string
+  companyId: string
+  projectId: string
   unitId: string
+  clientId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
 }
 
 export type DealUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DealUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DealListRelationFilter = {
@@ -397,48 +708,229 @@ export type DealOrderByRelationAggregateInput = {
 
 export type DealCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  status?: Prisma.SortOrder
-  amount?: Prisma.SortOrder
-  bookingUntil?: Prisma.SortOrder
-  clientId?: Prisma.SortOrder
+  companyId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   unitId?: Prisma.SortOrder
+  clientId?: Prisma.SortOrder
+  managerId?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  financingType?: Prisma.SortOrder
+  listPrice?: Prisma.SortOrder
+  salePrice?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
+  discountPercent?: Prisma.SortOrder
+  deposit?: Prisma.SortOrder
+  reservedAt?: Prisma.SortOrder
+  reservationExpiresAt?: Prisma.SortOrder
+  reservedById?: Prisma.SortOrder
+  contractNumber?: Prisma.SortOrder
+  contractDate?: Prisma.SortOrder
+  note?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type DealAvgOrderByAggregateInput = {
-  amount?: Prisma.SortOrder
+  listPrice?: Prisma.SortOrder
+  salePrice?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
+  discountPercent?: Prisma.SortOrder
+  deposit?: Prisma.SortOrder
 }
 
 export type DealMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  status?: Prisma.SortOrder
-  amount?: Prisma.SortOrder
-  bookingUntil?: Prisma.SortOrder
-  clientId?: Prisma.SortOrder
+  companyId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   unitId?: Prisma.SortOrder
+  clientId?: Prisma.SortOrder
+  managerId?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  financingType?: Prisma.SortOrder
+  listPrice?: Prisma.SortOrder
+  salePrice?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
+  discountPercent?: Prisma.SortOrder
+  deposit?: Prisma.SortOrder
+  reservedAt?: Prisma.SortOrder
+  reservationExpiresAt?: Prisma.SortOrder
+  reservedById?: Prisma.SortOrder
+  contractNumber?: Prisma.SortOrder
+  contractDate?: Prisma.SortOrder
+  note?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type DealMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  status?: Prisma.SortOrder
-  amount?: Prisma.SortOrder
-  bookingUntil?: Prisma.SortOrder
-  clientId?: Prisma.SortOrder
+  companyId?: Prisma.SortOrder
+  projectId?: Prisma.SortOrder
   unitId?: Prisma.SortOrder
+  clientId?: Prisma.SortOrder
+  managerId?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  financingType?: Prisma.SortOrder
+  listPrice?: Prisma.SortOrder
+  salePrice?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
+  discountPercent?: Prisma.SortOrder
+  deposit?: Prisma.SortOrder
+  reservedAt?: Prisma.SortOrder
+  reservationExpiresAt?: Prisma.SortOrder
+  reservedById?: Prisma.SortOrder
+  contractNumber?: Prisma.SortOrder
+  contractDate?: Prisma.SortOrder
+  note?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type DealSumOrderByAggregateInput = {
-  amount?: Prisma.SortOrder
+  listPrice?: Prisma.SortOrder
+  salePrice?: Prisma.SortOrder
+  discountAmount?: Prisma.SortOrder
+  discountPercent?: Prisma.SortOrder
+  deposit?: Prisma.SortOrder
 }
 
 export type DealScalarRelationFilter = {
   is?: Prisma.DealWhereInput
   isNot?: Prisma.DealWhereInput
+}
+
+export type DealNullableScalarRelationFilter = {
+  is?: Prisma.DealWhereInput | null
+  isNot?: Prisma.DealWhereInput | null
+}
+
+export type DealCreateNestedManyWithoutCompanyInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutCompanyInput, Prisma.DealUncheckedCreateWithoutCompanyInput> | Prisma.DealCreateWithoutCompanyInput[] | Prisma.DealUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutCompanyInput | Prisma.DealCreateOrConnectWithoutCompanyInput[]
+  createMany?: Prisma.DealCreateManyCompanyInputEnvelope
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+}
+
+export type DealUncheckedCreateNestedManyWithoutCompanyInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutCompanyInput, Prisma.DealUncheckedCreateWithoutCompanyInput> | Prisma.DealCreateWithoutCompanyInput[] | Prisma.DealUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutCompanyInput | Prisma.DealCreateOrConnectWithoutCompanyInput[]
+  createMany?: Prisma.DealCreateManyCompanyInputEnvelope
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+}
+
+export type DealUpdateManyWithoutCompanyNestedInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutCompanyInput, Prisma.DealUncheckedCreateWithoutCompanyInput> | Prisma.DealCreateWithoutCompanyInput[] | Prisma.DealUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutCompanyInput | Prisma.DealCreateOrConnectWithoutCompanyInput[]
+  upsert?: Prisma.DealUpsertWithWhereUniqueWithoutCompanyInput | Prisma.DealUpsertWithWhereUniqueWithoutCompanyInput[]
+  createMany?: Prisma.DealCreateManyCompanyInputEnvelope
+  set?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  disconnect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  delete?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  update?: Prisma.DealUpdateWithWhereUniqueWithoutCompanyInput | Prisma.DealUpdateWithWhereUniqueWithoutCompanyInput[]
+  updateMany?: Prisma.DealUpdateManyWithWhereWithoutCompanyInput | Prisma.DealUpdateManyWithWhereWithoutCompanyInput[]
+  deleteMany?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
+}
+
+export type DealUncheckedUpdateManyWithoutCompanyNestedInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutCompanyInput, Prisma.DealUncheckedCreateWithoutCompanyInput> | Prisma.DealCreateWithoutCompanyInput[] | Prisma.DealUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutCompanyInput | Prisma.DealCreateOrConnectWithoutCompanyInput[]
+  upsert?: Prisma.DealUpsertWithWhereUniqueWithoutCompanyInput | Prisma.DealUpsertWithWhereUniqueWithoutCompanyInput[]
+  createMany?: Prisma.DealCreateManyCompanyInputEnvelope
+  set?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  disconnect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  delete?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  update?: Prisma.DealUpdateWithWhereUniqueWithoutCompanyInput | Prisma.DealUpdateWithWhereUniqueWithoutCompanyInput[]
+  updateMany?: Prisma.DealUpdateManyWithWhereWithoutCompanyInput | Prisma.DealUpdateManyWithWhereWithoutCompanyInput[]
+  deleteMany?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
+}
+
+export type DealCreateNestedManyWithoutManagerInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutManagerInput, Prisma.DealUncheckedCreateWithoutManagerInput> | Prisma.DealCreateWithoutManagerInput[] | Prisma.DealUncheckedCreateWithoutManagerInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutManagerInput | Prisma.DealCreateOrConnectWithoutManagerInput[]
+  createMany?: Prisma.DealCreateManyManagerInputEnvelope
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+}
+
+export type DealCreateNestedManyWithoutReservedByInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutReservedByInput, Prisma.DealUncheckedCreateWithoutReservedByInput> | Prisma.DealCreateWithoutReservedByInput[] | Prisma.DealUncheckedCreateWithoutReservedByInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutReservedByInput | Prisma.DealCreateOrConnectWithoutReservedByInput[]
+  createMany?: Prisma.DealCreateManyReservedByInputEnvelope
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+}
+
+export type DealUncheckedCreateNestedManyWithoutManagerInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutManagerInput, Prisma.DealUncheckedCreateWithoutManagerInput> | Prisma.DealCreateWithoutManagerInput[] | Prisma.DealUncheckedCreateWithoutManagerInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutManagerInput | Prisma.DealCreateOrConnectWithoutManagerInput[]
+  createMany?: Prisma.DealCreateManyManagerInputEnvelope
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+}
+
+export type DealUncheckedCreateNestedManyWithoutReservedByInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutReservedByInput, Prisma.DealUncheckedCreateWithoutReservedByInput> | Prisma.DealCreateWithoutReservedByInput[] | Prisma.DealUncheckedCreateWithoutReservedByInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutReservedByInput | Prisma.DealCreateOrConnectWithoutReservedByInput[]
+  createMany?: Prisma.DealCreateManyReservedByInputEnvelope
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+}
+
+export type DealUpdateManyWithoutManagerNestedInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutManagerInput, Prisma.DealUncheckedCreateWithoutManagerInput> | Prisma.DealCreateWithoutManagerInput[] | Prisma.DealUncheckedCreateWithoutManagerInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutManagerInput | Prisma.DealCreateOrConnectWithoutManagerInput[]
+  upsert?: Prisma.DealUpsertWithWhereUniqueWithoutManagerInput | Prisma.DealUpsertWithWhereUniqueWithoutManagerInput[]
+  createMany?: Prisma.DealCreateManyManagerInputEnvelope
+  set?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  disconnect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  delete?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  update?: Prisma.DealUpdateWithWhereUniqueWithoutManagerInput | Prisma.DealUpdateWithWhereUniqueWithoutManagerInput[]
+  updateMany?: Prisma.DealUpdateManyWithWhereWithoutManagerInput | Prisma.DealUpdateManyWithWhereWithoutManagerInput[]
+  deleteMany?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
+}
+
+export type DealUpdateManyWithoutReservedByNestedInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutReservedByInput, Prisma.DealUncheckedCreateWithoutReservedByInput> | Prisma.DealCreateWithoutReservedByInput[] | Prisma.DealUncheckedCreateWithoutReservedByInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutReservedByInput | Prisma.DealCreateOrConnectWithoutReservedByInput[]
+  upsert?: Prisma.DealUpsertWithWhereUniqueWithoutReservedByInput | Prisma.DealUpsertWithWhereUniqueWithoutReservedByInput[]
+  createMany?: Prisma.DealCreateManyReservedByInputEnvelope
+  set?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  disconnect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  delete?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  update?: Prisma.DealUpdateWithWhereUniqueWithoutReservedByInput | Prisma.DealUpdateWithWhereUniqueWithoutReservedByInput[]
+  updateMany?: Prisma.DealUpdateManyWithWhereWithoutReservedByInput | Prisma.DealUpdateManyWithWhereWithoutReservedByInput[]
+  deleteMany?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
+}
+
+export type DealUncheckedUpdateManyWithoutManagerNestedInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutManagerInput, Prisma.DealUncheckedCreateWithoutManagerInput> | Prisma.DealCreateWithoutManagerInput[] | Prisma.DealUncheckedCreateWithoutManagerInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutManagerInput | Prisma.DealCreateOrConnectWithoutManagerInput[]
+  upsert?: Prisma.DealUpsertWithWhereUniqueWithoutManagerInput | Prisma.DealUpsertWithWhereUniqueWithoutManagerInput[]
+  createMany?: Prisma.DealCreateManyManagerInputEnvelope
+  set?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  disconnect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  delete?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  update?: Prisma.DealUpdateWithWhereUniqueWithoutManagerInput | Prisma.DealUpdateWithWhereUniqueWithoutManagerInput[]
+  updateMany?: Prisma.DealUpdateManyWithWhereWithoutManagerInput | Prisma.DealUpdateManyWithWhereWithoutManagerInput[]
+  deleteMany?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
+}
+
+export type DealUncheckedUpdateManyWithoutReservedByNestedInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutReservedByInput, Prisma.DealUncheckedCreateWithoutReservedByInput> | Prisma.DealCreateWithoutReservedByInput[] | Prisma.DealUncheckedCreateWithoutReservedByInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutReservedByInput | Prisma.DealCreateOrConnectWithoutReservedByInput[]
+  upsert?: Prisma.DealUpsertWithWhereUniqueWithoutReservedByInput | Prisma.DealUpsertWithWhereUniqueWithoutReservedByInput[]
+  createMany?: Prisma.DealCreateManyReservedByInputEnvelope
+  set?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  disconnect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  delete?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  update?: Prisma.DealUpdateWithWhereUniqueWithoutReservedByInput | Prisma.DealUpdateWithWhereUniqueWithoutReservedByInput[]
+  updateMany?: Prisma.DealUpdateManyWithWhereWithoutReservedByInput | Prisma.DealUpdateManyWithWhereWithoutReservedByInput[]
+  deleteMany?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
 }
 
 export type DealCreateNestedManyWithoutClientInput = {
@@ -480,6 +972,48 @@ export type DealUncheckedUpdateManyWithoutClientNestedInput = {
   connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
   update?: Prisma.DealUpdateWithWhereUniqueWithoutClientInput | Prisma.DealUpdateWithWhereUniqueWithoutClientInput[]
   updateMany?: Prisma.DealUpdateManyWithWhereWithoutClientInput | Prisma.DealUpdateManyWithWhereWithoutClientInput[]
+  deleteMany?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
+}
+
+export type DealCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutProjectInput, Prisma.DealUncheckedCreateWithoutProjectInput> | Prisma.DealCreateWithoutProjectInput[] | Prisma.DealUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutProjectInput | Prisma.DealCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.DealCreateManyProjectInputEnvelope
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+}
+
+export type DealUncheckedCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutProjectInput, Prisma.DealUncheckedCreateWithoutProjectInput> | Prisma.DealCreateWithoutProjectInput[] | Prisma.DealUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutProjectInput | Prisma.DealCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.DealCreateManyProjectInputEnvelope
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+}
+
+export type DealUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutProjectInput, Prisma.DealUncheckedCreateWithoutProjectInput> | Prisma.DealCreateWithoutProjectInput[] | Prisma.DealUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutProjectInput | Prisma.DealCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.DealUpsertWithWhereUniqueWithoutProjectInput | Prisma.DealUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.DealCreateManyProjectInputEnvelope
+  set?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  disconnect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  delete?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  update?: Prisma.DealUpdateWithWhereUniqueWithoutProjectInput | Prisma.DealUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.DealUpdateManyWithWhereWithoutProjectInput | Prisma.DealUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
+}
+
+export type DealUncheckedUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutProjectInput, Prisma.DealUncheckedCreateWithoutProjectInput> | Prisma.DealCreateWithoutProjectInput[] | Prisma.DealUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutProjectInput | Prisma.DealCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.DealUpsertWithWhereUniqueWithoutProjectInput | Prisma.DealUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.DealCreateManyProjectInputEnvelope
+  set?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  disconnect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  delete?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  connect?: Prisma.DealWhereUniqueInput | Prisma.DealWhereUniqueInput[]
+  update?: Prisma.DealUpdateWithWhereUniqueWithoutProjectInput | Prisma.DealUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.DealUpdateManyWithWhereWithoutProjectInput | Prisma.DealUpdateManyWithWhereWithoutProjectInput[]
   deleteMany?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
 }
 
@@ -529,8 +1063,8 @@ export type EnumDealStatusFieldUpdateOperationsInput = {
   set?: $Enums.DealStatus
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
+export type NullableEnumFinancingTypeFieldUpdateOperationsInput = {
+  set?: $Enums.FinancingType | null
 }
 
 export type DealCreateNestedOneWithoutPaymentsInput = {
@@ -547,26 +1081,380 @@ export type DealUpdateOneRequiredWithoutPaymentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.DealUpdateToOneWithWhereWithoutPaymentsInput, Prisma.DealUpdateWithoutPaymentsInput>, Prisma.DealUncheckedUpdateWithoutPaymentsInput>
 }
 
+export type DealCreateNestedOneWithoutPaymentSchedulesInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutPaymentSchedulesInput, Prisma.DealUncheckedCreateWithoutPaymentSchedulesInput>
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutPaymentSchedulesInput
+  connect?: Prisma.DealWhereUniqueInput
+}
+
+export type DealUpdateOneRequiredWithoutPaymentSchedulesNestedInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutPaymentSchedulesInput, Prisma.DealUncheckedCreateWithoutPaymentSchedulesInput>
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutPaymentSchedulesInput
+  upsert?: Prisma.DealUpsertWithoutPaymentSchedulesInput
+  connect?: Prisma.DealWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DealUpdateToOneWithWhereWithoutPaymentSchedulesInput, Prisma.DealUpdateWithoutPaymentSchedulesInput>, Prisma.DealUncheckedUpdateWithoutPaymentSchedulesInput>
+}
+
+export type DealCreateNestedOneWithoutActivitiesInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutActivitiesInput, Prisma.DealUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutActivitiesInput
+  connect?: Prisma.DealWhereUniqueInput
+}
+
+export type DealUpdateOneWithoutActivitiesNestedInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutActivitiesInput, Prisma.DealUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutActivitiesInput
+  upsert?: Prisma.DealUpsertWithoutActivitiesInput
+  disconnect?: Prisma.DealWhereInput | boolean
+  delete?: Prisma.DealWhereInput | boolean
+  connect?: Prisma.DealWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DealUpdateToOneWithWhereWithoutActivitiesInput, Prisma.DealUpdateWithoutActivitiesInput>, Prisma.DealUncheckedUpdateWithoutActivitiesInput>
+}
+
+export type DealCreateNestedOneWithoutTasksInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutTasksInput, Prisma.DealUncheckedCreateWithoutTasksInput>
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutTasksInput
+  connect?: Prisma.DealWhereUniqueInput
+}
+
+export type DealUpdateOneWithoutTasksNestedInput = {
+  create?: Prisma.XOR<Prisma.DealCreateWithoutTasksInput, Prisma.DealUncheckedCreateWithoutTasksInput>
+  connectOrCreate?: Prisma.DealCreateOrConnectWithoutTasksInput
+  upsert?: Prisma.DealUpsertWithoutTasksInput
+  disconnect?: Prisma.DealWhereInput | boolean
+  delete?: Prisma.DealWhereInput | boolean
+  connect?: Prisma.DealWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.DealUpdateToOneWithWhereWithoutTasksInput, Prisma.DealUpdateWithoutTasksInput>, Prisma.DealUncheckedUpdateWithoutTasksInput>
+}
+
+export type DealCreateWithoutCompanyInput = {
+  id?: string
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  project: Prisma.ProjectCreateNestedOneWithoutDealsInput
+  unit: Prisma.UnitCreateNestedOneWithoutDealsInput
+  client: Prisma.ClientCreateNestedOneWithoutDealsInput
+  manager?: Prisma.UserCreateNestedOneWithoutDealsInput
+  reservedBy?: Prisma.UserCreateNestedOneWithoutReservedDealsInput
+  paymentSchedules?: Prisma.PaymentScheduleCreateNestedManyWithoutDealInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutDealInput
+}
+
+export type DealUncheckedCreateWithoutCompanyInput = {
+  id?: string
+  projectId: string
+  unitId: string
+  clientId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedCreateNestedManyWithoutDealInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutDealInput
+}
+
+export type DealCreateOrConnectWithoutCompanyInput = {
+  where: Prisma.DealWhereUniqueInput
+  create: Prisma.XOR<Prisma.DealCreateWithoutCompanyInput, Prisma.DealUncheckedCreateWithoutCompanyInput>
+}
+
+export type DealCreateManyCompanyInputEnvelope = {
+  data: Prisma.DealCreateManyCompanyInput | Prisma.DealCreateManyCompanyInput[]
+  skipDuplicates?: boolean
+}
+
+export type DealUpsertWithWhereUniqueWithoutCompanyInput = {
+  where: Prisma.DealWhereUniqueInput
+  update: Prisma.XOR<Prisma.DealUpdateWithoutCompanyInput, Prisma.DealUncheckedUpdateWithoutCompanyInput>
+  create: Prisma.XOR<Prisma.DealCreateWithoutCompanyInput, Prisma.DealUncheckedCreateWithoutCompanyInput>
+}
+
+export type DealUpdateWithWhereUniqueWithoutCompanyInput = {
+  where: Prisma.DealWhereUniqueInput
+  data: Prisma.XOR<Prisma.DealUpdateWithoutCompanyInput, Prisma.DealUncheckedUpdateWithoutCompanyInput>
+}
+
+export type DealUpdateManyWithWhereWithoutCompanyInput = {
+  where: Prisma.DealScalarWhereInput
+  data: Prisma.XOR<Prisma.DealUpdateManyMutationInput, Prisma.DealUncheckedUpdateManyWithoutCompanyInput>
+}
+
+export type DealScalarWhereInput = {
+  AND?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
+  OR?: Prisma.DealScalarWhereInput[]
+  NOT?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
+  id?: Prisma.StringFilter<"Deal"> | string
+  companyId?: Prisma.StringFilter<"Deal"> | string
+  projectId?: Prisma.StringFilter<"Deal"> | string
+  unitId?: Prisma.StringFilter<"Deal"> | string
+  clientId?: Prisma.StringFilter<"Deal"> | string
+  managerId?: Prisma.StringNullableFilter<"Deal"> | string | null
+  status?: Prisma.EnumDealStatusFilter<"Deal"> | $Enums.DealStatus
+  financingType?: Prisma.EnumFinancingTypeNullableFilter<"Deal"> | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.DecimalNullableFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.DecimalNullableFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.DecimalNullableFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  reservationExpiresAt?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  reservedById?: Prisma.StringNullableFilter<"Deal"> | string | null
+  contractNumber?: Prisma.StringNullableFilter<"Deal"> | string | null
+  contractDate?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  note?: Prisma.StringNullableFilter<"Deal"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+}
+
+export type DealCreateWithoutManagerInput = {
+  id?: string
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  company: Prisma.CompanyCreateNestedOneWithoutDealsInput
+  project: Prisma.ProjectCreateNestedOneWithoutDealsInput
+  unit: Prisma.UnitCreateNestedOneWithoutDealsInput
+  client: Prisma.ClientCreateNestedOneWithoutDealsInput
+  reservedBy?: Prisma.UserCreateNestedOneWithoutReservedDealsInput
+  paymentSchedules?: Prisma.PaymentScheduleCreateNestedManyWithoutDealInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutDealInput
+}
+
+export type DealUncheckedCreateWithoutManagerInput = {
+  id?: string
+  companyId: string
+  projectId: string
+  unitId: string
+  clientId: string
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedCreateNestedManyWithoutDealInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutDealInput
+}
+
+export type DealCreateOrConnectWithoutManagerInput = {
+  where: Prisma.DealWhereUniqueInput
+  create: Prisma.XOR<Prisma.DealCreateWithoutManagerInput, Prisma.DealUncheckedCreateWithoutManagerInput>
+}
+
+export type DealCreateManyManagerInputEnvelope = {
+  data: Prisma.DealCreateManyManagerInput | Prisma.DealCreateManyManagerInput[]
+  skipDuplicates?: boolean
+}
+
+export type DealCreateWithoutReservedByInput = {
+  id?: string
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  company: Prisma.CompanyCreateNestedOneWithoutDealsInput
+  project: Prisma.ProjectCreateNestedOneWithoutDealsInput
+  unit: Prisma.UnitCreateNestedOneWithoutDealsInput
+  client: Prisma.ClientCreateNestedOneWithoutDealsInput
+  manager?: Prisma.UserCreateNestedOneWithoutDealsInput
+  paymentSchedules?: Prisma.PaymentScheduleCreateNestedManyWithoutDealInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutDealInput
+}
+
+export type DealUncheckedCreateWithoutReservedByInput = {
+  id?: string
+  companyId: string
+  projectId: string
+  unitId: string
+  clientId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedCreateNestedManyWithoutDealInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutDealInput
+}
+
+export type DealCreateOrConnectWithoutReservedByInput = {
+  where: Prisma.DealWhereUniqueInput
+  create: Prisma.XOR<Prisma.DealCreateWithoutReservedByInput, Prisma.DealUncheckedCreateWithoutReservedByInput>
+}
+
+export type DealCreateManyReservedByInputEnvelope = {
+  data: Prisma.DealCreateManyReservedByInput | Prisma.DealCreateManyReservedByInput[]
+  skipDuplicates?: boolean
+}
+
+export type DealUpsertWithWhereUniqueWithoutManagerInput = {
+  where: Prisma.DealWhereUniqueInput
+  update: Prisma.XOR<Prisma.DealUpdateWithoutManagerInput, Prisma.DealUncheckedUpdateWithoutManagerInput>
+  create: Prisma.XOR<Prisma.DealCreateWithoutManagerInput, Prisma.DealUncheckedCreateWithoutManagerInput>
+}
+
+export type DealUpdateWithWhereUniqueWithoutManagerInput = {
+  where: Prisma.DealWhereUniqueInput
+  data: Prisma.XOR<Prisma.DealUpdateWithoutManagerInput, Prisma.DealUncheckedUpdateWithoutManagerInput>
+}
+
+export type DealUpdateManyWithWhereWithoutManagerInput = {
+  where: Prisma.DealScalarWhereInput
+  data: Prisma.XOR<Prisma.DealUpdateManyMutationInput, Prisma.DealUncheckedUpdateManyWithoutManagerInput>
+}
+
+export type DealUpsertWithWhereUniqueWithoutReservedByInput = {
+  where: Prisma.DealWhereUniqueInput
+  update: Prisma.XOR<Prisma.DealUpdateWithoutReservedByInput, Prisma.DealUncheckedUpdateWithoutReservedByInput>
+  create: Prisma.XOR<Prisma.DealCreateWithoutReservedByInput, Prisma.DealUncheckedCreateWithoutReservedByInput>
+}
+
+export type DealUpdateWithWhereUniqueWithoutReservedByInput = {
+  where: Prisma.DealWhereUniqueInput
+  data: Prisma.XOR<Prisma.DealUpdateWithoutReservedByInput, Prisma.DealUncheckedUpdateWithoutReservedByInput>
+}
+
+export type DealUpdateManyWithWhereWithoutReservedByInput = {
+  where: Prisma.DealScalarWhereInput
+  data: Prisma.XOR<Prisma.DealUpdateManyMutationInput, Prisma.DealUncheckedUpdateManyWithoutReservedByInput>
+}
+
 export type DealCreateWithoutClientInput = {
   id?: string
   status?: $Enums.DealStatus
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Date | string | null
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  company: Prisma.CompanyCreateNestedOneWithoutDealsInput
+  project: Prisma.ProjectCreateNestedOneWithoutDealsInput
   unit: Prisma.UnitCreateNestedOneWithoutDealsInput
+  manager?: Prisma.UserCreateNestedOneWithoutDealsInput
+  reservedBy?: Prisma.UserCreateNestedOneWithoutReservedDealsInput
+  paymentSchedules?: Prisma.PaymentScheduleCreateNestedManyWithoutDealInput
   payments?: Prisma.PaymentCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutDealInput
 }
 
 export type DealUncheckedCreateWithoutClientInput = {
   id?: string
-  status?: $Enums.DealStatus
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Date | string | null
+  companyId: string
+  projectId: string
   unitId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedCreateNestedManyWithoutDealInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutDealInput
 }
 
 export type DealCreateOrConnectWithoutClientInput = {
@@ -595,40 +1483,142 @@ export type DealUpdateManyWithWhereWithoutClientInput = {
   data: Prisma.XOR<Prisma.DealUpdateManyMutationInput, Prisma.DealUncheckedUpdateManyWithoutClientInput>
 }
 
-export type DealScalarWhereInput = {
-  AND?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
-  OR?: Prisma.DealScalarWhereInput[]
-  NOT?: Prisma.DealScalarWhereInput | Prisma.DealScalarWhereInput[]
-  id?: Prisma.StringFilter<"Deal"> | string
-  status?: Prisma.EnumDealStatusFilter<"Deal"> | $Enums.DealStatus
-  amount?: Prisma.DecimalFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
-  clientId?: Prisma.StringFilter<"Deal"> | string
-  unitId?: Prisma.StringFilter<"Deal"> | string
-  createdAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
+export type DealCreateWithoutProjectInput = {
+  id?: string
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  company: Prisma.CompanyCreateNestedOneWithoutDealsInput
+  unit: Prisma.UnitCreateNestedOneWithoutDealsInput
+  client: Prisma.ClientCreateNestedOneWithoutDealsInput
+  manager?: Prisma.UserCreateNestedOneWithoutDealsInput
+  reservedBy?: Prisma.UserCreateNestedOneWithoutReservedDealsInput
+  paymentSchedules?: Prisma.PaymentScheduleCreateNestedManyWithoutDealInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutDealInput
+}
+
+export type DealUncheckedCreateWithoutProjectInput = {
+  id?: string
+  companyId: string
+  unitId: string
+  clientId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedCreateNestedManyWithoutDealInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutDealInput
+}
+
+export type DealCreateOrConnectWithoutProjectInput = {
+  where: Prisma.DealWhereUniqueInput
+  create: Prisma.XOR<Prisma.DealCreateWithoutProjectInput, Prisma.DealUncheckedCreateWithoutProjectInput>
+}
+
+export type DealCreateManyProjectInputEnvelope = {
+  data: Prisma.DealCreateManyProjectInput | Prisma.DealCreateManyProjectInput[]
+  skipDuplicates?: boolean
+}
+
+export type DealUpsertWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.DealWhereUniqueInput
+  update: Prisma.XOR<Prisma.DealUpdateWithoutProjectInput, Prisma.DealUncheckedUpdateWithoutProjectInput>
+  create: Prisma.XOR<Prisma.DealCreateWithoutProjectInput, Prisma.DealUncheckedCreateWithoutProjectInput>
+}
+
+export type DealUpdateWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.DealWhereUniqueInput
+  data: Prisma.XOR<Prisma.DealUpdateWithoutProjectInput, Prisma.DealUncheckedUpdateWithoutProjectInput>
+}
+
+export type DealUpdateManyWithWhereWithoutProjectInput = {
+  where: Prisma.DealScalarWhereInput
+  data: Prisma.XOR<Prisma.DealUpdateManyMutationInput, Prisma.DealUncheckedUpdateManyWithoutProjectInput>
 }
 
 export type DealCreateWithoutUnitInput = {
   id?: string
   status?: $Enums.DealStatus
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Date | string | null
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  company: Prisma.CompanyCreateNestedOneWithoutDealsInput
+  project: Prisma.ProjectCreateNestedOneWithoutDealsInput
   client: Prisma.ClientCreateNestedOneWithoutDealsInput
+  manager?: Prisma.UserCreateNestedOneWithoutDealsInput
+  reservedBy?: Prisma.UserCreateNestedOneWithoutReservedDealsInput
+  paymentSchedules?: Prisma.PaymentScheduleCreateNestedManyWithoutDealInput
   payments?: Prisma.PaymentCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutDealInput
 }
 
 export type DealUncheckedCreateWithoutUnitInput = {
   id?: string
-  status?: $Enums.DealStatus
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Date | string | null
+  companyId: string
+  projectId: string
   clientId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedCreateNestedManyWithoutDealInput
   payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutDealInput
 }
 
 export type DealCreateOrConnectWithoutUnitInput = {
@@ -660,23 +1650,57 @@ export type DealUpdateManyWithWhereWithoutUnitInput = {
 export type DealCreateWithoutPaymentsInput = {
   id?: string
   status?: $Enums.DealStatus
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Date | string | null
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  client: Prisma.ClientCreateNestedOneWithoutDealsInput
+  deletedAt?: Date | string | null
+  company: Prisma.CompanyCreateNestedOneWithoutDealsInput
+  project: Prisma.ProjectCreateNestedOneWithoutDealsInput
   unit: Prisma.UnitCreateNestedOneWithoutDealsInput
+  client: Prisma.ClientCreateNestedOneWithoutDealsInput
+  manager?: Prisma.UserCreateNestedOneWithoutDealsInput
+  reservedBy?: Prisma.UserCreateNestedOneWithoutReservedDealsInput
+  paymentSchedules?: Prisma.PaymentScheduleCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutDealInput
 }
 
 export type DealUncheckedCreateWithoutPaymentsInput = {
   id?: string
-  status?: $Enums.DealStatus
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Date | string | null
-  clientId: string
+  companyId: string
+  projectId: string
   unitId: string
+  clientId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutDealInput
 }
 
 export type DealCreateOrConnectWithoutPaymentsInput = {
@@ -698,107 +1722,1065 @@ export type DealUpdateToOneWithWhereWithoutPaymentsInput = {
 export type DealUpdateWithoutPaymentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  client?: Prisma.ClientUpdateOneRequiredWithoutDealsNestedInput
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  company?: Prisma.CompanyUpdateOneRequiredWithoutDealsNestedInput
+  project?: Prisma.ProjectUpdateOneRequiredWithoutDealsNestedInput
   unit?: Prisma.UnitUpdateOneRequiredWithoutDealsNestedInput
+  client?: Prisma.ClientUpdateOneRequiredWithoutDealsNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDealsNestedInput
+  reservedBy?: Prisma.UserUpdateOneWithoutReservedDealsNestedInput
+  paymentSchedules?: Prisma.PaymentScheduleUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutDealNestedInput
 }
 
 export type DealUncheckedUpdateWithoutPaymentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutDealNestedInput
+}
+
+export type DealCreateWithoutPaymentSchedulesInput = {
+  id?: string
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  company: Prisma.CompanyCreateNestedOneWithoutDealsInput
+  project: Prisma.ProjectCreateNestedOneWithoutDealsInput
+  unit: Prisma.UnitCreateNestedOneWithoutDealsInput
+  client: Prisma.ClientCreateNestedOneWithoutDealsInput
+  manager?: Prisma.UserCreateNestedOneWithoutDealsInput
+  reservedBy?: Prisma.UserCreateNestedOneWithoutReservedDealsInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutDealInput
+}
+
+export type DealUncheckedCreateWithoutPaymentSchedulesInput = {
+  id?: string
+  companyId: string
+  projectId: string
+  unitId: string
+  clientId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutDealInput
+}
+
+export type DealCreateOrConnectWithoutPaymentSchedulesInput = {
+  where: Prisma.DealWhereUniqueInput
+  create: Prisma.XOR<Prisma.DealCreateWithoutPaymentSchedulesInput, Prisma.DealUncheckedCreateWithoutPaymentSchedulesInput>
+}
+
+export type DealUpsertWithoutPaymentSchedulesInput = {
+  update: Prisma.XOR<Prisma.DealUpdateWithoutPaymentSchedulesInput, Prisma.DealUncheckedUpdateWithoutPaymentSchedulesInput>
+  create: Prisma.XOR<Prisma.DealCreateWithoutPaymentSchedulesInput, Prisma.DealUncheckedCreateWithoutPaymentSchedulesInput>
+  where?: Prisma.DealWhereInput
+}
+
+export type DealUpdateToOneWithWhereWithoutPaymentSchedulesInput = {
+  where?: Prisma.DealWhereInput
+  data: Prisma.XOR<Prisma.DealUpdateWithoutPaymentSchedulesInput, Prisma.DealUncheckedUpdateWithoutPaymentSchedulesInput>
+}
+
+export type DealUpdateWithoutPaymentSchedulesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  company?: Prisma.CompanyUpdateOneRequiredWithoutDealsNestedInput
+  project?: Prisma.ProjectUpdateOneRequiredWithoutDealsNestedInput
+  unit?: Prisma.UnitUpdateOneRequiredWithoutDealsNestedInput
+  client?: Prisma.ClientUpdateOneRequiredWithoutDealsNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDealsNestedInput
+  reservedBy?: Prisma.UserUpdateOneWithoutReservedDealsNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutDealNestedInput
+}
+
+export type DealUncheckedUpdateWithoutPaymentSchedulesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutDealNestedInput
+}
+
+export type DealCreateWithoutActivitiesInput = {
+  id?: string
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  company: Prisma.CompanyCreateNestedOneWithoutDealsInput
+  project: Prisma.ProjectCreateNestedOneWithoutDealsInput
+  unit: Prisma.UnitCreateNestedOneWithoutDealsInput
+  client: Prisma.ClientCreateNestedOneWithoutDealsInput
+  manager?: Prisma.UserCreateNestedOneWithoutDealsInput
+  reservedBy?: Prisma.UserCreateNestedOneWithoutReservedDealsInput
+  paymentSchedules?: Prisma.PaymentScheduleCreateNestedManyWithoutDealInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutDealInput
+}
+
+export type DealUncheckedCreateWithoutActivitiesInput = {
+  id?: string
+  companyId: string
+  projectId: string
+  unitId: string
+  clientId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedCreateNestedManyWithoutDealInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutDealInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutDealInput
+}
+
+export type DealCreateOrConnectWithoutActivitiesInput = {
+  where: Prisma.DealWhereUniqueInput
+  create: Prisma.XOR<Prisma.DealCreateWithoutActivitiesInput, Prisma.DealUncheckedCreateWithoutActivitiesInput>
+}
+
+export type DealUpsertWithoutActivitiesInput = {
+  update: Prisma.XOR<Prisma.DealUpdateWithoutActivitiesInput, Prisma.DealUncheckedUpdateWithoutActivitiesInput>
+  create: Prisma.XOR<Prisma.DealCreateWithoutActivitiesInput, Prisma.DealUncheckedCreateWithoutActivitiesInput>
+  where?: Prisma.DealWhereInput
+}
+
+export type DealUpdateToOneWithWhereWithoutActivitiesInput = {
+  where?: Prisma.DealWhereInput
+  data: Prisma.XOR<Prisma.DealUpdateWithoutActivitiesInput, Prisma.DealUncheckedUpdateWithoutActivitiesInput>
+}
+
+export type DealUpdateWithoutActivitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  company?: Prisma.CompanyUpdateOneRequiredWithoutDealsNestedInput
+  project?: Prisma.ProjectUpdateOneRequiredWithoutDealsNestedInput
+  unit?: Prisma.UnitUpdateOneRequiredWithoutDealsNestedInput
+  client?: Prisma.ClientUpdateOneRequiredWithoutDealsNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDealsNestedInput
+  reservedBy?: Prisma.UserUpdateOneWithoutReservedDealsNestedInput
+  paymentSchedules?: Prisma.PaymentScheduleUpdateManyWithoutDealNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutDealNestedInput
+}
+
+export type DealUncheckedUpdateWithoutActivitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedUpdateManyWithoutDealNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutDealNestedInput
+}
+
+export type DealCreateWithoutTasksInput = {
+  id?: string
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  company: Prisma.CompanyCreateNestedOneWithoutDealsInput
+  project: Prisma.ProjectCreateNestedOneWithoutDealsInput
+  unit: Prisma.UnitCreateNestedOneWithoutDealsInput
+  client: Prisma.ClientCreateNestedOneWithoutDealsInput
+  manager?: Prisma.UserCreateNestedOneWithoutDealsInput
+  reservedBy?: Prisma.UserCreateNestedOneWithoutReservedDealsInput
+  paymentSchedules?: Prisma.PaymentScheduleCreateNestedManyWithoutDealInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutDealInput
+}
+
+export type DealUncheckedCreateWithoutTasksInput = {
+  id?: string
+  companyId: string
+  projectId: string
+  unitId: string
+  clientId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedCreateNestedManyWithoutDealInput
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutDealInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutDealInput
+}
+
+export type DealCreateOrConnectWithoutTasksInput = {
+  where: Prisma.DealWhereUniqueInput
+  create: Prisma.XOR<Prisma.DealCreateWithoutTasksInput, Prisma.DealUncheckedCreateWithoutTasksInput>
+}
+
+export type DealUpsertWithoutTasksInput = {
+  update: Prisma.XOR<Prisma.DealUpdateWithoutTasksInput, Prisma.DealUncheckedUpdateWithoutTasksInput>
+  create: Prisma.XOR<Prisma.DealCreateWithoutTasksInput, Prisma.DealUncheckedCreateWithoutTasksInput>
+  where?: Prisma.DealWhereInput
+}
+
+export type DealUpdateToOneWithWhereWithoutTasksInput = {
+  where?: Prisma.DealWhereInput
+  data: Prisma.XOR<Prisma.DealUpdateWithoutTasksInput, Prisma.DealUncheckedUpdateWithoutTasksInput>
+}
+
+export type DealUpdateWithoutTasksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  company?: Prisma.CompanyUpdateOneRequiredWithoutDealsNestedInput
+  project?: Prisma.ProjectUpdateOneRequiredWithoutDealsNestedInput
+  unit?: Prisma.UnitUpdateOneRequiredWithoutDealsNestedInput
+  client?: Prisma.ClientUpdateOneRequiredWithoutDealsNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDealsNestedInput
+  reservedBy?: Prisma.UserUpdateOneWithoutReservedDealsNestedInput
+  paymentSchedules?: Prisma.PaymentScheduleUpdateManyWithoutDealNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutDealNestedInput
+}
+
+export type DealUncheckedUpdateWithoutTasksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedUpdateManyWithoutDealNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutDealNestedInput
+}
+
+export type DealCreateManyCompanyInput = {
+  id?: string
+  projectId: string
+  unitId: string
+  clientId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+}
+
+export type DealUpdateWithoutCompanyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  project?: Prisma.ProjectUpdateOneRequiredWithoutDealsNestedInput
+  unit?: Prisma.UnitUpdateOneRequiredWithoutDealsNestedInput
+  client?: Prisma.ClientUpdateOneRequiredWithoutDealsNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDealsNestedInput
+  reservedBy?: Prisma.UserUpdateOneWithoutReservedDealsNestedInput
+  paymentSchedules?: Prisma.PaymentScheduleUpdateManyWithoutDealNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutDealNestedInput
+}
+
+export type DealUncheckedUpdateWithoutCompanyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedUpdateManyWithoutDealNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutDealNestedInput
+}
+
+export type DealUncheckedUpdateManyWithoutCompanyInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type DealCreateManyManagerInput = {
+  id?: string
+  companyId: string
+  projectId: string
+  unitId: string
+  clientId: string
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+}
+
+export type DealCreateManyReservedByInput = {
+  id?: string
+  companyId: string
+  projectId: string
+  unitId: string
+  clientId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+}
+
+export type DealUpdateWithoutManagerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  company?: Prisma.CompanyUpdateOneRequiredWithoutDealsNestedInput
+  project?: Prisma.ProjectUpdateOneRequiredWithoutDealsNestedInput
+  unit?: Prisma.UnitUpdateOneRequiredWithoutDealsNestedInput
+  client?: Prisma.ClientUpdateOneRequiredWithoutDealsNestedInput
+  reservedBy?: Prisma.UserUpdateOneWithoutReservedDealsNestedInput
+  paymentSchedules?: Prisma.PaymentScheduleUpdateManyWithoutDealNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutDealNestedInput
+}
+
+export type DealUncheckedUpdateWithoutManagerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedUpdateManyWithoutDealNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutDealNestedInput
+}
+
+export type DealUncheckedUpdateManyWithoutManagerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type DealUpdateWithoutReservedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  company?: Prisma.CompanyUpdateOneRequiredWithoutDealsNestedInput
+  project?: Prisma.ProjectUpdateOneRequiredWithoutDealsNestedInput
+  unit?: Prisma.UnitUpdateOneRequiredWithoutDealsNestedInput
+  client?: Prisma.ClientUpdateOneRequiredWithoutDealsNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDealsNestedInput
+  paymentSchedules?: Prisma.PaymentScheduleUpdateManyWithoutDealNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutDealNestedInput
+}
+
+export type DealUncheckedUpdateWithoutReservedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedUpdateManyWithoutDealNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutDealNestedInput
+}
+
+export type DealUncheckedUpdateManyWithoutReservedByInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DealCreateManyClientInput = {
   id?: string
-  status?: $Enums.DealStatus
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Date | string | null
+  companyId: string
+  projectId: string
   unitId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
 }
 
 export type DealUpdateWithoutClientInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  company?: Prisma.CompanyUpdateOneRequiredWithoutDealsNestedInput
+  project?: Prisma.ProjectUpdateOneRequiredWithoutDealsNestedInput
   unit?: Prisma.UnitUpdateOneRequiredWithoutDealsNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDealsNestedInput
+  reservedBy?: Prisma.UserUpdateOneWithoutReservedDealsNestedInput
+  paymentSchedules?: Prisma.PaymentScheduleUpdateManyWithoutDealNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutDealNestedInput
 }
 
 export type DealUncheckedUpdateWithoutClientInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedUpdateManyWithoutDealNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutDealNestedInput
 }
 
 export type DealUncheckedUpdateManyWithoutClientInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type DealCreateManyProjectInput = {
+  id?: string
+  companyId: string
+  unitId: string
+  clientId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+}
+
+export type DealUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  company?: Prisma.CompanyUpdateOneRequiredWithoutDealsNestedInput
+  unit?: Prisma.UnitUpdateOneRequiredWithoutDealsNestedInput
+  client?: Prisma.ClientUpdateOneRequiredWithoutDealsNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDealsNestedInput
+  reservedBy?: Prisma.UserUpdateOneWithoutReservedDealsNestedInput
+  paymentSchedules?: Prisma.PaymentScheduleUpdateManyWithoutDealNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutDealNestedInput
+}
+
+export type DealUncheckedUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedUpdateManyWithoutDealNestedInput
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutDealNestedInput
+}
+
+export type DealUncheckedUpdateManyWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  unitId?: Prisma.StringFieldUpdateOperationsInput | string
+  clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type DealCreateManyUnitInput = {
   id?: string
-  status?: $Enums.DealStatus
-  amount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Date | string | null
+  companyId: string
+  projectId: string
   clientId: string
+  managerId?: string | null
+  status?: $Enums.DealStatus
+  financingType?: $Enums.FinancingType | null
+  listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Date | string | null
+  reservationExpiresAt?: Date | string | null
+  reservedById?: string | null
+  contractNumber?: string | null
+  contractDate?: Date | string | null
+  note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
 }
 
 export type DealUpdateWithoutUnitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  company?: Prisma.CompanyUpdateOneRequiredWithoutDealsNestedInput
+  project?: Prisma.ProjectUpdateOneRequiredWithoutDealsNestedInput
   client?: Prisma.ClientUpdateOneRequiredWithoutDealsNestedInput
+  manager?: Prisma.UserUpdateOneWithoutDealsNestedInput
+  reservedBy?: Prisma.UserUpdateOneWithoutReservedDealsNestedInput
+  paymentSchedules?: Prisma.PaymentScheduleUpdateManyWithoutDealNestedInput
   payments?: Prisma.PaymentUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutDealNestedInput
 }
 
 export type DealUncheckedUpdateWithoutUnitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  paymentSchedules?: Prisma.PaymentScheduleUncheckedUpdateManyWithoutDealNestedInput
   payments?: Prisma.PaymentUncheckedUpdateManyWithoutDealNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutDealNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutDealNestedInput
 }
 
 export type DealUncheckedUpdateManyWithoutUnitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
-  amount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  bookingUntil?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
+  financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
+  listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  salePrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  discountAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  discountPercent?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  deposit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  reservedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -807,11 +2789,17 @@ export type DealUncheckedUpdateManyWithoutUnitInput = {
  */
 
 export type DealCountOutputType = {
+  paymentSchedules: number
   payments: number
+  activities: number
+  tasks: number
 }
 
 export type DealCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  paymentSchedules?: boolean | DealCountOutputTypeCountPaymentSchedulesArgs
   payments?: boolean | DealCountOutputTypeCountPaymentsArgs
+  activities?: boolean | DealCountOutputTypeCountActivitiesArgs
+  tasks?: boolean | DealCountOutputTypeCountTasksArgs
 }
 
 /**
@@ -827,95 +2815,223 @@ export type DealCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
 /**
  * DealCountOutputType without action
  */
+export type DealCountOutputTypeCountPaymentSchedulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentScheduleWhereInput
+}
+
+/**
+ * DealCountOutputType without action
+ */
 export type DealCountOutputTypeCountPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PaymentWhereInput
+}
+
+/**
+ * DealCountOutputType without action
+ */
+export type DealCountOutputTypeCountActivitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ActivityWhereInput
+}
+
+/**
+ * DealCountOutputType without action
+ */
+export type DealCountOutputTypeCountTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TaskWhereInput
 }
 
 
 export type DealSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  status?: boolean
-  amount?: boolean
-  bookingUntil?: boolean
-  clientId?: boolean
+  companyId?: boolean
+  projectId?: boolean
   unitId?: boolean
+  clientId?: boolean
+  managerId?: boolean
+  status?: boolean
+  financingType?: boolean
+  listPrice?: boolean
+  salePrice?: boolean
+  discountAmount?: boolean
+  discountPercent?: boolean
+  deposit?: boolean
+  reservedAt?: boolean
+  reservationExpiresAt?: boolean
+  reservedById?: boolean
+  contractNumber?: boolean
+  contractDate?: boolean
+  note?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
+  deletedAt?: boolean
+  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   unit?: boolean | Prisma.UnitDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
+  manager?: boolean | Prisma.Deal$managerArgs<ExtArgs>
+  reservedBy?: boolean | Prisma.Deal$reservedByArgs<ExtArgs>
+  paymentSchedules?: boolean | Prisma.Deal$paymentSchedulesArgs<ExtArgs>
   payments?: boolean | Prisma.Deal$paymentsArgs<ExtArgs>
+  activities?: boolean | Prisma.Deal$activitiesArgs<ExtArgs>
+  tasks?: boolean | Prisma.Deal$tasksArgs<ExtArgs>
   _count?: boolean | Prisma.DealCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["deal"]>
 
 export type DealSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  status?: boolean
-  amount?: boolean
-  bookingUntil?: boolean
-  clientId?: boolean
+  companyId?: boolean
+  projectId?: boolean
   unitId?: boolean
+  clientId?: boolean
+  managerId?: boolean
+  status?: boolean
+  financingType?: boolean
+  listPrice?: boolean
+  salePrice?: boolean
+  discountAmount?: boolean
+  discountPercent?: boolean
+  deposit?: boolean
+  reservedAt?: boolean
+  reservationExpiresAt?: boolean
+  reservedById?: boolean
+  contractNumber?: boolean
+  contractDate?: boolean
+  note?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
+  deletedAt?: boolean
+  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   unit?: boolean | Prisma.UnitDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
+  manager?: boolean | Prisma.Deal$managerArgs<ExtArgs>
+  reservedBy?: boolean | Prisma.Deal$reservedByArgs<ExtArgs>
 }, ExtArgs["result"]["deal"]>
 
 export type DealSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  status?: boolean
-  amount?: boolean
-  bookingUntil?: boolean
-  clientId?: boolean
+  companyId?: boolean
+  projectId?: boolean
   unitId?: boolean
+  clientId?: boolean
+  managerId?: boolean
+  status?: boolean
+  financingType?: boolean
+  listPrice?: boolean
+  salePrice?: boolean
+  discountAmount?: boolean
+  discountPercent?: boolean
+  deposit?: boolean
+  reservedAt?: boolean
+  reservationExpiresAt?: boolean
+  reservedById?: boolean
+  contractNumber?: boolean
+  contractDate?: boolean
+  note?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
+  deletedAt?: boolean
+  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   unit?: boolean | Prisma.UnitDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
+  manager?: boolean | Prisma.Deal$managerArgs<ExtArgs>
+  reservedBy?: boolean | Prisma.Deal$reservedByArgs<ExtArgs>
 }, ExtArgs["result"]["deal"]>
 
 export type DealSelectScalar = {
   id?: boolean
-  status?: boolean
-  amount?: boolean
-  bookingUntil?: boolean
-  clientId?: boolean
+  companyId?: boolean
+  projectId?: boolean
   unitId?: boolean
+  clientId?: boolean
+  managerId?: boolean
+  status?: boolean
+  financingType?: boolean
+  listPrice?: boolean
+  salePrice?: boolean
+  discountAmount?: boolean
+  discountPercent?: boolean
+  deposit?: boolean
+  reservedAt?: boolean
+  reservationExpiresAt?: boolean
+  reservedById?: boolean
+  contractNumber?: boolean
+  contractDate?: boolean
+  note?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
 }
 
-export type DealOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "status" | "amount" | "bookingUntil" | "clientId" | "unitId" | "createdAt" | "updatedAt", ExtArgs["result"]["deal"]>
+export type DealOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "projectId" | "unitId" | "clientId" | "managerId" | "status" | "financingType" | "listPrice" | "salePrice" | "discountAmount" | "discountPercent" | "deposit" | "reservedAt" | "reservationExpiresAt" | "reservedById" | "contractNumber" | "contractDate" | "note" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["deal"]>
 export type DealInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
+  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   unit?: boolean | Prisma.UnitDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
+  manager?: boolean | Prisma.Deal$managerArgs<ExtArgs>
+  reservedBy?: boolean | Prisma.Deal$reservedByArgs<ExtArgs>
+  paymentSchedules?: boolean | Prisma.Deal$paymentSchedulesArgs<ExtArgs>
   payments?: boolean | Prisma.Deal$paymentsArgs<ExtArgs>
+  activities?: boolean | Prisma.Deal$activitiesArgs<ExtArgs>
+  tasks?: boolean | Prisma.Deal$tasksArgs<ExtArgs>
   _count?: boolean | Prisma.DealCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type DealIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
+  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   unit?: boolean | Prisma.UnitDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
+  manager?: boolean | Prisma.Deal$managerArgs<ExtArgs>
+  reservedBy?: boolean | Prisma.Deal$reservedByArgs<ExtArgs>
 }
 export type DealIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
+  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
+  project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   unit?: boolean | Prisma.UnitDefaultArgs<ExtArgs>
+  client?: boolean | Prisma.ClientDefaultArgs<ExtArgs>
+  manager?: boolean | Prisma.Deal$managerArgs<ExtArgs>
+  reservedBy?: boolean | Prisma.Deal$reservedByArgs<ExtArgs>
 }
 
 export type $DealPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Deal"
   objects: {
-    client: Prisma.$ClientPayload<ExtArgs>
+    company: Prisma.$CompanyPayload<ExtArgs>
+    project: Prisma.$ProjectPayload<ExtArgs>
     unit: Prisma.$UnitPayload<ExtArgs>
+    client: Prisma.$ClientPayload<ExtArgs>
+    manager: Prisma.$UserPayload<ExtArgs> | null
+    reservedBy: Prisma.$UserPayload<ExtArgs> | null
+    paymentSchedules: Prisma.$PaymentSchedulePayload<ExtArgs>[]
     payments: Prisma.$PaymentPayload<ExtArgs>[]
+    activities: Prisma.$ActivityPayload<ExtArgs>[]
+    tasks: Prisma.$TaskPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
-    status: $Enums.DealStatus
-    amount: runtime.Decimal
-    bookingUntil: Date | null
-    clientId: string
+    companyId: string
+    projectId: string
     unitId: string
+    clientId: string
+    managerId: string | null
+    status: $Enums.DealStatus
+    financingType: $Enums.FinancingType | null
+    listPrice: runtime.Decimal
+    salePrice: runtime.Decimal
+    discountAmount: runtime.Decimal | null
+    discountPercent: runtime.Decimal | null
+    deposit: runtime.Decimal | null
+    reservedAt: Date | null
+    reservationExpiresAt: Date | null
+    reservedById: string | null
+    contractNumber: string | null
+    contractDate: Date | null
+    note: string | null
     createdAt: Date
     updatedAt: Date
+    deletedAt: Date | null
   }, ExtArgs["result"]["deal"]>
   composites: {}
 }
@@ -1310,9 +3426,16 @@ readonly fields: DealFieldRefs;
  */
 export interface Prisma__DealClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  client<T extends Prisma.ClientDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientDefaultArgs<ExtArgs>>): Prisma.Prisma__ClientClient<runtime.Types.Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  company<T extends Prisma.CompanyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyDefaultArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  project<T extends Prisma.ProjectDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ProjectDefaultArgs<ExtArgs>>): Prisma.Prisma__ProjectClient<runtime.Types.Result.GetResult<Prisma.$ProjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   unit<T extends Prisma.UnitDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UnitDefaultArgs<ExtArgs>>): Prisma.Prisma__UnitClient<runtime.Types.Result.GetResult<Prisma.$UnitPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  client<T extends Prisma.ClientDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClientDefaultArgs<ExtArgs>>): Prisma.Prisma__ClientClient<runtime.Types.Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  manager<T extends Prisma.Deal$managerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Deal$managerArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  reservedBy<T extends Prisma.Deal$reservedByArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Deal$reservedByArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  paymentSchedules<T extends Prisma.Deal$paymentSchedulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Deal$paymentSchedulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentSchedulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   payments<T extends Prisma.Deal$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Deal$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  activities<T extends Prisma.Deal$activitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Deal$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tasks<T extends Prisma.Deal$tasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Deal$tasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1343,13 +3466,27 @@ export interface Prisma__DealClient<T, Null = never, ExtArgs extends runtime.Typ
  */
 export interface DealFieldRefs {
   readonly id: Prisma.FieldRef<"Deal", 'String'>
-  readonly status: Prisma.FieldRef<"Deal", 'DealStatus'>
-  readonly amount: Prisma.FieldRef<"Deal", 'Decimal'>
-  readonly bookingUntil: Prisma.FieldRef<"Deal", 'DateTime'>
-  readonly clientId: Prisma.FieldRef<"Deal", 'String'>
+  readonly companyId: Prisma.FieldRef<"Deal", 'String'>
+  readonly projectId: Prisma.FieldRef<"Deal", 'String'>
   readonly unitId: Prisma.FieldRef<"Deal", 'String'>
+  readonly clientId: Prisma.FieldRef<"Deal", 'String'>
+  readonly managerId: Prisma.FieldRef<"Deal", 'String'>
+  readonly status: Prisma.FieldRef<"Deal", 'DealStatus'>
+  readonly financingType: Prisma.FieldRef<"Deal", 'FinancingType'>
+  readonly listPrice: Prisma.FieldRef<"Deal", 'Decimal'>
+  readonly salePrice: Prisma.FieldRef<"Deal", 'Decimal'>
+  readonly discountAmount: Prisma.FieldRef<"Deal", 'Decimal'>
+  readonly discountPercent: Prisma.FieldRef<"Deal", 'Decimal'>
+  readonly deposit: Prisma.FieldRef<"Deal", 'Decimal'>
+  readonly reservedAt: Prisma.FieldRef<"Deal", 'DateTime'>
+  readonly reservationExpiresAt: Prisma.FieldRef<"Deal", 'DateTime'>
+  readonly reservedById: Prisma.FieldRef<"Deal", 'String'>
+  readonly contractNumber: Prisma.FieldRef<"Deal", 'String'>
+  readonly contractDate: Prisma.FieldRef<"Deal", 'DateTime'>
+  readonly note: Prisma.FieldRef<"Deal", 'String'>
   readonly createdAt: Prisma.FieldRef<"Deal", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Deal", 'DateTime'>
+  readonly deletedAt: Prisma.FieldRef<"Deal", 'DateTime'>
 }
     
 
@@ -1751,6 +3888,68 @@ export type DealDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
+ * Deal.manager
+ */
+export type Deal$managerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+}
+
+/**
+ * Deal.reservedBy
+ */
+export type Deal$reservedByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+}
+
+/**
+ * Deal.paymentSchedules
+ */
+export type Deal$paymentSchedulesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PaymentSchedule
+   */
+  select?: Prisma.PaymentScheduleSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PaymentSchedule
+   */
+  omit?: Prisma.PaymentScheduleOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentScheduleInclude<ExtArgs> | null
+  where?: Prisma.PaymentScheduleWhereInput
+  orderBy?: Prisma.PaymentScheduleOrderByWithRelationInput | Prisma.PaymentScheduleOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentScheduleWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentScheduleScalarFieldEnum | Prisma.PaymentScheduleScalarFieldEnum[]
+}
+
+/**
  * Deal.payments
  */
 export type Deal$paymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1772,6 +3971,54 @@ export type Deal$paymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[]
+}
+
+/**
+ * Deal.activities
+ */
+export type Deal$activitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Activity
+   */
+  select?: Prisma.ActivitySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Activity
+   */
+  omit?: Prisma.ActivityOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ActivityInclude<ExtArgs> | null
+  where?: Prisma.ActivityWhereInput
+  orderBy?: Prisma.ActivityOrderByWithRelationInput | Prisma.ActivityOrderByWithRelationInput[]
+  cursor?: Prisma.ActivityWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ActivityScalarFieldEnum | Prisma.ActivityScalarFieldEnum[]
+}
+
+/**
+ * Deal.tasks
+ */
+export type Deal$tasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Task
+   */
+  select?: Prisma.TaskSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Task
+   */
+  omit?: Prisma.TaskOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TaskInclude<ExtArgs> | null
+  where?: Prisma.TaskWhereInput
+  orderBy?: Prisma.TaskOrderByWithRelationInput | Prisma.TaskOrderByWithRelationInput[]
+  cursor?: Prisma.TaskWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TaskScalarFieldEnum | Prisma.TaskScalarFieldEnum[]
 }
 
 /**

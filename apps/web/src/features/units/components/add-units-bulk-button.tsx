@@ -45,7 +45,10 @@ export function AddUnitsBulkButton({
                 Bulk Units
             </Button>
 
-            <Sheet onOpenChange={({ open: isOpen }) => setOpen(isOpen)} open={open}>
+            <Sheet
+                onOpenChange={({ open: isOpen }) => setOpen(isOpen)}
+                open={open}
+            >
                 <SheetContent variant="inset" className="sm:max-w-md">
                     <SheetHeader>
                         <SheetTitle>Add multiple units to Floor {floorNumber}</SheetTitle>

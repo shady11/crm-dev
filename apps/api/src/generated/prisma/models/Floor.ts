@@ -45,6 +45,7 @@ export type FloorMinAggregateOutputType = {
   entranceId: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  deletedAt: Date | null
 }
 
 export type FloorMaxAggregateOutputType = {
@@ -56,6 +57,7 @@ export type FloorMaxAggregateOutputType = {
   entranceId: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  deletedAt: Date | null
 }
 
 export type FloorCountAggregateOutputType = {
@@ -67,6 +69,7 @@ export type FloorCountAggregateOutputType = {
   entranceId: number
   createdAt: number
   updatedAt: number
+  deletedAt: number
   _all: number
 }
 
@@ -90,6 +93,7 @@ export type FloorMinAggregateInputType = {
   entranceId?: true
   createdAt?: true
   updatedAt?: true
+  deletedAt?: true
 }
 
 export type FloorMaxAggregateInputType = {
@@ -101,6 +105,7 @@ export type FloorMaxAggregateInputType = {
   entranceId?: true
   createdAt?: true
   updatedAt?: true
+  deletedAt?: true
 }
 
 export type FloorCountAggregateInputType = {
@@ -112,6 +117,7 @@ export type FloorCountAggregateInputType = {
   entranceId?: true
   createdAt?: true
   updatedAt?: true
+  deletedAt?: true
   _all?: true
 }
 
@@ -210,6 +216,7 @@ export type FloorGroupByOutputType = {
   entranceId: string
   createdAt: Date
   updatedAt: Date
+  deletedAt: Date | null
   _count: FloorCountAggregateOutputType | null
   _avg: FloorAvgAggregateOutputType | null
   _sum: FloorSumAggregateOutputType | null
@@ -244,6 +251,7 @@ export type FloorWhereInput = {
   entranceId?: Prisma.StringFilter<"Floor"> | string
   createdAt?: Prisma.DateTimeFilter<"Floor"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Floor"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"Floor"> | Date | string | null
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
   block?: Prisma.XOR<Prisma.BlockScalarRelationFilter, Prisma.BlockWhereInput>
   entrance?: Prisma.XOR<Prisma.EntranceScalarRelationFilter, Prisma.EntranceWhereInput>
@@ -259,6 +267,7 @@ export type FloorOrderByWithRelationInput = {
   entranceId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   project?: Prisma.ProjectOrderByWithRelationInput
   block?: Prisma.BlockOrderByWithRelationInput
   entrance?: Prisma.EntranceOrderByWithRelationInput
@@ -278,6 +287,7 @@ export type FloorWhereUniqueInput = Prisma.AtLeast<{
   entranceId?: Prisma.StringFilter<"Floor"> | string
   createdAt?: Prisma.DateTimeFilter<"Floor"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Floor"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"Floor"> | Date | string | null
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
   block?: Prisma.XOR<Prisma.BlockScalarRelationFilter, Prisma.BlockWhereInput>
   entrance?: Prisma.XOR<Prisma.EntranceScalarRelationFilter, Prisma.EntranceWhereInput>
@@ -293,6 +303,7 @@ export type FloorOrderByWithAggregationInput = {
   entranceId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.FloorCountOrderByAggregateInput
   _avg?: Prisma.FloorAvgOrderByAggregateInput
   _max?: Prisma.FloorMaxOrderByAggregateInput
@@ -312,6 +323,7 @@ export type FloorScalarWhereWithAggregatesInput = {
   entranceId?: Prisma.StringWithAggregatesFilter<"Floor"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Floor"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Floor"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Floor"> | Date | string | null
 }
 
 export type FloorCreateInput = {
@@ -320,6 +332,7 @@ export type FloorCreateInput = {
   order?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   project: Prisma.ProjectCreateNestedOneWithoutFloorsInput
   block: Prisma.BlockCreateNestedOneWithoutFloorsInput
   entrance: Prisma.EntranceCreateNestedOneWithoutFloorsInput
@@ -335,6 +348,7 @@ export type FloorUncheckedCreateInput = {
   entranceId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   units?: Prisma.UnitUncheckedCreateNestedManyWithoutFloorInput
 }
 
@@ -344,6 +358,7 @@ export type FloorUpdateInput = {
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   project?: Prisma.ProjectUpdateOneRequiredWithoutFloorsNestedInput
   block?: Prisma.BlockUpdateOneRequiredWithoutFloorsNestedInput
   entrance?: Prisma.EntranceUpdateOneRequiredWithoutFloorsNestedInput
@@ -359,6 +374,7 @@ export type FloorUncheckedUpdateInput = {
   entranceId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   units?: Prisma.UnitUncheckedUpdateManyWithoutFloorNestedInput
 }
 
@@ -371,6 +387,7 @@ export type FloorCreateManyInput = {
   entranceId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
 }
 
 export type FloorUpdateManyMutationInput = {
@@ -379,6 +396,7 @@ export type FloorUpdateManyMutationInput = {
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FloorUncheckedUpdateManyInput = {
@@ -390,6 +408,7 @@ export type FloorUncheckedUpdateManyInput = {
   entranceId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FloorListRelationFilter = {
@@ -416,6 +435,7 @@ export type FloorCountOrderByAggregateInput = {
   entranceId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type FloorAvgOrderByAggregateInput = {
@@ -432,6 +452,7 @@ export type FloorMaxOrderByAggregateInput = {
   entranceId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type FloorMinOrderByAggregateInput = {
@@ -443,6 +464,7 @@ export type FloorMinOrderByAggregateInput = {
   entranceId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type FloorSumOrderByAggregateInput = {
@@ -601,6 +623,7 @@ export type FloorCreateWithoutProjectInput = {
   order?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   block: Prisma.BlockCreateNestedOneWithoutFloorsInput
   entrance: Prisma.EntranceCreateNestedOneWithoutFloorsInput
   units?: Prisma.UnitCreateNestedManyWithoutFloorInput
@@ -614,6 +637,7 @@ export type FloorUncheckedCreateWithoutProjectInput = {
   entranceId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   units?: Prisma.UnitUncheckedCreateNestedManyWithoutFloorInput
 }
 
@@ -655,6 +679,7 @@ export type FloorScalarWhereInput = {
   entranceId?: Prisma.StringFilter<"Floor"> | string
   createdAt?: Prisma.DateTimeFilter<"Floor"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Floor"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"Floor"> | Date | string | null
 }
 
 export type FloorCreateWithoutBlockInput = {
@@ -663,6 +688,7 @@ export type FloorCreateWithoutBlockInput = {
   order?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   project: Prisma.ProjectCreateNestedOneWithoutFloorsInput
   entrance: Prisma.EntranceCreateNestedOneWithoutFloorsInput
   units?: Prisma.UnitCreateNestedManyWithoutFloorInput
@@ -676,6 +702,7 @@ export type FloorUncheckedCreateWithoutBlockInput = {
   entranceId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   units?: Prisma.UnitUncheckedCreateNestedManyWithoutFloorInput
 }
 
@@ -711,6 +738,7 @@ export type FloorCreateWithoutEntranceInput = {
   order?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   project: Prisma.ProjectCreateNestedOneWithoutFloorsInput
   block: Prisma.BlockCreateNestedOneWithoutFloorsInput
   units?: Prisma.UnitCreateNestedManyWithoutFloorInput
@@ -724,6 +752,7 @@ export type FloorUncheckedCreateWithoutEntranceInput = {
   blockId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   units?: Prisma.UnitUncheckedCreateNestedManyWithoutFloorInput
 }
 
@@ -759,6 +788,7 @@ export type FloorCreateWithoutUnitsInput = {
   order?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   project: Prisma.ProjectCreateNestedOneWithoutFloorsInput
   block: Prisma.BlockCreateNestedOneWithoutFloorsInput
   entrance: Prisma.EntranceCreateNestedOneWithoutFloorsInput
@@ -773,6 +803,7 @@ export type FloorUncheckedCreateWithoutUnitsInput = {
   entranceId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
 }
 
 export type FloorCreateOrConnectWithoutUnitsInput = {
@@ -797,6 +828,7 @@ export type FloorUpdateWithoutUnitsInput = {
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   project?: Prisma.ProjectUpdateOneRequiredWithoutFloorsNestedInput
   block?: Prisma.BlockUpdateOneRequiredWithoutFloorsNestedInput
   entrance?: Prisma.EntranceUpdateOneRequiredWithoutFloorsNestedInput
@@ -811,6 +843,7 @@ export type FloorUncheckedUpdateWithoutUnitsInput = {
   entranceId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FloorCreateManyProjectInput = {
@@ -821,6 +854,7 @@ export type FloorCreateManyProjectInput = {
   entranceId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
 }
 
 export type FloorUpdateWithoutProjectInput = {
@@ -829,6 +863,7 @@ export type FloorUpdateWithoutProjectInput = {
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   block?: Prisma.BlockUpdateOneRequiredWithoutFloorsNestedInput
   entrance?: Prisma.EntranceUpdateOneRequiredWithoutFloorsNestedInput
   units?: Prisma.UnitUpdateManyWithoutFloorNestedInput
@@ -842,6 +877,7 @@ export type FloorUncheckedUpdateWithoutProjectInput = {
   entranceId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   units?: Prisma.UnitUncheckedUpdateManyWithoutFloorNestedInput
 }
 
@@ -853,6 +889,7 @@ export type FloorUncheckedUpdateManyWithoutProjectInput = {
   entranceId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FloorCreateManyBlockInput = {
@@ -863,6 +900,7 @@ export type FloorCreateManyBlockInput = {
   entranceId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
 }
 
 export type FloorUpdateWithoutBlockInput = {
@@ -871,6 +909,7 @@ export type FloorUpdateWithoutBlockInput = {
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   project?: Prisma.ProjectUpdateOneRequiredWithoutFloorsNestedInput
   entrance?: Prisma.EntranceUpdateOneRequiredWithoutFloorsNestedInput
   units?: Prisma.UnitUpdateManyWithoutFloorNestedInput
@@ -884,6 +923,7 @@ export type FloorUncheckedUpdateWithoutBlockInput = {
   entranceId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   units?: Prisma.UnitUncheckedUpdateManyWithoutFloorNestedInput
 }
 
@@ -895,6 +935,7 @@ export type FloorUncheckedUpdateManyWithoutBlockInput = {
   entranceId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type FloorCreateManyEntranceInput = {
@@ -905,6 +946,7 @@ export type FloorCreateManyEntranceInput = {
   blockId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
 }
 
 export type FloorUpdateWithoutEntranceInput = {
@@ -913,6 +955,7 @@ export type FloorUpdateWithoutEntranceInput = {
   order?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   project?: Prisma.ProjectUpdateOneRequiredWithoutFloorsNestedInput
   block?: Prisma.BlockUpdateOneRequiredWithoutFloorsNestedInput
   units?: Prisma.UnitUpdateManyWithoutFloorNestedInput
@@ -926,6 +969,7 @@ export type FloorUncheckedUpdateWithoutEntranceInput = {
   blockId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   units?: Prisma.UnitUncheckedUpdateManyWithoutFloorNestedInput
 }
 
@@ -937,6 +981,7 @@ export type FloorUncheckedUpdateManyWithoutEntranceInput = {
   blockId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -979,6 +1024,7 @@ export type FloorSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   entranceId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   block?: boolean | Prisma.BlockDefaultArgs<ExtArgs>
   entrance?: boolean | Prisma.EntranceDefaultArgs<ExtArgs>
@@ -995,6 +1041,7 @@ export type FloorSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   entranceId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   block?: boolean | Prisma.BlockDefaultArgs<ExtArgs>
   entrance?: boolean | Prisma.EntranceDefaultArgs<ExtArgs>
@@ -1009,6 +1056,7 @@ export type FloorSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   entranceId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   block?: boolean | Prisma.BlockDefaultArgs<ExtArgs>
   entrance?: boolean | Prisma.EntranceDefaultArgs<ExtArgs>
@@ -1023,9 +1071,10 @@ export type FloorSelectScalar = {
   entranceId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
 }
 
-export type FloorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "number" | "order" | "projectId" | "blockId" | "entranceId" | "createdAt" | "updatedAt", ExtArgs["result"]["floor"]>
+export type FloorOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "number" | "order" | "projectId" | "blockId" | "entranceId" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["floor"]>
 export type FloorInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   block?: boolean | Prisma.BlockDefaultArgs<ExtArgs>
@@ -1061,6 +1110,7 @@ export type $FloorPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     entranceId: string
     createdAt: Date
     updatedAt: Date
+    deletedAt: Date | null
   }, ExtArgs["result"]["floor"]>
   composites: {}
 }
@@ -1496,6 +1546,7 @@ export interface FloorFieldRefs {
   readonly entranceId: Prisma.FieldRef<"Floor", 'String'>
   readonly createdAt: Prisma.FieldRef<"Floor", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Floor", 'DateTime'>
+  readonly deletedAt: Prisma.FieldRef<"Floor", 'DateTime'>
 }
     
 

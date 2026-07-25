@@ -20,6 +20,8 @@ import { type Unit, UNIT_STATUS_LABELS, UNIT_TYPE_LABELS, UNIT_STATUS_CLASSES } 
 import { updateUnit, deleteUnit } from "@/features/units/api/units.api.ts";
 import { UnitForm } from "./unit-form.tsx";
 import {api} from "@/lib/api.ts";
+import {Menu, MenuContent, MenuGroup, MenuItem, MenuSeparator, MenuTrigger} from "@/components/ui/menu.tsx";
+import {toast} from "@/components/ui/toast.tsx";
 
 interface UnitTableProps {
     units: Unit[];
@@ -40,6 +42,11 @@ export function UnitTable({ units }: UnitTableProps) {
             updateUnit(unitId, payload),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
+
+            toast.success({
+                title: "Successfully updated",
+            });
+
             setUnitSheet(null);
         },
     });
@@ -48,6 +55,10 @@ export function UnitTable({ units }: UnitTableProps) {
         mutationFn: (unitId: string) => api.post(`/units/${unitId}/duplicate`),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
+
+            toast.success({
+                title: "Successfully duplicated",
+            });
         },
     });
 
@@ -55,6 +66,11 @@ export function UnitTable({ units }: UnitTableProps) {
         mutationFn: (unitId: string) => deleteUnit(unitId),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
+
+            toast.success({
+                title: "Successfully deleted",
+            });
+
             setDeleteUnitDialog(null);
         },
     });
@@ -87,33 +103,40 @@ export function UnitTable({ units }: UnitTableProps) {
                                     <TableCell>{unit.area} m<sup>2</sup></TableCell>
                                     <TableCell>{unit.price} $</TableCell>
                                     <TableCell className="text-right">
-                                        <DropdownMenu>
-                                            <DropdownMenuTrigger asChild>
+                                        <Menu>
+                                            <MenuTrigger asChild>
                                                 <Button variant="ghost" size="icon-sm">
                                                     <MoreVertical />
                                                 </Button>
-                                            </DropdownMenuTrigger>
-                                            <DropdownMenuContent align="end">
-                                                <DropdownMenuItem
-                                                    onClick={() => setUnitSheet({
-                                                        open: true,
-                                                        unit: unit,
-                                                    })}
-                                                >
-                                                    Edit
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem onClick={() => duplicateUnitMutation.mutate(unit.id)}>
-                                                    Duplicate
-                                                </DropdownMenuItem>
-                                                <DropdownMenuSeparator />
-                                                <DropdownMenuItem
+                                            </MenuTrigger>
+                                            <MenuContent>
+                                                <MenuGroup>
+                                                    <MenuItem
+                                                        value="edit"
+                                                        onClick={() => setUnitSheet({
+                                                            open: true,
+                                                            unit: unit,
+                                                        })}
+                                                    >
+                                                        Edit
+                                                    </MenuItem>
+                                                    <MenuItem
+                                                        value="diplicate"
+                                                        onClick={() => duplicateUnitMutation.mutate(unit.id)}
+                                                    >
+                                                        Duplicate
+                                                    </MenuItem>
+                                                </MenuGroup>
+                                                <MenuSeparator />
+                                                <MenuItem
+                                                    value="delete"
                                                     variant="destructive"
                                                     onClick={() => setDeleteUnitDialog(unit)}
                                                 >
                                                     Delete
-                                                </DropdownMenuItem>
-                                            </DropdownMenuContent>
-                                        </DropdownMenu>
+                                                </MenuItem>
+                                            </MenuContent>
+                                        </Menu>
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -126,13 +149,11 @@ export function UnitTable({ units }: UnitTableProps) {
             {unitSheet && (
                 <Sheet
                     open={unitSheet.open}
-                    onOpenChange={(open) => !open && setUnitSheet(null)}
+                    onOpenChange={({ open: isOpen }) => setUnitSheet(isOpen ? unitSheet : null)}
                 >
-                    <SheetContent className="sm:max-w-md">
+                    <SheetContent className="sm:max-w-sm" variant="inset">
                         <SheetHeader>
-                            <SheetTitle>
-                                Edit unit №{unitSheet.unit?.number}
-                            </SheetTitle>
+                            <SheetTitle>Edit unit №{unitSheet.unit?.number}</SheetTitle>
                         </SheetHeader>
                         <UnitForm
                             key={`unit-${unitSheet.unit?.id}-${unitSheet.open ? "open" : "closed"}`}
@@ -161,7 +182,7 @@ export function UnitTable({ units }: UnitTableProps) {
             {/* Delete Unit Dialog */}
             <AlertDialog
                 open={!!deleteUnitDialog}
-                onOpenChange={(open) => !open && setDeleteUnitDialog(null)}
+                onOpenChange={({ open: isOpen }) => setDeleteUnitDialog(isOpen ? deleteUnitDialog : null)}
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>

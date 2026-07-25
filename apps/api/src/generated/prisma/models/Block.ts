@@ -50,6 +50,7 @@ export type BlockMinAggregateOutputType = {
   unitsCount: number | null
   createdAt: Date | null
   updatedAt: Date | null
+  deletedAt: Date | null
 }
 
 export type BlockMaxAggregateOutputType = {
@@ -62,6 +63,7 @@ export type BlockMaxAggregateOutputType = {
   unitsCount: number | null
   createdAt: Date | null
   updatedAt: Date | null
+  deletedAt: Date | null
 }
 
 export type BlockCountAggregateOutputType = {
@@ -74,6 +76,7 @@ export type BlockCountAggregateOutputType = {
   unitsCount: number
   createdAt: number
   updatedAt: number
+  deletedAt: number
   _all: number
 }
 
@@ -102,6 +105,7 @@ export type BlockMinAggregateInputType = {
   unitsCount?: true
   createdAt?: true
   updatedAt?: true
+  deletedAt?: true
 }
 
 export type BlockMaxAggregateInputType = {
@@ -114,6 +118,7 @@ export type BlockMaxAggregateInputType = {
   unitsCount?: true
   createdAt?: true
   updatedAt?: true
+  deletedAt?: true
 }
 
 export type BlockCountAggregateInputType = {
@@ -126,6 +131,7 @@ export type BlockCountAggregateInputType = {
   unitsCount?: true
   createdAt?: true
   updatedAt?: true
+  deletedAt?: true
   _all?: true
 }
 
@@ -225,6 +231,7 @@ export type BlockGroupByOutputType = {
   unitsCount: number
   createdAt: Date
   updatedAt: Date
+  deletedAt: Date | null
   _count: BlockCountAggregateOutputType | null
   _avg: BlockAvgAggregateOutputType | null
   _sum: BlockSumAggregateOutputType | null
@@ -260,6 +267,7 @@ export type BlockWhereInput = {
   unitsCount?: Prisma.IntFilter<"Block"> | number
   createdAt?: Prisma.DateTimeFilter<"Block"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Block"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"Block"> | Date | string | null
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
   entrances?: Prisma.EntranceListRelationFilter
   floors?: Prisma.FloorListRelationFilter
@@ -276,6 +284,7 @@ export type BlockOrderByWithRelationInput = {
   unitsCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   project?: Prisma.ProjectOrderByWithRelationInput
   entrances?: Prisma.EntranceOrderByRelationAggregateInput
   floors?: Prisma.FloorOrderByRelationAggregateInput
@@ -296,6 +305,7 @@ export type BlockWhereUniqueInput = Prisma.AtLeast<{
   unitsCount?: Prisma.IntFilter<"Block"> | number
   createdAt?: Prisma.DateTimeFilter<"Block"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Block"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"Block"> | Date | string | null
   project?: Prisma.XOR<Prisma.ProjectScalarRelationFilter, Prisma.ProjectWhereInput>
   entrances?: Prisma.EntranceListRelationFilter
   floors?: Prisma.FloorListRelationFilter
@@ -312,6 +322,7 @@ export type BlockOrderByWithAggregationInput = {
   unitsCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.BlockCountOrderByAggregateInput
   _avg?: Prisma.BlockAvgOrderByAggregateInput
   _max?: Prisma.BlockMaxOrderByAggregateInput
@@ -332,6 +343,7 @@ export type BlockScalarWhereWithAggregatesInput = {
   unitsCount?: Prisma.IntWithAggregatesFilter<"Block"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Block"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Block"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Block"> | Date | string | null
 }
 
 export type BlockCreateInput = {
@@ -343,6 +355,7 @@ export type BlockCreateInput = {
   unitsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   project: Prisma.ProjectCreateNestedOneWithoutBlocksInput
   entrances?: Prisma.EntranceCreateNestedManyWithoutBlockInput
   floors?: Prisma.FloorCreateNestedManyWithoutBlockInput
@@ -359,6 +372,7 @@ export type BlockUncheckedCreateInput = {
   unitsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   entrances?: Prisma.EntranceUncheckedCreateNestedManyWithoutBlockInput
   floors?: Prisma.FloorUncheckedCreateNestedManyWithoutBlockInput
   units?: Prisma.UnitUncheckedCreateNestedManyWithoutBlockInput
@@ -373,6 +387,7 @@ export type BlockUpdateInput = {
   unitsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   project?: Prisma.ProjectUpdateOneRequiredWithoutBlocksNestedInput
   entrances?: Prisma.EntranceUpdateManyWithoutBlockNestedInput
   floors?: Prisma.FloorUpdateManyWithoutBlockNestedInput
@@ -389,6 +404,7 @@ export type BlockUncheckedUpdateInput = {
   unitsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   entrances?: Prisma.EntranceUncheckedUpdateManyWithoutBlockNestedInput
   floors?: Prisma.FloorUncheckedUpdateManyWithoutBlockNestedInput
   units?: Prisma.UnitUncheckedUpdateManyWithoutBlockNestedInput
@@ -404,6 +420,7 @@ export type BlockCreateManyInput = {
   unitsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
 }
 
 export type BlockUpdateManyMutationInput = {
@@ -415,6 +432,7 @@ export type BlockUpdateManyMutationInput = {
   unitsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type BlockUncheckedUpdateManyInput = {
@@ -427,6 +445,7 @@ export type BlockUncheckedUpdateManyInput = {
   unitsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type BlockListRelationFilter = {
@@ -454,6 +473,7 @@ export type BlockCountOrderByAggregateInput = {
   unitsCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type BlockAvgOrderByAggregateInput = {
@@ -473,6 +493,7 @@ export type BlockMaxOrderByAggregateInput = {
   unitsCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type BlockMinOrderByAggregateInput = {
@@ -485,6 +506,7 @@ export type BlockMinOrderByAggregateInput = {
   unitsCount?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type BlockSumOrderByAggregateInput = {
@@ -600,6 +622,7 @@ export type BlockCreateWithoutProjectInput = {
   unitsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   entrances?: Prisma.EntranceCreateNestedManyWithoutBlockInput
   floors?: Prisma.FloorCreateNestedManyWithoutBlockInput
   units?: Prisma.UnitCreateNestedManyWithoutBlockInput
@@ -614,6 +637,7 @@ export type BlockUncheckedCreateWithoutProjectInput = {
   unitsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   entrances?: Prisma.EntranceUncheckedCreateNestedManyWithoutBlockInput
   floors?: Prisma.FloorUncheckedCreateNestedManyWithoutBlockInput
   units?: Prisma.UnitUncheckedCreateNestedManyWithoutBlockInput
@@ -658,6 +682,7 @@ export type BlockScalarWhereInput = {
   unitsCount?: Prisma.IntFilter<"Block"> | number
   createdAt?: Prisma.DateTimeFilter<"Block"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Block"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"Block"> | Date | string | null
 }
 
 export type BlockCreateWithoutEntrancesInput = {
@@ -669,6 +694,7 @@ export type BlockCreateWithoutEntrancesInput = {
   unitsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   project: Prisma.ProjectCreateNestedOneWithoutBlocksInput
   floors?: Prisma.FloorCreateNestedManyWithoutBlockInput
   units?: Prisma.UnitCreateNestedManyWithoutBlockInput
@@ -684,6 +710,7 @@ export type BlockUncheckedCreateWithoutEntrancesInput = {
   unitsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   floors?: Prisma.FloorUncheckedCreateNestedManyWithoutBlockInput
   units?: Prisma.UnitUncheckedCreateNestedManyWithoutBlockInput
 }
@@ -713,6 +740,7 @@ export type BlockUpdateWithoutEntrancesInput = {
   unitsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   project?: Prisma.ProjectUpdateOneRequiredWithoutBlocksNestedInput
   floors?: Prisma.FloorUpdateManyWithoutBlockNestedInput
   units?: Prisma.UnitUpdateManyWithoutBlockNestedInput
@@ -728,6 +756,7 @@ export type BlockUncheckedUpdateWithoutEntrancesInput = {
   unitsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   floors?: Prisma.FloorUncheckedUpdateManyWithoutBlockNestedInput
   units?: Prisma.UnitUncheckedUpdateManyWithoutBlockNestedInput
 }
@@ -741,6 +770,7 @@ export type BlockCreateWithoutFloorsInput = {
   unitsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   project: Prisma.ProjectCreateNestedOneWithoutBlocksInput
   entrances?: Prisma.EntranceCreateNestedManyWithoutBlockInput
   units?: Prisma.UnitCreateNestedManyWithoutBlockInput
@@ -756,6 +786,7 @@ export type BlockUncheckedCreateWithoutFloorsInput = {
   unitsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   entrances?: Prisma.EntranceUncheckedCreateNestedManyWithoutBlockInput
   units?: Prisma.UnitUncheckedCreateNestedManyWithoutBlockInput
 }
@@ -785,6 +816,7 @@ export type BlockUpdateWithoutFloorsInput = {
   unitsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   project?: Prisma.ProjectUpdateOneRequiredWithoutBlocksNestedInput
   entrances?: Prisma.EntranceUpdateManyWithoutBlockNestedInput
   units?: Prisma.UnitUpdateManyWithoutBlockNestedInput
@@ -800,6 +832,7 @@ export type BlockUncheckedUpdateWithoutFloorsInput = {
   unitsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   entrances?: Prisma.EntranceUncheckedUpdateManyWithoutBlockNestedInput
   units?: Prisma.UnitUncheckedUpdateManyWithoutBlockNestedInput
 }
@@ -813,6 +846,7 @@ export type BlockCreateWithoutUnitsInput = {
   unitsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   project: Prisma.ProjectCreateNestedOneWithoutBlocksInput
   entrances?: Prisma.EntranceCreateNestedManyWithoutBlockInput
   floors?: Prisma.FloorCreateNestedManyWithoutBlockInput
@@ -828,6 +862,7 @@ export type BlockUncheckedCreateWithoutUnitsInput = {
   unitsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   entrances?: Prisma.EntranceUncheckedCreateNestedManyWithoutBlockInput
   floors?: Prisma.FloorUncheckedCreateNestedManyWithoutBlockInput
 }
@@ -857,6 +892,7 @@ export type BlockUpdateWithoutUnitsInput = {
   unitsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   project?: Prisma.ProjectUpdateOneRequiredWithoutBlocksNestedInput
   entrances?: Prisma.EntranceUpdateManyWithoutBlockNestedInput
   floors?: Prisma.FloorUpdateManyWithoutBlockNestedInput
@@ -872,6 +908,7 @@ export type BlockUncheckedUpdateWithoutUnitsInput = {
   unitsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   entrances?: Prisma.EntranceUncheckedUpdateManyWithoutBlockNestedInput
   floors?: Prisma.FloorUncheckedUpdateManyWithoutBlockNestedInput
 }
@@ -885,6 +922,7 @@ export type BlockCreateManyProjectInput = {
   unitsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
 }
 
 export type BlockUpdateWithoutProjectInput = {
@@ -896,6 +934,7 @@ export type BlockUpdateWithoutProjectInput = {
   unitsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   entrances?: Prisma.EntranceUpdateManyWithoutBlockNestedInput
   floors?: Prisma.FloorUpdateManyWithoutBlockNestedInput
   units?: Prisma.UnitUpdateManyWithoutBlockNestedInput
@@ -910,6 +949,7 @@ export type BlockUncheckedUpdateWithoutProjectInput = {
   unitsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   entrances?: Prisma.EntranceUncheckedUpdateManyWithoutBlockNestedInput
   floors?: Prisma.FloorUncheckedUpdateManyWithoutBlockNestedInput
   units?: Prisma.UnitUncheckedUpdateManyWithoutBlockNestedInput
@@ -924,6 +964,7 @@ export type BlockUncheckedUpdateManyWithoutProjectInput = {
   unitsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -985,6 +1026,7 @@ export type BlockSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   unitsCount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   entrances?: boolean | Prisma.Block$entrancesArgs<ExtArgs>
   floors?: boolean | Prisma.Block$floorsArgs<ExtArgs>
@@ -1002,6 +1044,7 @@ export type BlockSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   unitsCount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["block"]>
 
@@ -1015,6 +1058,7 @@ export type BlockSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   unitsCount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["block"]>
 
@@ -1028,9 +1072,10 @@ export type BlockSelectScalar = {
   unitsCount?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
 }
 
-export type BlockOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "order" | "projectId" | "entrancesCount" | "floorsCount" | "unitsCount" | "createdAt" | "updatedAt", ExtArgs["result"]["block"]>
+export type BlockOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "order" | "projectId" | "entrancesCount" | "floorsCount" | "unitsCount" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["block"]>
 export type BlockInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
   entrances?: boolean | Prisma.Block$entrancesArgs<ExtArgs>
@@ -1063,6 +1108,7 @@ export type $BlockPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     unitsCount: number
     createdAt: Date
     updatedAt: Date
+    deletedAt: Date | null
   }, ExtArgs["result"]["block"]>
   composites: {}
 }
@@ -1499,6 +1545,7 @@ export interface BlockFieldRefs {
   readonly unitsCount: Prisma.FieldRef<"Block", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Block", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Block", 'DateTime'>
+  readonly deletedAt: Prisma.FieldRef<"Block", 'DateTime'>
 }
     
 

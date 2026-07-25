@@ -1,16 +1,19 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent } from "@/components/ui/card.tsx";
+import {useNavigate, useParams} from "react-router-dom";
+import {useQuery} from "@tanstack/react-query";
+import {Card, CardContent} from "@/components/ui/card.tsx";
 import type {Block} from "@/features/blocks/types/block.types.ts";
 import type {Project} from "@/features/projects/types/project.types.ts";
 import {Separator} from "@/components/ui/separator.tsx";
 import {
-    Building2Icon, BuildingIcon,
+    Building2Icon,
+    BuildingIcon,
     HouseIcon,
     Layers2Icon,
-    Loader2Icon, SquareArrowRightEnterIcon
+    Loader2Icon,
+    SquareArrowRightEnterIcon
 } from "lucide-react";
 import {getProjectTree} from "@/features/projects/api/projects.api.ts";
+import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 
 export function ChessboardBlocks() {
     const { projectId } = useParams<{ projectId: string }>();
@@ -34,21 +37,24 @@ export function ChessboardBlocks() {
 
     if (!tree || !tree.blocks || tree.blocks.length === 0) {
         return (
-            <div className="flex h-96 items-center justify-center text-muted-foreground">
-                <div className="text-center">
-                    <Building2Icon className="mx-auto h-12 w-12 mb-4" />
-                    <p className="text-lg font-medium">No blocks yet</p>
-                    <p className="text-sm">Create blocks in the Builder tab first</p>
-                </div>
-            </div>
+            <Empty>
+                <EmptyHeader>
+                    <EmptyMedia variant="icon">
+                        <Building2Icon strokeWidth={1.25}/>
+                    </EmptyMedia>
+                    <EmptyTitle>No blocks yet</EmptyTitle>
+                    <EmptyDescription>
+                        Create blocks in the Builder tab first
+                    </EmptyDescription>
+                </EmptyHeader>
+            </Empty>
         );
     }
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-lg font-semibold">Select Block</h2>
-                <p className="text-sm text-muted-foreground">Choose a block to view its chessboard</p>
+            <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-medium">Select Block</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -63,7 +69,7 @@ export function ChessboardBlocks() {
                     return (
                         <Card
                             key={block.id}
-                            className="cursor-pointer ring-0 border-0 bg-card shadow-sm"
+                            className="cursor-pointer border border-secondary shadow-none"
                             onClick={() => navigate(`./${block.id}`)}
                         >
                             <CardContent>
@@ -73,7 +79,7 @@ export function ChessboardBlocks() {
                                             <BuildingIcon size={32} strokeWidth={1.25} className="text-white" />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-semibold">Block {block.name}</h3>
+                                            <h3 className="text-lg font-medium">Block {block.name}</h3>
                                             {(block as any).code && (
                                                 <p className="text-xs text-muted-foreground">{(block as any).code}</p>
                                             )}

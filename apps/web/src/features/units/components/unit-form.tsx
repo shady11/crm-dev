@@ -1,22 +1,22 @@
-import { useEffect, useState } from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
+import {useEffect, useState} from "react";
+import {zodResolver} from "@hookform/resolvers/zod";
 import {Loader2, TriangleAlert} from "lucide-react";
 import {Controller, useForm} from "react-hook-form";
-import { z } from "zod";
-import { Button } from "@/components/ui/button.tsx";
-import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field.tsx";
-import { Input } from "@/components/ui/input.tsx";
+import {z} from "zod";
+import {Button} from "@/components/ui/button.tsx";
+import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field.tsx";
+import {Input} from "@/components/ui/input.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {
-    type Unit,
-    UnitType,
-    UnitStatus,
-    normalizeUnitType,
     normalizeUnitStatus,
-    UNIT_TYPE_LABELS,
-    UNIT_TYPE_VALUES,
+    normalizeUnitType,
+    type Unit,
     UNIT_STATUS_LABELS,
     UNIT_STATUS_VALUES,
+    UNIT_TYPE_LABELS,
+    UNIT_TYPE_VALUES,
+    UnitStatus,
+    UnitType,
 } from "@/features/units/types/unit.types.ts";
 import {SheetBody, SheetClose, SheetFooter} from "@/components/ui/sheet.tsx";
 import {createListCollection} from "@ark-ui/react";
@@ -28,16 +28,18 @@ import {
     NumberInputInput
 } from "@/components/ui/number-input.tsx";
 import {Alert, AlertTitle} from "@/components/ui/alert.tsx";
+import type {CreateUnitPayload} from "@/features/units/types/unit-payload.ts";
 
 const unitSchema = z.object({
-    number: z.string().trim().min(1, "Unit number is required"),
-    type: z.enum(UNIT_TYPE_VALUES, "Select a type"),
-    status: z.enum(UNIT_STATUS_VALUES, "Select a status"),
+    number: z.string().trim().min(1),
+    type: z.enum(UNIT_TYPE_VALUES),
+    status: z.enum(UNIT_STATUS_VALUES),
     rooms: z.number().optional(),
-    area: z.string().trim().min(0.1, "Area must be greater than 0"),
-    price: z.string().trim().min(0, "Price must be positive"),
+    area: z.number().positive(),
+    price: z.number().nonnegative(),
 });
 
+type UnitFormInput = z.input<typeof unitSchema>;
 type UnitFormValues = z.infer<typeof unitSchema>;
 
 type UnitFormProps = {
@@ -46,14 +48,7 @@ type UnitFormProps = {
     isSubmitting?: boolean;
     submitLabel?: string;
     onCancel?: () => void;
-    onSubmit: (payload: {
-        number: string;
-        type?: UnitType;
-        status?: UnitStatus;
-        rooms?: number;
-        area: string;
-        price: string;
-    }) => void;
+    onSubmit: (payload: Partial<CreateUnitPayload>) => void;
 };
 
 const DEFAULT_VALUES: UnitFormValues = {
@@ -61,8 +56,8 @@ const DEFAULT_VALUES: UnitFormValues = {
     type: UnitType.APARTMENT,
     status: UnitStatus.AVAILABLE,
     rooms: 1,
-    area: "",
-    price: "",
+    area: 0,
+    price: 0,
 };
 
 export function UnitForm({
@@ -82,7 +77,7 @@ export function UnitForm({
     const [, setSelectedStatus] =
         useState<UnitStatus>(initialStatus);
 
-    const form = useForm<UnitFormValues>({
+    const form = useForm<UnitFormInput>({
         resolver: zodResolver(unitSchema),
         defaultValues: DEFAULT_VALUES,
     });
@@ -93,8 +88,8 @@ export function UnitForm({
             type: initialType,
             status: initialStatus,
             rooms: unit?.rooms ?? 1,
-            area: unit?.area ?? "",
-            price: unit?.price ?? "",
+            area: Number(unit?.area ?? 0),
+            price: Number(unit?.price ?? 0),
         });
     }, [form, unit]);
 
@@ -159,7 +154,7 @@ export function UnitForm({
                                     collection={typeCollection}
                                     name={field.name}
                                     onValueChange={(item) => {
-                                        const type = normalizeUnitType(item.value[0]);
+                                        const type = item.value[0] as UnitType;
                                         setSelectedType(type);
                                         form.setValue("type", type, {
                                             shouldDirty: true,
@@ -251,7 +246,7 @@ export function UnitForm({
                                     collection={statusCollection}
                                     name={field.name}
                                     onValueChange={(item) => {
-                                        const status = normalizeUnitStatus(item.value[0]);
+                                        const status = item.value[0] as UnitStatus;
                                         setSelectedStatus(status);
                                         form.setValue("status", status, {
                                             shouldDirty: true,

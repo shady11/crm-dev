@@ -149,7 +149,7 @@ export const PopoverTitle = (
 
   return (
     <ArkPopover.Title
-      className={cn("font-semibold text-base leading-none", className)}
+      className={cn("font-medium text-base leading-none", className)}
       data-slot="popover-title"
       {...rest}
     />

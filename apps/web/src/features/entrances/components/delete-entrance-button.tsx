@@ -22,7 +22,7 @@ interface DeleteEntranceButtonProps {
 
 export function DeleteEntranceButton({ entrance }: DeleteEntranceButtonProps) {
     const queryClient = useQueryClient();
-    const [isOpen, setIsOpen] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const deleteEntranceMutation = useMutation({
         mutationFn: () => deleteEntrance(entrance.id),
@@ -31,10 +31,10 @@ export function DeleteEntranceButton({ entrance }: DeleteEntranceButtonProps) {
 
             toast.success({
                 title: "Successfully deleted",
-                description: `Entrance ${entrance.name} has been deleted.`,
+                // description: `Entrance ${entrance.name} has been deleted.`,
             });
 
-            setIsOpen(false);
+            setOpen(false);
         },
     });
 
@@ -43,14 +43,14 @@ export function DeleteEntranceButton({ entrance }: DeleteEntranceButtonProps) {
             <Button
                 size="icon-sm"
                 variant="destructive"
-                onClick={() => setIsOpen(true)}
+                onClick={() => setOpen(true)}
             >
                 <Trash2 className="size-3" />
             </Button>
 
             <AlertDialog
-                open={isOpen}
-                onOpenChange={({ open }) => setIsOpen(open)}
+                open={open}
+                onOpenChange={({ open }) => setOpen(open)}
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>

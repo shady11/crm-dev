@@ -1,15 +1,11 @@
 "use client";
 
-import { DatePicker as ArkCalendar } from "@ark-ui/react/date-picker";
-import {
-  ChevronDownIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "lucide-react";
+import {DatePicker as ArkCalendar} from "@ark-ui/react/date-picker";
+import {ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon,} from "lucide-react";
 import type React from "react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { nativeSelectVariants } from "@/components/ui/native-select";
+import {cn} from "@/lib/utils";
+import {Button} from "@/components/ui/button";
+import {nativeSelectVariants} from "@/components/ui/native-select";
 
 export const Calendar = (
   props: React.ComponentProps<typeof ArkCalendar.Root>
@@ -228,7 +224,7 @@ export const CalendarTable = (
 interface CalendarWeekDaysProps
   extends React.ComponentProps<typeof ArkCalendar.TableHead> {
   /**
-   * The format of the week days
+   * The utils of the week days
    *
    * @default 'narrow'
    */

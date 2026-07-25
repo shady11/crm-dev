@@ -138,7 +138,10 @@ export function ProjectPage() {
 
             <Outlet/>
 
-            <Sheet onOpenChange={({ open: isOpen }) => setOpen(isOpen)} open={open}>
+            <Sheet
+                onOpenChange={({ open: isOpen }) => setOpen(isOpen)}
+                open={open}
+            >
                 <SheetContent variant="inset" className="sm:max-w-md">
                     <SheetHeader>
                         <SheetTitle>Edit project</SheetTitle>

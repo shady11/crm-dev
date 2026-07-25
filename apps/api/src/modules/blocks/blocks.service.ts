@@ -1,15 +1,10 @@
-import {
-    BadRequestException,
-    ForbiddenException,
-    Injectable,
-    NotFoundException,
-} from "@nestjs/common";
+import {BadRequestException, ForbiddenException, Injectable, NotFoundException,} from "@nestjs/common";
 import {Prisma, UnitStatus} from "@/generated/prisma/client";
-import { PrismaService } from "@/database/prisma.service";
-import { AuthUser } from "@/common/types/auth-user.type";
-import { CreateBlockDto } from "./dto/create-block.dto";
-import { UpdateBlockDto } from "./dto/update-block.dto";
-import { QueryBlocksDto } from "./dto/query-blocks.dto";
+import {PrismaService} from "@/database/prisma.service";
+import {AuthUser} from "@/common/types/auth-user.type";
+import {CreateBlockDto} from "./dto/create-block.dto";
+import {UpdateBlockDto} from "./dto/update-block.dto";
+import {QueryBlocksDto} from "./dto/query-blocks.dto";
 
 @Injectable()
 export class BlocksService {

@@ -1,13 +1,8 @@
-import {
-    BadRequestException,
-    ForbiddenException,
-    Injectable,
-    NotFoundException,
-} from "@nestjs/common";
-import { Prisma, UnitStatus, UnitType } from "@/generated/prisma/client";
-import { PrismaService } from "@/database/prisma.service";
-import { AuthUser } from "@/common/types/auth-user.type";
-import { QueryChessboardDto } from "./dto/query-chessboard.dto";
+import {BadRequestException, ForbiddenException, Injectable, NotFoundException,} from "@nestjs/common";
+import {Prisma, UnitStatus, UnitType} from "@/generated/prisma/client";
+import {PrismaService} from "@/database/prisma.service";
+import {AuthUser} from "@/common/types/auth-user.type";
+import {QueryChessboardDto} from "./dto/query-chessboard.dto";
 
 type ChessboardUnit = {
     id: string;
@@ -261,10 +256,8 @@ export class ChessboardService {
             },
             {
                 AVAILABLE: 0,
-                BOOKED: 0,
+                RESERVED: 0,
                 SOLD: 0,
-                INSTALLMENT: 0,
-                MORTGAGE: 0,
                 UNAVAILABLE: 0,
             },
         );

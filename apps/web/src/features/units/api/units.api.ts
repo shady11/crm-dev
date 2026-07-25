@@ -1,15 +1,7 @@
-import { api } from "@/lib/api";
-import type { PaginatedResponse } from "@/lib/api-types.ts";
-import type { Unit, UnitStatus, UnitType } from "@/features/units/types/unit.types";
-
-export type UnitPayload = {
-    number: string;
-    type?: UnitType;
-    status?: UnitStatus;
-    rooms?: number;
-    area: number;
-    price: number;
-};
+import {api} from "@/lib/api";
+import type {PaginatedResponse} from "@/lib/api-types.ts";
+import type {Unit, UnitStatus} from "@/features/units/types/unit.types";
+import type {CreateUnitPayload, UpdateUnitPayload} from "@/features/units/types/unit-payload.ts";
 
 export async function getUnits(floorId: string) {
     const response = await api.get<PaginatedResponse<Unit>>(
@@ -20,7 +12,7 @@ export async function getUnits(floorId: string) {
 
 export async function createUnit(
     floorId: string,
-    payload: UnitPayload,
+    payload: CreateUnitPayload,
 ) {
     const response = await api.post<Unit>(
         `/floors/${floorId}/units`,
@@ -31,7 +23,7 @@ export async function createUnit(
 
 export async function updateUnit(
     unitId: string,
-    payload: Partial<UnitPayload>,
+    payload: UpdateUnitPayload,
 ) {
     const response = await api.patch<Unit>(
         `/units/${unitId}`,

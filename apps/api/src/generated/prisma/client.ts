@@ -94,3 +94,23 @@ export type Deal = Prisma.DealModel
  * 
  */
 export type Payment = Prisma.PaymentModel
+/**
+ * Model PaymentSchedule
+ * 
+ */
+export type PaymentSchedule = Prisma.PaymentScheduleModel
+/**
+ * Model Activity
+ * 
+ */
+export type Activity = Prisma.ActivityModel
+/**
+ * Model Task
+ * 
+ */
+export type Task = Prisma.TaskModel
+/**
+ * Model Document
+ * 
+ */
+export type Document = Prisma.DocumentModel

@@ -18,12 +18,21 @@ enum UserRole {
 enum LeadStatus {
   NEW
   CONTACTED
-  MEETING_SCHEDULED
+  QUALIFIED
+  MEETING
   NEGOTIATION
-  BOOKING
-  CONTRACT
-  SOLD
-  REJECTED
+  CONVERTED
+  LOST
+}
+
+enum ProjectStatus {
+  DRAFT
+  PLANNING
+  ACTIVE
+  PAUSED
+  SOLDOUT
+  COMPLETED
+  ARCHIVED
 }
 
 enum UnitType {
@@ -35,16 +44,14 @@ enum UnitType {
 
 enum UnitStatus {
   AVAILABLE
-  BOOKED
+  RESERVED
   SOLD
-  INSTALLMENT
-  MORTGAGE
   UNAVAILABLE
 }
 
 enum DealStatus {
-  BOOKED
-  CONTRACT
+  RESERVED
+  CONTRACT_SIGNED
   ACTIVE
   COMPLETED
   CANCELLED
@@ -59,22 +66,134 @@ enum PaymentMethod {
   OTHER
 }
 
-model Company {
-  id        String   @id @default(uuid())
-  name      String
-  phone     String?
-  address   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum FinancingType {
+  CASH
+  INSTALLMENT
+  MORTGAGE
+}
 
-  users    User[]
-  leads    Lead[]
-  clients  Client[]
-  projects Project[]
+enum PaymentType {
+  DEPOSIT
+  INSTALLMENT
+  FINAL
+  REFUND
+}
+
+enum PaymentScheduleStatus {
+  PENDING
+  PARTIAL
+  PAID
+  OVERDUE
+}
+
+enum ActivityType {
+  LEAD_CREATED
+  LEAD_UPDATED
+
+  CLIENT_CREATED
+  CLIENT_UPDATED
+
+  DEAL_CREATED
+  DEAL_UPDATED
+
+  UNIT_RESERVED
+  RESERVATION_EXTENDED
+  RESERVATION_CANCELLED
+
+  CONTRACT_SIGNED
+
+  PAYMENT_RECEIVED
+  PAYMENT_REFUNDED
+
+  NOTE_ADDED
+
+  TASK_CREATED
+  TASK_COMPLETED
+
+  CALL
+  MEETING
+  EMAIL
+}
+
+enum ActivityAction {
+  CREATED
+  UPDATED
+  DELETED
+
+  RESERVED_UNIT
+  CANCELLED_RESERVATION
+
+  CREATED_DEAL
+  UPDATED_DEAL
+  CHANGED_DEAL_STATUS
+
+  CREATED_PAYMENT
+  RECEIVED_PAYMENT
+
+  GENERATED_CONTRACT
+
+  CREATED_TASK
+  COMPLETED_TASK
+
+  NOTE_ADDED
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+enum DocumentOwnerType {
+  LEAD
+  CLIENT
+  DEAL
+  PROJECT
+  UNIT
+}
+
+enum DocumentType {
+  PASSPORT
+  CONTRACT
+  RESERVATION
+  PAYMENT_RECEIPT
+  PAYMENT_SCHEDULE
+  INVOICE
+  AGREEMENT
+  POWER_OF_ATTORNEY
+  FLOOR_PLAN
+  OTHER
+}
+
+model Company {
+  id String @id @default(uuid())
+
+  name    String
+  phone   String?
+  address String?
+
+  currency String? @default("KGS")
+  timezone String?
+  locale   String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  users      User[]
+  leads      Lead[]
+  clients    Client[]
+  projects   Project[]
+  deals      Deal[]
+  activities Activity[]
+  tasks      Task[]
+  documents  Document[]
 }
 
 model User {
-  id           String   @id @default(uuid())
+  id String @id @default(uuid())
+
   fullName     String
   email        String   @unique
   phone        String?
@@ -85,13 +204,23 @@ model User {
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
 
-  leads     Lead[]   @relation("LeadManager")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  leads         Lead[]
+  managedLeads  Lead[]     @relation("LeadManager")
+  deals         Deal[]
+  reservedDeals Deal[]     @relation("ReservedBy")
+  payments      Payment[]
+  activities    Activity[]
+  tasks         Task[]
+  documents     Document[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 }
 
 model Lead {
-  id       String     @id @default(uuid())
+  id String @id @default(uuid())
+
   source   String?
   status   LeadStatus @default(NEW)
   fullName String
@@ -99,8 +228,15 @@ model Lead {
   email    String?
   comment  String?
 
+  nextContactAt DateTime?
+  lastContactAt DateTime?
+  assignedAt    DateTime?
+
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
+
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id])
 
   managerId String?
   manager   User?   @relation("LeadManager", fields: [managerId], references: [id])
@@ -108,8 +244,12 @@ model Lead {
   clientId String?
   client   Client? @relation(fields: [clientId], references: [id])
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  activities Activity[]
+  tasks      Task[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@index([companyId])
   @@index([companyId, status])
@@ -118,48 +258,60 @@ model Lead {
 }
 
 model Client {
-  id       String  @id @default(uuid())
-  fullName String
-  phone    String
-  whatsapp String?
-  email    String?
-  passport String?
+  id String @id @default(uuid())
+
+  fullName  String
+  phone     String
+  whatsapp  String?
+  email     String?
+  passport  String?
+  pin       String?
+  birthDate DateTime?
+  address   String?
+  notes     String?
 
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  leads Lead[]
-  deals Deal[]
+  leads      Lead[]
+  deals      Deal[]
+  activities Activity[]
+  tasks      Task[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@index([companyId])
   @@index([companyId, phone])
 }
 
 model Project {
-  id      String  @id @default(uuid())
+  id String @id @default(uuid())
+
   name    String
   address String?
-  status  String  @default("active")
+  status  ProjectStatus @default(DRAFT)
 
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  blocks Block[]
-  units  Unit[]
-
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  blocks    Block[]
+  units     Unit[]
   entrances Entrance[]
   floors    Floor[]
+  deals     Deal[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@index([companyId])
 }
 
 model Block {
-  id    String @id @default(uuid())
+  id String @id @default(uuid())
+
   name  String
   order Int    @default(0)
 
@@ -174,15 +326,17 @@ model Block {
   floors    Floor[]
   units     Unit[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@unique([projectId, name])
   @@index([projectId])
 }
 
 model Entrance {
-  id    String @id @default(uuid())
+  id String @id @default(uuid())
+
   name  String
   order Int    @default(0)
 
@@ -195,8 +349,9 @@ model Entrance {
   floors Floor[]
   units  Unit[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@unique([blockId, name])
   @@index([blockId])
@@ -204,9 +359,10 @@ model Entrance {
 }
 
 model Floor {
-  id     String @id @default(uuid())
+  id String @id @default(uuid())
+
   number Int
-  order  Int    @default(0)
+  order  Int @default(0)
 
   projectId String
   project   Project @relation(fields: [projectId], references: [id])
@@ -219,8 +375,9 @@ model Floor {
 
   units Unit[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@unique([entranceId, number])
   @@index([entranceId])
@@ -229,14 +386,16 @@ model Floor {
 }
 
 model Unit {
-  id     String     @id @default(uuid())
+  id String @id @default(uuid())
+
   number String
   type   UnitType   @default(APARTMENT)
   status UnitStatus @default(AVAILABLE)
 
-  rooms Int?
-  area  Decimal
-  price Decimal
+  rooms       Int?
+  area        Decimal
+  price       Decimal
+  pricePerSqm Decimal?
 
   projectId String
   project   Project @relation(fields: [projectId], references: [id])
@@ -252,8 +411,9 @@ model Unit {
 
   deals Deal[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@unique([blockId, number])
   @@index([projectId])
@@ -267,33 +427,224 @@ model Unit {
 }
 
 model Deal {
-  id           String     @id @default(uuid())
-  status       DealStatus @default(BOOKED)
-  amount       Decimal
-  bookingUntil DateTime?
+  id String @id @default(uuid())
 
-  clientId String
-  client   Client @relation(fields: [clientId], references: [id])
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   unitId String
-  unit   Unit   @relation(fields: [unitId], references: [id])
+  unit   Unit   @relation(fields: [unitId], references: [id], onDelete: Restrict)
 
-  payments Payment[]
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Restrict)
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  managerId String?
+  manager   User?   @relation(fields: [managerId], references: [id])
+
+  status        DealStatus     @default(RESERVED)
+  financingType FinancingType?
+
+  listPrice Decimal @db.Decimal(14, 2)
+  salePrice Decimal @db.Decimal(14, 2)
+
+  discountAmount  Decimal? @db.Decimal(14, 2)
+  discountPercent Decimal? @db.Decimal(5, 2)
+  deposit         Decimal? @db.Decimal(14, 2)
+
+  reservedAt           DateTime?
+  reservationExpiresAt DateTime?
+  reservedById         String?
+  reservedBy           User?     @relation("ReservedBy", fields: [reservedById], references: [id])
+
+  contractNumber String?
+  contractDate   DateTime?
+
+  note String? @db.Text
+
+  paymentSchedules PaymentSchedule[]
+  payments         Payment[]
+
+  activities Activity[]
+  tasks      Task[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([projectId])
+  @@index([unitId])
+  @@index([clientId])
+  @@index([managerId])
+  @@index([status])
+  @@index([companyId, status])
+  @@index([companyId, managerId])
+  @@index([companyId, clientId])
+  @@index([companyId, createdAt])
 }
 
 model Payment {
-  id      String        @id @default(uuid())
-  amount  Decimal
-  paidAt  DateTime
-  method  PaymentMethod
-  comment String?
+  id String @id @default(uuid())
 
   dealId String
-  deal   Deal   @relation(fields: [dealId], references: [id])
+  deal   Deal   @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  amount Decimal @db.Decimal(14, 2)
+
+  paymentMethod PaymentMethod
+  paymentType   PaymentType
+
+  paidAt DateTime
+
+  reference String?
+
+  note String?
+
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  @@index([dealId])
+  @@index([paidAt])
+  @@index([paymentMethod])
+  @@index([paymentType])
+}
+
+model PaymentSchedule {
+  id String @id @default(uuid())
+
+  dealId String
+  deal   Deal   @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  dueDate DateTime
+
+  amount Decimal @db.Decimal(14, 2)
+
+  paidAmount Decimal @default(0) @db.Decimal(14, 2)
+
+  status PaymentScheduleStatus
+  order  Int
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([dealId, order])
+  @@index([dealId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([dealId, dueDate])
+}
+
+model Activity {
+  id String @id @default(uuid())
+
+  action ActivityAction
+
+  type ActivityType
+
+  title       String
+  description String?
+  metadata    Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  leadId String?
+  lead   Lead?   @relation(fields: [leadId], references: [id])
+
+  clientId String?
+  client   Client? @relation(fields: [clientId], references: [id])
+
+  dealId String?
+  deal   Deal?   @relation(fields: [dealId], references: [id])
 
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([dealId])
+  @@index([clientId])
+  @@index([leadId])
+}
+
+model Task {
+  id String @id @default(uuid())
+
+  title       String
+  description String?
+  dueDate     DateTime?
+  status      TaskStatus @default(TODO)
+
+  assignedToId String
+  assignedTo   User   @relation(fields: [assignedToId], references: [id])
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  leadId String?
+  lead   Lead?   @relation(fields: [leadId], references: [id])
+
+  clientId String?
+  client   Client? @relation(fields: [clientId], references: [id])
+
+  dealId String?
+  deal   Deal?   @relation(fields: [dealId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([assignedToId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([dealId])
+  @@index([clientId])
+  @@index([leadId])
+}
+
+model Document {
+  id String @id @default(uuid())
+
+  name         String
+  originalName String
+  mimeType     String
+  extension    String
+
+  size Int
+
+  path String
+  url  String?
+
+  type DocumentType @default(OTHER)
+
+  ownerType DocumentOwnerType
+  ownerId   String
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  uploadedById String
+  uploadedBy   User   @relation(fields: [uploadedById], references: [id])
+
+  metadata Json?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([companyId])
+  @@index([ownerType, ownerId])
+  @@index([type])
+  @@index([uploadedById])
+  @@index([createdAt])
 }

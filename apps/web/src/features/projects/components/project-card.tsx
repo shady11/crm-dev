@@ -1,9 +1,17 @@
 import {Badge} from "@/components/ui/badge.tsx";
-import {type Project, PROJECT_STATUS_BADGE_CLASSES, PROJECT_STATUS_LABELS} from "@/features/projects/types/project.types.ts";
+import {
+    type Project,
+    PROJECT_STATUS_BADGE_CLASSES,
+    PROJECT_STATUS_LABELS
+} from "@/features/projects/types/project.types.ts";
 import {Building2} from "lucide-react";
 import {
-    AlertDialog, AlertDialogAction, AlertDialogCancel,
-    AlertDialogContent, AlertDialogDescription, AlertDialogFooter,
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
@@ -23,7 +31,7 @@ export function ProjectCard({project, onDelete, isDeleting}: Props) {
 
     return (
         <>
-            <Item variant="default" className="bg-card shadow-sm p-4">
+            <Item variant="default" className="border border-secondary p-4">
                 <a href={`/projects/${project.id}`} className="flex w-full flex-col gap-4">
                     <div className="flex w-full items-center gap-4">
                         <ItemMedia variant="icon">

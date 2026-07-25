@@ -57,6 +57,7 @@
     --shadow-lg: var(--shadow-lg);
     --shadow-xl: var(--shadow-xl);
     --shadow-2xl: var(--shadow-2xl);
+    --shadow-custom: var(--shadow-custom);
     --animate-slide-up: slideUp 0.2s ease-out;
     --animate-slide-down: slideDown 0.2s ease-out;
     --animate-expand: expand 0.2s ease-out;
@@ -151,9 +152,9 @@
     --spacing: 0.3rem;
     --radius: 0.625rem;
 
-    --background: oklch(0.9555 0.0125 271.28);
+    --background: oklch(1 0 0);
     --foreground: oklch(0.21 0.03 264.67);
-    --card: oklch(0.9793 0.0083 271.33);
+    --card: oklch(1 0 0);
     --card-foreground: oklch(0.21 0.03 264.67);
     --popover: oklch(1.00 0 0);
     --popover-foreground: oklch(0.21 0.03 264.67);
@@ -166,7 +167,7 @@
     --accent: oklch(0.95 0.02 261.78);
     --accent-foreground: oklch(0.48 0.20 260.48);
     --destructive: oklch(0.58 0.22 27.33);
-    --border: oklch(0.8893 0.0169 259.42);
+    --border: oklch(0.96 0 0);
     --input: oklch(0.9002 0.013 266.69);
     --ring: oklch(0.48 0.20 260.48);
     --chart-1: oklch(0.48 0.20 260.48);
@@ -174,7 +175,7 @@
     --chart-3: oklch(0.40 0.16 259.09);
     --chart-4: oklch(0.43 0.16 259.85);
     --chart-5: oklch(0.29 0.07 260.37);
-    --sidebar: oklch(0.97 0.00 264.70);
+    --sidebar: oklch(1 0 0);
     --sidebar-foreground: oklch(0.21 0.03 264.67);
     --sidebar-primary: oklch(0.48 0.20 260.48);
     --sidebar-primary-foreground: oklch(1.00 0 0);
@@ -191,6 +192,7 @@
     --shadow-lg: 0 1px 3px 0px oklch(0.00 0 0 / 0.10), 0 4px 6px -1px oklch(0.00 0 0 / 0.10);
     --shadow-xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.10), 0 8px 10px -1px oklch(0.00 0 0 / 0.10);
     --shadow-2xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.25);
+    --shadow-custom: 0 1px 10px 0px oklch(0 0 0 / 0.15);
     --destructive-foreground: var(--color-red-700);
     --info: var(--color-blue-500);
     --info-foreground: var(--color-blue-700);
@@ -216,8 +218,8 @@
     --accent: oklch(0.33 0.04 264.82);
     --accent-foreground: oklch(0.93 0.01 264.60);
     --destructive: oklch(0.64 0.21 25.33);
-    --border: oklch(0.35 0.04 262.16);
-    --input: oklch(0.35 0.04 262.16);
+    --border: oklch(0.422 0.035 261.299);
+    --input: oklch(0.422 0.035 261.299);
     --ring: oklch(0.56 0.24 260.95);
     --chart-1: oklch(0.56 0.24 260.95);
     --chart-2: oklch(0.48 0.20 260.48);
@@ -255,7 +257,7 @@
     @apply border-border outline-ring/50;
     }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-sidebar text-foreground;
     }
   html {
     @apply font-sans;

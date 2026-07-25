@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Loader2} from "lucide-react";
+import {Loader2, TriangleAlert} from "lucide-react";
 import {Controller, useForm} from "react-hook-form";
 import {z} from "zod";
 
@@ -18,6 +18,7 @@ import {
 } from "@/features/projects/types/project.types";
 import {SheetBody, SheetClose, SheetFooter} from "@/components/ui/sheet.tsx";
 import {createListCollection} from "@ark-ui/react";
+import {Alert, AlertTitle} from "@/components/ui/alert.tsx";
 
 const projectSchema = z.object({
     name: z.string().trim().min(2, "Project name must be at least 2 characters"),
@@ -39,7 +40,7 @@ type ProjectFormProps = {
 const DEFAULT_VALUES: ProjectFormValues = {
     name: "",
     address: "",
-    status: ProjectStatus.Active,
+    status: ProjectStatus.DRAFT,
 };
 
 export function ProjectForm({
@@ -54,6 +55,7 @@ export function ProjectForm({
     const initialStatus = normalizeProjectStatus(project?.status);
     const [, setSelectedStatus] =
         useState<ProjectStatus>(initialStatus);
+
     const form = useForm<ProjectFormValues>({
         resolver: zodResolver(projectSchema),
         defaultValues: {
@@ -133,7 +135,7 @@ export function ProjectForm({
                                     collection={statusCollection}
                                     name={field.name}
                                     onValueChange={(item) => {
-                                        const status = normalizeProjectStatus(item.value[0]);
+                                        const status = item.value[0] as ProjectStatus;
                                         setSelectedStatus(status);
                                         form.setValue("status", status, {
                                             shouldDirty: true,
@@ -161,9 +163,10 @@ export function ProjectForm({
 
 
                 {errorMessage && (
-                    <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                        {errorMessage}
-                    </p>
+                    <Alert variant="destructive" className="mt-4">
+                        <TriangleAlert />
+                        <AlertTitle>{errorMessage}</AlertTitle>
+                    </Alert>
                 )}
             </SheetBody>
             <SheetFooter>

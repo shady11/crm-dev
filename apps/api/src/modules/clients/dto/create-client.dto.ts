@@ -1,4 +1,4 @@
-import { IsEmail, IsOptional, IsString, MinLength } from "class-validator";
+import {IsEmail, IsOptional, IsString, MinLength} from "class-validator";
 
 export class CreateClientDto {
     @IsString()
@@ -20,4 +20,9 @@ export class CreateClientDto {
     @IsOptional()
     @IsString()
     passport?: string;
+
+    @IsOptional()
+    @IsString()
+    @MinLength(14)
+    pin?: string;
 }

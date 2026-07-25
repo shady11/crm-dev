@@ -23,7 +23,7 @@ export function FloorItem({
 
     return (
         <div>
-            <Item variant="outline" className="bg-muted/50 py-2">
+            <Item variant="outline" className="bg-muted/50 py-2 cursor-pointer">
                 <ItemMedia variant="icon" className="h-full">
                     <Layers2 className="size-4" />
                 </ItemMedia>

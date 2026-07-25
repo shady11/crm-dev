@@ -31,9 +31,14 @@ export type ClientMinAggregateOutputType = {
   whatsapp: string | null
   email: string | null
   passport: string | null
+  pin: string | null
+  birthDate: Date | null
+  address: string | null
+  notes: string | null
   companyId: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  deletedAt: Date | null
 }
 
 export type ClientMaxAggregateOutputType = {
@@ -43,9 +48,14 @@ export type ClientMaxAggregateOutputType = {
   whatsapp: string | null
   email: string | null
   passport: string | null
+  pin: string | null
+  birthDate: Date | null
+  address: string | null
+  notes: string | null
   companyId: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  deletedAt: Date | null
 }
 
 export type ClientCountAggregateOutputType = {
@@ -55,9 +65,14 @@ export type ClientCountAggregateOutputType = {
   whatsapp: number
   email: number
   passport: number
+  pin: number
+  birthDate: number
+  address: number
+  notes: number
   companyId: number
   createdAt: number
   updatedAt: number
+  deletedAt: number
   _all: number
 }
 
@@ -69,9 +84,14 @@ export type ClientMinAggregateInputType = {
   whatsapp?: true
   email?: true
   passport?: true
+  pin?: true
+  birthDate?: true
+  address?: true
+  notes?: true
   companyId?: true
   createdAt?: true
   updatedAt?: true
+  deletedAt?: true
 }
 
 export type ClientMaxAggregateInputType = {
@@ -81,9 +101,14 @@ export type ClientMaxAggregateInputType = {
   whatsapp?: true
   email?: true
   passport?: true
+  pin?: true
+  birthDate?: true
+  address?: true
+  notes?: true
   companyId?: true
   createdAt?: true
   updatedAt?: true
+  deletedAt?: true
 }
 
 export type ClientCountAggregateInputType = {
@@ -93,9 +118,14 @@ export type ClientCountAggregateInputType = {
   whatsapp?: true
   email?: true
   passport?: true
+  pin?: true
+  birthDate?: true
+  address?: true
+  notes?: true
   companyId?: true
   createdAt?: true
   updatedAt?: true
+  deletedAt?: true
   _all?: true
 }
 
@@ -178,9 +208,14 @@ export type ClientGroupByOutputType = {
   whatsapp: string | null
   email: string | null
   passport: string | null
+  pin: string | null
+  birthDate: Date | null
+  address: string | null
+  notes: string | null
   companyId: string
   createdAt: Date
   updatedAt: Date
+  deletedAt: Date | null
   _count: ClientCountAggregateOutputType | null
   _min: ClientMinAggregateOutputType | null
   _max: ClientMaxAggregateOutputType | null
@@ -211,12 +246,19 @@ export type ClientWhereInput = {
   whatsapp?: Prisma.StringNullableFilter<"Client"> | string | null
   email?: Prisma.StringNullableFilter<"Client"> | string | null
   passport?: Prisma.StringNullableFilter<"Client"> | string | null
+  pin?: Prisma.StringNullableFilter<"Client"> | string | null
+  birthDate?: Prisma.DateTimeNullableFilter<"Client"> | Date | string | null
+  address?: Prisma.StringNullableFilter<"Client"> | string | null
+  notes?: Prisma.StringNullableFilter<"Client"> | string | null
   companyId?: Prisma.StringFilter<"Client"> | string
   createdAt?: Prisma.DateTimeFilter<"Client"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Client"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"Client"> | Date | string | null
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   leads?: Prisma.LeadListRelationFilter
   deals?: Prisma.DealListRelationFilter
+  activities?: Prisma.ActivityListRelationFilter
+  tasks?: Prisma.TaskListRelationFilter
 }
 
 export type ClientOrderByWithRelationInput = {
@@ -226,12 +268,19 @@ export type ClientOrderByWithRelationInput = {
   whatsapp?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   passport?: Prisma.SortOrderInput | Prisma.SortOrder
+  pin?: Prisma.SortOrderInput | Prisma.SortOrder
+  birthDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  address?: Prisma.SortOrderInput | Prisma.SortOrder
+  notes?: Prisma.SortOrderInput | Prisma.SortOrder
   companyId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   company?: Prisma.CompanyOrderByWithRelationInput
   leads?: Prisma.LeadOrderByRelationAggregateInput
   deals?: Prisma.DealOrderByRelationAggregateInput
+  activities?: Prisma.ActivityOrderByRelationAggregateInput
+  tasks?: Prisma.TaskOrderByRelationAggregateInput
 }
 
 export type ClientWhereUniqueInput = Prisma.AtLeast<{
@@ -244,12 +293,19 @@ export type ClientWhereUniqueInput = Prisma.AtLeast<{
   whatsapp?: Prisma.StringNullableFilter<"Client"> | string | null
   email?: Prisma.StringNullableFilter<"Client"> | string | null
   passport?: Prisma.StringNullableFilter<"Client"> | string | null
+  pin?: Prisma.StringNullableFilter<"Client"> | string | null
+  birthDate?: Prisma.DateTimeNullableFilter<"Client"> | Date | string | null
+  address?: Prisma.StringNullableFilter<"Client"> | string | null
+  notes?: Prisma.StringNullableFilter<"Client"> | string | null
   companyId?: Prisma.StringFilter<"Client"> | string
   createdAt?: Prisma.DateTimeFilter<"Client"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Client"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"Client"> | Date | string | null
   company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   leads?: Prisma.LeadListRelationFilter
   deals?: Prisma.DealListRelationFilter
+  activities?: Prisma.ActivityListRelationFilter
+  tasks?: Prisma.TaskListRelationFilter
 }, "id">
 
 export type ClientOrderByWithAggregationInput = {
@@ -259,9 +315,14 @@ export type ClientOrderByWithAggregationInput = {
   whatsapp?: Prisma.SortOrderInput | Prisma.SortOrder
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   passport?: Prisma.SortOrderInput | Prisma.SortOrder
+  pin?: Prisma.SortOrderInput | Prisma.SortOrder
+  birthDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  address?: Prisma.SortOrderInput | Prisma.SortOrder
+  notes?: Prisma.SortOrderInput | Prisma.SortOrder
   companyId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ClientCountOrderByAggregateInput
   _max?: Prisma.ClientMaxOrderByAggregateInput
   _min?: Prisma.ClientMinOrderByAggregateInput
@@ -277,9 +338,14 @@ export type ClientScalarWhereWithAggregatesInput = {
   whatsapp?: Prisma.StringNullableWithAggregatesFilter<"Client"> | string | null
   email?: Prisma.StringNullableWithAggregatesFilter<"Client"> | string | null
   passport?: Prisma.StringNullableWithAggregatesFilter<"Client"> | string | null
+  pin?: Prisma.StringNullableWithAggregatesFilter<"Client"> | string | null
+  birthDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Client"> | Date | string | null
+  address?: Prisma.StringNullableWithAggregatesFilter<"Client"> | string | null
+  notes?: Prisma.StringNullableWithAggregatesFilter<"Client"> | string | null
   companyId?: Prisma.StringWithAggregatesFilter<"Client"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Client"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Client"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Client"> | Date | string | null
 }
 
 export type ClientCreateInput = {
@@ -289,11 +355,18 @@ export type ClientCreateInput = {
   whatsapp?: string | null
   email?: string | null
   passport?: string | null
+  pin?: string | null
+  birthDate?: Date | string | null
+  address?: string | null
+  notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   company: Prisma.CompanyCreateNestedOneWithoutClientsInput
   leads?: Prisma.LeadCreateNestedManyWithoutClientInput
   deals?: Prisma.DealCreateNestedManyWithoutClientInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutClientInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutClientInput
 }
 
 export type ClientUncheckedCreateInput = {
@@ -303,11 +376,18 @@ export type ClientUncheckedCreateInput = {
   whatsapp?: string | null
   email?: string | null
   passport?: string | null
+  pin?: string | null
+  birthDate?: Date | string | null
+  address?: string | null
+  notes?: string | null
   companyId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   leads?: Prisma.LeadUncheckedCreateNestedManyWithoutClientInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutClientInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutClientInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutClientInput
 }
 
 export type ClientUpdateInput = {
@@ -317,11 +397,18 @@ export type ClientUpdateInput = {
   whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   company?: Prisma.CompanyUpdateOneRequiredWithoutClientsNestedInput
   leads?: Prisma.LeadUpdateManyWithoutClientNestedInput
   deals?: Prisma.DealUpdateManyWithoutClientNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutClientNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutClientNestedInput
 }
 
 export type ClientUncheckedUpdateInput = {
@@ -331,11 +418,18 @@ export type ClientUncheckedUpdateInput = {
   whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   leads?: Prisma.LeadUncheckedUpdateManyWithoutClientNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutClientNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutClientNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutClientNestedInput
 }
 
 export type ClientCreateManyInput = {
@@ -345,9 +439,14 @@ export type ClientCreateManyInput = {
   whatsapp?: string | null
   email?: string | null
   passport?: string | null
+  pin?: string | null
+  birthDate?: Date | string | null
+  address?: string | null
+  notes?: string | null
   companyId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
 }
 
 export type ClientUpdateManyMutationInput = {
@@ -357,8 +456,13 @@ export type ClientUpdateManyMutationInput = {
   whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ClientUncheckedUpdateManyInput = {
@@ -368,9 +472,14 @@ export type ClientUncheckedUpdateManyInput = {
   whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type ClientListRelationFilter = {
@@ -395,9 +504,14 @@ export type ClientCountOrderByAggregateInput = {
   whatsapp?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passport?: Prisma.SortOrder
+  pin?: Prisma.SortOrder
+  birthDate?: Prisma.SortOrder
+  address?: Prisma.SortOrder
+  notes?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type ClientMaxOrderByAggregateInput = {
@@ -407,9 +521,14 @@ export type ClientMaxOrderByAggregateInput = {
   whatsapp?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passport?: Prisma.SortOrder
+  pin?: Prisma.SortOrder
+  birthDate?: Prisma.SortOrder
+  address?: Prisma.SortOrder
+  notes?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type ClientMinOrderByAggregateInput = {
@@ -419,9 +538,14 @@ export type ClientMinOrderByAggregateInput = {
   whatsapp?: Prisma.SortOrder
   email?: Prisma.SortOrder
   passport?: Prisma.SortOrder
+  pin?: Prisma.SortOrder
+  birthDate?: Prisma.SortOrder
+  address?: Prisma.SortOrder
+  notes?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type ClientScalarRelationFilter = {
@@ -501,6 +625,38 @@ export type ClientUpdateOneRequiredWithoutDealsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ClientUpdateToOneWithWhereWithoutDealsInput, Prisma.ClientUpdateWithoutDealsInput>, Prisma.ClientUncheckedUpdateWithoutDealsInput>
 }
 
+export type ClientCreateNestedOneWithoutActivitiesInput = {
+  create?: Prisma.XOR<Prisma.ClientCreateWithoutActivitiesInput, Prisma.ClientUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.ClientCreateOrConnectWithoutActivitiesInput
+  connect?: Prisma.ClientWhereUniqueInput
+}
+
+export type ClientUpdateOneWithoutActivitiesNestedInput = {
+  create?: Prisma.XOR<Prisma.ClientCreateWithoutActivitiesInput, Prisma.ClientUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.ClientCreateOrConnectWithoutActivitiesInput
+  upsert?: Prisma.ClientUpsertWithoutActivitiesInput
+  disconnect?: Prisma.ClientWhereInput | boolean
+  delete?: Prisma.ClientWhereInput | boolean
+  connect?: Prisma.ClientWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ClientUpdateToOneWithWhereWithoutActivitiesInput, Prisma.ClientUpdateWithoutActivitiesInput>, Prisma.ClientUncheckedUpdateWithoutActivitiesInput>
+}
+
+export type ClientCreateNestedOneWithoutTasksInput = {
+  create?: Prisma.XOR<Prisma.ClientCreateWithoutTasksInput, Prisma.ClientUncheckedCreateWithoutTasksInput>
+  connectOrCreate?: Prisma.ClientCreateOrConnectWithoutTasksInput
+  connect?: Prisma.ClientWhereUniqueInput
+}
+
+export type ClientUpdateOneWithoutTasksNestedInput = {
+  create?: Prisma.XOR<Prisma.ClientCreateWithoutTasksInput, Prisma.ClientUncheckedCreateWithoutTasksInput>
+  connectOrCreate?: Prisma.ClientCreateOrConnectWithoutTasksInput
+  upsert?: Prisma.ClientUpsertWithoutTasksInput
+  disconnect?: Prisma.ClientWhereInput | boolean
+  delete?: Prisma.ClientWhereInput | boolean
+  connect?: Prisma.ClientWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ClientUpdateToOneWithWhereWithoutTasksInput, Prisma.ClientUpdateWithoutTasksInput>, Prisma.ClientUncheckedUpdateWithoutTasksInput>
+}
+
 export type ClientCreateWithoutCompanyInput = {
   id?: string
   fullName: string
@@ -508,10 +664,17 @@ export type ClientCreateWithoutCompanyInput = {
   whatsapp?: string | null
   email?: string | null
   passport?: string | null
+  pin?: string | null
+  birthDate?: Date | string | null
+  address?: string | null
+  notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   leads?: Prisma.LeadCreateNestedManyWithoutClientInput
   deals?: Prisma.DealCreateNestedManyWithoutClientInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutClientInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutClientInput
 }
 
 export type ClientUncheckedCreateWithoutCompanyInput = {
@@ -521,10 +684,17 @@ export type ClientUncheckedCreateWithoutCompanyInput = {
   whatsapp?: string | null
   email?: string | null
   passport?: string | null
+  pin?: string | null
+  birthDate?: Date | string | null
+  address?: string | null
+  notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   leads?: Prisma.LeadUncheckedCreateNestedManyWithoutClientInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutClientInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutClientInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutClientInput
 }
 
 export type ClientCreateOrConnectWithoutCompanyInput = {
@@ -563,9 +733,14 @@ export type ClientScalarWhereInput = {
   whatsapp?: Prisma.StringNullableFilter<"Client"> | string | null
   email?: Prisma.StringNullableFilter<"Client"> | string | null
   passport?: Prisma.StringNullableFilter<"Client"> | string | null
+  pin?: Prisma.StringNullableFilter<"Client"> | string | null
+  birthDate?: Prisma.DateTimeNullableFilter<"Client"> | Date | string | null
+  address?: Prisma.StringNullableFilter<"Client"> | string | null
+  notes?: Prisma.StringNullableFilter<"Client"> | string | null
   companyId?: Prisma.StringFilter<"Client"> | string
   createdAt?: Prisma.DateTimeFilter<"Client"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Client"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"Client"> | Date | string | null
 }
 
 export type ClientCreateWithoutLeadsInput = {
@@ -575,10 +750,17 @@ export type ClientCreateWithoutLeadsInput = {
   whatsapp?: string | null
   email?: string | null
   passport?: string | null
+  pin?: string | null
+  birthDate?: Date | string | null
+  address?: string | null
+  notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   company: Prisma.CompanyCreateNestedOneWithoutClientsInput
   deals?: Prisma.DealCreateNestedManyWithoutClientInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutClientInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutClientInput
 }
 
 export type ClientUncheckedCreateWithoutLeadsInput = {
@@ -588,10 +770,17 @@ export type ClientUncheckedCreateWithoutLeadsInput = {
   whatsapp?: string | null
   email?: string | null
   passport?: string | null
+  pin?: string | null
+  birthDate?: Date | string | null
+  address?: string | null
+  notes?: string | null
   companyId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutClientInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutClientInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutClientInput
 }
 
 export type ClientCreateOrConnectWithoutLeadsInput = {
@@ -617,10 +806,17 @@ export type ClientUpdateWithoutLeadsInput = {
   whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   company?: Prisma.CompanyUpdateOneRequiredWithoutClientsNestedInput
   deals?: Prisma.DealUpdateManyWithoutClientNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutClientNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutClientNestedInput
 }
 
 export type ClientUncheckedUpdateWithoutLeadsInput = {
@@ -630,10 +826,17 @@ export type ClientUncheckedUpdateWithoutLeadsInput = {
   whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   deals?: Prisma.DealUncheckedUpdateManyWithoutClientNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutClientNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutClientNestedInput
 }
 
 export type ClientCreateWithoutDealsInput = {
@@ -643,10 +846,17 @@ export type ClientCreateWithoutDealsInput = {
   whatsapp?: string | null
   email?: string | null
   passport?: string | null
+  pin?: string | null
+  birthDate?: Date | string | null
+  address?: string | null
+  notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   company: Prisma.CompanyCreateNestedOneWithoutClientsInput
   leads?: Prisma.LeadCreateNestedManyWithoutClientInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutClientInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutClientInput
 }
 
 export type ClientUncheckedCreateWithoutDealsInput = {
@@ -656,10 +866,17 @@ export type ClientUncheckedCreateWithoutDealsInput = {
   whatsapp?: string | null
   email?: string | null
   passport?: string | null
+  pin?: string | null
+  birthDate?: Date | string | null
+  address?: string | null
+  notes?: string | null
   companyId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
   leads?: Prisma.LeadUncheckedCreateNestedManyWithoutClientInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutClientInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutClientInput
 }
 
 export type ClientCreateOrConnectWithoutDealsInput = {
@@ -685,10 +902,17 @@ export type ClientUpdateWithoutDealsInput = {
   whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   company?: Prisma.CompanyUpdateOneRequiredWithoutClientsNestedInput
   leads?: Prisma.LeadUpdateManyWithoutClientNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutClientNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutClientNestedInput
 }
 
 export type ClientUncheckedUpdateWithoutDealsInput = {
@@ -698,10 +922,209 @@ export type ClientUncheckedUpdateWithoutDealsInput = {
   whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   leads?: Prisma.LeadUncheckedUpdateManyWithoutClientNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutClientNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutClientNestedInput
+}
+
+export type ClientCreateWithoutActivitiesInput = {
+  id?: string
+  fullName: string
+  phone: string
+  whatsapp?: string | null
+  email?: string | null
+  passport?: string | null
+  pin?: string | null
+  birthDate?: Date | string | null
+  address?: string | null
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  company: Prisma.CompanyCreateNestedOneWithoutClientsInput
+  leads?: Prisma.LeadCreateNestedManyWithoutClientInput
+  deals?: Prisma.DealCreateNestedManyWithoutClientInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutClientInput
+}
+
+export type ClientUncheckedCreateWithoutActivitiesInput = {
+  id?: string
+  fullName: string
+  phone: string
+  whatsapp?: string | null
+  email?: string | null
+  passport?: string | null
+  pin?: string | null
+  birthDate?: Date | string | null
+  address?: string | null
+  notes?: string | null
+  companyId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  leads?: Prisma.LeadUncheckedCreateNestedManyWithoutClientInput
+  deals?: Prisma.DealUncheckedCreateNestedManyWithoutClientInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutClientInput
+}
+
+export type ClientCreateOrConnectWithoutActivitiesInput = {
+  where: Prisma.ClientWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClientCreateWithoutActivitiesInput, Prisma.ClientUncheckedCreateWithoutActivitiesInput>
+}
+
+export type ClientUpsertWithoutActivitiesInput = {
+  update: Prisma.XOR<Prisma.ClientUpdateWithoutActivitiesInput, Prisma.ClientUncheckedUpdateWithoutActivitiesInput>
+  create: Prisma.XOR<Prisma.ClientCreateWithoutActivitiesInput, Prisma.ClientUncheckedCreateWithoutActivitiesInput>
+  where?: Prisma.ClientWhereInput
+}
+
+export type ClientUpdateToOneWithWhereWithoutActivitiesInput = {
+  where?: Prisma.ClientWhereInput
+  data: Prisma.XOR<Prisma.ClientUpdateWithoutActivitiesInput, Prisma.ClientUncheckedUpdateWithoutActivitiesInput>
+}
+
+export type ClientUpdateWithoutActivitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  company?: Prisma.CompanyUpdateOneRequiredWithoutClientsNestedInput
+  leads?: Prisma.LeadUpdateManyWithoutClientNestedInput
+  deals?: Prisma.DealUpdateManyWithoutClientNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutClientNestedInput
+}
+
+export type ClientUncheckedUpdateWithoutActivitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  leads?: Prisma.LeadUncheckedUpdateManyWithoutClientNestedInput
+  deals?: Prisma.DealUncheckedUpdateManyWithoutClientNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutClientNestedInput
+}
+
+export type ClientCreateWithoutTasksInput = {
+  id?: string
+  fullName: string
+  phone: string
+  whatsapp?: string | null
+  email?: string | null
+  passport?: string | null
+  pin?: string | null
+  birthDate?: Date | string | null
+  address?: string | null
+  notes?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  company: Prisma.CompanyCreateNestedOneWithoutClientsInput
+  leads?: Prisma.LeadCreateNestedManyWithoutClientInput
+  deals?: Prisma.DealCreateNestedManyWithoutClientInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutClientInput
+}
+
+export type ClientUncheckedCreateWithoutTasksInput = {
+  id?: string
+  fullName: string
+  phone: string
+  whatsapp?: string | null
+  email?: string | null
+  passport?: string | null
+  pin?: string | null
+  birthDate?: Date | string | null
+  address?: string | null
+  notes?: string | null
+  companyId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  leads?: Prisma.LeadUncheckedCreateNestedManyWithoutClientInput
+  deals?: Prisma.DealUncheckedCreateNestedManyWithoutClientInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutClientInput
+}
+
+export type ClientCreateOrConnectWithoutTasksInput = {
+  where: Prisma.ClientWhereUniqueInput
+  create: Prisma.XOR<Prisma.ClientCreateWithoutTasksInput, Prisma.ClientUncheckedCreateWithoutTasksInput>
+}
+
+export type ClientUpsertWithoutTasksInput = {
+  update: Prisma.XOR<Prisma.ClientUpdateWithoutTasksInput, Prisma.ClientUncheckedUpdateWithoutTasksInput>
+  create: Prisma.XOR<Prisma.ClientCreateWithoutTasksInput, Prisma.ClientUncheckedCreateWithoutTasksInput>
+  where?: Prisma.ClientWhereInput
+}
+
+export type ClientUpdateToOneWithWhereWithoutTasksInput = {
+  where?: Prisma.ClientWhereInput
+  data: Prisma.XOR<Prisma.ClientUpdateWithoutTasksInput, Prisma.ClientUncheckedUpdateWithoutTasksInput>
+}
+
+export type ClientUpdateWithoutTasksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  company?: Prisma.CompanyUpdateOneRequiredWithoutClientsNestedInput
+  leads?: Prisma.LeadUpdateManyWithoutClientNestedInput
+  deals?: Prisma.DealUpdateManyWithoutClientNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutClientNestedInput
+}
+
+export type ClientUncheckedUpdateWithoutTasksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  fullName?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  passport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  leads?: Prisma.LeadUncheckedUpdateManyWithoutClientNestedInput
+  deals?: Prisma.DealUncheckedUpdateManyWithoutClientNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutClientNestedInput
 }
 
 export type ClientCreateManyCompanyInput = {
@@ -711,8 +1134,13 @@ export type ClientCreateManyCompanyInput = {
   whatsapp?: string | null
   email?: string | null
   passport?: string | null
+  pin?: string | null
+  birthDate?: Date | string | null
+  address?: string | null
+  notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  deletedAt?: Date | string | null
 }
 
 export type ClientUpdateWithoutCompanyInput = {
@@ -722,10 +1150,17 @@ export type ClientUpdateWithoutCompanyInput = {
   whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   leads?: Prisma.LeadUpdateManyWithoutClientNestedInput
   deals?: Prisma.DealUpdateManyWithoutClientNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutClientNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutClientNestedInput
 }
 
 export type ClientUncheckedUpdateWithoutCompanyInput = {
@@ -735,10 +1170,17 @@ export type ClientUncheckedUpdateWithoutCompanyInput = {
   whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   leads?: Prisma.LeadUncheckedUpdateManyWithoutClientNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutClientNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutClientNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutClientNestedInput
 }
 
 export type ClientUncheckedUpdateManyWithoutCompanyInput = {
@@ -748,8 +1190,13 @@ export type ClientUncheckedUpdateManyWithoutCompanyInput = {
   whatsapp?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   passport?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pin?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -760,11 +1207,15 @@ export type ClientUncheckedUpdateManyWithoutCompanyInput = {
 export type ClientCountOutputType = {
   leads: number
   deals: number
+  activities: number
+  tasks: number
 }
 
 export type ClientCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   leads?: boolean | ClientCountOutputTypeCountLeadsArgs
   deals?: boolean | ClientCountOutputTypeCountDealsArgs
+  activities?: boolean | ClientCountOutputTypeCountActivitiesArgs
+  tasks?: boolean | ClientCountOutputTypeCountTasksArgs
 }
 
 /**
@@ -791,6 +1242,20 @@ export type ClientCountOutputTypeCountDealsArgs<ExtArgs extends runtime.Types.Ex
   where?: Prisma.DealWhereInput
 }
 
+/**
+ * ClientCountOutputType without action
+ */
+export type ClientCountOutputTypeCountActivitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ActivityWhereInput
+}
+
+/**
+ * ClientCountOutputType without action
+ */
+export type ClientCountOutputTypeCountTasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TaskWhereInput
+}
+
 
 export type ClientSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -799,12 +1264,19 @@ export type ClientSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   whatsapp?: boolean
   email?: boolean
   passport?: boolean
+  pin?: boolean
+  birthDate?: boolean
+  address?: boolean
+  notes?: boolean
   companyId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   leads?: boolean | Prisma.Client$leadsArgs<ExtArgs>
   deals?: boolean | Prisma.Client$dealsArgs<ExtArgs>
+  activities?: boolean | Prisma.Client$activitiesArgs<ExtArgs>
+  tasks?: boolean | Prisma.Client$tasksArgs<ExtArgs>
   _count?: boolean | Prisma.ClientCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["client"]>
 
@@ -815,9 +1287,14 @@ export type ClientSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   whatsapp?: boolean
   email?: boolean
   passport?: boolean
+  pin?: boolean
+  birthDate?: boolean
+  address?: boolean
+  notes?: boolean
   companyId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["client"]>
 
@@ -828,9 +1305,14 @@ export type ClientSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   whatsapp?: boolean
   email?: boolean
   passport?: boolean
+  pin?: boolean
+  birthDate?: boolean
+  address?: boolean
+  notes?: boolean
   companyId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["client"]>
 
@@ -841,16 +1323,23 @@ export type ClientSelectScalar = {
   whatsapp?: boolean
   email?: boolean
   passport?: boolean
+  pin?: boolean
+  birthDate?: boolean
+  address?: boolean
+  notes?: boolean
   companyId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  deletedAt?: boolean
 }
 
-export type ClientOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "phone" | "whatsapp" | "email" | "passport" | "companyId" | "createdAt" | "updatedAt", ExtArgs["result"]["client"]>
+export type ClientOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "fullName" | "phone" | "whatsapp" | "email" | "passport" | "pin" | "birthDate" | "address" | "notes" | "companyId" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["client"]>
 export type ClientInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   leads?: boolean | Prisma.Client$leadsArgs<ExtArgs>
   deals?: boolean | Prisma.Client$dealsArgs<ExtArgs>
+  activities?: boolean | Prisma.Client$activitiesArgs<ExtArgs>
+  tasks?: boolean | Prisma.Client$tasksArgs<ExtArgs>
   _count?: boolean | Prisma.ClientCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ClientIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -866,6 +1355,8 @@ export type $ClientPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     company: Prisma.$CompanyPayload<ExtArgs>
     leads: Prisma.$LeadPayload<ExtArgs>[]
     deals: Prisma.$DealPayload<ExtArgs>[]
+    activities: Prisma.$ActivityPayload<ExtArgs>[]
+    tasks: Prisma.$TaskPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -874,9 +1365,14 @@ export type $ClientPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     whatsapp: string | null
     email: string | null
     passport: string | null
+    pin: string | null
+    birthDate: Date | null
+    address: string | null
+    notes: string | null
     companyId: string
     createdAt: Date
     updatedAt: Date
+    deletedAt: Date | null
   }, ExtArgs["result"]["client"]>
   composites: {}
 }
@@ -1274,6 +1770,8 @@ export interface Prisma__ClientClient<T, Null = never, ExtArgs extends runtime.T
   company<T extends Prisma.CompanyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyDefaultArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   leads<T extends Prisma.Client$leadsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Client$leadsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LeadPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   deals<T extends Prisma.Client$dealsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Client$dealsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  activities<T extends Prisma.Client$activitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Client$activitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tasks<T extends Prisma.Client$tasksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Client$tasksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TaskPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1309,9 +1807,14 @@ export interface ClientFieldRefs {
   readonly whatsapp: Prisma.FieldRef<"Client", 'String'>
   readonly email: Prisma.FieldRef<"Client", 'String'>
   readonly passport: Prisma.FieldRef<"Client", 'String'>
+  readonly pin: Prisma.FieldRef<"Client", 'String'>
+  readonly birthDate: Prisma.FieldRef<"Client", 'DateTime'>
+  readonly address: Prisma.FieldRef<"Client", 'String'>
+  readonly notes: Prisma.FieldRef<"Client", 'String'>
   readonly companyId: Prisma.FieldRef<"Client", 'String'>
   readonly createdAt: Prisma.FieldRef<"Client", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Client", 'DateTime'>
+  readonly deletedAt: Prisma.FieldRef<"Client", 'DateTime'>
 }
     
 
@@ -1758,6 +2261,54 @@ export type Client$dealsArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.DealScalarFieldEnum | Prisma.DealScalarFieldEnum[]
+}
+
+/**
+ * Client.activities
+ */
+export type Client$activitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Activity
+   */
+  select?: Prisma.ActivitySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Activity
+   */
+  omit?: Prisma.ActivityOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ActivityInclude<ExtArgs> | null
+  where?: Prisma.ActivityWhereInput
+  orderBy?: Prisma.ActivityOrderByWithRelationInput | Prisma.ActivityOrderByWithRelationInput[]
+  cursor?: Prisma.ActivityWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ActivityScalarFieldEnum | Prisma.ActivityScalarFieldEnum[]
+}
+
+/**
+ * Client.tasks
+ */
+export type Client$tasksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Task
+   */
+  select?: Prisma.TaskSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Task
+   */
+  omit?: Prisma.TaskOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TaskInclude<ExtArgs> | null
+  where?: Prisma.TaskWhereInput
+  orderBy?: Prisma.TaskOrderByWithRelationInput | Prisma.TaskOrderByWithRelationInput[]
+  cursor?: Prisma.TaskWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TaskScalarFieldEnum | Prisma.TaskScalarFieldEnum[]
 }
 
 /**

@@ -1,7 +1,7 @@
 "use client";
 
-import { ark } from "@ark-ui/react/factory";
-import { cn } from "@/lib/utils";
+import {ark} from "@ark-ui/react/factory";
+import {cn} from "@/lib/utils";
 
 interface SeparatorProps extends React.ComponentProps<typeof ark.div> {
   /**
@@ -20,7 +20,7 @@ export const Separator = (props: SeparatorProps) => {
       aria-orientation={orientation}
       className={cn(
         "shrink-0",
-        "bg-input",
+        "bg-secondary",
         "data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full",
         "data-[orientation=vertical]:w-px data-[orientation=vertical]:not-[[class^='h-']]:not-[[class*='_h-']]:self-stretch",
         className

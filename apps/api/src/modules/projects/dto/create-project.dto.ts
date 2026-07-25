@@ -1,4 +1,5 @@
-import { IsOptional, IsString, MinLength } from "class-validator";
+import {IsEnum, IsOptional, IsString, MinLength} from "class-validator";
+import {ProjectStatus} from "@/generated/prisma/enums";
 
 export class CreateProjectDto {
     @IsString()
@@ -10,6 +11,8 @@ export class CreateProjectDto {
     address?: string;
 
     @IsOptional()
-    @IsString()
-    status?: string;
+
+    @IsOptional()
+    @IsEnum(ProjectStatus)
+    status?: ProjectStatus;
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import { ark } from "@ark-ui/react/factory";
+import {ark} from "@ark-ui/react/factory";
 import type * as React from "react";
-import { cn } from "@/lib/utils";
+import {cn} from "@/lib/utils";
 
 export const Empty = (props: React.ComponentProps<typeof ark.div>) => {
     const { className, ...rest } = props;
@@ -10,7 +10,7 @@ export const Empty = (props: React.ComponentProps<typeof ark.div>) => {
     return (
         <ark.div
             className={cn(
-                "flex min-h-80 w-full flex-col items-center justify-center rounded-xl border border-dashed bg-muted/20 p-8",
+                "flex min-h-80 w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-muted p-8",
                 className
             )}
             data-slot="empty"

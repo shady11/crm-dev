@@ -126,7 +126,7 @@ export function BulkFloorsForm({
             onSubmit={handleSubmit}
         >
             <SheetBody scrollFade>
-                <FieldGroup className="gap-5 py-2">
+                <FieldGroup className="gap-5 py-4">
                     <div className="flex items-center justify-between">
                         <div>
                             <h3 className="text-sm font-medium">Floors</h3>

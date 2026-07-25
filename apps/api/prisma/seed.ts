@@ -1,11 +1,6 @@
 import "dotenv/config";
-import {
-    PrismaClient,
-    UserRole,
-    UnitStatus,
-    UnitType,
-} from "@/generated/prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
+import {PrismaClient, UnitStatus, UnitType, UserRole,} from "@/generated/prisma/client";
+import {PrismaPg} from "@prisma/adapter-pg";
 import * as bcrypt from "bcrypt";
 
 const adapter = new PrismaPg({
@@ -29,6 +24,8 @@ async function main() {
             name: "Bishkek Dev",
             phone: "+996700000000",
             address: "Bishkek",
+            timezone: "UTC+6",
+            locale: "ky"
         },
     });
 
@@ -57,7 +54,7 @@ async function main() {
 
     const block = await prisma.block.create({
         data: {
-            name: "Блок A",
+            name: "A",
             order: 1,
             projectId: project.id,
         },
@@ -65,7 +62,7 @@ async function main() {
 
     const entrance = await prisma.entrance.create({
         data: {
-            name: "Подъезд 1",
+            name: "1",
             order: 1,
             projectId: project.id,
             blockId: block.id,
@@ -88,12 +85,7 @@ async function main() {
                 data: {
                     number: `${floorNumber}${unitIndex.toString().padStart(2, "0")}`,
                     type: UnitType.APARTMENT,
-                    status:
-                        unitIndex === 2
-                            ? UnitStatus.BOOKED
-                            : unitIndex === 4
-                                ? UnitStatus.SOLD
-                                : UnitStatus.AVAILABLE,
+                    status: UnitStatus.AVAILABLE,
                     rooms: unitIndex % 3 === 0 ? 3 : unitIndex % 2 === 0 ? 2 : 1,
                     area: 42 + unitIndex * 4,
                     price: 42000 + unitIndex * 3500,

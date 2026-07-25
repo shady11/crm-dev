@@ -162,7 +162,7 @@ export const FieldLabel = (
     <ArkField.Label
       className={cn(
         "group/field-label peer/field-label",
-        "select-none font-normal text-sm leading-snug",
+        "select-none font-medium text-sm leading-snug",
         "flex w-fit gap-1",
         "has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col has-[>[data-slot=field]]:rounded-xl has-[>[data-slot=field]]:border *:data-[slot=field]:p-2.5",
         "has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/5",

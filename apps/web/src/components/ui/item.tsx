@@ -1,10 +1,10 @@
 "use client";
 
-import { ark } from "@ark-ui/react/factory";
+import {ark} from "@ark-ui/react/factory";
 import type React from "react";
-import { tv, type VariantProps } from "tailwind-variants";
-import { cn } from "@/lib/utils";
-import { Separator } from "@/components/ui/separator";
+import {tv, type VariantProps} from "tailwind-variants";
+import {cn} from "@/lib/utils";
+import {Separator} from "@/components/ui/separator";
 
 export const ItemGroup = (props: React.ComponentProps<typeof ark.div>) => {
   const { className, ...rest } = props;

@@ -1,8 +1,8 @@
 import {BadRequestException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
 import {PrismaService} from "@/database/prisma.service";
-import { AuthUser } from "@/common/types/auth-user.type";
+import {AuthUser} from "@/common/types/auth-user.type";
 import {QueryProjectsDto} from "@/modules/projects/dto/query-projects.dto";
-import { Prisma } from "@/generated/prisma/client";
+import {Prisma, ProjectStatus} from "@/generated/prisma/client";
 import {CreateProjectDto} from "@/modules/projects/dto/create-project.dto";
 import {UpdateProjectDto} from "@/modules/projects/dto/update-project.dto";
 
@@ -129,7 +129,7 @@ export class ProjectsService {
             data: {
                 name: dto.name,
                 address: dto.address,
-                status: dto.status ?? "active",
+                status: dto.status ?? ProjectStatus.DRAFT,
                 companyId: user.companyId,
             },
         });

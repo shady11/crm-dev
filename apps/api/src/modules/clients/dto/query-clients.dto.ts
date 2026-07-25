@@ -1,16 +1,14 @@
-import {
-    IsInt,
-    IsOptional,
-    IsString,
-    Max,
-    Min,
-} from "class-validator";
-import { Transform } from "class-transformer";
+import {IsInt, IsOptional, IsString, IsUUID, Max, Min} from "class-validator";
+import {Transform} from "class-transformer";
 
 export class QueryClientsDto {
     @IsOptional()
     @IsString()
     search?: string;
+
+    @IsOptional()
+    @IsUUID()
+    projectId?: string;
 
     @IsOptional()
     @Transform(({ value }) => Number(value))

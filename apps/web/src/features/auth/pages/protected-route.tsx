@@ -1,6 +1,6 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { authStorage } from "@/lib/auth-storage";
-import { useAuth } from "../hooks/useAuth";
+import {Navigate, Outlet} from "react-router-dom";
+import {authStorage} from "@/lib/auth-storage";
+import {useAuth} from "../hooks/use-auth.ts";
 import {Loader} from "lucide-react";
 
 export function ProtectedRoute() {

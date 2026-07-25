@@ -1,33 +1,23 @@
-import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button.tsx";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet.tsx";
-import { createUnit } from "@/features/units/api/units.api.ts";
-import { UnitForm } from "./unit-form.tsx";
+import {useState} from "react";
+import {Plus} from "lucide-react";
+import {Button} from "@/components/ui/button.tsx";
+import {Sheet, SheetContent, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
+import {UnitForm} from "./unit-form.tsx";
 import type {Floor} from "@/features/floors/types/floor.types.ts";
-import {toast} from "@/components/ui/toast.tsx";
+import {useCreateUnit} from "@/features/units/hooks/use-create-unit.ts";
 
 interface AddUnitButtonProps {
-    floor: Floor
+    floor: Floor;
 }
 
-export function AddUnitButton({ floor }: AddUnitButtonProps) {
-    const queryClient = useQueryClient();
+export function AddUnitButton({
+                                  floor,
+                              }: AddUnitButtonProps) {
     const [open, setOpen] = useState(false);
 
-    const createUnitMutation = useMutation({
-        mutationFn: (payload: any) => createUnit(floor.id, payload),
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
-
-            toast.success({
-                title: "Successfully created",
-                // description: `Floor ${variables.number} has been created.`,
-            });
-
-            setOpen(false);
-        },
+    const createUnitMutation = useCreateUnit({
+        floorId: floor.id,
+        onSuccess: () => setOpen(false),
     });
 
     return (
@@ -42,24 +32,29 @@ export function AddUnitButton({ floor }: AddUnitButtonProps) {
             </Button>
 
             <Sheet
-                onOpenChange={({ open: isOpen }) => setOpen(isOpen)}
                 open={open}
+                onOpenChange={({ open }) => setOpen(open)}
             >
-                <SheetContent className="sm:max-w-sm" variant="inset">
+                <SheetContent
+                    variant="inset"
+                    className="sm:max-w-sm"
+                >
                     <SheetHeader>
-                        <SheetTitle>Add unit to Floor {floor.number}</SheetTitle>
+                        <SheetTitle>
+                            Add Unit to Floor {floor.number}
+                        </SheetTitle>
                     </SheetHeader>
+
                     <UnitForm
-                        key={`unit-new-${open ? "open" : "closed"}`}
                         errorMessage={
                             createUnitMutation.isError
                                 ? "Unit could not be created. Check the details and try again."
                                 : undefined
                         }
                         isSubmitting={createUnitMutation.isPending}
-                        submitLabel="Create unit"
+                        submitLabel="Create Unit"
                         onCancel={() => setOpen(false)}
-                        onSubmit={(payload) => createUnitMutation.mutate(payload)}
+                        onSubmit={createUnitMutation.mutate}
                     />
                 </SheetContent>
             </Sheet>

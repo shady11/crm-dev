@@ -38,7 +38,7 @@ export function OverviewCards({project}: Props) {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {items.map((item, index) => (
-                <Card key={index} className="border-0 shadow-sm p-4">
+                <Card key={index} className="border border-secondary p-4">
                     <CardContent className="flex items-center justify-between gap-3 p-0">
 
                         <div className="flex flex-col gap-1">

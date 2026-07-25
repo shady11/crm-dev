@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { updateFloor } from "@/features/floors/api/floors.api.ts";
 import type { Floor } from "@/features/floors/types/floor.types.ts";
 import { FloorForm } from "./floor-form.tsx";
+import {toast} from "@/components/ui/toast.tsx";
 
 interface EditFloorButtonProps {
     floor: Floor;
@@ -13,14 +14,20 @@ interface EditFloorButtonProps {
 
 export function EditFloorButton({ floor }: EditFloorButtonProps) {
     const queryClient = useQueryClient();
-    const [isOpen, setIsOpen] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const updateFloorMutation = useMutation({
         mutationFn: (payload: { number: number; order?: number }) =>
             updateFloor(floor.id, payload),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
-            setIsOpen(false);
+
+            toast.success({
+                title: "Successfully updated",
+                // description: `Floor ${variables.name} has been updated.`,
+            });
+
+            setOpen(false);
         },
     });
 
@@ -29,18 +36,21 @@ export function EditFloorButton({ floor }: EditFloorButtonProps) {
             <Button
                 size="icon-sm"
                 variant="secondary"
-                onClick={() => setIsOpen(true)}
+                onClick={() => setOpen(true)}
             >
                 <Pen className="size-3" />
             </Button>
 
-            <Sheet open={isOpen} onOpenChange={setIsOpen}>
-                <SheetContent className="sm:max-w-md">
+            <Sheet
+                onOpenChange={({ open: isOpen }) => setOpen(isOpen)}
+                open={open}
+            >
+                <SheetContent className="sm:max-w-sm" variant="inset">
                     <SheetHeader>
                         <SheetTitle>Edit floor</SheetTitle>
                     </SheetHeader>
                     <FloorForm
-                        key={`floor-${floor.id}-${isOpen ? "open" : "closed"}`}
+                        key={`floor-${floor.id}-${open ? "open" : "closed"}`}
                         floor={floor}
                         errorMessage={
                             updateFloorMutation.isError
@@ -49,7 +59,7 @@ export function EditFloorButton({ floor }: EditFloorButtonProps) {
                         }
                         isSubmitting={updateFloorMutation.isPending}
                         submitLabel="Save changes"
-                        onCancel={() => setIsOpen(false)}
+                        onCancel={() => setOpen(false)}
                         onSubmit={(payload) => updateFloorMutation.mutate(payload)}
                     />
                 </SheetContent>

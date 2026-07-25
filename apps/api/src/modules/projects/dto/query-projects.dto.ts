@@ -1,11 +1,6 @@
-import {
-    IsInt,
-    IsOptional,
-    IsString,
-    Max,
-    Min,
-} from "class-validator";
-import { Transform } from "class-transformer";
+import {IsEnum, IsInt, IsOptional, IsString, Max, Min,} from "class-validator";
+import {Transform} from "class-transformer";
+import {ProjectStatus} from "@/generated/prisma/enums";
 
 export class QueryProjectsDto {
     @IsOptional()
@@ -13,8 +8,8 @@ export class QueryProjectsDto {
     search?: string;
 
     @IsOptional()
-    @IsString()
-    status?: string;
+    @IsEnum(ProjectStatus)
+    status?: ProjectStatus;
 
     @IsOptional()
     @Transform(({ value }) => Number(value))

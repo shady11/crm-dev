@@ -1,21 +1,14 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import {
-    ChevronDownIcon,
-    ArrowLeftIcon, Loader2Icon, Building2Icon, DoorOpenIcon
-} from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card.tsx";
-import { Button } from "@/components/ui/button.tsx";
+import {useNavigate, useParams} from "react-router-dom";
+import {useQuery} from "@tanstack/react-query";
+import {ArrowLeftIcon, Building2Icon, ChevronDownIcon, DoorOpenIcon, Loader2Icon} from "lucide-react";
+import {Card, CardContent} from "@/components/ui/card.tsx";
+import {Button} from "@/components/ui/button.tsx";
 import type {Project} from "@/features/projects/types/project.types.ts";
 import type {Block} from "@/features/blocks/types/block.types.ts";
 import type {Entrance} from "@/features/entrances/types/entrance.types.ts";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList
-} from "@/components/ui/breadcrumb.tsx";
+import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList} from "@/components/ui/breadcrumb.tsx";
 import {getProjectTree} from "@/features/projects/api/projects.api.ts";
+import {Menu, MenuContent, MenuGroup, MenuItem, MenuTrigger} from "@/components/ui/menu.tsx";
 
 export function ChessboardEntrances() {
     const { projectId, blockId } = useParams<{ projectId: string; blockId: string }>();
@@ -64,21 +57,21 @@ export function ChessboardEntrances() {
                         </BreadcrumbLink>
                     </BreadcrumbItem>
                     <BreadcrumbItem>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline" size="sm" className="flex gap-3">
+                        <Menu>
+                            <MenuTrigger asChild>
+                                <Button variant="outline" size="sm" className="flex gap-3 font-medium">
                                     Block {block.name}
                                     <ChevronDownIcon className="size-3" />
                                 </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="start">
-                                <DropdownMenuGroup>
-                                    {blocks.map((block) => (
-                                        <DropdownMenuItem onClick={() => navigate(`../${block.id}`)}>Block {block.name}</DropdownMenuItem>
+                            </MenuTrigger>
+                            <MenuContent>
+                                <MenuGroup>
+                                    {blocks.map((block, index) => (
+                                        <MenuItem value={`block-${index}`} onClick={() => navigate(`../${block.id}`)}>Block {block.name}</MenuItem>
                                     ))}
-                                </DropdownMenuGroup>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                                </MenuGroup>
+                            </MenuContent>
+                        </Menu>
                     </BreadcrumbItem>
                 </BreadcrumbList>
             </Breadcrumb>
@@ -92,7 +85,7 @@ export function ChessboardEntrances() {
                     return (
                         <Card
                             key={entrance.id}
-                            className="cursor-pointer ring-0 border-0 bg-card shadow-sm"
+                            className="cursor-pointer border border-secondary shadow-none"
                             onClick={() => navigate(`./${entrance.id}`)}
                         >
                             <CardContent>
@@ -101,7 +94,7 @@ export function ChessboardEntrances() {
                                         <DoorOpenIcon size={32} strokeWidth={1.25} className="text-primary"/>
                                     </div>
                                     <div>
-                                        <h3 className="font-semibold">Entrance {entrance.name}</h3>
+                                        <h3 className="font-medium">Entrance {entrance.name}</h3>
                                         <p className="text-sm text-muted-foreground">
                                             {totalFloors} floor{totalFloors !== 1 ? 's' : ''} • {totalUnits} unit{totalUnits !== 1 ? 's' : ''}
                                         </p>

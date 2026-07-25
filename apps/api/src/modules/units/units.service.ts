@@ -1,11 +1,11 @@
 import {BadRequestException, ForbiddenException, Injectable, NotFoundException,} from "@nestjs/common";
 import {Prisma, UnitStatus} from "@/generated/prisma/client";
-import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateUnitDto} from "./dto/create-unit.dto";
 import {UpdateUnitDto} from "./dto/update-unit.dto";
 import {QueryUnitsDto} from "./dto/query-units.dto";
 import {CreateUnitsBulkDto} from "@/modules/units/dto/create-units-bulk.dto";
+import {PrismaService} from "@/database/prisma.service";
 
 @Injectable()
 export class UnitsService {
@@ -300,8 +300,6 @@ export class UnitsService {
                     select: {
                         id: true,
                         status: true,
-                        amount: true,
-                        bookingUntil: true,
                         client: {
                             select: {
                                 id: true,

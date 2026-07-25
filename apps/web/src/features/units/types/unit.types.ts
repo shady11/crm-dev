@@ -23,10 +23,8 @@ export const UNIT_TYPE_LABELS: Record<UnitType, string> = {
 
 export const UnitStatus = {
     AVAILABLE: "AVAILABLE",
-    BOOKED: "BOOKED",
+    RESERVED: "RESERVED",
     SOLD: "SOLD",
-    INSTALLMENT: "INSTALLMENT",
-    MORTGAGE: "MORTGAGE",
     UNAVAILABLE: "UNAVAILABLE",
 } as const;
 
@@ -34,39 +32,33 @@ export type UnitStatus = (typeof UnitStatus)[keyof typeof UnitStatus];
 
 export const UNIT_STATUS_VALUES = [
     UnitStatus.AVAILABLE,
-    UnitStatus.BOOKED,
+    UnitStatus.RESERVED,
     UnitStatus.SOLD,
-    UnitStatus.INSTALLMENT,
-    UnitStatus.MORTGAGE,
     UnitStatus.UNAVAILABLE,
 ] as const;
 
 export const UNIT_STATUS_LABELS: Record<UnitStatus, string> = {
     [UnitStatus.AVAILABLE]: "Available",
-    [UnitStatus.BOOKED]: "Booked",
+    [UnitStatus.RESERVED]: "Reserved",
     [UnitStatus.SOLD]: "Sold",
-    [UnitStatus.INSTALLMENT]: "Installment",
-    [UnitStatus.MORTGAGE]: "Mortgage",
     [UnitStatus.UNAVAILABLE]: "Unavailable",
 };
 
 export const UNIT_STATUS_CLASSES: Record<UnitStatus, string> = {
-    [UnitStatus.AVAILABLE]: "bg-emerald-500",
-    [UnitStatus.BOOKED]: "bg-amber-500",
-    [UnitStatus.SOLD]: "bg-rose-500",
-    [UnitStatus.INSTALLMENT]: "bg-blue-500",
-    [UnitStatus.MORTGAGE]: "bg-indigo-500",
-    [UnitStatus.UNAVAILABLE]: "bg-gray-500",
+    [UnitStatus.AVAILABLE]: "bg-emerald-400",
+    [UnitStatus.RESERVED]: "bg-amber-400",
+    [UnitStatus.SOLD]: "bg-rose-400",
+    [UnitStatus.UNAVAILABLE]: "bg-gray-400",
 };
 
 export function isUnitType(type?: string | null): type is UnitType {
-    const normalizedType = type?.trim().toLowerCase();
+    const normalizedType = type?.trim().toUpperCase();
 
     return UNIT_TYPE_VALUES.some((value) => value === normalizedType);
 }
 
 export function normalizeUnitType(type?: string | null): UnitType {
-    const normalizedType = type?.trim().toLowerCase();
+    const normalizedType = type?.trim().toUpperCase();
 
     return isUnitType(normalizedType)
         ? normalizedType
@@ -74,13 +66,13 @@ export function normalizeUnitType(type?: string | null): UnitType {
 }
 
 export function isUnitStatus(status?: string | null): status is UnitStatus {
-    const normalizedStatus = status?.trim().toLowerCase();
+    const normalizedStatus = status?.trim().toUpperCase();
 
     return UNIT_STATUS_VALUES.some((value) => value === normalizedStatus);
 }
 
 export function normalizeUnitStatus(status?: string | null): UnitStatus {
-    const normalizedStatus = status?.trim().toLowerCase();
+    const normalizedStatus = status?.trim().toUpperCase();
 
     return isUnitStatus(normalizedStatus)
         ? normalizedStatus

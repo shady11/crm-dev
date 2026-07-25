@@ -77,7 +77,7 @@ export function BlockForm({
             onSubmit={form.handleSubmit(handleSubmit)}
         >
             <SheetBody scrollFade>
-                <FieldGroup className="gap-5 py-2">
+                <FieldGroup className="gap-5 py-4">
                     <Controller
                         control={form.control}
                         name="name"

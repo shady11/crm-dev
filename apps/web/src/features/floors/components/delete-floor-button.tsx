@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog.tsx";
 import { deleteFloor } from "@/features/floors/api/floors.api.ts";
 import type { Floor } from "@/features/floors/types/floor.types.ts";
+import {toast} from "@/components/ui/toast.tsx";
 
 interface DeleteFloorButtonProps {
     floor: Floor;
@@ -21,13 +22,19 @@ interface DeleteFloorButtonProps {
 
 export function DeleteFloorButton({ floor }: DeleteFloorButtonProps) {
     const queryClient = useQueryClient();
-    const [isOpen, setIsOpen] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const deleteFloorMutation = useMutation({
         mutationFn: () => deleteFloor(floor.id),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
-            setIsOpen(false);
+
+            toast.success({
+                title: "Successfully deleted",
+                // description: `Entrance ${floor.number} has been deleted.`,
+            });
+
+            setOpen(false);
         },
     });
 
@@ -36,12 +43,15 @@ export function DeleteFloorButton({ floor }: DeleteFloorButtonProps) {
             <Button
                 size="icon-sm"
                 variant="destructive"
-                onClick={() => setIsOpen(true)}
+                onClick={() => setOpen(true)}
             >
                 <Trash2 className="size-3" />
             </Button>
 
-            <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+            <AlertDialog
+                open={open}
+                onOpenChange={({ open }) => setOpen(open)}
+            >
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete floor?</AlertDialogTitle>

@@ -1,18 +1,34 @@
 import { useState } from "react";
-import { Loader2, Plus, Trash2, Wand2 } from "lucide-react";
+import {Loader2, Plus, Trash2, TriangleAlert, Wand2} from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {
+    normalizeUnitType,
     UNIT_TYPE_LABELS,
     UNIT_TYPE_VALUES,
     type UnitType,
 } from "@/features/units/types/unit.types.ts";
 import * as React from "react";
-import {Popover, PopoverContent, PopoverTrigger} from "@/components/ui/popover.tsx";
+import {
+    Popover,
+    PopoverBody, PopoverClose,
+    PopoverContent,
+    PopoverFooter,
+    PopoverHeader,
+    PopoverTrigger
+} from "@/components/ui/popover.tsx";
 import {SheetBody, SheetClose, SheetFooter} from "@/components/ui/sheet.tsx";
 import {createListCollection} from "@ark-ui/react";
+import {
+    NumberInput,
+    NumberInputDecrement,
+    NumberInputGroup,
+    NumberInputIncrement,
+    NumberInputInput
+} from "@/components/ui/number-input.tsx";
+import {Alert, AlertTitle} from "@/components/ui/alert.tsx";
 
 interface UnitRow {
     number: string;
@@ -51,13 +67,13 @@ export function BulkUnitsForm({
         },
     ]);
 
-    const [autoGenOpen, setAutoGenOpen] = useState(false);
+    const [open, setAutoGenOpen] = useState(false);
     const [genCount, setGenCount] = useState(5);
     const [genStartFrom, setGenStartFrom] = useState(String(nextStartNumber));
-    const [genRooms, setGenRooms] = useState("");
-    const [genArea, setGenArea] = useState("0");
-    const [genPrice, setGenPrice] = useState("0");
-    const [genType, setGenType] = useState<UnitType>("APARTMENT");
+    const [genRooms, setGenRooms] = useState(1);
+    const [genArea, setGenArea] = useState(0);
+    const [genPrice, setGenPrice] = useState(0);
+    const [genType, setGenType] = useState("APARTMENT");
 
     const addUnit = () => {
         const allNumbers = [
@@ -99,10 +115,10 @@ export function BulkUnitsForm({
         for (let i = 0; i < genCount; i++) {
             newUnits.push({
                 number: String(startNum + i),
-                type: genType,
-                rooms: genRooms ? parseInt(genRooms) : undefined,
-                area: parseFloat(genArea || "0"),
-                price: parseFloat(genPrice || "0"),
+                type: normalizeUnitType(genType),
+                rooms: genRooms ?? undefined,
+                area: genArea || 0,
+                price: genPrice || 0,
             });
         }
         setUnits(newUnits);
@@ -134,13 +150,11 @@ export function BulkUnitsForm({
 
     const duplicateNumbers = getDuplicateNumbers();
 
-    const unitsCollection = createListCollection({
-        items: [
-            UNIT_TYPE_VALUES.map((type) => ({
-                label: UNIT_TYPE_LABELS[type],
-                value: type,
-            })),
-        ]
+    const typeCollection = createListCollection({
+        items: UNIT_TYPE_VALUES.map((type) => ({
+            label: UNIT_TYPE_LABELS[type],
+            value: type,
+        })),
     });
 
     return (
@@ -149,12 +163,12 @@ export function BulkUnitsForm({
             onSubmit={handleSubmit}
         >
             <SheetBody scrollFade>
-                <FieldGroup className="gap-5 pb-0">
+                <FieldGroup className="gap-5 py-4">
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <h3 className="text-sm font-medium">Units</h3>
                             <div className="flex gap-2">
-                                <Popover open={autoGenOpen} onOpenChange={setAutoGenOpen}>
+                                <Popover onOpenChange={({ open: isOpen }) => setAutoGenOpen(isOpen)} open={open}>
                                     <PopoverTrigger asChild>
                                         <Button
                                             type="button"
@@ -166,90 +180,110 @@ export function BulkUnitsForm({
                                             Auto-generate
                                         </Button>
                                     </PopoverTrigger>
-                                    <PopoverContent className="w-80">
-                                        <div className="space-y-4">
-                                            <h4 className="font-medium leading-none">Auto-generate Units</h4>
-                                            <div className="space-y-2">
-                                                <Field>
+                                    <PopoverContent className="w-64">
+                                        <PopoverHeader title="Auto-generate Units"/>
+                                        <PopoverBody>
+                                            <FieldGroup className="gap-2">
+                                                <Field className="grid grid-cols-3 items-center gap-4">
                                                     <FieldLabel>Number of units</FieldLabel>
                                                     <Input
-                                                        type="number"
+                                                        size="sm"
+                                                        className="col-span-2"
                                                         value={genCount}
                                                         onChange={(e) => setGenCount(Number(e.target.value))}
                                                         min={1}
-                                                        max={100}
                                                     />
                                                 </Field>
-                                                <Field>
+                                                <Field className="grid grid-cols-3 items-center gap-4">
                                                     <FieldLabel>Starting number</FieldLabel>
                                                     <Input
+                                                        size="sm"
+                                                        className="col-span-2"
                                                         value={genStartFrom}
                                                         onChange={(e) => setGenStartFrom(e.target.value)}
                                                         placeholder={String(nextStartNumber)}
                                                     />
                                                 </Field>
-                                                <Field>
+                                                <Field className="grid grid-cols-3 items-center gap-4">
                                                     <FieldLabel>Type</FieldLabel>
                                                     <Select
-                                                        collection={unitsCollection}
+                                                        className="col-span-2"
+                                                        collection={typeCollection}
                                                         value={[genType]}
-                                                        onValueChange={({ value }) =>
-                                                            setGenType((value[0] ?? "APARTMENT") as UnitType)
-                                                        }
+                                                        onValueChange={(item) => {
+                                                            setGenType(item.value[0])
+                                                        }}
                                                     >
-                                                        <SelectTrigger className="w-full">
-                                                            <SelectValue />
+                                                        <SelectTrigger className="w-full" size="sm">
+                                                            <SelectValue placeholder="Select" />
                                                         </SelectTrigger>
-
-                                                        <SelectContent>
-                                                            {UNIT_TYPE_VALUES.map((type) => (
-                                                                <SelectItem key={type} item={type}>
-                                                                    {UNIT_TYPE_LABELS[type]}
+                                                        <SelectContent className="z-51">
+                                                            {typeCollection.items.map((item) => (
+                                                                <SelectItem key={item.value} item={item}>
+                                                                    {item.label}
                                                                 </SelectItem>
                                                             ))}
                                                         </SelectContent>
                                                     </Select>
                                                 </Field>
-                                                <Field>
-                                                    <FieldLabel>Rooms (optional)</FieldLabel>
-                                                    <Input
-                                                        value={genRooms}
-                                                        onChange={(e) => setGenRooms(e.target.value)}
-                                                    />
+                                                <Field className="grid grid-cols-3 items-center gap-4">
+                                                    <FieldLabel>Rooms</FieldLabel>
+                                                    <NumberInput
+                                                        size="sm"
+                                                        className="col-span-2"
+                                                        value={genRooms.toString()}
+                                                        min={1}
+                                                        disabled={isSubmitting}
+                                                        onValueChange={({ valueAsNumber }) =>
+                                                            setGenRooms(valueAsNumber)
+                                                        }
+                                                    >
+                                                        <NumberInputGroup>
+                                                            <NumberInputDecrement />
+                                                            <NumberInputInput/>
+                                                            <NumberInputIncrement />
+                                                        </NumberInputGroup>
+                                                    </NumberInput>
                                                 </Field>
-                                                <Field>
+                                                <Field className="grid grid-cols-3 items-center gap-4">
                                                     <FieldLabel>Area (m²)</FieldLabel>
                                                     <Input
+                                                        size="sm"
+                                                        className="col-span-2"
                                                         value={genArea}
-                                                        onChange={(e) => setGenArea(e.target.value)}
+                                                        onChange={(e) => setGenArea(Number(e.target.value))}
                                                     />
                                                 </Field>
-                                                <Field>
-                                                    <FieldLabel>Price, $</FieldLabel>
+                                                <Field className="grid grid-cols-3 items-center gap-4">
+                                                    <FieldLabel>Price</FieldLabel>
                                                     <Input
+                                                        size="sm"
+                                                        className="col-span-2"
                                                         value={genPrice}
-                                                        onChange={(e) => setGenPrice(e.target.value)}
+                                                        onChange={(e) => setGenPrice(Number(e.target.value))}
                                                     />
                                                 </Field>
-                                            </div>
-                                            <div className="flex justify-end gap-2">
+                                            </FieldGroup>
+                                        </PopoverBody>
+                                        <PopoverFooter>
+                                            <PopoverClose asChild>
                                                 <Button
                                                     type="button"
-                                                    variant="outline"
+                                                    variant="secondary"
                                                     size="sm"
                                                     onClick={() => setAutoGenOpen(false)}
                                                 >
                                                     Cancel
                                                 </Button>
-                                                <Button
-                                                    type="button"
-                                                    size="sm"
-                                                    onClick={autoGenerateUnits}
-                                                >
-                                                    Generate
-                                                </Button>
-                                            </div>
-                                        </div>
+                                            </PopoverClose>
+                                            <Button
+                                                type="button"
+                                                size="sm"
+                                                onClick={autoGenerateUnits}
+                                            >
+                                                Generate
+                                            </Button>
+                                        </PopoverFooter>
                                     </PopoverContent>
                                 </Popover>
                                 <Button
@@ -281,7 +315,7 @@ export function BulkUnitsForm({
                                         </Button>
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
-                                        <Field data-invalid={duplicateNumbers.includes(unit.number)}>
+                                        <Field invalid={duplicateNumbers.includes(unit.number)}>
                                             <FieldLabel>Number</FieldLabel>
                                             <Input
                                                 value={unit.number}
@@ -298,7 +332,7 @@ export function BulkUnitsForm({
                                         <Field>
                                             <FieldLabel>Type</FieldLabel>
                                             <Select
-                                                collection={unitsCollection}
+                                                collection={typeCollection}
                                                 value={[unit.type]}
                                                 disabled={isSubmitting}
                                                 onValueChange={({ value }) =>
@@ -310,33 +344,41 @@ export function BulkUnitsForm({
                                                 </SelectTrigger>
 
                                                 <SelectContent>
-                                                    {UNIT_TYPE_VALUES.map((type) => (
-                                                        <SelectItem key={type} item={type}>
-                                                            {UNIT_TYPE_LABELS[type]}
+                                                    {typeCollection.items.map((type) => (
+                                                        <SelectItem key={type.value} item={type}>
+                                                            {type.label}
                                                         </SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
                                         </Field>
-                                        <Field>
+                                        <Field className="col-span-2">
                                             <FieldLabel>Rooms</FieldLabel>
-                                            <Input
-                                                value={unit.rooms || ""}
-                                                onChange={(e) => updateUnit(index, "rooms", e.target.value ? Number(e.target.value) : undefined)}
+                                            <NumberInput
+                                                size="sm"
+                                                value={unit.rooms?.toString() ?? genRooms.toString()}
+                                                min={1}
                                                 disabled={isSubmitting}
-                                            />
+                                                onValueChange={({ valueAsNumber }) =>
+                                                    updateUnit(index, "rooms", valueAsNumber)
+                                                }
+                                            >
+                                                <NumberInputGroup>
+                                                    <NumberInputDecrement />
+                                                    <NumberInputInput/>
+                                                    <NumberInputIncrement />
+                                                </NumberInputGroup>
+                                            </NumberInput>
                                         </Field>
                                         <Field>
                                             <FieldLabel>Area (m²)</FieldLabel>
                                             <Input
-                                                type="number"
-                                                step="0.01"
                                                 value={unit.area}
                                                 onChange={(e) => updateUnit(index, "area", Number(e.target.value))}
                                                 disabled={isSubmitting}
                                             />
                                         </Field>
-                                        <Field className="col-span-2">
+                                        <Field>
                                             <FieldLabel>Price, $</FieldLabel>
                                             <Input
                                                 value={unit.price}
@@ -351,15 +393,17 @@ export function BulkUnitsForm({
                     </div>
 
                     {duplicateNumbers.length > 0 && (
-                        <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                            Duplicate unit numbers detected. Please fix them before creating.
-                        </p>
+                        <Alert variant="destructive" className="mt-4 items-center">
+                            <TriangleAlert />
+                            <AlertTitle>Duplicate floor numbers detected. Please fix them before creating.</AlertTitle>
+                        </Alert>
                     )}
 
                     {errorMessage && (
-                        <p className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                            {errorMessage}
-                        </p>
+                        <Alert variant="destructive" className="mt-4">
+                            <TriangleAlert />
+                            <AlertTitle>{errorMessage}</AlertTitle>
+                        </Alert>
                     )}
                 </FieldGroup>
             </SheetBody>

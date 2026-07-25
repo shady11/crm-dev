@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog.tsx";
 import { api } from "@/lib/api.ts";
 import type { Floor } from "@/features/floors/types/floor.types.ts";
+import {toast} from "@/components/ui/toast.tsx";
 
 interface DuplicateFloorButtonProps {
     floor: Floor;
@@ -21,13 +22,19 @@ interface DuplicateFloorButtonProps {
 
 export function DuplicateFloorButton({ floor }: DuplicateFloorButtonProps) {
     const queryClient = useQueryClient();
-    const [isOpen, setIsOpen] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const duplicateMutation = useMutation({
         mutationFn: () => api.post(`/floors/${floor.id}/duplicate`),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
-            setIsOpen(false);
+
+            toast.success({
+                title: "Successfully duplicated",
+                // description: `Floor ${floor.name} has been duplicated.`,
+            });
+
+            setOpen(false);
         },
     });
 
@@ -36,12 +43,15 @@ export function DuplicateFloorButton({ floor }: DuplicateFloorButtonProps) {
             <Button
                 size="icon-sm"
                 variant="ghost"
-                onClick={() => setIsOpen(true)}
+                onClick={() => setOpen(true)}
             >
                 <Copy className="size-3" />
             </Button>
 
-            <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+            <AlertDialog
+                open={open}
+                onOpenChange={({ open }) => setOpen(open)}
+            >
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Duplicate floor?</AlertDialogTitle>

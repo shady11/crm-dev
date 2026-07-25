@@ -61,7 +61,11 @@ export const ModelName = {
   Floor: 'Floor',
   Unit: 'Unit',
   Deal: 'Deal',
-  Payment: 'Payment'
+  Payment: 'Payment',
+  PaymentSchedule: 'PaymentSchedule',
+  Activity: 'Activity',
+  Task: 'Task',
+  Document: 'Document'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -85,8 +89,12 @@ export const CompanyScalarFieldEnum = {
   name: 'name',
   phone: 'phone',
   address: 'address',
+  currency: 'currency',
+  timezone: 'timezone',
+  locale: 'locale',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
@@ -102,7 +110,8 @@ export const UserScalarFieldEnum = {
   isActive: 'isActive',
   companyId: 'companyId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -116,11 +125,16 @@ export const LeadScalarFieldEnum = {
   phone: 'phone',
   email: 'email',
   comment: 'comment',
+  nextContactAt: 'nextContactAt',
+  lastContactAt: 'lastContactAt',
+  assignedAt: 'assignedAt',
   companyId: 'companyId',
+  createdById: 'createdById',
   managerId: 'managerId',
   clientId: 'clientId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type LeadScalarFieldEnum = (typeof LeadScalarFieldEnum)[keyof typeof LeadScalarFieldEnum]
@@ -133,9 +147,14 @@ export const ClientScalarFieldEnum = {
   whatsapp: 'whatsapp',
   email: 'email',
   passport: 'passport',
+  pin: 'pin',
+  birthDate: 'birthDate',
+  address: 'address',
+  notes: 'notes',
   companyId: 'companyId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type ClientScalarFieldEnum = (typeof ClientScalarFieldEnum)[keyof typeof ClientScalarFieldEnum]
@@ -148,7 +167,8 @@ export const ProjectScalarFieldEnum = {
   status: 'status',
   companyId: 'companyId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
@@ -163,7 +183,8 @@ export const BlockScalarFieldEnum = {
   floorsCount: 'floorsCount',
   unitsCount: 'unitsCount',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type BlockScalarFieldEnum = (typeof BlockScalarFieldEnum)[keyof typeof BlockScalarFieldEnum]
@@ -176,7 +197,8 @@ export const EntranceScalarFieldEnum = {
   projectId: 'projectId',
   blockId: 'blockId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type EntranceScalarFieldEnum = (typeof EntranceScalarFieldEnum)[keyof typeof EntranceScalarFieldEnum]
@@ -190,7 +212,8 @@ export const FloorScalarFieldEnum = {
   blockId: 'blockId',
   entranceId: 'entranceId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type FloorScalarFieldEnum = (typeof FloorScalarFieldEnum)[keyof typeof FloorScalarFieldEnum]
@@ -204,12 +227,14 @@ export const UnitScalarFieldEnum = {
   rooms: 'rooms',
   area: 'area',
   price: 'price',
+  pricePerSqm: 'pricePerSqm',
   projectId: 'projectId',
   blockId: 'blockId',
   entranceId: 'entranceId',
   floorId: 'floorId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type UnitScalarFieldEnum = (typeof UnitScalarFieldEnum)[keyof typeof UnitScalarFieldEnum]
@@ -217,13 +242,27 @@ export type UnitScalarFieldEnum = (typeof UnitScalarFieldEnum)[keyof typeof Unit
 
 export const DealScalarFieldEnum = {
   id: 'id',
-  status: 'status',
-  amount: 'amount',
-  bookingUntil: 'bookingUntil',
-  clientId: 'clientId',
+  companyId: 'companyId',
+  projectId: 'projectId',
   unitId: 'unitId',
+  clientId: 'clientId',
+  managerId: 'managerId',
+  status: 'status',
+  financingType: 'financingType',
+  listPrice: 'listPrice',
+  salePrice: 'salePrice',
+  discountAmount: 'discountAmount',
+  discountPercent: 'discountPercent',
+  deposit: 'deposit',
+  reservedAt: 'reservedAt',
+  reservationExpiresAt: 'reservationExpiresAt',
+  reservedById: 'reservedById',
+  contractNumber: 'contractNumber',
+  contractDate: 'contractDate',
+  note: 'note',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type DealScalarFieldEnum = (typeof DealScalarFieldEnum)[keyof typeof DealScalarFieldEnum]
@@ -231,16 +270,95 @@ export type DealScalarFieldEnum = (typeof DealScalarFieldEnum)[keyof typeof Deal
 
 export const PaymentScalarFieldEnum = {
   id: 'id',
-  amount: 'amount',
-  paidAt: 'paidAt',
-  method: 'method',
-  comment: 'comment',
   dealId: 'dealId',
+  userId: 'userId',
+  amount: 'amount',
+  paymentMethod: 'paymentMethod',
+  paymentType: 'paymentType',
+  paidAt: 'paidAt',
+  reference: 'reference',
+  note: 'note',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  deletedAt: 'deletedAt'
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
+
+
+export const PaymentScheduleScalarFieldEnum = {
+  id: 'id',
+  dealId: 'dealId',
+  dueDate: 'dueDate',
+  amount: 'amount',
+  paidAmount: 'paidAmount',
+  status: 'status',
+  order: 'order',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type PaymentScheduleScalarFieldEnum = (typeof PaymentScheduleScalarFieldEnum)[keyof typeof PaymentScheduleScalarFieldEnum]
+
+
+export const ActivityScalarFieldEnum = {
+  id: 'id',
+  action: 'action',
+  type: 'type',
+  title: 'title',
+  description: 'description',
+  metadata: 'metadata',
+  companyId: 'companyId',
+  userId: 'userId',
+  leadId: 'leadId',
+  clientId: 'clientId',
+  dealId: 'dealId',
+  createdAt: 'createdAt'
+} as const
+
+export type ActivityScalarFieldEnum = (typeof ActivityScalarFieldEnum)[keyof typeof ActivityScalarFieldEnum]
+
+
+export const TaskScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  description: 'description',
+  dueDate: 'dueDate',
+  status: 'status',
+  assignedToId: 'assignedToId',
+  companyId: 'companyId',
+  leadId: 'leadId',
+  clientId: 'clientId',
+  dealId: 'dealId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
+
+
+export const DocumentScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  originalName: 'originalName',
+  mimeType: 'mimeType',
+  extension: 'extension',
+  size: 'size',
+  path: 'path',
+  url: 'url',
+  type: 'type',
+  ownerType: 'ownerType',
+  ownerId: 'ownerId',
+  companyId: 'companyId',
+  uploadedById: 'uploadedById',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type DocumentScalarFieldEnum = (typeof DocumentScalarFieldEnum)[keyof typeof DocumentScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -249,6 +367,14 @@ export const SortOrder = {
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -265,4 +391,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
