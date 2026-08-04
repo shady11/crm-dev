@@ -17,7 +17,7 @@ export function ChessboardUnitCard({
     const price = Number(unit.price);
     const area = Number(unit.area);
 
-    const pricePerM2 =
+    const pricePerSqM =
         area > 0
             ? Math.round(price / area)
             : 0;
@@ -47,7 +47,7 @@ export function ChessboardUnitCard({
                     {parseFloat(unit.price).toLocaleString('en-US', { maximumFractionDigits: 0 })} $
                 </span>
                 <span>
-                    {pricePerM2} $/m²
+                    {pricePerSqM} $/m²
                 </span>
             </div>
             <div className="flex items-center justify-between w-full gap-8 text-xs">

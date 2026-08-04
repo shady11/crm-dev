@@ -133,23 +133,25 @@ export function ReservationStep({ form, apartment, managers }: ReservationStepPr
                 <div className="space-y-1 rounded-lg border border-secondary p-3 text-sm">
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">List price</span>
-                        <span>{calculation.price.toLocaleString("en-US")} $</span>
+                        <span>{calculation.price.toLocaleString("ru-RU")} $</span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">Discount</span>
-                        <span>-{calculation.discountAmount.toLocaleString("en-US")} $</span>
+                        <span>
+                            {calculation.discountAmount > 0 && `- ${calculation.discountAmount.toLocaleString("ru-RU")} $`}
+                        </span>
                     </div>
                     <div className="flex justify-between font-medium">
                         <span>Final price</span>
-                        <span>{calculation.finalPrice.toLocaleString("en-US")} $</span>
+                        <span>{calculation.finalPrice.toLocaleString("ru-RU")} $</span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">Deposit</span>
-                        <span>{calculation.deposit.toLocaleString("en-US")} $</span>
+                        <span>{calculation.deposit.toLocaleString("ru-RU")} $</span>
                     </div>
                     <div className="flex justify-between font-medium">
                         <span>Remaining</span>
-                        <span>{calculation.remaining.toLocaleString("en-US")} $</span>
+                        <span>{calculation.remaining.toLocaleString("ru-RU")} $</span>
                     </div>
                 </div>
             </FieldGroup>

@@ -11,7 +11,7 @@ import {
 } from 'class-validator';
 
 import {Type} from 'class-transformer';
-import {FinancingType} from "@/generated/prisma/client";
+import {FinancingType, PaymentMethod} from "@/generated/prisma/client";
 
 export class ReserveUnitDto {
     @IsUUID()
@@ -50,6 +50,10 @@ export class ReserveUnitDto {
     @IsNumber({ maxDecimalPlaces: 2 })
     @Min(0)
     deposit?: number;
+
+    @IsOptional()
+    @IsEnum(PaymentMethod)
+    depositPaymentMethod?: PaymentMethod;
 
     @IsOptional()
     @IsDateString()

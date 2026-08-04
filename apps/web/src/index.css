@@ -1,14 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-
-@import "@/assets/fonts/tt-norms/stylesheet.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
     --font-heading: var(--font-sans);
-    --font-sans: 'TT Norms Pro', sans-serif;
+    --font-sans: 'Inter', sans-serif;
     --color-background: var(--background);
     --color-foreground: var(--foreground);
     --color-card: var(--card);
@@ -167,7 +167,7 @@
     --accent: oklch(0.95 0.02 261.78);
     --accent-foreground: oklch(0.48 0.20 260.48);
     --destructive: oklch(0.58 0.22 27.33);
-    --border: oklch(0.96 0 0);
+    --border: oklch(0.9142 0.0208 274.02);
     --input: oklch(0.9002 0.013 266.69);
     --ring: oklch(0.48 0.20 260.48);
     --chart-1: oklch(0.48 0.20 260.48);

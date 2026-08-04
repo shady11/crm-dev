@@ -19,4 +19,8 @@ export const paths = {
         },
         sales: (projectId: string) => `/projects/${projectId}/sales`,
     },
+    deals: {
+        root: "/deals",
+        detail: (dealId: string) => `/deals/${dealId}`,
+    },
 } as const;

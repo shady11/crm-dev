@@ -299,12 +299,31 @@ export class UnitsService {
                     },
                     select: {
                         id: true,
+                        dealNumber: true,
                         status: true,
+                        financingType: true,
+                        salePrice: true,
+                        discountAmount: true,
+                        discountPercent: true,
+                        deposit: true,
+                        reservedAt: true,
+                        reservationExpiresAt: true,
+                        contractNumber: true,
+                        contractDate: true,
+                        cancelledAt: true,
+                        cancelReason: true,
+                        note: true,
                         client: {
                             select: {
                                 id: true,
                                 fullName: true,
                                 phone: true,
+                            },
+                        },
+                        manager: {
+                            select: {
+                                id: true,
+                                fullName: true,
                             },
                         },
                         createdAt: true,

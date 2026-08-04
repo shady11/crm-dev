@@ -72,18 +72,17 @@ export class DealDomainService {
     ensureCanComplete(
         deal: Deal,
         schedules: Pick<PaymentSchedule, 'status'>[],
+        totalPaid: Prisma.Decimal,
     ): void {
         this.ensureStatus(deal, DealStatus.ACTIVE);
 
-        const unpaid = schedules.some(
-            s => s.status !== PaymentScheduleStatus.PAID,
-        );
-
+        const unpaid = schedules.some(s => s.status !== PaymentScheduleStatus.PAID);
         if (unpaid) {
-            throw new InvalidDealStateException(
-                deal.status,
-                'All installments must be paid.',
-            );
+            throw new InvalidDealStateException(deal.status, 'All installments must be paid.');
+        }
+
+        if (totalPaid.lessThan(deal.salePrice)) {
+            throw new InvalidDealStateException(deal.status, 'Deal is not fully paid.');
         }
     }
 

@@ -33,13 +33,13 @@ export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
 };
 
 export const PROJECT_STATUS_BADGE_CLASSES: Record<ProjectStatus, string> = {
-    [ProjectStatus.DRAFT]: "bg-gray-500",
-    [ProjectStatus.PLANNING]: "bg-amber-500",
-    [ProjectStatus.ACTIVE]: "bg-emerald-500",
-    [ProjectStatus.PAUSED]: "bg-cyan-500",
-    [ProjectStatus.SOLDOUT]: "bg-indigo-500",
-    [ProjectStatus.COMPLETED]: "bg-blue-500",
-    [ProjectStatus.ARCHIVED]: "bg-slate-500",
+    [ProjectStatus.DRAFT]: "bg-gray-400",
+    [ProjectStatus.PLANNING]: "bg-amber-400",
+    [ProjectStatus.ACTIVE]: "bg-emerald-400",
+    [ProjectStatus.PAUSED]: "bg-cyan-400",
+    [ProjectStatus.SOLDOUT]: "bg-indigo-400",
+    [ProjectStatus.COMPLETED]: "bg-blue-400",
+    [ProjectStatus.ARCHIVED]: "bg-slate-400",
 };
 
 export function isProjectStatus(status?: string | null): status is ProjectStatus {

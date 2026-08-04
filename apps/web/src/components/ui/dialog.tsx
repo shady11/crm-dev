@@ -1,14 +1,14 @@
 "use client";
 
-import { Dialog as ArkDialog, useDialogContext } from "@ark-ui/react/dialog";
-import { ark } from "@ark-ui/react/factory";
-import { Portal } from "@ark-ui/react/portal";
-import { XIcon } from "lucide-react";
+import {Dialog as ArkDialog, useDialogContext} from "@ark-ui/react/dialog";
+import {ark} from "@ark-ui/react/factory";
+import {Portal} from "@ark-ui/react/portal";
+import {XIcon} from "lucide-react";
 import React from "react";
-import { tv, type VariantProps } from "tailwind-variants";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import {tv, type VariantProps} from "tailwind-variants";
+import {cn} from "@/lib/utils";
+import {Button} from "@/components/ui/button";
+import {ScrollArea} from "@/components/ui/scroll-area";
 
 export const useDialog = useDialogContext;
 
@@ -260,7 +260,7 @@ export const DialogHeader = (props: DialogHeaderProps) => {
       className={cn(
         "shrink-0",
         "p-(--space)",
-        "flex flex-col gap-2",
+        "flex flex-col gap-1",
         "in-[[data-slot=dialog-content]:has([data-slot=dialog-body])]:pb-3",
         className
       )}

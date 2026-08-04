@@ -1,12 +1,9 @@
 "use client";
 
-import {
-  ScrollArea as ArkScrollArea,
-  useScrollAreaContext,
-} from "@ark-ui/react/scroll-area";
+import {ScrollArea as ArkScrollArea, useScrollAreaContext,} from "@ark-ui/react/scroll-area";
 import type React from "react";
-import { tv, type VariantProps } from "tailwind-variants";
-import { cn } from "@/lib/utils";
+import {tv, type VariantProps} from "tailwind-variants";
+import {cn} from "@/lib/utils";
 
 export const useScrollArea = useScrollAreaContext;
 
@@ -77,8 +74,8 @@ export const ScrollAreaScrollbar = (
         "m-1",
         "bg-transparent",
         "opacity-0 transition-opacity delay-300",
-        "data-[orientation=vertical]:w-1.5",
-        "data-[orientation=horizontal]:h-1.5 data-[orientation=horizontal]:flex-col",
+        "data-[orientation=vertical]:w-1",
+        "data-[orientation=horizontal]:h-1 data-[orientation=horizontal]:flex-col",
         "data-hover:opacity-100 data-hover:delay-0 data-hover:duration-100",
         "data-scrolling:opacity-100 data-scrolling:delay-0 data-scrolling:duration-100",
         "data-[orientation=vertical]:in-[[data-slot=scroll-area]:not([data-overflow-y])]:hidden",

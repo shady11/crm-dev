@@ -12,29 +12,21 @@ export const DEAL_DETAILS_INCLUDE = {
     project: true,
 
     unit: {
-        include: {
-            block: true,
-            entrance: true,
-            floor: true,
-        },
+        include: { block: true, entrance: true, floor: true },
     },
 
     payments: {
-        orderBy: {
-            paidAt: 'desc',
-        },
+        where: { deletedAt: null },
+        orderBy: { paidAt: 'desc' },
     },
 
     paymentSchedules: {
-        orderBy: {
-            order: 'asc',
-        },
+        where: { deletedAt: null },
+        orderBy: { order: 'asc' },
     },
 
     activities: {
-        orderBy: {
-            createdAt: 'desc',
-        },
+        orderBy: { createdAt: 'desc' },
     },
 
     tasks: true,

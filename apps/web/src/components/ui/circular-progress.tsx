@@ -1,12 +1,9 @@
 "use client";
 
-import { ark } from "@ark-ui/react/";
-import {
-  Progress as ArkProgress,
-  useProgressContext,
-} from "@ark-ui/react/progress";
+import {ark} from "@ark-ui/react";
+import {Progress as ArkProgress, useProgressContext,} from "@ark-ui/react/progress";
 import type React from "react";
-import { cn } from "@/lib/utils";
+import {cn} from "@/lib/utils";
 
 export const useCircularProgress = useProgressContext;
 

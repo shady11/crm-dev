@@ -2,9 +2,9 @@ import {SheetBody} from "@/components/ui/sheet";
 import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/components/ui/data-list";
 import {ApartmentCard} from "./apartment-card";
 import {calculateBooking} from "../../utils/booking-calculator";
-import type {Client} from "@/features/clients/api/clients.api";
 import type {BookingFormInput} from "@/features/deals/schemas/booking.schema.ts";
 import type {ApartmentSummary} from "@/features/deals/types/booking.types.ts";
+import type {Client} from "@/features/clients/types/client.types.ts";
 
 interface SummaryStepProps {
     values: BookingFormInput;
@@ -38,19 +38,19 @@ export function SummaryStep({ values, apartment, selectedClient, managerName }: 
                     </DataListItem>
                     <DataListItem>
                         <DataListItemLabel>Expires</DataListItemLabel>
-                        <DataListItemValue>{values.reservation.expiresAt?.toLocaleDateString() ?? "—"}</DataListItemValue>
+                        <DataListItemValue>{values.reservation.expiresAt?.toLocaleDateString("ru-RU") ?? "—"}</DataListItemValue>
                     </DataListItem>
                     <DataListItem>
                         <DataListItemLabel>Final price</DataListItemLabel>
-                        <DataListItemValue>{calculation.finalPrice.toLocaleString("en-US")} $</DataListItemValue>
+                        <DataListItemValue>{calculation.finalPrice.toLocaleString("ru-RU")} $</DataListItemValue>
                     </DataListItem>
                     <DataListItem>
                         <DataListItemLabel>Deposit</DataListItemLabel>
-                        <DataListItemValue>{calculation.deposit.toLocaleString("en-US")} $</DataListItemValue>
+                        <DataListItemValue>{calculation.deposit.toLocaleString("ru-RU")} $</DataListItemValue>
                     </DataListItem>
                     <DataListItem>
                         <DataListItemLabel>Remaining</DataListItemLabel>
-                        <DataListItemValue>{calculation.remaining.toLocaleString("en-US")} $</DataListItemValue>
+                        <DataListItemValue>{calculation.remaining.toLocaleString("ru-RU")} $</DataListItemValue>
                     </DataListItem>
                 </DataList>
 

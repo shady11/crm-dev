@@ -28,7 +28,12 @@ export const projectsRoutes: RouteObject = {
                             path: ":blockId",
                             children: [
                                 { index: true, element: <ChessboardEntrances /> },
-                                { path: ":entranceId", element: <ChessboardMatrix /> },
+                                {
+                                    path: ":entranceId",
+                                    children: [
+                                        { index: true, element: <ChessboardMatrix /> },
+                                    ],
+                                },
                             ],
                         },
                     ],

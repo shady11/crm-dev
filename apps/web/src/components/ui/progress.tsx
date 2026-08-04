@@ -1,12 +1,9 @@
 "use client";
 
-import {
-  Progress as ArkProgress,
-  useProgressContext,
-} from "@ark-ui/react/progress";
+import {Progress as ArkProgress, useProgressContext,} from "@ark-ui/react/progress";
 import type React from "react";
-import { cn } from "@/lib/utils";
-import { FieldLabel } from "@/components/ui/field";
+import {cn} from "@/lib/utils";
+import {FieldLabel} from "@/components/ui/field";
 
 export const useProgress = useProgressContext;
 
@@ -66,8 +63,8 @@ export const ProgressTrack = (
       "bg-input",
       "rounded-full",
       "overflow-x-hidden",
-      "data-[orientation=horizontal]:h-2 data-[orientation=horizontal]:w-full",
-      "data-[orientation=vertical]:h-full data-[orientation=vertical]:w-2"
+      "data-[orientation=horizontal]:h-1 data-[orientation=horizontal]:w-full",
+      "data-[orientation=vertical]:h-full data-[orientation=vertical]:w-1"
     )}
     data-slot="progress-track"
     {...props}

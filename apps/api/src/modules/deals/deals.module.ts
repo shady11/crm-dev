@@ -5,8 +5,8 @@ import {DealsController} from './controllers/deals.controller';
 
 import {DealsService} from './services/deals.service';
 import {DealActivityService} from './services/deal-activity.service';
-// import {PaymentService} from './services/payment.service';
-// import {PaymentScheduleService} from './services/payment-schedule.service';
+import {PaymentService} from './services/payment.service';
+import {PaymentScheduleService} from './services/payment-schedule.service';
 import {DealMapper} from "@/modules/deals/mappers/deal.mapper";
 import {DealDomainService} from "@/modules/deals/services/deal-domain.service";
 
@@ -17,14 +17,14 @@ import {DealDomainService} from "@/modules/deals/services/deal-domain.service";
     DealsService,
     DealDomainService,
     DealActivityService,
-    // PaymentService,
-    // PaymentScheduleService,
+    PaymentService,
+    PaymentScheduleService,
     DealMapper,
   ],
   exports: [
     DealsService,
-    // PaymentService,
-    // PaymentScheduleService,
+    PaymentService,
+    PaymentScheduleService,
   ],
 })
 export class DealsModule {}

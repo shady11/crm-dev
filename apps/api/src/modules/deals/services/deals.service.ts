@@ -1,6 +1,13 @@
 import {ForbiddenException, Injectable,} from '@nestjs/common';
 
-import {DealStatus, Prisma, UnitStatus} from '@/generated/prisma/client';
+import {
+  DealStatus,
+  PaymentMethod,
+  PaymentScheduleStatus,
+  PaymentType,
+  Prisma,
+  UnitStatus
+} from '@/generated/prisma/client';
 import {PrismaService} from '@/database/prisma.service';
 
 import {ClientNotFoundException, DealNotFoundException, UnitNotFoundException,} from '../exceptions';
@@ -12,6 +19,10 @@ import {DealActivityService} from './deal-activity.service';
 import {ACTIVE_DEAL_STATUSES, DEAL_DETAILS_INCLUDE} from "../deal.constants";
 import {ReserveUnitDto} from "../dto/reserve-unit.dto";
 import {AuthUser} from "@/common/types/auth-user.type";
+import {ExtendReservationDto} from "@/modules/deals/dto/extend-reservation.dto";
+import {SignContractDto} from "@/modules/deals/dto/sign-contract.dto";
+import {CancelDealDto} from "@/modules/deals/dto/cancel-deal.dto";
+import {DbClient} from "@/database/prisma.types";
 
 @Injectable()
 export class DealsService {
@@ -31,6 +42,10 @@ export class DealsService {
       throw new ForbiddenException("User does not belong to a company");
     }
 
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+    const skip = (page - 1) * limit;
+
     const where: Prisma.DealWhereInput = {
       companyId: user.companyId,
       status: query.status,
@@ -39,26 +54,42 @@ export class DealsService {
       managerId: query.managerId,
     };
 
-    const deals = await this.prisma.deal.findMany({
-      where,
-      include: {
-        client: true,
-        manager: true,
-        project: true,
-        unit: {
-          include: {
-            block: true,
-            entrance: true,
-            floor: true,
+    if (query.search) {
+      where.OR = [
+        { dealNumber: { contains: query.search, mode: "insensitive" } },
+        { client: { fullName: { contains: query.search, mode: "insensitive" } } },
+        { client: { phone: { contains: query.search, mode: "insensitive" } } },
+        { unit: { number: { contains: query.search, mode: "insensitive" } } },
+      ];
+    }
+
+    const [deals, total] = await Promise.all([
+      this.prisma.deal.findMany({
+        where,
+        skip,
+        take: limit,
+        include: {
+          client: true,
+          manager: true,
+          project: true,
+          unit: {
+            include: { block: true, entrance: true, floor: true },
           },
         },
-      },
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.deal.count({ where }),
+    ]);
 
-    return this.mapper.toList(deals);
+    return {
+      items: this.mapper.toList(deals),
+      meta: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async findOne(user: AuthUser, id: string) {
@@ -114,9 +145,22 @@ export class DealsService {
 
       this.domain.ensureNoActiveDeal(activeDeal, unit);
 
+      const year = new Date().getFullYear();
+      const prefix = `D-${year}-`;
+
+      const lastDeal = await db.deal.findFirst({
+        where: { companyId, dealNumber: { startsWith: prefix } },
+        orderBy: { dealNumber: "desc" },
+        select: { dealNumber: true },
+      });
+
+      const nextSeq = lastDeal ? parseInt(lastDeal.dealNumber.slice(prefix.length), 10) + 1 : 1;
+      const dealNumber = `${prefix}${String(nextSeq).padStart(4, "0")}`;
+
       const deal = await db.deal.create({
         data: {
           companyId,
+          dealNumber,
 
           projectId: unit.projectId,
           unitId: unit.id,
@@ -145,6 +189,19 @@ export class DealsService {
           note: dto.note,
         },
       });
+
+      if (dto.deposit && dto.deposit > 0) {
+        await db.payment.create({
+          data: {
+            dealId: deal.id,
+            userId: user.id,
+            amount: dto.deposit,
+            paymentMethod: dto.depositPaymentMethod ?? PaymentMethod.CASH,
+            paymentType: PaymentType.DEPOSIT,
+            paidAt: new Date(),
+          },
+        });
+      }
 
       await db.unit.update({
         where: {
@@ -178,6 +235,215 @@ export class DealsService {
     });
 
     return this.mapper.toDetails(result);
+  }
+
+  async extendReservation(user: AuthUser, id: string, dto: ExtendReservationDto) {
+    if (!user.companyId) {
+      throw new ForbiddenException("User does not belong to a company");
+    }
+
+    const companyId = user.companyId;
+
+    const result = await this.prisma.$transaction(async db => {
+      const deal = await db.deal.findFirst({ where: { id, companyId } });
+      if (!deal) throw new DealNotFoundException(id);
+
+      const newExpiresAt = new Date(dto.reservationExpiresAt);
+      this.domain.ensureCanExtendReservation(deal, newExpiresAt);
+
+      await db.deal.update({
+        where: { id },
+        data: { reservationExpiresAt: newExpiresAt },
+      });
+
+      await this.activityService.extendReservation({
+        db, companyId, userId: user.id,
+        dealId: deal.id, clientId: deal.clientId,
+        metadata: { reservationExpiresAt: newExpiresAt.toISOString() },
+      });
+
+      return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
+    });
+
+    return this.mapper.toDetails(result);
+  }
+
+  async signContract(user: AuthUser, id: string, dto: SignContractDto) {
+    if (!user.companyId) {
+      throw new ForbiddenException("User does not belong to a company");
+    }
+
+    const companyId = user.companyId;
+
+    const result = await this.prisma.$transaction(async db => {
+      const deal = await db.deal.findFirst({ where: { id, companyId } });
+      if (!deal) throw new DealNotFoundException(id);
+
+      this.domain.ensureCanSignContract(deal);
+
+      await db.deal.update({
+        where: { id },
+        data: {
+          status: this.domain.nextStatusAfterReservation(),
+          contractNumber: dto.contractNumber,
+          contractDate: new Date(dto.contractDate),
+          note: dto.note ?? deal.note,
+        },
+      });
+
+      await this.activityService.signContract({
+        db, companyId, userId: user.id,
+        dealId: deal.id, clientId: deal.clientId,
+        metadata: { contractNumber: dto.contractNumber },
+      });
+
+      return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
+    });
+
+    return this.mapper.toDetails(result);
+  }
+
+  async activate(user: AuthUser, id: string) {
+    if (!user.companyId) {
+      throw new ForbiddenException("User does not belong to a company");
+    }
+
+    const companyId = user.companyId;
+
+    const result = await this.prisma.$transaction(async db => {
+      const deal = await db.deal.findFirst({ where: { id, companyId } });
+      if (!deal) throw new DealNotFoundException(id);
+
+      this.domain.ensureCanActivate(deal);
+
+      await db.deal.update({
+        where: { id },
+        data: { status: this.domain.nextStatusAfterContract() },
+      });
+
+      await this.activityService.dealUpdated({
+        db, companyId, userId: user.id,
+        dealId: deal.id, clientId: deal.clientId,
+        metadata: { status: "ACTIVE" },
+      });
+
+      return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
+    });
+
+    return this.mapper.toDetails(result);
+  }
+
+  async cancelDeal(user: AuthUser, id: string, dto: CancelDealDto) {
+    if (!user.companyId) {
+      throw new ForbiddenException("User does not belong to a company");
+    }
+
+    const companyId = user.companyId;
+
+    const result = await this.prisma.$transaction(async db => {
+      const deal = await db.deal.findFirst({ where: { id, companyId } });
+      if (!deal) throw new DealNotFoundException(id);
+
+      this.domain.ensureCanCancel(deal);
+
+      await db.deal.update({
+        where: { id },
+        data: {
+          status: this.domain.cancelledStatus(),
+          cancelledAt: new Date(),
+          cancelReason: dto.reason,
+        },
+      });
+
+      await db.unit.update({
+        where: { id: deal.unitId },
+        data: { status: UnitStatus.AVAILABLE },
+      });
+
+      await db.paymentSchedule.updateMany({
+        where: {
+          dealId: deal.id,
+          deletedAt: null,
+          status: { in: [PaymentScheduleStatus.PENDING, PaymentScheduleStatus.PARTIAL, PaymentScheduleStatus.OVERDUE] },
+        },
+        data: { deletedAt: new Date() },
+      });
+
+      await this.activityService.cancelReservation({
+        db, companyId, userId: user.id,
+        dealId: deal.id, clientId: deal.clientId,
+        metadata: { reason: dto.reason ?? null },
+      });
+
+      return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
+    });
+
+    return this.mapper.toDetails(result);
+  }
+
+  async complete(user: AuthUser, id: string) {
+    if (!user.companyId) {
+      throw new ForbiddenException("User does not belong to a company");
+    }
+
+    const companyId = user.companyId;
+
+    const result = await this.prisma.$transaction(async db => {
+      await this.tryCompleteWithinTransaction(db, companyId, user.id, id, true);
+      return db.deal.findUniqueOrThrow({ where: { id }, include: DEAL_DETAILS_INCLUDE });
+    });
+
+    return this.mapper.toDetails(result);
+  }
+
+  async tryCompleteWithinTransaction(
+      db: DbClient,
+      companyId: string,
+      userId: string,
+      dealId: string,
+      throwOnIneligible = false,
+  ): Promise<boolean> {
+    const deal = await db.deal.findFirst({ where: { id: dealId, companyId } });
+    if (!deal) {
+      if (throwOnIneligible) throw new DealNotFoundException(dealId);
+      return false;
+    }
+
+    const schedules = await db.paymentSchedule.findMany({
+      where: { dealId, deletedAt: null },
+      select: { status: true },
+    });
+
+    const paidAgg = await db.payment.aggregate({
+      where: { dealId, deletedAt: null },
+      _sum: { amount: true },
+    });
+    const totalPaid = paidAgg._sum.amount ?? new Prisma.Decimal(0);
+
+    try {
+      this.domain.ensureCanComplete(deal, schedules, totalPaid);
+    } catch (error) {
+      if (throwOnIneligible) throw error;
+      return false;
+    }
+
+    await db.deal.update({
+      where: { id: dealId },
+      data: { status: this.domain.nextStatusAfterCompletion() },
+    });
+
+    await db.unit.update({
+      where: { id: deal.unitId },
+      data: { status: UnitStatus.SOLD },
+    });
+
+    await this.activityService.dealUpdated({
+      db, companyId, userId,
+      dealId, clientId: deal.clientId,
+      metadata: { status: 'COMPLETED' },
+    });
+
+    return true;
   }
 
   // --------------------------------------------------------------------------
@@ -216,5 +482,22 @@ export class DealsService {
     return this.prisma.user.findFirstOrThrow({
       where: { id: managerId, companyId },
     });
+  }
+
+  async getStatusSummary(user: AuthUser) {
+    if (!user.companyId) {
+      throw new ForbiddenException("User does not belong to a company");
+    }
+
+    const counts = await this.prisma.deal.groupBy({
+      by: ['status'],
+      where: { companyId: user.companyId },
+      _count: { _all: true },
+    });
+
+    return Object.values(DealStatus).map(status => ({
+      status,
+      count: counts.find(c => c.status === status)?._count._all ?? 0,
+    }));
   }
 }

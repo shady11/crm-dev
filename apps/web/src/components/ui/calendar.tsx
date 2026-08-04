@@ -105,7 +105,7 @@ export const CalendarYearSelect = (
       data-slot="calendar-year-select-wrapper"
     >
       <ArkCalendar.YearSelect
-        className={cn(nativeSelectVariants())}
+        className={cn(nativeSelectVariants({size: "sm"}))}
         data-slot="calendar-year-select"
         {...rest}
       />
@@ -133,7 +133,7 @@ export const CalendarMonthSelect = (
       data-slot="calendar-month-select-wrapper"
     >
       <ArkCalendar.MonthSelect
-        className={cn(nativeSelectVariants(), className)}
+        className={cn(nativeSelectVariants({size: "sm"}), className)}
         data-slot="calendar-month-select"
         {...rest}
       />
@@ -178,7 +178,7 @@ export const CalendarViewControl = (
       className={cn(
         "relative",
         "h-auto w-full",
-        "flex items-center gap-1.5",
+        "flex items-center gap-1",
         className
       )}
       data-slot="calendar-view-control"
@@ -191,7 +191,7 @@ export const CalendarPrevTrigger = (
   props: React.ComponentProps<typeof ArkCalendar.PrevTrigger>
 ) => (
   <ArkCalendar.PrevTrigger asChild data-slot="calendar-prev-trigger" {...props}>
-    <Button className="me-auto" size="icon-md" variant="ghost">
+    <Button className="me-auto" size="icon-sm" variant="ghost">
       <ChevronLeftIcon aria-hidden className="rtl:rotate-180" />
     </Button>
   </ArkCalendar.PrevTrigger>
@@ -201,7 +201,7 @@ export const CalendarNextTrigger = (
   props: React.ComponentProps<typeof ArkCalendar.NextTrigger>
 ) => (
   <ArkCalendar.NextTrigger asChild data-slot="calendar-next-trigger" {...props}>
-    <Button className="ms-auto" size="icon-md" variant="ghost">
+    <Button className="ms-auto" size="icon-sm" variant="ghost">
       <ChevronRightIcon aria-hidden className="rtl:rotate-180" />
     </Button>
   </ArkCalendar.NextTrigger>

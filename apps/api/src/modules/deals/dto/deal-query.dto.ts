@@ -1,5 +1,6 @@
-import {IsEnum, IsOptional, IsUUID,} from 'class-validator';
+import {IsEnum, IsInt, IsOptional, IsString, IsUUID, Max, Min,} from 'class-validator';
 import {DealStatus} from "@/generated/prisma/client";
+import {Transform} from "class-transformer";
 
 export class DealQueryDto {
     @IsOptional()
@@ -17,4 +18,21 @@ export class DealQueryDto {
     @IsOptional()
     @IsUUID()
     clientId?: string;
+
+    @IsOptional()
+    @IsString()
+    search?: string;
+
+    @IsOptional()
+    @Transform(({ value }) => Number(value))
+    @IsInt()
+    @Min(1)
+    page?: number = 1;
+
+    @IsOptional()
+    @Transform(({ value }) => Number(value))
+    @IsInt()
+    @Min(1)
+    @Max(100)
+    limit?: number = 20;
 }

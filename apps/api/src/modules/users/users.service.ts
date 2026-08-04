@@ -32,10 +32,13 @@ export class UsersService {
     constructor(private readonly prisma: PrismaService) {}
 
     async findAll(user: AuthUser, query: QueryUsersDto) {
-
         if (!user.companyId) {
             throw new ForbiddenException("User does not belong to a company");
         }
+
+        const page = query.page ?? 1;
+        const limit = query.limit ?? 20;
+        const skip = (page - 1) * limit;
 
         const where: Prisma.UserWhereInput = {
             companyId: user.companyId,
@@ -53,26 +56,32 @@ export class UsersService {
             ];
         }
 
-        const items = await this.prisma.user.findMany({
-            where,
-            orderBy: { fullName: "asc" },
-            select: {
-                id: true,
-                fullName: true,
-                email: true,
-                phone: true,
-                role: true,
-                isActive: true,
-            },
-        });
+        const [items, total] = await Promise.all([
+            this.prisma.user.findMany({
+                where,
+                skip,
+                take: limit,
+                orderBy: { fullName: "asc" },
+                select: {
+                    id: true,
+                    fullName: true,
+                    email: true,
+                    phone: true,
+                    role: true,
+                    isActive: true,
+                    createdAt: true,
+                },
+            }),
+            this.prisma.user.count({ where }),
+        ]);
 
         return {
             items,
             meta: {
-                page: 1,
-                limit: items.length,
-                total: items.length,
-                pages: 1,
+                page,
+                limit,
+                total,
+                pages: Math.ceil(total / limit),
             },
         };
     }

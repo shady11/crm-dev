@@ -49,6 +49,7 @@ export type DealMinAggregateOutputType = {
   unitId: string | null
   clientId: string | null
   managerId: string | null
+  dealNumber: string | null
   status: $Enums.DealStatus | null
   financingType: $Enums.FinancingType | null
   listPrice: runtime.Decimal | null
@@ -61,6 +62,8 @@ export type DealMinAggregateOutputType = {
   reservedById: string | null
   contractNumber: string | null
   contractDate: Date | null
+  cancelledAt: Date | null
+  cancelReason: string | null
   note: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -74,6 +77,7 @@ export type DealMaxAggregateOutputType = {
   unitId: string | null
   clientId: string | null
   managerId: string | null
+  dealNumber: string | null
   status: $Enums.DealStatus | null
   financingType: $Enums.FinancingType | null
   listPrice: runtime.Decimal | null
@@ -86,6 +90,8 @@ export type DealMaxAggregateOutputType = {
   reservedById: string | null
   contractNumber: string | null
   contractDate: Date | null
+  cancelledAt: Date | null
+  cancelReason: string | null
   note: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -99,6 +105,7 @@ export type DealCountAggregateOutputType = {
   unitId: number
   clientId: number
   managerId: number
+  dealNumber: number
   status: number
   financingType: number
   listPrice: number
@@ -111,6 +118,8 @@ export type DealCountAggregateOutputType = {
   reservedById: number
   contractNumber: number
   contractDate: number
+  cancelledAt: number
+  cancelReason: number
   note: number
   createdAt: number
   updatedAt: number
@@ -142,6 +151,7 @@ export type DealMinAggregateInputType = {
   unitId?: true
   clientId?: true
   managerId?: true
+  dealNumber?: true
   status?: true
   financingType?: true
   listPrice?: true
@@ -154,6 +164,8 @@ export type DealMinAggregateInputType = {
   reservedById?: true
   contractNumber?: true
   contractDate?: true
+  cancelledAt?: true
+  cancelReason?: true
   note?: true
   createdAt?: true
   updatedAt?: true
@@ -167,6 +179,7 @@ export type DealMaxAggregateInputType = {
   unitId?: true
   clientId?: true
   managerId?: true
+  dealNumber?: true
   status?: true
   financingType?: true
   listPrice?: true
@@ -179,6 +192,8 @@ export type DealMaxAggregateInputType = {
   reservedById?: true
   contractNumber?: true
   contractDate?: true
+  cancelledAt?: true
+  cancelReason?: true
   note?: true
   createdAt?: true
   updatedAt?: true
@@ -192,6 +207,7 @@ export type DealCountAggregateInputType = {
   unitId?: true
   clientId?: true
   managerId?: true
+  dealNumber?: true
   status?: true
   financingType?: true
   listPrice?: true
@@ -204,6 +220,8 @@ export type DealCountAggregateInputType = {
   reservedById?: true
   contractNumber?: true
   contractDate?: true
+  cancelledAt?: true
+  cancelReason?: true
   note?: true
   createdAt?: true
   updatedAt?: true
@@ -304,6 +322,7 @@ export type DealGroupByOutputType = {
   unitId: string
   clientId: string
   managerId: string | null
+  dealNumber: string
   status: $Enums.DealStatus
   financingType: $Enums.FinancingType | null
   listPrice: runtime.Decimal
@@ -316,6 +335,8 @@ export type DealGroupByOutputType = {
   reservedById: string | null
   contractNumber: string | null
   contractDate: Date | null
+  cancelledAt: Date | null
+  cancelReason: string | null
   note: string | null
   createdAt: Date
   updatedAt: Date
@@ -352,6 +373,7 @@ export type DealWhereInput = {
   unitId?: Prisma.StringFilter<"Deal"> | string
   clientId?: Prisma.StringFilter<"Deal"> | string
   managerId?: Prisma.StringNullableFilter<"Deal"> | string | null
+  dealNumber?: Prisma.StringFilter<"Deal"> | string
   status?: Prisma.EnumDealStatusFilter<"Deal"> | $Enums.DealStatus
   financingType?: Prisma.EnumFinancingTypeNullableFilter<"Deal"> | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -364,6 +386,8 @@ export type DealWhereInput = {
   reservedById?: Prisma.StringNullableFilter<"Deal"> | string | null
   contractNumber?: Prisma.StringNullableFilter<"Deal"> | string | null
   contractDate?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  cancelledAt?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  cancelReason?: Prisma.StringNullableFilter<"Deal"> | string | null
   note?: Prisma.StringNullableFilter<"Deal"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
@@ -387,6 +411,7 @@ export type DealOrderByWithRelationInput = {
   unitId?: Prisma.SortOrder
   clientId?: Prisma.SortOrder
   managerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  dealNumber?: Prisma.SortOrder
   status?: Prisma.SortOrder
   financingType?: Prisma.SortOrderInput | Prisma.SortOrder
   listPrice?: Prisma.SortOrder
@@ -399,6 +424,8 @@ export type DealOrderByWithRelationInput = {
   reservedById?: Prisma.SortOrderInput | Prisma.SortOrder
   contractNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   contractDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelReason?: Prisma.SortOrderInput | Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -417,6 +444,7 @@ export type DealOrderByWithRelationInput = {
 
 export type DealWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  companyId_dealNumber?: Prisma.DealCompanyIdDealNumberCompoundUniqueInput
   AND?: Prisma.DealWhereInput | Prisma.DealWhereInput[]
   OR?: Prisma.DealWhereInput[]
   NOT?: Prisma.DealWhereInput | Prisma.DealWhereInput[]
@@ -425,6 +453,7 @@ export type DealWhereUniqueInput = Prisma.AtLeast<{
   unitId?: Prisma.StringFilter<"Deal"> | string
   clientId?: Prisma.StringFilter<"Deal"> | string
   managerId?: Prisma.StringNullableFilter<"Deal"> | string | null
+  dealNumber?: Prisma.StringFilter<"Deal"> | string
   status?: Prisma.EnumDealStatusFilter<"Deal"> | $Enums.DealStatus
   financingType?: Prisma.EnumFinancingTypeNullableFilter<"Deal"> | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -437,6 +466,8 @@ export type DealWhereUniqueInput = Prisma.AtLeast<{
   reservedById?: Prisma.StringNullableFilter<"Deal"> | string | null
   contractNumber?: Prisma.StringNullableFilter<"Deal"> | string | null
   contractDate?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  cancelledAt?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  cancelReason?: Prisma.StringNullableFilter<"Deal"> | string | null
   note?: Prisma.StringNullableFilter<"Deal"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
@@ -451,7 +482,7 @@ export type DealWhereUniqueInput = Prisma.AtLeast<{
   payments?: Prisma.PaymentListRelationFilter
   activities?: Prisma.ActivityListRelationFilter
   tasks?: Prisma.TaskListRelationFilter
-}, "id">
+}, "id" | "companyId_dealNumber">
 
 export type DealOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -460,6 +491,7 @@ export type DealOrderByWithAggregationInput = {
   unitId?: Prisma.SortOrder
   clientId?: Prisma.SortOrder
   managerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  dealNumber?: Prisma.SortOrder
   status?: Prisma.SortOrder
   financingType?: Prisma.SortOrderInput | Prisma.SortOrder
   listPrice?: Prisma.SortOrder
@@ -472,6 +504,8 @@ export type DealOrderByWithAggregationInput = {
   reservedById?: Prisma.SortOrderInput | Prisma.SortOrder
   contractNumber?: Prisma.SortOrderInput | Prisma.SortOrder
   contractDate?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  cancelReason?: Prisma.SortOrderInput | Prisma.SortOrder
   note?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -493,6 +527,7 @@ export type DealScalarWhereWithAggregatesInput = {
   unitId?: Prisma.StringWithAggregatesFilter<"Deal"> | string
   clientId?: Prisma.StringWithAggregatesFilter<"Deal"> | string
   managerId?: Prisma.StringNullableWithAggregatesFilter<"Deal"> | string | null
+  dealNumber?: Prisma.StringWithAggregatesFilter<"Deal"> | string
   status?: Prisma.EnumDealStatusWithAggregatesFilter<"Deal"> | $Enums.DealStatus
   financingType?: Prisma.EnumFinancingTypeNullableWithAggregatesFilter<"Deal"> | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalWithAggregatesFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -505,6 +540,8 @@ export type DealScalarWhereWithAggregatesInput = {
   reservedById?: Prisma.StringNullableWithAggregatesFilter<"Deal"> | string | null
   contractNumber?: Prisma.StringNullableWithAggregatesFilter<"Deal"> | string | null
   contractDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Deal"> | Date | string | null
+  cancelledAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Deal"> | Date | string | null
+  cancelReason?: Prisma.StringNullableWithAggregatesFilter<"Deal"> | string | null
   note?: Prisma.StringNullableWithAggregatesFilter<"Deal"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Deal"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Deal"> | Date | string
@@ -513,6 +550,7 @@ export type DealScalarWhereWithAggregatesInput = {
 
 export type DealCreateInput = {
   id?: string
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -524,6 +562,8 @@ export type DealCreateInput = {
   reservationExpiresAt?: Date | string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -547,6 +587,7 @@ export type DealUncheckedCreateInput = {
   unitId: string
   clientId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -559,6 +600,8 @@ export type DealUncheckedCreateInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -571,6 +614,7 @@ export type DealUncheckedCreateInput = {
 
 export type DealUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -582,6 +626,8 @@ export type DealUpdateInput = {
   reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -605,6 +651,7 @@ export type DealUncheckedUpdateInput = {
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -617,6 +664,8 @@ export type DealUncheckedUpdateInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -634,6 +683,7 @@ export type DealCreateManyInput = {
   unitId: string
   clientId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -646,6 +696,8 @@ export type DealCreateManyInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -654,6 +706,7 @@ export type DealCreateManyInput = {
 
 export type DealUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -665,6 +718,8 @@ export type DealUpdateManyMutationInput = {
   reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -678,6 +733,7 @@ export type DealUncheckedUpdateManyInput = {
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -690,6 +746,8 @@ export type DealUncheckedUpdateManyInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -706,6 +764,11 @@ export type DealOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type DealCompanyIdDealNumberCompoundUniqueInput = {
+  companyId: string
+  dealNumber: string
+}
+
 export type DealCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   companyId?: Prisma.SortOrder
@@ -713,6 +776,7 @@ export type DealCountOrderByAggregateInput = {
   unitId?: Prisma.SortOrder
   clientId?: Prisma.SortOrder
   managerId?: Prisma.SortOrder
+  dealNumber?: Prisma.SortOrder
   status?: Prisma.SortOrder
   financingType?: Prisma.SortOrder
   listPrice?: Prisma.SortOrder
@@ -725,6 +789,8 @@ export type DealCountOrderByAggregateInput = {
   reservedById?: Prisma.SortOrder
   contractNumber?: Prisma.SortOrder
   contractDate?: Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrder
+  cancelReason?: Prisma.SortOrder
   note?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -746,6 +812,7 @@ export type DealMaxOrderByAggregateInput = {
   unitId?: Prisma.SortOrder
   clientId?: Prisma.SortOrder
   managerId?: Prisma.SortOrder
+  dealNumber?: Prisma.SortOrder
   status?: Prisma.SortOrder
   financingType?: Prisma.SortOrder
   listPrice?: Prisma.SortOrder
@@ -758,6 +825,8 @@ export type DealMaxOrderByAggregateInput = {
   reservedById?: Prisma.SortOrder
   contractNumber?: Prisma.SortOrder
   contractDate?: Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrder
+  cancelReason?: Prisma.SortOrder
   note?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -771,6 +840,7 @@ export type DealMinOrderByAggregateInput = {
   unitId?: Prisma.SortOrder
   clientId?: Prisma.SortOrder
   managerId?: Prisma.SortOrder
+  dealNumber?: Prisma.SortOrder
   status?: Prisma.SortOrder
   financingType?: Prisma.SortOrder
   listPrice?: Prisma.SortOrder
@@ -783,6 +853,8 @@ export type DealMinOrderByAggregateInput = {
   reservedById?: Prisma.SortOrder
   contractNumber?: Prisma.SortOrder
   contractDate?: Prisma.SortOrder
+  cancelledAt?: Prisma.SortOrder
+  cancelReason?: Prisma.SortOrder
   note?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -1129,6 +1201,7 @@ export type DealUpdateOneWithoutTasksNestedInput = {
 
 export type DealCreateWithoutCompanyInput = {
   id?: string
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1140,6 +1213,8 @@ export type DealCreateWithoutCompanyInput = {
   reservationExpiresAt?: Date | string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1161,6 +1236,7 @@ export type DealUncheckedCreateWithoutCompanyInput = {
   unitId: string
   clientId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1173,6 +1249,8 @@ export type DealUncheckedCreateWithoutCompanyInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1219,6 +1297,7 @@ export type DealScalarWhereInput = {
   unitId?: Prisma.StringFilter<"Deal"> | string
   clientId?: Prisma.StringFilter<"Deal"> | string
   managerId?: Prisma.StringNullableFilter<"Deal"> | string | null
+  dealNumber?: Prisma.StringFilter<"Deal"> | string
   status?: Prisma.EnumDealStatusFilter<"Deal"> | $Enums.DealStatus
   financingType?: Prisma.EnumFinancingTypeNullableFilter<"Deal"> | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFilter<"Deal"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1231,6 +1310,8 @@ export type DealScalarWhereInput = {
   reservedById?: Prisma.StringNullableFilter<"Deal"> | string | null
   contractNumber?: Prisma.StringNullableFilter<"Deal"> | string | null
   contractDate?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  cancelledAt?: Prisma.DateTimeNullableFilter<"Deal"> | Date | string | null
+  cancelReason?: Prisma.StringNullableFilter<"Deal"> | string | null
   note?: Prisma.StringNullableFilter<"Deal"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Deal"> | Date | string
@@ -1239,6 +1320,7 @@ export type DealScalarWhereInput = {
 
 export type DealCreateWithoutManagerInput = {
   id?: string
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1250,6 +1332,8 @@ export type DealCreateWithoutManagerInput = {
   reservationExpiresAt?: Date | string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1271,6 +1355,7 @@ export type DealUncheckedCreateWithoutManagerInput = {
   projectId: string
   unitId: string
   clientId: string
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1283,6 +1368,8 @@ export type DealUncheckedCreateWithoutManagerInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1305,6 +1392,7 @@ export type DealCreateManyManagerInputEnvelope = {
 
 export type DealCreateWithoutReservedByInput = {
   id?: string
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1316,6 +1404,8 @@ export type DealCreateWithoutReservedByInput = {
   reservationExpiresAt?: Date | string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1338,6 +1428,7 @@ export type DealUncheckedCreateWithoutReservedByInput = {
   unitId: string
   clientId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1349,6 +1440,8 @@ export type DealUncheckedCreateWithoutReservedByInput = {
   reservationExpiresAt?: Date | string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1403,6 +1496,7 @@ export type DealUpdateManyWithWhereWithoutReservedByInput = {
 
 export type DealCreateWithoutClientInput = {
   id?: string
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1414,6 +1508,8 @@ export type DealCreateWithoutClientInput = {
   reservationExpiresAt?: Date | string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1435,6 +1531,7 @@ export type DealUncheckedCreateWithoutClientInput = {
   projectId: string
   unitId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1447,6 +1544,8 @@ export type DealUncheckedCreateWithoutClientInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1485,6 +1584,7 @@ export type DealUpdateManyWithWhereWithoutClientInput = {
 
 export type DealCreateWithoutProjectInput = {
   id?: string
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1496,6 +1596,8 @@ export type DealCreateWithoutProjectInput = {
   reservationExpiresAt?: Date | string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1517,6 +1619,7 @@ export type DealUncheckedCreateWithoutProjectInput = {
   unitId: string
   clientId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1529,6 +1632,8 @@ export type DealUncheckedCreateWithoutProjectInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1567,6 +1672,7 @@ export type DealUpdateManyWithWhereWithoutProjectInput = {
 
 export type DealCreateWithoutUnitInput = {
   id?: string
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1578,6 +1684,8 @@ export type DealCreateWithoutUnitInput = {
   reservationExpiresAt?: Date | string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1599,6 +1707,7 @@ export type DealUncheckedCreateWithoutUnitInput = {
   projectId: string
   clientId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1611,6 +1720,8 @@ export type DealUncheckedCreateWithoutUnitInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1649,6 +1760,7 @@ export type DealUpdateManyWithWhereWithoutUnitInput = {
 
 export type DealCreateWithoutPaymentsInput = {
   id?: string
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1660,6 +1772,8 @@ export type DealCreateWithoutPaymentsInput = {
   reservationExpiresAt?: Date | string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1682,6 +1796,7 @@ export type DealUncheckedCreateWithoutPaymentsInput = {
   unitId: string
   clientId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1694,6 +1809,8 @@ export type DealUncheckedCreateWithoutPaymentsInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1721,6 +1838,7 @@ export type DealUpdateToOneWithWhereWithoutPaymentsInput = {
 
 export type DealUpdateWithoutPaymentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1732,6 +1850,8 @@ export type DealUpdateWithoutPaymentsInput = {
   reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1754,6 +1874,7 @@ export type DealUncheckedUpdateWithoutPaymentsInput = {
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1766,6 +1887,8 @@ export type DealUncheckedUpdateWithoutPaymentsInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1777,6 +1900,7 @@ export type DealUncheckedUpdateWithoutPaymentsInput = {
 
 export type DealCreateWithoutPaymentSchedulesInput = {
   id?: string
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1788,6 +1912,8 @@ export type DealCreateWithoutPaymentSchedulesInput = {
   reservationExpiresAt?: Date | string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1810,6 +1936,7 @@ export type DealUncheckedCreateWithoutPaymentSchedulesInput = {
   unitId: string
   clientId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1822,6 +1949,8 @@ export type DealUncheckedCreateWithoutPaymentSchedulesInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1849,6 +1978,7 @@ export type DealUpdateToOneWithWhereWithoutPaymentSchedulesInput = {
 
 export type DealUpdateWithoutPaymentSchedulesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1860,6 +1990,8 @@ export type DealUpdateWithoutPaymentSchedulesInput = {
   reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1882,6 +2014,7 @@ export type DealUncheckedUpdateWithoutPaymentSchedulesInput = {
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1894,6 +2027,8 @@ export type DealUncheckedUpdateWithoutPaymentSchedulesInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1905,6 +2040,7 @@ export type DealUncheckedUpdateWithoutPaymentSchedulesInput = {
 
 export type DealCreateWithoutActivitiesInput = {
   id?: string
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1916,6 +2052,8 @@ export type DealCreateWithoutActivitiesInput = {
   reservationExpiresAt?: Date | string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1938,6 +2076,7 @@ export type DealUncheckedCreateWithoutActivitiesInput = {
   unitId: string
   clientId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1950,6 +2089,8 @@ export type DealUncheckedCreateWithoutActivitiesInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1977,6 +2118,7 @@ export type DealUpdateToOneWithWhereWithoutActivitiesInput = {
 
 export type DealUpdateWithoutActivitiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1988,6 +2130,8 @@ export type DealUpdateWithoutActivitiesInput = {
   reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2010,6 +2154,7 @@ export type DealUncheckedUpdateWithoutActivitiesInput = {
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2022,6 +2167,8 @@ export type DealUncheckedUpdateWithoutActivitiesInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2033,6 +2180,7 @@ export type DealUncheckedUpdateWithoutActivitiesInput = {
 
 export type DealCreateWithoutTasksInput = {
   id?: string
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2044,6 +2192,8 @@ export type DealCreateWithoutTasksInput = {
   reservationExpiresAt?: Date | string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2066,6 +2216,7 @@ export type DealUncheckedCreateWithoutTasksInput = {
   unitId: string
   clientId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2078,6 +2229,8 @@ export type DealUncheckedCreateWithoutTasksInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2105,6 +2258,7 @@ export type DealUpdateToOneWithWhereWithoutTasksInput = {
 
 export type DealUpdateWithoutTasksInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2116,6 +2270,8 @@ export type DealUpdateWithoutTasksInput = {
   reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2138,6 +2294,7 @@ export type DealUncheckedUpdateWithoutTasksInput = {
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2150,6 +2307,8 @@ export type DealUncheckedUpdateWithoutTasksInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2165,6 +2324,7 @@ export type DealCreateManyCompanyInput = {
   unitId: string
   clientId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2177,6 +2337,8 @@ export type DealCreateManyCompanyInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2185,6 +2347,7 @@ export type DealCreateManyCompanyInput = {
 
 export type DealUpdateWithoutCompanyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2196,6 +2359,8 @@ export type DealUpdateWithoutCompanyInput = {
   reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2217,6 +2382,7 @@ export type DealUncheckedUpdateWithoutCompanyInput = {
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2229,6 +2395,8 @@ export type DealUncheckedUpdateWithoutCompanyInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2245,6 +2413,7 @@ export type DealUncheckedUpdateManyWithoutCompanyInput = {
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2257,6 +2426,8 @@ export type DealUncheckedUpdateManyWithoutCompanyInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2269,6 +2440,7 @@ export type DealCreateManyManagerInput = {
   projectId: string
   unitId: string
   clientId: string
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2281,6 +2453,8 @@ export type DealCreateManyManagerInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2294,6 +2468,7 @@ export type DealCreateManyReservedByInput = {
   unitId: string
   clientId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2305,6 +2480,8 @@ export type DealCreateManyReservedByInput = {
   reservationExpiresAt?: Date | string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2313,6 +2490,7 @@ export type DealCreateManyReservedByInput = {
 
 export type DealUpdateWithoutManagerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2324,6 +2502,8 @@ export type DealUpdateWithoutManagerInput = {
   reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2345,6 +2525,7 @@ export type DealUncheckedUpdateWithoutManagerInput = {
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2357,6 +2538,8 @@ export type DealUncheckedUpdateWithoutManagerInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2373,6 +2556,7 @@ export type DealUncheckedUpdateManyWithoutManagerInput = {
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2385,6 +2569,8 @@ export type DealUncheckedUpdateManyWithoutManagerInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2393,6 +2579,7 @@ export type DealUncheckedUpdateManyWithoutManagerInput = {
 
 export type DealUpdateWithoutReservedByInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2404,6 +2591,8 @@ export type DealUpdateWithoutReservedByInput = {
   reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2426,6 +2615,7 @@ export type DealUncheckedUpdateWithoutReservedByInput = {
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2437,6 +2627,8 @@ export type DealUncheckedUpdateWithoutReservedByInput = {
   reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2454,6 +2646,7 @@ export type DealUncheckedUpdateManyWithoutReservedByInput = {
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2465,6 +2658,8 @@ export type DealUncheckedUpdateManyWithoutReservedByInput = {
   reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2477,6 +2672,7 @@ export type DealCreateManyClientInput = {
   projectId: string
   unitId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2489,6 +2685,8 @@ export type DealCreateManyClientInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2497,6 +2695,7 @@ export type DealCreateManyClientInput = {
 
 export type DealUpdateWithoutClientInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2508,6 +2707,8 @@ export type DealUpdateWithoutClientInput = {
   reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2529,6 +2730,7 @@ export type DealUncheckedUpdateWithoutClientInput = {
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2541,6 +2743,8 @@ export type DealUncheckedUpdateWithoutClientInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2557,6 +2761,7 @@ export type DealUncheckedUpdateManyWithoutClientInput = {
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2569,6 +2774,8 @@ export type DealUncheckedUpdateManyWithoutClientInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2581,6 +2788,7 @@ export type DealCreateManyProjectInput = {
   unitId: string
   clientId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2593,6 +2801,8 @@ export type DealCreateManyProjectInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2601,6 +2811,7 @@ export type DealCreateManyProjectInput = {
 
 export type DealUpdateWithoutProjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2612,6 +2823,8 @@ export type DealUpdateWithoutProjectInput = {
   reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2633,6 +2846,7 @@ export type DealUncheckedUpdateWithoutProjectInput = {
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2645,6 +2859,8 @@ export type DealUncheckedUpdateWithoutProjectInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2661,6 +2877,7 @@ export type DealUncheckedUpdateManyWithoutProjectInput = {
   unitId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2673,6 +2890,8 @@ export type DealUncheckedUpdateManyWithoutProjectInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2685,6 +2904,7 @@ export type DealCreateManyUnitInput = {
   projectId: string
   clientId: string
   managerId?: string | null
+  dealNumber: string
   status?: $Enums.DealStatus
   financingType?: $Enums.FinancingType | null
   listPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2697,6 +2917,8 @@ export type DealCreateManyUnitInput = {
   reservedById?: string | null
   contractNumber?: string | null
   contractDate?: Date | string | null
+  cancelledAt?: Date | string | null
+  cancelReason?: string | null
   note?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -2705,6 +2927,7 @@ export type DealCreateManyUnitInput = {
 
 export type DealUpdateWithoutUnitInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2716,6 +2939,8 @@ export type DealUpdateWithoutUnitInput = {
   reservationExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2737,6 +2962,7 @@ export type DealUncheckedUpdateWithoutUnitInput = {
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2749,6 +2975,8 @@ export type DealUncheckedUpdateWithoutUnitInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2765,6 +2993,7 @@ export type DealUncheckedUpdateManyWithoutUnitInput = {
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   clientId?: Prisma.StringFieldUpdateOperationsInput | string
   managerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealNumber?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.EnumDealStatusFieldUpdateOperationsInput | $Enums.DealStatus
   financingType?: Prisma.NullableEnumFinancingTypeFieldUpdateOperationsInput | $Enums.FinancingType | null
   listPrice?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -2777,6 +3006,8 @@ export type DealUncheckedUpdateManyWithoutUnitInput = {
   reservedById?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   contractDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  cancelReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   note?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -2848,6 +3079,7 @@ export type DealSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   unitId?: boolean
   clientId?: boolean
   managerId?: boolean
+  dealNumber?: boolean
   status?: boolean
   financingType?: boolean
   listPrice?: boolean
@@ -2860,6 +3092,8 @@ export type DealSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   reservedById?: boolean
   contractNumber?: boolean
   contractDate?: boolean
+  cancelledAt?: boolean
+  cancelReason?: boolean
   note?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -2884,6 +3118,7 @@ export type DealSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   unitId?: boolean
   clientId?: boolean
   managerId?: boolean
+  dealNumber?: boolean
   status?: boolean
   financingType?: boolean
   listPrice?: boolean
@@ -2896,6 +3131,8 @@ export type DealSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   reservedById?: boolean
   contractNumber?: boolean
   contractDate?: boolean
+  cancelledAt?: boolean
+  cancelReason?: boolean
   note?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -2915,6 +3152,7 @@ export type DealSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   unitId?: boolean
   clientId?: boolean
   managerId?: boolean
+  dealNumber?: boolean
   status?: boolean
   financingType?: boolean
   listPrice?: boolean
@@ -2927,6 +3165,8 @@ export type DealSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   reservedById?: boolean
   contractNumber?: boolean
   contractDate?: boolean
+  cancelledAt?: boolean
+  cancelReason?: boolean
   note?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -2946,6 +3186,7 @@ export type DealSelectScalar = {
   unitId?: boolean
   clientId?: boolean
   managerId?: boolean
+  dealNumber?: boolean
   status?: boolean
   financingType?: boolean
   listPrice?: boolean
@@ -2958,13 +3199,15 @@ export type DealSelectScalar = {
   reservedById?: boolean
   contractNumber?: boolean
   contractDate?: boolean
+  cancelledAt?: boolean
+  cancelReason?: boolean
   note?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
 }
 
-export type DealOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "projectId" | "unitId" | "clientId" | "managerId" | "status" | "financingType" | "listPrice" | "salePrice" | "discountAmount" | "discountPercent" | "deposit" | "reservedAt" | "reservationExpiresAt" | "reservedById" | "contractNumber" | "contractDate" | "note" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["deal"]>
+export type DealOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "companyId" | "projectId" | "unitId" | "clientId" | "managerId" | "dealNumber" | "status" | "financingType" | "listPrice" | "salePrice" | "discountAmount" | "discountPercent" | "deposit" | "reservedAt" | "reservationExpiresAt" | "reservedById" | "contractNumber" | "contractDate" | "cancelledAt" | "cancelReason" | "note" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["deal"]>
 export type DealInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   project?: boolean | Prisma.ProjectDefaultArgs<ExtArgs>
@@ -3016,6 +3259,7 @@ export type $DealPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     unitId: string
     clientId: string
     managerId: string | null
+    dealNumber: string
     status: $Enums.DealStatus
     financingType: $Enums.FinancingType | null
     listPrice: runtime.Decimal
@@ -3028,6 +3272,8 @@ export type $DealPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     reservedById: string | null
     contractNumber: string | null
     contractDate: Date | null
+    cancelledAt: Date | null
+    cancelReason: string | null
     note: string | null
     createdAt: Date
     updatedAt: Date
@@ -3471,6 +3717,7 @@ export interface DealFieldRefs {
   readonly unitId: Prisma.FieldRef<"Deal", 'String'>
   readonly clientId: Prisma.FieldRef<"Deal", 'String'>
   readonly managerId: Prisma.FieldRef<"Deal", 'String'>
+  readonly dealNumber: Prisma.FieldRef<"Deal", 'String'>
   readonly status: Prisma.FieldRef<"Deal", 'DealStatus'>
   readonly financingType: Prisma.FieldRef<"Deal", 'FinancingType'>
   readonly listPrice: Prisma.FieldRef<"Deal", 'Decimal'>
@@ -3483,6 +3730,8 @@ export interface DealFieldRefs {
   readonly reservedById: Prisma.FieldRef<"Deal", 'String'>
   readonly contractNumber: Prisma.FieldRef<"Deal", 'String'>
   readonly contractDate: Prisma.FieldRef<"Deal", 'DateTime'>
+  readonly cancelledAt: Prisma.FieldRef<"Deal", 'DateTime'>
+  readonly cancelReason: Prisma.FieldRef<"Deal", 'String'>
   readonly note: Prisma.FieldRef<"Deal", 'String'>
   readonly createdAt: Prisma.FieldRef<"Deal", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Deal", 'DateTime'>

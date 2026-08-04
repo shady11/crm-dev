@@ -5,6 +5,7 @@ import {QueryProjectsDto} from "@/modules/projects/dto/query-projects.dto";
 import {Prisma, ProjectStatus} from "@/generated/prisma/client";
 import {CreateProjectDto} from "@/modules/projects/dto/create-project.dto";
 import {UpdateProjectDto} from "@/modules/projects/dto/update-project.dto";
+import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 
 @Injectable()
 export class ProjectsService {
@@ -244,6 +245,39 @@ export class ProjectsService {
                                         units: {
                                             orderBy: {
                                                 number: "asc",
+                                            },
+                                            include: {
+                                                deals: {
+                                                    where: {
+                                                        status: { in: ACTIVE_DEAL_STATUSES },
+                                                    },
+                                                    orderBy: {
+                                                        createdAt: "desc",
+                                                    },
+                                                    take: 1,
+                                                    select: {
+                                                        id: true,
+                                                        dealNumber: true,
+                                                        status: true,
+                                                        reservedAt: true,
+                                                        reservationExpiresAt: true,
+                                                        salePrice: true,
+                                                        deposit: true,
+                                                        client: {
+                                                            select: {
+                                                                id: true,
+                                                                fullName: true,
+                                                                phone: true,
+                                                            },
+                                                        },
+                                                        manager: {
+                                                            select: {
+                                                                id: true,
+                                                                fullName: true,
+                                                            },
+                                                        },
+                                                    },
+                                                },
                                             },
                                         },
                                     },

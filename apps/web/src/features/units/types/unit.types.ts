@@ -1,3 +1,5 @@
+import type {UnitDealHistoryEntry} from "@/features/deals/types/deal.types.ts";
+
 export const UnitType = {
     APARTMENT: "APARTMENT",
     COMMERCIAL: "COMMERCIAL",
@@ -108,5 +110,8 @@ export type Unit = {
     project?: {
         id: string;
         name: string;
+        address?: string | null;
     };
+
+    deals?: UnitDealHistoryEntry[];
 };

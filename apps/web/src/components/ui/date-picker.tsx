@@ -1,25 +1,14 @@
 "use client";
 
-import {
-  DatePicker as ArkDatePicker,
-  useDatePickerContext,
-} from "@ark-ui/react/date-picker";
-import { Portal } from "@ark-ui/react/portal";
-import { CalendarIcon, ClockIcon } from "lucide-react";
+import {DatePicker as ArkDatePicker, useDatePickerContext,} from "@ark-ui/react/date-picker";
+import {Portal} from "@ark-ui/react/portal";
+import {CalendarIcon, ClockIcon} from "lucide-react";
 import type React from "react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-  Calendar,
-  CalendarPresetTrigger,
-} from "@/components/ui/calendar";
-import type { Input, InputProps } from "@/components/ui/input";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group";
+import {cn} from "@/lib/utils";
+import {Button} from "@/components/ui/button";
+import {Calendar, CalendarPresetTrigger,} from "@/components/ui/calendar";
+import type {Input, InputProps} from "@/components/ui/input";
+import {InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput,} from "@/components/ui/input-group";
 
 export const useDatePicker = useDatePickerContext;
 
@@ -128,7 +117,7 @@ export const DatePickerContent = (
           className={cn(
             "[--cell-size:--spacing(8)]",
             "z-[calc(50+var(--layer-index,0))]",
-            "w-fit min-w-72",
+            "w-fit min-w-64",
             "p-3",
             "bg-popover",
             "text-popover-foreground",

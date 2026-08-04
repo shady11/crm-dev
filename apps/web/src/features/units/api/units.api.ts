@@ -10,6 +10,11 @@ export async function getUnits(floorId: string) {
     return response.data;
 }
 
+export async function getUnit(id: string) {
+    const response = await api.get<Unit>(`/units/${id}`);
+    return response.data;
+}
+
 export async function createUnit(
     floorId: string,
     payload: CreateUnitPayload,

@@ -444,6 +444,7 @@ model Deal {
   managerId String?
   manager   User?   @relation(fields: [managerId], references: [id])
 
+  dealNumber    String
   status        DealStatus     @default(RESERVED)
   financingType FinancingType?
 
@@ -462,6 +463,9 @@ model Deal {
   contractNumber String?
   contractDate   DateTime?
 
+  cancelledAt  DateTime?
+  cancelReason String?
+
   note String? @db.Text
 
   paymentSchedules PaymentSchedule[]
@@ -474,6 +478,7 @@ model Deal {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
+  @@unique([companyId, dealNumber])
   @@index([projectId])
   @@index([unitId])
   @@index([clientId])

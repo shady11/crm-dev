@@ -12,7 +12,16 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar.tsx"
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {Box, Building2, GalleryVerticalEnd, Handshake, LayoutDashboard, SettingsIcon, Users} from "lucide-react";
+import {
+    Box,
+    Building2,
+    GalleryVerticalEnd,
+    Handshake,
+    LayoutDashboard,
+    SettingsIcon,
+    SquareUser,
+    Users
+} from "lucide-react";
 
 const data = {
     navMain: [
@@ -29,6 +38,11 @@ const data = {
         {
             title: "Clients",
             url: "/clients",
+            icon: SquareUser,
+        },
+        {
+            title: "Deals",
+            url: "/deals",
             icon: Handshake,
         },
         {

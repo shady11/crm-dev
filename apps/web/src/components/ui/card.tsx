@@ -106,7 +106,7 @@ export const CardTitle = (props: React.ComponentProps<typeof ark.div>) => {
   return (
     <ark.div
       className={cn(
-        "font-heading font-semibold text-foreground text-lg/6",
+        "font-medium text-foreground text-base",
         className
       )}
       data-slot="card-title"
