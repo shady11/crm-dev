@@ -6,6 +6,7 @@ import {AuthUser} from "@/common/types/auth-user.type";
 import {QueryLeadsDto} from "@/modules/leads/dto/query-leads.dto";
 import {CreateLeadDto} from "@/modules/leads/dto/create-lead.dto";
 import {UpdateLeadDto} from "@/modules/leads/dto/update-lead.dto";
+import {ConvertLeadDto} from "@/modules/leads/dto/convert-lead.dto";
 import { RolesGuard } from "@/common/guards/roles.guard";
 import {Roles} from "@/common/decorators/roles.decorator";
 import {UserRole} from "@/generated/prisma/enums";
@@ -58,6 +59,20 @@ export class LeadsController {
         @Body() dto: UpdateLeadDto,
     ) {
         return this.leadsService.update(user, id, dto);
+    }
+
+    @Roles(
+        UserRole.COMPANY_ADMIN,
+        UserRole.SALES_HEAD,
+        UserRole.SALES_MANAGER,
+    )
+    @Post(":id/convert")
+    convert(
+        @CurrentUser() user: AuthUser,
+        @Param("id") id: string,
+        @Body() dto: ConvertLeadDto,
+    ) {
+        return this.leadsService.convert(user, id, dto);
     }
 
     @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD)

@@ -14,8 +14,45 @@ export async function getClients(params?: GetClientsParams) {
     return response.data;
 }
 
+export type ClientLeadSummary = {
+    id: string;
+    fullName: string;
+    phone: string;
+    source: string | null;
+    status: string;
+    createdAt: string;
+};
+
+export type ClientDealUnitSummary = {
+    id: string;
+    number: string;
+    type: string;
+    status: string;
+    rooms: number | null;
+    area: number;
+    price: number;
+    floor: { id: string; number: number } | null;
+    entrance: { id: string; name: string } | null;
+    block: { id: string; name: string } | null;
+    project: { id: string; name: string } | null;
+};
+
+export type ClientDealSummary = {
+    id: string;
+    status: string;
+    unit: ClientDealUnitSummary;
+    createdAt: string;
+};
+
+// GET /clients/:id returns leads/deals as full (slim) arrays, unlike the list
+// endpoint which returns a `_count` — these are genuinely different shapes.
+export type ClientDetails = Omit<Client, "_count"> & {
+    leads: ClientLeadSummary[];
+    deals: ClientDealSummary[];
+};
+
 export async function getClient(id: string) {
-    const response = await api.get<Client>(`/clients/${id}`);
+    const response = await api.get<ClientDetails>(`/clients/${id}`);
     return response.data;
 }
 

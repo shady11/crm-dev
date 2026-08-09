@@ -1,14 +1,20 @@
 import {BadRequestException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
 import {Prisma} from "@/generated/prisma/client";
+import {LeadStatus} from "@/generated/prisma/enums";
 import {PrismaService} from "@/database/prisma.service";
+import {ClientsService} from "@/modules/clients/clients.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {QueryLeadsDto} from "@/modules/leads/dto/query-leads.dto";
 import {CreateLeadDto} from "@/modules/leads/dto/create-lead.dto";
 import {UpdateLeadDto} from "@/modules/leads/dto/update-lead.dto";
+import {ConvertLeadDto} from "@/modules/leads/dto/convert-lead.dto";
 
 @Injectable()
 export class LeadsService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly clientsService: ClientsService,
+    ) {}
 
     async findAll(user: AuthUser, query: QueryLeadsDto) {
         if (!user.companyId) {
@@ -206,6 +212,63 @@ export class LeadsService {
                 comment: dto.comment,
                 managerId: dto.managerId,
                 clientId: dto.clientId,
+            },
+            include: {
+                manager: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                    },
+                },
+                client: {
+                    select: {
+                        id: true,
+                        fullName: true,
+                        phone: true,
+                    },
+                },
+            },
+        });
+    }
+
+    /**
+     * Converts a lead into a client. Either links the lead to an existing
+     * client (`dto.clientId`) or creates a brand-new client from the lead's
+     * own contact details, then marks the lead as CONVERTED.
+     */
+    async convert(user: AuthUser, id: string, dto: ConvertLeadDto) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const lead = await this.findOne(user, id);
+
+        if (lead.clientId) {
+            throw new BadRequestException("Lead is already linked to a client");
+        }
+
+        let clientId: string;
+
+        if (dto.clientId) {
+            await this.ensureClientBelongsToCompany(dto.clientId, user.companyId);
+            clientId = dto.clientId;
+        } else {
+            const client = await this.clientsService.create(user, {
+                fullName: lead.fullName,
+                phone: lead.phone,
+                email: lead.email ?? undefined,
+            });
+            clientId = client.id;
+        }
+
+        return this.prisma.lead.update({
+            where: {
+                id,
+            },
+            data: {
+                clientId,
+                status: LeadStatus.CONVERTED,
             },
             include: {
                 manager: {
