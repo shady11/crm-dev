@@ -18,6 +18,7 @@ import {
     GalleryVerticalEnd,
     Handshake,
     LayoutDashboard,
+    ListTodo,
     SettingsIcon,
     SquareUser,
     Users
@@ -34,6 +35,11 @@ const data = {
             title: "Leads",
             url: "/leads",
             icon: GalleryVerticalEnd,
+        },
+        {
+            title: "Tasks",
+            url: "/tasks",
+            icon: ListTodo,
         },
         {
             title: "Clients",

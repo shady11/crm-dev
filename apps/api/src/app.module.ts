@@ -13,6 +13,7 @@ import {UnitsModule} from './modules/units/units.module';
 import {ChessboardModule} from './modules/chessboard/chessboard.module';
 import {ReferencesModule} from './modules/references/references.module';
 import {DealsModule} from "@/modules/deals/deals.module";
+import {TasksModule} from "@/modules/tasks/tasks.module";
 
 @Module({
   imports: [
@@ -32,7 +33,8 @@ import {DealsModule} from "@/modules/deals/deals.module";
       UnitsModule,
       ChessboardModule,
       ReferencesModule,
-      DealsModule
+      DealsModule,
+      TasksModule
   ],
 })
 export class AppModule {}

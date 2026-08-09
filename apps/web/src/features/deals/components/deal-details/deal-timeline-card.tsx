@@ -47,15 +47,14 @@ export function     DealTimelineCard({ deal }: { deal: Deal }) {
                             <DataListItem>
                                 <DataListItemLabel>Cancelled</DataListItemLabel>
                                 <DataListItemValue>
-                                    {deal.cancelledAt && new Date(deal.cancelledAt).toLocaleDateString()}
+                                    {deal.cancelledAt && formatDate(deal.cancelledAt).date}
+                                    {deal.cancelReason && (
+                                        <div className="mt-1 text-xs text-muted-foreground">
+                                            Reason: {deal.cancelReason}
+                                        </div>
+                                    )}
                                 </DataListItemValue>
                             </DataListItem>
-                            {deal.cancelReason && (
-                                <DataListItem>
-                                    <DataListItemLabel>Reason</DataListItemLabel>
-                                    <DataListItemValue>{deal.cancelReason}</DataListItemValue>
-                                </DataListItem>
-                            )}
                         </>
                     )}
                     {deal.note && (

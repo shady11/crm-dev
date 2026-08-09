@@ -3,7 +3,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {ArrowLeft, CalendarIcon, Dot, MoreVerticalIcon} from "lucide-react";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
-import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader} from "@/components/ui/dialog";
 import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {useDeal} from "@/features/deals/hooks/use-deal";
@@ -37,6 +37,7 @@ import {NumberInput, NumberInputGroup, NumberInputInput} from "@/components/ui/n
 import type {PaymentMethod, PaymentType} from "../api/deals.api";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {DealTimelineCard} from "@/features/deals/components/deal-details/deal-timeline-card.tsx";
+import {DealTasksCard} from "@/features/deals/components/deal-tasks-card.tsx";
 
 export function DealDetailsPage() {
     const { dealId } = useParams<{ dealId: string }>();
@@ -121,9 +122,9 @@ export function DealDetailsPage() {
                                     </span>
                                 </div>
                             )}
-                            <p className="text-sm text-muted-foreground">
-                                {deal.contractNumber && `Контракт №${deal.contractNumber}`}
-                            </p>
+                            {deal.contractNumber && (
+                                <p className="text-sm text-muted-foreground">Contract №{deal.contractNumber}</p>
+                            )}
                         </div>
                     </div>
 
@@ -190,6 +191,7 @@ export function DealDetailsPage() {
                 <div className="flex-1 space-y-4">
                     <DealFinancialsCard deal={deal} />
                     <DealTimelineCard deal={deal} />
+                    <DealTasksCard dealId={deal.id} />
                     <DealHistoryCard activities={deal.activities} />
                 </div>
             </div>
@@ -220,7 +222,10 @@ export function DealDetailsPage() {
                             disabled={actions.cancel.isPending}
                             onClick={() =>
                                 actions.cancel.mutate(cancelReason || undefined, {
-                                    onSuccess: () => setCancelOpen(false),
+                                    onSuccess: () => {
+                                        setCancelOpen(false);
+                                        setCancelReason("");
+                                    },
                                 })
                             }
                         >
@@ -242,7 +247,11 @@ export function DealDetailsPage() {
                             <FieldGroup>
                                 <Field>
                                     <FieldLabel>New date</FieldLabel>
-                                    <DatePicker onValueChange={({ value }) => setNewExpiry(value)} value={newExpiry}>
+                                    <DatePicker
+                                        onValueChange={({ value }) => setNewExpiry(value)}
+                                        value={newExpiry}
+                                        min={deal.reservationExpiresAt ? parseDate(deal.reservationExpiresAt.slice(0, 10)) : undefined}
+                                    >
                                         <DatePickerTrigger asChild>
                                             <Button className="w-full flex justify-between" variant="outline">
                                                 {formatDate(newExpiry[0].toString()).date}
@@ -274,7 +283,10 @@ export function DealDetailsPage() {
                             disabled={!newExpiry || actions.extend.isPending}
                             onClick={() =>
                                 actions.extend.mutate(new Date(newExpiry[0].toString()).toISOString(), {
-                                    onSuccess: () => setExtendOpen(false),
+                                    onSuccess: () => {
+                                        setExtendOpen(false);
+                                        setNewExpiry([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+                                    },
                                 })
                             }
                         >
@@ -335,7 +347,13 @@ export function DealDetailsPage() {
 
                                 actions.sign.mutate(
                                     { contractNumber, contractDate: new Date(contractDate[0].toString()).toISOString() },
-                                    { onSuccess: () => setSignOpen(false) },
+                                    {
+                                        onSuccess: () => {
+                                            setSignOpen(false);
+                                            setContractNumber("");
+                                            setContractDate([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+                                        }
+                                    },
                                 )
                             }
                         >
@@ -347,10 +365,8 @@ export function DealDetailsPage() {
 
             {/* Generate payment schedule dialog */}
             <Dialog open={scheduleOpen} onOpenChange={({ open }) => setScheduleOpen(open)}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Generate payment schedule</DialogTitle>
-                    </DialogHeader>
+                <DialogContent size="sm">
+                    <DialogHeader title="Generate payment schedule"/>
                     <DialogBody className="flex flex-col gap-3">
                         <Field>
                             <FieldLabel>Number of installments</FieldLabel>
@@ -415,10 +431,8 @@ export function DealDetailsPage() {
 
             {/* Record payment dialog */}
             <Dialog open={paymentOpen} onOpenChange={({ open }) => setPaymentOpen(open)}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Record payment</DialogTitle>
-                    </DialogHeader>
+                <DialogContent size="sm">
+                    <DialogHeader title="Record payment"/>
                     <DialogBody className="flex flex-col gap-3">
                         <Field>
                             <FieldLabel>Amount</FieldLabel>
@@ -501,7 +515,16 @@ export function DealDetailsPage() {
                                         paidAt: new Date(paidAt[0].toString()).toISOString(),
                                         reference: reference || undefined,
                                     },
-                                    { onSuccess: () => setPaymentOpen(false) },
+                                    {
+                                        onSuccess: () => {
+                                            setPaymentOpen(false);
+                                            setPaymentAmount(0);
+                                            setPaymentMethod("");
+                                            setPaymentType("");
+                                            setReference("");
+                                            setPaidAt([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+                                        }
+                                    },
                                 )
                             }
                         >

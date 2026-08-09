@@ -9,6 +9,7 @@ import {usersRoutes} from "@/features/users/users.routes";
 import {paths} from "@/routes/paths";
 import {ClientsPage} from "@/features/clients";
 import {dealsRoutes} from "@/features/deals/deals.routes.tsx";
+import {tasksRoutes} from "@/features/tasks/tasks.routes.tsx";
 
 export const router = createBrowserRouter([
     { path: paths.home, element: <Navigate to={paths.projects.root} replace /> },
@@ -27,6 +28,7 @@ export const router = createBrowserRouter([
                     projectsRoutes,
                     dealsRoutes,
                     usersRoutes,
+                    tasksRoutes,
                     { path: "*", element: <NotFoundPage /> },
                 ],
             },

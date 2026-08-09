@@ -24,11 +24,13 @@ export function DealCard({ deal }: { deal: UnitDealHistoryEntry }) {
                         </div>
                         <div className="flex items-center text-xs font-normal text-muted-foreground">
                             <p>#{deal.dealNumber}</p>
-                            <Dot size={16}/>
                             {daysLeft !== null && (
-                                <p>
-                                    {daysLeft > 0 ? `${daysLeft}d left` : daysLeft === 0 ? "Expires today" : "Expired"}
-                                </p>
+                                <>
+                                    <Dot size={16}/>
+                                    <p>
+                                        {daysLeft > 0 ? `${daysLeft}d left` : daysLeft === 0 ? "Expires today" : "Expired"}
+                                    </p>
+                                </>
                             )}
                         </div>
                     </div>
