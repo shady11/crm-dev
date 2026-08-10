@@ -11,9 +11,10 @@ import {LeadsPage} from "@/features/leads";
 import {dealsRoutes} from "@/features/deals/deals.routes.tsx";
 import {tasksRoutes} from "@/features/tasks/tasks.routes.tsx";
 import {clientsRoutes} from "@/features/clients/clients.routes.tsx";
+import {DashboardPage} from "@/features/dashboard/pages/dashboard-page.tsx";
 
 export const router = createBrowserRouter([
-    { path: paths.home, element: <Navigate to={paths.projects.root} replace /> },
+    { path: paths.home, element: <Navigate to={paths.dashboard} replace /> },
     { path: paths.login, element: <LoginPage /> },
     {
         element: <ProtectedRoute />,
@@ -23,7 +24,7 @@ export const router = createBrowserRouter([
                 element: <AppLayout />,
                 children: [
                     { index: true, element: <Navigate to={paths.projects.root} replace /> },
-                    { path: "dashboard", element: <PlaceholderPage title="Dashboard" /> },
+                    { path: "dashboard", element: <DashboardPage /> },
                     { path: "leads", element: <LeadsPage /> },
                     { path: "settings", element: <PlaceholderPage title="Settings" /> },
                     clientsRoutes,

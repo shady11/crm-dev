@@ -4,7 +4,7 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {DEAL_STATUS_LABELS, DealStatus} from "@/features/deals/types/deal.types";
 import type {DealStatusFilter} from "@/features/deals/hooks/use-deals-list.ts";
-import {useProjectsFilter} from "@/features/clients/hooks/use-projects-filter.ts";
+import {useProjectsFilter} from "@/features/projects/hooks/use-projects-filter.ts";
 import {useManagers} from "@/features/users/hooks/use-managers.ts";
 
 interface DealsToolbarProps {

@@ -1,5 +1,5 @@
 import {useQuery} from "@tanstack/react-query";
-import {getProjects} from "@/features/projects/api/projects.api";
+import {getProjects} from "@/features/projects/api/projects.api.ts";
 
 export function useProjectsFilter() {
     const query = useQuery({

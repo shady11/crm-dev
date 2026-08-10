@@ -136,8 +136,8 @@ export async function getDeals(params?: GetDealsParams) {
     return response.data;
 }
 
-export async function getDealStatusSummary() {
-    const response = await api.get<DealStatusSummaryItem[]>("/deals/status-summary");
+export async function getDealStatusSummary(projectId?: string) {
+    const response = await api.get<DealStatusSummaryItem[]>("/deals/status-summary", { params: { projectId } });
     return response.data;
 }
 

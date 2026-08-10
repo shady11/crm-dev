@@ -532,14 +532,14 @@ export class DealsService {
     });
   }
 
-  async getStatusSummary(user: AuthUser) {
+  async getStatusSummary(user: AuthUser, projectId?: string) {
     if (!user.companyId) {
       throw new ForbiddenException("User does not belong to a company");
     }
 
     const counts = await this.prisma.deal.groupBy({
       by: ['status'],
-      where: { companyId: user.companyId },
+      where: { companyId: user.companyId, projectId },
       _count: { _all: true },
     });
 

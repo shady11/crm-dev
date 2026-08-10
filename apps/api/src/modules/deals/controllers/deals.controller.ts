@@ -55,8 +55,8 @@ export class DealsController {
       UserRole.FINANCE
   )
   @Get('status-summary')
-  getStatusSummary(@CurrentUser() user: AuthUser) {
-    return this.dealsService.getStatusSummary(user);
+  getStatusSummary(@CurrentUser() user: AuthUser, @Query('projectId') projectId?: string) {
+    return this.dealsService.getStatusSummary(user, projectId);
   }
 
   @Roles(

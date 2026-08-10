@@ -3,7 +3,7 @@ import {createListCollection} from "@ark-ui/react";
 import {Button} from "@/components/ui/button.tsx";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
-import {useProjectsFilter} from "@/features/clients/hooks/use-projects-filter.ts";
+import {useProjectsFilter} from "@/features/projects/hooks/use-projects-filter.ts";
 import type {ProjectFilterValue} from "@/features/clients/hooks/use-clients-list.ts";
 
 interface ClientsToolbarProps {
