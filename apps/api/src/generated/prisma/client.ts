@@ -114,3 +114,8 @@ export type Task = Prisma.TaskModel
  * 
  */
 export type Document = Prisma.DocumentModel
+/**
+ * Model Notification
+ * 
+ */
+export type Notification = Prisma.NotificationModel

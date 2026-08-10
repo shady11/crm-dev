@@ -73,7 +73,9 @@ export class ClientsService {
                     orderBy: { createdAt: "desc" },
                     select: {
                         id: true,
+                        dealNumber: true,
                         status: true,
+                        salePrice: true,
                         unit: {
                             select: {
                                 id: true,

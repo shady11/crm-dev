@@ -9,9 +9,13 @@ import {PaymentService} from './services/payment.service';
 import {PaymentScheduleService} from './services/payment-schedule.service';
 import {DealMapper} from "@/modules/deals/mappers/deal.mapper";
 import {DealDomainService} from "@/modules/deals/services/deal-domain.service";
+import {NotificationsModule} from "@/modules/notifications/notifications.module";
 
 @Module({
-  imports: [PrismaModule],
+  imports: [
+      PrismaModule,
+      NotificationsModule,
+  ],
   controllers: [DealsController],
   providers: [
     DealsService,

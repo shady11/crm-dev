@@ -6,6 +6,7 @@ import LanguageDropdown from "@/components/layout/header/language-dropdown.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {useTheme} from "@/hooks/use-theme.ts";
 import {Languages, MoonStar, Sun} from "lucide-react";
+import {NotificationBell} from "@/features/notifications/components/notification-bell.tsx";
 
 export function AppHeader() {
 
@@ -45,10 +46,11 @@ export function AppHeader() {
                 })}
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
+                <NotificationBell />
                 <LanguageDropdown
                     trigger={
-                        <Button variant="ghost" size="icon-lg">
+                        <Button variant="ghost" size="icon-md">
                             <Languages />
                         </Button>
                     }

@@ -1,5 +1,11 @@
 import {ForbiddenException, Injectable} from '@nestjs/common';
-import {DealStatus, PaymentScheduleStatus, Prisma} from '@/generated/prisma/client';
+import {
+    DealStatus,
+    NotificationEntityType,
+    NotificationType,
+    PaymentScheduleStatus,
+    Prisma
+} from '@/generated/prisma/client';
 import {PrismaService} from '@/database/prisma.service';
 import {AuthUser} from '@/common/types/auth-user.type';
 import {DealDomainService} from './deal-domain.service';
@@ -9,6 +15,7 @@ import {DealMapper} from '../mappers/deal.mapper';
 import {DEAL_DETAILS_INCLUDE} from '../deal.constants';
 import {DealNotFoundException} from '../exceptions';
 import {CreatePaymentDto} from '../dto/create-payment.dto';
+import {NotificationsService} from "@/modules/notifications/notifications.service";
 
 @Injectable()
 export class PaymentService {
@@ -18,6 +25,7 @@ export class PaymentService {
         private readonly domain: DealDomainService,
         private readonly activityService: DealActivityService,
         private readonly dealsService: DealsService,
+        private readonly notifications: NotificationsService,
     ) {}
 
     async create(user: AuthUser, dealId: string, dto: CreatePaymentDto) {
@@ -54,6 +62,18 @@ export class PaymentService {
                     note: dto.note,
                 },
             });
+
+            if (deal.managerId) {
+                await this.notifications.create({
+                    companyId,
+                    userId: deal.managerId,
+                    type: NotificationType.PAYMENT_RECEIVED,
+                    title: `Payment received for deal ${deal.dealNumber}`,
+                    message: `${amount.toString()} $`,
+                    entityType: NotificationEntityType.DEAL,
+                    entityId: dealId,
+                });
+            }
 
             // Apply this payment against outstanding schedule installments, in order
             let remainingToApply = amount;

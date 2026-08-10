@@ -197,3 +197,26 @@ export const DocumentType = {
 } as const
 
 export type DocumentType = (typeof DocumentType)[keyof typeof DocumentType]
+
+
+export const NotificationType = {
+  TASK_ASSIGNED: 'TASK_ASSIGNED',
+  TASK_DUE_SOON: 'TASK_DUE_SOON',
+  TASK_OVERDUE: 'TASK_OVERDUE',
+  DEAL_STATUS_CHANGED: 'DEAL_STATUS_CHANGED',
+  RESERVATION_EXPIRING: 'RESERVATION_EXPIRING',
+  PAYMENT_RECEIVED: 'PAYMENT_RECEIVED',
+  DOCUMENT_UPLOADED: 'DOCUMENT_UPLOADED'
+} as const
+
+export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
+
+
+export const NotificationEntityType = {
+  TASK: 'TASK',
+  DEAL: 'DEAL',
+  CLIENT: 'CLIENT',
+  DOCUMENT: 'DOCUMENT'
+} as const
+
+export type NotificationEntityType = (typeof NotificationEntityType)[keyof typeof NotificationEntityType]

@@ -8,6 +8,8 @@ import {Spinner} from "@/components/ui/spinner.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import type {Client} from "@/features/clients/types/client.types";
 import {formatCreatedAt, initials} from "@/features/clients/utils/format.ts";
+import {useNavigate} from "react-router-dom";
+import {paths} from "@/routes/paths.ts";
 
 interface ClientsTableProps {
     clients: Client[];
@@ -32,6 +34,9 @@ export function ClientsTable({
                                  onDelete,
                                  isDeleting,
                              }: ClientsTableProps) {
+
+    const navigate = useNavigate();
+
     if (isLoading) {
         return (
             <div className="flex h-64 items-center justify-center rounded-lg border border-secondary">
@@ -80,7 +85,7 @@ export function ClientsTable({
                         const created = formatCreatedAt(client.createdAt);
 
                         return (
-                            <TableRow key={client.id}>
+                            <TableRow key={client.id} className="cursor-pointer" onClick={() => navigate(paths.clients.detail(client.id))}>
                                 <TableCell>
                                     <Checkbox
                                         checked={selectedIds.has(client.id)}

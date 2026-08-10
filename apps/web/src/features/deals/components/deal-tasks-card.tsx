@@ -43,7 +43,7 @@ export function DealTasksCard({ dealId }: { dealId: string }) {
                 <CardTitle className="text-sm text-muted-foreground">
                     Tasks{tasks.length > 0 && ` (${tasks.length})`}
                 </CardTitle>
-                <Button variant="secondary" size="xs" onClick={openCreate}>
+                <Button variant="secondary" size="sm" onClick={openCreate}>
                     Add task
                 </Button>
             </CardHeader>

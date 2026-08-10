@@ -14,6 +14,9 @@ import {ChessboardModule} from './modules/chessboard/chessboard.module';
 import {ReferencesModule} from './modules/references/references.module';
 import {DealsModule} from "@/modules/deals/deals.module";
 import {TasksModule} from "@/modules/tasks/tasks.module";
+import {DocumentsModule} from "@/modules/documents/documents.module";
+import {ScheduleModule} from "@nestjs/schedule";
+import {NotificationsModule} from "@/modules/notifications/notifications.module";
 
 @Module({
   imports: [
@@ -21,6 +24,7 @@ import {TasksModule} from "@/modules/tasks/tasks.module";
           isGlobal: true,
           envFilePath: '.env'
       }),
+      ScheduleModule.forRoot(),
       PrismaModule,
       AuthModule,
       UsersModule,
@@ -34,7 +38,9 @@ import {TasksModule} from "@/modules/tasks/tasks.module";
       ChessboardModule,
       ReferencesModule,
       DealsModule,
-      TasksModule
+      TasksModule,
+      DocumentsModule,
+      NotificationsModule,
   ],
 })
 export class AppModule {}

@@ -39,7 +39,9 @@ export type ClientDealUnitSummary = {
 
 export type ClientDealSummary = {
     id: string;
+    dealNumber: string;
     status: string;
+    salePrice: number;
     unit: ClientDealUnitSummary;
     createdAt: string;
 };

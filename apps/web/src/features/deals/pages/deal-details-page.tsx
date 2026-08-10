@@ -38,6 +38,7 @@ import type {PaymentMethod, PaymentType} from "../api/deals.api";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {DealTimelineCard} from "@/features/deals/components/deal-details/deal-timeline-card.tsx";
 import {DealTasksCard} from "@/features/deals/components/deal-tasks-card.tsx";
+import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
 
 export function DealDetailsPage() {
     const { dealId } = useParams<{ dealId: string }>();
@@ -97,16 +98,6 @@ export function DealDetailsPage() {
     return (
         <div className="space-y-6">
             <div className="space-y-2">
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    className="-ml-2 text-muted-foreground"
-                    onClick={() => navigate("/deals")}
-                >
-                    <ArrowLeft className="size-3.5" />
-                    Back to deals
-                </Button>
-
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex flex-col gap-1.5">
                         <div className="flex flex-wrap items-center gap-2.5">
@@ -129,6 +120,10 @@ export function DealDetailsPage() {
                     </div>
 
                     <div className="flex items-center gap-2">
+                        <Button variant="ghost" onClick={() => navigate("/deals")}>
+                            <ArrowLeft className="size-3"/>
+                            Back
+                        </Button>
                         {deal.status === "RESERVED" && (
                             <>
                                 <Button variant="secondary" onClick={() => setExtendOpen(true)}>
@@ -192,6 +187,7 @@ export function DealDetailsPage() {
                     <DealFinancialsCard deal={deal} />
                     <DealTimelineCard deal={deal} />
                     <DealTasksCard dealId={deal.id} />
+                    <EntityDocumentsCard ownerType="DEAL" ownerId={deal.id} />
                     <DealHistoryCard activities={deal.activities} />
                 </div>
             </div>

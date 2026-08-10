@@ -7,10 +7,10 @@ import {PlaceholderPage} from "@/components/shared/placeholder-page.tsx";
 import {projectsRoutes} from "@/features/projects/projects.routes";
 import {usersRoutes} from "@/features/users/users.routes";
 import {paths} from "@/routes/paths";
-import {ClientsPage} from "@/features/clients";
 import {LeadsPage} from "@/features/leads";
 import {dealsRoutes} from "@/features/deals/deals.routes.tsx";
 import {tasksRoutes} from "@/features/tasks/tasks.routes.tsx";
+import {clientsRoutes} from "@/features/clients/clients.routes.tsx";
 
 export const router = createBrowserRouter([
     { path: paths.home, element: <Navigate to={paths.projects.root} replace /> },
@@ -26,7 +26,7 @@ export const router = createBrowserRouter([
                     { path: "dashboard", element: <PlaceholderPage title="Dashboard" /> },
                     { path: "leads", element: <LeadsPage /> },
                     { path: "settings", element: <PlaceholderPage title="Settings" /> },
-                    { path: "clients", element: <ClientsPage /> },
+                    clientsRoutes,
                     projectsRoutes,
                     dealsRoutes,
                     usersRoutes,

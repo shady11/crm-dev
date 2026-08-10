@@ -257,7 +257,7 @@ export class BlocksService {
 
         let unitCounter = 1;
 
-        // First create the block
+        // First, create the block
         const newBlock = await this.prisma.block.create({
             data: {
                 name: newName,

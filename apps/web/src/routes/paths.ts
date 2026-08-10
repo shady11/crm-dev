@@ -3,7 +3,10 @@ export const paths = {
     login: "/login",
     dashboard: "/dashboard",
     leads: "/leads",
-    clients: "/clients",
+    clients: {
+        root: "/clients",
+        detail: (clientId: string) => `/clients/${clientId}`,
+    },
     users: "/users",
     projects: {
         root: "/projects",
@@ -22,5 +25,8 @@ export const paths = {
     deals: {
         root: "/deals",
         detail: (dealId: string) => `/deals/${dealId}`,
+    },
+    tasks: {
+        root: "/tasks",
     },
 } as const;

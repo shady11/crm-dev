@@ -2,6 +2,8 @@ import {ForbiddenException, Injectable,} from '@nestjs/common';
 
 import {
   DealStatus,
+  NotificationEntityType,
+  NotificationType,
   PaymentMethod,
   PaymentScheduleStatus,
   PaymentType,
@@ -23,6 +25,7 @@ import {ExtendReservationDto} from "@/modules/deals/dto/extend-reservation.dto";
 import {SignContractDto} from "@/modules/deals/dto/sign-contract.dto";
 import {CancelDealDto} from "@/modules/deals/dto/cancel-deal.dto";
 import {DbClient} from "@/database/prisma.types";
+import {NotificationsService} from "@/modules/notifications/notifications.service";
 
 @Injectable()
 export class DealsService {
@@ -31,6 +34,7 @@ export class DealsService {
       private readonly mapper: DealMapper,
       private readonly domain: DealDomainService,
       private readonly activityService: DealActivityService,
+      private readonly notifications: NotificationsService,
   ) {}
 
   // --------------------------------------------------------------------------
@@ -297,6 +301,17 @@ export class DealsService {
         metadata: { contractNumber: dto.contractNumber },
       });
 
+      if (deal.managerId) {
+        await this.notifications.create({
+          companyId,
+          userId: deal.managerId,
+          type: NotificationType.DEAL_STATUS_CHANGED,
+          title: `Deal ${deal.dealNumber} is now ${this.domain.nextStatusAfterReservation()}`,
+          entityType: NotificationEntityType.DEAL,
+          entityId: deal.id,
+        });
+      }
+
       return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
     });
 
@@ -326,6 +341,17 @@ export class DealsService {
         dealId: deal.id, clientId: deal.clientId,
         metadata: { status: "ACTIVE" },
       });
+
+      if (deal.managerId) {
+        await this.notifications.create({
+          companyId,
+          userId: deal.managerId,
+          type: NotificationType.DEAL_STATUS_CHANGED,
+          title: `Deal ${deal.dealNumber} is now ${this.domain.nextStatusAfterContract()}`,
+          entityType: NotificationEntityType.DEAL,
+          entityId: deal.id,
+        });
+      }
 
       return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
     });
@@ -374,6 +400,17 @@ export class DealsService {
         dealId: deal.id, clientId: deal.clientId,
         metadata: { reason: dto.reason ?? null },
       });
+
+      if (deal.managerId) {
+        await this.notifications.create({
+          companyId,
+          userId: deal.managerId,
+          type: NotificationType.DEAL_STATUS_CHANGED,
+          title: `Deal ${deal.dealNumber} is now ${UnitStatus.AVAILABLE}`,
+          entityType: NotificationEntityType.DEAL,
+          entityId: deal.id,
+        });
+      }
 
       return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
     });
@@ -442,6 +479,17 @@ export class DealsService {
       dealId, clientId: deal.clientId,
       metadata: { status: 'COMPLETED' },
     });
+
+    if (deal.managerId) {
+      await this.notifications.create({
+        companyId,
+        userId: deal.managerId,
+        type: NotificationType.DEAL_STATUS_CHANGED,
+        title: `Deal ${deal.dealNumber} is now ${this.domain.nextStatusAfterCompletion()}`,
+        entityType: NotificationEntityType.DEAL,
+        entityId: deal.id,
+      });
+    }
 
     return true;
   }

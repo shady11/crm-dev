@@ -189,6 +189,8 @@ model Company {
   activities Activity[]
   tasks      Task[]
   documents  Document[]
+
+  notifications Notification[]
 }
 
 model User {
@@ -216,6 +218,8 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+
+  notifications Notification[]
 }
 
 model Lead {
@@ -652,4 +656,47 @@ model Document {
   @@index([type])
   @@index([uploadedById])
   @@index([createdAt])
+}
+
+model Notification {
+  id String @id @default(uuid())
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  type    NotificationType
+  title   String
+  message String?
+
+  entityType NotificationEntityType?
+  entityId   String?
+
+  isRead Boolean   @default(false)
+  readAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([companyId])
+  @@index([userId, isRead])
+  @@index([createdAt])
+}
+
+enum NotificationType {
+  TASK_ASSIGNED
+  TASK_DUE_SOON
+  TASK_OVERDUE
+  DEAL_STATUS_CHANGED
+  RESERVATION_EXPIRING
+  PAYMENT_RECEIVED
+  DOCUMENT_UPLOADED
+}
+
+enum NotificationEntityType {
+  TASK
+  DEAL
+  CLIENT
+  DOCUMENT
 }

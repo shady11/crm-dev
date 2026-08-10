@@ -1,5 +1,5 @@
 import {BadRequestException, ForbiddenException, Injectable} from "@nestjs/common";
-import {Prisma, TaskStatus} from "@/generated/prisma/client";
+import {NotificationEntityType, NotificationType, Prisma, TaskStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateTaskDto} from "./dto/create-task.dto";
@@ -7,6 +7,7 @@ import {UpdateTaskDto} from "./dto/update-task.dto";
 import {UpdateTaskStatusDto} from "./dto/update-task-status.dto";
 import {QueryTasksDto} from "./dto/query-tasks.dto";
 import {TaskNotFoundException} from "./exceptions/task-not-found.exception";
+import {NotificationsService} from "@/modules/notifications/notifications.service";
 
 const TASK_INCLUDE = {
     assignedTo: { select: { id: true, fullName: true } },
@@ -17,7 +18,10 @@ const TASK_INCLUDE = {
 
 @Injectable()
 export class TasksService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly notifications: NotificationsService,
+    ) {}
 
     async findAll(user: AuthUser, query: QueryTasksDto) {
         if (!user.companyId) {
@@ -87,7 +91,7 @@ export class TasksService {
         this.ensureSingleEntityLink(dto);
         await this.ensureAssigneeInCompany(dto.assignedToId, user.companyId);
 
-        return this.prisma.task.create({
+        const task = await this.prisma.task.create({
             data: {
                 title: dto.title,
                 description: dto.description,
@@ -101,6 +105,20 @@ export class TasksService {
             },
             include: TASK_INCLUDE,
         });
+
+        if (task.assignedToId !== user.id) {
+            await this.notifications.create({
+                companyId: user.companyId!,
+                userId: task.assignedToId,
+                type: NotificationType.TASK_ASSIGNED,
+                title: "New task assigned to you",
+                message: task.title,
+                entityType: NotificationEntityType.TASK,
+                entityId: task.id,
+            });
+        }
+
+        return task;
     }
 
     async update(user: AuthUser, id: string, dto: UpdateTaskDto) {
@@ -115,7 +133,7 @@ export class TasksService {
             await this.ensureAssigneeInCompany(dto.assignedToId, user.companyId);
         }
 
-        return this.prisma.task.update({
+        const task = await this.prisma.task.update({
             where: { id },
             data: {
                 title: dto.title,
@@ -129,6 +147,20 @@ export class TasksService {
             },
             include: TASK_INCLUDE,
         });
+
+        if (task.assignedToId !== user.id) {
+            await this.notifications.create({
+                companyId: user.companyId!,
+                userId: task.assignedToId,
+                type: NotificationType.TASK_ASSIGNED,
+                title: "New task assigned to you",
+                message: task.title,
+                entityType: NotificationEntityType.TASK,
+                entityId: task.id,
+            });
+        }
+
+        return task;
     }
 
     async updateStatus(user: AuthUser, id: string, dto: UpdateTaskStatusDto) {
