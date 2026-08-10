@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
-import { getMe } from "../api/auth.api";
-import { authStorage } from "@/lib/auth-storage";
+import {useQuery} from "@tanstack/react-query";
+import {getMe} from "../api/auth.api";
+import {authStorage} from "@/features/auth/utils/auth-storage.ts";
 
 export function useAuth() {
     const token = authStorage.getToken();

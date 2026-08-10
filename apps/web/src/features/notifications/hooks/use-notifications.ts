@@ -10,7 +10,7 @@ export function useUnreadCount() {
     return useQuery({
         queryKey: ["notifications", "unread-count"],
         queryFn: getUnreadCount,
-        refetchInterval: 30_000, // поллинг раз в 30с
+        refetchInterval: 5 * 60_000,
     });
 }
 

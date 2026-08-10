@@ -1,5 +1,5 @@
 import {Navigate, Outlet} from "react-router-dom";
-import {authStorage} from "@/lib/auth-storage";
+import {authStorage} from "@/features/auth/utils/auth-storage.ts";
 import {useAuth} from "../hooks/use-auth.ts";
 import {Loader} from "lucide-react";
 

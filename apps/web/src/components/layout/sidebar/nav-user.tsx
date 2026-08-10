@@ -2,7 +2,7 @@
 
 import {Avatar, AvatarFallback, AvatarImage,} from "@/components/ui/avatar.tsx"
 import {SidebarMenu, SidebarMenuButton, SidebarMenuItem,} from "@/components/ui/sidebar.tsx"
-import {authStorage} from "@/lib/auth-storage.ts";
+import {authStorage} from "@/features/auth/utils/auth-storage.ts";
 import {useNavigate} from "react-router-dom";
 import {useQueryClient} from "@tanstack/react-query";
 import {
@@ -15,6 +15,7 @@ import {
     MenuTrigger
 } from "@/components/ui/menu.tsx";
 import {BadgeCheck, Bell, ChevronsUpDown, LogOut} from "lucide-react";
+import {disconnectNotificationsSocket} from "@/lib/socket.ts";
 
 export function NavUser({
                             user,
@@ -29,6 +30,7 @@ export function NavUser({
     const queryClient = useQueryClient();
 
     const logout = () => {
+        disconnectNotificationsSocket();
         authStorage.clear();
         queryClient.clear();
         navigate("/login");

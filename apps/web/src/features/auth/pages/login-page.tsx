@@ -1,6 +1,6 @@
-import { Navigate } from "react-router-dom";
-import { LoginForm } from "../components/login-form";
-import { authStorage } from "@/lib/auth-storage";
+import {Navigate} from "react-router-dom";
+import {LoginForm} from "../components/login-form";
+import {authStorage} from "@/features/auth/utils/auth-storage.ts";
 
 export function LoginPage() {
     const token = authStorage.getToken();

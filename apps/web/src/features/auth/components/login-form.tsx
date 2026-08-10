@@ -1,21 +1,17 @@
 import * as React from "react"
-import { cn } from "@/lib/utils"
+import {cn} from "@/lib/utils"
 import placeholderImg from '@/assets/placeholder.svg'
-import { Button } from "@/components/ui/button.tsx"
-import { Card, CardContent } from "@/components/ui/card.tsx"
-import {
-    Field, FieldError,
-    FieldGroup,
-    FieldLabel,
-} from "@/components/ui/field.tsx"
-import { Input } from "@/components/ui/input.tsx"
+import {Button} from "@/components/ui/button.tsx"
+import {Card, CardContent} from "@/components/ui/card.tsx"
+import {Field, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field.tsx"
+import {Input} from "@/components/ui/input.tsx"
 import {z} from "zod";
 import {useNavigate} from "react-router-dom";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useMutation} from "@tanstack/react-query";
 import {login} from "@/features/auth/api/auth.api.ts";
-import {authStorage} from "@/lib/auth-storage.ts";
+import {authStorage} from "@/features/auth/utils/auth-storage.ts";
 import {Loader2, TriangleAlert} from "lucide-react";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {toast} from "@/components/ui/toast.tsx";

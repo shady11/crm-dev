@@ -3,6 +3,7 @@ import {NotificationEntityType, NotificationType, Prisma} from "@/generated/pris
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {QueryNotificationsDto} from "./dto/query-notifications.dto";
+import {NotificationsGateway} from "@/modules/notifications/notifications.gateway";
 
 interface CreateNotificationParams {
     companyId: string;
@@ -16,10 +17,22 @@ interface CreateNotificationParams {
 
 @Injectable()
 export class NotificationsService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly gateway: NotificationsGateway,
+    ) {}
 
     async create(params: CreateNotificationParams) {
-        return this.prisma.notification.create({ data: params });
+        const notification = await this.prisma.notification.create({ data: params });
+
+        const unreadCount = await this.prisma.notification.count({
+            where: { userId: params.userId, isRead: false },
+        });
+
+        this.gateway.emitToUser(params.userId, "notification:new", notification);
+        this.gateway.emitToUser(params.userId, "notification:unread-count", { count: unreadCount });
+
+        return notification;
     }
 
     async findAll(user: AuthUser, query: QueryNotificationsDto) {
@@ -58,6 +71,10 @@ export class NotificationsService {
             where: { id, userId: user.id },
             data: { isRead: true, readAt: new Date() },
         });
+
+        const count = await this.prisma.notification.count({ where: { userId: user.id, isRead: false } });
+        this.gateway.emitToUser(user.id, "notification:unread-count", { count });
+
         return { success: true };
     }
 
@@ -68,6 +85,9 @@ export class NotificationsService {
             where: { companyId: user.companyId, userId: user.id, isRead: false },
             data: { isRead: true, readAt: new Date() },
         });
+
+        this.gateway.emitToUser(user.id, "notification:unread-count", { count: 0 });
+
         return { success: true };
     }
 }

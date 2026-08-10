@@ -1,8 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
-import { Navigate, Outlet } from "react-router-dom";
-import { getMe } from "@/features/auth/api/auth.api";
-import { LoadingScreen } from "../shared/loading-screen";
-import {authStorage} from "@/lib/auth-storage.ts";
+import {useQuery} from "@tanstack/react-query";
+import {Navigate, Outlet} from "react-router-dom";
+import {getMe} from "@/features/auth/api/auth.api";
+import {LoadingScreen} from "../shared/loading-screen";
+import {authStorage} from "@/features/auth/utils/auth-storage.ts";
 
 export function ProtectedRoute() {
     const token = authStorage.getToken();

@@ -3,11 +3,13 @@ import {PrismaModule} from "@/database/prisma.module";
 import {NotificationsController} from "./notifications.controller";
 import {NotificationsService} from "./notifications.service";
 import {NotificationsCronService} from "./notifications-cron.service";
+import {AuthModule} from "@/modules/auth/auth.module";
+import {NotificationsGateway} from "@/modules/notifications/notifications.gateway";
 
 @Module({
-    imports: [PrismaModule],
+    imports: [PrismaModule, AuthModule],
     controllers: [NotificationsController],
-    providers: [NotificationsService, NotificationsCronService],
+    providers: [NotificationsService, NotificationsCronService, NotificationsGateway],
     exports: [NotificationsService],
 })
 export class NotificationsModule {}

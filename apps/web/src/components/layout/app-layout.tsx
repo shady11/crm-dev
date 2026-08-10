@@ -3,8 +3,11 @@ import {AppHeader} from "./header/app-header.tsx";
 import {AppSidebar} from "./sidebar/app-sidebar.tsx";
 import {SidebarProvider} from "@/components/ui/sidebar.tsx";
 import {ScrollArea} from "@/components/ui/scroll-area.tsx";
+import {useNotificationsSocket} from "@/features/notifications/hooks/use-notifications-socket.ts";
 
 export function AppLayout() {
+    useNotificationsSocket();
+
     return (
         <SidebarProvider>
             <AppSidebar />

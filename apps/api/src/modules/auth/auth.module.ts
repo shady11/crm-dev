@@ -5,7 +5,7 @@ import {JwtModule} from "@nestjs/jwt";
 import {AuthController} from "@/modules/auth/auth.controller";
 import {AuthService} from "@/modules/auth/auth.service";
 import {JwtStrategy} from "@/modules/auth/strategies/jwt.strategy";
-import type { StringValue } from "ms";
+import type {StringValue} from "ms";
 import {ConfigModule, ConfigService} from "@nestjs/config";
 
 @Module({
@@ -35,5 +35,8 @@ import {ConfigModule, ConfigService} from "@nestjs/config";
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],
+  exports: [
+      JwtModule
+  ]
 })
 export class AuthModule {}

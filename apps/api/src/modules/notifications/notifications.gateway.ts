@@ -1,0 +1,55 @@
+import {Injectable, Logger, UnauthorizedException} from "@nestjs/common";
+import {OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WebSocketServer} from "@nestjs/websockets";
+import {Server, Socket} from "socket.io";
+import {JwtService} from "@nestjs/jwt";
+import {AuthUser} from "@/common/types/auth-user.type";
+
+@WebSocketGateway({
+    namespace: "notifications",
+    cors: {
+        origin: process.env.CORS_ORIGIN ?? "http://localhost:5173",
+        credentials: true,
+    },
+})
+@Injectable()
+export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisconnect {
+    @WebSocketServer()
+    server: Server;
+
+    private readonly logger = new Logger(NotificationsGateway.name);
+
+    constructor(private readonly jwtService: JwtService) {}
+
+    async handleConnection(client: Socket) {
+        try {
+            const token = this.extractToken(client);
+            const payload = this.jwtService.verify<AuthUser>(token);
+
+            client.data.user = payload;
+            await client.join(`user:${payload.id}`);
+
+            this.logger.log(`Client connected: user ${payload.id}`);
+        } catch {
+            this.logger.warn("Rejected unauthenticated socket connection");
+            client.disconnect();
+        }
+    }
+
+    handleDisconnect(client: Socket) {
+        const user = client.data.user as AuthUser | undefined;
+        if (user) this.logger.log(`Client disconnected: user ${user.id}`);
+    }
+
+    private extractToken(client: Socket): string {
+        const token =
+            client.handshake.auth?.token ||
+            (client.handshake.headers?.authorization as string | undefined)?.replace("Bearer ", "");
+
+        if (!token) throw new UnauthorizedException("No token provided");
+        return token;
+    }
+
+    emitToUser(userId: string, event: string, payload: unknown) {
+        this.server.to(`user:${userId}`).emit(event, payload);
+    }
+}
