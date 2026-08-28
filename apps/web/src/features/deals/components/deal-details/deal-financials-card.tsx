@@ -1,10 +1,19 @@
 import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/components/ui/data-list.tsx";
 import type {DealDetails} from "@/features/deals/api/deals.api.ts";
+import {useTranslation} from "react-i18next";
+import {useFormatters} from "@/lib/i18n/formatters.ts";
 
-export function DealFinancialsCard({ deal }: { deal: DealDetails }) {
-    const totalPaid = deal.payments.reduce((sum, p) => sum + p.amount, 0);
-    const remaining = deal.salePrice - totalPaid;
+interface DealFinancialsCardProps {
+    deal: DealDetails;
+    totalPaid: number;
+    remaining: number;
+    companySettings?: { currency?: string | null; locale?: string | null };
+}
+
+export function DealFinancialsCard({ deal, totalPaid, remaining, companySettings }: DealFinancialsCardProps) {
+    const { t } = useTranslation("deals");
+    const { formatCurrency } = useFormatters(companySettings);
 
     const listPricePerSqM =
         deal.unit.area > 0
@@ -17,28 +26,28 @@ export function DealFinancialsCard({ deal }: { deal: DealDetails }) {
 
     return (
         <Card className="border border-secondary shadow-none flex-1 pt-0">
-            <CardHeader title="Financials" className="py-4 border-b gap-0"></CardHeader>
+            <CardHeader title={t("financials.title")} className="py-4 border-b gap-0"></CardHeader>
             <CardContent>
                 <div className="text-sm font-medium uppercase mb-2">Unit</div>
                 <DataList className="divide-y mb-4">
                     <DataListItem className="justify-between">
-                        <DataListItemLabel>List price</DataListItemLabel>
-                        <DataListItemValue className="flex-none">{deal.listPrice.toLocaleString("ru-RU")} $</DataListItemValue>
+                        <DataListItemLabel>{t("financials.listPrice")}</DataListItemLabel>
+                        <DataListItemValue className="flex-none">{formatCurrency(deal.listPrice)}</DataListItemValue>
                     </DataListItem>
                     <DataListItem className="justify-between">
-                        <DataListItemLabel>Price per meter</DataListItemLabel>
-                        <DataListItemValue className="flex-none">{listPricePerSqM.toLocaleString("ru-RU")} $/m²</DataListItemValue>
+                        <DataListItemLabel>{t("financials.pricePerMeter")}</DataListItemLabel>
+                        <DataListItemValue className="flex-none">{formatCurrency(listPricePerSqM)}/m²</DataListItemValue>
                     </DataListItem>
                 </DataList>
 
                 <div className="text-sm font-medium uppercase mb-2">Deal</div>
                 <DataList className="divide-y mb-4">
                     <DataListItem className="justify-between">
-                        <DataListItemLabel>Sale price</DataListItemLabel>
+                        <DataListItemLabel>{t("financials.salePrice")}</DataListItemLabel>
                         <DataListItemValue className="flex-none font-medium text-lg">
-                            {deal.salePrice.toLocaleString("ru-RU")} $
+                            {formatCurrency(deal.salePrice)}
                             <div className="font-normal text-sm text-end">
-                                {salePricePerSqM.toLocaleString("ru-RU")} $/m²
+                                {formatCurrency(salePricePerSqM)}/m²
                             </div>
                         </DataListItemValue>
                     </DataListItem>
@@ -52,16 +61,16 @@ export function DealFinancialsCard({ deal }: { deal: DealDetails }) {
                         </DataListItem>
                     )}
                     <DataListItem className="justify-between">
-                        <DataListItemLabel>Paid</DataListItemLabel>
-                        <DataListItemValue className="flex-none">{totalPaid.toLocaleString("ru-RU")} $</DataListItemValue>
+                        <DataListItemLabel>{t("financials.paid")}</DataListItemLabel>
+                        <DataListItemValue className="flex-none">{formatCurrency(totalPaid)}</DataListItemValue>
                     </DataListItem>
                     <DataListItem className="justify-between">
-                        <DataListItemLabel>Remaining</DataListItemLabel>
-                        <DataListItemValue className="flex-none">{remaining.toLocaleString("ru-RU")} $</DataListItemValue>
+                        <DataListItemLabel>{t("financials.remaining")}</DataListItemLabel>
+                        <DataListItemValue className="flex-none">{formatCurrency(remaining)}</DataListItemValue>
                     </DataListItem>
                     {deal.financingType && (
                         <DataListItem className="justify-between">
-                            <DataListItemLabel>Financing</DataListItemLabel>
+                            <DataListItemLabel>{t("financials.financing")}</DataListItemLabel>
                             <DataListItemValue className="flex-none">{deal.financingType}</DataListItemValue>
                         </DataListItem>
                     )}

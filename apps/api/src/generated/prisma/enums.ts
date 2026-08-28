@@ -9,139 +9,6 @@
 * 🟢 You can import this file directly.
 */
 
-export const UserRole = {
-  SUPER_ADMIN: 'SUPER_ADMIN',
-  COMPANY_ADMIN: 'COMPANY_ADMIN',
-  SALES_MANAGER: 'SALES_MANAGER',
-  SALES_HEAD: 'SALES_HEAD',
-  FINANCE: 'FINANCE'
-} as const
-
-export type UserRole = (typeof UserRole)[keyof typeof UserRole]
-
-
-export const LeadStatus = {
-  NEW: 'NEW',
-  CONTACTED: 'CONTACTED',
-  QUALIFIED: 'QUALIFIED',
-  MEETING: 'MEETING',
-  NEGOTIATION: 'NEGOTIATION',
-  CONVERTED: 'CONVERTED',
-  LOST: 'LOST'
-} as const
-
-export type LeadStatus = (typeof LeadStatus)[keyof typeof LeadStatus]
-
-
-export const ProjectStatus = {
-  DRAFT: 'DRAFT',
-  PLANNING: 'PLANNING',
-  ACTIVE: 'ACTIVE',
-  PAUSED: 'PAUSED',
-  SOLDOUT: 'SOLDOUT',
-  COMPLETED: 'COMPLETED',
-  ARCHIVED: 'ARCHIVED'
-} as const
-
-export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus]
-
-
-export const UnitType = {
-  APARTMENT: 'APARTMENT',
-  COMMERCIAL: 'COMMERCIAL',
-  PARKING: 'PARKING',
-  STORAGE: 'STORAGE'
-} as const
-
-export type UnitType = (typeof UnitType)[keyof typeof UnitType]
-
-
-export const UnitStatus = {
-  AVAILABLE: 'AVAILABLE',
-  RESERVED: 'RESERVED',
-  SOLD: 'SOLD',
-  UNAVAILABLE: 'UNAVAILABLE'
-} as const
-
-export type UnitStatus = (typeof UnitStatus)[keyof typeof UnitStatus]
-
-
-export const DealStatus = {
-  RESERVED: 'RESERVED',
-  CONTRACT_SIGNED: 'CONTRACT_SIGNED',
-  ACTIVE: 'ACTIVE',
-  COMPLETED: 'COMPLETED',
-  CANCELLED: 'CANCELLED'
-} as const
-
-export type DealStatus = (typeof DealStatus)[keyof typeof DealStatus]
-
-
-export const PaymentMethod = {
-  CASH: 'CASH',
-  BANK_TRANSFER: 'BANK_TRANSFER',
-  MBANK: 'MBANK',
-  OPTIMA: 'OPTIMA',
-  ELKART: 'ELKART',
-  OTHER: 'OTHER'
-} as const
-
-export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
-
-
-export const FinancingType = {
-  CASH: 'CASH',
-  INSTALLMENT: 'INSTALLMENT',
-  MORTGAGE: 'MORTGAGE'
-} as const
-
-export type FinancingType = (typeof FinancingType)[keyof typeof FinancingType]
-
-
-export const PaymentType = {
-  DEPOSIT: 'DEPOSIT',
-  INSTALLMENT: 'INSTALLMENT',
-  FINAL: 'FINAL',
-  REFUND: 'REFUND'
-} as const
-
-export type PaymentType = (typeof PaymentType)[keyof typeof PaymentType]
-
-
-export const PaymentScheduleStatus = {
-  PENDING: 'PENDING',
-  PARTIAL: 'PARTIAL',
-  PAID: 'PAID',
-  OVERDUE: 'OVERDUE'
-} as const
-
-export type PaymentScheduleStatus = (typeof PaymentScheduleStatus)[keyof typeof PaymentScheduleStatus]
-
-
-export const ActivityType = {
-  LEAD_CREATED: 'LEAD_CREATED',
-  LEAD_UPDATED: 'LEAD_UPDATED',
-  CLIENT_CREATED: 'CLIENT_CREATED',
-  CLIENT_UPDATED: 'CLIENT_UPDATED',
-  DEAL_CREATED: 'DEAL_CREATED',
-  DEAL_UPDATED: 'DEAL_UPDATED',
-  UNIT_RESERVED: 'UNIT_RESERVED',
-  RESERVATION_EXTENDED: 'RESERVATION_EXTENDED',
-  RESERVATION_CANCELLED: 'RESERVATION_CANCELLED',
-  CONTRACT_SIGNED: 'CONTRACT_SIGNED',
-  PAYMENT_RECEIVED: 'PAYMENT_RECEIVED',
-  PAYMENT_REFUNDED: 'PAYMENT_REFUNDED',
-  NOTE_ADDED: 'NOTE_ADDED',
-  TASK_CREATED: 'TASK_CREATED',
-  TASK_COMPLETED: 'TASK_COMPLETED',
-  CALL: 'CALL',
-  MEETING: 'MEETING',
-  EMAIL: 'EMAIL'
-} as const
-
-export type ActivityType = (typeof ActivityType)[keyof typeof ActivityType]
-
-
 export const ActivityAction = {
   CREATED: 'CREATED',
   UPDATED: 'UPDATED',
@@ -162,14 +29,50 @@ export const ActivityAction = {
 export type ActivityAction = (typeof ActivityAction)[keyof typeof ActivityAction]
 
 
-export const TaskStatus = {
-  TODO: 'TODO',
-  IN_PROGRESS: 'IN_PROGRESS',
-  DONE: 'DONE',
-  CANCELLED: 'CANCELLED'
+export const ActivityType = {
+  LEAD_CREATED: 'LEAD_CREATED',
+  LEAD_UPDATED: 'LEAD_UPDATED',
+  CLIENT_CREATED: 'CLIENT_CREATED',
+  CLIENT_UPDATED: 'CLIENT_UPDATED',
+  DEAL_CREATED: 'DEAL_CREATED',
+  DEAL_UPDATED: 'DEAL_UPDATED',
+  UNIT_RESERVED: 'UNIT_RESERVED',
+  RESERVATION_EXTENDED: 'RESERVATION_EXTENDED',
+  RESERVATION_CANCELLED: 'RESERVATION_CANCELLED',
+  RESERVATION_EXPIRED: 'RESERVATION_EXPIRED',
+  CONTRACT_SIGNED: 'CONTRACT_SIGNED',
+  PAYMENT_RECEIVED: 'PAYMENT_RECEIVED',
+  PAYMENT_REFUNDED: 'PAYMENT_REFUNDED',
+  NOTE_ADDED: 'NOTE_ADDED',
+  TASK_CREATED: 'TASK_CREATED',
+  TASK_COMPLETED: 'TASK_COMPLETED',
+  CALL: 'CALL',
+  MEETING: 'MEETING',
+  EMAIL: 'EMAIL'
 } as const
 
-export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
+export type ActivityType = (typeof ActivityType)[keyof typeof ActivityType]
+
+
+export const DealStatus = {
+  RESERVED: 'RESERVED',
+  CONTRACT_SIGNED: 'CONTRACT_SIGNED',
+  ACTIVE: 'ACTIVE',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type DealStatus = (typeof DealStatus)[keyof typeof DealStatus]
+
+
+export const FinancingType = {
+  CASH: 'CASH',
+  INSTALLMENT: 'INSTALLMENT',
+  MORTGAGE: 'MORTGAGE'
+} as const
+
+export type FinancingType = (typeof FinancingType)[keyof typeof FinancingType]
 
 
 export const DocumentOwnerType = {
@@ -199,6 +102,19 @@ export const DocumentType = {
 export type DocumentType = (typeof DocumentType)[keyof typeof DocumentType]
 
 
+export const LeadStatus = {
+  NEW: 'NEW',
+  CONTACTED: 'CONTACTED',
+  QUALIFIED: 'QUALIFIED',
+  MEETING: 'MEETING',
+  NEGOTIATION: 'NEGOTIATION',
+  CONVERTED: 'CONVERTED',
+  LOST: 'LOST'
+} as const
+
+export type LeadStatus = (typeof LeadStatus)[keyof typeof LeadStatus]
+
+
 export const NotificationType = {
   TASK_ASSIGNED: 'TASK_ASSIGNED',
   TASK_DUE_SOON: 'TASK_DUE_SOON',
@@ -220,3 +136,89 @@ export const NotificationEntityType = {
 } as const
 
 export type NotificationEntityType = (typeof NotificationEntityType)[keyof typeof NotificationEntityType]
+
+
+export const PaymentMethod = {
+  CASH: 'CASH',
+  BANK_TRANSFER: 'BANK_TRANSFER',
+  MBANK: 'MBANK',
+  OPTIMA: 'OPTIMA',
+  ELKART: 'ELKART',
+  OTHER: 'OTHER'
+} as const
+
+export type PaymentMethod = (typeof PaymentMethod)[keyof typeof PaymentMethod]
+
+
+export const PaymentType = {
+  DEPOSIT: 'DEPOSIT',
+  INSTALLMENT: 'INSTALLMENT',
+  FINAL: 'FINAL',
+  REFUND: 'REFUND'
+} as const
+
+export type PaymentType = (typeof PaymentType)[keyof typeof PaymentType]
+
+
+export const PaymentScheduleStatus = {
+  PENDING: 'PENDING',
+  PARTIAL: 'PARTIAL',
+  PAID: 'PAID',
+  OVERDUE: 'OVERDUE'
+} as const
+
+export type PaymentScheduleStatus = (typeof PaymentScheduleStatus)[keyof typeof PaymentScheduleStatus]
+
+
+export const ProjectStatus = {
+  DRAFT: 'DRAFT',
+  PLANNING: 'PLANNING',
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  SOLDOUT: 'SOLDOUT',
+  COMPLETED: 'COMPLETED',
+  ARCHIVED: 'ARCHIVED'
+} as const
+
+export type ProjectStatus = (typeof ProjectStatus)[keyof typeof ProjectStatus]
+
+
+export const TaskStatus = {
+  TODO: 'TODO',
+  IN_PROGRESS: 'IN_PROGRESS',
+  DONE: 'DONE',
+  CANCELLED: 'CANCELLED'
+} as const
+
+export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus]
+
+
+export const UnitType = {
+  APARTMENT: 'APARTMENT',
+  COMMERCIAL: 'COMMERCIAL',
+  PARKING: 'PARKING',
+  STORAGE: 'STORAGE'
+} as const
+
+export type UnitType = (typeof UnitType)[keyof typeof UnitType]
+
+
+export const UnitStatus = {
+  AVAILABLE: 'AVAILABLE',
+  RESERVED: 'RESERVED',
+  SOLD: 'SOLD',
+  UNAVAILABLE: 'UNAVAILABLE'
+} as const
+
+export type UnitStatus = (typeof UnitStatus)[keyof typeof UnitStatus]
+
+
+export const UserRole = {
+  SUPER_ADMIN: 'SUPER_ADMIN',
+  COMPANY_ADMIN: 'COMPANY_ADMIN',
+  SALES_MANAGER: 'SALES_MANAGER',
+  SALES_HEAD: 'SALES_HEAD',
+  FINANCE: 'FINANCE'
+} as const
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]

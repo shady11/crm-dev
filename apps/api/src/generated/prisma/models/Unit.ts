@@ -545,6 +545,11 @@ export type UnitOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type UnitScalarRelationFilter = {
+  is?: Prisma.UnitWhereInput
+  isNot?: Prisma.UnitWhereInput
+}
+
 export type UnitBlockIdNumberCompoundUniqueInput = {
   blockId: string
   number: string
@@ -618,53 +623,6 @@ export type UnitSumOrderByAggregateInput = {
   pricePerSqm?: Prisma.SortOrder
 }
 
-export type UnitScalarRelationFilter = {
-  is?: Prisma.UnitWhereInput
-  isNot?: Prisma.UnitWhereInput
-}
-
-export type UnitCreateNestedManyWithoutProjectInput = {
-  create?: Prisma.XOR<Prisma.UnitCreateWithoutProjectInput, Prisma.UnitUncheckedCreateWithoutProjectInput> | Prisma.UnitCreateWithoutProjectInput[] | Prisma.UnitUncheckedCreateWithoutProjectInput[]
-  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutProjectInput | Prisma.UnitCreateOrConnectWithoutProjectInput[]
-  createMany?: Prisma.UnitCreateManyProjectInputEnvelope
-  connect?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
-}
-
-export type UnitUncheckedCreateNestedManyWithoutProjectInput = {
-  create?: Prisma.XOR<Prisma.UnitCreateWithoutProjectInput, Prisma.UnitUncheckedCreateWithoutProjectInput> | Prisma.UnitCreateWithoutProjectInput[] | Prisma.UnitUncheckedCreateWithoutProjectInput[]
-  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutProjectInput | Prisma.UnitCreateOrConnectWithoutProjectInput[]
-  createMany?: Prisma.UnitCreateManyProjectInputEnvelope
-  connect?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
-}
-
-export type UnitUpdateManyWithoutProjectNestedInput = {
-  create?: Prisma.XOR<Prisma.UnitCreateWithoutProjectInput, Prisma.UnitUncheckedCreateWithoutProjectInput> | Prisma.UnitCreateWithoutProjectInput[] | Prisma.UnitUncheckedCreateWithoutProjectInput[]
-  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutProjectInput | Prisma.UnitCreateOrConnectWithoutProjectInput[]
-  upsert?: Prisma.UnitUpsertWithWhereUniqueWithoutProjectInput | Prisma.UnitUpsertWithWhereUniqueWithoutProjectInput[]
-  createMany?: Prisma.UnitCreateManyProjectInputEnvelope
-  set?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
-  disconnect?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
-  delete?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
-  connect?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
-  update?: Prisma.UnitUpdateWithWhereUniqueWithoutProjectInput | Prisma.UnitUpdateWithWhereUniqueWithoutProjectInput[]
-  updateMany?: Prisma.UnitUpdateManyWithWhereWithoutProjectInput | Prisma.UnitUpdateManyWithWhereWithoutProjectInput[]
-  deleteMany?: Prisma.UnitScalarWhereInput | Prisma.UnitScalarWhereInput[]
-}
-
-export type UnitUncheckedUpdateManyWithoutProjectNestedInput = {
-  create?: Prisma.XOR<Prisma.UnitCreateWithoutProjectInput, Prisma.UnitUncheckedCreateWithoutProjectInput> | Prisma.UnitCreateWithoutProjectInput[] | Prisma.UnitUncheckedCreateWithoutProjectInput[]
-  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutProjectInput | Prisma.UnitCreateOrConnectWithoutProjectInput[]
-  upsert?: Prisma.UnitUpsertWithWhereUniqueWithoutProjectInput | Prisma.UnitUpsertWithWhereUniqueWithoutProjectInput[]
-  createMany?: Prisma.UnitCreateManyProjectInputEnvelope
-  set?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
-  disconnect?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
-  delete?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
-  connect?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
-  update?: Prisma.UnitUpdateWithWhereUniqueWithoutProjectInput | Prisma.UnitUpdateWithWhereUniqueWithoutProjectInput[]
-  updateMany?: Prisma.UnitUpdateManyWithWhereWithoutProjectInput | Prisma.UnitUpdateManyWithWhereWithoutProjectInput[]
-  deleteMany?: Prisma.UnitScalarWhereInput | Prisma.UnitScalarWhereInput[]
-}
-
 export type UnitCreateNestedManyWithoutBlockInput = {
   create?: Prisma.XOR<Prisma.UnitCreateWithoutBlockInput, Prisma.UnitUncheckedCreateWithoutBlockInput> | Prisma.UnitCreateWithoutBlockInput[] | Prisma.UnitUncheckedCreateWithoutBlockInput[]
   connectOrCreate?: Prisma.UnitCreateOrConnectWithoutBlockInput | Prisma.UnitCreateOrConnectWithoutBlockInput[]
@@ -705,6 +663,20 @@ export type UnitUncheckedUpdateManyWithoutBlockNestedInput = {
   update?: Prisma.UnitUpdateWithWhereUniqueWithoutBlockInput | Prisma.UnitUpdateWithWhereUniqueWithoutBlockInput[]
   updateMany?: Prisma.UnitUpdateManyWithWhereWithoutBlockInput | Prisma.UnitUpdateManyWithWhereWithoutBlockInput[]
   deleteMany?: Prisma.UnitScalarWhereInput | Prisma.UnitScalarWhereInput[]
+}
+
+export type UnitCreateNestedOneWithoutDealsInput = {
+  create?: Prisma.XOR<Prisma.UnitCreateWithoutDealsInput, Prisma.UnitUncheckedCreateWithoutDealsInput>
+  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutDealsInput
+  connect?: Prisma.UnitWhereUniqueInput
+}
+
+export type UnitUpdateOneRequiredWithoutDealsNestedInput = {
+  create?: Prisma.XOR<Prisma.UnitCreateWithoutDealsInput, Prisma.UnitUncheckedCreateWithoutDealsInput>
+  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutDealsInput
+  upsert?: Prisma.UnitUpsertWithoutDealsInput
+  connect?: Prisma.UnitWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UnitUpdateToOneWithWhereWithoutDealsInput, Prisma.UnitUpdateWithoutDealsInput>, Prisma.UnitUncheckedUpdateWithoutDealsInput>
 }
 
 export type UnitCreateNestedManyWithoutEntranceInput = {
@@ -791,6 +763,48 @@ export type UnitUncheckedUpdateManyWithoutFloorNestedInput = {
   deleteMany?: Prisma.UnitScalarWhereInput | Prisma.UnitScalarWhereInput[]
 }
 
+export type UnitCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.UnitCreateWithoutProjectInput, Prisma.UnitUncheckedCreateWithoutProjectInput> | Prisma.UnitCreateWithoutProjectInput[] | Prisma.UnitUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutProjectInput | Prisma.UnitCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.UnitCreateManyProjectInputEnvelope
+  connect?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
+}
+
+export type UnitUncheckedCreateNestedManyWithoutProjectInput = {
+  create?: Prisma.XOR<Prisma.UnitCreateWithoutProjectInput, Prisma.UnitUncheckedCreateWithoutProjectInput> | Prisma.UnitCreateWithoutProjectInput[] | Prisma.UnitUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutProjectInput | Prisma.UnitCreateOrConnectWithoutProjectInput[]
+  createMany?: Prisma.UnitCreateManyProjectInputEnvelope
+  connect?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
+}
+
+export type UnitUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.UnitCreateWithoutProjectInput, Prisma.UnitUncheckedCreateWithoutProjectInput> | Prisma.UnitCreateWithoutProjectInput[] | Prisma.UnitUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutProjectInput | Prisma.UnitCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.UnitUpsertWithWhereUniqueWithoutProjectInput | Prisma.UnitUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.UnitCreateManyProjectInputEnvelope
+  set?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
+  disconnect?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
+  delete?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
+  connect?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
+  update?: Prisma.UnitUpdateWithWhereUniqueWithoutProjectInput | Prisma.UnitUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.UnitUpdateManyWithWhereWithoutProjectInput | Prisma.UnitUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.UnitScalarWhereInput | Prisma.UnitScalarWhereInput[]
+}
+
+export type UnitUncheckedUpdateManyWithoutProjectNestedInput = {
+  create?: Prisma.XOR<Prisma.UnitCreateWithoutProjectInput, Prisma.UnitUncheckedCreateWithoutProjectInput> | Prisma.UnitCreateWithoutProjectInput[] | Prisma.UnitUncheckedCreateWithoutProjectInput[]
+  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutProjectInput | Prisma.UnitCreateOrConnectWithoutProjectInput[]
+  upsert?: Prisma.UnitUpsertWithWhereUniqueWithoutProjectInput | Prisma.UnitUpsertWithWhereUniqueWithoutProjectInput[]
+  createMany?: Prisma.UnitCreateManyProjectInputEnvelope
+  set?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
+  disconnect?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
+  delete?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
+  connect?: Prisma.UnitWhereUniqueInput | Prisma.UnitWhereUniqueInput[]
+  update?: Prisma.UnitUpdateWithWhereUniqueWithoutProjectInput | Prisma.UnitUpdateWithWhereUniqueWithoutProjectInput[]
+  updateMany?: Prisma.UnitUpdateManyWithWhereWithoutProjectInput | Prisma.UnitUpdateManyWithWhereWithoutProjectInput[]
+  deleteMany?: Prisma.UnitScalarWhereInput | Prisma.UnitScalarWhereInput[]
+}
+
 export type EnumUnitTypeFieldUpdateOperationsInput = {
   set?: $Enums.UnitType
 }
@@ -805,119 +819,6 @@ export type NullableIntFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
-}
-
-export type DecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
-export type NullableDecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
-}
-
-export type UnitCreateNestedOneWithoutDealsInput = {
-  create?: Prisma.XOR<Prisma.UnitCreateWithoutDealsInput, Prisma.UnitUncheckedCreateWithoutDealsInput>
-  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutDealsInput
-  connect?: Prisma.UnitWhereUniqueInput
-}
-
-export type UnitUpdateOneRequiredWithoutDealsNestedInput = {
-  create?: Prisma.XOR<Prisma.UnitCreateWithoutDealsInput, Prisma.UnitUncheckedCreateWithoutDealsInput>
-  connectOrCreate?: Prisma.UnitCreateOrConnectWithoutDealsInput
-  upsert?: Prisma.UnitUpsertWithoutDealsInput
-  connect?: Prisma.UnitWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UnitUpdateToOneWithWhereWithoutDealsInput, Prisma.UnitUpdateWithoutDealsInput>, Prisma.UnitUncheckedUpdateWithoutDealsInput>
-}
-
-export type UnitCreateWithoutProjectInput = {
-  id?: string
-  number: string
-  type?: $Enums.UnitType
-  status?: $Enums.UnitStatus
-  rooms?: number | null
-  area: runtime.Decimal | runtime.DecimalJsLike | number | string
-  price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  pricePerSqm?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  deletedAt?: Date | string | null
-  block: Prisma.BlockCreateNestedOneWithoutUnitsInput
-  entrance: Prisma.EntranceCreateNestedOneWithoutUnitsInput
-  floor: Prisma.FloorCreateNestedOneWithoutUnitsInput
-  deals?: Prisma.DealCreateNestedManyWithoutUnitInput
-}
-
-export type UnitUncheckedCreateWithoutProjectInput = {
-  id?: string
-  number: string
-  type?: $Enums.UnitType
-  status?: $Enums.UnitStatus
-  rooms?: number | null
-  area: runtime.Decimal | runtime.DecimalJsLike | number | string
-  price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  pricePerSqm?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  blockId: string
-  entranceId: string
-  floorId: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  deletedAt?: Date | string | null
-  deals?: Prisma.DealUncheckedCreateNestedManyWithoutUnitInput
-}
-
-export type UnitCreateOrConnectWithoutProjectInput = {
-  where: Prisma.UnitWhereUniqueInput
-  create: Prisma.XOR<Prisma.UnitCreateWithoutProjectInput, Prisma.UnitUncheckedCreateWithoutProjectInput>
-}
-
-export type UnitCreateManyProjectInputEnvelope = {
-  data: Prisma.UnitCreateManyProjectInput | Prisma.UnitCreateManyProjectInput[]
-  skipDuplicates?: boolean
-}
-
-export type UnitUpsertWithWhereUniqueWithoutProjectInput = {
-  where: Prisma.UnitWhereUniqueInput
-  update: Prisma.XOR<Prisma.UnitUpdateWithoutProjectInput, Prisma.UnitUncheckedUpdateWithoutProjectInput>
-  create: Prisma.XOR<Prisma.UnitCreateWithoutProjectInput, Prisma.UnitUncheckedCreateWithoutProjectInput>
-}
-
-export type UnitUpdateWithWhereUniqueWithoutProjectInput = {
-  where: Prisma.UnitWhereUniqueInput
-  data: Prisma.XOR<Prisma.UnitUpdateWithoutProjectInput, Prisma.UnitUncheckedUpdateWithoutProjectInput>
-}
-
-export type UnitUpdateManyWithWhereWithoutProjectInput = {
-  where: Prisma.UnitScalarWhereInput
-  data: Prisma.XOR<Prisma.UnitUpdateManyMutationInput, Prisma.UnitUncheckedUpdateManyWithoutProjectInput>
-}
-
-export type UnitScalarWhereInput = {
-  AND?: Prisma.UnitScalarWhereInput | Prisma.UnitScalarWhereInput[]
-  OR?: Prisma.UnitScalarWhereInput[]
-  NOT?: Prisma.UnitScalarWhereInput | Prisma.UnitScalarWhereInput[]
-  id?: Prisma.StringFilter<"Unit"> | string
-  number?: Prisma.StringFilter<"Unit"> | string
-  type?: Prisma.EnumUnitTypeFilter<"Unit"> | $Enums.UnitType
-  status?: Prisma.EnumUnitStatusFilter<"Unit"> | $Enums.UnitStatus
-  rooms?: Prisma.IntNullableFilter<"Unit"> | number | null
-  area?: Prisma.DecimalFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  price?: Prisma.DecimalFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  pricePerSqm?: Prisma.DecimalNullableFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  projectId?: Prisma.StringFilter<"Unit"> | string
-  blockId?: Prisma.StringFilter<"Unit"> | string
-  entranceId?: Prisma.StringFilter<"Unit"> | string
-  floorId?: Prisma.StringFilter<"Unit"> | string
-  createdAt?: Prisma.DateTimeFilter<"Unit"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Unit"> | Date | string
-  deletedAt?: Prisma.DateTimeNullableFilter<"Unit"> | Date | string | null
 }
 
 export type UnitCreateWithoutBlockInput = {
@@ -980,6 +881,115 @@ export type UnitUpdateWithWhereUniqueWithoutBlockInput = {
 export type UnitUpdateManyWithWhereWithoutBlockInput = {
   where: Prisma.UnitScalarWhereInput
   data: Prisma.XOR<Prisma.UnitUpdateManyMutationInput, Prisma.UnitUncheckedUpdateManyWithoutBlockInput>
+}
+
+export type UnitScalarWhereInput = {
+  AND?: Prisma.UnitScalarWhereInput | Prisma.UnitScalarWhereInput[]
+  OR?: Prisma.UnitScalarWhereInput[]
+  NOT?: Prisma.UnitScalarWhereInput | Prisma.UnitScalarWhereInput[]
+  id?: Prisma.StringFilter<"Unit"> | string
+  number?: Prisma.StringFilter<"Unit"> | string
+  type?: Prisma.EnumUnitTypeFilter<"Unit"> | $Enums.UnitType
+  status?: Prisma.EnumUnitStatusFilter<"Unit"> | $Enums.UnitStatus
+  rooms?: Prisma.IntNullableFilter<"Unit"> | number | null
+  area?: Prisma.DecimalFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  price?: Prisma.DecimalFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  pricePerSqm?: Prisma.DecimalNullableFilter<"Unit"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  projectId?: Prisma.StringFilter<"Unit"> | string
+  blockId?: Prisma.StringFilter<"Unit"> | string
+  entranceId?: Prisma.StringFilter<"Unit"> | string
+  floorId?: Prisma.StringFilter<"Unit"> | string
+  createdAt?: Prisma.DateTimeFilter<"Unit"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"Unit"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"Unit"> | Date | string | null
+}
+
+export type UnitCreateWithoutDealsInput = {
+  id?: string
+  number: string
+  type?: $Enums.UnitType
+  status?: $Enums.UnitStatus
+  rooms?: number | null
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  pricePerSqm?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  project: Prisma.ProjectCreateNestedOneWithoutUnitsInput
+  block: Prisma.BlockCreateNestedOneWithoutUnitsInput
+  entrance: Prisma.EntranceCreateNestedOneWithoutUnitsInput
+  floor: Prisma.FloorCreateNestedOneWithoutUnitsInput
+}
+
+export type UnitUncheckedCreateWithoutDealsInput = {
+  id?: string
+  number: string
+  type?: $Enums.UnitType
+  status?: $Enums.UnitStatus
+  rooms?: number | null
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  pricePerSqm?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  projectId: string
+  blockId: string
+  entranceId: string
+  floorId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+}
+
+export type UnitCreateOrConnectWithoutDealsInput = {
+  where: Prisma.UnitWhereUniqueInput
+  create: Prisma.XOR<Prisma.UnitCreateWithoutDealsInput, Prisma.UnitUncheckedCreateWithoutDealsInput>
+}
+
+export type UnitUpsertWithoutDealsInput = {
+  update: Prisma.XOR<Prisma.UnitUpdateWithoutDealsInput, Prisma.UnitUncheckedUpdateWithoutDealsInput>
+  create: Prisma.XOR<Prisma.UnitCreateWithoutDealsInput, Prisma.UnitUncheckedCreateWithoutDealsInput>
+  where?: Prisma.UnitWhereInput
+}
+
+export type UnitUpdateToOneWithWhereWithoutDealsInput = {
+  where?: Prisma.UnitWhereInput
+  data: Prisma.XOR<Prisma.UnitUpdateWithoutDealsInput, Prisma.UnitUncheckedUpdateWithoutDealsInput>
+}
+
+export type UnitUpdateWithoutDealsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
+  status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
+  rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  pricePerSqm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  project?: Prisma.ProjectUpdateOneRequiredWithoutUnitsNestedInput
+  block?: Prisma.BlockUpdateOneRequiredWithoutUnitsNestedInput
+  entrance?: Prisma.EntranceUpdateOneRequiredWithoutUnitsNestedInput
+  floor?: Prisma.FloorUpdateOneRequiredWithoutUnitsNestedInput
+}
+
+export type UnitUncheckedUpdateWithoutDealsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
+  status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
+  rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  pricePerSqm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  projectId?: Prisma.StringFieldUpdateOperationsInput | string
+  blockId?: Prisma.StringFieldUpdateOperationsInput | string
+  entranceId?: Prisma.StringFieldUpdateOperationsInput | string
+  floorId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type UnitCreateWithoutEntranceInput = {
@@ -1106,7 +1116,7 @@ export type UnitUpdateManyWithWhereWithoutFloorInput = {
   data: Prisma.XOR<Prisma.UnitUpdateManyMutationInput, Prisma.UnitUncheckedUpdateManyWithoutFloorInput>
 }
 
-export type UnitCreateWithoutDealsInput = {
+export type UnitCreateWithoutProjectInput = {
   id?: string
   number: string
   type?: $Enums.UnitType
@@ -1118,13 +1128,13 @@ export type UnitCreateWithoutDealsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  project: Prisma.ProjectCreateNestedOneWithoutUnitsInput
   block: Prisma.BlockCreateNestedOneWithoutUnitsInput
   entrance: Prisma.EntranceCreateNestedOneWithoutUnitsInput
   floor: Prisma.FloorCreateNestedOneWithoutUnitsInput
+  deals?: Prisma.DealCreateNestedManyWithoutUnitInput
 }
 
-export type UnitUncheckedCreateWithoutDealsInput = {
+export type UnitUncheckedCreateWithoutProjectInput = {
   id?: string
   number: string
   type?: $Enums.UnitType
@@ -1133,135 +1143,39 @@ export type UnitUncheckedCreateWithoutDealsInput = {
   area: runtime.Decimal | runtime.DecimalJsLike | number | string
   price: runtime.Decimal | runtime.DecimalJsLike | number | string
   pricePerSqm?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  projectId: string
   blockId: string
   entranceId: string
   floorId: string
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  deals?: Prisma.DealUncheckedCreateNestedManyWithoutUnitInput
 }
 
-export type UnitCreateOrConnectWithoutDealsInput = {
+export type UnitCreateOrConnectWithoutProjectInput = {
   where: Prisma.UnitWhereUniqueInput
-  create: Prisma.XOR<Prisma.UnitCreateWithoutDealsInput, Prisma.UnitUncheckedCreateWithoutDealsInput>
+  create: Prisma.XOR<Prisma.UnitCreateWithoutProjectInput, Prisma.UnitUncheckedCreateWithoutProjectInput>
 }
 
-export type UnitUpsertWithoutDealsInput = {
-  update: Prisma.XOR<Prisma.UnitUpdateWithoutDealsInput, Prisma.UnitUncheckedUpdateWithoutDealsInput>
-  create: Prisma.XOR<Prisma.UnitCreateWithoutDealsInput, Prisma.UnitUncheckedCreateWithoutDealsInput>
-  where?: Prisma.UnitWhereInput
+export type UnitCreateManyProjectInputEnvelope = {
+  data: Prisma.UnitCreateManyProjectInput | Prisma.UnitCreateManyProjectInput[]
+  skipDuplicates?: boolean
 }
 
-export type UnitUpdateToOneWithWhereWithoutDealsInput = {
-  where?: Prisma.UnitWhereInput
-  data: Prisma.XOR<Prisma.UnitUpdateWithoutDealsInput, Prisma.UnitUncheckedUpdateWithoutDealsInput>
+export type UnitUpsertWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.UnitWhereUniqueInput
+  update: Prisma.XOR<Prisma.UnitUpdateWithoutProjectInput, Prisma.UnitUncheckedUpdateWithoutProjectInput>
+  create: Prisma.XOR<Prisma.UnitCreateWithoutProjectInput, Prisma.UnitUncheckedCreateWithoutProjectInput>
 }
 
-export type UnitUpdateWithoutDealsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  number?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
-  status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
-  rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  pricePerSqm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  project?: Prisma.ProjectUpdateOneRequiredWithoutUnitsNestedInput
-  block?: Prisma.BlockUpdateOneRequiredWithoutUnitsNestedInput
-  entrance?: Prisma.EntranceUpdateOneRequiredWithoutUnitsNestedInput
-  floor?: Prisma.FloorUpdateOneRequiredWithoutUnitsNestedInput
+export type UnitUpdateWithWhereUniqueWithoutProjectInput = {
+  where: Prisma.UnitWhereUniqueInput
+  data: Prisma.XOR<Prisma.UnitUpdateWithoutProjectInput, Prisma.UnitUncheckedUpdateWithoutProjectInput>
 }
 
-export type UnitUncheckedUpdateWithoutDealsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  number?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
-  status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
-  rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  pricePerSqm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  projectId?: Prisma.StringFieldUpdateOperationsInput | string
-  blockId?: Prisma.StringFieldUpdateOperationsInput | string
-  entranceId?: Prisma.StringFieldUpdateOperationsInput | string
-  floorId?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-}
-
-export type UnitCreateManyProjectInput = {
-  id?: string
-  number: string
-  type?: $Enums.UnitType
-  status?: $Enums.UnitStatus
-  rooms?: number | null
-  area: runtime.Decimal | runtime.DecimalJsLike | number | string
-  price: runtime.Decimal | runtime.DecimalJsLike | number | string
-  pricePerSqm?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  blockId: string
-  entranceId: string
-  floorId: string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  deletedAt?: Date | string | null
-}
-
-export type UnitUpdateWithoutProjectInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  number?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
-  status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
-  rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  pricePerSqm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  block?: Prisma.BlockUpdateOneRequiredWithoutUnitsNestedInput
-  entrance?: Prisma.EntranceUpdateOneRequiredWithoutUnitsNestedInput
-  floor?: Prisma.FloorUpdateOneRequiredWithoutUnitsNestedInput
-  deals?: Prisma.DealUpdateManyWithoutUnitNestedInput
-}
-
-export type UnitUncheckedUpdateWithoutProjectInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  number?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
-  status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
-  rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  pricePerSqm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  blockId?: Prisma.StringFieldUpdateOperationsInput | string
-  entranceId?: Prisma.StringFieldUpdateOperationsInput | string
-  floorId?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  deals?: Prisma.DealUncheckedUpdateManyWithoutUnitNestedInput
-}
-
-export type UnitUncheckedUpdateManyWithoutProjectInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  number?: Prisma.StringFieldUpdateOperationsInput | string
-  type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
-  status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
-  rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
-  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  pricePerSqm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  blockId?: Prisma.StringFieldUpdateOperationsInput | string
-  entranceId?: Prisma.StringFieldUpdateOperationsInput | string
-  floorId?: Prisma.StringFieldUpdateOperationsInput | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+export type UnitUpdateManyWithWhereWithoutProjectInput = {
+  where: Prisma.UnitScalarWhereInput
+  data: Prisma.XOR<Prisma.UnitUpdateManyMutationInput, Prisma.UnitUncheckedUpdateManyWithoutProjectInput>
 }
 
 export type UnitCreateManyBlockInput = {
@@ -1469,6 +1383,76 @@ export type UnitUncheckedUpdateManyWithoutFloorInput = {
   projectId?: Prisma.StringFieldUpdateOperationsInput | string
   blockId?: Prisma.StringFieldUpdateOperationsInput | string
   entranceId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type UnitCreateManyProjectInput = {
+  id?: string
+  number: string
+  type?: $Enums.UnitType
+  status?: $Enums.UnitStatus
+  rooms?: number | null
+  area: runtime.Decimal | runtime.DecimalJsLike | number | string
+  price: runtime.Decimal | runtime.DecimalJsLike | number | string
+  pricePerSqm?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  blockId: string
+  entranceId: string
+  floorId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+}
+
+export type UnitUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
+  status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
+  rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  pricePerSqm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  block?: Prisma.BlockUpdateOneRequiredWithoutUnitsNestedInput
+  entrance?: Prisma.EntranceUpdateOneRequiredWithoutUnitsNestedInput
+  floor?: Prisma.FloorUpdateOneRequiredWithoutUnitsNestedInput
+  deals?: Prisma.DealUpdateManyWithoutUnitNestedInput
+}
+
+export type UnitUncheckedUpdateWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
+  status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
+  rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  pricePerSqm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  blockId?: Prisma.StringFieldUpdateOperationsInput | string
+  entranceId?: Prisma.StringFieldUpdateOperationsInput | string
+  floorId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  deals?: Prisma.DealUncheckedUpdateManyWithoutUnitNestedInput
+}
+
+export type UnitUncheckedUpdateManyWithoutProjectInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  number?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumUnitTypeFieldUpdateOperationsInput | $Enums.UnitType
+  status?: Prisma.EnumUnitStatusFieldUpdateOperationsInput | $Enums.UnitStatus
+  rooms?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  area?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  price?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  pricePerSqm?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  blockId?: Prisma.StringFieldUpdateOperationsInput | string
+  entranceId?: Prisma.StringFieldUpdateOperationsInput | string
+  floorId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null

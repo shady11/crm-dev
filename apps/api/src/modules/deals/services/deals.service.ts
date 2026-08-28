@@ -12,7 +12,12 @@ import {
 } from '@/generated/prisma/client';
 import {PrismaService} from '@/database/prisma.service';
 
-import {ClientNotFoundException, DealNotFoundException, UnitNotFoundException,} from '../exceptions';
+import {
+  ClientNotFoundException,
+  DealNotFoundException,
+  SalePriceMismatchException,
+  UnitNotFoundException,
+} from '../exceptions';
 
 import {DealMapper} from '../mappers/deal.mapper';
 import {DealQueryDto} from '../dto/deal-query.dto';
@@ -149,6 +154,26 @@ export class DealsService {
 
       this.domain.ensureNoActiveDeal(activeDeal, unit);
 
+      const listPrice = new Prisma.Decimal(unit.price);
+      const discountPercent = new Prisma.Decimal(dto.discountPercent ?? 0);
+      const explicitDiscountAmount = dto.discountAmount != null
+          ? new Prisma.Decimal(dto.discountAmount)
+          : null;
+
+      const computedDiscountAmount = discountPercent.greaterThan(0)
+          ? listPrice.times(discountPercent).dividedBy(100).toDecimalPlaces(2)
+          : (explicitDiscountAmount ?? new Prisma.Decimal(0));
+
+      const computedSalePrice = listPrice.minus(computedDiscountAmount);
+      const submittedSalePrice = new Prisma.Decimal(dto.salePrice);
+
+      if (submittedSalePrice.minus(computedSalePrice).abs().greaterThan(0.01)) {
+        throw new SalePriceMismatchException(
+            computedSalePrice.toNumber(),
+            submittedSalePrice.toNumber(),
+        );
+      }
+
       const year = new Date().getFullYear();
       const prefix = `D-${year}-`;
 
@@ -176,10 +201,10 @@ export class DealsService {
           financingType: dto.financingType,
 
           listPrice: unit.price,
-          salePrice: dto.salePrice,
+          salePrice: computedSalePrice,
 
-          discountAmount: dto.discountAmount ?? 0,
-          discountPercent: dto.discountPercent ?? 0,
+          discountAmount: computedDiscountAmount,
+          discountPercent: discountPercent,
 
           deposit: dto.deposit ?? 0,
 

@@ -51,22 +51,22 @@ export const AnyNull = runtime.AnyNull
 
 
 export const ModelName = {
-  Company: 'Company',
-  User: 'User',
-  Lead: 'Lead',
-  Client: 'Client',
-  Project: 'Project',
+  Activity: 'Activity',
   Block: 'Block',
+  Client: 'Client',
+  Company: 'Company',
+  Deal: 'Deal',
+  Document: 'Document',
   Entrance: 'Entrance',
   Floor: 'Floor',
-  Unit: 'Unit',
-  Deal: 'Deal',
+  Lead: 'Lead',
+  Notification: 'Notification',
   Payment: 'Payment',
   PaymentSchedule: 'PaymentSchedule',
-  Activity: 'Activity',
+  Project: 'Project',
   Task: 'Task',
-  Document: 'Document',
-  Notification: 'Notification'
+  Unit: 'Unit',
+  User: 'User'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -85,60 +85,38 @@ export const TransactionIsolationLevel = runtime.makeStrictEnum({
 export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
 
 
-export const CompanyScalarFieldEnum = {
+export const ActivityScalarFieldEnum = {
+  id: 'id',
+  action: 'action',
+  type: 'type',
+  title: 'title',
+  description: 'description',
+  metadata: 'metadata',
+  companyId: 'companyId',
+  userId: 'userId',
+  leadId: 'leadId',
+  clientId: 'clientId',
+  dealId: 'dealId',
+  createdAt: 'createdAt'
+} as const
+
+export type ActivityScalarFieldEnum = (typeof ActivityScalarFieldEnum)[keyof typeof ActivityScalarFieldEnum]
+
+
+export const BlockScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  phone: 'phone',
-  address: 'address',
-  currency: 'currency',
-  timezone: 'timezone',
-  locale: 'locale',
+  order: 'order',
+  projectId: 'projectId',
+  entrancesCount: 'entrancesCount',
+  floorsCount: 'floorsCount',
+  unitsCount: 'unitsCount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'
 } as const
 
-export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
-
-
-export const UserScalarFieldEnum = {
-  id: 'id',
-  fullName: 'fullName',
-  email: 'email',
-  phone: 'phone',
-  passwordHash: 'passwordHash',
-  role: 'role',
-  isActive: 'isActive',
-  companyId: 'companyId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
-} as const
-
-export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
-
-
-export const LeadScalarFieldEnum = {
-  id: 'id',
-  source: 'source',
-  status: 'status',
-  fullName: 'fullName',
-  phone: 'phone',
-  email: 'email',
-  comment: 'comment',
-  nextContactAt: 'nextContactAt',
-  lastContactAt: 'lastContactAt',
-  assignedAt: 'assignedAt',
-  companyId: 'companyId',
-  createdById: 'createdById',
-  managerId: 'managerId',
-  clientId: 'clientId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
-} as const
-
-export type LeadScalarFieldEnum = (typeof LeadScalarFieldEnum)[keyof typeof LeadScalarFieldEnum]
+export type BlockScalarFieldEnum = (typeof BlockScalarFieldEnum)[keyof typeof BlockScalarFieldEnum]
 
 
 export const ClientScalarFieldEnum = {
@@ -161,84 +139,20 @@ export const ClientScalarFieldEnum = {
 export type ClientScalarFieldEnum = (typeof ClientScalarFieldEnum)[keyof typeof ClientScalarFieldEnum]
 
 
-export const ProjectScalarFieldEnum = {
+export const CompanyScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  phone: 'phone',
   address: 'address',
-  status: 'status',
-  companyId: 'companyId',
+  currency: 'currency',
+  timezone: 'timezone',
+  locale: 'locale',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'
 } as const
 
-export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
-
-
-export const BlockScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  order: 'order',
-  projectId: 'projectId',
-  entrancesCount: 'entrancesCount',
-  floorsCount: 'floorsCount',
-  unitsCount: 'unitsCount',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
-} as const
-
-export type BlockScalarFieldEnum = (typeof BlockScalarFieldEnum)[keyof typeof BlockScalarFieldEnum]
-
-
-export const EntranceScalarFieldEnum = {
-  id: 'id',
-  name: 'name',
-  order: 'order',
-  projectId: 'projectId',
-  blockId: 'blockId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
-} as const
-
-export type EntranceScalarFieldEnum = (typeof EntranceScalarFieldEnum)[keyof typeof EntranceScalarFieldEnum]
-
-
-export const FloorScalarFieldEnum = {
-  id: 'id',
-  number: 'number',
-  order: 'order',
-  projectId: 'projectId',
-  blockId: 'blockId',
-  entranceId: 'entranceId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
-} as const
-
-export type FloorScalarFieldEnum = (typeof FloorScalarFieldEnum)[keyof typeof FloorScalarFieldEnum]
-
-
-export const UnitScalarFieldEnum = {
-  id: 'id',
-  number: 'number',
-  type: 'type',
-  status: 'status',
-  rooms: 'rooms',
-  area: 'area',
-  price: 'price',
-  pricePerSqm: 'pricePerSqm',
-  projectId: 'projectId',
-  blockId: 'blockId',
-  entranceId: 'entranceId',
-  floorId: 'floorId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
-} as const
-
-export type UnitScalarFieldEnum = (typeof UnitScalarFieldEnum)[keyof typeof UnitScalarFieldEnum]
+export type CompanyScalarFieldEnum = (typeof CompanyScalarFieldEnum)[keyof typeof CompanyScalarFieldEnum]
 
 
 export const DealScalarFieldEnum = {
@@ -270,6 +184,98 @@ export const DealScalarFieldEnum = {
 } as const
 
 export type DealScalarFieldEnum = (typeof DealScalarFieldEnum)[keyof typeof DealScalarFieldEnum]
+
+
+export const DocumentScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  originalName: 'originalName',
+  mimeType: 'mimeType',
+  extension: 'extension',
+  size: 'size',
+  path: 'path',
+  url: 'url',
+  type: 'type',
+  ownerType: 'ownerType',
+  ownerId: 'ownerId',
+  companyId: 'companyId',
+  uploadedById: 'uploadedById',
+  metadata: 'metadata',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type DocumentScalarFieldEnum = (typeof DocumentScalarFieldEnum)[keyof typeof DocumentScalarFieldEnum]
+
+
+export const EntranceScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  order: 'order',
+  projectId: 'projectId',
+  blockId: 'blockId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type EntranceScalarFieldEnum = (typeof EntranceScalarFieldEnum)[keyof typeof EntranceScalarFieldEnum]
+
+
+export const FloorScalarFieldEnum = {
+  id: 'id',
+  number: 'number',
+  order: 'order',
+  projectId: 'projectId',
+  blockId: 'blockId',
+  entranceId: 'entranceId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type FloorScalarFieldEnum = (typeof FloorScalarFieldEnum)[keyof typeof FloorScalarFieldEnum]
+
+
+export const LeadScalarFieldEnum = {
+  id: 'id',
+  source: 'source',
+  status: 'status',
+  fullName: 'fullName',
+  phone: 'phone',
+  email: 'email',
+  comment: 'comment',
+  nextContactAt: 'nextContactAt',
+  lastContactAt: 'lastContactAt',
+  assignedAt: 'assignedAt',
+  companyId: 'companyId',
+  createdById: 'createdById',
+  managerId: 'managerId',
+  clientId: 'clientId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type LeadScalarFieldEnum = (typeof LeadScalarFieldEnum)[keyof typeof LeadScalarFieldEnum]
+
+
+export const NotificationScalarFieldEnum = {
+  id: 'id',
+  companyId: 'companyId',
+  userId: 'userId',
+  type: 'type',
+  title: 'title',
+  message: 'message',
+  entityType: 'entityType',
+  entityId: 'entityId',
+  isRead: 'isRead',
+  readAt: 'readAt',
+  createdAt: 'createdAt'
+} as const
+
+export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
 export const PaymentScalarFieldEnum = {
@@ -305,22 +311,18 @@ export const PaymentScheduleScalarFieldEnum = {
 export type PaymentScheduleScalarFieldEnum = (typeof PaymentScheduleScalarFieldEnum)[keyof typeof PaymentScheduleScalarFieldEnum]
 
 
-export const ActivityScalarFieldEnum = {
+export const ProjectScalarFieldEnum = {
   id: 'id',
-  action: 'action',
-  type: 'type',
-  title: 'title',
-  description: 'description',
-  metadata: 'metadata',
+  name: 'name',
+  address: 'address',
+  status: 'status',
   companyId: 'companyId',
-  userId: 'userId',
-  leadId: 'leadId',
-  clientId: 'clientId',
-  dealId: 'dealId',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
-export type ActivityScalarFieldEnum = (typeof ActivityScalarFieldEnum)[keyof typeof ActivityScalarFieldEnum]
+export type ProjectScalarFieldEnum = (typeof ProjectScalarFieldEnum)[keyof typeof ProjectScalarFieldEnum]
 
 
 export const TaskScalarFieldEnum = {
@@ -342,44 +344,43 @@ export const TaskScalarFieldEnum = {
 export type TaskScalarFieldEnum = (typeof TaskScalarFieldEnum)[keyof typeof TaskScalarFieldEnum]
 
 
-export const DocumentScalarFieldEnum = {
+export const UnitScalarFieldEnum = {
   id: 'id',
-  name: 'name',
-  originalName: 'originalName',
-  mimeType: 'mimeType',
-  extension: 'extension',
-  size: 'size',
-  path: 'path',
-  url: 'url',
+  number: 'number',
   type: 'type',
-  ownerType: 'ownerType',
-  ownerId: 'ownerId',
-  companyId: 'companyId',
-  uploadedById: 'uploadedById',
-  metadata: 'metadata',
+  status: 'status',
+  rooms: 'rooms',
+  area: 'area',
+  price: 'price',
+  pricePerSqm: 'pricePerSqm',
+  projectId: 'projectId',
+  blockId: 'blockId',
+  entranceId: 'entranceId',
+  floorId: 'floorId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'
 } as const
 
-export type DocumentScalarFieldEnum = (typeof DocumentScalarFieldEnum)[keyof typeof DocumentScalarFieldEnum]
+export type UnitScalarFieldEnum = (typeof UnitScalarFieldEnum)[keyof typeof UnitScalarFieldEnum]
 
 
-export const NotificationScalarFieldEnum = {
+export const UserScalarFieldEnum = {
   id: 'id',
+  fullName: 'fullName',
+  email: 'email',
+  phone: 'phone',
+  passwordHash: 'passwordHash',
+  role: 'role',
+  isActive: 'isActive',
+  sessionsValidFrom: 'sessionsValidFrom',
   companyId: 'companyId',
-  userId: 'userId',
-  type: 'type',
-  title: 'title',
-  message: 'message',
-  entityType: 'entityType',
-  entityId: 'entityId',
-  isRead: 'isRead',
-  readAt: 'readAt',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
-export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -406,14 +407,6 @@ export const QueryMode = {
 export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
-export const NullsOrder = {
-  first: 'first',
-  last: 'last'
-} as const
-
-export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
 export const JsonNullValueFilter = {
   DbNull: DbNull,
   JsonNull: JsonNull,
@@ -421,4 +414,12 @@ export const JsonNullValueFilter = {
 } as const
 
 export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+export const NullsOrder = {
+  first: 'first',
+  last: 'last'
+} as const
+
+export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 

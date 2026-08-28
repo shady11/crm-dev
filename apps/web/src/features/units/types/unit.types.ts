@@ -39,11 +39,11 @@ export const UNIT_STATUS_VALUES = [
     UnitStatus.UNAVAILABLE,
 ] as const;
 
-export const UNIT_STATUS_LABELS: Record<UnitStatus, string> = {
-    [UnitStatus.AVAILABLE]: "Available",
-    [UnitStatus.RESERVED]: "Reserved",
-    [UnitStatus.SOLD]: "Sold",
-    [UnitStatus.UNAVAILABLE]: "Unavailable",
+export const UNIT_STATUS_LABEL_KEYS: Record<UnitStatus, string> = {
+    [UnitStatus.AVAILABLE]: "units:status.available",
+    [UnitStatus.RESERVED]: "units:status.reserved",
+    [UnitStatus.SOLD]: "units:status.sold",
+    [UnitStatus.UNAVAILABLE]: "units:status.unavailable",
 };
 
 export const UNIT_STATUS_CLASSES: Record<UnitStatus, string> = {

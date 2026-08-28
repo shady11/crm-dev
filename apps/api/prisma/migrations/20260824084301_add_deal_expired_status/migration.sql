@@ -1,0 +1,5 @@
+-- AlterEnum
+ALTER TYPE "ActivityType" ADD VALUE 'RESERVATION_EXPIRED';
+
+-- AlterEnum
+ALTER TYPE "DealStatus" ADD VALUE 'EXPIRED';

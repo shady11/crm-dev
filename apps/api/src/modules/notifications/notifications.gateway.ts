@@ -3,6 +3,7 @@ import {OnGatewayConnection, OnGatewayDisconnect, WebSocketGateway, WebSocketSer
 import {Server, Socket} from "socket.io";
 import {JwtService} from "@nestjs/jwt";
 import {AuthUser} from "@/common/types/auth-user.type";
+import {JwtPayload, SessionValidationService} from "@/modules/auth/session-validation.service";
 
 @WebSocketGateway({
     namespace: "notifications",
@@ -18,17 +19,21 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
 
     private readonly logger = new Logger(NotificationsGateway.name);
 
-    constructor(private readonly jwtService: JwtService) {}
+    constructor(
+        private readonly jwtService: JwtService,
+        private readonly sessionValidation: SessionValidationService,
+    ) {}
 
     async handleConnection(client: Socket) {
         try {
             const token = this.extractToken(client);
-            const payload = this.jwtService.verify<AuthUser>(token);
+            const decoded = this.jwtService.verify<JwtPayload>(token);
+            const user = await this.sessionValidation.validate(decoded);
 
-            client.data.user = payload;
-            await client.join(`user:${payload.id}`);
+            client.data.user = user;
+            await client.join(`user:${user.id}`);
 
-            this.logger.log(`Client connected: user ${payload.id}`);
+            this.logger.log(`Client connected: user ${user.id}`);
         } catch {
             this.logger.warn("Rejected unauthenticated socket connection");
             client.disconnect();

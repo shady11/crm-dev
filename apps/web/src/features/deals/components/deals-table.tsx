@@ -5,9 +5,10 @@ import {Badge} from "@/components/ui/badge.tsx";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
-import {DEAL_STATUS_LABELS, DEAL_STATUS_VISUALS} from "@/features/deals/types/deal.types";
+import {DEAL_STATUS_LABEL_KEYS, DEAL_STATUS_VISUALS} from "@/features/deals/types/deal.types";
 import type {Deal} from "@/features/deals/api/deals.api";
 import {formatCreatedAt, initials} from "@/features/deals/utils/format.ts";
+import {useTranslation} from "react-i18next";
 
 interface DealsTableProps {
     deals: Deal[];
@@ -15,6 +16,8 @@ interface DealsTableProps {
 }
 
 export function DealsTable({ deals, isLoading }: DealsTableProps) {
+    const { t } = useTranslation("deals");
+
     const navigate = useNavigate();
 
     if (isLoading) {
@@ -78,7 +81,9 @@ export function DealsTable({ deals, isLoading }: DealsTableProps) {
                                 </TableCell>
                                 <TableCell>{deal.manager?.fullName ?? "—"}</TableCell>
                                 <TableCell>
-                                    <Badge className={`${visual?.bg} text-white`}>{DEAL_STATUS_LABELS[deal.status]}</Badge>
+                                    <Badge className={`${visual?.bg} text-white`}>
+                                        {t(DEAL_STATUS_LABEL_KEYS[deal.status])}
+                                    </Badge>
                                 </TableCell>
                                 <TableCell>{deal.salePrice.toLocaleString("ru-RU")} $</TableCell>
                                 <TableCell className="pr-4">

@@ -2,10 +2,13 @@ import {Search} from "lucide-react";
 import {createListCollection} from "@ark-ui/react";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
-import {DEAL_STATUS_LABELS, DealStatus} from "@/features/deals/types/deal.types";
+import {DEAL_STATUS_LABEL_KEYS, DealStatus} from "@/features/deals/types/deal.types";
 import type {DealStatusFilter} from "@/features/deals/hooks/use-deals-list.ts";
 import {useProjectsFilter} from "@/features/projects/hooks/use-projects-filter.ts";
 import {useManagers} from "@/features/users/hooks/use-managers.ts";
+import {useTranslation} from "react-i18next";
+
+const { t } = useTranslation("deals");
 
 interface DealsToolbarProps {
     statusFilter: DealStatusFilter;
@@ -21,7 +24,11 @@ interface DealsToolbarProps {
 const statusCollection = createListCollection({
     items: [
         { label: "All statuses", value: "all" },
-        ...Object.values(DealStatus).map((status) => ({ label: DEAL_STATUS_LABELS[status], value: status })),
+        ...Object.values(DealStatus).map(
+            (status) => ({
+                label: t(DEAL_STATUS_LABEL_KEYS[status]), value: status
+            })
+        ),
     ],
 });
 

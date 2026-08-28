@@ -24,6 +24,7 @@ export class UnitsService {
             project: {
                 companyId: user.companyId,
             },
+            deletedAt: null,
         };
 
         if (query.projectId) {
@@ -179,6 +180,7 @@ export class UnitsService {
                     },
                 },
             },
+            deletedAt: null,
         };
 
         if (query.type) {
@@ -266,6 +268,7 @@ export class UnitsService {
                 project: {
                     companyId: user.companyId,
                 },
+                deletedAt: null,
             },
             include: {
                 project: {
@@ -501,6 +504,7 @@ export class UnitsService {
                 project: {
                     companyId: user.companyId,
                 },
+                deletedAt: null,
             },
         });
 

@@ -663,6 +663,14 @@ export type DocumentUncheckedUpdateManyWithoutCompanyNestedInput = {
   deleteMany?: Prisma.DocumentScalarWhereInput | Prisma.DocumentScalarWhereInput[]
 }
 
+export type EnumDocumentTypeFieldUpdateOperationsInput = {
+  set?: $Enums.DocumentType
+}
+
+export type EnumDocumentOwnerTypeFieldUpdateOperationsInput = {
+  set?: $Enums.DocumentOwnerType
+}
+
 export type DocumentCreateNestedManyWithoutUploadedByInput = {
   create?: Prisma.XOR<Prisma.DocumentCreateWithoutUploadedByInput, Prisma.DocumentUncheckedCreateWithoutUploadedByInput> | Prisma.DocumentCreateWithoutUploadedByInput[] | Prisma.DocumentUncheckedCreateWithoutUploadedByInput[]
   connectOrCreate?: Prisma.DocumentCreateOrConnectWithoutUploadedByInput | Prisma.DocumentCreateOrConnectWithoutUploadedByInput[]
@@ -703,14 +711,6 @@ export type DocumentUncheckedUpdateManyWithoutUploadedByNestedInput = {
   update?: Prisma.DocumentUpdateWithWhereUniqueWithoutUploadedByInput | Prisma.DocumentUpdateWithWhereUniqueWithoutUploadedByInput[]
   updateMany?: Prisma.DocumentUpdateManyWithWhereWithoutUploadedByInput | Prisma.DocumentUpdateManyWithWhereWithoutUploadedByInput[]
   deleteMany?: Prisma.DocumentScalarWhereInput | Prisma.DocumentScalarWhereInput[]
-}
-
-export type EnumDocumentTypeFieldUpdateOperationsInput = {
-  set?: $Enums.DocumentType
-}
-
-export type EnumDocumentOwnerTypeFieldUpdateOperationsInput = {
-  set?: $Enums.DocumentOwnerType
 }
 
 export type DocumentCreateWithoutCompanyInput = {

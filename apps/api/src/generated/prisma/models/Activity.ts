@@ -420,16 +420,6 @@ export type ActivityUncheckedUpdateManyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type ActivityListRelationFilter = {
-  every?: Prisma.ActivityWhereInput
-  some?: Prisma.ActivityWhereInput
-  none?: Prisma.ActivityWhereInput
-}
-
-export type ActivityOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
-}
-
 export type ActivityCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   action?: Prisma.SortOrder
@@ -473,130 +463,34 @@ export type ActivityMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
 }
 
-export type ActivityCreateNestedManyWithoutCompanyInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutCompanyInput, Prisma.ActivityUncheckedCreateWithoutCompanyInput> | Prisma.ActivityCreateWithoutCompanyInput[] | Prisma.ActivityUncheckedCreateWithoutCompanyInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutCompanyInput | Prisma.ActivityCreateOrConnectWithoutCompanyInput[]
-  createMany?: Prisma.ActivityCreateManyCompanyInputEnvelope
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+export type ActivityListRelationFilter = {
+  every?: Prisma.ActivityWhereInput
+  some?: Prisma.ActivityWhereInput
+  none?: Prisma.ActivityWhereInput
 }
 
-export type ActivityUncheckedCreateNestedManyWithoutCompanyInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutCompanyInput, Prisma.ActivityUncheckedCreateWithoutCompanyInput> | Prisma.ActivityCreateWithoutCompanyInput[] | Prisma.ActivityUncheckedCreateWithoutCompanyInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutCompanyInput | Prisma.ActivityCreateOrConnectWithoutCompanyInput[]
-  createMany?: Prisma.ActivityCreateManyCompanyInputEnvelope
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+export type ActivityOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
-export type ActivityUpdateManyWithoutCompanyNestedInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutCompanyInput, Prisma.ActivityUncheckedCreateWithoutCompanyInput> | Prisma.ActivityCreateWithoutCompanyInput[] | Prisma.ActivityUncheckedCreateWithoutCompanyInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutCompanyInput | Prisma.ActivityCreateOrConnectWithoutCompanyInput[]
-  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutCompanyInput | Prisma.ActivityUpsertWithWhereUniqueWithoutCompanyInput[]
-  createMany?: Prisma.ActivityCreateManyCompanyInputEnvelope
-  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutCompanyInput | Prisma.ActivityUpdateWithWhereUniqueWithoutCompanyInput[]
-  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutCompanyInput | Prisma.ActivityUpdateManyWithWhereWithoutCompanyInput[]
-  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
+export type StringFieldUpdateOperationsInput = {
+  set?: string
 }
 
-export type ActivityUncheckedUpdateManyWithoutCompanyNestedInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutCompanyInput, Prisma.ActivityUncheckedCreateWithoutCompanyInput> | Prisma.ActivityCreateWithoutCompanyInput[] | Prisma.ActivityUncheckedCreateWithoutCompanyInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutCompanyInput | Prisma.ActivityCreateOrConnectWithoutCompanyInput[]
-  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutCompanyInput | Prisma.ActivityUpsertWithWhereUniqueWithoutCompanyInput[]
-  createMany?: Prisma.ActivityCreateManyCompanyInputEnvelope
-  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutCompanyInput | Prisma.ActivityUpdateWithWhereUniqueWithoutCompanyInput[]
-  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutCompanyInput | Prisma.ActivityUpdateManyWithWhereWithoutCompanyInput[]
-  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
+export type EnumActivityActionFieldUpdateOperationsInput = {
+  set?: $Enums.ActivityAction
 }
 
-export type ActivityCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutUserInput, Prisma.ActivityUncheckedCreateWithoutUserInput> | Prisma.ActivityCreateWithoutUserInput[] | Prisma.ActivityUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutUserInput | Prisma.ActivityCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.ActivityCreateManyUserInputEnvelope
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+export type EnumActivityTypeFieldUpdateOperationsInput = {
+  set?: $Enums.ActivityType
 }
 
-export type ActivityUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutUserInput, Prisma.ActivityUncheckedCreateWithoutUserInput> | Prisma.ActivityCreateWithoutUserInput[] | Prisma.ActivityUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutUserInput | Prisma.ActivityCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.ActivityCreateManyUserInputEnvelope
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
 }
 
-export type ActivityUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutUserInput, Prisma.ActivityUncheckedCreateWithoutUserInput> | Prisma.ActivityCreateWithoutUserInput[] | Prisma.ActivityUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutUserInput | Prisma.ActivityCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutUserInput | Prisma.ActivityUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.ActivityCreateManyUserInputEnvelope
-  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutUserInput | Prisma.ActivityUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutUserInput | Prisma.ActivityUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
-}
-
-export type ActivityUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutUserInput, Prisma.ActivityUncheckedCreateWithoutUserInput> | Prisma.ActivityCreateWithoutUserInput[] | Prisma.ActivityUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutUserInput | Prisma.ActivityCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutUserInput | Prisma.ActivityUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.ActivityCreateManyUserInputEnvelope
-  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutUserInput | Prisma.ActivityUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutUserInput | Prisma.ActivityUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
-}
-
-export type ActivityCreateNestedManyWithoutLeadInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutLeadInput, Prisma.ActivityUncheckedCreateWithoutLeadInput> | Prisma.ActivityCreateWithoutLeadInput[] | Prisma.ActivityUncheckedCreateWithoutLeadInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutLeadInput | Prisma.ActivityCreateOrConnectWithoutLeadInput[]
-  createMany?: Prisma.ActivityCreateManyLeadInputEnvelope
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-}
-
-export type ActivityUncheckedCreateNestedManyWithoutLeadInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutLeadInput, Prisma.ActivityUncheckedCreateWithoutLeadInput> | Prisma.ActivityCreateWithoutLeadInput[] | Prisma.ActivityUncheckedCreateWithoutLeadInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutLeadInput | Prisma.ActivityCreateOrConnectWithoutLeadInput[]
-  createMany?: Prisma.ActivityCreateManyLeadInputEnvelope
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-}
-
-export type ActivityUpdateManyWithoutLeadNestedInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutLeadInput, Prisma.ActivityUncheckedCreateWithoutLeadInput> | Prisma.ActivityCreateWithoutLeadInput[] | Prisma.ActivityUncheckedCreateWithoutLeadInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutLeadInput | Prisma.ActivityCreateOrConnectWithoutLeadInput[]
-  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutLeadInput | Prisma.ActivityUpsertWithWhereUniqueWithoutLeadInput[]
-  createMany?: Prisma.ActivityCreateManyLeadInputEnvelope
-  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutLeadInput | Prisma.ActivityUpdateWithWhereUniqueWithoutLeadInput[]
-  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutLeadInput | Prisma.ActivityUpdateManyWithWhereWithoutLeadInput[]
-  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
-}
-
-export type ActivityUncheckedUpdateManyWithoutLeadNestedInput = {
-  create?: Prisma.XOR<Prisma.ActivityCreateWithoutLeadInput, Prisma.ActivityUncheckedCreateWithoutLeadInput> | Prisma.ActivityCreateWithoutLeadInput[] | Prisma.ActivityUncheckedCreateWithoutLeadInput[]
-  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutLeadInput | Prisma.ActivityCreateOrConnectWithoutLeadInput[]
-  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutLeadInput | Prisma.ActivityUpsertWithWhereUniqueWithoutLeadInput[]
-  createMany?: Prisma.ActivityCreateManyLeadInputEnvelope
-  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
-  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutLeadInput | Prisma.ActivityUpdateWithWhereUniqueWithoutLeadInput[]
-  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutLeadInput | Prisma.ActivityUpdateManyWithWhereWithoutLeadInput[]
-  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
+export type DateTimeFieldUpdateOperationsInput = {
+  set?: Date | string
 }
 
 export type ActivityCreateNestedManyWithoutClientInput = {
@@ -638,6 +532,48 @@ export type ActivityUncheckedUpdateManyWithoutClientNestedInput = {
   connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
   update?: Prisma.ActivityUpdateWithWhereUniqueWithoutClientInput | Prisma.ActivityUpdateWithWhereUniqueWithoutClientInput[]
   updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutClientInput | Prisma.ActivityUpdateManyWithWhereWithoutClientInput[]
+  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
+}
+
+export type ActivityCreateNestedManyWithoutCompanyInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutCompanyInput, Prisma.ActivityUncheckedCreateWithoutCompanyInput> | Prisma.ActivityCreateWithoutCompanyInput[] | Prisma.ActivityUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutCompanyInput | Prisma.ActivityCreateOrConnectWithoutCompanyInput[]
+  createMany?: Prisma.ActivityCreateManyCompanyInputEnvelope
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+}
+
+export type ActivityUncheckedCreateNestedManyWithoutCompanyInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutCompanyInput, Prisma.ActivityUncheckedCreateWithoutCompanyInput> | Prisma.ActivityCreateWithoutCompanyInput[] | Prisma.ActivityUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutCompanyInput | Prisma.ActivityCreateOrConnectWithoutCompanyInput[]
+  createMany?: Prisma.ActivityCreateManyCompanyInputEnvelope
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+}
+
+export type ActivityUpdateManyWithoutCompanyNestedInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutCompanyInput, Prisma.ActivityUncheckedCreateWithoutCompanyInput> | Prisma.ActivityCreateWithoutCompanyInput[] | Prisma.ActivityUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutCompanyInput | Prisma.ActivityCreateOrConnectWithoutCompanyInput[]
+  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutCompanyInput | Prisma.ActivityUpsertWithWhereUniqueWithoutCompanyInput[]
+  createMany?: Prisma.ActivityCreateManyCompanyInputEnvelope
+  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutCompanyInput | Prisma.ActivityUpdateWithWhereUniqueWithoutCompanyInput[]
+  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutCompanyInput | Prisma.ActivityUpdateManyWithWhereWithoutCompanyInput[]
+  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
+}
+
+export type ActivityUncheckedUpdateManyWithoutCompanyNestedInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutCompanyInput, Prisma.ActivityUncheckedCreateWithoutCompanyInput> | Prisma.ActivityCreateWithoutCompanyInput[] | Prisma.ActivityUncheckedCreateWithoutCompanyInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutCompanyInput | Prisma.ActivityCreateOrConnectWithoutCompanyInput[]
+  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutCompanyInput | Prisma.ActivityUpsertWithWhereUniqueWithoutCompanyInput[]
+  createMany?: Prisma.ActivityCreateManyCompanyInputEnvelope
+  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutCompanyInput | Prisma.ActivityUpdateWithWhereUniqueWithoutCompanyInput[]
+  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutCompanyInput | Prisma.ActivityUpdateManyWithWhereWithoutCompanyInput[]
   deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
 }
 
@@ -683,192 +619,88 @@ export type ActivityUncheckedUpdateManyWithoutDealNestedInput = {
   deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
 }
 
-export type EnumActivityActionFieldUpdateOperationsInput = {
-  set?: $Enums.ActivityAction
+export type ActivityCreateNestedManyWithoutLeadInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutLeadInput, Prisma.ActivityUncheckedCreateWithoutLeadInput> | Prisma.ActivityCreateWithoutLeadInput[] | Prisma.ActivityUncheckedCreateWithoutLeadInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutLeadInput | Prisma.ActivityCreateOrConnectWithoutLeadInput[]
+  createMany?: Prisma.ActivityCreateManyLeadInputEnvelope
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
 }
 
-export type EnumActivityTypeFieldUpdateOperationsInput = {
-  set?: $Enums.ActivityType
+export type ActivityUncheckedCreateNestedManyWithoutLeadInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutLeadInput, Prisma.ActivityUncheckedCreateWithoutLeadInput> | Prisma.ActivityCreateWithoutLeadInput[] | Prisma.ActivityUncheckedCreateWithoutLeadInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutLeadInput | Prisma.ActivityCreateOrConnectWithoutLeadInput[]
+  createMany?: Prisma.ActivityCreateManyLeadInputEnvelope
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
 }
 
-export type ActivityCreateWithoutCompanyInput = {
-  id?: string
-  action: $Enums.ActivityAction
-  type: $Enums.ActivityType
-  title: string
-  description?: string | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutActivitiesInput
-  lead?: Prisma.LeadCreateNestedOneWithoutActivitiesInput
-  client?: Prisma.ClientCreateNestedOneWithoutActivitiesInput
-  deal?: Prisma.DealCreateNestedOneWithoutActivitiesInput
+export type ActivityUpdateManyWithoutLeadNestedInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutLeadInput, Prisma.ActivityUncheckedCreateWithoutLeadInput> | Prisma.ActivityCreateWithoutLeadInput[] | Prisma.ActivityUncheckedCreateWithoutLeadInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutLeadInput | Prisma.ActivityCreateOrConnectWithoutLeadInput[]
+  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutLeadInput | Prisma.ActivityUpsertWithWhereUniqueWithoutLeadInput[]
+  createMany?: Prisma.ActivityCreateManyLeadInputEnvelope
+  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutLeadInput | Prisma.ActivityUpdateWithWhereUniqueWithoutLeadInput[]
+  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutLeadInput | Prisma.ActivityUpdateManyWithWhereWithoutLeadInput[]
+  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
 }
 
-export type ActivityUncheckedCreateWithoutCompanyInput = {
-  id?: string
-  action: $Enums.ActivityAction
-  type: $Enums.ActivityType
-  title: string
-  description?: string | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  userId: string
-  leadId?: string | null
-  clientId?: string | null
-  dealId?: string | null
-  createdAt?: Date | string
+export type ActivityUncheckedUpdateManyWithoutLeadNestedInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutLeadInput, Prisma.ActivityUncheckedCreateWithoutLeadInput> | Prisma.ActivityCreateWithoutLeadInput[] | Prisma.ActivityUncheckedCreateWithoutLeadInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutLeadInput | Prisma.ActivityCreateOrConnectWithoutLeadInput[]
+  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutLeadInput | Prisma.ActivityUpsertWithWhereUniqueWithoutLeadInput[]
+  createMany?: Prisma.ActivityCreateManyLeadInputEnvelope
+  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutLeadInput | Prisma.ActivityUpdateWithWhereUniqueWithoutLeadInput[]
+  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutLeadInput | Prisma.ActivityUpdateManyWithWhereWithoutLeadInput[]
+  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
 }
 
-export type ActivityCreateOrConnectWithoutCompanyInput = {
-  where: Prisma.ActivityWhereUniqueInput
-  create: Prisma.XOR<Prisma.ActivityCreateWithoutCompanyInput, Prisma.ActivityUncheckedCreateWithoutCompanyInput>
+export type ActivityCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutUserInput, Prisma.ActivityUncheckedCreateWithoutUserInput> | Prisma.ActivityCreateWithoutUserInput[] | Prisma.ActivityUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutUserInput | Prisma.ActivityCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.ActivityCreateManyUserInputEnvelope
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
 }
 
-export type ActivityCreateManyCompanyInputEnvelope = {
-  data: Prisma.ActivityCreateManyCompanyInput | Prisma.ActivityCreateManyCompanyInput[]
-  skipDuplicates?: boolean
+export type ActivityUncheckedCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutUserInput, Prisma.ActivityUncheckedCreateWithoutUserInput> | Prisma.ActivityCreateWithoutUserInput[] | Prisma.ActivityUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutUserInput | Prisma.ActivityCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.ActivityCreateManyUserInputEnvelope
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
 }
 
-export type ActivityUpsertWithWhereUniqueWithoutCompanyInput = {
-  where: Prisma.ActivityWhereUniqueInput
-  update: Prisma.XOR<Prisma.ActivityUpdateWithoutCompanyInput, Prisma.ActivityUncheckedUpdateWithoutCompanyInput>
-  create: Prisma.XOR<Prisma.ActivityCreateWithoutCompanyInput, Prisma.ActivityUncheckedCreateWithoutCompanyInput>
+export type ActivityUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutUserInput, Prisma.ActivityUncheckedCreateWithoutUserInput> | Prisma.ActivityCreateWithoutUserInput[] | Prisma.ActivityUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutUserInput | Prisma.ActivityCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutUserInput | Prisma.ActivityUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.ActivityCreateManyUserInputEnvelope
+  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutUserInput | Prisma.ActivityUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutUserInput | Prisma.ActivityUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
 }
 
-export type ActivityUpdateWithWhereUniqueWithoutCompanyInput = {
-  where: Prisma.ActivityWhereUniqueInput
-  data: Prisma.XOR<Prisma.ActivityUpdateWithoutCompanyInput, Prisma.ActivityUncheckedUpdateWithoutCompanyInput>
-}
-
-export type ActivityUpdateManyWithWhereWithoutCompanyInput = {
-  where: Prisma.ActivityScalarWhereInput
-  data: Prisma.XOR<Prisma.ActivityUpdateManyMutationInput, Prisma.ActivityUncheckedUpdateManyWithoutCompanyInput>
-}
-
-export type ActivityScalarWhereInput = {
-  AND?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
-  OR?: Prisma.ActivityScalarWhereInput[]
-  NOT?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
-  id?: Prisma.StringFilter<"Activity"> | string
-  action?: Prisma.EnumActivityActionFilter<"Activity"> | $Enums.ActivityAction
-  type?: Prisma.EnumActivityTypeFilter<"Activity"> | $Enums.ActivityType
-  title?: Prisma.StringFilter<"Activity"> | string
-  description?: Prisma.StringNullableFilter<"Activity"> | string | null
-  metadata?: Prisma.JsonNullableFilter<"Activity">
-  companyId?: Prisma.StringFilter<"Activity"> | string
-  userId?: Prisma.StringFilter<"Activity"> | string
-  leadId?: Prisma.StringNullableFilter<"Activity"> | string | null
-  clientId?: Prisma.StringNullableFilter<"Activity"> | string | null
-  dealId?: Prisma.StringNullableFilter<"Activity"> | string | null
-  createdAt?: Prisma.DateTimeFilter<"Activity"> | Date | string
-}
-
-export type ActivityCreateWithoutUserInput = {
-  id?: string
-  action: $Enums.ActivityAction
-  type: $Enums.ActivityType
-  title: string
-  description?: string | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Date | string
-  company: Prisma.CompanyCreateNestedOneWithoutActivitiesInput
-  lead?: Prisma.LeadCreateNestedOneWithoutActivitiesInput
-  client?: Prisma.ClientCreateNestedOneWithoutActivitiesInput
-  deal?: Prisma.DealCreateNestedOneWithoutActivitiesInput
-}
-
-export type ActivityUncheckedCreateWithoutUserInput = {
-  id?: string
-  action: $Enums.ActivityAction
-  type: $Enums.ActivityType
-  title: string
-  description?: string | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  companyId: string
-  leadId?: string | null
-  clientId?: string | null
-  dealId?: string | null
-  createdAt?: Date | string
-}
-
-export type ActivityCreateOrConnectWithoutUserInput = {
-  where: Prisma.ActivityWhereUniqueInput
-  create: Prisma.XOR<Prisma.ActivityCreateWithoutUserInput, Prisma.ActivityUncheckedCreateWithoutUserInput>
-}
-
-export type ActivityCreateManyUserInputEnvelope = {
-  data: Prisma.ActivityCreateManyUserInput | Prisma.ActivityCreateManyUserInput[]
-  skipDuplicates?: boolean
-}
-
-export type ActivityUpsertWithWhereUniqueWithoutUserInput = {
-  where: Prisma.ActivityWhereUniqueInput
-  update: Prisma.XOR<Prisma.ActivityUpdateWithoutUserInput, Prisma.ActivityUncheckedUpdateWithoutUserInput>
-  create: Prisma.XOR<Prisma.ActivityCreateWithoutUserInput, Prisma.ActivityUncheckedCreateWithoutUserInput>
-}
-
-export type ActivityUpdateWithWhereUniqueWithoutUserInput = {
-  where: Prisma.ActivityWhereUniqueInput
-  data: Prisma.XOR<Prisma.ActivityUpdateWithoutUserInput, Prisma.ActivityUncheckedUpdateWithoutUserInput>
-}
-
-export type ActivityUpdateManyWithWhereWithoutUserInput = {
-  where: Prisma.ActivityScalarWhereInput
-  data: Prisma.XOR<Prisma.ActivityUpdateManyMutationInput, Prisma.ActivityUncheckedUpdateManyWithoutUserInput>
-}
-
-export type ActivityCreateWithoutLeadInput = {
-  id?: string
-  action: $Enums.ActivityAction
-  type: $Enums.ActivityType
-  title: string
-  description?: string | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Date | string
-  company: Prisma.CompanyCreateNestedOneWithoutActivitiesInput
-  user: Prisma.UserCreateNestedOneWithoutActivitiesInput
-  client?: Prisma.ClientCreateNestedOneWithoutActivitiesInput
-  deal?: Prisma.DealCreateNestedOneWithoutActivitiesInput
-}
-
-export type ActivityUncheckedCreateWithoutLeadInput = {
-  id?: string
-  action: $Enums.ActivityAction
-  type: $Enums.ActivityType
-  title: string
-  description?: string | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  companyId: string
-  userId: string
-  clientId?: string | null
-  dealId?: string | null
-  createdAt?: Date | string
-}
-
-export type ActivityCreateOrConnectWithoutLeadInput = {
-  where: Prisma.ActivityWhereUniqueInput
-  create: Prisma.XOR<Prisma.ActivityCreateWithoutLeadInput, Prisma.ActivityUncheckedCreateWithoutLeadInput>
-}
-
-export type ActivityCreateManyLeadInputEnvelope = {
-  data: Prisma.ActivityCreateManyLeadInput | Prisma.ActivityCreateManyLeadInput[]
-  skipDuplicates?: boolean
-}
-
-export type ActivityUpsertWithWhereUniqueWithoutLeadInput = {
-  where: Prisma.ActivityWhereUniqueInput
-  update: Prisma.XOR<Prisma.ActivityUpdateWithoutLeadInput, Prisma.ActivityUncheckedUpdateWithoutLeadInput>
-  create: Prisma.XOR<Prisma.ActivityCreateWithoutLeadInput, Prisma.ActivityUncheckedCreateWithoutLeadInput>
-}
-
-export type ActivityUpdateWithWhereUniqueWithoutLeadInput = {
-  where: Prisma.ActivityWhereUniqueInput
-  data: Prisma.XOR<Prisma.ActivityUpdateWithoutLeadInput, Prisma.ActivityUncheckedUpdateWithoutLeadInput>
-}
-
-export type ActivityUpdateManyWithWhereWithoutLeadInput = {
-  where: Prisma.ActivityScalarWhereInput
-  data: Prisma.XOR<Prisma.ActivityUpdateManyMutationInput, Prisma.ActivityUncheckedUpdateManyWithoutLeadInput>
+export type ActivityUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.ActivityCreateWithoutUserInput, Prisma.ActivityUncheckedCreateWithoutUserInput> | Prisma.ActivityCreateWithoutUserInput[] | Prisma.ActivityUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ActivityCreateOrConnectWithoutUserInput | Prisma.ActivityCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.ActivityUpsertWithWhereUniqueWithoutUserInput | Prisma.ActivityUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.ActivityCreateManyUserInputEnvelope
+  set?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  disconnect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  delete?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  connect?: Prisma.ActivityWhereUniqueInput | Prisma.ActivityWhereUniqueInput[]
+  update?: Prisma.ActivityUpdateWithWhereUniqueWithoutUserInput | Prisma.ActivityUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.ActivityUpdateManyWithWhereWithoutUserInput | Prisma.ActivityUpdateManyWithWhereWithoutUserInput[]
+  deleteMany?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
 }
 
 export type ActivityCreateWithoutClientInput = {
@@ -925,6 +757,78 @@ export type ActivityUpdateManyWithWhereWithoutClientInput = {
   data: Prisma.XOR<Prisma.ActivityUpdateManyMutationInput, Prisma.ActivityUncheckedUpdateManyWithoutClientInput>
 }
 
+export type ActivityScalarWhereInput = {
+  AND?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
+  OR?: Prisma.ActivityScalarWhereInput[]
+  NOT?: Prisma.ActivityScalarWhereInput | Prisma.ActivityScalarWhereInput[]
+  id?: Prisma.StringFilter<"Activity"> | string
+  action?: Prisma.EnumActivityActionFilter<"Activity"> | $Enums.ActivityAction
+  type?: Prisma.EnumActivityTypeFilter<"Activity"> | $Enums.ActivityType
+  title?: Prisma.StringFilter<"Activity"> | string
+  description?: Prisma.StringNullableFilter<"Activity"> | string | null
+  metadata?: Prisma.JsonNullableFilter<"Activity">
+  companyId?: Prisma.StringFilter<"Activity"> | string
+  userId?: Prisma.StringFilter<"Activity"> | string
+  leadId?: Prisma.StringNullableFilter<"Activity"> | string | null
+  clientId?: Prisma.StringNullableFilter<"Activity"> | string | null
+  dealId?: Prisma.StringNullableFilter<"Activity"> | string | null
+  createdAt?: Prisma.DateTimeFilter<"Activity"> | Date | string
+}
+
+export type ActivityCreateWithoutCompanyInput = {
+  id?: string
+  action: $Enums.ActivityAction
+  type: $Enums.ActivityType
+  title: string
+  description?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutActivitiesInput
+  lead?: Prisma.LeadCreateNestedOneWithoutActivitiesInput
+  client?: Prisma.ClientCreateNestedOneWithoutActivitiesInput
+  deal?: Prisma.DealCreateNestedOneWithoutActivitiesInput
+}
+
+export type ActivityUncheckedCreateWithoutCompanyInput = {
+  id?: string
+  action: $Enums.ActivityAction
+  type: $Enums.ActivityType
+  title: string
+  description?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  userId: string
+  leadId?: string | null
+  clientId?: string | null
+  dealId?: string | null
+  createdAt?: Date | string
+}
+
+export type ActivityCreateOrConnectWithoutCompanyInput = {
+  where: Prisma.ActivityWhereUniqueInput
+  create: Prisma.XOR<Prisma.ActivityCreateWithoutCompanyInput, Prisma.ActivityUncheckedCreateWithoutCompanyInput>
+}
+
+export type ActivityCreateManyCompanyInputEnvelope = {
+  data: Prisma.ActivityCreateManyCompanyInput | Prisma.ActivityCreateManyCompanyInput[]
+  skipDuplicates?: boolean
+}
+
+export type ActivityUpsertWithWhereUniqueWithoutCompanyInput = {
+  where: Prisma.ActivityWhereUniqueInput
+  update: Prisma.XOR<Prisma.ActivityUpdateWithoutCompanyInput, Prisma.ActivityUncheckedUpdateWithoutCompanyInput>
+  create: Prisma.XOR<Prisma.ActivityCreateWithoutCompanyInput, Prisma.ActivityUncheckedCreateWithoutCompanyInput>
+}
+
+export type ActivityUpdateWithWhereUniqueWithoutCompanyInput = {
+  where: Prisma.ActivityWhereUniqueInput
+  data: Prisma.XOR<Prisma.ActivityUpdateWithoutCompanyInput, Prisma.ActivityUncheckedUpdateWithoutCompanyInput>
+}
+
+export type ActivityUpdateManyWithWhereWithoutCompanyInput = {
+  where: Prisma.ActivityScalarWhereInput
+  data: Prisma.XOR<Prisma.ActivityUpdateManyMutationInput, Prisma.ActivityUncheckedUpdateManyWithoutCompanyInput>
+}
+
 export type ActivityCreateWithoutDealInput = {
   id?: string
   action: $Enums.ActivityAction
@@ -977,6 +881,170 @@ export type ActivityUpdateWithWhereUniqueWithoutDealInput = {
 export type ActivityUpdateManyWithWhereWithoutDealInput = {
   where: Prisma.ActivityScalarWhereInput
   data: Prisma.XOR<Prisma.ActivityUpdateManyMutationInput, Prisma.ActivityUncheckedUpdateManyWithoutDealInput>
+}
+
+export type ActivityCreateWithoutLeadInput = {
+  id?: string
+  action: $Enums.ActivityAction
+  type: $Enums.ActivityType
+  title: string
+  description?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  company: Prisma.CompanyCreateNestedOneWithoutActivitiesInput
+  user: Prisma.UserCreateNestedOneWithoutActivitiesInput
+  client?: Prisma.ClientCreateNestedOneWithoutActivitiesInput
+  deal?: Prisma.DealCreateNestedOneWithoutActivitiesInput
+}
+
+export type ActivityUncheckedCreateWithoutLeadInput = {
+  id?: string
+  action: $Enums.ActivityAction
+  type: $Enums.ActivityType
+  title: string
+  description?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  companyId: string
+  userId: string
+  clientId?: string | null
+  dealId?: string | null
+  createdAt?: Date | string
+}
+
+export type ActivityCreateOrConnectWithoutLeadInput = {
+  where: Prisma.ActivityWhereUniqueInput
+  create: Prisma.XOR<Prisma.ActivityCreateWithoutLeadInput, Prisma.ActivityUncheckedCreateWithoutLeadInput>
+}
+
+export type ActivityCreateManyLeadInputEnvelope = {
+  data: Prisma.ActivityCreateManyLeadInput | Prisma.ActivityCreateManyLeadInput[]
+  skipDuplicates?: boolean
+}
+
+export type ActivityUpsertWithWhereUniqueWithoutLeadInput = {
+  where: Prisma.ActivityWhereUniqueInput
+  update: Prisma.XOR<Prisma.ActivityUpdateWithoutLeadInput, Prisma.ActivityUncheckedUpdateWithoutLeadInput>
+  create: Prisma.XOR<Prisma.ActivityCreateWithoutLeadInput, Prisma.ActivityUncheckedCreateWithoutLeadInput>
+}
+
+export type ActivityUpdateWithWhereUniqueWithoutLeadInput = {
+  where: Prisma.ActivityWhereUniqueInput
+  data: Prisma.XOR<Prisma.ActivityUpdateWithoutLeadInput, Prisma.ActivityUncheckedUpdateWithoutLeadInput>
+}
+
+export type ActivityUpdateManyWithWhereWithoutLeadInput = {
+  where: Prisma.ActivityScalarWhereInput
+  data: Prisma.XOR<Prisma.ActivityUpdateManyMutationInput, Prisma.ActivityUncheckedUpdateManyWithoutLeadInput>
+}
+
+export type ActivityCreateWithoutUserInput = {
+  id?: string
+  action: $Enums.ActivityAction
+  type: $Enums.ActivityType
+  title: string
+  description?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  company: Prisma.CompanyCreateNestedOneWithoutActivitiesInput
+  lead?: Prisma.LeadCreateNestedOneWithoutActivitiesInput
+  client?: Prisma.ClientCreateNestedOneWithoutActivitiesInput
+  deal?: Prisma.DealCreateNestedOneWithoutActivitiesInput
+}
+
+export type ActivityUncheckedCreateWithoutUserInput = {
+  id?: string
+  action: $Enums.ActivityAction
+  type: $Enums.ActivityType
+  title: string
+  description?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  companyId: string
+  leadId?: string | null
+  clientId?: string | null
+  dealId?: string | null
+  createdAt?: Date | string
+}
+
+export type ActivityCreateOrConnectWithoutUserInput = {
+  where: Prisma.ActivityWhereUniqueInput
+  create: Prisma.XOR<Prisma.ActivityCreateWithoutUserInput, Prisma.ActivityUncheckedCreateWithoutUserInput>
+}
+
+export type ActivityCreateManyUserInputEnvelope = {
+  data: Prisma.ActivityCreateManyUserInput | Prisma.ActivityCreateManyUserInput[]
+  skipDuplicates?: boolean
+}
+
+export type ActivityUpsertWithWhereUniqueWithoutUserInput = {
+  where: Prisma.ActivityWhereUniqueInput
+  update: Prisma.XOR<Prisma.ActivityUpdateWithoutUserInput, Prisma.ActivityUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.ActivityCreateWithoutUserInput, Prisma.ActivityUncheckedCreateWithoutUserInput>
+}
+
+export type ActivityUpdateWithWhereUniqueWithoutUserInput = {
+  where: Prisma.ActivityWhereUniqueInput
+  data: Prisma.XOR<Prisma.ActivityUpdateWithoutUserInput, Prisma.ActivityUncheckedUpdateWithoutUserInput>
+}
+
+export type ActivityUpdateManyWithWhereWithoutUserInput = {
+  where: Prisma.ActivityScalarWhereInput
+  data: Prisma.XOR<Prisma.ActivityUpdateManyMutationInput, Prisma.ActivityUncheckedUpdateManyWithoutUserInput>
+}
+
+export type ActivityCreateManyClientInput = {
+  id?: string
+  action: $Enums.ActivityAction
+  type: $Enums.ActivityType
+  title: string
+  description?: string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  companyId: string
+  userId: string
+  leadId?: string | null
+  dealId?: string | null
+  createdAt?: Date | string
+}
+
+export type ActivityUpdateWithoutClientInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  action?: Prisma.EnumActivityActionFieldUpdateOperationsInput | $Enums.ActivityAction
+  type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  company?: Prisma.CompanyUpdateOneRequiredWithoutActivitiesNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutActivitiesNestedInput
+  lead?: Prisma.LeadUpdateOneWithoutActivitiesNestedInput
+  deal?: Prisma.DealUpdateOneWithoutActivitiesNestedInput
+}
+
+export type ActivityUncheckedUpdateWithoutClientInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  action?: Prisma.EnumActivityActionFieldUpdateOperationsInput | $Enums.ActivityAction
+  type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  leadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type ActivityUncheckedUpdateManyWithoutClientInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  action?: Prisma.EnumActivityActionFieldUpdateOperationsInput | $Enums.ActivityAction
+  type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
+  companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  leadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dealId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ActivityCreateManyCompanyInput = {
@@ -1035,7 +1103,7 @@ export type ActivityUncheckedUpdateManyWithoutCompanyInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type ActivityCreateManyUserInput = {
+export type ActivityCreateManyDealInput = {
   id?: string
   action: $Enums.ActivityAction
   type: $Enums.ActivityType
@@ -1043,13 +1111,13 @@ export type ActivityCreateManyUserInput = {
   description?: string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   companyId: string
+  userId: string
   leadId?: string | null
   clientId?: string | null
-  dealId?: string | null
   createdAt?: Date | string
 }
 
-export type ActivityUpdateWithoutUserInput = {
+export type ActivityUpdateWithoutDealInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumActivityActionFieldUpdateOperationsInput | $Enums.ActivityAction
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
@@ -1058,12 +1126,12 @@ export type ActivityUpdateWithoutUserInput = {
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutActivitiesNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutActivitiesNestedInput
   lead?: Prisma.LeadUpdateOneWithoutActivitiesNestedInput
   client?: Prisma.ClientUpdateOneWithoutActivitiesNestedInput
-  deal?: Prisma.DealUpdateOneWithoutActivitiesNestedInput
 }
 
-export type ActivityUncheckedUpdateWithoutUserInput = {
+export type ActivityUncheckedUpdateWithoutDealInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumActivityActionFieldUpdateOperationsInput | $Enums.ActivityAction
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
@@ -1071,13 +1139,13 @@ export type ActivityUncheckedUpdateWithoutUserInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   leadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  dealId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type ActivityUncheckedUpdateManyWithoutUserInput = {
+export type ActivityUncheckedUpdateManyWithoutDealInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumActivityActionFieldUpdateOperationsInput | $Enums.ActivityAction
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
@@ -1085,9 +1153,9 @@ export type ActivityUncheckedUpdateManyWithoutUserInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
   leadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   clientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  dealId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -1147,7 +1215,7 @@ export type ActivityUncheckedUpdateManyWithoutLeadInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type ActivityCreateManyClientInput = {
+export type ActivityCreateManyUserInput = {
   id?: string
   action: $Enums.ActivityAction
   type: $Enums.ActivityType
@@ -1155,13 +1223,13 @@ export type ActivityCreateManyClientInput = {
   description?: string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   companyId: string
-  userId: string
   leadId?: string | null
+  clientId?: string | null
   dealId?: string | null
   createdAt?: Date | string
 }
 
-export type ActivityUpdateWithoutClientInput = {
+export type ActivityUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumActivityActionFieldUpdateOperationsInput | $Enums.ActivityAction
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
@@ -1170,12 +1238,12 @@ export type ActivityUpdateWithoutClientInput = {
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   company?: Prisma.CompanyUpdateOneRequiredWithoutActivitiesNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutActivitiesNestedInput
   lead?: Prisma.LeadUpdateOneWithoutActivitiesNestedInput
+  client?: Prisma.ClientUpdateOneWithoutActivitiesNestedInput
   deal?: Prisma.DealUpdateOneWithoutActivitiesNestedInput
 }
 
-export type ActivityUncheckedUpdateWithoutClientInput = {
+export type ActivityUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumActivityActionFieldUpdateOperationsInput | $Enums.ActivityAction
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
@@ -1183,13 +1251,13 @@ export type ActivityUncheckedUpdateWithoutClientInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
   leadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dealId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type ActivityUncheckedUpdateManyWithoutClientInput = {
+export type ActivityUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   action?: Prisma.EnumActivityActionFieldUpdateOperationsInput | $Enums.ActivityAction
   type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
@@ -1197,65 +1265,9 @@ export type ActivityUncheckedUpdateManyWithoutClientInput = {
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
   companyId?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
   leadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  clientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   dealId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type ActivityCreateManyDealInput = {
-  id?: string
-  action: $Enums.ActivityAction
-  type: $Enums.ActivityType
-  title: string
-  description?: string | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  companyId: string
-  userId: string
-  leadId?: string | null
-  clientId?: string | null
-  createdAt?: Date | string
-}
-
-export type ActivityUpdateWithoutDealInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  action?: Prisma.EnumActivityActionFieldUpdateOperationsInput | $Enums.ActivityAction
-  type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  company?: Prisma.CompanyUpdateOneRequiredWithoutActivitiesNestedInput
-  user?: Prisma.UserUpdateOneRequiredWithoutActivitiesNestedInput
-  lead?: Prisma.LeadUpdateOneWithoutActivitiesNestedInput
-  client?: Prisma.ClientUpdateOneWithoutActivitiesNestedInput
-}
-
-export type ActivityUncheckedUpdateWithoutDealInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  action?: Prisma.EnumActivityActionFieldUpdateOperationsInput | $Enums.ActivityAction
-  type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  companyId?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  leadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  clientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type ActivityUncheckedUpdateManyWithoutDealInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  action?: Prisma.EnumActivityActionFieldUpdateOperationsInput | $Enums.ActivityAction
-  type?: Prisma.EnumActivityTypeFieldUpdateOperationsInput | $Enums.ActivityType
-  title?: Prisma.StringFieldUpdateOperationsInput | string
-  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  metadata?: Prisma.NullableJsonNullValueInput | runtime.InputJsonValue
-  companyId?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.StringFieldUpdateOperationsInput | string
-  leadId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  clientId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 

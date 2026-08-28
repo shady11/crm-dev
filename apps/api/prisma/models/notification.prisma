@@ -1,0 +1,42 @@
+enum NotificationType {
+  TASK_ASSIGNED
+  TASK_DUE_SOON
+  TASK_OVERDUE
+  DEAL_STATUS_CHANGED
+  RESERVATION_EXPIRING
+  PAYMENT_RECEIVED
+  DOCUMENT_UPLOADED
+}
+
+enum NotificationEntityType {
+  TASK
+  DEAL
+  CLIENT
+  DOCUMENT
+}
+
+model Notification {
+  id String @id @default(uuid())
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  type    NotificationType
+  title   String
+  message String?
+
+  entityType NotificationEntityType?
+  entityId   String?
+
+  isRead Boolean   @default(false)
+  readAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([companyId])
+  @@index([userId, isRead])
+  @@index([createdAt])
+}

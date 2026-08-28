@@ -1,0 +1,41 @@
+{
+  "actions": {
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Изменить",
+    "create": "Создать",
+    "confirm": "Подтвердить",
+    "back": "Назад",
+    "goBack": "Вернуться",
+    "createAnyway": "Всё равно создать",
+    "saveChanges": "Сохранить изменения",
+    "deleting": "Удаление...",
+    "creating": "Создание...",
+    "saving": "Сохранение..."
+  },
+  "labels": {
+    "status": "Статус",
+    "type": "Тип",
+    "price": "Цена",
+    "area": "Площадь",
+    "rooms": "Комнаты",
+    "phone": "Телефон",
+    "email": "Эл. почта",
+    "name": "Полное имя",
+    "notes": "Заметки",
+    "createdAt": "Создано",
+    "block": "Блок",
+    "entrance": "Подъезд",
+    "floor": "Этаж"
+  },
+  "units": {
+    "sqm": "м²",
+    "pricePerSqm": "{{value}}/м²"
+  },
+  "errors": {
+    "genericTitle": "Что-то пошло не так",
+    "tryAgain": "Пожалуйста, попробуйте снова.",
+    "notFound": "Не найдено"
+  }
+}

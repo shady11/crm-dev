@@ -493,6 +493,18 @@ export type NotificationUncheckedUpdateManyWithoutCompanyNestedInput = {
   deleteMany?: Prisma.NotificationScalarWhereInput | Prisma.NotificationScalarWhereInput[]
 }
 
+export type EnumNotificationTypeFieldUpdateOperationsInput = {
+  set?: $Enums.NotificationType
+}
+
+export type NullableEnumNotificationEntityTypeFieldUpdateOperationsInput = {
+  set?: $Enums.NotificationEntityType | null
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
+}
+
 export type NotificationCreateNestedManyWithoutUserInput = {
   create?: Prisma.XOR<Prisma.NotificationCreateWithoutUserInput, Prisma.NotificationUncheckedCreateWithoutUserInput> | Prisma.NotificationCreateWithoutUserInput[] | Prisma.NotificationUncheckedCreateWithoutUserInput[]
   connectOrCreate?: Prisma.NotificationCreateOrConnectWithoutUserInput | Prisma.NotificationCreateOrConnectWithoutUserInput[]
@@ -533,14 +545,6 @@ export type NotificationUncheckedUpdateManyWithoutUserNestedInput = {
   update?: Prisma.NotificationUpdateWithWhereUniqueWithoutUserInput | Prisma.NotificationUpdateWithWhereUniqueWithoutUserInput[]
   updateMany?: Prisma.NotificationUpdateManyWithWhereWithoutUserInput | Prisma.NotificationUpdateManyWithWhereWithoutUserInput[]
   deleteMany?: Prisma.NotificationScalarWhereInput | Prisma.NotificationScalarWhereInput[]
-}
-
-export type EnumNotificationTypeFieldUpdateOperationsInput = {
-  set?: $Enums.NotificationType
-}
-
-export type NullableEnumNotificationEntityTypeFieldUpdateOperationsInput = {
-  set?: $Enums.NotificationEntityType | null
 }
 
 export type NotificationCreateWithoutCompanyInput = {

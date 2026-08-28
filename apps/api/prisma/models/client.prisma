@@ -1,0 +1,28 @@
+model Client {
+  id String @id @default(uuid())
+
+  fullName  String
+  phone     String
+  whatsapp  String?
+  email     String?
+  passport  String?
+  pin       String?
+  birthDate DateTime?
+  address   String?
+  notes     String?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  leads      Lead[]
+  deals      Deal[]
+  activities Activity[]
+  tasks      Task[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([companyId])
+  @@index([companyId, phone])
+}

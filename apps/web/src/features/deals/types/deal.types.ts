@@ -6,6 +6,7 @@ export const DealStatus = {
     ACTIVE: "ACTIVE",
     COMPLETED: "COMPLETED",
     CANCELLED: "CANCELLED",
+    EXPIRED: "EXPIRED",
 } as const;
 
 export type DealStatus = (typeof DealStatus)[keyof typeof DealStatus];
@@ -16,12 +17,13 @@ export const ACTIVE_DEAL_STATUSES: DealStatus[] = [
     DealStatus.ACTIVE,
 ];
 
-export const DEAL_STATUS_LABELS: Record<DealStatus, string> = {
-    [DealStatus.RESERVED]: "Reserved",
-    [DealStatus.CONTRACT_SIGNED]: "Contract signed",
-    [DealStatus.ACTIVE]: "Active",
-    [DealStatus.COMPLETED]: "Completed",
-    [DealStatus.CANCELLED]: "Cancelled",
+export const DEAL_STATUS_LABEL_KEYS: Record<DealStatus, string> = {
+    [DealStatus.RESERVED]: "deals:status.reserved",
+    [DealStatus.CONTRACT_SIGNED]: "deals:status.contractSigned",
+    [DealStatus.ACTIVE]: "deals:status.active",
+    [DealStatus.COMPLETED]: "deals:status.completed",
+    [DealStatus.CANCELLED]: "deals:status.cancelled",
+    [DealStatus.EXPIRED]: "deals:status.expired",
 };
 
 export const DEAL_STATUS_VISUALS: Record<
@@ -51,6 +53,11 @@ export const DEAL_STATUS_VISUALS: Record<
     CANCELLED: {
         icon: XCircleIcon,
         heading: "Cancelled",
+        bg: "bg-gray-400",
+    },
+    EXPIRED: {
+        icon: XCircleIcon,
+        heading: "Expired",
         bg: "bg-gray-400",
     },
 };

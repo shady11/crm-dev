@@ -7,12 +7,15 @@ import {AuthService} from "@/modules/auth/auth.service";
 import {JwtStrategy} from "@/modules/auth/strategies/jwt.strategy";
 import type {StringValue} from "ms";
 import {ConfigModule, ConfigService} from "@nestjs/config";
+import {PrismaModule} from "@/database/prisma.module";
+import {SessionValidationService} from "@/modules/auth/session-validation.service";
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
     ConfigModule,
+    PrismaModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -34,7 +37,7 @@ import {ConfigModule, ConfigService} from "@nestjs/config";
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, SessionValidationService],
   exports: [
       JwtModule
   ]

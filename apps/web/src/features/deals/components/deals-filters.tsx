@@ -1,6 +1,9 @@
 import {createListCollection} from "@ark-ui/react";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {DEAL_STATUS_LABELS, DealStatus} from "@/features/deals/types/deal.types";
+import {DEAL_STATUS_LABEL_KEYS, DealStatus} from "@/features/deals/types/deal.types";
+import {useTranslation} from "react-i18next";
+
+const { t } = useTranslation("deals");
 
 interface DealsFiltersProps {
     status?: DealStatus;
@@ -10,7 +13,12 @@ interface DealsFiltersProps {
 const statusCollection = createListCollection({
     items: [
         { label: "All statuses", value: "ALL" },
-        ...Object.values(DealStatus).map((status) => ({ label: DEAL_STATUS_LABELS[status], value: status })),
+        ...Object.values(DealStatus).map(
+            (status) => ({
+                label: t(DEAL_STATUS_LABEL_KEYS[status]),
+                value: status
+            })
+        ),
     ],
 });
 

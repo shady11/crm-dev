@@ -1,0 +1,54 @@
+enum UnitType {
+  APARTMENT
+  COMMERCIAL
+  PARKING
+  STORAGE
+}
+
+enum UnitStatus {
+  AVAILABLE
+  RESERVED
+  SOLD
+  UNAVAILABLE
+}
+
+model Unit {
+  id String @id @default(uuid())
+
+  number String
+  type   UnitType   @default(APARTMENT)
+  status UnitStatus @default(AVAILABLE)
+
+  rooms       Int?
+  area        Decimal
+  price       Decimal
+  pricePerSqm Decimal?
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  blockId String
+  block   Block  @relation(fields: [blockId], references: [id])
+
+  entranceId String
+  entrance   Entrance @relation(fields: [entranceId], references: [id])
+
+  floorId String
+  floor   Floor  @relation(fields: [floorId], references: [id])
+
+  deals Deal[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([blockId, number])
+  @@index([projectId])
+  @@index([blockId])
+  @@index([entranceId])
+  @@index([floorId])
+  @@index([status])
+  @@index([type])
+  @@index([blockId, status])
+  @@index([blockId, type])
+}

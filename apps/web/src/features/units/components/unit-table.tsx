@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MoreVertical } from "lucide-react";
-import { Button } from "@/components/ui/button.tsx";
-import { Card, CardContent } from "@/components/ui/card.tsx";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table.tsx";
-import { Badge } from "@/components/ui/badge.tsx";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet.tsx";
+import {useState} from "react";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {MoreVertical} from "lucide-react";
+import {Button} from "@/components/ui/button.tsx";
+import {Card, CardContent} from "@/components/ui/card.tsx";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
+import {Badge} from "@/components/ui/badge.tsx";
+import {Sheet, SheetContent, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -16,18 +16,26 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog.tsx";
-import { type Unit, UNIT_STATUS_LABELS, UNIT_TYPE_LABELS, UNIT_STATUS_CLASSES } from "@/features/units/types/unit.types.ts";
-import { updateUnit, deleteUnit } from "@/features/units/api/units.api.ts";
-import { UnitForm } from "./unit-form.tsx";
+import {
+    type Unit,
+    UNIT_STATUS_CLASSES,
+    UNIT_STATUS_LABEL_KEYS,
+    UNIT_TYPE_LABELS
+} from "@/features/units/types/unit.types.ts";
+import {deleteUnit, updateUnit} from "@/features/units/api/units.api.ts";
+import {UnitForm} from "./unit-form.tsx";
 import {api} from "@/lib/api.ts";
 import {Menu, MenuContent, MenuGroup, MenuItem, MenuSeparator, MenuTrigger} from "@/components/ui/menu.tsx";
 import {toast} from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 
 interface UnitTableProps {
     units: Unit[];
 }
 
 export function UnitTable({ units }: UnitTableProps) {
+    const { t } = useTranslation("units");
+
     const queryClient = useQueryClient();
 
     const [unitSheet, setUnitSheet] = useState<{
@@ -96,7 +104,7 @@ export function UnitTable({ units }: UnitTableProps) {
                                     <TableCell className="font-medium">№{unit.number}</TableCell>
                                     <TableCell>
                                         <Badge className={`${UNIT_STATUS_CLASSES[unit.status]} text-white`}>
-                                            {UNIT_STATUS_LABELS[unit.status]}
+                                            {t(UNIT_STATUS_LABEL_KEYS[unit.status])}
                                         </Badge>
                                     </TableCell>
                                     <TableCell>{UNIT_TYPE_LABELS[unit.type]}</TableCell>

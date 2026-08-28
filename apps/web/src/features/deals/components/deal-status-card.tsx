@@ -1,6 +1,7 @@
 import {CheckCircle2Icon} from "lucide-react";
 import {Card, CardContent} from "@/components/ui/card.tsx";
-import {DEAL_STATUS_LABELS, DEAL_STATUS_VISUALS, type DealStatus} from "@/features/deals/types/deal.types";
+import {DEAL_STATUS_LABEL_KEYS, DEAL_STATUS_VISUALS, type DealStatus} from "@/features/deals/types/deal.types";
+import {useTranslation} from "react-i18next";
 
 interface DealStatusCardProps {
     status: DealStatus;
@@ -8,6 +9,8 @@ interface DealStatusCardProps {
 }
 
 export function DealStatusCard({ status, count }: DealStatusCardProps) {
+    const { t } = useTranslation("deals");
+
     const visual = DEAL_STATUS_VISUALS[status];
     const Icon = visual?.icon ?? CheckCircle2Icon;
 
@@ -18,7 +21,7 @@ export function DealStatusCard({ status, count }: DealStatusCardProps) {
                     <Icon size={20} strokeWidth={1.75} />
                 </div>
                 <div>
-                    <h3 className="font-medium">{DEAL_STATUS_LABELS[status]}</h3>
+                    <h3 className="font-medium">{t(DEAL_STATUS_LABEL_KEYS[status])}</h3>
                     <p className="text-sm text-muted-foreground">
                         {count} deal{count !== 1 ? "s" : ""}
                     </p>

@@ -1,0 +1,48 @@
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  MEETING
+  NEGOTIATION
+  CONVERTED
+  LOST
+}
+
+model Lead {
+  id String @id @default(uuid())
+
+  source   String?
+  status   LeadStatus @default(NEW)
+  fullName String
+  phone    String
+  email    String?
+  comment  String?
+
+  nextContactAt DateTime?
+  lastContactAt DateTime?
+  assignedAt    DateTime?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  createdById String?
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+
+  managerId String?
+  manager   User?   @relation("LeadManager", fields: [managerId], references: [id])
+
+  clientId String?
+  client   Client? @relation(fields: [clientId], references: [id])
+
+  activities Activity[]
+  tasks      Task[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([companyId])
+  @@index([companyId, status])
+  @@index([companyId, managerId])
+  @@index([phone])
+}

@@ -2,12 +2,12 @@ import {BadRequestException, ForbiddenException, Injectable} from '@nestjs/commo
 import {ActivityAction, ActivityType, DealStatus, PaymentScheduleStatus, Prisma} from '@/generated/prisma/client';
 import {PrismaService} from '@/database/prisma.service';
 import {AuthUser} from '@/common/types/auth-user.type';
-import {DealDomainService} from './deal-domain.service';
-import {DealActivityService} from './deal-activity.service';
-import {DealNotFoundException, PaymentScheduleAlreadyGeneratedException} from '../exceptions';
-import {GeneratePaymentScheduleDto} from '../dto/generate-payment-schedule.dto';
+import {DealDomainService} from '../deal-domain.service';
+import {DealActivityService} from '../deal-activity.service';
+import {DealNotFoundException, PaymentScheduleAlreadyGeneratedException} from '../../exceptions';
+import {GeneratePaymentScheduleDto} from '../../dto/payments/generate-payment-schedule.dto';
 import {DealMapper} from "@/modules/deals/mappers/deal.mapper";
-import {DEAL_DETAILS_INCLUDE} from "../deal.constants";
+import {DEAL_DETAILS_INCLUDE} from "../../deal.constants";
 
 @Injectable()
 export class PaymentScheduleService {

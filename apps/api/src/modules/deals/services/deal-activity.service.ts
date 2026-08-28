@@ -1,11 +1,9 @@
 import {Injectable} from '@nestjs/common';
-
-import {ActivityAction, ActivityType, Prisma,} from '@/generated/prisma/client';
-import {DbClient} from "@/database/prisma.types";
+import {ActivityAction, ActivityType, Prisma} from '@/generated/prisma/client';
+import {DbClient} from '@/database/prisma.types';
 
 interface CreateActivityParams {
     db: DbClient;
-
     companyId: string;
     userId: string;
 
@@ -92,6 +90,17 @@ export class DealActivityService {
         });
     }
 
+    expireReservation(
+        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+    ) {
+        return this.create({
+            ...params,
+            action: ActivityAction.CHANGED_DEAL_STATUS,
+            type: ActivityType.RESERVATION_EXPIRED,
+            title: 'Reservation expired',
+        });
+    }
+
     signContract(
         params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
     ) {
@@ -111,6 +120,17 @@ export class DealActivityService {
             action: ActivityAction.RECEIVED_PAYMENT,
             type: ActivityType.PAYMENT_RECEIVED,
             title: 'Payment received',
+        });
+    }
+
+    paymentRefunded(
+        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+    ) {
+        return this.create({
+            ...params,
+            action: ActivityAction.RECEIVED_PAYMENT,
+            type: ActivityType.PAYMENT_REFUNDED,
+            title: 'Refund issued',
         });
     }
 

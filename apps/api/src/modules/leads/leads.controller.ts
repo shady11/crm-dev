@@ -7,7 +7,7 @@ import {QueryLeadsDto} from "@/modules/leads/dto/query-leads.dto";
 import {CreateLeadDto} from "@/modules/leads/dto/create-lead.dto";
 import {UpdateLeadDto} from "@/modules/leads/dto/update-lead.dto";
 import {ConvertLeadDto} from "@/modules/leads/dto/convert-lead.dto";
-import { RolesGuard } from "@/common/guards/roles.guard";
+import {RolesGuard} from "@/common/guards/roles.guard";
 import {Roles} from "@/common/decorators/roles.decorator";
 import {UserRole} from "@/generated/prisma/enums";
 import {CompanyGuard} from "@/common/guards/company.guard";
@@ -35,6 +35,15 @@ export class LeadsController {
     @Post()
     create(@CurrentUser() user: AuthUser, @Body() dto: CreateLeadDto) {
         return this.leadsService.create(user, dto);
+    }
+
+    @Get("duplicates")
+    checkDuplicates(
+        @CurrentUser() user: AuthUser,
+        @Query("phone") phone: string,
+        @Query("excludeLeadId") excludeLeadId?: string,
+    ) {
+        return this.leadsService.checkDuplicates(user, phone, excludeLeadId);
     }
 
     @Roles(

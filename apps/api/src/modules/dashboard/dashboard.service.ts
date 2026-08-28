@@ -24,7 +24,7 @@ export class DashboardService {
             this.prisma.deal.count({ where: { companyId, projectId, status: { in: ACTIVE_DEAL_STATUSES } } }),
             this.prisma.unit.groupBy({
                 by: ["status"],
-                where: { project: { companyId, id: projectId } },
+                where: { project: { companyId, id: projectId }, deletedAt: null },
                 _count: { _all: true },
             }),
             this.prisma.task.count({
@@ -83,7 +83,7 @@ export class DashboardService {
 
         const counts = await this.prisma.unit.groupBy({
             by: ["status"],
-            where: { project: { companyId: user.companyId, id: projectId } },
+            where: { project: { companyId: user.companyId, id: projectId }, deletedAt: null },
             _count: { _all: true },
         });
 

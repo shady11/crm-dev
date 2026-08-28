@@ -11,7 +11,7 @@ import {
     normalizeUnitStatus,
     normalizeUnitType,
     type Unit,
-    UNIT_STATUS_LABELS,
+    UNIT_STATUS_LABEL_KEYS,
     UNIT_STATUS_VALUES,
     UNIT_TYPE_LABELS,
     UNIT_TYPE_VALUES,
@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/number-input.tsx";
 import {Alert, AlertTitle} from "@/components/ui/alert.tsx";
 import type {CreateUnitPayload} from "@/features/units/types/unit-payload.ts";
+import {useTranslation} from "react-i18next";
 
 const unitSchema = z.object({
     number: z.string().trim().min(1),
@@ -68,6 +69,7 @@ export function UnitForm({
                              onCancel,
                              onSubmit,
                          }: UnitFormProps) {
+    const { t } = useTranslation();
 
     const initialType = normalizeUnitType(unit?.type);
     const [, setSelectedType] =
@@ -116,7 +118,7 @@ export function UnitForm({
     const statusCollection = createListCollection({
         items: [
             ...UNIT_STATUS_VALUES.map((status) => ({
-                label: UNIT_STATUS_LABELS[status],
+                label: t(UNIT_STATUS_LABEL_KEYS[status]),
                 value: status,
             })),
         ]

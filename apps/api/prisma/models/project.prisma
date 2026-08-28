@@ -1,0 +1,32 @@
+enum ProjectStatus {
+  DRAFT
+  PLANNING
+  ACTIVE
+  PAUSED
+  SOLDOUT
+  COMPLETED
+  ARCHIVED
+}
+
+model Project {
+  id String @id @default(uuid())
+
+  name    String
+  address String?
+  status  ProjectStatus @default(DRAFT)
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  blocks    Block[]
+  units     Unit[]
+  entrances Entrance[]
+  floors    Floor[]
+  deals     Deal[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([companyId])
+}

@@ -86,6 +86,7 @@ export class ChessboardService {
             project: {
                 companyId: user.companyId,
             },
+            deletedAt: null,
         };
 
         if (query.blockId) {

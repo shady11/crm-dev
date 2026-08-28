@@ -289,6 +289,47 @@ export class LeadsService {
         });
     }
 
+    async checkDuplicates(user: AuthUser, phone: string, excludeLeadId?: string) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const companyId = user.companyId;
+
+        const [leads, clients] = await Promise.all([
+            this.prisma.lead.findMany({
+                where: {
+                    companyId,
+                    phone,
+                    deletedAt: null,
+                    id: excludeLeadId ? { not: excludeLeadId } : undefined,
+                },
+                select: {
+                    id: true,
+                    fullName: true,
+                    phone: true,
+                    status: true,
+                    createdAt: true,
+                },
+                orderBy: { createdAt: "desc" },
+                take: 5,
+            }),
+            this.prisma.client.findMany({
+                where: { companyId, phone, deletedAt: null },
+                select: {
+                    id: true,
+                    fullName: true,
+                    phone: true,
+                    createdAt: true,
+                },
+                orderBy: { createdAt: "desc" },
+                take: 5,
+            }),
+        ]);
+
+        return { leads, clients };
+    }
+
     async remove(user: AuthUser, id: string) {
         if (!user.companyId) {
             throw new ForbiddenException("User does not belong to a company");

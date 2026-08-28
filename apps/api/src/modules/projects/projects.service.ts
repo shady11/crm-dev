@@ -246,6 +246,9 @@ export class ProjectsService {
                                             orderBy: {
                                                 number: "asc",
                                             },
+                                            where: {
+                                                deletedAt: null,
+                                            },
                                             include: {
                                                 deals: {
                                                     where: {

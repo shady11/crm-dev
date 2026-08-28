@@ -6,7 +6,7 @@ import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover"
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
 import {
     UNIT_STATUS_CLASSES,
-    UNIT_STATUS_LABELS,
+    UNIT_STATUS_LABEL_KEYS,
     UNIT_STATUS_VALUES,
     UNIT_TYPE_LABELS,
     UNIT_TYPE_VALUES,
@@ -15,6 +15,7 @@ import {
 } from "@/features/units/types/unit.types";
 import {Status} from "@/components/ui/status.tsx";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
+import {useTranslation} from "react-i18next";
 
 export interface Filters {
     status: UnitStatus | "all";
@@ -33,15 +34,6 @@ interface ChessboardFiltersProps {
     onFiltersChange(filters: Filters): void;
     onClearFilters(): void;
 }
-
-const statusCollection = createListCollection({
-    items: [
-        ...UNIT_STATUS_VALUES.map((status) => ({
-            label: UNIT_STATUS_LABELS[status],
-            value: status,
-        })),
-    ],
-});
 
 const typeCollection = createListCollection({
     items: [
@@ -81,6 +73,9 @@ export function ChessboardFilters({
                                       onFiltersChange,
                                       onClearFilters,
                                   }: ChessboardFiltersProps) {
+
+    const { t } = useTranslation("units");
+    
     const getRoomsSummary = () => {
         if (!filters.rooms) return "Rooms";
         return `${filters.rooms} room${filters.rooms === "1" ? "" : "s"}`;
@@ -99,6 +94,15 @@ export function ChessboardFilters({
         if (filters.priceMin) return `Over $${filters.priceMin}`;
         return `Under $${filters.priceMax}`;
     };
+
+    const statusCollection = createListCollection({
+        items: [
+            ...UNIT_STATUS_VALUES.map((status) => ({
+                label: t(UNIT_STATUS_LABEL_KEYS[status]),
+                value: status,
+            })),
+        ],
+    });
 
     return (
         <div className="flex items-center">

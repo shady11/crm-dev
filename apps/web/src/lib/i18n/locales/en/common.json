@@ -1,0 +1,41 @@
+{
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "confirm": "Confirm",
+    "back": "Back",
+    "goBack": "Go back",
+    "createAnyway": "Create anyway",
+    "saveChanges": "Save changes",
+    "deleting": "Deleting...",
+    "creating": "Creating...",
+    "saving": "Saving..."
+  },
+  "labels": {
+    "status": "Status",
+    "type": "Type",
+    "price": "Price",
+    "area": "Area",
+    "rooms": "Rooms",
+    "phone": "Phone",
+    "email": "Email",
+    "name": "Full name",
+    "notes": "Notes",
+    "createdAt": "Created",
+    "block": "Block",
+    "entrance": "Entrance",
+    "floor": "Floor"
+  },
+  "units": {
+    "sqm": "m²",
+    "pricePerSqm": "{{value}}/m²"
+  },
+  "errors": {
+    "genericTitle": "Something went wrong",
+    "tryAgain": "Please try again.",
+    "notFound": "Not found"
+  }
+}

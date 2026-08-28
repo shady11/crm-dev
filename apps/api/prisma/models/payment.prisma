@@ -1,0 +1,77 @@
+enum PaymentMethod {
+  CASH
+  BANK_TRANSFER
+  MBANK
+  OPTIMA
+  ELKART
+  OTHER
+}
+
+enum PaymentType {
+  DEPOSIT
+  INSTALLMENT
+  FINAL
+  REFUND
+}
+
+enum PaymentScheduleStatus {
+  PENDING
+  PARTIAL
+  PAID
+  OVERDUE
+}
+
+model Payment {
+  id String @id @default(uuid())
+
+  dealId String
+  deal   Deal   @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  user   User?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  amount Decimal @db.Decimal(14, 2)
+
+  paymentMethod PaymentMethod
+  paymentType   PaymentType
+
+  paidAt DateTime
+
+  reference String?
+
+  note String?
+
+  createdAt DateTime  @default(now())
+  deletedAt DateTime?
+
+  @@index([dealId])
+  @@index([paidAt])
+  @@index([paymentMethod])
+  @@index([paymentType])
+}
+
+model PaymentSchedule {
+  id String @id @default(uuid())
+
+  dealId String
+  deal   Deal   @relation(fields: [dealId], references: [id], onDelete: Cascade)
+
+  dueDate DateTime
+
+  amount Decimal @db.Decimal(14, 2)
+
+  paidAmount Decimal @default(0) @db.Decimal(14, 2)
+
+  status PaymentScheduleStatus
+  order  Int
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([dealId, order])
+  @@index([dealId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([dealId, dueDate])
+}

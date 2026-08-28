@@ -146,6 +146,9 @@ export class UsersService {
             throw new BadRequestException("You cannot deactivate your own account");
         }
 
+        const rolesChanged = dto.role !== undefined && dto.role !== target.role;
+        const beingDeactivated = dto.isActive === false && target.isActive === true;
+
         return this.prisma.user.update({
             where: { id },
             data: {
@@ -154,6 +157,7 @@ export class UsersService {
                 phone: dto.phone,
                 role: dto.role,
                 isActive: dto.isActive,
+                ...(rolesChanged || beingDeactivated ? { sessionsValidFrom: new Date() } : {}),
             },
             select: USER_SAFE_SELECT,
         });
@@ -176,7 +180,31 @@ export class UsersService {
 
         await this.prisma.user.update({
             where: { id },
-            data: { passwordHash },
+            data: {
+                passwordHash,
+                sessionsValidFrom: new Date()
+            },
+        });
+
+        return { success: true };
+    }
+
+    async revokeSessions(user: AuthUser, id: string) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const target = await this.prisma.user.findFirst({
+            where: { id, companyId: user.companyId },
+        });
+
+        if (!target) {
+            throw new NotFoundException("User not found");
+        }
+
+        await this.prisma.user.update({
+            where: { id },
+            data: { sessionsValidFrom: new Date() },
         });
 
         return { success: true };

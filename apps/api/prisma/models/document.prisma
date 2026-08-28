@@ -1,0 +1,57 @@
+enum DocumentOwnerType {
+  LEAD
+  CLIENT
+  DEAL
+  PROJECT
+  UNIT
+}
+
+enum DocumentType {
+  PASSPORT
+  CONTRACT
+  RESERVATION
+  PAYMENT_RECEIPT
+  PAYMENT_SCHEDULE
+  INVOICE
+  AGREEMENT
+  POWER_OF_ATTORNEY
+  FLOOR_PLAN
+  OTHER
+}
+
+model Document {
+  id String @id @default(uuid())
+
+  name         String
+  originalName String
+  mimeType     String
+  extension    String
+
+  size Int
+
+  path String
+  url  String?
+
+  type DocumentType @default(OTHER)
+
+  ownerType DocumentOwnerType
+  ownerId   String
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  uploadedById String
+  uploadedBy   User   @relation(fields: [uploadedById], references: [id])
+
+  metadata Json?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([companyId])
+  @@index([ownerType, ownerId])
+  @@index([type])
+  @@index([uploadedById])
+  @@index([createdAt])
+}

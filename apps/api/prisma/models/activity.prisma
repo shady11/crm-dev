@@ -1,0 +1,89 @@
+enum ActivityAction {
+  CREATED
+  UPDATED
+  DELETED
+
+  RESERVED_UNIT
+  CANCELLED_RESERVATION
+
+  CREATED_DEAL
+  UPDATED_DEAL
+  CHANGED_DEAL_STATUS
+
+  CREATED_PAYMENT
+  RECEIVED_PAYMENT
+
+  GENERATED_CONTRACT
+
+  CREATED_TASK
+  COMPLETED_TASK
+
+  NOTE_ADDED
+}
+
+enum ActivityType {
+  LEAD_CREATED
+  LEAD_UPDATED
+
+  CLIENT_CREATED
+  CLIENT_UPDATED
+
+  DEAL_CREATED
+  DEAL_UPDATED
+
+  UNIT_RESERVED
+  RESERVATION_EXTENDED
+  RESERVATION_CANCELLED
+  RESERVATION_EXPIRED
+
+  CONTRACT_SIGNED
+
+  PAYMENT_RECEIVED
+  PAYMENT_REFUNDED
+
+  NOTE_ADDED
+
+  TASK_CREATED
+  TASK_COMPLETED
+
+  CALL
+  MEETING
+  EMAIL
+}
+
+model Activity {
+  id String @id @default(uuid())
+
+  action ActivityAction
+
+  type ActivityType
+
+  title       String
+  description String?
+  metadata    Json?
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  leadId String?
+  lead   Lead?   @relation(fields: [leadId], references: [id])
+
+  clientId String?
+  client   Client? @relation(fields: [clientId], references: [id])
+
+  dealId String?
+  deal   Deal?   @relation(fields: [dealId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([companyId])
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([dealId])
+  @@index([clientId])
+  @@index([leadId])
+}

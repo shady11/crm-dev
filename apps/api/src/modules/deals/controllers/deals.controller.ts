@@ -13,10 +13,10 @@ import {ReserveUnitDto} from '../dto/reserve-unit.dto';
 import {ExtendReservationDto} from "@/modules/deals/dto/extend-reservation.dto";
 import {SignContractDto} from "@/modules/deals/dto/sign-contract.dto";
 import {CancelDealDto} from "@/modules/deals/dto/cancel-deal.dto";
-import {GeneratePaymentScheduleDto} from "@/modules/deals/dto/generate-payment-schedule.dto";
-import {CreatePaymentDto} from "@/modules/deals/dto/create-payment.dto";
-import {PaymentScheduleService} from "@/modules/deals/services/payment-schedule.service";
-import {PaymentService} from "@/modules/deals/services/payment.service";
+import {GeneratePaymentScheduleDto} from "@/modules/deals/dto/payments/generate-payment-schedule.dto";
+import {CreatePaymentDto} from "@/modules/deals/dto/payments/create-payment.dto";
+import {PaymentScheduleService} from "@/modules/deals/services/payments/payment-schedule.service";
+import {PaymentService} from "@/modules/deals/services/payments/payment.service";
 
 @UseGuards(JwtAuthGuard, CompanyGuard, RolesGuard)
 @Controller('deals')

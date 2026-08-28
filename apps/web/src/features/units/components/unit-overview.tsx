@@ -2,11 +2,12 @@ import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/co
 import {
     type Unit,
     UNIT_STATUS_CLASSES,
-    UNIT_STATUS_LABELS,
+    UNIT_STATUS_LABEL_KEYS,
     UNIT_TYPE_LABELS
 } from "@/features/units/types/unit.types.ts";
 import type {Floor} from "@/features/floors/types/floor.types.ts";
 import {Badge} from "@/components/ui/badge.tsx";
+import {useTranslation} from "react-i18next";
 
 interface UnitOverviewProps {
     unit: Unit | null;
@@ -17,6 +18,7 @@ export const UnitOverview = ({
                                  unit,
                                  floor,
                              }: UnitOverviewProps) => {
+    const { t } = useTranslation("units");
 
     const pricePerSqM =
         parseFloat(unit.area) > 0
@@ -38,7 +40,7 @@ export const UnitOverview = ({
                     <DataListItemLabel>Status</DataListItemLabel>
                     <DataListItemValue>
                         <Badge className={`${UNIT_STATUS_CLASSES[unit.status]} text-white`}>
-                            {UNIT_STATUS_LABELS[unit.status]}
+                            {t(UNIT_STATUS_LABEL_KEYS[unit.status])}
                         </Badge>
                     </DataListItemValue>
                 </DataListItem>

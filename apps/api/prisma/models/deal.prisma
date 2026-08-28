@@ -1,0 +1,78 @@
+enum DealStatus {
+  RESERVED
+  CONTRACT_SIGNED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum FinancingType {
+  CASH
+  INSTALLMENT
+  MORTGAGE
+}
+
+model Deal {
+  id String @id @default(uuid())
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  unitId String
+  unit   Unit   @relation(fields: [unitId], references: [id], onDelete: Restrict)
+
+  clientId String
+  client   Client @relation(fields: [clientId], references: [id], onDelete: Restrict)
+
+  managerId String?
+  manager   User?   @relation(fields: [managerId], references: [id])
+
+  dealNumber    String
+  status        DealStatus     @default(RESERVED)
+  financingType FinancingType?
+
+  listPrice Decimal @db.Decimal(14, 2)
+  salePrice Decimal @db.Decimal(14, 2)
+
+  discountAmount  Decimal? @db.Decimal(14, 2)
+  discountPercent Decimal? @db.Decimal(5, 2)
+  deposit         Decimal? @db.Decimal(14, 2)
+
+  reservedAt           DateTime?
+  reservationExpiresAt DateTime?
+  reservedById         String?
+  reservedBy           User?     @relation("ReservedBy", fields: [reservedById], references: [id])
+
+  contractNumber String?
+  contractDate   DateTime?
+
+  cancelledAt  DateTime?
+  cancelReason String?
+
+  note String? @db.Text
+
+  paymentSchedules PaymentSchedule[]
+  payments         Payment[]
+
+  activities Activity[]
+  tasks      Task[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([companyId, dealNumber])
+  @@index([projectId])
+  @@index([unitId])
+  @@index([clientId])
+  @@index([managerId])
+  @@index([status])
+  @@index([companyId, status])
+  @@index([companyId, managerId])
+  @@index([companyId, clientId])
+  @@index([companyId, createdAt])
+}

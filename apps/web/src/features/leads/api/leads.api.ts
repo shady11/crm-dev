@@ -75,3 +75,15 @@ export async function convertLead(id: string, payload?: ConvertLeadPayload) {
     const response = await api.post<Lead>(`/leads/${id}/convert`, payload ?? {});
     return response.data;
 }
+
+export type DuplicateLeadCheckResult = {
+    leads: { id: string; fullName: string; phone: string; status: string; createdAt: string }[];
+    clients: { id: string; fullName: string; phone: string; createdAt: string }[];
+};
+
+export async function checkLeadDuplicates(phone: string, excludeLeadId?: string) {
+    const response = await api.get<DuplicateLeadCheckResult>("/leads/duplicates", {
+        params: { phone, excludeLeadId },
+    });
+    return response.data;
+}

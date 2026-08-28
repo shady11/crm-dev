@@ -1,0 +1,41 @@
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  CANCELLED
+}
+
+model Task {
+  id String @id @default(uuid())
+
+  title       String
+  description String?
+  dueDate     DateTime?
+  status      TaskStatus @default(TODO)
+
+  assignedToId String
+  assignedTo   User   @relation(fields: [assignedToId], references: [id])
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  leadId String?
+  lead   Lead?   @relation(fields: [leadId], references: [id])
+
+  clientId String?
+  client   Client? @relation(fields: [clientId], references: [id])
+
+  dealId String?
+  deal   Deal?   @relation(fields: [dealId], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([assignedToId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([dealId])
+  @@index([clientId])
+  @@index([leadId])
+}

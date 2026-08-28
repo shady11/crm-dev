@@ -439,6 +439,11 @@ export type CompanyUncheckedUpdateManyInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
+export type CompanyScalarRelationFilter = {
+  is?: Prisma.CompanyWhereInput
+  isNot?: Prisma.CompanyWhereInput
+}
+
 export type CompanyCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
@@ -483,25 +488,116 @@ export type CompanyNullableScalarRelationFilter = {
   isNot?: Prisma.CompanyWhereInput | null
 }
 
-export type CompanyScalarRelationFilter = {
-  is?: Prisma.CompanyWhereInput
-  isNot?: Prisma.CompanyWhereInput
+export type CompanyCreateNestedOneWithoutActivitiesInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutActivitiesInput, Prisma.CompanyUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutActivitiesInput
+  connect?: Prisma.CompanyWhereUniqueInput
 }
 
-export type StringFieldUpdateOperationsInput = {
-  set?: string
+export type CompanyUpdateOneRequiredWithoutActivitiesNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutActivitiesInput, Prisma.CompanyUncheckedCreateWithoutActivitiesInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutActivitiesInput
+  upsert?: Prisma.CompanyUpsertWithoutActivitiesInput
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutActivitiesInput, Prisma.CompanyUpdateWithoutActivitiesInput>, Prisma.CompanyUncheckedUpdateWithoutActivitiesInput>
 }
 
-export type NullableStringFieldUpdateOperationsInput = {
-  set?: string | null
+export type CompanyCreateNestedOneWithoutClientsInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutClientsInput, Prisma.CompanyUncheckedCreateWithoutClientsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutClientsInput
+  connect?: Prisma.CompanyWhereUniqueInput
 }
 
-export type DateTimeFieldUpdateOperationsInput = {
-  set?: Date | string
+export type CompanyUpdateOneRequiredWithoutClientsNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutClientsInput, Prisma.CompanyUncheckedCreateWithoutClientsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutClientsInput
+  upsert?: Prisma.CompanyUpsertWithoutClientsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutClientsInput, Prisma.CompanyUpdateWithoutClientsInput>, Prisma.CompanyUncheckedUpdateWithoutClientsInput>
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
+export type CompanyCreateNestedOneWithoutDealsInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutDealsInput, Prisma.CompanyUncheckedCreateWithoutDealsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutDealsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+}
+
+export type CompanyUpdateOneRequiredWithoutDealsNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutDealsInput, Prisma.CompanyUncheckedCreateWithoutDealsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutDealsInput
+  upsert?: Prisma.CompanyUpsertWithoutDealsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutDealsInput, Prisma.CompanyUpdateWithoutDealsInput>, Prisma.CompanyUncheckedUpdateWithoutDealsInput>
+}
+
+export type CompanyCreateNestedOneWithoutDocumentsInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutDocumentsInput, Prisma.CompanyUncheckedCreateWithoutDocumentsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutDocumentsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+}
+
+export type CompanyUpdateOneRequiredWithoutDocumentsNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutDocumentsInput, Prisma.CompanyUncheckedCreateWithoutDocumentsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutDocumentsInput
+  upsert?: Prisma.CompanyUpsertWithoutDocumentsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutDocumentsInput, Prisma.CompanyUpdateWithoutDocumentsInput>, Prisma.CompanyUncheckedUpdateWithoutDocumentsInput>
+}
+
+export type CompanyCreateNestedOneWithoutLeadsInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutLeadsInput, Prisma.CompanyUncheckedCreateWithoutLeadsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutLeadsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+}
+
+export type CompanyUpdateOneRequiredWithoutLeadsNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutLeadsInput, Prisma.CompanyUncheckedCreateWithoutLeadsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutLeadsInput
+  upsert?: Prisma.CompanyUpsertWithoutLeadsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutLeadsInput, Prisma.CompanyUpdateWithoutLeadsInput>, Prisma.CompanyUncheckedUpdateWithoutLeadsInput>
+}
+
+export type CompanyCreateNestedOneWithoutNotificationsInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutNotificationsInput, Prisma.CompanyUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutNotificationsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+}
+
+export type CompanyUpdateOneRequiredWithoutNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutNotificationsInput, Prisma.CompanyUncheckedCreateWithoutNotificationsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutNotificationsInput
+  upsert?: Prisma.CompanyUpsertWithoutNotificationsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutNotificationsInput, Prisma.CompanyUpdateWithoutNotificationsInput>, Prisma.CompanyUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type CompanyCreateNestedOneWithoutProjectsInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutProjectsInput, Prisma.CompanyUncheckedCreateWithoutProjectsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutProjectsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+}
+
+export type CompanyUpdateOneRequiredWithoutProjectsNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutProjectsInput, Prisma.CompanyUncheckedCreateWithoutProjectsInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutProjectsInput
+  upsert?: Prisma.CompanyUpsertWithoutProjectsInput
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutProjectsInput, Prisma.CompanyUpdateWithoutProjectsInput>, Prisma.CompanyUncheckedUpdateWithoutProjectsInput>
+}
+
+export type CompanyCreateNestedOneWithoutTasksInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutTasksInput, Prisma.CompanyUncheckedCreateWithoutTasksInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutTasksInput
+  connect?: Prisma.CompanyWhereUniqueInput
+}
+
+export type CompanyUpdateOneRequiredWithoutTasksNestedInput = {
+  create?: Prisma.XOR<Prisma.CompanyCreateWithoutTasksInput, Prisma.CompanyUncheckedCreateWithoutTasksInput>
+  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutTasksInput
+  upsert?: Prisma.CompanyUpsertWithoutTasksInput
+  connect?: Prisma.CompanyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutTasksInput, Prisma.CompanyUpdateWithoutTasksInput>, Prisma.CompanyUncheckedUpdateWithoutTasksInput>
 }
 
 export type CompanyCreateNestedOneWithoutUsersInput = {
@@ -520,219 +616,7 @@ export type CompanyUpdateOneWithoutUsersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutUsersInput, Prisma.CompanyUpdateWithoutUsersInput>, Prisma.CompanyUncheckedUpdateWithoutUsersInput>
 }
 
-export type CompanyCreateNestedOneWithoutLeadsInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutLeadsInput, Prisma.CompanyUncheckedCreateWithoutLeadsInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutLeadsInput
-  connect?: Prisma.CompanyWhereUniqueInput
-}
-
-export type CompanyUpdateOneRequiredWithoutLeadsNestedInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutLeadsInput, Prisma.CompanyUncheckedCreateWithoutLeadsInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutLeadsInput
-  upsert?: Prisma.CompanyUpsertWithoutLeadsInput
-  connect?: Prisma.CompanyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutLeadsInput, Prisma.CompanyUpdateWithoutLeadsInput>, Prisma.CompanyUncheckedUpdateWithoutLeadsInput>
-}
-
-export type CompanyCreateNestedOneWithoutClientsInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutClientsInput, Prisma.CompanyUncheckedCreateWithoutClientsInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutClientsInput
-  connect?: Prisma.CompanyWhereUniqueInput
-}
-
-export type CompanyUpdateOneRequiredWithoutClientsNestedInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutClientsInput, Prisma.CompanyUncheckedCreateWithoutClientsInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutClientsInput
-  upsert?: Prisma.CompanyUpsertWithoutClientsInput
-  connect?: Prisma.CompanyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutClientsInput, Prisma.CompanyUpdateWithoutClientsInput>, Prisma.CompanyUncheckedUpdateWithoutClientsInput>
-}
-
-export type CompanyCreateNestedOneWithoutProjectsInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutProjectsInput, Prisma.CompanyUncheckedCreateWithoutProjectsInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutProjectsInput
-  connect?: Prisma.CompanyWhereUniqueInput
-}
-
-export type CompanyUpdateOneRequiredWithoutProjectsNestedInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutProjectsInput, Prisma.CompanyUncheckedCreateWithoutProjectsInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutProjectsInput
-  upsert?: Prisma.CompanyUpsertWithoutProjectsInput
-  connect?: Prisma.CompanyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutProjectsInput, Prisma.CompanyUpdateWithoutProjectsInput>, Prisma.CompanyUncheckedUpdateWithoutProjectsInput>
-}
-
-export type CompanyCreateNestedOneWithoutDealsInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutDealsInput, Prisma.CompanyUncheckedCreateWithoutDealsInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutDealsInput
-  connect?: Prisma.CompanyWhereUniqueInput
-}
-
-export type CompanyUpdateOneRequiredWithoutDealsNestedInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutDealsInput, Prisma.CompanyUncheckedCreateWithoutDealsInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutDealsInput
-  upsert?: Prisma.CompanyUpsertWithoutDealsInput
-  connect?: Prisma.CompanyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutDealsInput, Prisma.CompanyUpdateWithoutDealsInput>, Prisma.CompanyUncheckedUpdateWithoutDealsInput>
-}
-
-export type CompanyCreateNestedOneWithoutActivitiesInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutActivitiesInput, Prisma.CompanyUncheckedCreateWithoutActivitiesInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutActivitiesInput
-  connect?: Prisma.CompanyWhereUniqueInput
-}
-
-export type CompanyUpdateOneRequiredWithoutActivitiesNestedInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutActivitiesInput, Prisma.CompanyUncheckedCreateWithoutActivitiesInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutActivitiesInput
-  upsert?: Prisma.CompanyUpsertWithoutActivitiesInput
-  connect?: Prisma.CompanyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutActivitiesInput, Prisma.CompanyUpdateWithoutActivitiesInput>, Prisma.CompanyUncheckedUpdateWithoutActivitiesInput>
-}
-
-export type CompanyCreateNestedOneWithoutTasksInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutTasksInput, Prisma.CompanyUncheckedCreateWithoutTasksInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutTasksInput
-  connect?: Prisma.CompanyWhereUniqueInput
-}
-
-export type CompanyUpdateOneRequiredWithoutTasksNestedInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutTasksInput, Prisma.CompanyUncheckedCreateWithoutTasksInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutTasksInput
-  upsert?: Prisma.CompanyUpsertWithoutTasksInput
-  connect?: Prisma.CompanyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutTasksInput, Prisma.CompanyUpdateWithoutTasksInput>, Prisma.CompanyUncheckedUpdateWithoutTasksInput>
-}
-
-export type CompanyCreateNestedOneWithoutDocumentsInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutDocumentsInput, Prisma.CompanyUncheckedCreateWithoutDocumentsInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutDocumentsInput
-  connect?: Prisma.CompanyWhereUniqueInput
-}
-
-export type CompanyUpdateOneRequiredWithoutDocumentsNestedInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutDocumentsInput, Prisma.CompanyUncheckedCreateWithoutDocumentsInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutDocumentsInput
-  upsert?: Prisma.CompanyUpsertWithoutDocumentsInput
-  connect?: Prisma.CompanyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutDocumentsInput, Prisma.CompanyUpdateWithoutDocumentsInput>, Prisma.CompanyUncheckedUpdateWithoutDocumentsInput>
-}
-
-export type CompanyCreateNestedOneWithoutNotificationsInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutNotificationsInput, Prisma.CompanyUncheckedCreateWithoutNotificationsInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutNotificationsInput
-  connect?: Prisma.CompanyWhereUniqueInput
-}
-
-export type CompanyUpdateOneRequiredWithoutNotificationsNestedInput = {
-  create?: Prisma.XOR<Prisma.CompanyCreateWithoutNotificationsInput, Prisma.CompanyUncheckedCreateWithoutNotificationsInput>
-  connectOrCreate?: Prisma.CompanyCreateOrConnectWithoutNotificationsInput
-  upsert?: Prisma.CompanyUpsertWithoutNotificationsInput
-  connect?: Prisma.CompanyWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.CompanyUpdateToOneWithWhereWithoutNotificationsInput, Prisma.CompanyUpdateWithoutNotificationsInput>, Prisma.CompanyUncheckedUpdateWithoutNotificationsInput>
-}
-
-export type CompanyCreateWithoutUsersInput = {
-  id?: string
-  name: string
-  phone?: string | null
-  address?: string | null
-  currency?: string | null
-  timezone?: string | null
-  locale?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  deletedAt?: Date | string | null
-  leads?: Prisma.LeadCreateNestedManyWithoutCompanyInput
-  clients?: Prisma.ClientCreateNestedManyWithoutCompanyInput
-  projects?: Prisma.ProjectCreateNestedManyWithoutCompanyInput
-  deals?: Prisma.DealCreateNestedManyWithoutCompanyInput
-  activities?: Prisma.ActivityCreateNestedManyWithoutCompanyInput
-  tasks?: Prisma.TaskCreateNestedManyWithoutCompanyInput
-  documents?: Prisma.DocumentCreateNestedManyWithoutCompanyInput
-  notifications?: Prisma.NotificationCreateNestedManyWithoutCompanyInput
-}
-
-export type CompanyUncheckedCreateWithoutUsersInput = {
-  id?: string
-  name: string
-  phone?: string | null
-  address?: string | null
-  currency?: string | null
-  timezone?: string | null
-  locale?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  deletedAt?: Date | string | null
-  leads?: Prisma.LeadUncheckedCreateNestedManyWithoutCompanyInput
-  clients?: Prisma.ClientUncheckedCreateNestedManyWithoutCompanyInput
-  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutCompanyInput
-  deals?: Prisma.DealUncheckedCreateNestedManyWithoutCompanyInput
-  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutCompanyInput
-  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCompanyInput
-  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutCompanyInput
-  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCompanyInput
-}
-
-export type CompanyCreateOrConnectWithoutUsersInput = {
-  where: Prisma.CompanyWhereUniqueInput
-  create: Prisma.XOR<Prisma.CompanyCreateWithoutUsersInput, Prisma.CompanyUncheckedCreateWithoutUsersInput>
-}
-
-export type CompanyUpsertWithoutUsersInput = {
-  update: Prisma.XOR<Prisma.CompanyUpdateWithoutUsersInput, Prisma.CompanyUncheckedUpdateWithoutUsersInput>
-  create: Prisma.XOR<Prisma.CompanyCreateWithoutUsersInput, Prisma.CompanyUncheckedCreateWithoutUsersInput>
-  where?: Prisma.CompanyWhereInput
-}
-
-export type CompanyUpdateToOneWithWhereWithoutUsersInput = {
-  where?: Prisma.CompanyWhereInput
-  data: Prisma.XOR<Prisma.CompanyUpdateWithoutUsersInput, Prisma.CompanyUncheckedUpdateWithoutUsersInput>
-}
-
-export type CompanyUpdateWithoutUsersInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  currency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  leads?: Prisma.LeadUpdateManyWithoutCompanyNestedInput
-  clients?: Prisma.ClientUpdateManyWithoutCompanyNestedInput
-  projects?: Prisma.ProjectUpdateManyWithoutCompanyNestedInput
-  deals?: Prisma.DealUpdateManyWithoutCompanyNestedInput
-  activities?: Prisma.ActivityUpdateManyWithoutCompanyNestedInput
-  tasks?: Prisma.TaskUpdateManyWithoutCompanyNestedInput
-  documents?: Prisma.DocumentUpdateManyWithoutCompanyNestedInput
-  notifications?: Prisma.NotificationUpdateManyWithoutCompanyNestedInput
-}
-
-export type CompanyUncheckedUpdateWithoutUsersInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  currency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  leads?: Prisma.LeadUncheckedUpdateManyWithoutCompanyNestedInput
-  clients?: Prisma.ClientUncheckedUpdateManyWithoutCompanyNestedInput
-  projects?: Prisma.ProjectUncheckedUpdateManyWithoutCompanyNestedInput
-  deals?: Prisma.DealUncheckedUpdateManyWithoutCompanyNestedInput
-  activities?: Prisma.ActivityUncheckedUpdateManyWithoutCompanyNestedInput
-  tasks?: Prisma.TaskUncheckedUpdateManyWithoutCompanyNestedInput
-  documents?: Prisma.DocumentUncheckedUpdateManyWithoutCompanyNestedInput
-  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCompanyNestedInput
-}
-
-export type CompanyCreateWithoutLeadsInput = {
+export type CompanyCreateWithoutActivitiesInput = {
   id?: string
   name: string
   phone?: string | null
@@ -744,16 +628,16 @@ export type CompanyCreateWithoutLeadsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   users?: Prisma.UserCreateNestedManyWithoutCompanyInput
+  leads?: Prisma.LeadCreateNestedManyWithoutCompanyInput
   clients?: Prisma.ClientCreateNestedManyWithoutCompanyInput
   projects?: Prisma.ProjectCreateNestedManyWithoutCompanyInput
   deals?: Prisma.DealCreateNestedManyWithoutCompanyInput
-  activities?: Prisma.ActivityCreateNestedManyWithoutCompanyInput
   tasks?: Prisma.TaskCreateNestedManyWithoutCompanyInput
   documents?: Prisma.DocumentCreateNestedManyWithoutCompanyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCompanyInput
 }
 
-export type CompanyUncheckedCreateWithoutLeadsInput = {
+export type CompanyUncheckedCreateWithoutActivitiesInput = {
   id?: string
   name: string
   phone?: string | null
@@ -765,32 +649,32 @@ export type CompanyUncheckedCreateWithoutLeadsInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   users?: Prisma.UserUncheckedCreateNestedManyWithoutCompanyInput
+  leads?: Prisma.LeadUncheckedCreateNestedManyWithoutCompanyInput
   clients?: Prisma.ClientUncheckedCreateNestedManyWithoutCompanyInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutCompanyInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutCompanyInput
-  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutCompanyInput
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCompanyInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutCompanyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCompanyInput
 }
 
-export type CompanyCreateOrConnectWithoutLeadsInput = {
+export type CompanyCreateOrConnectWithoutActivitiesInput = {
   where: Prisma.CompanyWhereUniqueInput
-  create: Prisma.XOR<Prisma.CompanyCreateWithoutLeadsInput, Prisma.CompanyUncheckedCreateWithoutLeadsInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutActivitiesInput, Prisma.CompanyUncheckedCreateWithoutActivitiesInput>
 }
 
-export type CompanyUpsertWithoutLeadsInput = {
-  update: Prisma.XOR<Prisma.CompanyUpdateWithoutLeadsInput, Prisma.CompanyUncheckedUpdateWithoutLeadsInput>
-  create: Prisma.XOR<Prisma.CompanyCreateWithoutLeadsInput, Prisma.CompanyUncheckedCreateWithoutLeadsInput>
+export type CompanyUpsertWithoutActivitiesInput = {
+  update: Prisma.XOR<Prisma.CompanyUpdateWithoutActivitiesInput, Prisma.CompanyUncheckedUpdateWithoutActivitiesInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutActivitiesInput, Prisma.CompanyUncheckedCreateWithoutActivitiesInput>
   where?: Prisma.CompanyWhereInput
 }
 
-export type CompanyUpdateToOneWithWhereWithoutLeadsInput = {
+export type CompanyUpdateToOneWithWhereWithoutActivitiesInput = {
   where?: Prisma.CompanyWhereInput
-  data: Prisma.XOR<Prisma.CompanyUpdateWithoutLeadsInput, Prisma.CompanyUncheckedUpdateWithoutLeadsInput>
+  data: Prisma.XOR<Prisma.CompanyUpdateWithoutActivitiesInput, Prisma.CompanyUncheckedUpdateWithoutActivitiesInput>
 }
 
-export type CompanyUpdateWithoutLeadsInput = {
+export type CompanyUpdateWithoutActivitiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -802,16 +686,16 @@ export type CompanyUpdateWithoutLeadsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUpdateManyWithoutCompanyNestedInput
+  leads?: Prisma.LeadUpdateManyWithoutCompanyNestedInput
   clients?: Prisma.ClientUpdateManyWithoutCompanyNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutCompanyNestedInput
   deals?: Prisma.DealUpdateManyWithoutCompanyNestedInput
-  activities?: Prisma.ActivityUpdateManyWithoutCompanyNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutCompanyNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutCompanyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCompanyNestedInput
 }
 
-export type CompanyUncheckedUpdateWithoutLeadsInput = {
+export type CompanyUncheckedUpdateWithoutActivitiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -823,10 +707,10 @@ export type CompanyUncheckedUpdateWithoutLeadsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   users?: Prisma.UserUncheckedUpdateManyWithoutCompanyNestedInput
+  leads?: Prisma.LeadUncheckedUpdateManyWithoutCompanyNestedInput
   clients?: Prisma.ClientUncheckedUpdateManyWithoutCompanyNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutCompanyNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutCompanyNestedInput
-  activities?: Prisma.ActivityUncheckedUpdateManyWithoutCompanyNestedInput
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutCompanyNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutCompanyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCompanyNestedInput
@@ -925,106 +809,6 @@ export type CompanyUncheckedUpdateWithoutClientsInput = {
   users?: Prisma.UserUncheckedUpdateManyWithoutCompanyNestedInput
   leads?: Prisma.LeadUncheckedUpdateManyWithoutCompanyNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutCompanyNestedInput
-  deals?: Prisma.DealUncheckedUpdateManyWithoutCompanyNestedInput
-  activities?: Prisma.ActivityUncheckedUpdateManyWithoutCompanyNestedInput
-  tasks?: Prisma.TaskUncheckedUpdateManyWithoutCompanyNestedInput
-  documents?: Prisma.DocumentUncheckedUpdateManyWithoutCompanyNestedInput
-  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCompanyNestedInput
-}
-
-export type CompanyCreateWithoutProjectsInput = {
-  id?: string
-  name: string
-  phone?: string | null
-  address?: string | null
-  currency?: string | null
-  timezone?: string | null
-  locale?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  deletedAt?: Date | string | null
-  users?: Prisma.UserCreateNestedManyWithoutCompanyInput
-  leads?: Prisma.LeadCreateNestedManyWithoutCompanyInput
-  clients?: Prisma.ClientCreateNestedManyWithoutCompanyInput
-  deals?: Prisma.DealCreateNestedManyWithoutCompanyInput
-  activities?: Prisma.ActivityCreateNestedManyWithoutCompanyInput
-  tasks?: Prisma.TaskCreateNestedManyWithoutCompanyInput
-  documents?: Prisma.DocumentCreateNestedManyWithoutCompanyInput
-  notifications?: Prisma.NotificationCreateNestedManyWithoutCompanyInput
-}
-
-export type CompanyUncheckedCreateWithoutProjectsInput = {
-  id?: string
-  name: string
-  phone?: string | null
-  address?: string | null
-  currency?: string | null
-  timezone?: string | null
-  locale?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  deletedAt?: Date | string | null
-  users?: Prisma.UserUncheckedCreateNestedManyWithoutCompanyInput
-  leads?: Prisma.LeadUncheckedCreateNestedManyWithoutCompanyInput
-  clients?: Prisma.ClientUncheckedCreateNestedManyWithoutCompanyInput
-  deals?: Prisma.DealUncheckedCreateNestedManyWithoutCompanyInput
-  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutCompanyInput
-  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCompanyInput
-  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutCompanyInput
-  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCompanyInput
-}
-
-export type CompanyCreateOrConnectWithoutProjectsInput = {
-  where: Prisma.CompanyWhereUniqueInput
-  create: Prisma.XOR<Prisma.CompanyCreateWithoutProjectsInput, Prisma.CompanyUncheckedCreateWithoutProjectsInput>
-}
-
-export type CompanyUpsertWithoutProjectsInput = {
-  update: Prisma.XOR<Prisma.CompanyUpdateWithoutProjectsInput, Prisma.CompanyUncheckedUpdateWithoutProjectsInput>
-  create: Prisma.XOR<Prisma.CompanyCreateWithoutProjectsInput, Prisma.CompanyUncheckedCreateWithoutProjectsInput>
-  where?: Prisma.CompanyWhereInput
-}
-
-export type CompanyUpdateToOneWithWhereWithoutProjectsInput = {
-  where?: Prisma.CompanyWhereInput
-  data: Prisma.XOR<Prisma.CompanyUpdateWithoutProjectsInput, Prisma.CompanyUncheckedUpdateWithoutProjectsInput>
-}
-
-export type CompanyUpdateWithoutProjectsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  currency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  users?: Prisma.UserUpdateManyWithoutCompanyNestedInput
-  leads?: Prisma.LeadUpdateManyWithoutCompanyNestedInput
-  clients?: Prisma.ClientUpdateManyWithoutCompanyNestedInput
-  deals?: Prisma.DealUpdateManyWithoutCompanyNestedInput
-  activities?: Prisma.ActivityUpdateManyWithoutCompanyNestedInput
-  tasks?: Prisma.TaskUpdateManyWithoutCompanyNestedInput
-  documents?: Prisma.DocumentUpdateManyWithoutCompanyNestedInput
-  notifications?: Prisma.NotificationUpdateManyWithoutCompanyNestedInput
-}
-
-export type CompanyUncheckedUpdateWithoutProjectsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  currency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  users?: Prisma.UserUncheckedUpdateManyWithoutCompanyNestedInput
-  leads?: Prisma.LeadUncheckedUpdateManyWithoutCompanyNestedInput
-  clients?: Prisma.ClientUncheckedUpdateManyWithoutCompanyNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutCompanyNestedInput
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutCompanyNestedInput
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutCompanyNestedInput
@@ -1132,7 +916,7 @@ export type CompanyUncheckedUpdateWithoutDealsInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCompanyNestedInput
 }
 
-export type CompanyCreateWithoutActivitiesInput = {
+export type CompanyCreateWithoutDocumentsInput = {
   id?: string
   name: string
   phone?: string | null
@@ -1148,12 +932,12 @@ export type CompanyCreateWithoutActivitiesInput = {
   clients?: Prisma.ClientCreateNestedManyWithoutCompanyInput
   projects?: Prisma.ProjectCreateNestedManyWithoutCompanyInput
   deals?: Prisma.DealCreateNestedManyWithoutCompanyInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutCompanyInput
   tasks?: Prisma.TaskCreateNestedManyWithoutCompanyInput
-  documents?: Prisma.DocumentCreateNestedManyWithoutCompanyInput
   notifications?: Prisma.NotificationCreateNestedManyWithoutCompanyInput
 }
 
-export type CompanyUncheckedCreateWithoutActivitiesInput = {
+export type CompanyUncheckedCreateWithoutDocumentsInput = {
   id?: string
   name: string
   phone?: string | null
@@ -1169,28 +953,28 @@ export type CompanyUncheckedCreateWithoutActivitiesInput = {
   clients?: Prisma.ClientUncheckedCreateNestedManyWithoutCompanyInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutCompanyInput
   deals?: Prisma.DealUncheckedCreateNestedManyWithoutCompanyInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutCompanyInput
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCompanyInput
-  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutCompanyInput
   notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCompanyInput
 }
 
-export type CompanyCreateOrConnectWithoutActivitiesInput = {
+export type CompanyCreateOrConnectWithoutDocumentsInput = {
   where: Prisma.CompanyWhereUniqueInput
-  create: Prisma.XOR<Prisma.CompanyCreateWithoutActivitiesInput, Prisma.CompanyUncheckedCreateWithoutActivitiesInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutDocumentsInput, Prisma.CompanyUncheckedCreateWithoutDocumentsInput>
 }
 
-export type CompanyUpsertWithoutActivitiesInput = {
-  update: Prisma.XOR<Prisma.CompanyUpdateWithoutActivitiesInput, Prisma.CompanyUncheckedUpdateWithoutActivitiesInput>
-  create: Prisma.XOR<Prisma.CompanyCreateWithoutActivitiesInput, Prisma.CompanyUncheckedCreateWithoutActivitiesInput>
+export type CompanyUpsertWithoutDocumentsInput = {
+  update: Prisma.XOR<Prisma.CompanyUpdateWithoutDocumentsInput, Prisma.CompanyUncheckedUpdateWithoutDocumentsInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutDocumentsInput, Prisma.CompanyUncheckedCreateWithoutDocumentsInput>
   where?: Prisma.CompanyWhereInput
 }
 
-export type CompanyUpdateToOneWithWhereWithoutActivitiesInput = {
+export type CompanyUpdateToOneWithWhereWithoutDocumentsInput = {
   where?: Prisma.CompanyWhereInput
-  data: Prisma.XOR<Prisma.CompanyUpdateWithoutActivitiesInput, Prisma.CompanyUncheckedUpdateWithoutActivitiesInput>
+  data: Prisma.XOR<Prisma.CompanyUpdateWithoutDocumentsInput, Prisma.CompanyUncheckedUpdateWithoutDocumentsInput>
 }
 
-export type CompanyUpdateWithoutActivitiesInput = {
+export type CompanyUpdateWithoutDocumentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1206,12 +990,12 @@ export type CompanyUpdateWithoutActivitiesInput = {
   clients?: Prisma.ClientUpdateManyWithoutCompanyNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutCompanyNestedInput
   deals?: Prisma.DealUpdateManyWithoutCompanyNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutCompanyNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutCompanyNestedInput
-  documents?: Prisma.DocumentUpdateManyWithoutCompanyNestedInput
   notifications?: Prisma.NotificationUpdateManyWithoutCompanyNestedInput
 }
 
-export type CompanyUncheckedUpdateWithoutActivitiesInput = {
+export type CompanyUncheckedUpdateWithoutDocumentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1227,6 +1011,306 @@ export type CompanyUncheckedUpdateWithoutActivitiesInput = {
   clients?: Prisma.ClientUncheckedUpdateManyWithoutCompanyNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutCompanyNestedInput
   deals?: Prisma.DealUncheckedUpdateManyWithoutCompanyNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutCompanyNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutCompanyNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCompanyNestedInput
+}
+
+export type CompanyCreateWithoutLeadsInput = {
+  id?: string
+  name: string
+  phone?: string | null
+  address?: string | null
+  currency?: string | null
+  timezone?: string | null
+  locale?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  users?: Prisma.UserCreateNestedManyWithoutCompanyInput
+  clients?: Prisma.ClientCreateNestedManyWithoutCompanyInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutCompanyInput
+  deals?: Prisma.DealCreateNestedManyWithoutCompanyInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutCompanyInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutCompanyInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutCompanyInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutCompanyInput
+}
+
+export type CompanyUncheckedCreateWithoutLeadsInput = {
+  id?: string
+  name: string
+  phone?: string | null
+  address?: string | null
+  currency?: string | null
+  timezone?: string | null
+  locale?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutCompanyInput
+  clients?: Prisma.ClientUncheckedCreateNestedManyWithoutCompanyInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutCompanyInput
+  deals?: Prisma.DealUncheckedCreateNestedManyWithoutCompanyInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutCompanyInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCompanyInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutCompanyInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCompanyInput
+}
+
+export type CompanyCreateOrConnectWithoutLeadsInput = {
+  where: Prisma.CompanyWhereUniqueInput
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutLeadsInput, Prisma.CompanyUncheckedCreateWithoutLeadsInput>
+}
+
+export type CompanyUpsertWithoutLeadsInput = {
+  update: Prisma.XOR<Prisma.CompanyUpdateWithoutLeadsInput, Prisma.CompanyUncheckedUpdateWithoutLeadsInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutLeadsInput, Prisma.CompanyUncheckedCreateWithoutLeadsInput>
+  where?: Prisma.CompanyWhereInput
+}
+
+export type CompanyUpdateToOneWithWhereWithoutLeadsInput = {
+  where?: Prisma.CompanyWhereInput
+  data: Prisma.XOR<Prisma.CompanyUpdateWithoutLeadsInput, Prisma.CompanyUncheckedUpdateWithoutLeadsInput>
+}
+
+export type CompanyUpdateWithoutLeadsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  users?: Prisma.UserUpdateManyWithoutCompanyNestedInput
+  clients?: Prisma.ClientUpdateManyWithoutCompanyNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutCompanyNestedInput
+  deals?: Prisma.DealUpdateManyWithoutCompanyNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutCompanyNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutCompanyNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutCompanyNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutCompanyNestedInput
+}
+
+export type CompanyUncheckedUpdateWithoutLeadsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  users?: Prisma.UserUncheckedUpdateManyWithoutCompanyNestedInput
+  clients?: Prisma.ClientUncheckedUpdateManyWithoutCompanyNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutCompanyNestedInput
+  deals?: Prisma.DealUncheckedUpdateManyWithoutCompanyNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutCompanyNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutCompanyNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCompanyNestedInput
+}
+
+export type CompanyCreateWithoutNotificationsInput = {
+  id?: string
+  name: string
+  phone?: string | null
+  address?: string | null
+  currency?: string | null
+  timezone?: string | null
+  locale?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  users?: Prisma.UserCreateNestedManyWithoutCompanyInput
+  leads?: Prisma.LeadCreateNestedManyWithoutCompanyInput
+  clients?: Prisma.ClientCreateNestedManyWithoutCompanyInput
+  projects?: Prisma.ProjectCreateNestedManyWithoutCompanyInput
+  deals?: Prisma.DealCreateNestedManyWithoutCompanyInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutCompanyInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutCompanyInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutCompanyInput
+}
+
+export type CompanyUncheckedCreateWithoutNotificationsInput = {
+  id?: string
+  name: string
+  phone?: string | null
+  address?: string | null
+  currency?: string | null
+  timezone?: string | null
+  locale?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutCompanyInput
+  leads?: Prisma.LeadUncheckedCreateNestedManyWithoutCompanyInput
+  clients?: Prisma.ClientUncheckedCreateNestedManyWithoutCompanyInput
+  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutCompanyInput
+  deals?: Prisma.DealUncheckedCreateNestedManyWithoutCompanyInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutCompanyInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCompanyInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutCompanyInput
+}
+
+export type CompanyCreateOrConnectWithoutNotificationsInput = {
+  where: Prisma.CompanyWhereUniqueInput
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutNotificationsInput, Prisma.CompanyUncheckedCreateWithoutNotificationsInput>
+}
+
+export type CompanyUpsertWithoutNotificationsInput = {
+  update: Prisma.XOR<Prisma.CompanyUpdateWithoutNotificationsInput, Prisma.CompanyUncheckedUpdateWithoutNotificationsInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutNotificationsInput, Prisma.CompanyUncheckedCreateWithoutNotificationsInput>
+  where?: Prisma.CompanyWhereInput
+}
+
+export type CompanyUpdateToOneWithWhereWithoutNotificationsInput = {
+  where?: Prisma.CompanyWhereInput
+  data: Prisma.XOR<Prisma.CompanyUpdateWithoutNotificationsInput, Prisma.CompanyUncheckedUpdateWithoutNotificationsInput>
+}
+
+export type CompanyUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  users?: Prisma.UserUpdateManyWithoutCompanyNestedInput
+  leads?: Prisma.LeadUpdateManyWithoutCompanyNestedInput
+  clients?: Prisma.ClientUpdateManyWithoutCompanyNestedInput
+  projects?: Prisma.ProjectUpdateManyWithoutCompanyNestedInput
+  deals?: Prisma.DealUpdateManyWithoutCompanyNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutCompanyNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutCompanyNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutCompanyNestedInput
+}
+
+export type CompanyUncheckedUpdateWithoutNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  users?: Prisma.UserUncheckedUpdateManyWithoutCompanyNestedInput
+  leads?: Prisma.LeadUncheckedUpdateManyWithoutCompanyNestedInput
+  clients?: Prisma.ClientUncheckedUpdateManyWithoutCompanyNestedInput
+  projects?: Prisma.ProjectUncheckedUpdateManyWithoutCompanyNestedInput
+  deals?: Prisma.DealUncheckedUpdateManyWithoutCompanyNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutCompanyNestedInput
+  tasks?: Prisma.TaskUncheckedUpdateManyWithoutCompanyNestedInput
+  documents?: Prisma.DocumentUncheckedUpdateManyWithoutCompanyNestedInput
+}
+
+export type CompanyCreateWithoutProjectsInput = {
+  id?: string
+  name: string
+  phone?: string | null
+  address?: string | null
+  currency?: string | null
+  timezone?: string | null
+  locale?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  users?: Prisma.UserCreateNestedManyWithoutCompanyInput
+  leads?: Prisma.LeadCreateNestedManyWithoutCompanyInput
+  clients?: Prisma.ClientCreateNestedManyWithoutCompanyInput
+  deals?: Prisma.DealCreateNestedManyWithoutCompanyInput
+  activities?: Prisma.ActivityCreateNestedManyWithoutCompanyInput
+  tasks?: Prisma.TaskCreateNestedManyWithoutCompanyInput
+  documents?: Prisma.DocumentCreateNestedManyWithoutCompanyInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutCompanyInput
+}
+
+export type CompanyUncheckedCreateWithoutProjectsInput = {
+  id?: string
+  name: string
+  phone?: string | null
+  address?: string | null
+  currency?: string | null
+  timezone?: string | null
+  locale?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  users?: Prisma.UserUncheckedCreateNestedManyWithoutCompanyInput
+  leads?: Prisma.LeadUncheckedCreateNestedManyWithoutCompanyInput
+  clients?: Prisma.ClientUncheckedCreateNestedManyWithoutCompanyInput
+  deals?: Prisma.DealUncheckedCreateNestedManyWithoutCompanyInput
+  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutCompanyInput
+  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCompanyInput
+  documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutCompanyInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCompanyInput
+}
+
+export type CompanyCreateOrConnectWithoutProjectsInput = {
+  where: Prisma.CompanyWhereUniqueInput
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutProjectsInput, Prisma.CompanyUncheckedCreateWithoutProjectsInput>
+}
+
+export type CompanyUpsertWithoutProjectsInput = {
+  update: Prisma.XOR<Prisma.CompanyUpdateWithoutProjectsInput, Prisma.CompanyUncheckedUpdateWithoutProjectsInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutProjectsInput, Prisma.CompanyUncheckedCreateWithoutProjectsInput>
+  where?: Prisma.CompanyWhereInput
+}
+
+export type CompanyUpdateToOneWithWhereWithoutProjectsInput = {
+  where?: Prisma.CompanyWhereInput
+  data: Prisma.XOR<Prisma.CompanyUpdateWithoutProjectsInput, Prisma.CompanyUncheckedUpdateWithoutProjectsInput>
+}
+
+export type CompanyUpdateWithoutProjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  users?: Prisma.UserUpdateManyWithoutCompanyNestedInput
+  leads?: Prisma.LeadUpdateManyWithoutCompanyNestedInput
+  clients?: Prisma.ClientUpdateManyWithoutCompanyNestedInput
+  deals?: Prisma.DealUpdateManyWithoutCompanyNestedInput
+  activities?: Prisma.ActivityUpdateManyWithoutCompanyNestedInput
+  tasks?: Prisma.TaskUpdateManyWithoutCompanyNestedInput
+  documents?: Prisma.DocumentUpdateManyWithoutCompanyNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutCompanyNestedInput
+}
+
+export type CompanyUncheckedUpdateWithoutProjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  users?: Prisma.UserUncheckedUpdateManyWithoutCompanyNestedInput
+  leads?: Prisma.LeadUncheckedUpdateManyWithoutCompanyNestedInput
+  clients?: Prisma.ClientUncheckedUpdateManyWithoutCompanyNestedInput
+  deals?: Prisma.DealUncheckedUpdateManyWithoutCompanyNestedInput
+  activities?: Prisma.ActivityUncheckedUpdateManyWithoutCompanyNestedInput
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutCompanyNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutCompanyNestedInput
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCompanyNestedInput
@@ -1332,7 +1416,7 @@ export type CompanyUncheckedUpdateWithoutTasksInput = {
   notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCompanyNestedInput
 }
 
-export type CompanyCreateWithoutDocumentsInput = {
+export type CompanyCreateWithoutUsersInput = {
   id?: string
   name: string
   phone?: string | null
@@ -1343,107 +1427,6 @@ export type CompanyCreateWithoutDocumentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  users?: Prisma.UserCreateNestedManyWithoutCompanyInput
-  leads?: Prisma.LeadCreateNestedManyWithoutCompanyInput
-  clients?: Prisma.ClientCreateNestedManyWithoutCompanyInput
-  projects?: Prisma.ProjectCreateNestedManyWithoutCompanyInput
-  deals?: Prisma.DealCreateNestedManyWithoutCompanyInput
-  activities?: Prisma.ActivityCreateNestedManyWithoutCompanyInput
-  tasks?: Prisma.TaskCreateNestedManyWithoutCompanyInput
-  notifications?: Prisma.NotificationCreateNestedManyWithoutCompanyInput
-}
-
-export type CompanyUncheckedCreateWithoutDocumentsInput = {
-  id?: string
-  name: string
-  phone?: string | null
-  address?: string | null
-  currency?: string | null
-  timezone?: string | null
-  locale?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  deletedAt?: Date | string | null
-  users?: Prisma.UserUncheckedCreateNestedManyWithoutCompanyInput
-  leads?: Prisma.LeadUncheckedCreateNestedManyWithoutCompanyInput
-  clients?: Prisma.ClientUncheckedCreateNestedManyWithoutCompanyInput
-  projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutCompanyInput
-  deals?: Prisma.DealUncheckedCreateNestedManyWithoutCompanyInput
-  activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutCompanyInput
-  tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCompanyInput
-  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCompanyInput
-}
-
-export type CompanyCreateOrConnectWithoutDocumentsInput = {
-  where: Prisma.CompanyWhereUniqueInput
-  create: Prisma.XOR<Prisma.CompanyCreateWithoutDocumentsInput, Prisma.CompanyUncheckedCreateWithoutDocumentsInput>
-}
-
-export type CompanyUpsertWithoutDocumentsInput = {
-  update: Prisma.XOR<Prisma.CompanyUpdateWithoutDocumentsInput, Prisma.CompanyUncheckedUpdateWithoutDocumentsInput>
-  create: Prisma.XOR<Prisma.CompanyCreateWithoutDocumentsInput, Prisma.CompanyUncheckedCreateWithoutDocumentsInput>
-  where?: Prisma.CompanyWhereInput
-}
-
-export type CompanyUpdateToOneWithWhereWithoutDocumentsInput = {
-  where?: Prisma.CompanyWhereInput
-  data: Prisma.XOR<Prisma.CompanyUpdateWithoutDocumentsInput, Prisma.CompanyUncheckedUpdateWithoutDocumentsInput>
-}
-
-export type CompanyUpdateWithoutDocumentsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  currency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  users?: Prisma.UserUpdateManyWithoutCompanyNestedInput
-  leads?: Prisma.LeadUpdateManyWithoutCompanyNestedInput
-  clients?: Prisma.ClientUpdateManyWithoutCompanyNestedInput
-  projects?: Prisma.ProjectUpdateManyWithoutCompanyNestedInput
-  deals?: Prisma.DealUpdateManyWithoutCompanyNestedInput
-  activities?: Prisma.ActivityUpdateManyWithoutCompanyNestedInput
-  tasks?: Prisma.TaskUpdateManyWithoutCompanyNestedInput
-  notifications?: Prisma.NotificationUpdateManyWithoutCompanyNestedInput
-}
-
-export type CompanyUncheckedUpdateWithoutDocumentsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  currency?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  timezone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  locale?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  users?: Prisma.UserUncheckedUpdateManyWithoutCompanyNestedInput
-  leads?: Prisma.LeadUncheckedUpdateManyWithoutCompanyNestedInput
-  clients?: Prisma.ClientUncheckedUpdateManyWithoutCompanyNestedInput
-  projects?: Prisma.ProjectUncheckedUpdateManyWithoutCompanyNestedInput
-  deals?: Prisma.DealUncheckedUpdateManyWithoutCompanyNestedInput
-  activities?: Prisma.ActivityUncheckedUpdateManyWithoutCompanyNestedInput
-  tasks?: Prisma.TaskUncheckedUpdateManyWithoutCompanyNestedInput
-  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCompanyNestedInput
-}
-
-export type CompanyCreateWithoutNotificationsInput = {
-  id?: string
-  name: string
-  phone?: string | null
-  address?: string | null
-  currency?: string | null
-  timezone?: string | null
-  locale?: string | null
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  deletedAt?: Date | string | null
-  users?: Prisma.UserCreateNestedManyWithoutCompanyInput
   leads?: Prisma.LeadCreateNestedManyWithoutCompanyInput
   clients?: Prisma.ClientCreateNestedManyWithoutCompanyInput
   projects?: Prisma.ProjectCreateNestedManyWithoutCompanyInput
@@ -1451,9 +1434,10 @@ export type CompanyCreateWithoutNotificationsInput = {
   activities?: Prisma.ActivityCreateNestedManyWithoutCompanyInput
   tasks?: Prisma.TaskCreateNestedManyWithoutCompanyInput
   documents?: Prisma.DocumentCreateNestedManyWithoutCompanyInput
+  notifications?: Prisma.NotificationCreateNestedManyWithoutCompanyInput
 }
 
-export type CompanyUncheckedCreateWithoutNotificationsInput = {
+export type CompanyUncheckedCreateWithoutUsersInput = {
   id?: string
   name: string
   phone?: string | null
@@ -1464,7 +1448,6 @@ export type CompanyUncheckedCreateWithoutNotificationsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
-  users?: Prisma.UserUncheckedCreateNestedManyWithoutCompanyInput
   leads?: Prisma.LeadUncheckedCreateNestedManyWithoutCompanyInput
   clients?: Prisma.ClientUncheckedCreateNestedManyWithoutCompanyInput
   projects?: Prisma.ProjectUncheckedCreateNestedManyWithoutCompanyInput
@@ -1472,25 +1455,26 @@ export type CompanyUncheckedCreateWithoutNotificationsInput = {
   activities?: Prisma.ActivityUncheckedCreateNestedManyWithoutCompanyInput
   tasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCompanyInput
   documents?: Prisma.DocumentUncheckedCreateNestedManyWithoutCompanyInput
+  notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutCompanyInput
 }
 
-export type CompanyCreateOrConnectWithoutNotificationsInput = {
+export type CompanyCreateOrConnectWithoutUsersInput = {
   where: Prisma.CompanyWhereUniqueInput
-  create: Prisma.XOR<Prisma.CompanyCreateWithoutNotificationsInput, Prisma.CompanyUncheckedCreateWithoutNotificationsInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutUsersInput, Prisma.CompanyUncheckedCreateWithoutUsersInput>
 }
 
-export type CompanyUpsertWithoutNotificationsInput = {
-  update: Prisma.XOR<Prisma.CompanyUpdateWithoutNotificationsInput, Prisma.CompanyUncheckedUpdateWithoutNotificationsInput>
-  create: Prisma.XOR<Prisma.CompanyCreateWithoutNotificationsInput, Prisma.CompanyUncheckedCreateWithoutNotificationsInput>
+export type CompanyUpsertWithoutUsersInput = {
+  update: Prisma.XOR<Prisma.CompanyUpdateWithoutUsersInput, Prisma.CompanyUncheckedUpdateWithoutUsersInput>
+  create: Prisma.XOR<Prisma.CompanyCreateWithoutUsersInput, Prisma.CompanyUncheckedCreateWithoutUsersInput>
   where?: Prisma.CompanyWhereInput
 }
 
-export type CompanyUpdateToOneWithWhereWithoutNotificationsInput = {
+export type CompanyUpdateToOneWithWhereWithoutUsersInput = {
   where?: Prisma.CompanyWhereInput
-  data: Prisma.XOR<Prisma.CompanyUpdateWithoutNotificationsInput, Prisma.CompanyUncheckedUpdateWithoutNotificationsInput>
+  data: Prisma.XOR<Prisma.CompanyUpdateWithoutUsersInput, Prisma.CompanyUncheckedUpdateWithoutUsersInput>
 }
 
-export type CompanyUpdateWithoutNotificationsInput = {
+export type CompanyUpdateWithoutUsersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1501,7 +1485,6 @@ export type CompanyUpdateWithoutNotificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  users?: Prisma.UserUpdateManyWithoutCompanyNestedInput
   leads?: Prisma.LeadUpdateManyWithoutCompanyNestedInput
   clients?: Prisma.ClientUpdateManyWithoutCompanyNestedInput
   projects?: Prisma.ProjectUpdateManyWithoutCompanyNestedInput
@@ -1509,9 +1492,10 @@ export type CompanyUpdateWithoutNotificationsInput = {
   activities?: Prisma.ActivityUpdateManyWithoutCompanyNestedInput
   tasks?: Prisma.TaskUpdateManyWithoutCompanyNestedInput
   documents?: Prisma.DocumentUpdateManyWithoutCompanyNestedInput
+  notifications?: Prisma.NotificationUpdateManyWithoutCompanyNestedInput
 }
 
-export type CompanyUncheckedUpdateWithoutNotificationsInput = {
+export type CompanyUncheckedUpdateWithoutUsersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1522,7 +1506,6 @@ export type CompanyUncheckedUpdateWithoutNotificationsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  users?: Prisma.UserUncheckedUpdateManyWithoutCompanyNestedInput
   leads?: Prisma.LeadUncheckedUpdateManyWithoutCompanyNestedInput
   clients?: Prisma.ClientUncheckedUpdateManyWithoutCompanyNestedInput
   projects?: Prisma.ProjectUncheckedUpdateManyWithoutCompanyNestedInput
@@ -1530,6 +1513,7 @@ export type CompanyUncheckedUpdateWithoutNotificationsInput = {
   activities?: Prisma.ActivityUncheckedUpdateManyWithoutCompanyNestedInput
   tasks?: Prisma.TaskUncheckedUpdateManyWithoutCompanyNestedInput
   documents?: Prisma.DocumentUncheckedUpdateManyWithoutCompanyNestedInput
+  notifications?: Prisma.NotificationUncheckedUpdateManyWithoutCompanyNestedInput
 }
 
 

@@ -58,6 +58,12 @@ export class UsersController {
     }
 
     @Roles(UserRole.COMPANY_ADMIN)
+    @Post(":id/revoke-sessions")
+    revokeSessions(@CurrentUser() user: AuthUser, @Param("id") id: string) {
+        return this.usersService.revokeSessions(user, id);
+    }
+
+    @Roles(UserRole.COMPANY_ADMIN)
     @Delete(":id")
     remove(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.usersService.remove(user, id);

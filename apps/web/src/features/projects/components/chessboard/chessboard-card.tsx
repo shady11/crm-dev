@@ -8,9 +8,10 @@ import type {Floor} from "@/features/floors/types/floor.types";
 import {
     type Unit,
     UNIT_STATUS_CLASSES,
-    UNIT_STATUS_LABELS,
+    UNIT_STATUS_LABEL_KEYS,
     UNIT_STATUS_VALUES,
 } from "@/features/units/types/unit.types";
+import {useTranslation} from "react-i18next";
 
 interface ChessboardCardProps {
     entranceName: string;
@@ -23,13 +24,6 @@ interface ChessboardCardProps {
     onUnitClick(floor: Floor, unit: Unit): void;
 }
 
-const statusCollection = createListCollection({
-    items: UNIT_STATUS_VALUES.map((status) => ({
-        label: UNIT_STATUS_LABELS[status],
-        value: status,
-    })),
-});
-
 export function ChessboardCard({
                                    entranceName,
                                    floors,
@@ -40,6 +34,15 @@ export function ChessboardCard({
                                    unitMatchesFilters,
                                    onUnitClick,
                                }: ChessboardCardProps) {
+    const { t } = useTranslation("units");
+
+    const statusCollection = createListCollection({
+        items: UNIT_STATUS_VALUES.map((status) => ({
+            label: t(UNIT_STATUS_LABEL_KEYS[status]),
+            value: status,
+        })),
+    });
+
     return (
         <Card className="border border-secondary p-0 gap-0">
             <CardHeader className="gap-0 border-b py-6">

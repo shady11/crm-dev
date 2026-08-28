@@ -13,6 +13,7 @@ import {
     ActiveDealExistsException,
     InvalidDealStateException,
     PaymentExceedsBalanceException,
+    RefundExceedsPaidException,
     ReservationDateInvalidException,
     ReservationExpiredException,
     UnitNotAvailableException,
@@ -29,6 +30,7 @@ export class DealDomainService {
     private readonly finishedStatuses: DealStatus[] = [
         DealStatus.COMPLETED,
         DealStatus.CANCELLED,
+        DealStatus.EXPIRED,
     ];
 
     ensureUnitCanBeReserved(unit: Unit): void {
@@ -93,11 +95,15 @@ export class DealDomainService {
     ensurePaymentWithinBalance(
         deal: Deal,
         totalPaid: Prisma.Decimal,
-        paymentAmount: Prisma.Decimal,
+        signedAmount: Prisma.Decimal,
     ): void {
-        const remaining = deal.salePrice.minus(totalPaid);
+        const newTotal = totalPaid.plus(signedAmount);
 
-        if (paymentAmount.greaterThan(remaining)) {
+        if (newTotal.lessThan(0)) {
+            throw new RefundExceedsPaidException();
+        }
+
+        if (signedAmount.greaterThan(0) && newTotal.greaterThan(deal.salePrice)) {
             throw new PaymentExceedsBalanceException();
         }
     }

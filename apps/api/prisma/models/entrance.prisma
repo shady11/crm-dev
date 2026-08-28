@@ -1,0 +1,23 @@
+model Entrance {
+  id String @id @default(uuid())
+
+  name  String
+  order Int    @default(0)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+
+  blockId String
+  block   Block  @relation(fields: [blockId], references: [id])
+
+  floors Floor[]
+  units  Unit[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@unique([blockId, name])
+  @@index([blockId])
+  @@index([projectId])
+}

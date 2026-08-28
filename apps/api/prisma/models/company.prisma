@@ -1,0 +1,26 @@
+model Company {
+  id String @id @default(uuid())
+
+  name    String
+  phone   String?
+  address String?
+
+  currency String? @default("KGS")
+  timezone String?
+  locale   String?
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  users      User[]
+  leads      Lead[]
+  clients    Client[]
+  projects   Project[]
+  deals      Deal[]
+  activities Activity[]
+  tasks      Task[]
+  documents  Document[]
+
+  notifications Notification[]
+}

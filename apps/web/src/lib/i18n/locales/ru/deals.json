@@ -1,0 +1,21 @@
+{
+  "status": {
+    "reserved": "Забронировано",
+    "contractSigned": "Договор подписан",
+    "active": "В процессе",
+    "completed": "Завершена",
+    "cancelled": "Отменена",
+    "expired": "Истекла"
+  },
+  "financials": {
+    "title": "Финансы",
+    "salePrice": "Цена продажи",
+    "paid": "Оплачено",
+    "remaining": "Остаток",
+    "financing": "Финансирование"
+  },
+  "unitCard": {
+    "unitNumber": "Юнит №{{number}}",
+    "floor": "{{floor}} этаж"
+  }
+}

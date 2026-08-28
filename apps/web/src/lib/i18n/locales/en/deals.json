@@ -1,0 +1,23 @@
+{
+  "status": {
+    "reserved": "Reserved",
+    "contractSigned": "Contract signed",
+    "active": "Active",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "expired": "Expired"
+  },
+  "financials": {
+    "title": "Financials",
+    "listPrice": "List price",
+    "pricePerMeter": "Price per meter",
+    "salePrice": "Sale price",
+    "paid": "Paid",
+    "remaining": "Remaining",
+    "financing": "Financing"
+  },
+  "unitCard": {
+    "unitNumber": "Unit №{{number}}",
+    "floor": "{{floor}}-floor"
+  }
+}

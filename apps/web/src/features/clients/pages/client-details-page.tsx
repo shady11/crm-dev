@@ -13,7 +13,7 @@ import {useClient} from "@/features/clients/hooks/use-client.ts";
 import {initials} from "@/features/clients/utils/format.ts";
 import {updateClient, type UpdateClientPayload} from "@/features/clients/api/clients.api.ts";
 import {ClientTasksCard} from "@/features/tasks/components/client-tasks-card.tsx";
-import {DEAL_STATUS_LABELS, DEAL_STATUS_VISUALS} from "@/features/deals/types/deal.types.ts";
+import {DEAL_STATUS_LABEL_KEYS, DEAL_STATUS_VISUALS} from "@/features/deals/types/deal.types.ts";
 import {paths} from "@/routes/paths.ts";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
 
@@ -141,7 +141,7 @@ export function ClientDetailsPage() {
                                                 {deal.salePrice != null && (
                                                     <p className="font-medium">{Number(deal.salePrice).toLocaleString("en-US")} $</p>
                                                 )}
-                                                <Badge className={`${visual?.bg} text-white`}>{DEAL_STATUS_LABELS[deal.status]}</Badge>
+                                                <Badge className={`${visual?.bg} text-white`}>{DEAL_STATUS_LABEL_KEYS[deal.status]}</Badge>
                                             </div>
                                         </Link>
                                     );

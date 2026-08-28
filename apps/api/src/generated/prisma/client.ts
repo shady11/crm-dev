@@ -29,8 +29,8 @@ export * from "./enums"
  * const prisma = new PrismaClient({
  *   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL })
  * })
- * // Fetch zero or more Companies
- * const companies = await prisma.company.findMany()
+ * // Fetch zero or more Activities
+ * const activities = await prisma.activity.findMany()
  * ```
  * 
  * Read more in our [docs](https://pris.ly/d/client).
@@ -40,35 +40,35 @@ export type PrismaClient<LogOpts extends Prisma.LogLevel = never, OmitOpts exten
 export { Prisma }
 
 /**
- * Model Company
+ * Model Activity
  * 
  */
-export type Company = Prisma.CompanyModel
+export type Activity = Prisma.ActivityModel
 /**
- * Model User
+ * Model Block
  * 
  */
-export type User = Prisma.UserModel
-/**
- * Model Lead
- * 
- */
-export type Lead = Prisma.LeadModel
+export type Block = Prisma.BlockModel
 /**
  * Model Client
  * 
  */
 export type Client = Prisma.ClientModel
 /**
- * Model Project
+ * Model Company
  * 
  */
-export type Project = Prisma.ProjectModel
+export type Company = Prisma.CompanyModel
 /**
- * Model Block
+ * Model Deal
  * 
  */
-export type Block = Prisma.BlockModel
+export type Deal = Prisma.DealModel
+/**
+ * Model Document
+ * 
+ */
+export type Document = Prisma.DocumentModel
 /**
  * Model Entrance
  * 
@@ -80,15 +80,15 @@ export type Entrance = Prisma.EntranceModel
  */
 export type Floor = Prisma.FloorModel
 /**
- * Model Unit
+ * Model Lead
  * 
  */
-export type Unit = Prisma.UnitModel
+export type Lead = Prisma.LeadModel
 /**
- * Model Deal
+ * Model Notification
  * 
  */
-export type Deal = Prisma.DealModel
+export type Notification = Prisma.NotificationModel
 /**
  * Model Payment
  * 
@@ -100,22 +100,22 @@ export type Payment = Prisma.PaymentModel
  */
 export type PaymentSchedule = Prisma.PaymentScheduleModel
 /**
- * Model Activity
+ * Model Project
  * 
  */
-export type Activity = Prisma.ActivityModel
+export type Project = Prisma.ProjectModel
 /**
  * Model Task
  * 
  */
 export type Task = Prisma.TaskModel
 /**
- * Model Document
+ * Model Unit
  * 
  */
-export type Document = Prisma.DocumentModel
+export type Unit = Prisma.UnitModel
 /**
- * Model Notification
+ * Model User
  * 
  */
-export type Notification = Prisma.NotificationModel
+export type User = Prisma.UserModel
