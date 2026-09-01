@@ -1,6 +1,6 @@
 import {Outlet, useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {PROJECT_STATUS_BADGE_CLASSES, PROJECT_STATUS_LABELS} from "@/features/projects/types/project.types.ts";
+import {PROJECT_STATUS_BADGE_CLASSES, PROJECT_STATUS_LABEL_KEYS} from "@/features/projects/types/project.types.ts";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {ArrowLeft, Loader2, Pen, Trash2} from "lucide-react";
@@ -21,8 +21,11 @@ import {ProjectTabs} from "@/features/projects/components/project-tabs.tsx";
 import {deleteProject, getProject, updateProject} from "@/features/projects/api/projects.api.ts";
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
 import {toast} from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 
 export function ProjectPage() {
+    const { t } = useTranslation("projects");
+
     const {projectId} = useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -86,7 +89,7 @@ export function ProjectPage() {
                 <div className="flex items-center gap-4">
                     <h1 className="text-3xl font-medium">{project.name}</h1>
                     <Badge variant="default" className={PROJECT_STATUS_BADGE_CLASSES[project.status]}>
-                        {PROJECT_STATUS_LABELS[project.status]}
+                        {t(PROJECT_STATUS_LABEL_KEYS[project.status])}
                     </Badge>
                 </div>
 

@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/select.tsx";
 import { ProjectForm } from "@/features/projects/components/project-form";
 import {
-    PROJECT_STATUS_LABELS,
+    PROJECT_STATUS_LABEL_KEYS,
     PROJECT_STATUS_VALUES,
     type Project,
     type ProjectStatus,
@@ -32,10 +32,12 @@ import {
 } from "@/features/projects/api/projects.api.ts";
 import {ProjectCard} from "@/features/projects/components/project-card.tsx";
 import {createListCollection} from "@ark-ui/react";
+import {useTranslation} from "react-i18next";
 
 type ProjectStatusFilter = ProjectStatus | "all";
 
 export function ProjectsPage() {
+    const { t } = useTranslation("projects");
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
     const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -107,7 +109,7 @@ export function ProjectsPage() {
         items: [
             { label: "All", value: "all" },
             ...PROJECT_STATUS_VALUES.map((status) => ({
-                label: PROJECT_STATUS_LABELS[status],
+                label: t(PROJECT_STATUS_LABEL_KEYS[status]),
                 value: status,
             })),
         ],

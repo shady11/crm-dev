@@ -7,11 +7,11 @@ export const TaskStatus = {
 
 export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
 
-export const TASK_STATUS_LABELS: Record<TaskStatus, string> = {
-    [TaskStatus.TODO]: "To do",
-    [TaskStatus.IN_PROGRESS]: "In progress",
-    [TaskStatus.DONE]: "Done",
-    [TaskStatus.CANCELLED]: "Cancelled",
+export const TASK_STATUS_LABEL_KEYS: Record<TaskStatus, string> = {
+    [TaskStatus.TODO]: "tasks:status.to_do",
+    [TaskStatus.IN_PROGRESS]: "tasks:status.in_progress",
+    [TaskStatus.DONE]: "tasks:status.done",
+    [TaskStatus.CANCELLED]: "tasks:status.cancelled",
 };
 
 export const TASK_STATUS_CLASSES: Record<TaskStatus, string> = {

@@ -1,0 +1,11 @@
+{
+  "status": {
+    "draft": "Draft",
+    "planning": "Planning",
+    "active": "Active",
+    "paused": "Paused",
+    "sold_out": "Sold out",
+    "completed": "Completed",
+    "archived": "Archived"
+  }
+}

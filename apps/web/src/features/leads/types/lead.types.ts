@@ -10,7 +10,7 @@ export const LeadStatus = {
 
 export type LeadStatus = (typeof LeadStatus)[keyof typeof LeadStatus];
 
-export const LEAD_STATUS_LABELS: Record<LeadStatus, string> = {
+export const LEAD_STATUS_LABEL_KEYS: Record<LeadStatus, string> = {
     [LeadStatus.NEW]: "New",
     [LeadStatus.CONTACTED]: "Contacted",
     [LeadStatus.QUALIFIED]: "Qualified",

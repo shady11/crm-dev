@@ -1,0 +1,11 @@
+{
+  "status": {
+    "new": "New",
+    "contacted": "Contacted",
+    "qualified": "Qualified",
+    "meeting": "Meeting",
+    "negotiation": "Negotiation",
+    "converted": "Converted",
+    "lost": "Lost"
+  }
+}

@@ -1,4 +1,5 @@
 import {api} from "@/lib/api";
+import type {UnitStatus} from "@/features/units/types/unit.types.ts";
 
 export type DashboardKpis = {
     revenueThisMonth: number;
@@ -9,7 +10,7 @@ export type DashboardKpis = {
 };
 
 export type RevenueTrendPoint = { month: string; revenue: number };
-export type UnitsSummaryItem = { status: string; count: number };
+export type UnitsSummaryItem = { status: UnitStatus; count: number };
 
 export type AttentionDeal = {
     id: string; dealNumber: string; reservationExpiresAt: string;

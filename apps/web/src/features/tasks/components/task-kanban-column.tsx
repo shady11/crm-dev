@@ -1,8 +1,9 @@
 import {useDroppable} from "@dnd-kit/core";
 import {cn} from "@/lib/utils";
-import {TASK_STATUS_CLASSES, TASK_STATUS_LABELS, type TaskStatus} from "@/features/tasks/types/task.types.ts";
+import {TASK_STATUS_CLASSES, TASK_STATUS_LABEL_KEYS, type TaskStatus} from "@/features/tasks/types/task.types.ts";
 import {TaskKanbanCard} from "./task-kanban-card.tsx";
 import type {Task} from "@/features/tasks/api/tasks.api.ts";
+import {useTranslation} from "react-i18next";
 
 interface TaskKanbanColumnProps {
     status: TaskStatus;
@@ -11,6 +12,7 @@ interface TaskKanbanColumnProps {
 }
 
 export function TaskKanbanColumn({ status, tasks, onCardClick }: TaskKanbanColumnProps) {
+    const { t } = useTranslation("tasks");
     const { setNodeRef, isOver } = useDroppable({ id: status });
 
     return (
@@ -23,7 +25,7 @@ export function TaskKanbanColumn({ status, tasks, onCardClick }: TaskKanbanColum
         >
             <div className="flex items-center gap-2 px-1">
                 <span className={`size-2 rounded-full ${TASK_STATUS_CLASSES[status]}`} />
-                <h3 className="text-sm font-medium">{TASK_STATUS_LABELS[status]}</h3>
+                <h3 className="text-sm font-medium">{t(TASK_STATUS_LABEL_KEYS[status])}</h3>
                 <span className="ml-auto text-xs text-muted-foreground">{tasks.length}</span>
             </div>
 

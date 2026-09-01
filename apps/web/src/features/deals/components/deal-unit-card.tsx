@@ -2,7 +2,7 @@ import {HouseIcon} from "lucide-react";
 import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import {Separator} from "@/components/ui/separator.tsx";
 import type {Deal} from "@/features/deals/api/deals.api.ts";
-import {UNIT_TYPE_LABELS} from "@/features/units/types/unit.types.ts";
+import {UNIT_TYPE_LABEL_KEYS} from "@/features/units/types/unit.types.ts";
 import {useTranslation} from "react-i18next";
 import {useFormatters} from "@/lib/i18n/formatters.ts";
 
@@ -15,7 +15,7 @@ export function DealUnitCard({
     project: Deal["project"];
     companySettings?: { currency?: string | null; locale?: string | null };
 }) {
-    const { t } = useTranslation(["deals", "common"]);
+    const { t } = useTranslation(["deals", "common","units"]);
     const { formatCurrency } = useFormatters(companySettings);
 
     return (
@@ -53,7 +53,7 @@ export function DealUnitCard({
                             {t("labels.type", { ns: "common" })}
                         </p>
                         <p className="font-medium">
-                            {UNIT_TYPE_LABELS[unit.type]}
+                            {t(UNIT_TYPE_LABEL_KEYS[unit.type])}
                         </p>
                     </div>
                     {unit.rooms != null && (

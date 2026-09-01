@@ -3,8 +3,9 @@ import {createListCollection} from "@ark-ui/react";
 import {Button} from "@/components/ui/button.tsx";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
-import {LEAD_STATUS_LABELS, LeadStatus} from "@/features/leads/types/lead.types.ts";
+import {LEAD_STATUS_LABEL_KEYS, LeadStatus} from "@/features/leads/types/lead.types.ts";
 import type {LeadStatusFilterValue} from "@/features/leads/hooks/use-leads-list.ts";
+import {useTranslation} from "react-i18next";
 
 interface LeadsToolbarProps {
     search: string;
@@ -21,10 +22,17 @@ export function LeadsToolbar({
                                   onStatusFilterChange,
                                   onAddLead,
                               }: LeadsToolbarProps) {
+    const { t } = useTranslation("leads");
+
     const statusCollection = createListCollection({
         items: [
             { label: "Filter by status", value: "all" },
-            ...Object.values(LeadStatus).map((status) => ({ label: LEAD_STATUS_LABELS[status], value: status })),
+            ...Object.values(LeadStatus).map(
+                (status) => ({
+                    label: t(LEAD_STATUS_LABEL_KEYS[status]),
+                    value: status
+                })
+            ),
         ],
     });
 

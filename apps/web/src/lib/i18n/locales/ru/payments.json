@@ -1,0 +1,24 @@
+{
+  "type": {
+    "deposit": "Deposit",
+    "installment": "Installment",
+    "final_payment": "Final payment",
+    "refund": "Refund"
+  },
+  "method": {
+    "cash": "Cash",
+    "bank_transfer": "Bank transfer",
+    "mbank": "MBank",
+    "optima": "Optima",
+    "elkart": "Elkart",
+    "other": "Other"
+  },
+  "schedule": {
+    "status": {
+      "pending": "Pending",
+      "partial": "Partial",
+      "paid": "Paid",
+      "overdue": "Overdue"
+    }
+  }
+}

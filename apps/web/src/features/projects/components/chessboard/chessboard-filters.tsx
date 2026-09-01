@@ -8,7 +8,7 @@ import {
     UNIT_STATUS_CLASSES,
     UNIT_STATUS_LABEL_KEYS,
     UNIT_STATUS_VALUES,
-    UNIT_TYPE_LABELS,
+    UNIT_TYPE_LABEL_KEYS,
     UNIT_TYPE_VALUES,
     type UnitStatus,
     type UnitType,
@@ -34,15 +34,6 @@ interface ChessboardFiltersProps {
     onFiltersChange(filters: Filters): void;
     onClearFilters(): void;
 }
-
-const typeCollection = createListCollection({
-    items: [
-        ...UNIT_TYPE_VALUES.map((type) => ({
-            label: UNIT_TYPE_LABELS[type],
-            value: type,
-        })),
-    ],
-});
 
 /* Presets Data Definitions */
 const ROOM_PRESETS = [
@@ -94,6 +85,15 @@ export function ChessboardFilters({
         if (filters.priceMin) return `Over $${filters.priceMin}`;
         return `Under $${filters.priceMax}`;
     };
+
+    const typeCollection = createListCollection({
+        items: [
+            ...UNIT_TYPE_VALUES.map((type) => ({
+                label: t(UNIT_TYPE_LABEL_KEYS[type]),
+                value: type,
+            })),
+        ],
+    });
 
     const statusCollection = createListCollection({
         items: [

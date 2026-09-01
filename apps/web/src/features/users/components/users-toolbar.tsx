@@ -3,8 +3,9 @@ import {createListCollection} from "@ark-ui/react";
 import {Button} from "@/components/ui/button.tsx";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
-import {USER_ROLE_LABELS, type UserRole} from "@/features/users/types/user.types";
+import {USER_ROLE_LABEL_KEYS, type UserRole} from "@/features/users/types/user.types";
 import type {RoleFilterValue, StatusFilter} from "@/features/users/hooks/use-users-list.ts";
+import {useTranslation} from "react-i18next";
 
 interface UsersToolbarProps {
     statusFilter: StatusFilter;
@@ -34,10 +35,17 @@ export function UsersToolbar({
                                  onSearchChange,
                                  onAddUser,
                              }: UsersToolbarProps) {
+    const { t } = useTranslation("users");
+
     const roleCollection = createListCollection({
         items: [
             { label: "Filter by role", value: "all" },
-            ...visibleRoles.map((role) => ({ label: USER_ROLE_LABELS[role], value: role })),
+            ...visibleRoles.map(
+                (role) => ({
+                    label: t(USER_ROLE_LABEL_KEYS[role]),
+                    value: role
+                })
+            ),
         ],
     });
 

@@ -20,7 +20,7 @@ import {
     type Unit,
     UNIT_STATUS_CLASSES,
     UNIT_STATUS_LABEL_KEYS,
-    UNIT_TYPE_LABELS
+    UNIT_TYPE_LABEL_KEYS
 } from "@/features/units/types/unit.types.ts";
 import {deleteUnit, updateUnit} from "@/features/units/api/units.api.ts";
 import {UnitForm} from "./unit-form.tsx";
@@ -107,7 +107,7 @@ export function UnitTable({ units }: UnitTableProps) {
                                             {t(UNIT_STATUS_LABEL_KEYS[unit.status])}
                                         </Badge>
                                     </TableCell>
-                                    <TableCell>{UNIT_TYPE_LABELS[unit.type]}</TableCell>
+                                    <TableCell>{t(UNIT_TYPE_LABEL_KEYS[unit.type])}</TableCell>
                                     <TableCell>{unit.area} m<sup>2</sup></TableCell>
                                     <TableCell>{unit.price} $</TableCell>
                                     <TableCell className="text-right">

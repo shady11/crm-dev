@@ -4,5 +4,11 @@
     "reserved": "Reserved",
     "sold": "Sold",
     "unavailable": "Unavailable"
+  },
+  "type": {
+    "apartment": "Apartment",
+    "commercial": "Commercial",
+    "parking": "Parking",
+    "storage": "Storage"
   }
 }

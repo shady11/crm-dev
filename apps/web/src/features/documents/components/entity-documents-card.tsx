@@ -7,22 +7,21 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {useEntityDocuments} from "@/features/documents/hooks/use-entity-documents.ts";
 import {useDocumentActions} from "@/features/documents/hooks/use-document-actions.ts";
 import {
-    DOCUMENT_TYPE_LABELS,
+    DOCUMENT_TYPE_LABEL_KEYS,
     type DocumentOwnerType,
     DocumentType,
     formatFileSize
 } from "@/features/documents/types/document.types.ts";
+import {useTranslation} from "react-i18next";
 
 interface EntityDocumentsCardProps {
     ownerType: DocumentOwnerType;
     ownerId: string;
 }
 
-const typeCollection = createListCollection({
-    items: Object.values(DocumentType).map((t) => ({ label: DOCUMENT_TYPE_LABELS[t], value: t })),
-});
-
 export function EntityDocumentsCard({ ownerType, ownerId }: EntityDocumentsCardProps) {
+    const { t } = useTranslation("documents");
+
     const { documents, isLoading } = useEntityDocuments(ownerType, ownerId);
     const actions = useDocumentActions();
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -35,6 +34,15 @@ export function EntityDocumentsCard({ ownerType, ownerId }: EntityDocumentsCardP
         }
         e.target.value = "";
     };
+
+    const typeCollection = createListCollection({
+        items: Object.values(DocumentType).map(
+            (type) => ({
+                label: t(DOCUMENT_TYPE_LABEL_KEYS[type]),
+                value: type
+            })
+        ),
+    });
 
     return (
         <Card className="border border-secondary shadow-none pt-0">
@@ -70,7 +78,7 @@ export function EntityDocumentsCard({ ownerType, ownerId }: EntityDocumentsCardP
                                 <div className="min-w-0 flex-1">
                                     <p className="truncate font-medium">{doc.originalName}</p>
                                     <p className="text-xs text-muted-foreground">
-                                        {DOCUMENT_TYPE_LABELS[doc.type]} · {formatFileSize(doc.size)} · {doc.uploadedBy.fullName}
+                                        {t(DOCUMENT_TYPE_LABEL_KEYS[doc.type])} · {formatFileSize(doc.size)} · {doc.uploadedBy.fullName}
                                     </p>
                                 </div>
                                 <Button variant="ghost" size="icon-sm" onClick={() => actions.download.mutate(doc)}>

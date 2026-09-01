@@ -3,9 +3,10 @@ import {createListCollection} from "@ark-ui/react";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {TASK_STATUS_LABELS, TaskStatus} from "@/features/tasks/types/task.types.ts";
+import {TASK_STATUS_LABEL_KEYS, TaskStatus} from "@/features/tasks/types/task.types.ts";
 import type {TaskStatusFilter} from "@/features/tasks/hooks/use-tasks-list.ts";
 import {useAssignableUsers} from "@/features/users/hooks/use-assignable-users.ts";
+import {useTranslation} from "react-i18next";
 
 interface TasksToolbarProps {
     statusFilter: TaskStatusFilter;
@@ -18,14 +19,24 @@ interface TasksToolbarProps {
     hideStatusFilter?: boolean;
 }
 
-const statusCollection = createListCollection({
-    items: [{ label: "All statuses", value: "all" }, ...Object.values(TaskStatus).map((s) => ({ label: TASK_STATUS_LABELS[s], value: s }))],
-});
-
 export function TasksToolbar({ statusFilter, onStatusFilterChange, assignedToId, onAssignedToIdChange, search, onSearchChange, onAddTask, hideStatusFilter }: TasksToolbarProps) {
+    const { t } = useTranslation("tasks");
+
     const assignableUsers = useAssignableUsers();
     const assigneeCollection = createListCollection({
         items: [{ label: "Everyone", value: "all" }, ...assignableUsers.data.map((u) => ({ label: u.fullName, value: u.id }))],
+    });
+
+    const statusCollection = createListCollection({
+        items: [
+            { label: "All statuses", value: "all" },
+            ...Object.values(TaskStatus).map(
+                (s) => ({
+                    label: t(TASK_STATUS_LABEL_KEYS[s]),
+                    value: s
+                })
+            )
+        ],
     });
 
     return (

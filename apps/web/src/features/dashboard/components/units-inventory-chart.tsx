@@ -2,17 +2,25 @@ import {Cell, Pie, PieChart} from "recharts";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {ChartContainer, ChartTooltip, ChartTooltipContent} from "@/components/ui/chart.tsx";
 import type {UnitsSummaryItem} from "@/features/dashboard/api/dashboard.api.ts";
+import {UNIT_STATUS_LABEL_KEYS} from "@/features/units/types/unit.types.ts";
+import {useTranslation} from "react-i18next";
 
 const STATUS_COLORS: Record<string, string> = {
     AVAILABLE: "#34d399", RESERVED: "#fbbf24", SOLD: "#fb7185", UNAVAILABLE: "#9ca3af",
 };
-const STATUS_LABELS: Record<string, string> = {
-    AVAILABLE: "Available", RESERVED: "Reserved", SOLD: "Sold", UNAVAILABLE: "Unavailable",
-};
 
 export function UnitsInventoryChart({ data }: { data: UnitsSummaryItem[] }) {
+    const { t } = useTranslation("units");
+
     const total = data.reduce((sum, d) => sum + d.count, 0);
-    const chartData = data.map((d) => ({ name: STATUS_LABELS[d.status] ?? d.status, value: d.count, status: d.status }));
+
+    const chartData = data.map(
+        (d) => ({
+            name: t(UNIT_STATUS_LABEL_KEYS[d.status]) ?? d.status,
+            value: d.count,
+            status: d.status
+        })
+    );
 
     return (
         <Card className="border border-secondary shadow-none">

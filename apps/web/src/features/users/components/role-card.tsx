@@ -1,7 +1,8 @@
 import {FolderCog} from "lucide-react";
 import {Card, CardContent} from "@/components/ui/card.tsx";
 import {Avatar, AvatarFallback, AvatarGroupCount} from "@/components/ui/avatar.tsx";
-import {USER_ROLE_BADGE_CLASSES, USER_ROLE_LABELS, type UserRole} from "@/features/users/types/user.types";
+import {USER_ROLE_BADGE_CLASSES, USER_ROLE_LABEL_KEYS, type UserRole} from "@/features/users/types/user.types";
+import {useTranslation} from "react-i18next";
 
 interface RoleCardProps {
     role: UserRole;
@@ -10,6 +11,8 @@ interface RoleCardProps {
 }
 
 export function RoleCard({ role, memberCount, memberInitials }: RoleCardProps) {
+    const { t } = useTranslation("users");
+
     const extra = memberCount - memberInitials.length;
 
     return (
@@ -20,7 +23,7 @@ export function RoleCard({ role, memberCount, memberInitials }: RoleCardProps) {
                         <div className={`rounded-lg p-2 text-white ${USER_ROLE_BADGE_CLASSES[role]}`}>
                             <FolderCog size={20} strokeWidth={1.75} />
                         </div>
-                        <h3 className="font-medium">{USER_ROLE_LABELS[role]}</h3>
+                        <h3 className="font-medium">{t(USER_ROLE_LABEL_KEYS[role])}</h3>
                     </div>
                 </div>
 

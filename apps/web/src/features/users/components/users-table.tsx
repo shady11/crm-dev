@@ -6,8 +6,9 @@ import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/co
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {UserStatusDot} from "@/features/users/components/user-status-dot.tsx";
-import {type User, USER_ROLE_LABELS} from "@/features/users/types/user.types";
+import {type User, USER_ROLE_LABEL_KEYS} from "@/features/users/types/user.types";
 import {formatCreatedAt, initials} from "@/features/users/utils/format.ts";
+import {useTranslation} from "react-i18next";
 
 interface UsersTableProps {
     users: User[];
@@ -32,6 +33,8 @@ export function UsersTable({
                                onDelete,
                                isDeleting,
                            }: UsersTableProps) {
+    const { t } = useTranslation("users");
+
     if (isLoading) {
         return (
             <div className="flex h-64 items-center justify-center rounded-lg border border-secondary">
@@ -99,7 +102,7 @@ export function UsersTable({
                                         </div>
                                     </div>
                                 </TableCell>
-                                <TableCell>{USER_ROLE_LABELS[user.role]}</TableCell>
+                                <TableCell>{t(USER_ROLE_LABEL_KEYS[user.role])}</TableCell>
                                 <TableCell>
                                     <p>{created.date}</p>
                                     <p className="text-xs text-muted-foreground">{created.time}</p>

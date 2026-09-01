@@ -16,11 +16,11 @@ export const UNIT_TYPE_VALUES = [
     UnitType.STORAGE,
 ] as const;
 
-export const UNIT_TYPE_LABELS: Record<UnitType, string> = {
-    [UnitType.APARTMENT]: "Apartment",
-    [UnitType.COMMERCIAL]: "Commercial",
-    [UnitType.PARKING]: "Parking",
-    [UnitType.STORAGE]: "Storage",
+export const UNIT_TYPE_LABEL_KEYS: Record<UnitType, string> = {
+    [UnitType.APARTMENT]: "units:type.apartment",
+    [UnitType.COMMERCIAL]: "units:type.commercial",
+    [UnitType.PARKING]: "units:type.parking",
+    [UnitType.STORAGE]: "units:type.storage",
 };
 
 export const UnitStatus = {

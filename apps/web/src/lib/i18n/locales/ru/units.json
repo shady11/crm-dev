@@ -4,5 +4,11 @@
     "reserved": "Забронировано",
     "sold": "Продано",
     "unavailable": "Недоступно"
+  },
+  "type": {
+    "apartment": "Квартира",
+    "commercial": "Коммерческое",
+    "parking": "Паркинг",
+    "storage": "Кладовка"
   }
 }

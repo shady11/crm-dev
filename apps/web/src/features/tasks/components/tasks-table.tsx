@@ -3,8 +3,9 @@ import {Badge} from "@/components/ui/badge.tsx";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
-import {TASK_STATUS_CLASSES, TASK_STATUS_LABELS} from "@/features/tasks/types/task.types.ts";
+import {TASK_STATUS_CLASSES, TASK_STATUS_LABEL_KEYS} from "@/features/tasks/types/task.types.ts";
 import type {Task} from "@/features/tasks/api/tasks.api.ts";
+import {useTranslation} from "react-i18next";
 
 interface TasksTableProps {
     tasks: Task[];
@@ -17,6 +18,8 @@ function isOverdue(task: Task) {
 }
 
 export function TasksTable({ tasks, isLoading, onRowClick }: TasksTableProps) {
+    const { t } = useTranslation("tasks");
+
     if (isLoading) {
         return <div className="flex h-64 items-center justify-center rounded-lg border border-secondary"><Spinner className="size-6" /></div>;
     }
@@ -63,7 +66,7 @@ export function TasksTable({ tasks, isLoading, onRowClick }: TasksTableProps) {
                             </TableCell>
                             <TableCell>
                                 <Badge className={`${TASK_STATUS_CLASSES[task.status]} text-white`}>
-                                    {TASK_STATUS_LABELS[task.status]}
+                                    {t(TASK_STATUS_LABEL_KEYS[task.status])}
                                 </Badge>
                             </TableCell>
                         </TableRow>

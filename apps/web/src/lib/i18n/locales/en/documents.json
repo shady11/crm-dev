@@ -1,0 +1,14 @@
+{
+  "type": {
+    "passport": "Passport",
+    "contract": "Contract",
+    "reservation": "Reservation",
+    "payment_receipt": "Payment receipt",
+    "payment_schedule": "Payment schedule",
+    "invoice": "Invoice",
+    "agreement": "Agreement",
+    "power_of_attorney": "Power of attorney",
+    "floor_plan": "Floor plan",
+    "other": "Other"
+  }
+}

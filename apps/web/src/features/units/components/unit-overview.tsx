@@ -3,15 +3,15 @@ import {
     type Unit,
     UNIT_STATUS_CLASSES,
     UNIT_STATUS_LABEL_KEYS,
-    UNIT_TYPE_LABELS
+    UNIT_TYPE_LABEL_KEYS
 } from "@/features/units/types/unit.types.ts";
 import type {Floor} from "@/features/floors/types/floor.types.ts";
 import {Badge} from "@/components/ui/badge.tsx";
 import {useTranslation} from "react-i18next";
 
 interface UnitOverviewProps {
-    unit: Unit | null;
-    floor: Floor | null;
+    unit: Unit;
+    floor: Floor;
 }
 
 export const UnitOverview = ({
@@ -46,7 +46,7 @@ export const UnitOverview = ({
                 </DataListItem>
                 <DataListItem>
                     <DataListItemLabel>Type</DataListItemLabel>
-                    <DataListItemValue>{UNIT_TYPE_LABELS[unit.type]}</DataListItemValue>
+                    <DataListItemValue>{t(UNIT_TYPE_LABEL_KEYS[unit.type])}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
                     <DataListItemLabel>Rooms</DataListItemLabel>

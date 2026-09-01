@@ -16,12 +16,12 @@ export const USER_ROLE_VALUES = [
     UserRole.FINANCE,
 ] as const;
 
-export const USER_ROLE_LABELS: Record<UserRole, string> = {
-    [UserRole.SUPER_ADMIN]: "Super Admin",
-    [UserRole.COMPANY_ADMIN]: "Company Admin",
-    [UserRole.SALES_MANAGER]: "Sales Manager",
-    [UserRole.SALES_HEAD]: "Sales Head",
-    [UserRole.FINANCE]: "Finance",
+export const USER_ROLE_LABEL_KEYS: Record<UserRole, string> = {
+    [UserRole.SUPER_ADMIN]: "users:role.super_admin",
+    [UserRole.COMPANY_ADMIN]: "users:role.company_admin",
+    [UserRole.SALES_MANAGER]: "users:role.sales_manager",
+    [UserRole.SALES_HEAD]: "users:role.sales_head",
+    [UserRole.FINANCE]: "users:role.finance",
 };
 
 export const USER_ROLE_BADGE_CLASSES: Record<UserRole, string> = {

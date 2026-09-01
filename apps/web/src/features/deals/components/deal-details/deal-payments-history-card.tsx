@@ -1,21 +1,22 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import type {DealDetails} from "@/features/deals/api/deals.api.ts";
+import {useTranslation} from "react-i18next";
 
-const PAYMENT_TYPE_LABELS: Record<string, string> = {
-    DEPOSIT: "Deposit",
-    INSTALLMENT: "Installment",
-    FINAL: "Final payment",
-    REFUND: "Refund",
+const PAYMENT_TYPE_LABEL_KEYS: Record<string, string> = {
+    DEPOSIT: "payments:type.deposit",
+    INSTALLMENT: "payments:type:installment",
+    FINAL: "payments:type.final_payment",
+    REFUND: "payments:type.refund",
 };
 
-const PAYMENT_METHOD_LABELS: Record<string, string> = {
-    CASH: "Cash",
-    BANK_TRANSFER: "Bank transfer",
-    MBANK: "MBank",
-    OPTIMA: "Optima",
-    ELKART: "Elkart",
-    OTHER: "Other",
+const PAYMENT_METHOD_LABEL_KEYS: Record<string, string> = {
+    CASH: "payments:method.cash",
+    BANK_TRANSFER: "payments:method.bank_transfer",
+    MBANK: "payments:method.mbank",
+    OPTIMA: "payments:method.optima",
+    ELKART: "payments:method.elkart",
+    OTHER: "payments:method.other",
 };
 
 interface DealPaymentsHistoryCardProps {
@@ -25,6 +26,7 @@ interface DealPaymentsHistoryCardProps {
 }
 
 export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPayment }: DealPaymentsHistoryCardProps) {
+    const { t } = useTranslation("payments");
     return (
         <Card className="border border-secondary shadow-none pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
@@ -43,9 +45,9 @@ export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPa
                         {payments.map((p) => (
                             <div key={p.id} className="flex items-center justify-between gap-3 py-2.5 text-sm">
                                 <div>
-                                    <p className="font-medium">{PAYMENT_TYPE_LABELS[p.paymentType] ?? p.paymentType}</p>
+                                    <p className="font-medium">{t(PAYMENT_TYPE_LABEL_KEYS[p.paymentType]) ?? p.paymentType}</p>
                                     <p className="text-xs text-muted-foreground">
-                                        {PAYMENT_METHOD_LABELS[p.paymentMethod] ?? p.paymentMethod}
+                                        {t(PAYMENT_METHOD_LABEL_KEYS[p.paymentMethod]) ?? p.paymentMethod}
                                         {p.reference && ` · ${p.reference}`}
                                     </p>
                                 </div>

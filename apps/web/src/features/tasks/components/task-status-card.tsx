@@ -1,6 +1,7 @@
 import {CheckCircle2Icon, CircleIcon, ClockIcon, XCircleIcon} from "lucide-react";
 import {Card, CardContent} from "@/components/ui/card.tsx";
-import {TASK_STATUS_CLASSES, TASK_STATUS_LABELS, type TaskStatus} from "@/features/tasks/types/task.types.ts";
+import {TASK_STATUS_CLASSES, TASK_STATUS_LABEL_KEYS, type TaskStatus} from "@/features/tasks/types/task.types.ts";
+import {useTranslation} from "react-i18next";
 
 const ICONS: Record<TaskStatus, typeof CircleIcon> = {
     TODO: CircleIcon,
@@ -10,7 +11,10 @@ const ICONS: Record<TaskStatus, typeof CircleIcon> = {
 };
 
 export function TaskStatusCard({ status, count }: { status: TaskStatus; count: number }) {
+    const { t } = useTranslation("tasks");
+
     const Icon = ICONS[status];
+
     return (
         <Card className="border border-secondary shadow-none">
             <CardContent className="flex items-center gap-3">
@@ -18,7 +22,7 @@ export function TaskStatusCard({ status, count }: { status: TaskStatus; count: n
                     <Icon size={20} strokeWidth={1.75} />
                 </div>
                 <div>
-                    <h3 className="font-medium">{TASK_STATUS_LABELS[status]}</h3>
+                    <h3 className="font-medium">{t(TASK_STATUS_LABEL_KEYS[status])}</h3>
                     <p className="text-sm text-muted-foreground">{count} task{count !== 1 ? "s" : ""}</p>
                 </div>
             </CardContent>

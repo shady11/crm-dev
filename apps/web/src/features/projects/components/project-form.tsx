@@ -12,13 +12,14 @@ import type {ProjectPayload} from "@/features/projects/api/projects.api";
 import {
     normalizeProjectStatus,
     type Project,
-    PROJECT_STATUS_LABELS,
+    PROJECT_STATUS_LABEL_KEYS,
     PROJECT_STATUS_VALUES,
     ProjectStatus,
 } from "@/features/projects/types/project.types";
 import {SheetBody, SheetClose, SheetFooter} from "@/components/ui/sheet.tsx";
 import {createListCollection} from "@ark-ui/react";
 import {Alert, AlertTitle} from "@/components/ui/alert.tsx";
+import {useTranslation} from "react-i18next";
 
 const projectSchema = z.object({
     name: z.string().trim().min(2, "Project name must be at least 2 characters"),
@@ -51,6 +52,7 @@ export function ProjectForm({
                                 onCancel,
                                 onSubmit,
                             }: ProjectFormProps) {
+    const { t } = useTranslation("projects");
 
     const initialStatus = normalizeProjectStatus(project?.status);
     const [, setSelectedStatus] =
@@ -82,7 +84,7 @@ export function ProjectForm({
     const statusCollection = createListCollection({
         items: [
             ...PROJECT_STATUS_VALUES.map((status) => ({
-                label: PROJECT_STATUS_LABELS[status],
+                label: t(PROJECT_STATUS_LABEL_KEYS[status]),
                 value: status,
             })),
         ]

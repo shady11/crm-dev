@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {
     normalizeUnitType,
-    UNIT_TYPE_LABELS,
+    UNIT_TYPE_LABEL_KEYS,
     UNIT_TYPE_VALUES,
     type UnitType,
 } from "@/features/units/types/unit.types.ts";
@@ -29,6 +29,7 @@ import {
     NumberInputInput
 } from "@/components/ui/number-input.tsx";
 import {Alert, AlertTitle} from "@/components/ui/alert.tsx";
+import {useTranslation} from "react-i18next";
 
 interface UnitRow {
     number: string;
@@ -55,6 +56,7 @@ export function BulkUnitsForm({
                                   onCancel,
                                   onSubmit,
                               }: BulkUnitsFormProps) {
+    const { t } = useTranslation("units");
     const nextStartNumber = lastGlobalUnitNumber + 1;
 
     const [units, setUnits] = useState<UnitRow[]>([
@@ -152,7 +154,7 @@ export function BulkUnitsForm({
 
     const typeCollection = createListCollection({
         items: UNIT_TYPE_VALUES.map((type) => ({
-            label: UNIT_TYPE_LABELS[type],
+            label: t(UNIT_TYPE_LABEL_KEYS[type]),
             value: type,
         })),
     });

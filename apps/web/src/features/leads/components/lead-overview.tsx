@@ -1,14 +1,17 @@
 import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/components/ui/data-list.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
 import type {Lead} from "@/features/leads/api/leads.api.ts";
-import {LEAD_STATUS_CLASSES, LEAD_STATUS_LABELS} from "@/features/leads/types/lead.types.ts";
+import {LEAD_STATUS_CLASSES, LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
 import {formatCreatedAt} from "@/features/leads/utils/format.ts";
+import {useTranslation} from "react-i18next";
 
 interface LeadOverviewProps {
     lead: Lead;
 }
 
 export function LeadOverview({ lead }: LeadOverviewProps) {
+    const { t } = useTranslation("leads");
+
     const created = formatCreatedAt(lead.createdAt);
 
     return (
@@ -30,7 +33,7 @@ export function LeadOverview({ lead }: LeadOverviewProps) {
                     <DataListItemLabel>Status</DataListItemLabel>
                     <DataListItemValue>
                         <Badge className={`${LEAD_STATUS_CLASSES[lead.status]} text-white`}>
-                            {LEAD_STATUS_LABELS[lead.status]}
+                            {t(LEAD_STATUS_LABEL_KEYS[lead.status])}
                         </Badge>
                     </DataListItemValue>
                 </DataListItem>

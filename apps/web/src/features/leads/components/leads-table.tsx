@@ -6,8 +6,9 @@ import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/co
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import type {Lead} from "@/features/leads/api/leads.api.ts";
-import {LEAD_STATUS_CLASSES, LEAD_STATUS_LABELS} from "@/features/leads/types/lead.types.ts";
+import {LEAD_STATUS_CLASSES, LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
 import {formatCreatedAt, initials} from "@/features/leads/utils/format.ts";
+import {useTranslation} from "react-i18next";
 
 interface LeadsTableProps {
     leads: Lead[];
@@ -28,6 +29,8 @@ export function LeadsTable({
                                 onToggleOne,
                                 onRowClick,
                             }: LeadsTableProps) {
+    const { t } = useTranslation("leads");
+
     if (isLoading) {
         return (
             <div className="flex h-64 items-center justify-center rounded-lg border border-secondary">
@@ -96,7 +99,7 @@ export function LeadsTable({
                                 </TableCell>
                                 <TableCell>
                                     <Badge className={`${LEAD_STATUS_CLASSES[lead.status]} text-white`}>
-                                        {LEAD_STATUS_LABELS[lead.status]}
+                                        {t(LEAD_STATUS_LABEL_KEYS[lead.status])}
                                     </Badge>
                                 </TableCell>
                                 <TableCell>{lead.manager?.fullName ?? "—"}</TableCell>

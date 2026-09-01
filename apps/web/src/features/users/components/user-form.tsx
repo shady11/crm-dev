@@ -16,11 +16,12 @@ import {
     getVisibleRoles,
     normalizeUserRole,
     type User,
-    USER_ROLE_LABELS,
+    USER_ROLE_LABEL_KEYS,
     USER_ROLE_VALUES,
     UserRole,
 } from "@/features/users/types/user.types";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {useTranslation} from "react-i18next";
 
 const baseSchema = z.object({
     fullName: z.string().trim().min(2, "Name must be at least 2 characters"),
@@ -68,6 +69,8 @@ export function UserForm({
                              onCancel,
                              onSubmit,
                          }: UserFormProps) {
+    const { t } = useTranslation("users");
+
     const { user: currentUser } = useAuth();
     const visibleRoles = getVisibleRoles(currentUser?.role);
 
@@ -112,7 +115,7 @@ export function UserForm({
 
     const roleCollection = createListCollection({
         items: visibleRoles.map((role) => ({
-            label: USER_ROLE_LABELS[role],
+            label: t(USER_ROLE_LABEL_KEYS[role]),
             value: role,
         })),
     });

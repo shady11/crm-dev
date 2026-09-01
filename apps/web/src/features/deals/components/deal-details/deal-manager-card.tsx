@@ -3,9 +3,12 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
 import {initials} from "@/features/deals/utils/format.ts";
 import type {Deal} from "@/features/deals/api/deals.api.ts";
-import {USER_ROLE_LABELS} from "@/features/users/types/user.types.ts";
+import {USER_ROLE_LABEL_KEYS} from "@/features/users/types/user.types.ts";
+import {useTranslation} from "react-i18next";
 
 export function DealManagerCard({ manager }: { manager: Deal["manager"] }) {
+    const { t } = useTranslation("users");
+
     return (
         <Card className="border border-secondary shadow-none flex-1 pt-0">
             <CardHeader title="Manager" className="py-4 border-b gap-0"></CardHeader>
@@ -18,7 +21,7 @@ export function DealManagerCard({ manager }: { manager: Deal["manager"] }) {
                 <div className="flex flex-col gap-1">
                     <p className="font-medium">{manager?.fullName ?? "Unassigned"}</p>
                     <p className="flex items-center gap-2 text-sm  text-muted-foreground">
-                        {USER_ROLE_LABELS[manager?.role]}
+                        {t(USER_ROLE_LABEL_KEYS[manager!.role])}
                     </p>
                 </div>
             </CardContent>

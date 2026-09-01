@@ -1,0 +1,8 @@
+{
+  "status": {
+    "to_do": "To do",
+    "in_progress": "In progress",
+    "done": "Done",
+    "cancelled": "Cancelled"
+  }
+}

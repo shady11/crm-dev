@@ -15,7 +15,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {SheetBody, SheetClose, SheetFooter} from "@/components/ui/sheet.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {useAssignableUsers} from "@/features/users/hooks/use-assignable-users.ts";
-import {TASK_STATUS_LABELS, TaskStatus} from "@/features/tasks/types/task.types.ts";
+import {TASK_STATUS_LABEL_KEYS, TaskStatus} from "@/features/tasks/types/task.types.ts";
 import type {Task, TaskPayload} from "@/features/tasks/api/tasks.api.ts";
 import {formatDate} from "@/utils/date-formatter.ts";
 import {
@@ -28,6 +28,7 @@ import {
     CalendarWeekDays,
     CalendarYearSelect
 } from "@/components/ui/calendar.tsx";
+import {useTranslation} from "react-i18next";
 
 const taskSchema = z.object({
     title: z.string().trim().min(2, "Title must be at least 2 characters"),
@@ -64,6 +65,8 @@ function toFormValues(task?: Task | null): TaskFormValues {
 }
 
 export function TaskForm({ task, errorMessage, isSubmitting, submitLabel = "Save", onCancel, onSubmit }: TaskFormProps) {
+    const { t } = useTranslation("tasks");
+
     const assignableUsers = useAssignableUsers();
 
     const form = useForm<TaskFormValues>({
@@ -74,7 +77,12 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel = "Save
     useEffect(() => { form.reset(toFormValues(task)); }, [task]);
 
     const statusCollection = createListCollection({
-        items: Object.values(TaskStatus).map((s) => ({ label: TASK_STATUS_LABELS[s], value: s })),
+        items: Object.values(TaskStatus).map(
+            (s) => ({
+                label: t(TASK_STATUS_LABEL_KEYS[s]),
+                value: s
+            })
+        ),
     });
     const assigneeCollection = createListCollection({
         items: assignableUsers.data.map((u) => ({ label: u.fullName, value: u.id })),

@@ -1,5 +1,6 @@
 import {cn} from "@/lib/utils";
-import {type Unit, UNIT_STATUS_CLASSES, UNIT_TYPE_LABELS,} from "@/features/units/types/unit.types";
+import {type Unit, UNIT_STATUS_CLASSES, UNIT_TYPE_LABEL_KEYS} from "@/features/units/types/unit.types";
+import {useTranslation} from "react-i18next";
 
 interface MatrixUnitCardProps {
     unit: Unit;
@@ -14,6 +15,7 @@ export function ChessboardUnitCard({
                                        dimmed,
                                        onClick,
                                    }: MatrixUnitCardProps) {
+    const { t } = useTranslation("units");
     const price = Number(unit.price);
     const area = Number(unit.area);
 
@@ -52,7 +54,7 @@ export function ChessboardUnitCard({
             </div>
             <div className="flex items-center justify-between w-full gap-8 text-xs">
                 <span>
-                    {UNIT_TYPE_LABELS[unit.type]}
+                    {t(UNIT_TYPE_LABEL_KEYS[unit.type])}
                 </span>
                 <span>
                     {parseFloat(unit.area).toFixed(0)} m²

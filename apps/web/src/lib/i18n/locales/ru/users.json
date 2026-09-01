@@ -1,0 +1,9 @@
+{
+  "role": {
+    "super_admin": "Super Admin",
+    "company_admin": "Company Admin",
+    "sales_manager": "Sales Manager",
+    "sales_head": "Sales Head",
+    "finance": "Finance"
+  }
+}

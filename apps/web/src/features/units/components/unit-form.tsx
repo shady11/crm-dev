@@ -13,7 +13,7 @@ import {
     type Unit,
     UNIT_STATUS_LABEL_KEYS,
     UNIT_STATUS_VALUES,
-    UNIT_TYPE_LABELS,
+    UNIT_TYPE_LABEL_KEYS,
     UNIT_TYPE_VALUES,
     UnitStatus,
     UnitType,
@@ -69,7 +69,7 @@ export function UnitForm({
                              onCancel,
                              onSubmit,
                          }: UnitFormProps) {
-    const { t } = useTranslation();
+    const { t } = useTranslation("units");
 
     const initialType = normalizeUnitType(unit?.type);
     const [, setSelectedType] =
@@ -109,7 +109,7 @@ export function UnitForm({
     const typeCollection = createListCollection({
         items: [
             ...UNIT_TYPE_VALUES.map((type) => ({
-                label: UNIT_TYPE_LABELS[type],
+                label: t(UNIT_TYPE_LABEL_KEYS[type]),
                 value: type,
             })),
         ]

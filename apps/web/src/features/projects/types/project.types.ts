@@ -22,14 +22,14 @@ export const PROJECT_STATUS_VALUES = [
     ProjectStatus.ARCHIVED,
 ] as const;
 
-export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
-    [ProjectStatus.DRAFT]: "Draft",
-    [ProjectStatus.PLANNING]: "Planning",
-    [ProjectStatus.ACTIVE]: "Active",
-    [ProjectStatus.PAUSED]: "Paused",
-    [ProjectStatus.SOLDOUT]: "Sold out",
-    [ProjectStatus.COMPLETED]: "Completed",
-    [ProjectStatus.ARCHIVED]: "Archived",
+export const PROJECT_STATUS_LABEL_KEYS: Record<ProjectStatus, string> = {
+    [ProjectStatus.DRAFT]: "projects:status.draft",
+    [ProjectStatus.PLANNING]: "projects:status.planning",
+    [ProjectStatus.ACTIVE]: "projects:status.active",
+    [ProjectStatus.PAUSED]: "projects:status.paused",
+    [ProjectStatus.SOLDOUT]: "projects:status.sold_out",
+    [ProjectStatus.COMPLETED]: "projects:status.completed",
+    [ProjectStatus.ARCHIVED]: "projects:status.archived",
 };
 
 export const PROJECT_STATUS_BADGE_CLASSES: Record<ProjectStatus, string> = {

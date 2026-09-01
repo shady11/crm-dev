@@ -14,7 +14,8 @@ import {SheetBody, SheetClose, SheetFooter} from "@/components/ui/sheet.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {useManagers} from "@/features/users/hooks/use-managers.ts";
 import type {CreateLeadPayload, Lead, UpdateLeadPayload} from "@/features/leads/api/leads.api.ts";
-import {LEAD_STATUS_LABELS, LeadStatus} from "@/features/leads/types/lead.types.ts";
+import {LEAD_STATUS_LABEL_KEYS, LeadStatus} from "@/features/leads/types/lead.types.ts";
+import {useTranslation} from "react-i18next";
 
 const UNASSIGNED = "unassigned";
 
@@ -70,6 +71,8 @@ export function LeadForm({
                               onCancel,
                               onSubmit,
                           }: LeadFormProps) {
+    const { t } = useTranslation("leads");
+
     const managers = useManagers();
 
     const form = useForm<LeadFormValues>({
@@ -82,7 +85,12 @@ export function LeadForm({
     }, [lead, form]);
 
     const statusCollection = createListCollection({
-        items: Object.values(LeadStatus).map((status) => ({ label: LEAD_STATUS_LABELS[status], value: status })),
+        items: Object.values(LeadStatus).map(
+            (status) => ({
+                label: t(LEAD_STATUS_LABEL_KEYS[status]),
+                value: status
+            })
+        ),
     });
 
     const managerCollection = createListCollection({

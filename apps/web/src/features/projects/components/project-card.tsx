@@ -2,7 +2,7 @@ import {Badge} from "@/components/ui/badge.tsx";
 import {
     type Project,
     PROJECT_STATUS_BADGE_CLASSES,
-    PROJECT_STATUS_LABELS
+    PROJECT_STATUS_LABEL_KEYS
 } from "@/features/projects/types/project.types.ts";
 import {Building2} from "lucide-react";
 import {
@@ -18,6 +18,7 @@ import {
 import {useState} from "react";
 import {Item, ItemContent, ItemDescription, ItemMedia, ItemTitle} from "@/components/ui/item";
 import {Separator} from "@/components/ui/separator.tsx";
+import {useTranslation} from "react-i18next";
 
 type Props = {
     project: Project;
@@ -27,6 +28,8 @@ type Props = {
 };
 
 export function ProjectCard({project, onDelete, isDeleting}: Props) {
+    const { t } = useTranslation("projects");
+
     const [deleteOpen, setDeleteOpen] = useState(false);
 
     return (
@@ -43,19 +46,19 @@ export function ProjectCard({project, onDelete, isDeleting}: Props) {
                         </ItemContent>
                         <Badge variant="default"
                                className={PROJECT_STATUS_BADGE_CLASSES[project.status]}>
-                            {PROJECT_STATUS_LABELS[project.status]}
+                            {t(PROJECT_STATUS_LABEL_KEYS[project.status])}
                         </Badge>
                     </div>
                     <Separator/>
                     <div className="flex items-center gap-4 text-sm *:[div]:space-y-1">
                         <div>
                             <p className="font-medium leading-none">Blocks</p>
-                            <p className="text-muted-foreground">{project._count.blocks}</p>
+                            <p className="text-muted-foreground">{project._count?.blocks}</p>
                         </div>
                         <Separator orientation="vertical" />
                         <div>
                             <p className="font-medium leading-none">Units</p>
-                            <p className="text-muted-foreground">{project._count.units}</p>
+                            <p className="text-muted-foreground">{project._count?.units}</p>
                         </div>
                     </div>
                 </a>

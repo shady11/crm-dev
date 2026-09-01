@@ -15,7 +15,8 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog.tsx";
-import {type User, USER_ROLE_BADGE_CLASSES, USER_ROLE_LABELS} from "@/features/users/types/user.types.ts";
+import {type User, USER_ROLE_BADGE_CLASSES, USER_ROLE_LABEL_KEYS} from "@/features/users/types/user.types.ts";
+import {useTranslation} from "react-i18next";
 
 type Props = {
     user: User;
@@ -25,6 +26,7 @@ type Props = {
 };
 
 export function UserCard({ user, onEdit, onDelete, isDeleting }: Props) {
+    const { t } = useTranslation("users");
     const [deactivateOpen, setDeactivateOpen] = useState(false);
 
     return (
@@ -52,7 +54,7 @@ export function UserCard({ user, onEdit, onDelete, isDeleting }: Props) {
                             )}
                         </ItemContent>
                         <Badge variant="default" className={USER_ROLE_BADGE_CLASSES[user.role]}>
-                            {USER_ROLE_LABELS[user.role]}
+                            {t(USER_ROLE_LABEL_KEYS[user.role])}
                         </Badge>
                     </div>
 

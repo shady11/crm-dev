@@ -1,6 +1,7 @@
 import {api} from "@/lib/api";
 import type {DealStatus} from "@/features/deals/types/deal.types.ts";
 import type {PaginatedResponse} from "@/lib/api-types.ts";
+import type {UserRole} from "@/features/users/types/user.types.ts";
 
 export type FinancingType = "CASH" | "INSTALLMENT" | "MORTGAGE";
 
@@ -9,7 +10,7 @@ export type PaymentType = "DEPOSIT" | "INSTALLMENT" | "FINAL" | "REFUND";
 export type PaymentScheduleStatus = "PENDING" | "PARTIAL" | "PAID" | "OVERDUE";
 
 type DealClient = { id: string; fullName: string; phone: string; email:string };
-type DealManager = { id: string; fullName: string; role: string } | null;
+type DealManager = { id: string; fullName: string; role: UserRole } | null;
 type DealUnit = {
     id: string;
     number: string;

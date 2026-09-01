@@ -5,16 +5,19 @@ import {Button} from "@/components/ui/button.tsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {TaskFormSheet} from "@/features/tasks/components/task-form-sheet.tsx";
 import {useTaskActions} from "@/features/tasks/hooks/use-task-actions.ts";
-import {TASK_STATUS_CLASSES, TASK_STATUS_LABELS} from "@/features/tasks/types/task.types.ts";
+import {TASK_STATUS_CLASSES, TASK_STATUS_LABEL_KEYS} from "@/features/tasks/types/task.types.ts";
 import type {Task, TaskPayload} from "@/features/tasks/api/tasks.api.ts";
 import {getTasks} from "@/features/tasks/api/tasks.api.ts";
 import {useQuery} from "@tanstack/react-query";
+import {useTranslation} from "react-i18next";
 
 const ICONS: Record<string, typeof CircleIcon> = {
     TODO: CircleIcon, IN_PROGRESS: ClockIcon, DONE: CheckCircle2Icon, CANCELLED: XCircleIcon,
 };
 
 export function ClientTasksCard({ clientId }: { clientId: string }) {
+    const { t } = useTranslation("tasks");
+
     const tasksQuery = useQuery({
         queryKey: ["tasks", { clientId }],
         queryFn: () => getTasks({ clientId, limit: 50 }),
@@ -65,7 +68,7 @@ export function ClientTasksCard({ clientId }: { clientId: string }) {
                                         </p>
                                     </div>
                                     <Badge className={`${TASK_STATUS_CLASSES[task.status]} shrink-0 text-white`}>
-                                        {TASK_STATUS_LABELS[task.status]}
+                                        {t(TASK_STATUS_LABEL_KEYS[task.status])}
                                     </Badge>
                                 </div>
                             );

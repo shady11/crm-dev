@@ -5,6 +5,7 @@ import {ScrollArea} from "@/components/ui/scroll-area.tsx";
 import type {DealDetails} from "@/features/deals/api/deals.api.ts";
 import {Table, TableBody, TableCell, TableRow} from "@/components/ui/table.tsx";
 import {Progress} from "@/components/ui/progress";
+import {useTranslation} from "react-i18next";
 
 const SCHEDULE_STATUS_CLASSES: Record<string, string> = {
     PENDING: "bg-gray-400",
@@ -13,11 +14,11 @@ const SCHEDULE_STATUS_CLASSES: Record<string, string> = {
     OVERDUE: "bg-rose-500",
 };
 
-const SCHEDULE_STATUS_LABELS: Record<string, string> = {
-    PENDING: "Pending",
-    PARTIAL: "Partial",
-    PAID: "Paid",
-    OVERDUE: "Overdue",
+const SCHEDULE_STATUS_LABEL_KEYS: Record<string, string> = {
+    PENDING: "payments:schedule.status.pending",
+    PARTIAL: "payments:schedule.status.partial",
+    PAID: "payments:schedule.status.paid",
+    OVERDUE: "payments:schedule.status.overdue",
 };
 
 interface DealPaymentScheduleCardProps {
@@ -27,6 +28,8 @@ interface DealPaymentScheduleCardProps {
 }
 
 export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule }: DealPaymentScheduleCardProps) {
+    const { t } = useTranslation("payments");
+
     const canGenerate = status === "ACTIVE";
 
     const paidCount = schedules.filter((s) => s.status === "PAID").length;
@@ -91,7 +94,7 @@ export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule 
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <Badge className={`${SCHEDULE_STATUS_CLASSES[s.status]} text-white`}>
-                                                    {SCHEDULE_STATUS_LABELS[s.status]}
+                                                    {t(SCHEDULE_STATUS_LABEL_KEYS[s.status])}
                                                 </Badge>
                                             </TableCell>
                                         </TableRow>
