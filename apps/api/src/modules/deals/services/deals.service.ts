@@ -31,6 +31,7 @@ import {SignContractDto} from "@/modules/deals/dto/sign-contract.dto";
 import {CancelDealDto} from "@/modules/deals/dto/cancel-deal.dto";
 import {DbClient} from "@/database/prisma.types";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
+import {DealNumberService} from "@/modules/deals/services/deal-number.service";
 
 @Injectable()
 export class DealsService {
@@ -40,6 +41,7 @@ export class DealsService {
       private readonly domain: DealDomainService,
       private readonly activityService: DealActivityService,
       private readonly notifications: NotificationsService,
+      private readonly dealNumberService: DealNumberService,
   ) {}
 
   // --------------------------------------------------------------------------
@@ -174,17 +176,7 @@ export class DealsService {
         );
       }
 
-      const year = new Date().getFullYear();
-      const prefix = `D-${year}-`;
-
-      const lastDeal = await db.deal.findFirst({
-        where: { companyId, dealNumber: { startsWith: prefix } },
-        orderBy: { dealNumber: "desc" },
-        select: { dealNumber: true },
-      });
-
-      const nextSeq = lastDeal ? parseInt(lastDeal.dealNumber.slice(prefix.length), 10) + 1 : 1;
-      const dealNumber = `${prefix}${String(nextSeq).padStart(4, "0")}`;
+      const dealNumber = await this.dealNumberService.generateDealNumber(db, companyId);
 
       const deal = await db.deal.create({
         data: {

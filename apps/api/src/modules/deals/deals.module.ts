@@ -11,12 +11,10 @@ import {DealMapper} from "@/modules/deals/mappers/deal.mapper";
 import {DealDomainService} from "@/modules/deals/services/deal-domain.service";
 import {NotificationsModule} from "@/modules/notifications/notifications.module";
 import {DealExpiryService} from "@/modules/deals/services/deal-expiry.service";
+import { DealNumberService } from '@/modules/deals/services/deal-number.service';
 
 @Module({
-  imports: [
-      PrismaModule,
-      NotificationsModule,
-  ],
+  imports: [PrismaModule, NotificationsModule],
   controllers: [DealsController],
   providers: [
     DealsService,
@@ -26,11 +24,8 @@ import {DealExpiryService} from "@/modules/deals/services/deal-expiry.service";
     PaymentScheduleService,
     DealMapper,
     DealExpiryService,
+    DealNumberService,
   ],
-  exports: [
-    DealsService,
-    PaymentService,
-    PaymentScheduleService,
-  ],
+  exports: [DealsService, PaymentService, PaymentScheduleService],
 })
 export class DealsModule {}

@@ -1,6 +1,6 @@
 import {Injectable} from '@nestjs/common';
 
-import {DealDetails, DealListItem} from './deal.types';
+import {DealDetails, DealListItem} from './deals.types';
 
 @Injectable()
 export class DealMapper {

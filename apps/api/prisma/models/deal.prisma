@@ -76,3 +76,11 @@ model Deal {
   @@index([companyId, clientId])
   @@index([companyId, createdAt])
 }
+
+model DealNumberCounter {
+  companyId    String
+  year         Int
+  lastSequence Int    @default(0)
+
+  @@id([companyId, year])
+}
