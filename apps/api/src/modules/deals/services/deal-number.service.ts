@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import { DbClient } from '@/database/prisma.types';
+import { DealNumberGenerationFailedException } from '../exceptions';
 
 @Injectable()
 export class DealNumberService {
@@ -50,6 +51,13 @@ export class DealNumberService {
       WHERE "companyId" = ${companyId} AND "year" = ${year}
       RETURNING "lastSequence"
     `;
+
+    // Unreachable in practice — the counter row is seeded immediately above, in
+    // this same transaction. Checked anyway so that if it ever does happen, the
+    // caller sees a named error instead of "cannot read property of undefined".
+    if (result.length === 0) {
+      throw new DealNumberGenerationFailedException(companyId, year);
+    }
 
     const sequence = result[0].lastSequence;
 

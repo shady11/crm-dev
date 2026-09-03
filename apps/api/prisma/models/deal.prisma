@@ -78,9 +78,11 @@ model Deal {
 }
 
 model DealNumberCounter {
-  companyId    String
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
   year         Int
-  lastSequence Int    @default(0)
+  lastSequence Int @default(0)
 
   @@id([companyId, year])
 }

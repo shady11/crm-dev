@@ -18,16 +18,16 @@ export const DocumentType = {
 export type DocumentType = (typeof DocumentType)[keyof typeof DocumentType];
 
 export const DOCUMENT_TYPE_LABEL_KEYS: Record<DocumentType, string> = {
-    PASSPORT: "documents.type.passport",
-    CONTRACT: "documents.type.contract",
-    RESERVATION: "documents.type.reservation",
-    PAYMENT_RECEIPT: "documents.type.payment_receipt",
-    PAYMENT_SCHEDULE: "documents.type.payment_schedule",
-    INVOICE: "documents.type.invoice",
-    AGREEMENT: "documents.type.agreement",
-    POWER_OF_ATTORNEY: "documents.type.power_of_attorney",
-    FLOOR_PLAN: "documents.type.floor_plan",
-    OTHER: "documents.type.other",
+    PASSPORT: "documents:type.passport",
+    CONTRACT: "documents:type.contract",
+    RESERVATION: "documents:type.reservation",
+    PAYMENT_RECEIPT: "documents:type.payment_receipt",
+    PAYMENT_SCHEDULE: "documents:type.payment_schedule",
+    INVOICE: "documents:type.invoice",
+    AGREEMENT: "documents:type.agreement",
+    POWER_OF_ATTORNEY: "documents:type.power_of_attorney",
+    FLOOR_PLAN: "documents:type.floor_plan",
+    OTHER: "documents:type.other",
 };
 
 export function formatFileSize(bytes: number): string {

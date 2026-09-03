@@ -4,13 +4,15 @@ import {Server, Socket} from "socket.io";
 import {JwtService} from "@nestjs/jwt";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {JwtPayload, SessionValidationService} from "@/modules/auth/session-validation.service";
+import {corsOptions} from "@/config/env.config";
 
 @WebSocketGateway({
     namespace: "notifications",
-    cors: {
-        origin: process.env.CORS_ORIGIN ?? "http://localhost:5173",
-        credentials: true,
-    },
+    // Same options object as app.enableCors() in main.ts. Previously this read
+    // its own CORS_ORIGIN variable, and read it at decorator-evaluation time —
+    // before ConfigModule had loaded .env — so it silently kept the localhost
+    // fallback in every deployment.
+    cors: corsOptions(),
 })
 @Injectable()
 export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisconnect {

@@ -22,5 +22,6 @@ model Company {
   tasks      Task[]
   documents  Document[]
 
-  notifications Notification[]
+  notifications      Notification[]
+  dealNumberCounters DealNumberCounter[]
 }

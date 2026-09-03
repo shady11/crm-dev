@@ -9,6 +9,8 @@
   },
   "financials": {
     "title": "Финансы",
+    "listPrice": "Базовая цена",
+    "pricePerMeter": "Цена за м²",
     "salePrice": "Цена продажи",
     "paid": "Оплачено",
     "remaining": "Остаток",

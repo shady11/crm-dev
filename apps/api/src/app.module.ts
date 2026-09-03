@@ -1,5 +1,10 @@
 import {Module} from '@nestjs/common';
 import {ConfigModule} from "@nestjs/config";
+import {validateEnv} from "@/config/env.config";
+import {APP_FILTER, APP_GUARD} from "@nestjs/core";
+import {ThrottlerGuard, ThrottlerModule} from "@nestjs/throttler";
+import {AllExceptionsFilter} from "@/common/filters/all-exceptions.filter";
+import {HealthModule} from "@/modules/health/health.module";
 import {PrismaModule} from "@/database/prisma.module";
 import {AuthModule} from "@/modules/auth/auth.module";
 import {UsersModule} from "@/modules/users/users.module";
@@ -23,9 +28,23 @@ import {DashboardModule} from "@/modules/dashboard/dashboard.module";
   imports: [
       ConfigModule.forRoot({
           isGlobal: true,
-          envFilePath: '.env'
+          envFilePath: '.env',
+          // Fails fast on a missing variable instead of letting the app boot
+          // half-configured. Runs after the .env file is loaded and before any
+          // provider is constructed.
+          validate: validateEnv,
       }),
       ScheduleModule.forRoot(),
+      // Default ceiling for every route. Generous enough that normal CRM use
+      // never touches it — the point is to stop scripted abuse, not to shape
+      // traffic. The login route sets its own, far tighter limit.
+      ThrottlerModule.forRoot([
+          {
+              name: "default",
+              ttl: 60_000,
+              limit: 300,
+          },
+      ]),
       PrismaModule,
       AuthModule,
       UsersModule,
@@ -42,7 +61,20 @@ import {DashboardModule} from "@/modules/dashboard/dashboard.module";
       TasksModule,
       DocumentsModule,
       NotificationsModule,
-      DashboardModule
+      DashboardModule,
+      // Registered so /api/health exists at all — it was written but never
+      // imported, so the endpoint returned 404 and nothing could monitor it.
+      HealthModule,
+  ],
+  providers: [
+      {
+          provide: APP_GUARD,
+          useClass: ThrottlerGuard,
+      },
+      {
+          provide: APP_FILTER,
+          useClass: AllExceptionsFilter,
+      },
   ],
 })
 export class AppModule {}

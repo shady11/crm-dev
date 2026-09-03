@@ -11,13 +11,13 @@ export const LeadStatus = {
 export type LeadStatus = (typeof LeadStatus)[keyof typeof LeadStatus];
 
 export const LEAD_STATUS_LABEL_KEYS: Record<LeadStatus, string> = {
-    [LeadStatus.NEW]: "New",
-    [LeadStatus.CONTACTED]: "Contacted",
-    [LeadStatus.QUALIFIED]: "Qualified",
-    [LeadStatus.MEETING]: "Meeting",
-    [LeadStatus.NEGOTIATION]: "Negotiation",
-    [LeadStatus.CONVERTED]: "Converted",
-    [LeadStatus.LOST]: "Lost",
+    [LeadStatus.NEW]: "leads:status.new",
+    [LeadStatus.CONTACTED]: "leads:status.contacted",
+    [LeadStatus.QUALIFIED]: "leads:status.qualified",
+    [LeadStatus.MEETING]: "leads:status.meeting",
+    [LeadStatus.NEGOTIATION]: "leads:status.negotiation",
+    [LeadStatus.CONVERTED]: "leads:status.converted",
+    [LeadStatus.LOST]: "leads:status.lost",
 };
 
 export const LEAD_STATUS_CLASSES: Record<LeadStatus, string> = {
