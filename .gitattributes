@@ -1,0 +1,27 @@
+# Normalise every text file to LF in the repository.
+#
+# Without this, files committed from Windows carry CRLF, and every checkout on
+# Linux (CI, Docker builds, the pilot server) reports the whole tree as modified
+# — which is what made `git status` list ~350 changed files with no real changes.
+#
+# `text=auto` lets git decide what is text; it stores LF and checks out using
+# each developer's core.autocrlf setting, so Windows editors still see CRLF.
+* text=auto eol=lf
+
+# Shell scripts must keep LF even on Windows checkouts — a CRLF shebang line
+# fails with "bad interpreter" inside a container.
+*.sh text eol=lf
+
+# Lockfiles are generated; never merge them by hand.
+package-lock.json -diff linguist-generated
+
+# Binary: never touch, never diff.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.pdf binary
