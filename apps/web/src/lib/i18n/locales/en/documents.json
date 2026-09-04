@@ -10,5 +10,17 @@
     "power_of_attorney": "Power of attorney",
     "floor_plan": "Floor plan",
     "other": "Other"
+  },
+  "card": {
+    "title": "Documents",
+    "upload": "Upload",
+    "empty": "No documents uploaded yet."
+  },
+  "toast": {
+    "uploaded": "Document uploaded",
+    "uploadError": "Failed to upload document",
+    "deleted": "Document deleted",
+    "deleteError": "Failed to delete document",
+    "downloadError": "Failed to download document"
   }
 }

@@ -48,7 +48,7 @@ export function EntityDocumentsCard({ ownerType, ownerId }: EntityDocumentsCardP
         <Card className="border border-secondary shadow-none pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
                 <CardTitle className="text-sm text-muted-foreground">
-                    Documents{documents.length > 0 && ` (${documents.length})`}
+                    {t("card.title")}{documents.length > 0 && ` (${documents.length})`}
                 </CardTitle>
                 <div className="flex items-center gap-2">
                     <Select
@@ -62,14 +62,14 @@ export function EntityDocumentsCard({ ownerType, ownerId }: EntityDocumentsCardP
                         </SelectContent>
                     </Select>
                     <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()} disabled={actions.upload.isPending}>
-                        Upload
+                        {t("card.upload")}
                     </Button>
                     <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileSelected} />
                 </div>
             </CardHeader>
             <CardContent>
                 {isLoading ? null : documents.length === 0 ? (
-                    <p className="py-6 text-center text-sm text-muted-foreground">No documents uploaded yet.</p>
+                    <p className="py-6 text-center text-sm text-muted-foreground">{t("card.empty")}</p>
                 ) : (
                     <div className="flex flex-col divide-y">
                         {documents.map((doc) => (
