@@ -2,7 +2,11 @@ import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {PrismaService} from '@/database/prisma.service';
 import {AuthUser} from '@/common/types/auth-user.type';
 
-export interface JwtPayload extends AuthUser {
+// The JWT itself never carries company settings (currency/locale/timezone) -
+// validate() below always re-queries them fresh, so a change to a company's
+// settings takes effect on the very next request instead of waiting for
+// every outstanding token to expire.
+export interface JwtPayload extends Omit<AuthUser, 'company'> {
     iat: number;
     exp: number;
 }
@@ -22,7 +26,17 @@ export class SessionValidationService {
                 companyId: true,
                 isActive: true,
                 sessionsValidFrom: true,
-                company: { select: { suspendedAt: true, deletedAt: true } },
+                company: {
+                    select: {
+                        id: true,
+                        name: true,
+                        currency: true,
+                        locale: true,
+                        timezone: true,
+                        suspendedAt: true,
+                        deletedAt: true,
+                    },
+                },
             },
         });
 
@@ -55,6 +69,15 @@ export class SessionValidationService {
             name: user.fullName,
             role: user.role,
             companyId: user.companyId,
+            company: user.company
+                ? {
+                      id: user.company.id,
+                      name: user.company.name,
+                      currency: user.company.currency,
+                      locale: user.company.locale,
+                      timezone: user.company.timezone,
+                  }
+                : null,
         };
     }
 }

@@ -2,9 +2,23 @@ import {BadRequestException, Injectable, UnauthorizedException} from "@nestjs/co
 import { UsersService } from "@/modules/users/users.service";
 import {JwtService} from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
-import {AuthUser} from "@/common/types/auth-user.type";
+import {AuthCompanySummary, AuthUser} from "@/common/types/auth-user.type";
 import {PrismaService} from "@/database/prisma.service";
 import {ChangePasswordDto} from "@/modules/auth/dto/change-password.dto";
+
+// Shapes a full Prisma Company row down to the subset the client needs -
+// used for both the login response and (via SessionValidationService) every
+// authenticated request, so the two never quietly drift out of sync.
+function toCompanySummary(company: { id: string; name: string; currency: string | null; locale: string | null; timezone: string | null } | null): AuthCompanySummary | null {
+    if (!company) return null;
+    return {
+        id: company.id,
+        name: company.name,
+        currency: company.currency,
+        locale: company.locale,
+        timezone: company.timezone,
+    };
+}
 
 @Injectable()
 export class AuthService {
@@ -44,7 +58,7 @@ export class AuthService {
             throw new UnauthorizedException("This company is not active. Contact your administrator.");
         }
 
-        const payload: AuthUser = {
+        const payload: Omit<AuthUser, "company"> = {
             id: user.id,
             email: user.email,
             name: user.fullName,
@@ -63,7 +77,7 @@ export class AuthService {
                 phone: user.phone,
                 role: user.role,
                 companyId: user.companyId,
-                company: user.company,
+                company: toCompanySummary(user.company),
             },
         };
     }
@@ -103,7 +117,7 @@ export class AuthService {
             data: { passwordHash, sessionsValidFrom: new Date() },
         });
 
-        const payload: AuthUser = {
+        const payload: Omit<AuthUser, "company"> = {
             id: record.id,
             email: record.email,
             name: record.fullName,

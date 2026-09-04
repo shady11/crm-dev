@@ -18,6 +18,7 @@ describe("UsersService — role boundaries", () => {
         name: "Company Admin",
         role: UserRole.COMPANY_ADMIN,
         companyId: "company-1",
+        company: null,
     };
 
     const superAdminRow = {

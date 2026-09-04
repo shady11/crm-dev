@@ -15,6 +15,7 @@ describe("AuthService.changeOwnPassword", () => {
         name: "Aigul",
         role: UserRole.SALES_MANAGER,
         companyId: "company-1",
+        company: null,
     };
 
     let passwordHash: string;
