@@ -29,7 +29,7 @@ export function LeadsTable({
                                 onToggleOne,
                                 onRowClick,
                             }: LeadsTableProps) {
-    const { t } = useTranslation("leads");
+    const { t, i18n } = useTranslation("leads");
 
     if (isLoading) {
         return (
@@ -46,8 +46,8 @@ export function LeadsTable({
                     <EmptyMedia variant="icon">
                         <UsersRoundIcon strokeWidth={1.25} />
                     </EmptyMedia>
-                    <EmptyTitle>No leads found</EmptyTitle>
-                    <EmptyDescription>Try adjusting your filters or search.</EmptyDescription>
+                    <EmptyTitle>{t("table.emptyTitle")}</EmptyTitle>
+                    <EmptyDescription>{t("table.emptyDescription")}</EmptyDescription>
                 </EmptyHeader>
             </Empty>
         );
@@ -64,15 +64,15 @@ export function LeadsTable({
                                 onCheckedChange={(details) => onToggleAll(details.checked === true)}
                             />
                         </TableHead>
-                        <TableHead>Lead</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Manager</TableHead>
-                        <TableHead>Created</TableHead>
+                        <TableHead>{t("table.lead")}</TableHead>
+                        <TableHead>{t("table.status")}</TableHead>
+                        <TableHead>{t("table.manager")}</TableHead>
+                        <TableHead>{t("table.created")}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {leads.map((lead) => {
-                        const created = formatCreatedAt(lead.createdAt);
+                        const created = formatCreatedAt(lead.createdAt, i18n.language);
 
                         return (
                             <TableRow

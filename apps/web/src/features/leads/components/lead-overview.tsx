@@ -10,27 +10,27 @@ interface LeadOverviewProps {
 }
 
 export function LeadOverview({ lead }: LeadOverviewProps) {
-    const { t } = useTranslation("leads");
+    const { t, i18n } = useTranslation("leads");
 
-    const created = formatCreatedAt(lead.createdAt);
+    const created = formatCreatedAt(lead.createdAt, i18n.language);
 
     return (
         <div className="rounded-lg border border-secondary px-4 py-2">
             <DataList className="divide-y">
                 <DataListItem>
-                    <DataListItemLabel>Full name</DataListItemLabel>
+                    <DataListItemLabel>{t("overview.fullName")}</DataListItemLabel>
                     <DataListItemValue>{lead.fullName}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
-                    <DataListItemLabel>Phone</DataListItemLabel>
+                    <DataListItemLabel>{t("overview.phone")}</DataListItemLabel>
                     <DataListItemValue>{lead.phone}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
-                    <DataListItemLabel>Email</DataListItemLabel>
+                    <DataListItemLabel>{t("overview.email")}</DataListItemLabel>
                     <DataListItemValue>{lead.email ?? "—"}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
-                    <DataListItemLabel>Status</DataListItemLabel>
+                    <DataListItemLabel>{t("overview.status")}</DataListItemLabel>
                     <DataListItemValue>
                         <Badge className={`${LEAD_STATUS_CLASSES[lead.status]} text-white`}>
                             {t(LEAD_STATUS_LABEL_KEYS[lead.status])}
@@ -38,21 +38,21 @@ export function LeadOverview({ lead }: LeadOverviewProps) {
                     </DataListItemValue>
                 </DataListItem>
                 <DataListItem>
-                    <DataListItemLabel>Source</DataListItemLabel>
+                    <DataListItemLabel>{t("overview.source")}</DataListItemLabel>
                     <DataListItemValue>{lead.source ?? "—"}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
-                    <DataListItemLabel>Manager</DataListItemLabel>
-                    <DataListItemValue>{lead.manager?.fullName ?? "Unassigned"}</DataListItemValue>
+                    <DataListItemLabel>{t("overview.manager")}</DataListItemLabel>
+                    <DataListItemValue>{lead.manager?.fullName ?? t("overview.unassigned")}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
-                    <DataListItemLabel>Comment</DataListItemLabel>
+                    <DataListItemLabel>{t("overview.comment")}</DataListItemLabel>
                     <DataListItemValue>{lead.comment ?? "—"}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
-                    <DataListItemLabel>Created</DataListItemLabel>
+                    <DataListItemLabel>{t("overview.created")}</DataListItemLabel>
                     <DataListItemValue>
-                        {created.date} at {created.time}
+                        {t("overview.createdAt", { date: created.date, time: created.time })}
                     </DataListItemValue>
                 </DataListItem>
             </DataList>

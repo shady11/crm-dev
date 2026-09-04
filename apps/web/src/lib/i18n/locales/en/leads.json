@@ -7,5 +7,140 @@
     "negotiation": "Negotiation",
     "converted": "Converted",
     "lost": "Lost"
+  },
+  "page": {
+    "title": "Leads"
+  },
+  "toolbar": {
+    "heading": "All Leads",
+    "filterByStatus": "Filter by status",
+    "searchPlaceholder": "Search for leads...",
+    "addLead": "Add New Lead"
+  },
+  "table": {
+    "lead": "Lead",
+    "status": "Status",
+    "manager": "Manager",
+    "created": "Created",
+    "emptyTitle": "No leads found",
+    "emptyDescription": "Try adjusting your filters or search."
+  },
+  "pagination": {
+    "rowsPerPage": "Rows per page"
+  },
+  "actionBar": {
+    "selected": "{{count}} selected",
+    "delete": "Delete",
+    "clearSelection": "Clear selection"
+  },
+  "overview": {
+    "fullName": "Full name",
+    "phone": "Phone",
+    "email": "Email",
+    "status": "Status",
+    "source": "Source",
+    "manager": "Manager",
+    "unassigned": "Unassigned",
+    "comment": "Comment",
+    "created": "Created",
+    "createdAt": "{{date}} at {{time}}"
+  },
+  "clientTab": {
+    "notConverted": "This lead hasn't been converted to a client yet.",
+    "convertToClient": "Convert to client",
+    "loadError": "Linked client could not be loaded.",
+    "fullName": "Full name",
+    "phone": "Phone",
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "passport": "Passport",
+    "leads": "Leads",
+    "deals": "Deals"
+  },
+  "detailsSheet": {
+    "overviewTab": "Overview",
+    "clientTab": "Client",
+    "edit": "Edit",
+    "convert": "Convert"
+  },
+  "form": {
+    "editTitle": "Edit lead",
+    "addTitle": "Add lead",
+    "editDescription": "Update the lead's details.",
+    "addDescription": "Add a new lead record.",
+    "saveError": "Lead could not be saved. Check the details and try again.",
+    "saveChanges": "Save changes",
+    "create": "Create lead",
+    "fullName": "Full name",
+    "phone": "Phone",
+    "email": "Email (optional)",
+    "source": "Source (optional)",
+    "sourcePlaceholder": "e.g. Instagram, referral, walk-in",
+    "status": "Status",
+    "manager": "Manager (optional)",
+    "unassigned": "Unassigned",
+    "comment": "Comment (optional)",
+    "commentPlaceholder": "Notes about this lead",
+    "cancel": "Cancel",
+    "validation": {
+      "nameMin": "Name must be at least 2 characters",
+      "phoneMin": "Phone must be at least 5 characters",
+      "invalidEmail": "Invalid email"
+    }
+  },
+  "convertDialog": {
+    "title": "Convert to client",
+    "descriptionNamed": "Turn {{name}} into a client record.",
+    "descriptionGeneric": "Turn this lead into a client record.",
+    "createNew": "Create new client",
+    "linkExisting": "Link existing client",
+    "cancel": "Cancel",
+    "converting": "Converting...",
+    "convert": "Convert",
+    "error": "Could not convert this lead. Check the details and try again."
+  },
+  "deleteDialog": {
+    "title": "Delete lead?",
+    "description": "This will permanently delete {{name}}. This action cannot be undone.",
+    "descriptionFallback": "this lead",
+    "cancel": "Cancel",
+    "deleting": "Deleting...",
+    "delete": "Delete"
+  },
+  "deleteLeads": {
+    "title_one": "Delete {{count}} lead?",
+    "title_few": "Delete {{count}} leads?",
+    "title_many": "Delete {{count}} leads?",
+    "title_other": "Delete {{count}} leads?",
+    "description_one": "This will permanently delete the selected lead. This action cannot be undone.",
+    "description_few": "This will permanently delete the selected leads. This action cannot be undone.",
+    "description_many": "This will permanently delete the selected leads. This action cannot be undone.",
+    "description_other": "This will permanently delete the selected leads. This action cannot be undone.",
+    "cancel": "Cancel",
+    "deleting": "Deleting...",
+    "delete": "Delete"
+  },
+  "toasts": {
+    "createSuccessTitle": "Successfully created",
+    "createSuccessDescription": "The new lead has been added.",
+    "createErrorTitle": "Failed to create lead",
+    "createErrorDescription": "Please check the details and try again.",
+    "updateSuccessTitle": "Successfully updated",
+    "updateSuccessDescription": "The lead has been updated.",
+    "updateErrorTitle": "Failed to update lead",
+    "updateErrorDescription": "Please try again.",
+    "convertSuccessTitle": "Lead converted",
+    "convertSuccessDescription": "The lead is now a client.",
+    "convertErrorTitle": "Failed to convert lead",
+    "convertErrorDescription": "Please try again.",
+    "deleteSuccessTitle": "Lead deleted",
+    "deleteSuccessDescription": "The lead has been removed.",
+    "deleteErrorTitle": "Failed to delete lead",
+    "deleteErrorDescription": "Please try again.",
+    "bulkDeleteAllFailed": "None of the selected leads could be deleted.",
+    "bulkDeletePartialFailed": "{{failed}} of {{total}} selected leads could not be deleted.",
+    "bulkDeleteSuccessTitle": "Leads deleted",
+    "bulkDeleteSuccessDescription": "Selected leads have been removed.",
+    "bulkDeleteIssuesTitle": "Bulk delete had issues"
   }
 }

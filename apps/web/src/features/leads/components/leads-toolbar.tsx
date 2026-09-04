@@ -26,7 +26,7 @@ export function LeadsToolbar({
 
     const statusCollection = createListCollection({
         items: [
-            { label: "Filter by status", value: "all" },
+            { label: t("toolbar.filterByStatus"), value: "all" },
             ...Object.values(LeadStatus).map(
                 (status) => ({
                     label: t(LEAD_STATUS_LABEL_KEYS[status]),
@@ -38,7 +38,7 @@ export function LeadsToolbar({
 
     return (
         <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-medium">All Leads</h2>
+            <h2 className="text-lg font-medium">{t("toolbar.heading")}</h2>
 
             <div className="flex flex-wrap items-center gap-2">
                 <Select
@@ -47,7 +47,7 @@ export function LeadsToolbar({
                     onValueChange={({ value }) => onStatusFilterChange((value[0] ?? "all") as LeadStatusFilterValue)}
                 >
                     <SelectTrigger className="w-48">
-                        <SelectValue placeholder="Filter by status" />
+                        <SelectValue placeholder={t("toolbar.filterByStatus")} />
                     </SelectTrigger>
                     <SelectContent>
                         {statusCollection.items.map((item) => (
@@ -60,7 +60,7 @@ export function LeadsToolbar({
 
                 <InputGroup className="w-56">
                     <InputGroupInput
-                        placeholder="Search for leads..."
+                        placeholder={t("toolbar.searchPlaceholder")}
                         value={search}
                         onChange={(e) => onSearchChange(e.target.value)}
                     />
@@ -71,7 +71,7 @@ export function LeadsToolbar({
 
                 <Button onClick={onAddLead}>
                     <Plus className="size-3" />
-                    Add New Lead
+                    {t("toolbar.addLead")}
                 </Button>
             </div>
         </div>

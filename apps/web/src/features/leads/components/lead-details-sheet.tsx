@@ -5,6 +5,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx
 import type {Lead} from "@/features/leads/api/leads.api.ts";
 import {LeadOverview} from "@/features/leads/components/lead-overview.tsx";
 import {LeadClientTab} from "@/features/leads/components/lead-client-tab.tsx";
+import {useTranslation} from "react-i18next";
 
 interface LeadDetailsSheetProps {
     lead: Lead | null;
@@ -23,6 +24,8 @@ export function LeadDetailsSheet({
                                       onRequestConvert,
                                       onRequestDelete,
                                   }: LeadDetailsSheetProps) {
+    const { t } = useTranslation("leads");
+
     if (!lead) {
         return null;
     }
@@ -38,8 +41,8 @@ export function LeadDetailsSheet({
                     <div className="py-4">
                         <Tabs defaultValue="overview" className="gap-6">
                             <TabsList>
-                                <TabsTrigger value="overview">Overview</TabsTrigger>
-                                <TabsTrigger value="client">Client</TabsTrigger>
+                                <TabsTrigger value="overview">{t("detailsSheet.overviewTab")}</TabsTrigger>
+                                <TabsTrigger value="client">{t("detailsSheet.clientTab")}</TabsTrigger>
                             </TabsList>
 
                             <TabsContent value="overview">
@@ -59,12 +62,12 @@ export function LeadDetailsSheet({
                     </Button>
                     <Button variant="secondary" className="flex-1" onClick={onEdit}>
                         <Pen className="size-4" />
-                        Edit
+                        {t("detailsSheet.edit")}
                     </Button>
                     {!lead.client && (
                         <Button className="flex-1" onClick={onRequestConvert}>
                             <UserPlusIcon className="size-4" />
-                            Convert
+                            {t("detailsSheet.convert")}
                         </Button>
                     )}
                 </SheetFooter>

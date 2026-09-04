@@ -8,14 +8,16 @@ import {DeleteLeadsDialog} from "@/features/leads/components/delete-leads-dialog
 import {ConvertLeadDialog} from "@/features/leads/components/convert-lead-dialog.tsx";
 import {LeadDetailsSheet} from "@/features/leads/components/lead-details-sheet.tsx";
 import {useLeadsList} from "@/features/leads/hooks/use-leads-list.ts";
+import {useTranslation} from "react-i18next";
 
 export function LeadsPage() {
+    const { t } = useTranslation("leads");
     const { filters, pagination, table, selection, form, deleteDialog, bulkDeleteDialog, convertDialog, detailsSheet } = useLeadsList();
 
     return (
         <div className="space-y-6">
             <div className="flex items-start justify-between gap-4">
-                <h2 className="text-2xl font-medium tracking-tight">Leads</h2>
+                <h2 className="text-2xl font-medium tracking-tight">{t("page.title")}</h2>
             </div>
 
             <div className="space-y-4">
@@ -80,7 +82,7 @@ export function LeadsPage() {
             <ConvertLeadDialog
                 lead={convertDialog.lead}
                 isSubmitting={convertDialog.isConverting}
-                errorMessage={convertDialog.hasError ? "Could not convert this lead. Check the details and try again." : undefined}
+                errorMessage={convertDialog.hasError ? t("convertDialog.error") : undefined}
                 onClose={convertDialog.onCancel}
                 onConfirm={convertDialog.onConfirm}
             />

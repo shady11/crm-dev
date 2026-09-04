@@ -5,6 +5,7 @@ import {Spinner} from "@/components/ui/spinner.tsx";
 import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/components/ui/data-list.tsx";
 import {getClient} from "@/features/clients/api/clients.api.ts";
 import type {Lead} from "@/features/leads/api/leads.api.ts";
+import {useTranslation} from "react-i18next";
 
 interface LeadClientTabProps {
     lead: Lead;
@@ -12,6 +13,7 @@ interface LeadClientTabProps {
 }
 
 export function LeadClientTab({ lead, onConvert }: LeadClientTabProps) {
+    const { t } = useTranslation("leads");
     const clientId = lead.client?.id;
 
     const clientQuery = useQuery({
@@ -24,11 +26,11 @@ export function LeadClientTab({ lead, onConvert }: LeadClientTabProps) {
         return (
             <div className="flex flex-col items-center gap-3 py-10 text-center">
                 <p className="text-sm text-muted-foreground">
-                    This lead hasn't been converted to a client yet.
+                    {t("clientTab.notConverted")}
                 </p>
                 <Button onClick={onConvert}>
                     <UserPlusIcon className="size-4" />
-                    Convert to client
+                    {t("clientTab.convertToClient")}
                 </Button>
             </div>
         );
@@ -47,7 +49,7 @@ export function LeadClientTab({ lead, onConvert }: LeadClientTabProps) {
     if (!client) {
         return (
             <p className="py-6 text-center text-sm text-muted-foreground">
-                Linked client could not be loaded.
+                {t("clientTab.loadError")}
             </p>
         );
     }
@@ -56,31 +58,31 @@ export function LeadClientTab({ lead, onConvert }: LeadClientTabProps) {
         <div className="rounded-lg border border-secondary px-4 py-2">
             <DataList className="divide-y">
                 <DataListItem>
-                    <DataListItemLabel>Full name</DataListItemLabel>
+                    <DataListItemLabel>{t("clientTab.fullName")}</DataListItemLabel>
                     <DataListItemValue>{client.fullName}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
-                    <DataListItemLabel>Phone</DataListItemLabel>
+                    <DataListItemLabel>{t("clientTab.phone")}</DataListItemLabel>
                     <DataListItemValue>{client.phone}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
-                    <DataListItemLabel>WhatsApp</DataListItemLabel>
+                    <DataListItemLabel>{t("clientTab.whatsapp")}</DataListItemLabel>
                     <DataListItemValue>{client.whatsapp ?? "—"}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
-                    <DataListItemLabel>Email</DataListItemLabel>
+                    <DataListItemLabel>{t("clientTab.email")}</DataListItemLabel>
                     <DataListItemValue>{client.email ?? "—"}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
-                    <DataListItemLabel>Passport</DataListItemLabel>
+                    <DataListItemLabel>{t("clientTab.passport")}</DataListItemLabel>
                     <DataListItemValue>{client.passport ?? "—"}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
-                    <DataListItemLabel>Leads</DataListItemLabel>
+                    <DataListItemLabel>{t("clientTab.leads")}</DataListItemLabel>
                     <DataListItemValue>{client.leads.length}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
-                    <DataListItemLabel>Deals</DataListItemLabel>
+                    <DataListItemLabel>{t("clientTab.deals")}</DataListItemLabel>
                     <DataListItemValue>{client.deals.length}</DataListItemValue>
                 </DataListItem>
             </DataList>

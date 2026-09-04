@@ -18,6 +18,7 @@ import {ClientSearch} from "@/features/clients/components/client-search.tsx";
 import type {Client} from "@/features/clients/types/client.types.ts";
 import type {Lead} from "@/features/leads/api/leads.api.ts";
 import {initials} from "@/features/leads/utils/format.ts";
+import {useTranslation} from "react-i18next";
 
 type ConvertMode = "new" | "existing";
 
@@ -30,6 +31,7 @@ interface ConvertLeadDialogProps {
 }
 
 export function ConvertLeadDialog({ lead, isSubmitting = false, errorMessage, onClose, onConfirm }: ConvertLeadDialogProps) {
+    const { t } = useTranslation("leads");
     const [mode, setMode] = useState<ConvertMode>("new");
     const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
@@ -50,9 +52,9 @@ export function ConvertLeadDialog({ lead, isSubmitting = false, errorMessage, on
         <Dialog open={!!lead} onOpenChange={({ open }) => !open && onClose()}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Convert to client</DialogTitle>
+                    <DialogTitle>{t("convertDialog.title")}</DialogTitle>
                     <DialogDescription>
-                        {lead ? `Turn ${lead.fullName} into a client record.` : "Turn this lead into a client record."}
+                        {lead ? t("convertDialog.descriptionNamed", { name: lead.fullName }) : t("convertDialog.descriptionGeneric")}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -64,14 +66,14 @@ export function ConvertLeadDialog({ lead, isSubmitting = false, errorMessage, on
                                 className={`flex-1 rounded-md border border-secondary p-2 text-sm font-medium ${mode === "new" ? "bg-secondary text-secondary-foreground" : ""}`}
                                 onClick={() => setMode("new")}
                             >
-                                Create new client
+                                {t("convertDialog.createNew")}
                             </button>
                             <button
                                 type="button"
                                 className={`flex-1 rounded-md border border-secondary p-2 text-sm font-medium ${mode === "existing" ? "bg-secondary text-secondary-foreground" : ""}`}
                                 onClick={() => setMode("existing")}
                             >
-                                Link existing client
+                                {t("convertDialog.linkExisting")}
                             </button>
                         </div>
 
@@ -108,7 +110,7 @@ export function ConvertLeadDialog({ lead, isSubmitting = false, errorMessage, on
                 <DialogFooter>
                     <DialogClose asChild>
                         <Button variant="secondary" className="flex-1" disabled={isSubmitting} onClick={onClose}>
-                            Cancel
+                            {t("convertDialog.cancel")}
                         </Button>
                     </DialogClose>
                     <Button
@@ -117,7 +119,7 @@ export function ConvertLeadDialog({ lead, isSubmitting = false, errorMessage, on
                         onClick={handleConfirm}
                     >
                         <UserPlusIcon className="size-4" />
-                        {isSubmitting ? "Converting..." : "Convert"}
+                        {isSubmitting ? t("convertDialog.converting") : t("convertDialog.convert")}
                     </Button>
                 </DialogFooter>
             </DialogContent>

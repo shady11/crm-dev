@@ -1,4 +1,4 @@
-import {useEffect} from "react";
+import {useEffect, useMemo} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Loader2, TriangleAlert} from "lucide-react";
 import {Controller, useForm} from "react-hook-form";
@@ -19,17 +19,15 @@ import {useTranslation} from "react-i18next";
 
 const UNASSIGNED = "unassigned";
 
-const leadSchema = z.object({
-    fullName: z.string().trim().min(2, "Name must be at least 2 characters"),
-    phone: z.string().trim().min(5, "Phone must be at least 5 characters"),
-    email: z.string().trim().email("Invalid email").optional().or(z.literal("")),
-    source: z.string().trim().optional(),
-    status: z.enum(LeadStatus),
-    managerId: z.string(),
-    comment: z.string().trim().optional(),
-});
-
-type LeadFormValues = z.infer<typeof leadSchema>;
+type LeadFormValues = {
+    fullName: string;
+    phone: string;
+    email?: string;
+    source?: string;
+    status: LeadStatus;
+    managerId: string;
+    comment?: string;
+};
 
 type LeadFormProps = {
     lead?: Lead | null;
@@ -75,6 +73,18 @@ export function LeadForm({
 
     const managers = useManagers();
 
+    // Rebuilt whenever the language changes, so a validation message that
+    // fired before a language switch doesn't stay frozen in the old language.
+    const leadSchema = useMemo(() => z.object({
+        fullName: z.string().trim().min(2, t("form.validation.nameMin")),
+        phone: z.string().trim().min(5, t("form.validation.phoneMin")),
+        email: z.string().trim().email(t("form.validation.invalidEmail")).optional().or(z.literal("")),
+        source: z.string().trim().optional(),
+        status: z.enum(LeadStatus),
+        managerId: z.string(),
+        comment: z.string().trim().optional(),
+    }), [t]);
+
     const form = useForm<LeadFormValues>({
         resolver: zodResolver(leadSchema),
         defaultValues: DEFAULT_VALUES,
@@ -95,7 +105,7 @@ export function LeadForm({
 
     const managerCollection = createListCollection({
         items: [
-            { label: "Unassigned", value: UNASSIGNED },
+            { label: t("form.unassigned"), value: UNASSIGNED },
             ...managers.data.map((manager) => ({ label: manager.fullName, value: manager.id })),
         ],
     });
@@ -121,8 +131,8 @@ export function LeadForm({
                         name="fullName"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Full name</FieldLabel>
-                                <Input {...field} placeholder="Full name" aria-label="Full name" />
+                                <FieldLabel>{t("form.fullName")}</FieldLabel>
+                                <Input {...field} placeholder={t("form.fullName")} aria-label={t("form.fullName")} />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}
@@ -133,8 +143,8 @@ export function LeadForm({
                         name="phone"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Phone</FieldLabel>
-                                <Input {...field} placeholder="Phone" aria-label="Phone" />
+                                <FieldLabel>{t("form.phone")}</FieldLabel>
+                                <Input {...field} placeholder={t("form.phone")} aria-label={t("form.phone")} />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}
@@ -145,8 +155,8 @@ export function LeadForm({
                         name="email"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Email (optional)</FieldLabel>
-                                <Input {...field} type="email" placeholder="name@example.com" aria-label="Email" />
+                                <FieldLabel>{t("form.email")}</FieldLabel>
+                                <Input {...field} type="email" placeholder="name@example.com" aria-label={t("form.email")} />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}
@@ -157,8 +167,8 @@ export function LeadForm({
                         name="source"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Source (optional)</FieldLabel>
-                                <Input {...field} placeholder="e.g. Instagram, referral, walk-in" aria-label="Source" />
+                                <FieldLabel>{t("form.source")}</FieldLabel>
+                                <Input {...field} placeholder={t("form.sourcePlaceholder")} aria-label={t("form.source")} />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}
@@ -169,7 +179,7 @@ export function LeadForm({
                         name="status"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Status</FieldLabel>
+                                <FieldLabel>{t("form.status")}</FieldLabel>
                                 <Select
                                     collection={statusCollection}
                                     value={[field.value]}
@@ -196,7 +206,7 @@ export function LeadForm({
                         name="managerId"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Manager (optional)</FieldLabel>
+                                <FieldLabel>{t("form.manager")}</FieldLabel>
                                 <Select
                                     collection={managerCollection}
                                     value={[field.value]}
@@ -223,8 +233,8 @@ export function LeadForm({
                         name="comment"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Comment (optional)</FieldLabel>
-                                <Textarea {...field} rows={3} placeholder="Notes about this lead" />
+                                <FieldLabel>{t("form.comment")}</FieldLabel>
+                                <Textarea {...field} rows={3} placeholder={t("form.commentPlaceholder")} />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}
@@ -242,13 +252,13 @@ export function LeadForm({
                 <SheetClose asChild>
                     {onCancel && (
                         <Button variant="secondary" className="flex-1" disabled={isSubmitting} onClick={onCancel}>
-                            Cancel
+                            {t("form.cancel")}
                         </Button>
                     )}
                 </SheetClose>
                 <Button type="submit" className="flex-1" disabled={isSubmitting}>
                     {isSubmitting && <Loader2 className="animate-spin" />}
-                    {submitLabel ?? (lead ? "Save changes" : "Create lead")}
+                    {submitLabel ?? (lead ? t("form.saveChanges") : t("form.create"))}
                 </Button>
             </SheetFooter>
         </form>

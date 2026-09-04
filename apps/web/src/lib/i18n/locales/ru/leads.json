@@ -7,5 +7,140 @@
     "negotiation": "Переговоры",
     "converted": "Конвертирован",
     "lost": "Потерян"
+  },
+  "page": {
+    "title": "Лиды"
+  },
+  "toolbar": {
+    "heading": "Все лиды",
+    "filterByStatus": "Фильтр по статусу",
+    "searchPlaceholder": "Поиск лидов...",
+    "addLead": "Добавить лида"
+  },
+  "table": {
+    "lead": "Лид",
+    "status": "Статус",
+    "manager": "Менеджер",
+    "created": "Создан",
+    "emptyTitle": "Лиды не найдены",
+    "emptyDescription": "Попробуйте изменить фильтры или поиск."
+  },
+  "pagination": {
+    "rowsPerPage": "Строк на странице"
+  },
+  "actionBar": {
+    "selected": "Выбрано: {{count}}",
+    "delete": "Удалить",
+    "clearSelection": "Очистить выбор"
+  },
+  "overview": {
+    "fullName": "ФИО",
+    "phone": "Телефон",
+    "email": "Email",
+    "status": "Статус",
+    "source": "Источник",
+    "manager": "Менеджер",
+    "unassigned": "Не назначен",
+    "comment": "Комментарий",
+    "created": "Создан",
+    "createdAt": "{{date}} в {{time}}"
+  },
+  "clientTab": {
+    "notConverted": "Этот лид ещё не конвертирован в клиента.",
+    "convertToClient": "Конвертировать в клиента",
+    "loadError": "Не удалось загрузить привязанного клиента.",
+    "fullName": "ФИО",
+    "phone": "Телефон",
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "passport": "Паспорт",
+    "leads": "Лиды",
+    "deals": "Сделки"
+  },
+  "detailsSheet": {
+    "overviewTab": "Обзор",
+    "clientTab": "Клиент",
+    "edit": "Редактировать",
+    "convert": "Конвертировать"
+  },
+  "form": {
+    "editTitle": "Редактировать лида",
+    "addTitle": "Добавить лида",
+    "editDescription": "Обновите данные лида.",
+    "addDescription": "Добавьте новую запись лида.",
+    "saveError": "Не удалось сохранить лида. Проверьте данные и попробуйте снова.",
+    "saveChanges": "Сохранить изменения",
+    "create": "Создать лида",
+    "fullName": "ФИО",
+    "phone": "Телефон",
+    "email": "Email (необязательно)",
+    "source": "Источник (необязательно)",
+    "sourcePlaceholder": "например, Instagram, рекомендация, визит",
+    "status": "Статус",
+    "manager": "Менеджер (необязательно)",
+    "unassigned": "Не назначен",
+    "comment": "Комментарий (необязательно)",
+    "commentPlaceholder": "Заметки о лиде",
+    "cancel": "Отмена",
+    "validation": {
+      "nameMin": "Имя должно содержать не менее 2 символов",
+      "phoneMin": "Телефон должен содержать не менее 5 символов",
+      "invalidEmail": "Некорректный email"
+    }
+  },
+  "convertDialog": {
+    "title": "Конвертировать в клиента",
+    "descriptionNamed": "Превратить {{name}} в запись клиента.",
+    "descriptionGeneric": "Превратить этого лида в запись клиента.",
+    "createNew": "Создать нового клиента",
+    "linkExisting": "Привязать существующего клиента",
+    "cancel": "Отмена",
+    "converting": "Конвертация...",
+    "convert": "Конвертировать",
+    "error": "Не удалось конвертировать лида. Проверьте данные и попробуйте снова."
+  },
+  "deleteDialog": {
+    "title": "Удалить лида?",
+    "description": "{{name}} будет удалён навсегда. Это действие нельзя отменить.",
+    "descriptionFallback": "Этот лид",
+    "cancel": "Отмена",
+    "deleting": "Удаление...",
+    "delete": "Удалить"
+  },
+  "deleteLeads": {
+    "title_one": "Удалить {{count}} лид?",
+    "title_few": "Удалить {{count}} лида?",
+    "title_many": "Удалить {{count}} лидов?",
+    "title_other": "Удалить {{count}} лида?",
+    "description_one": "Выбранный лид будет удалён навсегда. Это действие нельзя отменить.",
+    "description_few": "Выбранные лиды будут удалены навсегда. Это действие нельзя отменить.",
+    "description_many": "Выбранные лиды будут удалены навсегда. Это действие нельзя отменить.",
+    "description_other": "Выбранные лиды будут удалены навсегда. Это действие нельзя отменить.",
+    "cancel": "Отмена",
+    "deleting": "Удаление...",
+    "delete": "Удалить"
+  },
+  "toasts": {
+    "createSuccessTitle": "Успешно создано",
+    "createSuccessDescription": "Новый лид добавлен.",
+    "createErrorTitle": "Не удалось создать лида",
+    "createErrorDescription": "Проверьте данные и попробуйте снова.",
+    "updateSuccessTitle": "Успешно обновлено",
+    "updateSuccessDescription": "Лид обновлён.",
+    "updateErrorTitle": "Не удалось обновить лида",
+    "updateErrorDescription": "Попробуйте снова.",
+    "convertSuccessTitle": "Лид конвертирован",
+    "convertSuccessDescription": "Теперь это клиент.",
+    "convertErrorTitle": "Не удалось конвертировать лида",
+    "convertErrorDescription": "Попробуйте снова.",
+    "deleteSuccessTitle": "Лид удалён",
+    "deleteSuccessDescription": "Лид удалён из списка.",
+    "deleteErrorTitle": "Не удалось удалить лида",
+    "deleteErrorDescription": "Попробуйте снова.",
+    "bulkDeleteAllFailed": "Ни один из выбранных лидов не удалось удалить.",
+    "bulkDeletePartialFailed": "{{failed}} из {{total}} выбранных лидов не удалось удалить.",
+    "bulkDeleteSuccessTitle": "Лиды удалены",
+    "bulkDeleteSuccessDescription": "Выбранные лиды удалены.",
+    "bulkDeleteIssuesTitle": "Возникли проблемы при массовом удалении"
   }
 }

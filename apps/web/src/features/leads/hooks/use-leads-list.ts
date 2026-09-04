@@ -1,6 +1,7 @@
 import {useState} from "react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 import {
     type ConvertLeadPayload,
     convertLead,
@@ -17,6 +18,7 @@ import type {LeadStatus} from "@/features/leads/types/lead.types.ts";
 export type LeadStatusFilterValue = LeadStatus | "all";
 
 export function useLeadsList() {
+    const { t } = useTranslation("leads");
     const queryClient = useQueryClient();
 
     const [search, setSearchState] = useState("");
@@ -48,11 +50,11 @@ export function useLeadsList() {
         mutationFn: (payload: CreateLeadPayload) => createLead(payload),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["leads"] });
-            toast.success({ title: "Successfully created", description: "The new lead has been added." });
+            toast.success({ title: t("toasts.createSuccessTitle"), description: t("toasts.createSuccessDescription") });
             closeForm();
         },
         onError: () => {
-            toast.error({ title: "Failed to create lead", description: "Please check the details and try again." });
+            toast.error({ title: t("toasts.createErrorTitle"), description: t("toasts.createErrorDescription") });
         },
     });
 
@@ -60,11 +62,11 @@ export function useLeadsList() {
         mutationFn: ({ id, payload }: { id: string; payload: UpdateLeadPayload }) => updateLead(id, payload),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["leads"] });
-            toast.success({ title: "Successfully updated", description: "The lead has been updated." });
+            toast.success({ title: t("toasts.updateSuccessTitle"), description: t("toasts.updateSuccessDescription") });
             closeForm();
         },
         onError: () => {
-            toast.error({ title: "Failed to update lead", description: "Please try again." });
+            toast.error({ title: t("toasts.updateErrorTitle"), description: t("toasts.updateErrorDescription") });
         },
     });
 
@@ -73,11 +75,11 @@ export function useLeadsList() {
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["leads"] });
             await queryClient.invalidateQueries({ queryKey: ["clients"] });
-            toast.success({ title: "Lead converted", description: "The lead is now a client." });
+            toast.success({ title: t("toasts.convertSuccessTitle"), description: t("toasts.convertSuccessDescription") });
             setConvertTarget(null);
         },
         onError: () => {
-            toast.error({ title: "Failed to convert lead", description: "Please try again." });
+            toast.error({ title: t("toasts.convertErrorTitle"), description: t("toasts.convertErrorDescription") });
         },
     });
 
@@ -85,12 +87,12 @@ export function useLeadsList() {
         mutationFn: deleteLead,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["leads"] });
-            toast.success({ title: "Lead deleted", description: "The lead has been removed." });
+            toast.success({ title: t("toasts.deleteSuccessTitle"), description: t("toasts.deleteSuccessDescription") });
             setDeleteTarget(null);
             setDetailsTarget(null);
         },
         onError: () => {
-            toast.error({ title: "Failed to delete lead", description: "Please try again." });
+            toast.error({ title: t("toasts.deleteErrorTitle"), description: t("toasts.deleteErrorDescription") });
         },
     });
 
@@ -102,20 +104,20 @@ export function useLeadsList() {
             if (failed > 0) {
                 throw new Error(
                     failed === ids.length
-                        ? "None of the selected leads could be deleted."
-                        : `${failed} of ${ids.length} selected leads could not be deleted.`,
+                        ? t("toasts.bulkDeleteAllFailed")
+                        : t("toasts.bulkDeletePartialFailed", { failed, total: ids.length }),
                 );
             }
         },
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["leads"] });
-            toast.success({ title: "Leads deleted", description: "Selected leads have been removed." });
+            toast.success({ title: t("toasts.bulkDeleteSuccessTitle"), description: t("toasts.bulkDeleteSuccessDescription") });
             setSelectedIds(new Set());
             setBulkDeleteDialogOpen(false);
         },
         onError: async (error: Error) => {
             await queryClient.invalidateQueries({ queryKey: ["leads"] });
-            toast.error({ title: "Bulk delete had issues", description: error.message });
+            toast.error({ title: t("toasts.bulkDeleteIssuesTitle"), description: error.message });
             setSelectedIds(new Set());
             setBulkDeleteDialogOpen(false);
         },
