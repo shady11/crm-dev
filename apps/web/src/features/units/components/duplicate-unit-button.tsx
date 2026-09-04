@@ -14,12 +14,14 @@ import {
 } from "@/components/ui/alert-dialog.tsx";
 import { api } from "@/lib/api.ts";
 import type { Unit } from "@/features/units/types/unit.types.ts";
+import {useTranslation} from "react-i18next";
 
 interface DuplicateUnitButtonProps {
     unit: Unit;
 }
 
 export function DuplicateUnitButton({ unit }: DuplicateUnitButtonProps) {
+    const { t } = useTranslation("units");
     const queryClient = useQueryClient();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -44,20 +46,18 @@ export function DuplicateUnitButton({ unit }: DuplicateUnitButtonProps) {
             <AlertDialog open={isOpen} onOpenChange={({open}) => setIsOpen(open)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Duplicate unit?</AlertDialogTitle>
+                        <AlertDialogTitle>{t("duplicate.title")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will create a copy of Unit №{unit.number}.
+                            {t("duplicate.description", { number: unit.number })}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={duplicateMutation.isPending}>
-                            Cancel
-                        </AlertDialogCancel>
+                        <AlertDialogCancel disabled={duplicateMutation.isPending}>{t("common:actions.cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                             disabled={duplicateMutation.isPending}
                             onClick={() => duplicateMutation.mutate()}
                         >
-                            {duplicateMutation.isPending ? "Duplicating..." : "Duplicate"}
+                            {duplicateMutation.isPending ? t("common:actions.duplicating") : t("common:actions.duplicate")}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

@@ -168,7 +168,7 @@ export function BulkUnitsForm({
                 <FieldGroup className="gap-5 py-4">
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <h3 className="text-sm font-medium">Units</h3>
+                            <h3 className="text-sm font-medium">{t("bulk.unitsHeading")}</h3>
                             <div className="flex gap-2">
                                 <Popover onOpenChange={({ open: isOpen }) => setAutoGenOpen(isOpen)} open={open}>
                                     <PopoverTrigger asChild>
@@ -178,16 +178,14 @@ export function BulkUnitsForm({
                                             variant="outline"
                                             disabled={isSubmitting}
                                         >
-                                            <Wand2 className="size-3 mr-1" />
-                                            Auto-generate
-                                        </Button>
+                                            <Wand2 className="size-3 mr-1" /> {t("bulk.autoGenerate")}</Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-64">
-                                        <PopoverHeader title="Auto-generate Units"/>
+                                        <PopoverHeader title={t("bulk.autoGeneratePopoverTitle")}/>
                                         <PopoverBody>
                                             <FieldGroup className="gap-2">
                                                 <Field className="grid grid-cols-3 items-center gap-4">
-                                                    <FieldLabel>Number of units</FieldLabel>
+                                                    <FieldLabel>{t("bulk.numberOfUnitsLabel")}</FieldLabel>
                                                     <Input
                                                         size="sm"
                                                         className="col-span-2"
@@ -197,7 +195,7 @@ export function BulkUnitsForm({
                                                     />
                                                 </Field>
                                                 <Field className="grid grid-cols-3 items-center gap-4">
-                                                    <FieldLabel>Starting number</FieldLabel>
+                                                    <FieldLabel>{t("bulk.startingNumberLabel")}</FieldLabel>
                                                     <Input
                                                         size="sm"
                                                         className="col-span-2"
@@ -207,7 +205,7 @@ export function BulkUnitsForm({
                                                     />
                                                 </Field>
                                                 <Field className="grid grid-cols-3 items-center gap-4">
-                                                    <FieldLabel>Type</FieldLabel>
+                                                    <FieldLabel>{t("common:labels.type")}</FieldLabel>
                                                     <Select
                                                         className="col-span-2"
                                                         collection={typeCollection}
@@ -217,7 +215,7 @@ export function BulkUnitsForm({
                                                         }}
                                                     >
                                                         <SelectTrigger className="w-full" size="sm">
-                                                            <SelectValue placeholder="Select" />
+                                                            <SelectValue placeholder={t("common:placeholders.select")} />
                                                         </SelectTrigger>
                                                         <SelectContent className="z-51">
                                                             {typeCollection.items.map((item) => (
@@ -229,7 +227,7 @@ export function BulkUnitsForm({
                                                     </Select>
                                                 </Field>
                                                 <Field className="grid grid-cols-3 items-center gap-4">
-                                                    <FieldLabel>Rooms</FieldLabel>
+                                                    <FieldLabel>{t("common:labels.rooms")}</FieldLabel>
                                                     <NumberInput
                                                         size="sm"
                                                         className="col-span-2"
@@ -248,7 +246,7 @@ export function BulkUnitsForm({
                                                     </NumberInput>
                                                 </Field>
                                                 <Field className="grid grid-cols-3 items-center gap-4">
-                                                    <FieldLabel>Area (m²)</FieldLabel>
+                                                    <FieldLabel>{t("form.areaLabel")}</FieldLabel>
                                                     <Input
                                                         size="sm"
                                                         className="col-span-2"
@@ -257,7 +255,7 @@ export function BulkUnitsForm({
                                                     />
                                                 </Field>
                                                 <Field className="grid grid-cols-3 items-center gap-4">
-                                                    <FieldLabel>Price</FieldLabel>
+                                                    <FieldLabel>{t("common:labels.price")}</FieldLabel>
                                                     <Input
                                                         size="sm"
                                                         className="col-span-2"
@@ -274,17 +272,13 @@ export function BulkUnitsForm({
                                                     variant="secondary"
                                                     size="sm"
                                                     onClick={() => setAutoGenOpen(false)}
-                                                >
-                                                    Cancel
-                                                </Button>
+                                                >{t("common:actions.cancel")}</Button>
                                             </PopoverClose>
                                             <Button
                                                 type="button"
                                                 size="sm"
                                                 onClick={autoGenerateUnits}
-                                            >
-                                                Generate
-                                            </Button>
+                                            >{t("bulk.generate")}</Button>
                                         </PopoverFooter>
                                     </PopoverContent>
                                 </Popover>
@@ -295,9 +289,7 @@ export function BulkUnitsForm({
                                     onClick={addUnit}
                                     disabled={isSubmitting}
                                 >
-                                    <Plus className="size-3" />
-                                    Add Unit
-                                </Button>
+                                    <Plus className="size-3" /> {t("bulk.addUnit")}</Button>
                             </div>
                         </div>
 
@@ -305,7 +297,7 @@ export function BulkUnitsForm({
                             {units.map((unit, index) => (
                                 <div key={index} className="rounded-lg border p-3 space-y-2">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium">№{unit.number}</span>
+                                        <span className="text-sm font-medium">{t("bulk.rowNumberLabel", { number: unit.number })}</span>
                                         <Button
                                             type="button"
                                             size="icon-sm"
@@ -318,7 +310,7 @@ export function BulkUnitsForm({
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
                                         <Field invalid={duplicateNumbers.includes(unit.number)}>
-                                            <FieldLabel>Number</FieldLabel>
+                                            <FieldLabel>{t("bulk.numberLabel")}</FieldLabel>
                                             <Input
                                                 value={unit.number}
                                                 onChange={(e) => updateUnit(index, "number", e.target.value)}
@@ -326,13 +318,11 @@ export function BulkUnitsForm({
                                                 aria-invalid={duplicateNumbers.includes(unit.number)}
                                             />
                                             {duplicateNumbers.includes(unit.number) && (
-                                                <p className="text-xs text-destructive mt-1">
-                                                    This number already exists
-                                                </p>
+                                                <p className="text-xs text-destructive mt-1">{t("bulk.duplicateNumberError")}</p>
                                             )}
                                         </Field>
                                         <Field>
-                                            <FieldLabel>Type</FieldLabel>
+                                            <FieldLabel>{t("common:labels.type")}</FieldLabel>
                                             <Select
                                                 collection={typeCollection}
                                                 value={[unit.type]}
@@ -355,7 +345,7 @@ export function BulkUnitsForm({
                                             </Select>
                                         </Field>
                                         <Field className="col-span-2">
-                                            <FieldLabel>Rooms</FieldLabel>
+                                            <FieldLabel>{t("common:labels.rooms")}</FieldLabel>
                                             <NumberInput
                                                 size="sm"
                                                 value={unit.rooms?.toString() ?? genRooms.toString()}
@@ -373,7 +363,7 @@ export function BulkUnitsForm({
                                             </NumberInput>
                                         </Field>
                                         <Field>
-                                            <FieldLabel>Area (m²)</FieldLabel>
+                                            <FieldLabel>{t("form.areaLabel")}</FieldLabel>
                                             <Input
                                                 value={unit.area}
                                                 onChange={(e) => updateUnit(index, "area", Number(e.target.value))}
@@ -381,7 +371,7 @@ export function BulkUnitsForm({
                                             />
                                         </Field>
                                         <Field>
-                                            <FieldLabel>Price, $</FieldLabel>
+                                            <FieldLabel>{t("bulk.priceLabelDollar")}</FieldLabel>
                                             <Input
                                                 value={unit.price}
                                                 onChange={(e) => updateUnit(index, "price", Number(e.target.value))}
@@ -397,7 +387,7 @@ export function BulkUnitsForm({
                     {duplicateNumbers.length > 0 && (
                         <Alert variant="destructive" className="mt-4 items-center">
                             <TriangleAlert />
-                            <AlertTitle>Duplicate floor numbers detected. Please fix them before creating.</AlertTitle>
+                            <AlertTitle>{t("bulk.duplicateNumbersAlert")}</AlertTitle>
                         </Alert>
                     )}
 
@@ -418,14 +408,12 @@ export function BulkUnitsForm({
                             className="flex-1"
                             disabled={isSubmitting}
                             onClick={onCancel}
-                        >
-                            Cancel
-                        </Button>
+                        >{t("common:actions.cancel")}</Button>
                     )}
                 </SheetClose>
                 <Button type="submit" className="flex-1" disabled={isSubmitting}>
                     {isSubmitting && <Loader2 className="animate-spin" />}
-                    Create {units.length} Unit{units.length !== 1 ? "s" : ""}
+                    {t("bulk.submitCreate", { count: units.length })}
                 </Button>
             </SheetFooter>
         </form>

@@ -1,6 +1,7 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 
 import {toast} from "@/components/ui/toast";
+import {useTranslation} from "react-i18next";
 import {createUnit} from "@/features/units/api/units.api";
 
 import type {CreateUnitPayload} from "@/features/units/types/unit-payload";
@@ -14,6 +15,7 @@ export function useCreateUnit({
                                   floorId,
                                   onSuccess,
                               }: UseCreateUnitOptions) {
+    const { t } = useTranslation("units");
     const queryClient = useQueryClient();
 
     return useMutation({
@@ -26,8 +28,8 @@ export function useCreateUnit({
             });
 
             toast.success({
-                title: "Successfully created",
-                description: `Unit ${payload.number} has been created.`,
+                title: t("toasts.createdTitle"),
+                description: t("toasts.createdDescription", { number: payload.number }),
             });
 
             onSuccess?.(payload);

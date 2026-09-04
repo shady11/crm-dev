@@ -10,5 +10,116 @@
     "commercial": "Коммерческое",
     "parking": "Паркинг",
     "storage": "Кладовка"
+  },
+  "actions": {
+    "addUnit": "Добавить юнит",
+    "bulkUnits": "Массовое добавление"
+  },
+  "sheets": {
+    "addTitle": "Добавить юнит на этаж {{number}}",
+    "bulkAddTitle": "Добавить несколько юнитов на этаж {{number}}",
+    "editTitle": "Редактировать юнит №{{number}}",
+    "detailsTitle": "Юнит №{{number}}"
+  },
+  "form": {
+    "numberLabel": "Номер юнита",
+    "numberPlaceholder": "например, 1, 101, A-1",
+    "roomsLabel": "Комнаты (необязательно)",
+    "areaLabel": "Площадь (м²)",
+    "submitCreate": "Создать юнит",
+    "errorCreate": "Не удалось создать юнит. Проверьте данные и попробуйте снова.",
+    "errorSave": "Не удалось сохранить юнит. Проверьте данные и попробуйте снова."
+  },
+  "bulk": {
+    "unitsHeading": "Юниты",
+    "autoGenerate": "Автогенерация",
+    "autoGeneratePopoverTitle": "Автогенерация юнитов",
+    "numberOfUnitsLabel": "Количество юнитов",
+    "startingNumberLabel": "Начальный номер",
+    "roomsLabel": "Комнаты",
+    "areaLabel": "Площадь (м²)",
+    "priceLabel": "Цена",
+    "generate": "Сгенерировать",
+    "addUnit": "Добавить юнит",
+    "numberLabel": "Номер",
+    "duplicateNumberError": "Этот номер уже существует",
+    "duplicateNumbersAlert": "Обнаружены повторяющиеся номера юнитов. Исправьте их перед созданием.",
+    "priceLabelDollar": "Цена, $",
+    "rowNumberLabel": "№{{number}}",
+    "errorGeneric": "Не удалось создать юниты. Проверьте данные и попробуйте снова.",
+    "submitCreate_one": "Создать {{count}} юнит",
+    "submitCreate_few": "Создать {{count}} юнита",
+    "submitCreate_many": "Создать {{count}} юнитов",
+    "submitCreate_other": "Создать {{count}} юнита"
+  },
+  "table": {
+    "numberHeader": "Номер",
+    "actionsHeader": "Действия"
+  },
+  "delete": {
+    "title": "Удалить юнит?",
+    "description": "Юнит №{{number}} будет удалён безвозвратно. Это действие нельзя отменить."
+  },
+  "duplicate": {
+    "title": "Дублировать юнит?",
+    "description": "Будет создана копия юнита №{{number}}."
+  },
+  "toasts": {
+    "createdTitle": "Успешно создано",
+    "createdDescription": "Юнит {{number}} создан.",
+    "updatedTitle": "Успешно обновлено",
+    "duplicatedTitle": "Успешно продублировано",
+    "deletedTitle": "Успешно удалено"
+  },
+  "overview": {
+    "numberLabel": "Номер юнита",
+    "pricePerSqmLabel": "Цена за м²",
+    "listPriceLabel": "Цена продажи"
+  },
+  "details": {
+    "overviewTab": "Обзор",
+    "dealsTab": "Сделки",
+    "noDeals": "Для этого юнита пока нет сделок.",
+    "bookButton": "Забронировать"
+  },
+  "chessboard": {
+    "entranceLabel": "Подъезд {{name}}",
+    "rooms_one": "{{count}} комната",
+    "rooms_few": "{{count}} комнаты",
+    "rooms_many": "{{count}} комнат",
+    "rooms_other": "{{count}} комнаты",
+    "floors_one": "{{count}} этаж",
+    "floors_few": "{{count}} этажа",
+    "floors_many": "{{count}} этажей",
+    "floors_other": "{{count}} этажа",
+    "units_one": "{{count}} юнит",
+    "units_few": "{{count}} юнита",
+    "units_many": "{{count}} юнитов",
+    "units_other": "{{count}} юнита"
+  },
+  "filters": {
+    "roomsSummary_one": "{{count}} комната",
+    "roomsSummary_few": "{{count}} комнаты",
+    "roomsSummary_many": "{{count}} комнат",
+    "roomsSummary_other": "{{count}} комнаты",
+    "areaOver": "От {{value}} м²",
+    "areaUnder": "До {{value}} м²",
+    "areaRange": "{{min}}–{{max}} м²",
+    "priceOver": "От {{value}}",
+    "priceUnder": "До {{value}}",
+    "priceRange": "{{min}}–{{max}}",
+    "roomsCountLabel": "Количество комнат",
+    "rangeLabel": "Диапазон",
+    "presetsLabel": "Пресеты",
+    "fromPlaceholder": "От",
+    "toPlaceholder": "До",
+    "unitsFound_one": "найден {{count}} юнит",
+    "unitsFound_few": "найдено {{count}} юнита",
+    "unitsFound_many": "найдено {{count}} юнитов",
+    "unitsFound_other": "найдено {{count}} юнита",
+    "clearAll": "Сбросить всё",
+    "pricePresetUnder": "До {{value}}",
+    "pricePresetOver": "От {{value}}",
+    "pricePresetRange": "{{min}} – {{max}}"
   }
 }

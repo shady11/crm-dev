@@ -28,6 +28,7 @@ import {api} from "@/lib/api.ts";
 import {Menu, MenuContent, MenuGroup, MenuItem, MenuSeparator, MenuTrigger} from "@/components/ui/menu.tsx";
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 interface UnitTableProps {
     units: Unit[];
@@ -35,6 +36,7 @@ interface UnitTableProps {
 
 export function UnitTable({ units }: UnitTableProps) {
     const { t } = useTranslation("units");
+    const { formatCurrency } = useCompanyFormatters();
 
     const queryClient = useQueryClient();
 
@@ -52,7 +54,7 @@ export function UnitTable({ units }: UnitTableProps) {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
 
             toast.success({
-                title: "Successfully updated",
+                title: t("toasts.updatedTitle"),
             });
 
             setUnitSheet(null);
@@ -65,7 +67,7 @@ export function UnitTable({ units }: UnitTableProps) {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
 
             toast.success({
-                title: "Successfully duplicated",
+                title: t("toasts.duplicatedTitle"),
             });
         },
     });
@@ -76,7 +78,7 @@ export function UnitTable({ units }: UnitTableProps) {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
 
             toast.success({
-                title: "Successfully deleted",
+                title: t("toasts.deletedTitle"),
             });
 
             setDeleteUnitDialog(null);
@@ -90,12 +92,12 @@ export function UnitTable({ units }: UnitTableProps) {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-25">Number</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Type</TableHead>
-                                <TableHead>Area</TableHead>
-                                <TableHead>Price</TableHead>
-                                <TableHead className="text-right">Actions</TableHead>
+                                <TableHead className="w-25">{t("table.numberHeader")}</TableHead>
+                                <TableHead>{t("common:labels.status")}</TableHead>
+                                <TableHead>{t("common:labels.type")}</TableHead>
+                                <TableHead>{t("common:labels.area")}</TableHead>
+                                <TableHead>{t("common:labels.price")}</TableHead>
+                                <TableHead className="text-right">{t("table.actionsHeader")}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -108,8 +110,8 @@ export function UnitTable({ units }: UnitTableProps) {
                                         </Badge>
                                     </TableCell>
                                     <TableCell>{t(UNIT_TYPE_LABEL_KEYS[unit.type])}</TableCell>
-                                    <TableCell>{unit.area} m<sup>2</sup></TableCell>
-                                    <TableCell>{unit.price} $</TableCell>
+                                    <TableCell>{unit.area} {t("common:units.sqm")}</TableCell>
+                                    <TableCell>{formatCurrency(parseFloat(unit.price))}</TableCell>
                                     <TableCell className="text-right">
                                         <Menu>
                                             <MenuTrigger asChild>
@@ -125,24 +127,18 @@ export function UnitTable({ units }: UnitTableProps) {
                                                             open: true,
                                                             unit: unit,
                                                         })}
-                                                    >
-                                                        Edit
-                                                    </MenuItem>
+                                                    >{t("common:actions.edit")}</MenuItem>
                                                     <MenuItem
                                                         value="diplicate"
                                                         onClick={() => duplicateUnitMutation.mutate(unit.id)}
-                                                    >
-                                                        Duplicate
-                                                    </MenuItem>
+                                                    >{t("common:actions.duplicate")}</MenuItem>
                                                 </MenuGroup>
                                                 <MenuSeparator />
                                                 <MenuItem
                                                     value="delete"
                                                     variant="destructive"
                                                     onClick={() => setDeleteUnitDialog(unit)}
-                                                >
-                                                    Delete
-                                                </MenuItem>
+                                                >{t("common:actions.delete")}</MenuItem>
                                             </MenuContent>
                                         </Menu>
                                     </TableCell>
@@ -161,18 +157,18 @@ export function UnitTable({ units }: UnitTableProps) {
                 >
                     <SheetContent className="sm:max-w-sm" variant="inset">
                         <SheetHeader>
-                            <SheetTitle>Edit unit №{unitSheet.unit?.number}</SheetTitle>
+                            <SheetTitle>{t("sheets.editTitle", { number: unitSheet.unit?.number })}</SheetTitle>
                         </SheetHeader>
                         <UnitForm
                             key={`unit-${unitSheet.unit?.id}-${unitSheet.open ? "open" : "closed"}`}
                             unit={unitSheet.unit}
                             errorMessage={
                                 updateUnitMutation.isError
-                                    ? "Unit could not be saved. Check the details and try again."
+                                    ? t("form.errorSave")
                                     : undefined
                             }
                             isSubmitting={updateUnitMutation.isPending}
-                            submitLabel="Save changes"
+                            submitLabel={t("common:actions.saveChanges")}
                             onCancel={() => setUnitSheet(null)}
                             onSubmit={(payload) => {
                                 if (unitSheet.unit) {
@@ -194,22 +190,17 @@ export function UnitTable({ units }: UnitTableProps) {
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete unit?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This will permanently delete Unit №{deleteUnitDialog?.number}.
-                            This action cannot be undone.
-                        </AlertDialogDescription>
+                        <AlertDialogTitle>{t("delete.title")}</AlertDialogTitle>
+                        <AlertDialogDescription>{t("delete.description", { number: deleteUnitDialog?.number })}</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={deleteUnitMutation.isPending}>
-                            Cancel
-                        </AlertDialogCancel>
+                        <AlertDialogCancel disabled={deleteUnitMutation.isPending}>{t("common:actions.cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                             variant="destructive"
                             disabled={deleteUnitMutation.isPending}
                             onClick={() => deleteUnitDialog && deleteUnitMutation.mutate(deleteUnitDialog.id)}
                         >
-                            {deleteUnitMutation.isPending ? "Deleting..." : "Delete"}
+                            {deleteUnitMutation.isPending ? t("common:actions.deleting") : t("common:actions.delete")}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

@@ -5,6 +5,7 @@ import {Sheet, SheetContent, SheetHeader, SheetTitle} from "@/components/ui/shee
 import {UnitForm} from "./unit-form.tsx";
 import type {Floor} from "@/features/floors/types/floor.types.ts";
 import {useCreateUnit} from "@/features/units/hooks/use-create-unit.ts";
+import {useTranslation} from "react-i18next";
 
 interface AddUnitButtonProps {
     floor: Floor;
@@ -13,6 +14,7 @@ interface AddUnitButtonProps {
 export function AddUnitButton({
                                   floor,
                               }: AddUnitButtonProps) {
+    const { t } = useTranslation("units");
     const [open, setOpen] = useState(false);
 
     const createUnitMutation = useCreateUnit({
@@ -27,9 +29,7 @@ export function AddUnitButton({
                 variant="outline"
                 onClick={() => setOpen(true)}
             >
-                <Plus className="size-3" />
-                Add Unit
-            </Button>
+                <Plus className="size-3" /> {t("actions.addUnit")}</Button>
 
             <Sheet
                 open={open}
@@ -41,18 +41,18 @@ export function AddUnitButton({
                 >
                     <SheetHeader>
                         <SheetTitle>
-                            Add Unit to Floor {floor.number}
+                            {t("sheets.addTitle", { number: floor.number })}
                         </SheetTitle>
                     </SheetHeader>
 
                     <UnitForm
                         errorMessage={
                             createUnitMutation.isError
-                                ? "Unit could not be created. Check the details and try again."
+                                ? t("form.errorCreate")
                                 : undefined
                         }
                         isSubmitting={createUnitMutation.isPending}
-                        submitLabel="Create Unit"
+                        submitLabel={t("form.submitCreate")}
                         onCancel={() => setOpen(false)}
                         onSubmit={createUnitMutation.mutate}
                     />

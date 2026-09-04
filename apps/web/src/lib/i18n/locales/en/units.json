@@ -10,5 +10,116 @@
     "commercial": "Commercial",
     "parking": "Parking",
     "storage": "Storage"
+  },
+  "actions": {
+    "addUnit": "Add Unit",
+    "bulkUnits": "Bulk Units"
+  },
+  "sheets": {
+    "addTitle": "Add Unit to Floor {{number}}",
+    "bulkAddTitle": "Add multiple units to Floor {{number}}",
+    "editTitle": "Edit Unit №{{number}}",
+    "detailsTitle": "Unit №{{number}}"
+  },
+  "form": {
+    "numberLabel": "Unit Number",
+    "numberPlaceholder": "e.g., 1, 101, A-1",
+    "roomsLabel": "Rooms (Optional)",
+    "areaLabel": "Area (m²)",
+    "submitCreate": "Create Unit",
+    "errorCreate": "Unit could not be created. Check the details and try again.",
+    "errorSave": "Unit could not be saved. Check the details and try again."
+  },
+  "bulk": {
+    "unitsHeading": "Units",
+    "autoGenerate": "Auto-generate",
+    "autoGeneratePopoverTitle": "Auto-generate Units",
+    "numberOfUnitsLabel": "Number of units",
+    "startingNumberLabel": "Starting number",
+    "roomsLabel": "Rooms",
+    "areaLabel": "Area (m²)",
+    "priceLabel": "Price",
+    "generate": "Generate",
+    "addUnit": "Add Unit",
+    "numberLabel": "Number",
+    "duplicateNumberError": "This number already exists",
+    "duplicateNumbersAlert": "Duplicate unit numbers detected. Please fix them before creating.",
+    "priceLabelDollar": "Price, $",
+    "rowNumberLabel": "№{{number}}",
+    "errorGeneric": "Units could not be created. Check the details and try again.",
+    "submitCreate_one": "Create {{count}} Unit",
+    "submitCreate_few": "Create {{count}} Units",
+    "submitCreate_many": "Create {{count}} Units",
+    "submitCreate_other": "Create {{count}} Units"
+  },
+  "table": {
+    "numberHeader": "Number",
+    "actionsHeader": "Actions"
+  },
+  "delete": {
+    "title": "Delete unit?",
+    "description": "This will permanently delete Unit №{{number}}. This action cannot be undone."
+  },
+  "duplicate": {
+    "title": "Duplicate unit?",
+    "description": "This will create a copy of Unit №{{number}}."
+  },
+  "toasts": {
+    "createdTitle": "Successfully created",
+    "createdDescription": "Unit {{number}} has been created.",
+    "updatedTitle": "Successfully updated",
+    "duplicatedTitle": "Successfully duplicated",
+    "deletedTitle": "Successfully deleted"
+  },
+  "overview": {
+    "numberLabel": "Unit Number",
+    "pricePerSqmLabel": "Price per m²",
+    "listPriceLabel": "List price"
+  },
+  "details": {
+    "overviewTab": "Overview",
+    "dealsTab": "Deals",
+    "noDeals": "No deals recorded for this unit yet.",
+    "bookButton": "Book"
+  },
+  "chessboard": {
+    "entranceLabel": "Entrance {{name}}",
+    "rooms_one": "{{count}} room",
+    "rooms_few": "{{count}} rooms",
+    "rooms_many": "{{count}} rooms",
+    "rooms_other": "{{count}} rooms",
+    "floors_one": "{{count}} floor",
+    "floors_few": "{{count}} floors",
+    "floors_many": "{{count}} floors",
+    "floors_other": "{{count}} floors",
+    "units_one": "{{count}} unit",
+    "units_few": "{{count}} units",
+    "units_many": "{{count}} units",
+    "units_other": "{{count}} units"
+  },
+  "filters": {
+    "roomsSummary_one": "{{count}} room",
+    "roomsSummary_few": "{{count}} rooms",
+    "roomsSummary_many": "{{count}} rooms",
+    "roomsSummary_other": "{{count}} rooms",
+    "areaOver": "Over {{value}} m²",
+    "areaUnder": "Under {{value}} m²",
+    "areaRange": "{{min}}–{{max}} m²",
+    "priceOver": "Over {{value}}",
+    "priceUnder": "Under {{value}}",
+    "priceRange": "{{min}}–{{max}}",
+    "roomsCountLabel": "Rooms count",
+    "rangeLabel": "Range",
+    "presetsLabel": "Presets",
+    "fromPlaceholder": "From",
+    "toPlaceholder": "To",
+    "unitsFound_one": "{{count}} unit found",
+    "unitsFound_few": "{{count}} units found",
+    "unitsFound_many": "{{count}} units found",
+    "unitsFound_other": "{{count}} units found",
+    "clearAll": "Clear all",
+    "pricePresetUnder": "Under {{value}}",
+    "pricePresetOver": "Over {{value}}",
+    "pricePresetRange": "{{min}} – {{max}}"
   }
 }

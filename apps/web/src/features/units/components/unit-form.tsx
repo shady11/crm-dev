@@ -136,10 +136,10 @@ export function UnitForm({
                         name="number"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Unit Number</FieldLabel>
+                                <FieldLabel>{t("form.numberLabel")}</FieldLabel>
                                 <Input
                                     {...field}
-                                    placeholder="e.g., 1, 101, A-1"
+                                    placeholder={t("form.numberPlaceholder")}
                                 />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
@@ -151,7 +151,7 @@ export function UnitForm({
                         name="type"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid} orientation="responsive">
-                                <FieldLabel>Type</FieldLabel>
+                                <FieldLabel>{t("common:labels.type")}</FieldLabel>
                                 <Select
                                     collection={typeCollection}
                                     name={field.name}
@@ -166,7 +166,7 @@ export function UnitForm({
                                     value={[field.value]}
                                 >
                                     <SelectTrigger className="w-full min-w-32">
-                                        <SelectValue placeholder="Select" />
+                                        <SelectValue placeholder={t("common:placeholders.select")} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {typeCollection.items.map((type) => (
@@ -186,7 +186,7 @@ export function UnitForm({
                         name="rooms"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Rooms (Optional)</FieldLabel>
+                                <FieldLabel>{t("form.roomsLabel")}</FieldLabel>
                                 <NumberInput
                                     value={field.value?.toString() ?? ""}
                                     min={1}
@@ -215,7 +215,7 @@ export function UnitForm({
                         name="area"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Area (m²)</FieldLabel>
+                                <FieldLabel>{t("form.areaLabel")}</FieldLabel>
                                 <Input
                                     {...field}
                                 />
@@ -229,7 +229,7 @@ export function UnitForm({
                         name="price"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Price</FieldLabel>
+                                <FieldLabel>{t("common:labels.price")}</FieldLabel>
                                 <Input
                                     {...field}
                                 />
@@ -243,7 +243,7 @@ export function UnitForm({
                         name="status"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid} orientation="responsive">
-                                <FieldLabel>Status</FieldLabel>
+                                <FieldLabel>{t("common:labels.status")}</FieldLabel>
                                 <Select
                                     collection={statusCollection}
                                     name={field.name}
@@ -258,7 +258,7 @@ export function UnitForm({
                                     value={[field.value]}
                                 >
                                     <SelectTrigger className="w-full min-w-32">
-                                        <SelectValue placeholder="Select" />
+                                        <SelectValue placeholder={t("common:placeholders.select")} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {statusCollection.items.map((status) => (
@@ -290,14 +290,12 @@ export function UnitForm({
                             className="flex-1"
                             disabled={isSubmitting}
                             onClick={onCancel}
-                        >
-                            Cancel
-                        </Button>
+                        >{t("common:actions.cancel")}</Button>
                     )}
                 </SheetClose>
                 <Button type="submit" className="flex-1" disabled={isSubmitting}>
                     {isSubmitting && <Loader2 className="animate-spin" />}
-                    {submitLabel ?? (unit ? "Save changes" : "Create unit")}
+                    {submitLabel ?? (unit ? t("common:actions.saveChanges") : t("form.submitCreate"))}
                 </Button>
             </SheetFooter>
         </form>

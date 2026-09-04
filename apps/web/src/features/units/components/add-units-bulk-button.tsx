@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { api } from "@/lib/api.ts";
 import {BulkUnitsForm} from "@/features/units/components/bulk-units-form.tsx";
 import type {Unit} from "@/features/units/types/unit.types.ts";
+import {useTranslation} from "react-i18next";
 
 interface AddUnitsBulkButtonProps {
     floorId: string;
@@ -18,6 +19,7 @@ export function AddUnitsBulkButton({
                                        floorNumber,
                                        allBlockUnits = []
                                    }: AddUnitsBulkButtonProps) {
+    const { t } = useTranslation("units");
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -41,9 +43,7 @@ export function AddUnitsBulkButton({
                 variant="outline"
                 onClick={() => setOpen(true)}
             >
-                <LayoutGrid className="size-3" />
-                Bulk Units
-            </Button>
+                <LayoutGrid className="size-3" /> {t("actions.bulkUnits")}</Button>
 
             <Sheet
                 onOpenChange={({ open: isOpen }) => setOpen(isOpen)}
@@ -51,14 +51,14 @@ export function AddUnitsBulkButton({
             >
                 <SheetContent variant="inset" className="sm:max-w-md">
                     <SheetHeader>
-                        <SheetTitle>Add multiple units to Floor {floorNumber}</SheetTitle>
+                        <SheetTitle>{t("sheets.bulkAddTitle", { number: floorNumber })}</SheetTitle>
                     </SheetHeader>
                     <BulkUnitsForm
                         existingUnits={allBlockUnits.map(u => ({ number: u.number }))}
                         lastGlobalUnitNumber={lastGlobalUnitNumber}
                         errorMessage={
                             createUnitsBulkMutation.isError
-                                ? "Units could not be created. Check the details and try again."
+                                ? t("bulk.errorGeneric")
                                 : undefined
                         }
                         isSubmitting={createUnitsBulkMutation.isPending}

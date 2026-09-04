@@ -6,6 +6,7 @@ import {type Unit,} from "@/features/units/types/unit.types.ts";
 import {DealCard} from "@/features/deals/components/deal-card.tsx";
 import {UnitOverview} from "@/features/units/components/unit-overview.tsx";
 import {useUnit} from "@/features/units/hooks/use-unit.ts";
+import {useTranslation} from "react-i18next";
 
 interface UnitDetailsSheetProps {
     unit: Unit | null;
@@ -27,6 +28,7 @@ export function UnitDetailsSheet({
                                      onBook,
                                  }: UnitDetailsSheetProps) {
 
+    const { t } = useTranslation("units");
     const unitDetailsQuery = useUnit(open ? unit?.id : undefined);
     const fullUnit = unitDetailsQuery.data ?? unit;
 
@@ -40,16 +42,16 @@ export function UnitDetailsSheet({
         <Sheet open={open} onOpenChange={({ open }) => onOpenChange(open)}>
             <SheetContent className="sm:max-w-lg" variant="inset">
                 <SheetHeader>
-                    <SheetTitle>Unit №{unit.number}</SheetTitle>
+                    <SheetTitle>{t("sheets.detailsTitle", { number: unit.number })}</SheetTitle>
                 </SheetHeader>
 
                 <SheetBody scrollFade>
                     <div className="py-4">
                         <Tabs defaultValue="overview" className="gap-6">
                             <TabsList>
-                                <TabsTrigger value="overview">Overview</TabsTrigger>
+                                <TabsTrigger value="overview">{t("details.overviewTab")}</TabsTrigger>
                                 <TabsTrigger value="deals">
-                                    Deals{deals.length > 0 && ` (${deals.length})`}
+                                    {t("details.dealsTab")}{deals.length > 0 && ` (${deals.length})`}
                                 </TabsTrigger>
                             </TabsList>
 
@@ -59,9 +61,7 @@ export function UnitDetailsSheet({
 
                             <TabsContent value="deals">
                                 {deals.length === 0 ? (
-                                    <p className="py-6 text-center text-sm text-muted-foreground">
-                                        No deals recorded for this unit yet.
-                                    </p>
+                                    <p className="py-6 text-center text-sm text-muted-foreground">{t("details.noDeals")}</p>
                                 ) : (
                                     <div className="flex flex-col gap-2">
                                         {deals.map((deal) => (
@@ -75,13 +75,9 @@ export function UnitDetailsSheet({
                 </SheetBody>
 
                 <SheetFooter>
-                    <Button variant="secondary" className="flex-1" onClick={onEdit}>
-                        Edit
-                    </Button>
+                    <Button variant="secondary" className="flex-1" onClick={onEdit}>{t("common:actions.edit")}</Button>
                     {unit.status === "AVAILABLE" && (
-                        <Button className="flex-1" onClick={onBook}>
-                            Book
-                        </Button>
+                        <Button className="flex-1" onClick={onBook}>{t("details.bookButton")}</Button>
                     )}
                 </SheetFooter>
             </SheetContent>

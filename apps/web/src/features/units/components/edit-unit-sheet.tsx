@@ -3,6 +3,7 @@ import {Sheet, SheetContent, SheetHeader, SheetTitle} from "@/components/ui/shee
 import {UnitForm} from "@/features/units/components/unit-form";
 import type {Unit} from "@/features/units/types/unit.types";
 import type {UpdateUnitPayload} from "@/features/units/types/unit-payload.ts";
+import {useTranslation} from "react-i18next";
 
 interface EditUnitSheetProps {
     unit: Unit | null;
@@ -24,6 +25,7 @@ export function EditUnitSheet({
                                   onOpenChange,
                                   onSubmit,
                               }: EditUnitSheetProps) {
+    const { t } = useTranslation("units");
 
     if (!unit) {
         return null;
@@ -39,15 +41,13 @@ export function EditUnitSheet({
                 className="sm:max-w-sm"
             >
                 <SheetHeader>
-                    <SheetTitle>
-                        Edit Unit №{unit.number}
-                    </SheetTitle>
+                    <SheetTitle>{t("sheets.editTitle", { number: unit.number })}</SheetTitle>
                 </SheetHeader>
 
                 <UnitForm
                     key={unit.id}
                     unit={unit}
-                    submitLabel="Save changes"
+                    submitLabel={t("common:actions.saveChanges")}
                     isSubmitting={isSubmitting}
                     errorMessage={errorMessage}
                     onCancel={() => onOpenChange(false)}
