@@ -22,11 +22,24 @@ export class SessionValidationService {
                 companyId: true,
                 isActive: true,
                 sessionsValidFrom: true,
+                company: { select: { suspendedAt: true, deletedAt: true } },
             },
         });
 
         if (!user || !user.isActive) {
             throw new UnauthorizedException('Session is no longer valid.');
+        }
+
+        // A suspended or deleted tenant must stop working immediately, for every
+        // one of its users. Checking it here — rather than deactivating each
+        // user account when a company is suspended — means suspension is one
+        // reversible field, and resuming does not have to guess which accounts
+        // were already inactive beforehand.
+        //
+        // SUPER_ADMIN has no company, so `company` is null and this never
+        // applies to them.
+        if (user.company && (user.company.suspendedAt || user.company.deletedAt)) {
+            throw new UnauthorizedException('This company is not active. Contact your administrator.');
         }
 
         const CLOCK_SKEW_TOLERANCE_MS = 2000;

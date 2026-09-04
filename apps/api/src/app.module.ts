@@ -5,6 +5,7 @@ import {APP_FILTER, APP_GUARD} from "@nestjs/core";
 import {ThrottlerGuard, ThrottlerModule} from "@nestjs/throttler";
 import {AllExceptionsFilter} from "@/common/filters/all-exceptions.filter";
 import {HealthModule} from "@/modules/health/health.module";
+import {CompaniesModule} from "@/modules/companies/companies.module";
 import {PrismaModule} from "@/database/prisma.module";
 import {AuthModule} from "@/modules/auth/auth.module";
 import {UsersModule} from "@/modules/users/users.module";
@@ -65,6 +66,9 @@ import {DashboardModule} from "@/modules/dashboard/dashboard.module";
       // Registered so /api/health exists at all — it was written but never
       // imported, so the endpoint returned 404 and nothing could monitor it.
       HealthModule,
+      // Tenant administration. Unlike every other feature module this one is
+      // not company-scoped — see companies.controller.ts.
+      CompaniesModule,
   ],
   providers: [
       {

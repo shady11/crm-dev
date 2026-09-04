@@ -1,6 +1,7 @@
-import {Body, Controller, Get, Post, UseGuards} from "@nestjs/common";
+import {Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, UseGuards} from "@nestjs/common";
 import {AuthService} from "@/modules/auth/auth.service";
 import {LoginDto} from "@/modules/auth/dto/login.dto";
+import {ChangePasswordDto} from "@/modules/auth/dto/change-password.dto";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {JwtAuthGuard} from "@/modules/auth/guards/jwt-auth.guard";
 import {CurrentUser} from "@/common/decorators/current-user.decorator";
@@ -23,5 +24,15 @@ export class AuthController {
     @Get("me")
     async me(@CurrentUser() user: AuthUser) {
         return user;
+    }
+
+    // Same tight limit as login: this endpoint also checks a password, so it is
+    // just as attractive to someone holding a stolen token.
+    @Throttle({default: {ttl: 60_000, limit: 10}})
+    @UseGuards(JwtAuthGuard)
+    @Patch("me/password")
+    @HttpCode(HttpStatus.OK)
+    async changePassword(@CurrentUser() user: AuthUser, @Body() dto: ChangePasswordDto) {
+        return this.authService.changeOwnPassword(user, dto);
     }
 }
