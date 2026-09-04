@@ -1,4 +1,5 @@
 import * as React from "react"
+import {useMemo} from "react"
 import {cn} from "@/lib/utils"
 import placeholderImg from '@/assets/placeholder.svg'
 import {Button} from "@/components/ui/button.tsx"
@@ -15,20 +16,27 @@ import {authStorage} from "@/features/auth/utils/auth-storage.ts";
 import {Loader2, TriangleAlert} from "lucide-react";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {toast} from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 
-const loginSchema = z.object({
-    email: z.email("Enter a valid email"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-type LoginFormValues = z.infer<typeof loginSchema>;
+type LoginFormValues = {
+    email: string;
+    password: string;
+};
 
 export function LoginForm({
                               className,
                               ...props
                           }: React.ComponentProps<"div">) {
 
+    const { t } = useTranslation("auth");
     const navigate = useNavigate();
+
+    // Rebuilt whenever the language changes, so a validation message that
+    // fired before a language switch doesn't stay frozen in the old language.
+    const loginSchema = useMemo(() => z.object({
+        email: z.email(t("login.validation.invalidEmail")),
+        password: z.string().min(6, t("login.validation.passwordMin")),
+    }), [t]);
 
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
@@ -44,7 +52,7 @@ export function LoginForm({
             authStorage.setToken(data.accessToken);
 
             toast.success({
-                title: "You have successfully signed in!",
+                title: t("login.success"),
             });
 
             navigate("/projects");
@@ -64,10 +72,10 @@ export function LoginForm({
                     <form className="p-6 md:px-8 md:py-12" onSubmit={form.handleSubmit(onSubmit)}>
                         <FieldGroup className="gap-6">
                             <div className="flex flex-col items-center gap-2 text-center">
-                                <h1 className="text-2xl font-bold mb-6">Авторизация</h1>
+                                <h1 className="text-2xl font-bold mb-6">{t("login.title")}</h1>
                             </div>
                             <Field invalid={!!errors.email}>
-                                <FieldLabel htmlFor="email">Email</FieldLabel>
+                                <FieldLabel htmlFor="email">{t("login.emailLabel")}</FieldLabel>
 
                                 <Input
                                     id="email"
@@ -83,7 +91,7 @@ export function LoginForm({
                                 </FieldError>
                             </Field>
                             <Field invalid={!!errors.password}>
-                                <FieldLabel htmlFor="password">Пароль</FieldLabel>
+                                <FieldLabel htmlFor="password">{t("login.passwordLabel")}</FieldLabel>
 
                                 <Input
                                     id="password"
@@ -102,9 +110,9 @@ export function LoginForm({
                             {mutation.isError && (
                                 <Alert variant="destructive">
                                     <TriangleAlert />
-                                    <AlertTitle>Authentication failed</AlertTitle>
+                                    <AlertTitle>{t("login.failedTitle")}</AlertTitle>
                                     <AlertDescription>
-                                        Invalid email or password.
+                                        {t("login.failedDescription")}
                                     </AlertDescription>
                                 </Alert>
                             )}
@@ -118,7 +126,7 @@ export function LoginForm({
                                     {mutation.isPending && (
                                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                     )}
-                                    Войти
+                                    {t("login.submit")}
                                 </Button>
                             </Field>
                         </FieldGroup>
