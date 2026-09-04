@@ -1,0 +1,18 @@
+{
+  "bell": {
+    "title": "Notifications",
+    "tabs": {
+      "all": "All",
+      "unread": "Unread"
+    },
+    "empty": "No notifications yet.",
+    "emptyUnread": "You're all caught up.",
+    "markAllAsRead": "Mark all as read"
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago"
+  }
+}

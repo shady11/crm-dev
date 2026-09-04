@@ -14,21 +14,23 @@ import {getNotificationLink} from "@/features/notifications/utils/notification-l
 import {NOTIFICATION_VISUALS} from "@/features/notifications/types/notification.types.ts";
 import type {Notification} from "@/features/notifications/api/notifications.api.ts";
 import {Float} from "@/components/ui/float.tsx";
-
-function timeAgo(iso: string) {
-    const diffMs = Date.now() - new Date(iso).getTime();
-    const mins = Math.floor(diffMs / 60000);
-    if (mins < 1) return "just now";
-    if (mins < 60) return `${mins} mins ago`;
-    const hours = Math.floor(mins / 60);
-    if (hours < 24) return `${hours} hours ago`;
-    return `${Math.floor(hours / 24)} days ago`;
-}
+import {useTranslation} from "react-i18next";
 
 export function NotificationBell() {
+    const { t } = useTranslation("notifications");
     const [open, setOpen] = useState(false);
     const [tab, setTab] = useState<"all" | "unread">("all");
     const navigate = useNavigate();
+
+    function timeAgo(iso: string) {
+        const diffMs = Date.now() - new Date(iso).getTime();
+        const mins = Math.floor(diffMs / 60000);
+        if (mins < 1) return t("time.justNow");
+        if (mins < 60) return t("time.minutesAgo", { count: mins });
+        const hours = Math.floor(mins / 60);
+        if (hours < 24) return t("time.hoursAgo", { count: hours });
+        return t("time.daysAgo", { count: Math.floor(hours / 24) });
+    }
 
     const unreadQuery = useUnreadCount();
     const listQuery = useNotificationsList(open, tab === "unread" ? false : undefined);
@@ -62,15 +64,15 @@ export function NotificationBell() {
             <Sheet open={open} onOpenChange={({ open: isOpen }) => setOpen(isOpen)}>
                 <SheetContent variant="inset" className="sm:max-w-md">
                     <SheetHeader>
-                        <SheetTitle>Notifications</SheetTitle>
+                        <SheetTitle>{t("bell.title")}</SheetTitle>
                     </SheetHeader>
 
                     <div className="px-6 pb-2">
                         <Tabs value={tab} onValueChange={({ value }) => setTab(value as "all" | "unread")}>
                             <TabsList>
-                                <TabsTrigger value="all">All</TabsTrigger>
+                                <TabsTrigger value="all">{t("bell.tabs.all")}</TabsTrigger>
                                 <TabsTrigger value="unread">
-                                    Unread{unreadCount > 0 && ` (${unreadCount})`}
+                                    {t("bell.tabs.unread")}{unreadCount > 0 && ` (${unreadCount})`}
                                 </TabsTrigger>
                             </TabsList>
                         </Tabs>
@@ -79,7 +81,7 @@ export function NotificationBell() {
                     <SheetBody scrollFade className="px-0">
                         {notifications.length === 0 ? (
                             <p className="py-10 text-center text-sm text-muted-foreground">
-                                {tab === "unread" ? "You're all caught up." : "No notifications yet."}
+                                {tab === "unread" ? t("bell.emptyUnread") : t("bell.empty")}
                             </p>
                         ) : (
                             <div className="flex flex-col divide-y">
@@ -128,7 +130,7 @@ export function NotificationBell() {
                             disabled={unreadCount === 0}
                             onClick={() => actions.markAllAsRead.mutate()}
                         >
-                            Mark all as read
+                            {t("bell.markAllAsRead")}
                         </Button>
                     </SheetFooter>
                 </SheetContent>
