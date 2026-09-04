@@ -23,7 +23,7 @@ export function TaskStatusCard({ status, count }: { status: TaskStatus; count: n
                 </div>
                 <div>
                     <h3 className="font-medium">{t(TASK_STATUS_LABEL_KEYS[status])}</h3>
-                    <p className="text-sm text-muted-foreground">{count} task{count !== 1 ? "s" : ""}</p>
+                    <p className="text-sm text-muted-foreground">{t("statusCard.count", { count })}</p>
                 </div>
             </CardContent>
         </Card>

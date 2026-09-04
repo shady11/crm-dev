@@ -10,10 +10,12 @@ import {TaskFormSheet} from "@/features/tasks/components/task-form-sheet.tsx";
 import {useTasksList} from "@/features/tasks/hooks/use-tasks-list.ts";
 import {useTaskActions} from "@/features/tasks/hooks/use-task-actions.ts";
 import type {Task, TaskPayload} from "@/features/tasks/api/tasks.api.ts";
+import {useTranslation} from "react-i18next";
 
 type TasksView = "table" | "board";
 
 export function TasksPage() {
+    const { t } = useTranslation("tasks");
     const { filters, pagination, table, statusSummary } = useTasksList();
     const actions = useTaskActions();
 
@@ -36,7 +38,7 @@ export function TasksPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-start justify-between gap-4">
-                <h2 className="text-2xl font-medium tracking-tight">Tasks</h2>
+                <h2 className="text-2xl font-medium tracking-tight">{t("page.title")}</h2>
 
                 <ToggleGroup
                     size="sm"
@@ -44,8 +46,8 @@ export function TasksPage() {
                     value={[view]}
                     onValueChange={({ value }) => setView((value[0] as TasksView) ?? "board")}
                 >
-                    <ToggleGroupItem value="board" aria-label="Board view"><LayoutGridIcon className="size-3.5" /></ToggleGroupItem>
-                    <ToggleGroupItem value="table" aria-label="Table view"><ListIcon className="size-3.5" /></ToggleGroupItem>
+                    <ToggleGroupItem value="board" aria-label={t("kanban.boardView")}><LayoutGridIcon className="size-3.5" /></ToggleGroupItem>
+                    <ToggleGroupItem value="table" aria-label={t("kanban.tableView")}><ListIcon className="size-3.5" /></ToggleGroupItem>
                 </ToggleGroup>
             </div>
 

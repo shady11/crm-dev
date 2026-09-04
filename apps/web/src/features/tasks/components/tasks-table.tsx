@@ -18,7 +18,7 @@ function isOverdue(task: Task) {
 }
 
 export function TasksTable({ tasks, isLoading, onRowClick }: TasksTableProps) {
-    const { t } = useTranslation("tasks");
+    const { t, i18n } = useTranslation("tasks");
 
     if (isLoading) {
         return <div className="flex h-64 items-center justify-center rounded-lg border border-secondary"><Spinner className="size-6" /></div>;
@@ -29,8 +29,8 @@ export function TasksTable({ tasks, isLoading, onRowClick }: TasksTableProps) {
             <Empty>
                 <EmptyHeader>
                     <EmptyMedia variant="icon"><ClipboardListIcon strokeWidth={1.25} /></EmptyMedia>
-                    <EmptyTitle>No tasks found</EmptyTitle>
-                    <EmptyDescription>Try adjusting your filters or search.</EmptyDescription>
+                    <EmptyTitle>{t("table.emptyTitle")}</EmptyTitle>
+                    <EmptyDescription>{t("table.emptyDescription")}</EmptyDescription>
                 </EmptyHeader>
             </Empty>
         );
@@ -41,11 +41,11 @@ export function TasksTable({ tasks, isLoading, onRowClick }: TasksTableProps) {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Title</TableHead>
-                        <TableHead>Related to</TableHead>
-                        <TableHead>Assignee</TableHead>
-                        <TableHead>Due date</TableHead>
-                        <TableHead>Status</TableHead>
+                        <TableHead>{t("table.title")}</TableHead>
+                        <TableHead>{t("table.relatedTo")}</TableHead>
+                        <TableHead>{t("table.assignee")}</TableHead>
+                        <TableHead>{t("table.dueDate")}</TableHead>
+                        <TableHead>{t("table.status")}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -53,14 +53,14 @@ export function TasksTable({ tasks, isLoading, onRowClick }: TasksTableProps) {
                         <TableRow key={task.id} className="cursor-pointer" onClick={() => onRowClick(task)}>
                             <TableCell className="font-medium">{task.title}</TableCell>
                             <TableCell className="text-muted-foreground">
-                                {task.deal ? `Deal ${task.deal.dealNumber}` : task.client ? task.client.fullName : task.lead ? task.lead.fullName : "—"}
+                                {task.deal ? t("related.deal", { number: task.deal.dealNumber }) : task.client ? task.client.fullName : task.lead ? task.lead.fullName : "—"}
                             </TableCell>
                             <TableCell>{task.assignedTo.fullName}</TableCell>
                             <TableCell>
                                 {task.dueDate ? (
                                     <span className={`flex items-center gap-1.5 ${isOverdue(task) ? "font-medium text-destructive" : ""}`}>
                                         <CalendarIcon size={14} />
-                                        {new Date(task.dueDate).toLocaleDateString()}
+                                        {new Date(task.dueDate).toLocaleDateString(i18n.language)}
                                     </span>
                                 ) : "—"}
                             </TableCell>

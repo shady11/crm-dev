@@ -1,6 +1,7 @@
 import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
 import {TaskForm} from "@/features/tasks/components/task-form.tsx";
 import type {Task, TaskPayload} from "@/features/tasks/api/tasks.api.ts";
+import {useTranslation} from "react-i18next";
 
 interface TaskFormSheetProps {
     open: boolean;
@@ -12,19 +13,21 @@ interface TaskFormSheetProps {
 }
 
 export function TaskFormSheet({ open, task, isSubmitting, hasError, onClose, onSubmit }: TaskFormSheetProps) {
+    const { t } = useTranslation("tasks");
+
     return (
         <Sheet onOpenChange={({ open: isOpen }) => !isOpen && onClose()} open={open}>
             <SheetContent variant="inset" className="sm:max-w-md">
                 <SheetHeader>
-                    <SheetTitle>{task ? "Edit task" : "Add task"}</SheetTitle>
-                    <SheetDescription>{task ? "Update the task details." : "Create a new task."}</SheetDescription>
+                    <SheetTitle>{task ? t("form.editTitle") : t("form.addTitle")}</SheetTitle>
+                    <SheetDescription>{task ? t("form.editDescription") : t("form.addDescription")}</SheetDescription>
                 </SheetHeader>
                 <TaskForm
                     key={`${task?.id ?? "create-task"}-${open ? "open" : "closed"}`}
                     task={task}
-                    errorMessage={hasError ? "Task could not be saved. Check the details and try again." : undefined}
+                    errorMessage={hasError ? t("form.saveError") : undefined}
                     isSubmitting={isSubmitting}
-                    submitLabel={task ? "Save changes" : "Create task"}
+                    submitLabel={task ? t("form.saveChanges") : t("form.create")}
                     onCancel={onClose}
                     onSubmit={onSubmit}
                 />

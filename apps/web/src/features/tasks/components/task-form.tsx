@@ -1,4 +1,4 @@
-import {useEffect} from "react";
+import {useEffect, useMemo} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {CalendarIcon, Loader2, TriangleAlert} from "lucide-react";
 import {Controller, useForm} from "react-hook-form";
@@ -30,15 +30,13 @@ import {
 } from "@/components/ui/calendar.tsx";
 import {useTranslation} from "react-i18next";
 
-const taskSchema = z.object({
-    title: z.string().trim().min(2, "Title must be at least 2 characters"),
-    description: z.string().trim().optional(),
-    dueDate: z.string().trim().optional(),
-    status: z.enum(TaskStatus),
-    assignedToId: z.string().min(1, "Select an assignee"),
-});
-
-type TaskFormValues = z.infer<typeof taskSchema>;
+type TaskFormValues = {
+    title: string;
+    description?: string;
+    dueDate?: string;
+    status: TaskStatus;
+    assignedToId: string;
+};
 
 interface TaskFormProps {
     task?: Task | null;
@@ -64,10 +62,20 @@ function toFormValues(task?: Task | null): TaskFormValues {
     };
 }
 
-export function TaskForm({ task, errorMessage, isSubmitting, submitLabel = "Save", onCancel, onSubmit }: TaskFormProps) {
-    const { t } = useTranslation("tasks");
+export function TaskForm({ task, errorMessage, isSubmitting, submitLabel, onCancel, onSubmit }: TaskFormProps) {
+    const { t, i18n } = useTranslation("tasks");
 
     const assignableUsers = useAssignableUsers();
+
+    // Rebuilt whenever the language changes, so a validation message that
+    // fired before a language switch doesn't stay frozen in the old language.
+    const taskSchema = useMemo(() => z.object({
+        title: z.string().trim().min(2, t("form.validation.titleMin")),
+        description: z.string().trim().optional(),
+        dueDate: z.string().trim().optional(),
+        status: z.enum(TaskStatus),
+        assignedToId: z.string().min(1, t("form.validation.selectAssignee")),
+    }), [t]);
 
     const form = useForm<TaskFormValues>({
         resolver: zodResolver(taskSchema),
@@ -111,15 +119,15 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel = "Save
 
                     <Controller control={form.control} name="title" render={({ field, fieldState }) => (
                         <Field invalid={fieldState.invalid}>
-                            <FieldLabel>Title</FieldLabel>
-                            <Input {...field} placeholder="e.g. Call the client about documents" />
+                            <FieldLabel>{t("form.title")}</FieldLabel>
+                            <Input {...field} placeholder={t("form.titlePlaceholder")} />
                             <FieldError>{fieldState.error?.message}</FieldError>
                         </Field>
                     )} />
 
                     <Controller control={form.control} name="description" render={({ field, fieldState }) => (
                         <Field invalid={fieldState.invalid}>
-                            <FieldLabel>Description (optional)</FieldLabel>
+                            <FieldLabel>{t("form.description")}</FieldLabel>
                             <Textarea {...field} rows={3} />
                             <FieldError>{fieldState.error?.message}</FieldError>
                         </Field>
@@ -127,9 +135,9 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel = "Save
 
                     <Controller control={form.control} name="assignedToId" render={({ field, fieldState }) => (
                         <Field invalid={fieldState.invalid}>
-                            <FieldLabel>Assignee</FieldLabel>
+                            <FieldLabel>{t("form.assignee")}</FieldLabel>
                             <Select collection={assigneeCollection} value={field.value ? [field.value] : []} onValueChange={(item) => field.onChange(item.value[0])}>
-                                <SelectTrigger className="w-full"><SelectValue placeholder="Select assignee" /></SelectTrigger>
+                                <SelectTrigger className="w-full"><SelectValue placeholder={t("form.selectAssignee")} /></SelectTrigger>
                                 <SelectContent>
                                     {assigneeCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
                                 </SelectContent>
@@ -140,7 +148,7 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel = "Save
 
                     <Controller control={form.control} name="status" render={({ field, fieldState }) => (
                         <Field invalid={fieldState.invalid}>
-                            <FieldLabel>Status</FieldLabel>
+                            <FieldLabel>{t("form.status")}</FieldLabel>
                             <Select collection={statusCollection} value={[field.value]} onValueChange={(item) => field.onChange(item.value[0])}>
                                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                                 <SelectContent>
@@ -156,14 +164,14 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel = "Save
                         name="dueDate"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Due date (optional)</FieldLabel>
+                                <FieldLabel>{t("form.dueDate")}</FieldLabel>
                                 <DatePicker
                                     value={field.value ? [parseDate(field.value)] : []}
                                     onValueChange={({ value }) => field.onChange(value[0] ? value[0].toString() : "")}
                                 >
                                     <DatePickerTrigger asChild>
                                         <Button type="button" className="w-full flex justify-between" variant="outline">
-                                            {field.value ? formatDate(field.value).date : "Select due date"}
+                                            {field.value ? formatDate(field.value, i18n.language).date : t("form.selectDueDate")}
                                             <CalendarIcon />
                                         </Button>
                                     </DatePickerTrigger>
@@ -189,11 +197,11 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel = "Save
 
             <SheetFooter>
                 <SheetClose asChild>
-                    <Button type="button" variant="secondary" className="flex-1" onClick={onCancel}>Cancel</Button>
+                    <Button type="button" variant="secondary" className="flex-1" onClick={onCancel}>{t("form.cancel")}</Button>
                 </SheetClose>
                 <Button type="submit" className="flex-1" disabled={isSubmitting}>
                     {isSubmitting && <Loader2 className="animate-spin" />}
-                    {submitLabel}
+                    {submitLabel ?? (task ? t("form.saveChanges") : t("form.save"))}
                 </Button>
             </SheetFooter>
         </form>

@@ -4,5 +4,87 @@
     "in_progress": "В процессе",
     "done": "Выполнено",
     "cancelled": "Отменено"
+  },
+  "page": {
+    "title": "Задачи"
+  },
+  "toolbar": {
+    "heading": "Все задачи",
+    "everyone": "Все",
+    "assigneePlaceholder": "Исполнитель",
+    "allStatuses": "Все статусы",
+    "filterByStatus": "Фильтр по статусу",
+    "searchPlaceholder": "Поиск задач...",
+    "addTask": "Добавить задачу"
+  },
+  "table": {
+    "title": "Название",
+    "relatedTo": "Связано с",
+    "assignee": "Исполнитель",
+    "dueDate": "Срок",
+    "status": "Статус",
+    "emptyTitle": "Задачи не найдены",
+    "emptyDescription": "Попробуйте изменить фильтры или поиск."
+  },
+  "pagination": {
+    "rowsPerPage": "Строк на странице"
+  },
+  "kanban": {
+    "noTasks": "Нет задач",
+    "boardView": "Вид доски",
+    "tableView": "Вид таблицы"
+  },
+  "statusCard": {
+    "count_one": "{{count}} задача",
+    "count_few": "{{count}} задачи",
+    "count_many": "{{count}} задач",
+    "count_other": "{{count}} задачи"
+  },
+  "related": {
+    "deal": "Сделка {{number}}"
+  },
+  "form": {
+    "editTitle": "Редактировать задачу",
+    "addTitle": "Добавить задачу",
+    "editDescription": "Обновите данные задачи.",
+    "addDescription": "Создайте новую задачу.",
+    "saveError": "Не удалось сохранить задачу. Проверьте данные и попробуйте снова.",
+    "saveChanges": "Сохранить изменения",
+    "create": "Создать задачу",
+    "save": "Сохранить",
+    "title": "Название",
+    "titlePlaceholder": "например, позвонить клиенту насчёт документов",
+    "description": "Описание (необязательно)",
+    "assignee": "Исполнитель",
+    "selectAssignee": "Выберите исполнителя",
+    "status": "Статус",
+    "dueDate": "Срок выполнения (необязательно)",
+    "selectDueDate": "Выберите дату",
+    "cancel": "Отмена",
+    "validation": {
+      "titleMin": "Название должно содержать не менее 2 символов",
+      "selectAssignee": "Выберите исполнителя"
+    }
+  },
+  "clientCard": {
+    "title": "Задачи",
+    "titleWithCount": "Задачи ({{count}})",
+    "addTask": "Добавить задачу",
+    "empty": "Нет задач, связанных с этим клиентом."
+  },
+  "toasts": {
+    "createSuccess": "Задача создана",
+    "createError": "Не удалось создать задачу",
+    "updateSuccess": "Задача обновлена",
+    "updateError": "Не удалось обновить задачу",
+    "statusError": "Не удалось обновить статус",
+    "deleteSuccess": "Задача удалена",
+    "deleteError": "Не удалось удалить задачу"
+  },
+  "dealCard": {
+    "title": "Задачи",
+    "titleWithCount": "Задачи ({{count}})",
+    "addTask": "Добавить задачу",
+    "empty": "Нет задач, связанных с этой сделкой."
   }
 }

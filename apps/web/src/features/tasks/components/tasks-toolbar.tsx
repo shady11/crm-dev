@@ -24,12 +24,12 @@ export function TasksToolbar({ statusFilter, onStatusFilterChange, assignedToId,
 
     const assignableUsers = useAssignableUsers();
     const assigneeCollection = createListCollection({
-        items: [{ label: "Everyone", value: "all" }, ...assignableUsers.data.map((u) => ({ label: u.fullName, value: u.id }))],
+        items: [{ label: t("toolbar.everyone"), value: "all" }, ...assignableUsers.data.map((u) => ({ label: u.fullName, value: u.id }))],
     });
 
     const statusCollection = createListCollection({
         items: [
-            { label: "All statuses", value: "all" },
+            { label: t("toolbar.allStatuses"), value: "all" },
             ...Object.values(TaskStatus).map(
                 (s) => ({
                     label: t(TASK_STATUS_LABEL_KEYS[s]),
@@ -41,11 +41,11 @@ export function TasksToolbar({ statusFilter, onStatusFilterChange, assignedToId,
 
     return (
         <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-medium">All Tasks</h2>
+            <h2 className="text-lg font-medium">{t("toolbar.heading")}</h2>
 
             <div className="flex flex-wrap items-center gap-2">
                 <Select collection={assigneeCollection} value={[assignedToId ?? "all"]} onValueChange={({ value }) => onAssignedToIdChange(value[0] === "all" ? undefined : value[0])}>
-                    <SelectTrigger className="w-44"><SelectValue placeholder="Assignee" /></SelectTrigger>
+                    <SelectTrigger className="w-44"><SelectValue placeholder={t("toolbar.assigneePlaceholder")} /></SelectTrigger>
                     <SelectContent>
                         {assigneeCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
                     </SelectContent>
@@ -53,7 +53,7 @@ export function TasksToolbar({ statusFilter, onStatusFilterChange, assignedToId,
 
                 {!hideStatusFilter && (
                     <Select collection={statusCollection} value={[statusFilter]} onValueChange={({ value }) => onStatusFilterChange((value[0] ?? "all") as TaskStatusFilter)}>
-                        <SelectTrigger className="w-48"><SelectValue placeholder="Filter by status" /></SelectTrigger>
+                        <SelectTrigger className="w-48"><SelectValue placeholder={t("toolbar.filterByStatus")} /></SelectTrigger>
                         <SelectContent>
                             {statusCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
                         </SelectContent>
@@ -61,13 +61,13 @@ export function TasksToolbar({ statusFilter, onStatusFilterChange, assignedToId,
                 )}
 
                 <InputGroup className="w-64">
-                    <InputGroupInput placeholder="Search tasks..." value={search} onChange={(e) => onSearchChange(e.target.value)} />
+                    <InputGroupInput placeholder={t("toolbar.searchPlaceholder")} value={search} onChange={(e) => onSearchChange(e.target.value)} />
                     <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
                 </InputGroup>
 
                 <Button onClick={onAddTask}>
                     <PlusIcon className="size-4" />
-                    Add task
+                    {t("toolbar.addTask")}
                 </Button>
             </div>
         </div>

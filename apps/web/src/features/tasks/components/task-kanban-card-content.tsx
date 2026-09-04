@@ -4,13 +4,15 @@ import type {Task} from "@/features/tasks/api/tasks.api.ts";
 import {Separator} from "@/components/ui/separator.tsx";
 import {formatDate} from "@/utils/date-formatter.ts";
 import {Badge} from "@/components/ui/badge.tsx";
+import {useTranslation} from "react-i18next";
 
 function isOverdue(task: Task) {
     return !!task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "DONE" && task.status !== "CANCELLED";
 }
 
 export function TaskKanbanCardContent({ task }: { task: Task }) {
-    const related = task.deal ? `Deal ${task.deal.dealNumber}` : task.client?.fullName ?? task.lead?.fullName;
+    const { t, i18n } = useTranslation("tasks");
+    const related = task.deal ? t("related.deal", { number: task.deal.dealNumber }) : task.client?.fullName ?? task.lead?.fullName;
 
     return (
         <>
@@ -37,7 +39,7 @@ export function TaskKanbanCardContent({ task }: { task: Task }) {
                     {task.dueDate && (
                         <span className={`flex shrink-0 items-center gap-1 ${isOverdue(task) ? "font-medium text-destructive" : ""}`}>
                             <CalendarIcon size={15}/>
-                            {formatDate(task.dueDate).date}
+                            {formatDate(task.dueDate, i18n.language).date}
                         </span>
                     )}
                 </div>

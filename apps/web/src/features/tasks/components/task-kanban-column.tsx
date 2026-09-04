@@ -31,7 +31,7 @@ export function TaskKanbanColumn({ status, tasks, onCardClick }: TaskKanbanColum
 
             <div className="flex flex-col gap-2 overflow-y-auto" style={{ maxHeight: "calc(100vh - 320px)" }}>
                 {tasks.length === 0 ? (
-                    <p className="py-6 text-center text-xs text-muted-foreground">No tasks</p>
+                    <p className="py-6 text-center text-xs text-muted-foreground">{t("kanban.noTasks")}</p>
                 ) : (
                     tasks.map((task) => <TaskKanbanCard key={task.id} task={task} onClick={onCardClick} />)
                 )}

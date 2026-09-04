@@ -4,5 +4,87 @@
     "in_progress": "In progress",
     "done": "Done",
     "cancelled": "Cancelled"
+  },
+  "page": {
+    "title": "Tasks"
+  },
+  "toolbar": {
+    "heading": "All Tasks",
+    "everyone": "Everyone",
+    "assigneePlaceholder": "Assignee",
+    "allStatuses": "All statuses",
+    "filterByStatus": "Filter by status",
+    "searchPlaceholder": "Search tasks...",
+    "addTask": "Add task"
+  },
+  "table": {
+    "title": "Title",
+    "relatedTo": "Related to",
+    "assignee": "Assignee",
+    "dueDate": "Due date",
+    "status": "Status",
+    "emptyTitle": "No tasks found",
+    "emptyDescription": "Try adjusting your filters or search."
+  },
+  "pagination": {
+    "rowsPerPage": "Rows per page"
+  },
+  "kanban": {
+    "noTasks": "No tasks",
+    "boardView": "Board view",
+    "tableView": "Table view"
+  },
+  "statusCard": {
+    "count_one": "{{count}} task",
+    "count_few": "{{count}} tasks",
+    "count_many": "{{count}} tasks",
+    "count_other": "{{count}} tasks"
+  },
+  "related": {
+    "deal": "Deal {{number}}"
+  },
+  "form": {
+    "editTitle": "Edit task",
+    "addTitle": "Add task",
+    "editDescription": "Update the task details.",
+    "addDescription": "Create a new task.",
+    "saveError": "Task could not be saved. Check the details and try again.",
+    "saveChanges": "Save changes",
+    "create": "Create task",
+    "save": "Save",
+    "title": "Title",
+    "titlePlaceholder": "e.g. Call the client about documents",
+    "description": "Description (optional)",
+    "assignee": "Assignee",
+    "selectAssignee": "Select assignee",
+    "status": "Status",
+    "dueDate": "Due date (optional)",
+    "selectDueDate": "Select due date",
+    "cancel": "Cancel",
+    "validation": {
+      "titleMin": "Title must be at least 2 characters",
+      "selectAssignee": "Select an assignee"
+    }
+  },
+  "clientCard": {
+    "title": "Tasks",
+    "titleWithCount": "Tasks ({{count}})",
+    "addTask": "Add task",
+    "empty": "No tasks linked to this client."
+  },
+  "toasts": {
+    "createSuccess": "Task created",
+    "createError": "Failed to create task",
+    "updateSuccess": "Task updated",
+    "updateError": "Failed to update task",
+    "statusError": "Failed to update status",
+    "deleteSuccess": "Task deleted",
+    "deleteError": "Failed to delete task"
+  },
+  "dealCard": {
+    "title": "Tasks",
+    "titleWithCount": "Tasks ({{count}})",
+    "addTask": "Add task",
+    "empty": "No tasks linked to this deal."
   }
 }
