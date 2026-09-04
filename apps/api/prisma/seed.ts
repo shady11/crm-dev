@@ -11,7 +11,32 @@ const prisma = new PrismaClient({
     adapter,
 });
 
+/**
+ * Demo data for local development only.
+ *
+ * This inserts a fixed company, a project called "ЖК Орион", sample inventory
+ * and an admin@crm.dev account whose password is password123. Running it
+ * against a real deployment would hand anyone who knows this repository an
+ * administrator login, so it refuses outside development.
+ *
+ * To create a real tenant use prisma/provision-tenant.ts instead.
+ */
+function assertNotProduction() {
+    const env = process.env.NODE_ENV;
+
+    if (env === "production" && process.env.ALLOW_DEMO_SEED !== "true") {
+        console.error(
+            "\n  seed: refusing to run with NODE_ENV=production.\n" +
+            "  This inserts demo data and a well-known admin password.\n" +
+            "  Use `npx tsx prisma/provision-tenant.ts` to create a real tenant.\n",
+        );
+        process.exit(1);
+    }
+}
+
 async function main() {
+    assertNotProduction();
+
     const passwordHash = await bcrypt.hash("password123", 10);
 
     const company = await prisma.company.upsert({

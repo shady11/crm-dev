@@ -14,7 +14,7 @@ export class CreateUserDto {
     phone?: string;
 
     @IsString()
-    @MinLength(6)
+    @MinLength(8)
     password!: string;
 
     @IsEnum(UserRole)

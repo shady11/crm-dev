@@ -6,7 +6,7 @@ import {
     NotFoundException,
 } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
-import {Prisma} from "@/generated/prisma/client";
+import {Prisma, UserRole} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateUserDto} from "./dto/create-user.dto";
@@ -40,12 +40,21 @@ export class UsersService {
         const limit = query.limit ?? 20;
         const skip = (page - 1) * limit;
 
+        const manageableRoles = getManageableRoles(user.role);
+
         const where: Prisma.UserWhereInput = {
             companyId: user.companyId,
+            deletedAt: null,
             isActive: query.isActive ?? true,
+            // Without this a COMPANY_ADMIN can enumerate SUPER_ADMIN accounts,
+            // which findOne() already refuses to return.
+            role: { in: manageableRoles },
         };
 
         if (query.role) {
+            if (!manageableRoles.includes(query.role)) {
+                throw new ForbiddenException("You cannot view users with this role");
+            }
             where.role = query.role;
         }
 
@@ -108,6 +117,8 @@ export class UsersService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
+        this.ensureCanAssignRole(user, dto.role);
+
         await this.ensureEmailIsUnique(dto.email);
 
         const passwordHash = await bcrypt.hash(dto.password, 10);
@@ -130,12 +141,10 @@ export class UsersService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        const target = await this.prisma.user.findFirst({
-            where: { id, companyId: user.companyId },
-        });
+        const target = await this.getManageableTargetOrThrow(user, id);
 
-        if (!target) {
-            throw new NotFoundException("User not found");
+        if (dto.role !== undefined) {
+            this.ensureCanAssignRole(user, dto.role);
         }
 
         if (dto.email && dto.email !== target.email) {
@@ -168,13 +177,7 @@ export class UsersService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        const target = await this.prisma.user.findFirst({
-            where: { id, companyId: user.companyId },
-        });
-
-        if (!target) {
-            throw new NotFoundException("User not found");
-        }
+        await this.getManageableTargetOrThrow(user, id);
 
         const passwordHash = await bcrypt.hash(dto.password, 10);
 
@@ -194,13 +197,7 @@ export class UsersService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        const target = await this.prisma.user.findFirst({
-            where: { id, companyId: user.companyId },
-        });
-
-        if (!target) {
-            throw new NotFoundException("User not found");
-        }
+        await this.getManageableTargetOrThrow(user, id);
 
         await this.prisma.user.update({
             where: { id },
@@ -219,13 +216,7 @@ export class UsersService {
             throw new BadRequestException("You cannot delete your own account");
         }
 
-        const target = await this.prisma.user.findFirst({
-            where: { id, companyId: user.companyId },
-        });
-
-        if (!target) {
-            throw new NotFoundException("User not found");
-        }
+        await this.getManageableTargetOrThrow(user, id);
 
         await this.prisma.user.update({
             where: { id },
@@ -260,6 +251,42 @@ export class UsersService {
         }
 
         return user;
+    }
+
+    /**
+     * Loads a user the actor is allowed to act on, or throws.
+     *
+     * Three conditions, all of which were missing from update(),
+     * updatePassword(), revokeSessions() and remove(): the target must be in
+     * the actor's company, must not already be soft-deleted, and must hold a
+     * role the actor may manage. Without the last one a COMPANY_ADMIN could
+     * reset a SUPER_ADMIN's password or delete the account outright.
+     *
+     * Returns 404 rather than 403 for a role the actor may not see, matching
+     * findOne() — a company admin should not be able to discover that a
+     * SUPER_ADMIN exists by probing ids.
+     */
+    private async getManageableTargetOrThrow(actor: AuthUser, id: string) {
+        const target = await this.prisma.user.findFirst({
+            where: { id, companyId: actor.companyId, deletedAt: null },
+        });
+
+        if (!target || !canActorSeeRole(actor.role, target.role)) {
+            throw new NotFoundException("User not found");
+        }
+
+        return target;
+    }
+
+    /**
+     * A user can never grant a role they could not otherwise manage. This is
+     * what stops a COMPANY_ADMIN creating a SUPER_ADMIN, or promoting a second
+     * account of their own to one.
+     */
+    private ensureCanAssignRole(actor: AuthUser, role: UserRole) {
+        if (!canActorSeeRole(actor.role, role)) {
+            throw new ForbiddenException("You cannot assign this role");
+        }
     }
 
     private async ensureEmailIsUnique(email: string, exceptUserId?: string) {
