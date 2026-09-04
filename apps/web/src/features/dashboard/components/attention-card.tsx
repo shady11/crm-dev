@@ -3,22 +3,24 @@ import {AlertTriangleIcon, ClockIcon} from "lucide-react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {paths} from "@/routes/paths.ts";
 import type {AttentionItems} from "@/features/dashboard/api/dashboard.api.ts";
+import {useTranslation} from "react-i18next";
 
 function daysUntil(iso: string) {
     return Math.ceil((new Date(iso).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 }
 
 export function AttentionCard({ data }: { data: AttentionItems }) {
+    const { t } = useTranslation("dashboard");
     const hasNothing = data.expiringDeals.length === 0 && data.urgentTasks.length === 0;
 
     return (
         <Card className="border border-secondary shadow-none pt-0">
             <CardHeader className="border-b py-4">
-                <CardTitle className="text-sm text-muted-foreground">Needs attention</CardTitle>
+                <CardTitle className="text-sm text-muted-foreground">{t("attention.title")}</CardTitle>
             </CardHeader>
             <CardContent>
                 {hasNothing ? (
-                    <p className="py-6 text-center text-sm text-muted-foreground">Nothing urgent right now.</p>
+                    <p className="py-6 text-center text-sm text-muted-foreground">{t("attention.empty")}</p>
                 ) : (
                     <div className="flex flex-col divide-y">
                         {data.expiringDeals.map((deal) => {
@@ -29,7 +31,7 @@ export function AttentionCard({ data }: { data: AttentionItems }) {
                                     <div className="min-w-0 flex-1">
                                         <p className="truncate font-medium">{deal.dealNumber} · {deal.client.fullName}</p>
                                         <p className="text-xs text-muted-foreground">
-                                            Reservation {days <= 0 ? "expired" : `expires in ${days}d`}
+                                            {days <= 0 ? t("attention.reservationExpired") : t("attention.reservationExpiresIn", { days })}
                                         </p>
                                     </div>
                                 </Link>
@@ -43,7 +45,7 @@ export function AttentionCard({ data }: { data: AttentionItems }) {
                                     <div className="min-w-0 flex-1">
                                         <p className="truncate font-medium">{task.title}</p>
                                         <p className="text-xs text-muted-foreground">
-                                            {task.assignedTo.fullName} · {days < 0 ? "Overdue" : days === 0 ? "Due today" : `Due in ${days}d`}
+                                            {task.assignedTo.fullName} · {days < 0 ? t("attention.taskOverdue") : days === 0 ? t("attention.taskDueToday") : t("attention.taskDueIn", { days })}
                                         </p>
                                     </div>
                                 </div>

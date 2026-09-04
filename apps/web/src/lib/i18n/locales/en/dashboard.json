@@ -1,0 +1,38 @@
+{
+  "title": "Dashboard",
+  "allProjects": "All projects",
+  "kpi": {
+    "revenueThisMonth": "Revenue this month",
+    "activeDeals": "Active deals",
+    "availableUnits": "Available units",
+    "unitsOfTotal": "of {{total}} total",
+    "overdueTasks": "Overdue tasks"
+  },
+  "revenueTrend": {
+    "title": "Revenue, last 6 months",
+    "seriesLabel": "Revenue"
+  },
+  "unitsInventory": {
+    "title": "Unit inventory",
+    "totalUnits": "{{count}} units total"
+  },
+  "dealsByStage": "Deals by stage",
+  "attention": {
+    "title": "Needs attention",
+    "empty": "Nothing urgent right now.",
+    "reservationExpired": "Reservation expired",
+    "reservationExpiresIn": "Reservation expires in {{days}}d",
+    "taskOverdue": "Overdue",
+    "taskDueToday": "Due today",
+    "taskDueIn": "Due in {{days}}d"
+  },
+  "recentActivity": {
+    "title": "Recent activity",
+    "empty": "No activity yet.",
+    "system": "System",
+    "justNow": "just now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago"
+  }
+}

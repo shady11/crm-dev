@@ -10,7 +10,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function UnitsInventoryChart({ data }: { data: UnitsSummaryItem[] }) {
-    const { t } = useTranslation("units");
+    const { t } = useTranslation(["units", "dashboard"]);
 
     const total = data.reduce((sum, d) => sum + d.count, 0);
 
@@ -25,7 +25,7 @@ export function UnitsInventoryChart({ data }: { data: UnitsSummaryItem[] }) {
     return (
         <Card className="border border-secondary shadow-none">
             <CardHeader>
-                <CardTitle className="text-sm text-muted-foreground">Unit inventory</CardTitle>
+                <CardTitle className="text-sm text-muted-foreground">{t("unitsInventory.title", { ns: "dashboard" })}</CardTitle>
             </CardHeader>
             <CardContent>
                 <ChartContainer config={{}} className="mx-auto h-56 w-full max-w-56">
@@ -46,7 +46,7 @@ export function UnitsInventoryChart({ data }: { data: UnitsSummaryItem[] }) {
                         </div>
                     ))}
                 </div>
-                <p className="mt-2 text-center text-xs text-muted-foreground">{total} units total</p>
+                <p className="mt-2 text-center text-xs text-muted-foreground">{t("unitsInventory.totalUnits", { ns: "dashboard", count: total })}</p>
             </CardContent>
         </Card>
     );

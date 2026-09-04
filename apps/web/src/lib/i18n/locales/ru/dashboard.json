@@ -1,0 +1,38 @@
+{
+  "title": "Дашборд",
+  "allProjects": "Все проекты",
+  "kpi": {
+    "revenueThisMonth": "Выручка за месяц",
+    "activeDeals": "Активные сделки",
+    "availableUnits": "Свободные юниты",
+    "unitsOfTotal": "из {{total}} всего",
+    "overdueTasks": "Просроченные задачи"
+  },
+  "revenueTrend": {
+    "title": "Выручка за последние 6 месяцев",
+    "seriesLabel": "Выручка"
+  },
+  "unitsInventory": {
+    "title": "Остатки юнитов",
+    "totalUnits": "Всего юнитов: {{count}}"
+  },
+  "dealsByStage": "Сделки по этапам",
+  "attention": {
+    "title": "Требует внимания",
+    "empty": "Сейчас ничего срочного нет.",
+    "reservationExpired": "Бронирование истекло",
+    "reservationExpiresIn": "Бронирование истекает через {{days}} дн.",
+    "taskOverdue": "Просрочено",
+    "taskDueToday": "Срок сегодня",
+    "taskDueIn": "Срок через {{days}} дн."
+  },
+  "recentActivity": {
+    "title": "Последняя активность",
+    "empty": "Пока нет активности.",
+    "system": "Система",
+    "justNow": "только что",
+    "minutesAgo": "{{count}} мин. назад",
+    "hoursAgo": "{{count}} ч. назад",
+    "daysAgo": "{{count}} дн. назад"
+  }
+}
