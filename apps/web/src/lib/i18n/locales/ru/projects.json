@@ -7,5 +7,79 @@
     "sold_out": "Распродано",
     "completed": "Завершён",
     "archived": "Архив"
+  },
+  "salesComingSoon": "Продажи (скоро)",
+  "tabs": {
+    "heading": "Проекты",
+    "addProject": "Добавить проект",
+    "statusAll": "Все",
+    "statusFilterAriaLabel": "Фильтр проектов по статусу"
+  },
+  "sheet": {
+    "addTitle": "Добавить проект",
+    "editTitle": "Редактировать проект",
+    "addDescription": "Создать новый проект для этой компании.",
+    "editDescription": "Обновить данные проекта."
+  },
+  "form": {
+    "nameLabel": "Название",
+    "namePlaceholder": "Название проекта",
+    "addressLabel": "Адрес",
+    "addressPlaceholder": "Адрес",
+    "submitCreate": "Создать проект",
+    "errorGeneric": "Не удалось сохранить проект. Проверьте данные и попробуйте снова.",
+    "validation": {
+      "nameMin": "Название проекта должно содержать не менее 2 символов",
+      "statusRequired": "Выберите статус"
+    }
+  },
+  "counts": {
+    "blocksLabel": "Блоки",
+    "unitsLabel": "Юниты"
+  },
+  "card": {
+    "deleteTitle": "Удалить проект?",
+    "deleteDescription": "Проект «{{name}}» будет удалён безвозвратно. Это действие нельзя отменить."
+  },
+  "page": {
+    "notFound": "Проект не найден",
+    "deleteDescription": "Проект «{{name}}» и все его вложенные структурные модели будут удалены безвозвратно. Это действие нельзя отменить.",
+    "toastUpdatedTitle": "Успешно обновлено",
+    "toastUpdatedDescription": "Проект «{{name}}» обновлён.",
+    "toastUpdateErrorTitle": "Не удалось обновить проект"
+  },
+  "structure": {
+    "heading": "Структура проекта",
+    "notFound": "Структура проекта не найдена",
+    "emptyTitle": "Пока нет блоков",
+    "emptyDescriptionPrefix": "Начните с создания первого блока.",
+    "emptyDescriptionSuffix": "Блоки помогают организовать подъезды, этажи и юниты в вашем проекте.",
+    "toastCreateErrorTitle": "Не удалось создать блок"
+  },
+  "overview": {
+    "heading": "Обзор проекта",
+    "notFound": "Проект не найден"
+  },
+  "chessboard": {
+    "blockLabel": "Блок {{name}}",
+    "entranceLabel": "Подъезд {{name}}",
+    "blockNotFound": "Блок не найден",
+    "selectBlockHeading": "Выберите блок",
+    "statEntrances": "Подъезды",
+    "statFloors": "Этажи",
+    "statUnits": "Юниты",
+    "noBlocksTitle": "Пока нет блоков",
+    "noBlocksDescription": "Сначала создайте блоки во вкладке «Конструктор»",
+    "noUnitsTitle": "Юниты не найдены",
+    "noUnitsDescription": "Попробуйте изменить фильтры",
+    "updateUnitError": "Не удалось обновить юнит.",
+    "floors_one": "{{count}} этаж",
+    "floors_few": "{{count}} этажа",
+    "floors_many": "{{count}} этажей",
+    "floors_other": "{{count}} этажа",
+    "units_one": "{{count}} юнит",
+    "units_few": "{{count}} юнита",
+    "units_many": "{{count}} юнитов",
+    "units_other": "{{count}} юнита"
   }
 }

@@ -1,6 +1,7 @@
 import {Card, CardContent} from "@/components/ui/card.tsx";
 import {type Project} from "@/features/projects/types/project.types.ts";
 import {Building, DoorOpen, type LucideIcon} from "lucide-react";
+import {useTranslation} from "react-i18next";
 
 type Props = {
     project: Project;
@@ -17,18 +18,19 @@ interface Item {
 type Items = Array<Item>;
 
 export function OverviewCards({project}: Props) {
+    const { t } = useTranslation("projects");
 
     const items: Items = [
         {
             title: project._count?.blocks ?? 0,
-            description: 'Blocks',
+            description: t("counts.blocksLabel"),
             icon: Building,
             iconColor: 'text-indigo-500',
             bgColor: 'bg-indigo-100',
         },
         {
             title: project._count?.units ?? 0,
-            description: 'Units',
+            description: t("counts.unitsLabel"),
             icon: DoorOpen,
             iconColor: 'text-emerald-500',
             bgColor: 'bg-emerald-100',

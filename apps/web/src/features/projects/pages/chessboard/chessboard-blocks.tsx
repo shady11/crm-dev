@@ -14,8 +14,10 @@ import {
 } from "lucide-react";
 import {getProjectTree} from "@/features/projects/api/projects.api.ts";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
+import {useTranslation} from "react-i18next";
 
 export function ChessboardBlocks() {
+    const { t } = useTranslation("projects");
     const { projectId } = useParams<{ projectId: string }>();
     const navigate = useNavigate();
 
@@ -42,10 +44,8 @@ export function ChessboardBlocks() {
                     <EmptyMedia variant="icon">
                         <Building2Icon strokeWidth={1.25}/>
                     </EmptyMedia>
-                    <EmptyTitle>No blocks yet</EmptyTitle>
-                    <EmptyDescription>
-                        Create blocks in the Builder tab first
-                    </EmptyDescription>
+                    <EmptyTitle>{t("chessboard.noBlocksTitle")}</EmptyTitle>
+                    <EmptyDescription>{t("chessboard.noBlocksDescription")}</EmptyDescription>
                 </EmptyHeader>
             </Empty>
         );
@@ -54,7 +54,7 @@ export function ChessboardBlocks() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-medium">Select Block</h2>
+                <h2 className="text-lg font-medium">{t("chessboard.selectBlockHeading")}</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -79,7 +79,7 @@ export function ChessboardBlocks() {
                                             <BuildingIcon size={32} strokeWidth={1.25} className="text-white" />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-medium">Block {block.name}</h3>
+                                            <h3 className="text-lg font-medium">{t("chessboard.blockLabel", { name: block.name })}</h3>
                                             {(block as any).code && (
                                                 <p className="text-xs text-muted-foreground">{(block as any).code}</p>
                                             )}
@@ -95,7 +95,7 @@ export function ChessboardBlocks() {
                                             <SquareArrowRightEnterIcon size={20} strokeWidth={1.5} className="text-amber-500" />
                                         </div>
                                         <div>
-                                            <p className="text-xs text-muted-foreground">Entrances</p>
+                                            <p className="text-xs text-muted-foreground">{t("chessboard.statEntrances")}</p>
                                             <span className="text-md font-medium">{totalEntrances}</span>
                                         </div>
                                     </div>
@@ -104,7 +104,7 @@ export function ChessboardBlocks() {
                                             <Layers2Icon size={20} strokeWidth={1.5} className="text-rose-500" />
                                         </div>
                                         <div>
-                                            <p className="text-xs text-muted-foreground">Floors</p>
+                                            <p className="text-xs text-muted-foreground">{t("chessboard.statFloors")}</p>
                                             <span className="text-md font-medium">{totalFloors}</span>
                                         </div>
                                     </div>
@@ -113,7 +113,7 @@ export function ChessboardBlocks() {
                                             <HouseIcon size={20} strokeWidth={1.5} className="text-emerald-500" />
                                         </div>
                                         <div>
-                                            <p className="text-xs text-muted-foreground">Units</p>
+                                            <p className="text-xs text-muted-foreground">{t("chessboard.statUnits")}</p>
                                             <span className="text-md font-medium">{totalUnits}</span>
                                         </div>
                                     </div>

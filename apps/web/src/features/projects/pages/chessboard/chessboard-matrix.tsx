@@ -15,6 +15,7 @@ import {ChessboardSheets} from "@/features/projects/components/chessboard/sheets
 import {useChessboardSheet} from "@/features/projects/hooks/use-chessboard-sheet.ts";
 import {useUpdateUnit} from "@/features/units/hooks/use-update-unit.ts";
 import {useManagers} from "@/features/users/hooks/use-managers.ts";
+import {useTranslation} from "react-i18next";
 
 interface Filters {
     status: UnitStatus | "all";
@@ -37,6 +38,7 @@ const DEFAULT_FILTERS: Filters = {
 };
 
 export function ChessboardMatrix() {
+    const { t } = useTranslation("projects");
     const { projectId, blockId, entranceId } = useParams<{
         projectId: string;
         blockId: string;
@@ -173,7 +175,7 @@ export function ChessboardMatrix() {
     if (!tree || !block || !entrance) {
         return (
             <div className="flex h-96 items-center justify-center text-muted-foreground">
-                <p>Not found</p>
+                <p>{t("common:errors.notFound")}</p>
             </div>
         );
     }
@@ -215,8 +217,8 @@ export function ChessboardMatrix() {
                         <EmptyMedia variant="icon">
                             <DoorOpen strokeWidth={1.25} />
                         </EmptyMedia>
-                        <EmptyTitle>No units found</EmptyTitle>
-                        <EmptyDescription>Try adjusting the filters</EmptyDescription>
+                        <EmptyTitle>{t("chessboard.noUnitsTitle")}</EmptyTitle>
+                        <EmptyDescription>{t("chessboard.noUnitsDescription")}</EmptyDescription>
                     </EmptyHeader>
                 </Empty>
             )}
@@ -228,7 +230,7 @@ export function ChessboardMatrix() {
                 updateState={{
                     isSubmitting: updateUnitMutation.isPending,
                     errorMessage: updateUnitMutation.isError
-                        ? "Failed to update unit."
+                        ? t("chessboard.updateUnitError")
                         : undefined,
                 }}
                 actions={{

@@ -20,14 +20,13 @@ import {SheetBody, SheetClose, SheetFooter} from "@/components/ui/sheet.tsx";
 import {createListCollection} from "@ark-ui/react";
 import {Alert, AlertTitle} from "@/components/ui/alert.tsx";
 import {useTranslation} from "react-i18next";
+import {useMemo} from "react";
 
-const projectSchema = z.object({
-    name: z.string().trim().min(2, "Project name must be at least 2 characters"),
-    address: z.string().trim().optional(),
-    status: z.enum(PROJECT_STATUS_VALUES, "Select a status"),
-});
-
-type ProjectFormValues = z.infer<typeof projectSchema>;
+type ProjectFormValues = {
+    name: string;
+    address?: string;
+    status: ProjectStatus;
+};
 
 type ProjectFormProps = {
     project?: Project | null;
@@ -53,6 +52,12 @@ export function ProjectForm({
                                 onSubmit,
                             }: ProjectFormProps) {
     const { t } = useTranslation("projects");
+
+    const projectSchema = useMemo(() => z.object({
+        name: z.string().trim().min(2, t("form.validation.nameMin")),
+        address: z.string().trim().optional(),
+        status: z.enum(PROJECT_STATUS_VALUES, t("form.validation.statusRequired")),
+    }), [t]);
 
     const initialStatus = normalizeProjectStatus(project?.status);
     const [, setSelectedStatus] =
@@ -102,11 +107,11 @@ export function ProjectForm({
                         name="name"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Name</FieldLabel>
+                                <FieldLabel>{t("form.nameLabel")}</FieldLabel>
                                 <Input
                                     {...field}
-                                    placeholder="Project name"
-                                    aria-label="Project name"
+                                    placeholder={t("form.namePlaceholder")}
+                                    aria-label={t("form.namePlaceholder")}
                                 />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
@@ -117,11 +122,11 @@ export function ProjectForm({
                         name="address"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Address</FieldLabel>
+                                <FieldLabel>{t("form.addressLabel")}</FieldLabel>
                                 <Input
                                     {...field}
-                                    placeholder="Address"
-                                    aria-label="Address"
+                                    placeholder={t("form.addressPlaceholder")}
+                                    aria-label={t("form.addressPlaceholder")}
                                 />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
@@ -132,7 +137,7 @@ export function ProjectForm({
                         name="status"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid} orientation="responsive">
-                                <FieldLabel>Status</FieldLabel>
+                                <FieldLabel>{t("common:labels.status")}</FieldLabel>
                                 <Select
                                     collection={statusCollection}
                                     name={field.name}
@@ -147,7 +152,7 @@ export function ProjectForm({
                                     value={[field.value]}
                                 >
                                     <SelectTrigger className="w-full min-w-32">
-                                        <SelectValue placeholder="Select" />
+                                        <SelectValue placeholder={t("common:placeholders.select")} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {statusCollection.items.map((status) => (
@@ -179,14 +184,12 @@ export function ProjectForm({
                             className="flex-1"
                             disabled={isSubmitting}
                             onClick={onCancel}
-                        >
-                            Cancel
-                        </Button>
+                        >{t("common:actions.cancel")}</Button>
                     )}
                 </SheetClose>
                 <Button type="submit" className="flex-1" disabled={isSubmitting}>
                     {isSubmitting && <Loader2 className="animate-spin"/>}
-                    {submitLabel ?? (project ? "Save changes" : "Create project")}
+                    {submitLabel ?? (project ? t("common:actions.saveChanges") : t("form.submitCreate"))}
                 </Button>
             </SheetFooter>
         </form>

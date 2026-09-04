@@ -4,8 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import {getProject} from "../api/projects.api";
 import {OverviewCards} from "@/features/projects/components/overview/overview-cards.tsx";
 import {Loader2} from "lucide-react";
+import {useTranslation} from "react-i18next";
 
 export function ProjectOverview() {
+    const { t } = useTranslation("projects");
     const { projectId } = useParams();
 
     const projectQuery = useQuery({
@@ -23,7 +25,7 @@ export function ProjectOverview() {
     }
 
     if (!projectQuery.data) {
-        return <div>Project not found</div>;
+        return <div>{t("overview.notFound")}</div>;
     }
 
     const project = projectQuery.data;
@@ -31,7 +33,7 @@ export function ProjectOverview() {
     return (
         <div className="space-y-2">
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-medium">Project Overview</h2>
+                <h2 className="text-lg font-medium">{t("overview.heading")}</h2>
             </div>
 
             <OverviewCards project={project}/>

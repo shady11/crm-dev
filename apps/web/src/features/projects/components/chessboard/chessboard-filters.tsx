@@ -16,6 +16,7 @@ import {
 import {Status} from "@/components/ui/status.tsx";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {useTranslation} from "react-i18next";
+import {useMemo} from "react";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 export interface Filters {
@@ -44,19 +45,7 @@ const ROOM_PRESETS = [
     { label: "4+", value: "4" },
 ];
 
-const AREA_PRESETS = [
-    { label: "Under 50 m²", min: "", max: "50" },
-    { label: "50 – 80 m²", min: "50", max: "80" },
-    { label: "80 – 120 m²", min: "80", max: "120" },
-    { label: "Over 120 m²", min: "120", max: "" },
-];
 
-const PRICE_PRESETS = [
-    { label: "Under $50k", min: "", max: "50000" },
-    { label: "$50k – $100k", min: "50000", max: "100000" },
-    { label: "$100k – $200k", min: "100000", max: "200000" },
-    { label: "Over $200k", min: "200000", max: "" },
-];
 
 export function ChessboardFilters({
                                       filters,
@@ -68,24 +57,38 @@ export function ChessboardFilters({
 
     const { t } = useTranslation("units");
     const { formatCurrency } = useCompanyFormatters();
+
+    const AREA_PRESETS = useMemo(() => [
+        { label: t("filters.areaUnder", { value: "50" }), min: "", max: "50" },
+        { label: t("filters.areaRange", { min: "50", max: "80" }), min: "50", max: "80" },
+        { label: t("filters.areaRange", { min: "80", max: "120" }), min: "80", max: "120" },
+        { label: t("filters.areaOver", { value: "120" }), min: "120", max: "" },
+    ], [t]);
+
+    const PRICE_PRESETS = useMemo(() => [
+        { label: t("filters.pricePresetUnder", { value: "$50k" }), min: "", max: "50000" },
+        { label: t("filters.pricePresetRange", { min: "$50k", max: "$100k" }), min: "50000", max: "100000" },
+        { label: t("filters.pricePresetRange", { min: "$100k", max: "$200k" }), min: "100000", max: "200000" },
+        { label: t("filters.pricePresetOver", { value: "$200k" }), min: "200000", max: "" },
+    ], [t]);
     
     const getRoomsSummary = () => {
-        if (!filters.rooms) return "Rooms";
-        return `${filters.rooms} room${filters.rooms === "1" ? "" : "s"}`;
+        if (!filters.rooms) return t("common:labels.rooms");
+        return t("filters.roomsSummary", { count: Number(filters.rooms) });
     };
 
     const getAreaSummary = () => {
-        if (!filters.areaMin && !filters.areaMax) return "Area";
-        if (filters.areaMin && filters.areaMax) return `${filters.areaMin}–${filters.areaMax} m²`;
-        if (filters.areaMin) return `Over ${filters.areaMin} m²`;
-        return `Under ${filters.areaMax} m²`;
+        if (!filters.areaMin && !filters.areaMax) return t("common:labels.area");
+        if (filters.areaMin && filters.areaMax) return t("filters.areaRange", { min: filters.areaMin, max: filters.areaMax });
+        if (filters.areaMin) return t("filters.areaOver", { value: filters.areaMin });
+        return t("filters.areaUnder", { value: filters.areaMax });
     };
 
     const getPriceSummary = () => {
-        if (!filters.priceMin && !filters.priceMax) return "Price";
-        if (filters.priceMin && filters.priceMax) return `${formatCurrency(Number(filters.priceMin))}–${formatCurrency(Number(filters.priceMax))}`;
-        if (filters.priceMin) return `Over ${formatCurrency(Number(filters.priceMin))}`;
-        return `Under ${formatCurrency(Number(filters.priceMax))}`;
+        if (!filters.priceMin && !filters.priceMax) return t("common:labels.price");
+        if (filters.priceMin && filters.priceMax) return t("filters.priceRange", { min: formatCurrency(Number(filters.priceMin)), max: formatCurrency(Number(filters.priceMax)) });
+        if (filters.priceMin) return t("filters.priceOver", { value: formatCurrency(Number(filters.priceMin)) });
+        return t("filters.priceUnder", { value: formatCurrency(Number(filters.priceMax)) });
     };
 
     const typeCollection = createListCollection({
@@ -123,7 +126,7 @@ export function ChessboardFilters({
                             }
                         >
                             <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Status" />
+                                <SelectValue placeholder={t("common:labels.status")} />
                             </SelectTrigger>
                             <SelectContent>
                                 {statusCollection.items.map((status) => (
@@ -153,7 +156,7 @@ export function ChessboardFilters({
                             }
                         >
                             <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Type" />
+                                <SelectValue placeholder={t("common:labels.type")} />
                             </SelectTrigger>
                             <SelectContent>
                                 {typeCollection.items.map((type) => (
@@ -179,9 +182,7 @@ export function ChessboardFilters({
                             </PopoverTrigger>
                             <PopoverContent className="w-52 space-y-3 p-3">
                                 <div className="flex flex-col gap-1">
-                                    <span className="text-sm font-medium text-muted-foreground">
-                                      Rooms count
-                                    </span>
+                                    <span className="text-sm font-medium text-muted-foreground">{t("filters.roomsCountLabel")}</span>
                                     <div className="grid grid-cols-4 gap-1.5 pt-0.5">
                                         {ROOM_PRESETS.map((preset) => {
                                             const isActive = filters.rooms === preset.value;
@@ -221,13 +222,11 @@ export function ChessboardFilters({
                             </PopoverTrigger>
                             <PopoverContent className="w-52 space-y-3 p-3">
                                 <div className="flex flex-col gap-1">
-                                    <span className="text-sm font-medium text-muted-foreground">
-                                        Range
-                                    </span>
+                                    <span className="text-sm font-medium text-muted-foreground">{t("filters.rangeLabel")}</span>
                                     <div className="flex items-center gap-2">
                                         <InputGroup size="sm">
                                             <InputGroupInput
-                                                placeholder="From"
+                                                placeholder={t("filters.fromPlaceholder")}
                                                 value={filters.areaMin}
                                                 onChange={(e) =>
                                                     onFiltersChange({
@@ -242,7 +241,7 @@ export function ChessboardFilters({
                                         </InputGroup>
                                         <InputGroup size="sm">
                                             <InputGroupInput
-                                                placeholder="To"
+                                                placeholder={t("filters.toPlaceholder")}
                                                 value={filters.areaMax}
                                                 onChange={(e) =>
                                                     onFiltersChange({
@@ -259,9 +258,7 @@ export function ChessboardFilters({
                                 </div>
 
                                 <div className="flex flex-col gap-1">
-                                    <span className="text-sm font-medium text-muted-foreground">
-                                      Presets
-                                    </span>
+                                    <span className="text-sm font-medium text-muted-foreground">{t("filters.presetsLabel")}</span>
                                     <div className="grid grid-cols-2 gap-1.5 pt-0.5">
                                         {AREA_PRESETS.map((preset) => {
                                             const isActive =
@@ -305,13 +302,11 @@ export function ChessboardFilters({
                             </PopoverTrigger>
                             <PopoverContent className="w-52 space-y-3 p-3">
                                 <div className="flex flex-col gap-1">
-                                    <span className="text-sm font-medium text-muted-foreground">
-                                        Range
-                                    </span>
+                                    <span className="text-sm font-medium text-muted-foreground">{t("filters.rangeLabel")}</span>
                                     <div className="flex items-center gap-2">
                                         <InputGroup size="sm">
                                             <InputGroupInput
-                                                placeholder="From"
+                                                placeholder={t("filters.fromPlaceholder")}
                                                 value={filters.priceMin}
                                                 onChange={(e) =>
                                                     onFiltersChange({
@@ -326,7 +321,7 @@ export function ChessboardFilters({
                                         </InputGroup>
                                         <InputGroup size="sm">
                                             <InputGroupInput
-                                                placeholder="To"
+                                                placeholder={t("filters.toPlaceholder")}
                                                 value={filters.priceMax}
                                                 onChange={(e) =>
                                                     onFiltersChange({
@@ -343,9 +338,7 @@ export function ChessboardFilters({
                                 </div>
 
                                 <div className="flex flex-col gap-1">
-                                    <span className="text-sm font-medium text-muted-foreground">
-                                        Presets
-                                    </span>
+                                    <span className="text-sm font-medium text-muted-foreground">{t("filters.presetsLabel")}</span>
                                     <div className="grid grid-cols-2 gap-1.5 pt-0.5">
                                         {PRICE_PRESETS.map((preset) => {
                                             const isActive =
@@ -378,12 +371,10 @@ export function ChessboardFilters({
                     {hasActiveFilters && (
                         <div className="flex items-center justify-between">
                             <span className="text-xs font-medium text-muted-foreground">
-                                {totalUnits} unit{totalUnits !== 1 ? "s" : ""} found
+                                {t("filters.unitsFound", { count: totalUnits })}
                             </span>
                             <Button variant="ghost" size="sm" onClick={onClearFilters}>
-                                <XIcon className="size-3" />
-                                Clear all
-                            </Button>
+                                <XIcon className="size-3" /> {t("filters.clearAll")}</Button>
                         </div>
                     )}
                 </div>

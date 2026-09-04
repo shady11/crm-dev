@@ -9,8 +9,10 @@ import type {Entrance} from "@/features/entrances/types/entrance.types.ts";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList} from "@/components/ui/breadcrumb.tsx";
 import {getProjectTree} from "@/features/projects/api/projects.api.ts";
 import {Menu, MenuContent, MenuGroup, MenuItem, MenuTrigger} from "@/components/ui/menu.tsx";
+import {useTranslation} from "react-i18next";
 
 export function ChessboardEntrances() {
+    const { t } = useTranslation("projects");
     const { projectId, blockId } = useParams<{ projectId: string; blockId: string }>();
     const navigate = useNavigate();
 
@@ -38,7 +40,7 @@ export function ChessboardEntrances() {
             <div className="flex h-96 items-center justify-center text-muted-foreground">
                 <div className="text-center">
                     <Building2Icon className="mx-auto h-12 w-12 mb-4" />
-                    <p className="text-lg font-medium">Block not found</p>
+                    <p className="text-lg font-medium">{t("chessboard.blockNotFound")}</p>
                 </div>
             </div>
         );
@@ -60,14 +62,14 @@ export function ChessboardEntrances() {
                         <Menu>
                             <MenuTrigger asChild>
                                 <Button variant="outline" size="sm" className="flex gap-3 font-medium">
-                                    Block {block.name}
+                                    {t("chessboard.blockLabel", { name: block.name })}
                                     <ChevronDownIcon className="size-3" />
                                 </Button>
                             </MenuTrigger>
                             <MenuContent>
                                 <MenuGroup>
                                     {blocks.map((block, index) => (
-                                        <MenuItem value={`block-${index}`} onClick={() => navigate(`../${block.id}`)}>Block {block.name}</MenuItem>
+                                        <MenuItem value={`block-${index}`} onClick={() => navigate(`../${block.id}`)}>{t("chessboard.blockLabel", { name: block.name })}</MenuItem>
                                     ))}
                                 </MenuGroup>
                             </MenuContent>
@@ -94,9 +96,9 @@ export function ChessboardEntrances() {
                                         <DoorOpenIcon size={32} strokeWidth={1.25} className="text-primary"/>
                                     </div>
                                     <div>
-                                        <h3 className="font-medium">Entrance {entrance.name}</h3>
+                                        <h3 className="font-medium">{t("chessboard.entranceLabel", { name: entrance.name })}</h3>
                                         <p className="text-sm text-muted-foreground">
-                                            {totalFloors} floor{totalFloors !== 1 ? 's' : ''} • {totalUnits} unit{totalUnits !== 1 ? 's' : ''}
+                                            {t("chessboard.floors", { count: totalFloors })} • {t("chessboard.units", { count: totalUnits })}
                                         </p>
                                     </div>
                                 </div>

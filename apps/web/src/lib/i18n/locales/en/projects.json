@@ -7,5 +7,79 @@
     "sold_out": "Sold out",
     "completed": "Completed",
     "archived": "Archived"
+  },
+  "salesComingSoon": "Sales (coming soon)",
+  "tabs": {
+    "heading": "Projects",
+    "addProject": "Add project",
+    "statusAll": "All",
+    "statusFilterAriaLabel": "Filter projects by status"
+  },
+  "sheet": {
+    "addTitle": "Add project",
+    "editTitle": "Edit project",
+    "addDescription": "Create a new project for this company.",
+    "editDescription": "Update project details."
+  },
+  "form": {
+    "nameLabel": "Name",
+    "namePlaceholder": "Project name",
+    "addressLabel": "Address",
+    "addressPlaceholder": "Address",
+    "submitCreate": "Create project",
+    "errorGeneric": "Project could not be saved. Check the details and try again.",
+    "validation": {
+      "nameMin": "Project name must be at least 2 characters",
+      "statusRequired": "Select a status"
+    }
+  },
+  "counts": {
+    "blocksLabel": "Blocks",
+    "unitsLabel": "Units"
+  },
+  "card": {
+    "deleteTitle": "Delete project?",
+    "deleteDescription": "This will permanently delete \"{{name}}\". This action cannot be undone."
+  },
+  "page": {
+    "notFound": "Project not found",
+    "deleteDescription": "This will permanently delete \"{{name}}\" and all of its nested structural models. This action cannot be undone.",
+    "toastUpdatedTitle": "Successfully updated",
+    "toastUpdatedDescription": "Project \"{{name}}\" has been updated.",
+    "toastUpdateErrorTitle": "Failed to update project"
+  },
+  "structure": {
+    "heading": "Project Structure",
+    "notFound": "Project structure not found",
+    "emptyTitle": "No blocks yet",
+    "emptyDescriptionPrefix": "Get started by creating your first block.",
+    "emptyDescriptionSuffix": "Blocks help you organize entrances, floors, and units in your project.",
+    "toastCreateErrorTitle": "Failed to create block"
+  },
+  "overview": {
+    "heading": "Project Overview",
+    "notFound": "Project not found"
+  },
+  "chessboard": {
+    "blockLabel": "Block {{name}}",
+    "entranceLabel": "Entrance {{name}}",
+    "blockNotFound": "Block not found",
+    "selectBlockHeading": "Select Block",
+    "statEntrances": "Entrances",
+    "statFloors": "Floors",
+    "statUnits": "Units",
+    "noBlocksTitle": "No blocks yet",
+    "noBlocksDescription": "Create blocks in the Builder tab first",
+    "noUnitsTitle": "No units found",
+    "noUnitsDescription": "Try adjusting the filters",
+    "updateUnitError": "Failed to update unit.",
+    "floors_one": "{{count}} floor",
+    "floors_few": "{{count}} floors",
+    "floors_many": "{{count}} floors",
+    "floors_other": "{{count}} floors",
+    "units_one": "{{count}} unit",
+    "units_few": "{{count}} units",
+    "units_many": "{{count}} units",
+    "units_other": "{{count}} units"
   }
 }

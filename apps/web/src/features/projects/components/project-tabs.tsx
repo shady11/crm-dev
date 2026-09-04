@@ -1,14 +1,17 @@
 import {NavLink} from "react-router-dom";
 import {cn} from "@/lib/utils";
-
-const tabs = [
-    { label: "Overview", to: "overview" },
-    { label: "Builder", to: "builder" },
-    { label: "Chessboard", to: "chessboard" },
-    { label: "Sales", to: "sales" },
-];
+import {useTranslation} from "react-i18next";
 
 export function ProjectTabs() {
+    const { t } = useTranslation("common");
+
+    const tabs = [
+        { label: t("nav.overview"), to: "overview" },
+        { label: t("nav.builder"), to: "builder" },
+        { label: t("nav.chessboard"), to: "chessboard" },
+        { label: t("nav.sales"), to: "sales" },
+    ];
+
     return (
         <div className="container-fluid border-b-2 border-secondary">
             <nav className="flex gap-3">

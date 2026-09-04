@@ -107,7 +107,7 @@ export function ProjectsPage() {
 
     const statusCollection = createListCollection({
         items: [
-            { label: "All", value: "all" },
+            { label: t("tabs.statusAll"), value: "all" },
             ...PROJECT_STATUS_VALUES.map((status) => ({
                 label: t(PROJECT_STATUS_LABEL_KEYS[status]),
                 value: status,
@@ -118,7 +118,7 @@ export function ProjectsPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between gap-4">
-                <h2 className="text-2xl font-medium tracking-tight">Projects</h2>
+                <h2 className="text-2xl font-medium tracking-tight">{t("tabs.heading")}</h2>
                 <div className="flex items-center gap-2">
                     <Select
                         collection={statusCollection}
@@ -129,9 +129,9 @@ export function ProjectsPage() {
                     >
                         <SelectTrigger
                             className="w-40"
-                            aria-label="Filter projects by status"
+                            aria-label={t("tabs.statusFilterAriaLabel")}
                         >
-                            <SelectValue placeholder="All" />
+                            <SelectValue placeholder={t("tabs.statusAll")} />
                         </SelectTrigger>
                         <SelectContent>
                             {statusCollection.items.map((status) => (
@@ -142,9 +142,7 @@ export function ProjectsPage() {
                         </SelectContent>
                     </Select>
                     <Button type="button" onClick={openCreateForm}>
-                        <Plus className="size-3"/>
-                        Add project
-                    </Button>
+                        <Plus className="size-3"/> {t("tabs.addProject")}</Button>
                 </div>
             </div>
 
@@ -166,12 +164,12 @@ export function ProjectsPage() {
                 <SheetContent variant="inset" className="sm:max-w-md">
                     <SheetHeader>
                         <SheetTitle>
-                            {editingProject ? "Edit project" : "Add project"}
+                            {editingProject ? t("sheet.editTitle") : t("sheet.addTitle")}
                         </SheetTitle>
                         <SheetDescription>
                             {editingProject
-                                ? "Update project details."
-                                : "Create a new project for this company."}
+                                ? t("sheet.editDescription")
+                                : t("sheet.addDescription")}
                         </SheetDescription>
                     </SheetHeader>
                     <ProjectForm
@@ -179,11 +177,11 @@ export function ProjectsPage() {
                         project={editingProject}
                         errorMessage={
                             createMutation.isError || updateMutation.isError
-                                ? "Project could not be saved. Check the details and try again."
+                                ? t("form.errorGeneric")
                                 : undefined
                         }
                         isSubmitting={isSubmitting}
-                        submitLabel={editingProject ? "Save changes" : "Create project"}
+                        submitLabel={editingProject ? t("common:actions.saveChanges") : t("form.submitCreate")}
                         onCancel={closeForm}
                         onSubmit={handleSubmit}
                     />

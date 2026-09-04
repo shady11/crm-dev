@@ -52,12 +52,12 @@ export function ProjectCard({project, onDelete, isDeleting}: Props) {
                     <Separator/>
                     <div className="flex items-center gap-4 text-sm *:[div]:space-y-1">
                         <div>
-                            <p className="font-medium leading-none">Blocks</p>
+                            <p className="font-medium leading-none">{t("counts.blocksLabel")}</p>
                             <p className="text-muted-foreground">{project._count?.blocks}</p>
                         </div>
                         <Separator orientation="vertical" />
                         <div>
-                            <p className="font-medium leading-none">Units</p>
+                            <p className="font-medium leading-none">{t("counts.unitsLabel")}</p>
                             <p className="text-muted-foreground">{project._count?.units}</p>
                         </div>
                     </div>
@@ -69,12 +69,9 @@ export function ProjectCard({project, onDelete, isDeleting}: Props) {
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>
-                            Delete project?
-                        </AlertDialogTitle>
+                        <AlertDialogTitle>{t("card.deleteTitle")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will permanently delete "{project.name}".
-                            This action cannot be undone.
+                            {t("card.deleteDescription", { name: project.name })}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 
@@ -84,9 +81,7 @@ export function ProjectCard({project, onDelete, isDeleting}: Props) {
                             onClick={(e) => {
                                 e.stopPropagation();
                             }}
-                        >
-                            Cancel
-                        </AlertDialogCancel>
+                        >{t("common:actions.cancel")}</AlertDialogCancel>
 
                         <AlertDialogAction
                             variant="destructive"
@@ -95,9 +90,7 @@ export function ProjectCard({project, onDelete, isDeleting}: Props) {
                                 onDelete?.(project);
                                 setDeleteOpen(false);
                             }}
-                        >
-                            Delete
-                        </AlertDialogAction>
+                        >{t("common:actions.delete")}</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

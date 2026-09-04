@@ -12,8 +12,10 @@ import {BlockForm} from "@/features/blocks/components/block-form.tsx";
 import {getProjectTree} from "@/features/projects/api/projects.api.ts";
 import {Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {toast} from "@/components/ui/toast";
+import {useTranslation} from "react-i18next";
 
 export function ProjectStructure() {
+    const { t } = useTranslation("projects");
     const { projectId } = useParams<{ projectId: string }>();
     const queryClient = useQueryClient();
 
@@ -40,8 +42,8 @@ export function ProjectStructure() {
             });
 
             toast.success({
-                title: "Successfully created",
-                description: `Block ${variables.name} has been added to the project.`,
+                title: t("toasts.createdTitle", { ns: "blocks" }),
+                description: t("toasts.createdDescription", { ns: "blocks", name: variables.name }),
             });
 
             setOpen(false);
@@ -49,8 +51,8 @@ export function ProjectStructure() {
 
         onError: () => {
             toast.error({
-                title: "Failed to create block",
-                description: "Please try again.",
+                title: t("structure.toastCreateErrorTitle"),
+                description: t("common:errors.tryAgain"),
             });
         },
     });
@@ -74,7 +76,7 @@ export function ProjectStructure() {
     }
 
     if (!treeQuery.data) {
-        return <div className="p-6 text-center font-medium">Project structure not found</div>;
+        return <div className="p-6 text-center font-medium">{t("structure.notFound")}</div>;
     }
 
     const tree = treeQuery.data as ProjectTree;
@@ -88,11 +90,9 @@ export function ProjectStructure() {
     return (
         <div className="space-y-2">
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-medium">Project Structure</h2>
+                <h2 className="text-lg font-medium">{t("structure.heading")}</h2>
                 <Button size="sm" variant="default" onClick={() => setOpen(true)}>
-                    <Plus className="size-3" />
-                    Add Block
-                </Button>
+                    <Plus className="size-3" /> {t("actions.addBlock", { ns: "blocks" })}</Button>
             </div>
 
             <div className="space-y-4">
@@ -111,17 +111,15 @@ export function ProjectStructure() {
                             <EmptyMedia variant="icon">
                                 <Building2 strokeWidth={1.25}/>
                             </EmptyMedia>
-                            <EmptyTitle>No blocks yet</EmptyTitle>
+                            <EmptyTitle>{t("structure.emptyTitle")}</EmptyTitle>
                             <EmptyDescription>
-                                Get started by creating your first block. <br/>
-                                Blocks help you organize entrances, floors, and units in your project.
+                                {t("structure.emptyDescriptionPrefix")} <br/>
+                                {t("structure.emptyDescriptionSuffix")}
                             </EmptyDescription>
                         </EmptyHeader>
                         <EmptyContent className="flex-row justify-center gap-2">
                             <Button size="sm" onClick={() => setOpen(true)}>
-                                <Plus className="size-3" />
-                                Add Block
-                            </Button>
+                                <Plus className="size-3" /> {t("actions.addBlock", { ns: "blocks" })}</Button>
                         </EmptyContent>
                     </Empty>
                 )}
@@ -133,18 +131,18 @@ export function ProjectStructure() {
             >
                 <SheetContent variant="inset" className="sm:max-w-md">
                     <SheetHeader>
-                        <SheetTitle>Create block</SheetTitle>
+                        <SheetTitle>{t("actions.createBlock", { ns: "blocks" })}</SheetTitle>
                     </SheetHeader>
                     <BlockForm
                         key={`block-new-${open ? "open" : "closed"}`}
                         defaultOrder={nextBlockOrder}
                         errorMessage={
                             createBlockMutation.isError
-                                ? "Block could not be saved. Check the details and try again."
+                                ? t("form.errorGeneric", { ns: "blocks" })
                                 : undefined
                         }
                         isSubmitting={createBlockMutation.isPending}
-                        submitLabel="Create block"
+                        submitLabel={t("actions.createBlock", { ns: "blocks" })}
                         onCancel={() => setOpen(false)}
                         onSubmit={(payload) => createBlockMutation.mutate(payload)}
                     />

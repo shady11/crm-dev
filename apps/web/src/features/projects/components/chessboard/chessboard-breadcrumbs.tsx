@@ -15,6 +15,7 @@ import {
 import { ArrowLeftIcon, ChevronDownIcon } from "lucide-react";
 import type { Block } from "@/features/blocks/types/block.types";
 import type { Entrance } from "@/features/entrances/types/entrance.types";
+import {useTranslation} from "react-i18next";
 
 interface ChessboardBreadcrumbsProps {
     block: Block;
@@ -35,6 +36,8 @@ export function ChessboardBreadcrumbs({
                                                 onBlockSelect,
                                                 onEntranceSelect,
                                             }: ChessboardBreadcrumbsProps) {
+    const { t } = useTranslation("projects");
+
     return (
         <Breadcrumb>
             <BreadcrumbList>
@@ -50,7 +53,7 @@ export function ChessboardBreadcrumbs({
                     <Menu>
                         <MenuTrigger asChild>
                             <Button variant="outline" size="sm" className="flex gap-2 font-medium">
-                                Block {block.name}
+                                {t("chessboard.blockLabel", { name: block.name })}
                                 <ChevronDownIcon className="size-3" />
                             </Button>
                         </MenuTrigger>
@@ -62,7 +65,7 @@ export function ChessboardBreadcrumbs({
                                         value={item.id}
                                         onClick={() => onBlockSelect(item.id)}
                                     >
-                                        Block {item.name}
+                                        {t("chessboard.blockLabel", { name: item.name })}
                                     </MenuItem>
                                 ))}
                             </MenuGroup>
@@ -74,7 +77,7 @@ export function ChessboardBreadcrumbs({
                     <Menu>
                         <MenuTrigger asChild>
                             <Button variant="outline" size="sm" className="flex gap-2 font-medium">
-                                Entrance {entrance.name}
+                                {t("chessboard.entranceLabel", { name: entrance.name })}
                                 <ChevronDownIcon className="size-3" />
                             </Button>
                         </MenuTrigger>
@@ -86,7 +89,7 @@ export function ChessboardBreadcrumbs({
                                         value={item.id}
                                         onClick={() => onEntranceSelect(item.id)}
                                     >
-                                        Entrance {item.name}
+                                        {t("chessboard.entranceLabel", { name: item.name })}
                                     </MenuItem>
                                 ))}
                             </MenuGroup>

@@ -45,8 +45,8 @@ export function ProjectPage() {
             await queryClient.invalidateQueries({queryKey: ["project", projectId]});
 
             toast.success({
-                title: "Successfully updated",
-                description: `Project "${variables.name}" has been updated.`,
+                title: t("page.toastUpdatedTitle"),
+                description: t("page.toastUpdatedDescription", { name: variables.name }),
             });
 
             setOpen(false);
@@ -54,8 +54,8 @@ export function ProjectPage() {
 
         onError: () => {
             toast.error({
-                title: "Failed to update project",
-                description: "Please try again.",
+                title: t("page.toastUpdateErrorTitle"),
+                description: t("common:errors.tryAgain"),
             });
         },
     });
@@ -77,7 +77,7 @@ export function ProjectPage() {
     }
 
     if (!projectQuery.data) {
-        return <div className="p-6 text-center font-medium">Project not found</div>;
+        return <div className="p-6 text-center font-medium">{t("page.notFound")}</div>;
     }
 
     const project = projectQuery.data;
@@ -95,41 +95,31 @@ export function ProjectPage() {
 
                 <div className="flex items-center gap-2">
                     <Button variant="ghost" onClick={() => navigate("/projects")}>
-                        <ArrowLeft className="size-3"/>
-                        Back
-                    </Button>
+                        <ArrowLeft className="size-3"/> {t("common:actions.back")}</Button>
 
                     <Button onClick={() => setOpen(true)}>
-                        <Pen className="size-3"/>
-                        Edit
-                    </Button>
+                        <Pen className="size-3"/> {t("common:actions.edit")}</Button>
 
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                             <Button variant="destructive">
-                                <Trash2 className="size-3"/>
-                                Delete
-                            </Button>
+                                <Trash2 className="size-3"/> {t("common:actions.delete")}</Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader>
-                                <AlertDialogTitle>Delete project?</AlertDialogTitle>
+                                <AlertDialogTitle>{t("card.deleteTitle")}</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                    This will permanently delete "{project.name}" and all of its nested structural
-                                    models.
-                                    This action cannot be undone.
+                                    {t("page.deleteDescription", { name: project.name })}
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                                <AlertDialogCancel disabled={deleteMutation.isPending}>
-                                    Cancel
-                                </AlertDialogCancel>
+                                <AlertDialogCancel disabled={deleteMutation.isPending}>{t("common:actions.cancel")}</AlertDialogCancel>
                                 <AlertDialogAction
                                     variant="destructive"
                                     disabled={deleteMutation.isPending}
                                     onClick={() => deleteMutation.mutate()}
                                 >
-                                    {deleteMutation.isPending ? "Deleting..." : "Delete"}
+                                    {deleteMutation.isPending ? t("common:actions.deleting") : t("common:actions.delete")}
                                 </AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
@@ -147,18 +137,18 @@ export function ProjectPage() {
             >
                 <SheetContent variant="inset" className="sm:max-w-md">
                     <SheetHeader>
-                        <SheetTitle>Edit project</SheetTitle>
+                        <SheetTitle>{t("sheet.editTitle")}</SheetTitle>
                     </SheetHeader>
                     <ProjectForm
                         key={`edit-project-${project.id}-${open ? "open" : "closed"}`}
                         project={project}
                         errorMessage={
                             updateMutation.isError
-                                ? "Project could not be saved. Check the details and try again."
+                                ? t("form.errorGeneric")
                                 : undefined
                         }
                         isSubmitting={isSubmitting}
-                        submitLabel="Save changes"
+                        submitLabel={t("common:actions.saveChanges")}
                         onCancel={() => setOpen(false)}
                         onSubmit={(payload) => updateMutation.mutate(payload)}
                     />

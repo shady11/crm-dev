@@ -47,7 +47,7 @@ export function ChessboardCard({
         <Card className="border border-secondary p-0 gap-0">
             <CardHeader className="gap-0 border-b py-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                    <h3 className="font-medium">Entrance {entranceName}</h3>
+                    <h3 className="font-medium">{t("chessboard.entranceLabel", { name: entranceName })}</h3>
 
                     <div className="flex flex-wrap items-center gap-4">
                         {statusCollection.items.map((status) => (
@@ -63,9 +63,9 @@ export function ChessboardCard({
                     </div>
 
                     <Badge variant="secondary" className="text-xs">
-                        {totalFloors} floor{totalFloors !== 1 ? "s" : ""}
+                        {t("chessboard.floors", { count: totalFloors })}
                         <Dot />
-                        {totalUnits} unit{totalUnits !== 1 ? "s" : ""}
+                        {t("chessboard.units", { count: totalUnits })}
                     </Badge>
                 </div>
             </CardHeader>

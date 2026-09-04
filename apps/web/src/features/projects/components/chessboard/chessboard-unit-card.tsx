@@ -40,7 +40,7 @@ export function ChessboardUnitCard({
         >
             <div className="flex items-center justify-between w-full gap-8 text-xs">
                 <span>
-                    {unit.rooms} rooms
+                    {t("chessboard.rooms", { count: unit.rooms })}
                 </span>
                 <span>
                     №{unit.number}
