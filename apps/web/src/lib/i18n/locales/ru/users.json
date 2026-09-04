@@ -1,9 +1,9 @@
 {
   "role": {
-    "super_admin": "Super Admin",
-    "company_admin": "Company Admin",
-    "sales_manager": "Sales Manager",
-    "sales_head": "Sales Head",
-    "finance": "Finance"
+    "super_admin": "Супер-администратор",
+    "company_admin": "Администратор компании",
+    "sales_manager": "Менеджер по продажам",
+    "sales_head": "Руководитель отдела продаж",
+    "finance": "Финансы"
   }
 }

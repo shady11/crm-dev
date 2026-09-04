@@ -8,6 +8,7 @@ import {Textarea} from "@/components/ui/textarea";
 import type {BookingFormInput} from "@/features/deals/schemas/booking.schema.ts";
 import type {ApartmentSummary} from "@/features/deals/types/booking.types.ts";
 import {calculateBooking} from "@/features/deals/utils/booking-calculator.ts";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 interface Manager {
     id: string;
@@ -21,6 +22,7 @@ interface ReservationStepProps {
 }
 
 export function ReservationStep({ form, apartment, managers }: ReservationStepProps) {
+    const { formatCurrency, currencyCode } = useCompanyFormatters();
     const discountPercent = form.watch("reservation.discountPercent") || 0;
     const deposit = form.watch("reservation.deposit") || 0;
 
@@ -103,7 +105,7 @@ export function ReservationStep({ form, apartment, managers }: ReservationStepPr
                     name="reservation.deposit"
                     render={({ field, fieldState }) => (
                         <Field invalid={fieldState.invalid}>
-                            <FieldLabel>Deposit ($)</FieldLabel>
+                            <FieldLabel>Deposit ({currencyCode})</FieldLabel>
                             <NumberInput
                                 value={field.value?.toString() ?? "0"}
                                 min={0}
@@ -133,25 +135,25 @@ export function ReservationStep({ form, apartment, managers }: ReservationStepPr
                 <div className="space-y-1 rounded-lg border border-secondary p-3 text-sm">
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">List price</span>
-                        <span>{calculation.price.toLocaleString("ru-RU")} $</span>
+                        <span>{formatCurrency(calculation.price)}</span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">Discount</span>
                         <span>
-                            {calculation.discountAmount > 0 && `- ${calculation.discountAmount.toLocaleString("ru-RU")} $`}
+                            {calculation.discountAmount > 0 && `- ${formatCurrency(calculation.discountAmount)}`}
                         </span>
                     </div>
                     <div className="flex justify-between font-medium">
                         <span>Final price</span>
-                        <span>{calculation.finalPrice.toLocaleString("ru-RU")} $</span>
+                        <span>{formatCurrency(calculation.finalPrice)}</span>
                     </div>
                     <div className="flex justify-between">
                         <span className="text-muted-foreground">Deposit</span>
-                        <span>{calculation.deposit.toLocaleString("ru-RU")} $</span>
+                        <span>{formatCurrency(calculation.deposit)}</span>
                     </div>
                     <div className="flex justify-between font-medium">
                         <span>Remaining</span>
-                        <span>{calculation.remaining.toLocaleString("ru-RU")} $</span>
+                        <span>{formatCurrency(calculation.remaining)}</span>
                     </div>
                 </div>
             </FieldGroup>

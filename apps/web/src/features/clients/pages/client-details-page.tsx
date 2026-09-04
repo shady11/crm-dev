@@ -17,9 +17,11 @@ import {ClientTasksCard} from "@/features/tasks/components/client-tasks-card.tsx
 import {DEAL_STATUS_LABEL_KEYS, DEAL_STATUS_VISUALS} from "@/features/deals/types/deal.types.ts";
 import {paths} from "@/routes/paths.ts";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 export function ClientDetailsPage() {
     const { t } = useTranslation("deals");
+    const { formatCurrency } = useCompanyFormatters();
     const { clientId } = useParams<{ clientId: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -141,7 +143,7 @@ export function ClientDetailsPage() {
                                             </div>
                                             <div className="text-right">
                                                 {deal.salePrice != null && (
-                                                    <p className="font-medium">{Number(deal.salePrice).toLocaleString("en-US")} $</p>
+                                                    <p className="font-medium">{formatCurrency(Number(deal.salePrice))}</p>
                                                 )}
                                                 <Badge className={`${visual?.bg} text-white`}>{t(DEAL_STATUS_LABEL_KEYS[deal.status])}</Badge>
                                             </div>

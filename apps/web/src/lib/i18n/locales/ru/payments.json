@@ -1,24 +1,24 @@
 {
   "type": {
-    "deposit": "Deposit",
-    "installment": "Installment",
-    "final_payment": "Final payment",
-    "refund": "Refund"
+    "deposit": "Задаток",
+    "installment": "Рассрочка",
+    "final_payment": "Финальный платёж",
+    "refund": "Возврат"
   },
   "method": {
-    "cash": "Cash",
-    "bank_transfer": "Bank transfer",
+    "cash": "Наличные",
+    "bank_transfer": "Банковский перевод",
     "mbank": "MBank",
     "optima": "Optima",
-    "elkart": "Elkart",
-    "other": "Other"
+    "elkart": "Элкарт",
+    "other": "Другое"
   },
   "schedule": {
     "status": {
-      "pending": "Pending",
-      "partial": "Partial",
-      "paid": "Paid",
-      "overdue": "Overdue"
+      "pending": "Ожидается",
+      "partial": "Частично оплачено",
+      "paid": "Оплачено",
+      "overdue": "Просрочено"
     }
   }
 }

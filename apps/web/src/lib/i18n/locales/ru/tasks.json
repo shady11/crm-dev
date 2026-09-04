@@ -1,8 +1,8 @@
 {
   "status": {
-    "to_do": "To do",
-    "in_progress": "In progress",
-    "done": "Done",
-    "cancelled": "Cancelled"
+    "to_do": "К выполнению",
+    "in_progress": "В процессе",
+    "done": "Выполнено",
+    "cancelled": "Отменено"
   }
 }

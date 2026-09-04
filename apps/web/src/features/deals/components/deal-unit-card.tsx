@@ -4,19 +4,17 @@ import {Separator} from "@/components/ui/separator.tsx";
 import type {Deal} from "@/features/deals/api/deals.api.ts";
 import {UNIT_TYPE_LABEL_KEYS} from "@/features/units/types/unit.types.ts";
 import {useTranslation} from "react-i18next";
-import {useFormatters} from "@/lib/i18n/formatters.ts";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 export function DealUnitCard({
                                  unit,
                                  project,
-                                 companySettings
 }: {
     unit: Deal["unit"];
     project: Deal["project"];
-    companySettings?: { currency?: string | null; locale?: string | null };
 }) {
     const { t } = useTranslation(["deals", "common","units"]);
-    const { formatCurrency } = useFormatters(companySettings);
+    const { formatCurrency } = useCompanyFormatters();
 
     return (
         <Card className="border border-secondary shadow-none flex-1 pt-0">

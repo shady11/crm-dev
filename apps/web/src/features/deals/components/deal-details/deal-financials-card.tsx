@@ -2,18 +2,17 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/components/ui/data-list.tsx";
 import type {DealDetails} from "@/features/deals/api/deals.api.ts";
 import {useTranslation} from "react-i18next";
-import {useFormatters} from "@/lib/i18n/formatters.ts";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 interface DealFinancialsCardProps {
     deal: DealDetails;
     totalPaid: number;
     remaining: number;
-    companySettings?: { currency?: string | null; locale?: string | null };
 }
 
-export function DealFinancialsCard({ deal, totalPaid, remaining, companySettings }: DealFinancialsCardProps) {
+export function DealFinancialsCard({ deal, totalPaid, remaining }: DealFinancialsCardProps) {
     const { t } = useTranslation("deals");
-    const { formatCurrency } = useFormatters(companySettings);
+    const { formatCurrency } = useCompanyFormatters();
 
     const listPricePerSqM =
         deal.unit.area > 0
@@ -56,7 +55,7 @@ export function DealFinancialsCard({ deal, totalPaid, remaining, companySettings
                             <DataListItemLabel>Discount</DataListItemLabel>
                             <DataListItemValue className="flex-none">
                                 {deal.discountPercent}%
-                                {deal.discountAmount != null && ` (${deal.discountAmount.toLocaleString("ru-RU")} $)`}
+                                {deal.discountAmount != null && ` (${formatCurrency(deal.discountAmount)})`}
                             </DataListItemValue>
                         </DataListItem>
                     )}

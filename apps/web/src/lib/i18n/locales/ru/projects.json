@@ -1,11 +1,11 @@
 {
   "status": {
-    "draft": "Draft",
-    "planning": "Planning",
-    "active": "Active",
-    "paused": "Paused",
-    "sold_out": "Sold out",
-    "completed": "Completed",
-    "archived": "Archived"
+    "draft": "Черновик",
+    "planning": "Планирование",
+    "active": "Активный",
+    "paused": "Приостановлен",
+    "sold_out": "Распродано",
+    "completed": "Завершён",
+    "archived": "Архив"
   }
 }

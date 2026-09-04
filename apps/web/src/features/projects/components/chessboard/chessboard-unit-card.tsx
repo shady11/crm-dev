@@ -1,6 +1,7 @@
 import {cn} from "@/lib/utils";
 import {type Unit, UNIT_STATUS_CLASSES, UNIT_TYPE_LABEL_KEYS} from "@/features/units/types/unit.types";
 import {useTranslation} from "react-i18next";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 interface MatrixUnitCardProps {
     unit: Unit;
@@ -16,6 +17,7 @@ export function ChessboardUnitCard({
                                        onClick,
                                    }: MatrixUnitCardProps) {
     const { t } = useTranslation("units");
+    const { formatCurrency, formatPricePerSqm } = useCompanyFormatters();
     const price = Number(unit.price);
     const area = Number(unit.area);
 
@@ -46,10 +48,10 @@ export function ChessboardUnitCard({
             </div>
             <div className="flex items-center justify-start w-full gap-4 text-xs font-medium">
                 <span className="text-lg">
-                    {parseFloat(unit.price).toLocaleString('en-US', { maximumFractionDigits: 0 })} $
+                    {formatCurrency(parseFloat(unit.price))}
                 </span>
                 <span>
-                    {pricePerSqM} $/m²
+                    {formatPricePerSqm(pricePerSqM)}
                 </span>
             </div>
             <div className="flex items-center justify-between w-full gap-8 text-xs">

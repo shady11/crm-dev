@@ -16,8 +16,11 @@ const DEFAULT_LOCALE = "ru-RU"; // primary target market language, not a browser
  * company's actual configured currency.
  *
  * `company` is optional and defaults are deliberately conservative rather
- * than guessing — see the runbook for wiring this to real company data via
- * whatever exposes the authenticated user's company settings on the frontend.
+ * than guessing. Most call sites should use useCompanyFormatters() instead
+ * (features/auth/hooks/use-company-formatters.ts), which binds this to the
+ * signed-in user's own company automatically — call this directly only when
+ * you already have a specific company's settings in hand (e.g. the super
+ * admin viewing a tenant that isn't the caller's own).
  */
 export function useFormatters(company?: CompanySettings) {
 
@@ -40,6 +43,10 @@ export function useFormatters(company?: CompanySettings) {
             formatPricePerSqm: (value: number) => `${number.format(value)} ${currency}/m²`,
             formatDate: (value: string | Date) => date.format(new Date(value)),
             formatDateTime: (value: string | Date) => dateTime.format(new Date(value)),
+            // The bare ISO currency code (e.g. "KGS") - for labels like
+            // "Deposit (KGS)" where a full Intl.NumberFormat call would be
+            // overkill, but "$" regardless of the company's currency is wrong.
+            currencyCode: currency,
         };
     }, [locale, currency]);
 }

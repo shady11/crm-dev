@@ -2,6 +2,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx
 import {Button} from "@/components/ui/button.tsx";
 import type {DealDetails} from "@/features/deals/api/deals.api.ts";
 import {useTranslation} from "react-i18next";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 const PAYMENT_TYPE_LABEL_KEYS: Record<string, string> = {
     DEPOSIT: "payments:type.deposit",
@@ -27,6 +28,7 @@ interface DealPaymentsHistoryCardProps {
 
 export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPayment }: DealPaymentsHistoryCardProps) {
     const { t } = useTranslation("payments");
+    const { formatCurrency } = useCompanyFormatters();
     return (
         <Card className="border border-secondary shadow-none pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
@@ -52,7 +54,7 @@ export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPa
                                     </p>
                                 </div>
                                 <div className="text-right">
-                                    <p className="font-medium">{p.amount.toLocaleString("en-US")} $</p>
+                                    <p className="font-medium">{formatCurrency(p.amount)}</p>
                                     <p className="text-xs text-muted-foreground">
                                         {new Date(p.paidAt).toLocaleDateString()}
                                     </p>

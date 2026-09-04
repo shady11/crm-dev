@@ -1,11 +1,11 @@
 {
   "status": {
-    "new": "New",
-    "contacted": "Contacted",
-    "qualified": "Qualified",
-    "meeting": "Meeting",
-    "negotiation": "Negotiation",
-    "converted": "Converted",
-    "lost": "Lost"
+    "new": "Новый",
+    "contacted": "Связались",
+    "qualified": "Квалифицирован",
+    "meeting": "Встреча",
+    "negotiation": "Переговоры",
+    "converted": "Конвертирован",
+    "lost": "Потерян"
   }
 }

@@ -1,22 +1,30 @@
 #!/usr/bin/env node
 /**
- * Fails when the locale bundles disagree, or when a *_LABEL_KEYS map points at
- * a key that does not exist.
+ * Fails when the locale bundles disagree, when a *_LABEL_KEYS map points at a
+ * key that does not exist, or when a namespace on disk was never registered
+ * in i18n/index.ts.
  *
- * Both of those shipped in e85f89d and neither was visible in review:
+ * All three have shipped for real and none was visible in review:
  *   - ru/deals.json was missing two keys en had, so those labels silently
- *     rendered in English on a Russian screen;
+ *     rendered in English on a Russian screen (e85f89d);
  *   - document.types.ts used "documents.type.passport" instead of
- *     "documents:type.passport", so i18next rendered the raw key on screen.
+ *     "documents:type.passport", so i18next rendered the raw key on screen
+ *     (e85f89d);
+ *   - documents.json, leads.json and tasks.json existed with correct keys in
+ *     both locales, but index.ts never imported them into `resources` — every
+ *     t() call in those three namespaces rendered its raw key, in both
+ *     languages, everywhere those features were used.
  *
- * i18next never throws for a missing key — it returns the key string — so this
- * class of bug reaches users unless something checks for it.
+ * i18next never throws for a missing key — it returns the key string — so
+ * every one of these classes of bug reaches users unless something checks
+ * for it.
  */
 import {readFileSync, readdirSync, statSync} from "node:fs";
 import {join, basename, relative} from "node:path";
 
 const LOCALES_DIR = "apps/web/src/lib/i18n/locales";
 const FEATURES_DIR = "apps/web/src/features";
+const I18N_INDEX = "apps/web/src/lib/i18n/index.ts";
 
 const problems = [];
 
@@ -64,7 +72,20 @@ for (const locale of others) {
     }
 }
 
-// 2. Every key referenced by a *_LABEL_KEYS map resolves, in every locale.
+// 2. Every namespace on disk is actually registered in i18n/index.ts - a
+//    namespace with perfect, fully-translated JSON files is still dead if
+//    nothing ever loads it into i18next's `resources`.
+const indexSrc = readFileSync(I18N_INDEX, "utf8");
+const registeredNamespaces = new Set(
+    [...indexSrc.matchAll(/^\s*(\w+):\s*\w+,?\s*$/gm)].map((m) => m[1]),
+);
+for (const ns of Object.keys(bundles[reference])) {
+    if (!registeredNamespaces.has(ns)) {
+        problems.push(`namespace "${ns}" has locale files but is not registered in ${I18N_INDEX}`);
+    }
+}
+
+// 3. Every key referenced by a *_LABEL_KEYS map resolves, in every locale.
 const resolve = (locale, ns, path) => {
     let node = bundles[locale][ns];
     for (const part of path.split(".")) {

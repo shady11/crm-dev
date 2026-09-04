@@ -16,6 +16,7 @@ import {
 import {Status} from "@/components/ui/status.tsx";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {useTranslation} from "react-i18next";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 export interface Filters {
     status: UnitStatus | "all";
@@ -66,6 +67,7 @@ export function ChessboardFilters({
                                   }: ChessboardFiltersProps) {
 
     const { t } = useTranslation("units");
+    const { formatCurrency } = useCompanyFormatters();
     
     const getRoomsSummary = () => {
         if (!filters.rooms) return "Rooms";
@@ -81,9 +83,9 @@ export function ChessboardFilters({
 
     const getPriceSummary = () => {
         if (!filters.priceMin && !filters.priceMax) return "Price";
-        if (filters.priceMin && filters.priceMax) return `$${filters.priceMin}–$${filters.priceMax}`;
-        if (filters.priceMin) return `Over $${filters.priceMin}`;
-        return `Under $${filters.priceMax}`;
+        if (filters.priceMin && filters.priceMax) return `${formatCurrency(Number(filters.priceMin))}–${formatCurrency(Number(filters.priceMax))}`;
+        if (filters.priceMin) return `Over ${formatCurrency(Number(filters.priceMin))}`;
+        return `Under ${formatCurrency(Number(filters.priceMax))}`;
     };
 
     const typeCollection = createListCollection({

@@ -5,8 +5,10 @@ import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/co
 import {formatDate} from "@/utils/date-formatter.ts";
 import {Button} from "@/components/ui/button.tsx";
 import {Link} from "react-router-dom";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 export function DealCard({ deal }: { deal: UnitDealHistoryEntry }) {
+    const { formatCurrency } = useCompanyFormatters();
     const visual = DEAL_STATUS_VISUALS[deal.status];
     const Icon = visual?.icon ?? CheckCircle2Icon;
     const daysLeft = deal.status === "RESERVED" ? daysUntil(deal.reservationExpiresAt) : null;
@@ -58,7 +60,7 @@ export function DealCard({ deal }: { deal: UnitDealHistoryEntry }) {
                     <DataListItem>
                         <DataListItemLabel>Sale price</DataListItemLabel>
                         <DataListItemValue>
-                            {parseFloat(deal.salePrice).toLocaleString("ru-RU")} $
+                            {formatCurrency(parseFloat(deal.salePrice))}
                         </DataListItemValue>
                     </DataListItem>
                     <DataListItem>
@@ -72,7 +74,7 @@ export function DealCard({ deal }: { deal: UnitDealHistoryEntry }) {
                     <DataListItem>
                         <DataListItemLabel>Deposit</DataListItemLabel>
                         <DataListItemValue>
-                            {deal.deposit ? parseFloat(deal.deposit).toLocaleString("ru-RU") : 0} $
+                            {formatCurrency(deal.deposit ? parseFloat(deal.deposit) : 0)}
                         </DataListItemValue>
                     </DataListItem>
                     <DataListItem>

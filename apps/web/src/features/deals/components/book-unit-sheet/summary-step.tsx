@@ -5,6 +5,7 @@ import {calculateBooking} from "../../utils/booking-calculator";
 import type {BookingFormInput} from "@/features/deals/schemas/booking.schema.ts";
 import type {ApartmentSummary} from "@/features/deals/types/booking.types.ts";
 import type {Client} from "@/features/clients/types/client.types.ts";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 interface SummaryStepProps {
     values: BookingFormInput;
@@ -14,6 +15,7 @@ interface SummaryStepProps {
 }
 
 export function SummaryStep({ values, apartment, selectedClient, managerName }: SummaryStepProps) {
+    const { formatCurrency } = useCompanyFormatters();
     const calculation = calculateBooking({
         price: apartment.price,
         discountPercent: values.reservation.discountPercent,
@@ -42,15 +44,15 @@ export function SummaryStep({ values, apartment, selectedClient, managerName }: 
                     </DataListItem>
                     <DataListItem>
                         <DataListItemLabel>Final price</DataListItemLabel>
-                        <DataListItemValue>{calculation.finalPrice.toLocaleString("ru-RU")} $</DataListItemValue>
+                        <DataListItemValue>{formatCurrency(calculation.finalPrice)}</DataListItemValue>
                     </DataListItem>
                     <DataListItem>
                         <DataListItemLabel>Deposit</DataListItemLabel>
-                        <DataListItemValue>{calculation.deposit.toLocaleString("ru-RU")} $</DataListItemValue>
+                        <DataListItemValue>{formatCurrency(calculation.deposit)}</DataListItemValue>
                     </DataListItem>
                     <DataListItem>
                         <DataListItemLabel>Remaining</DataListItemLabel>
-                        <DataListItemValue>{calculation.remaining.toLocaleString("ru-RU")} $</DataListItemValue>
+                        <DataListItemValue>{formatCurrency(calculation.remaining)}</DataListItemValue>
                     </DataListItem>
                 </DataList>
 

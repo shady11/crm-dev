@@ -8,6 +8,7 @@ import {
 import type {Floor} from "@/features/floors/types/floor.types.ts";
 import {Badge} from "@/components/ui/badge.tsx";
 import {useTranslation} from "react-i18next";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 interface UnitOverviewProps {
     unit: Unit;
@@ -19,6 +20,7 @@ export const UnitOverview = ({
                                  floor,
                              }: UnitOverviewProps) => {
     const { t } = useTranslation("units");
+    const { formatCurrency, formatPricePerSqm } = useCompanyFormatters();
 
     const pricePerSqM =
         parseFloat(unit.area) > 0
@@ -58,13 +60,13 @@ export const UnitOverview = ({
                 </DataListItem>
                 <DataListItem>
                     <DataListItemLabel>Price per m²</DataListItemLabel>
-                    <DataListItemValue>{pricePerSqM} $/m²</DataListItemValue>
+                    <DataListItemValue>{formatPricePerSqm(pricePerSqM)}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
                     <DataListItemLabel>List price</DataListItemLabel>
                     <DataListItemValue>
                         <h4 className="text-lg font-medium">
-                            {parseFloat(unit.price).toLocaleString("en-US")} $
+                            {formatCurrency(parseFloat(unit.price))}
                         </h4>
                     </DataListItemValue>
                 </DataListItem>

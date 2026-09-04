@@ -9,6 +9,7 @@ import {DEAL_STATUS_LABEL_KEYS, DEAL_STATUS_VISUALS} from "@/features/deals/type
 import type {Deal} from "@/features/deals/api/deals.api";
 import {formatCreatedAt, initials} from "@/features/deals/utils/format.ts";
 import {useTranslation} from "react-i18next";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 interface DealsTableProps {
     deals: Deal[];
@@ -17,6 +18,7 @@ interface DealsTableProps {
 
 export function DealsTable({ deals, isLoading }: DealsTableProps) {
     const { t } = useTranslation("deals");
+    const { formatCurrency } = useCompanyFormatters();
 
     const navigate = useNavigate();
 
@@ -85,7 +87,7 @@ export function DealsTable({ deals, isLoading }: DealsTableProps) {
                                         {t(DEAL_STATUS_LABEL_KEYS[deal.status])}
                                     </Badge>
                                 </TableCell>
-                                <TableCell>{deal.salePrice.toLocaleString("ru-RU")} $</TableCell>
+                                <TableCell>{formatCurrency(deal.salePrice)}</TableCell>
                                 <TableCell className="pr-4">
                                     <p>{created.date}</p>
                                     <p className="text-xs text-muted-foreground">{created.time}</p>

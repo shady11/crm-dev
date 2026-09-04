@@ -6,6 +6,7 @@ import type {DealDetails} from "@/features/deals/api/deals.api.ts";
 import {Table, TableBody, TableCell, TableRow} from "@/components/ui/table.tsx";
 import {Progress} from "@/components/ui/progress";
 import {useTranslation} from "react-i18next";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 const SCHEDULE_STATUS_CLASSES: Record<string, string> = {
     PENDING: "bg-gray-400",
@@ -29,6 +30,7 @@ interface DealPaymentScheduleCardProps {
 
 export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule }: DealPaymentScheduleCardProps) {
     const { t } = useTranslation("payments");
+    const { formatCurrency } = useCompanyFormatters();
 
     const canGenerate = status === "ACTIVE";
 
@@ -46,7 +48,7 @@ export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule 
                     <CardTitle>Payment schedule</CardTitle>
                     {schedules.length > 0 && (
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                            {paidCount}/{schedules.length} paid · {paidAmount.toLocaleString("ru-RU")}/{totalAmount.toLocaleString("ru-RU")} $
+                            {paidCount}/{schedules.length} paid · {formatCurrency(paidAmount)}/{formatCurrency(totalAmount)}
                         </p>
                     )}
                 </div>
@@ -90,7 +92,7 @@ export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule 
                                                 {new Date(s.dueDate).toLocaleDateString()}
                                             </TableCell>
                                             <TableCell>
-                                                {s.paidAmount.toLocaleString("ru-RU")} / {s.amount.toLocaleString("ru-RU")} $
+                                                {formatCurrency(s.paidAmount)} / {formatCurrency(s.amount)}
                                             </TableCell>
                                             <TableCell className="text-right">
                                                 <Badge className={`${SCHEDULE_STATUS_CLASSES[s.status]} text-white`}>

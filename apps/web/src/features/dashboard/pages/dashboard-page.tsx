@@ -10,9 +10,11 @@ import {RecentActivityCard} from "@/features/dashboard/components/recent-activit
 import {DealStatusCardsGrid} from "@/features/deals/components/deal-status-cards-grid.tsx";
 import {useDashboard} from "@/features/dashboard/hooks/use-dashboard.ts";
 import {useProjectsFilter} from "@/features/projects/hooks/use-projects-filter.ts";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 export function DashboardPage() {
     const [projectId, setProjectId] = useState<string | undefined>();
+    const { formatCurrency } = useCompanyFormatters();
     const projects = useProjectsFilter();
     const { kpis, revenueTrend, unitsSummary, attention, recentActivity, dealsStatus } = useDashboard(projectId);
 
@@ -43,7 +45,7 @@ export function DashboardPage() {
                 <KpiCard
                     icon={DollarSignIcon}
                     label="Revenue this month"
-                    value={kpis.data ? `${kpis.data.revenueThisMonth.toLocaleString("en-US")} $` : "—"}
+                    value={kpis.data ? formatCurrency(kpis.data.revenueThisMonth) : "—"}
                     accent="bg-emerald-500"
                 />
                 <KpiCard
