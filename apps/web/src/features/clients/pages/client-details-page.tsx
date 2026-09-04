@@ -1,4 +1,5 @@
 import {useState} from "react";
+import {useTranslation} from "react-i18next";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {ArrowLeft, MailIcon, Pen, PhoneIcon} from "lucide-react";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
@@ -18,6 +19,7 @@ import {paths} from "@/routes/paths.ts";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
 
 export function ClientDetailsPage() {
+    const { t } = useTranslation("deals");
     const { clientId } = useParams<{ clientId: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -141,7 +143,7 @@ export function ClientDetailsPage() {
                                                 {deal.salePrice != null && (
                                                     <p className="font-medium">{Number(deal.salePrice).toLocaleString("en-US")} $</p>
                                                 )}
-                                                <Badge className={`${visual?.bg} text-white`}>{DEAL_STATUS_LABEL_KEYS[deal.status]}</Badge>
+                                                <Badge className={`${visual?.bg} text-white`}>{t(DEAL_STATUS_LABEL_KEYS[deal.status])}</Badge>
                                             </div>
                                         </Link>
                                     );

@@ -49,7 +49,7 @@ type UnitFormProps = {
     isSubmitting?: boolean;
     submitLabel?: string;
     onCancel?: () => void;
-    onSubmit: (payload: Partial<CreateUnitPayload>) => void;
+    onSubmit: (payload: CreateUnitPayload) => void;
 };
 
 const DEFAULT_VALUES: UnitFormValues = {

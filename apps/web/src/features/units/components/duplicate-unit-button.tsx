@@ -41,7 +41,7 @@ export function DuplicateUnitButton({ unit }: DuplicateUnitButtonProps) {
                 <Copy className="size-3" />
             </Button>
 
-            <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+            <AlertDialog open={isOpen} onOpenChange={({open}) => setIsOpen(open)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>Duplicate unit?</AlertDialogTitle>

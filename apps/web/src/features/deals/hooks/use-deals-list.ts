@@ -28,7 +28,7 @@ export function useDealsList() {
 
     const summaryQuery = useQuery({
         queryKey: ["deals", "status-summary"],
-        queryFn: getDealStatusSummary,
+        queryFn: () => getDealStatusSummary(),
     });
 
     const countsByStatus = useMemo(() => {

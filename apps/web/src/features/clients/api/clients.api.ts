@@ -1,6 +1,7 @@
 import {api} from "@/lib/api";
 import type {PaginatedResponse} from "@/lib/api-types";
 import type {Client} from "../types/client.types";
+import type {DealStatus} from "@/features/deals/types/deal.types";
 
 export type GetClientsParams = {
     page?: number;
@@ -40,7 +41,7 @@ export type ClientDealUnitSummary = {
 export type ClientDealSummary = {
     id: string;
     dealNumber: string;
-    status: string;
+    status: DealStatus;
     salePrice: number;
     unit: ClientDealUnitSummary;
     createdAt: string;

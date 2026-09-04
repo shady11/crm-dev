@@ -4,7 +4,7 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 import {Button} from "@/components/ui/button";
 import {useSearchClients} from "@/features/clients/hooks/use-search-clients";
 import {ClientCard} from "./client-card";
-import type {Client} from "@/features/clients/api/clients.api";
+import type {Client} from "@/features/clients/types/client.types";
 
 interface ClientSearchProps {
     selectedClientId?: string;

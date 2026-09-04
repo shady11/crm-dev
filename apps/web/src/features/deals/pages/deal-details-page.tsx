@@ -71,6 +71,12 @@ export function DealDetailsPage() {
     const deal = dealQuery.data;
     if (!deal) return null;
 
+    // Payments are stored signed — refunds are negative amounts — so the plain
+    // sum is always the correct net figure, with no refund special-casing here
+    // or anywhere else. See PaymentService on the API side.
+    const totalPaid = deal.payments.reduce((sum, payment) => sum + payment.amount, 0);
+    const remaining = Math.max(deal.salePrice - totalPaid, 0);
+
     const visual = DEAL_STATUS_VISUALS[deal.status];
 
     const daysLeft = deal.status === "RESERVED" ? daysUntil(deal.reservationExpiresAt) : null;
@@ -184,7 +190,7 @@ export function DealDetailsPage() {
                     </div>
                 </div>
                 <div className="flex-1 space-y-4">
-                    <DealFinancialsCard deal={deal} />
+                    <DealFinancialsCard deal={deal} totalPaid={totalPaid} remaining={remaining} />
                     <DealTimelineCard deal={deal} />
                     <DealTasksCard dealId={deal.id} />
                     <EntityDocumentsCard ownerType="DEAL" ownerId={deal.id} />
@@ -235,7 +241,7 @@ export function DealDetailsPage() {
             <Dialog open={extendOpen} onOpenChange={({ open }) => setExtendOpen(open)}>
                 <DialogContent size="sm">
                     <DialogHeader
-                        description={deal.reservationExpiresAt && `Currently expires ${formatDate(deal.reservationExpiresAt).date}.`}
+                        description={deal.reservationExpiresAt ? `Currently expires ${formatDate(deal.reservationExpiresAt).date}.` : undefined}
                         title="Extend reservation"
                     />
                     <DialogBody>
