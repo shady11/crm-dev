@@ -12,14 +12,15 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar.tsx"
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {canAccess, type Feature} from "@/features/auth/access";
 import {
     Box,
     Building2,
     GalleryVerticalEnd,
+    Landmark,
     Handshake,
     LayoutDashboard,
     ListTodo,
-    SettingsIcon,
     SquareUser,
     Users
 } from "lucide-react";
@@ -28,43 +29,51 @@ const data = {
     navMain: [
         {
             title: "Dashboard",
+            feature: "dashboard" as Feature,
             url: "/dashboard",
             icon: LayoutDashboard,
         },
         {
             title: "Leads",
+            feature: "leads" as Feature,
             url: "/leads",
             icon: GalleryVerticalEnd,
         },
         {
             title: "Tasks",
+            feature: "tasks" as Feature,
             url: "/tasks",
             icon: ListTodo,
         },
         {
             title: "Clients",
+            feature: "clients" as Feature,
             url: "/clients",
             icon: SquareUser,
         },
         {
             title: "Deals",
+            feature: "deals" as Feature,
             url: "/deals",
             icon: Handshake,
         },
         {
             title: "Projects",
+            feature: "projects" as Feature,
             url: "/projects",
             icon: Building2,
         },
         {
-            title: "Users",
-            url: "/users",
-            icon: Users,
+            title: "Companies",
+            feature: "companies" as Feature,
+            url: "/companies",
+            icon: Landmark,
         },
         {
-            title: "Settings",
-            url: "/settings",
-            icon: SettingsIcon,
+            title: "Users",
+            feature: "users" as Feature,
+            url: "/users",
+            icon: Users,
         },
     ],
 };
@@ -97,7 +106,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={data.navMain} />
+                {/* Filtered by role so nobody is offered a link that RoleGuard
+                    will bounce them straight back from. */}
+                <NavMain items={data.navMain.filter((item) => canAccess(user?.role, item.feature))} />
             </SidebarContent>
 
             <SidebarFooter>

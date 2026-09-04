@@ -18,6 +18,7 @@ export function NavMain({
     items: {
         title: string
         url: string
+        feature?: string
         icon?: LucideIcon
         isActive?: boolean
         items?: {

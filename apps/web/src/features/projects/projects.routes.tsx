@@ -1,5 +1,7 @@
 import {lazy} from "react";
 import {Navigate, type RouteObject} from "react-router-dom";
+import {RoleGuard} from "@/features/auth/pages/role-guard";
+import {FEATURE_ROLES} from "@/features/auth/access";
 
 const ProjectsPage = lazy(() => import("./pages/projects-page").then(m => ({ default: m.ProjectsPage })));
 const ProjectPage = lazy(() => import("./pages/project-page").then(m => ({ default: m.ProjectPage })));
@@ -11,6 +13,7 @@ const ChessboardMatrix = lazy(() => import("./pages/chessboard/chessboard-matrix
 
 export const projectsRoutes: RouteObject = {
     path: "projects",
+    element: <RoleGuard allow={[...FEATURE_ROLES.projects]} />,
     children: [
         { index: true, element: <ProjectsPage /> },
         {
