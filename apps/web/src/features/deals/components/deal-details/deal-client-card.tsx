@@ -3,11 +3,14 @@ import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
 import {initials} from "@/features/deals/utils/format.ts";
 import type {Deal} from "@/features/deals/api/deals.api.ts";
 import {Mail, PhoneIcon} from "lucide-react";
+import {useTranslation} from "react-i18next";
 
 export function DealClientCard({ client }: { client: Deal["client"] }) {
+    const { t } = useTranslation("deals");
+
     return (
         <Card className="border border-secondary shadow-none flex-1 pt-0">
-            <CardHeader title="Client Details" className="py-4 border-b gap-0"></CardHeader>
+            <CardHeader title={t("clientCard.title")} className="py-4 border-b gap-0"></CardHeader>
             <CardContent className="flex gap-4">
                 <Avatar className="size-10">
                     <AvatarFallback>{initials(client.fullName)}</AvatarFallback>

@@ -14,10 +14,208 @@
     "salePrice": "Цена продажи",
     "paid": "Оплачено",
     "remaining": "Остаток",
-    "financing": "Финансирование"
+    "financing": "Финансирование",
+    "unitSection": "Юнит",
+    "dealSection": "Сделка",
+    "discount": "Скидка"
   },
   "unitCard": {
     "unitNumber": "Юнит №{{number}}",
     "floor": "{{floor}} этаж"
+  },
+  "page": {
+    "title": "Сделки"
+  },
+  "toolbar": {
+    "heading": "Все сделки",
+    "allStatuses": "Все статусы",
+    "allProjects": "Все проекты",
+    "allManagers": "Все менеджеры",
+    "projectPlaceholder": "Проект",
+    "managerPlaceholder": "Менеджер",
+    "filterByStatus": "Фильтр по статусу",
+    "statusPlaceholder": "Статус",
+    "searchPlaceholder": "Поиск по клиенту, телефону, юниту..."
+  },
+  "table": {
+    "dealNumber": "№ сделки",
+    "unit": "Юнит",
+    "client": "Клиент",
+    "manager": "Менеджер",
+    "status": "Статус",
+    "salePrice": "Цена продажи",
+    "created": "Создана",
+    "emptyTitle": "Сделки не найдены",
+    "emptyDescription": "Попробуйте изменить фильтры или поиск."
+  },
+  "pagination": {
+    "rowsPerPage": "Строк на странице"
+  },
+  "statusCard": {
+    "count_one": "{{count}} сделка",
+    "count_few": "{{count}} сделки",
+    "count_many": "{{count}} сделок",
+    "count_other": "{{count}} сделки"
+  },
+  "card": {
+    "client": "Клиент",
+    "reservedAt": "Забронировано",
+    "salePrice": "Цена продажи",
+    "expiresAt": "Истекает",
+    "deposit": "Депозит",
+    "manager": "Менеджер",
+    "dealDetails": "Детали сделки",
+    "daysLeft_one": "Остался {{count}} день",
+    "daysLeft_few": "Осталось {{count}} дня",
+    "daysLeft_many": "Осталось {{count}} дней",
+    "daysLeft_other": "Осталось {{count}} дня",
+    "expiresToday": "Истекает сегодня",
+    "expired": "Истекло",
+    "headings": {
+      "reserved": "Бронирование",
+      "contractSigned": "Договор подписан",
+      "active": "Продажа в процессе",
+      "completed": "Продано",
+      "cancelled": "Отменено",
+      "expired": "Истекло"
+    }
+  },
+  "financing": {
+    "cash": "Наличные",
+    "installment": "Рассрочка",
+    "mortgage": "Ипотека"
+  },
+  "clientCard": {
+    "title": "Данные клиента"
+  },
+  "managerCard": {
+    "title": "Менеджер",
+    "unassigned": "Не назначен"
+  },
+  "historyCard": {
+    "title": "История",
+    "empty": "Активность пока не зафиксирована."
+  },
+  "timelineCard": {
+    "title": "Хронология",
+    "created": "Создана",
+    "reserved": "Забронирована",
+    "expires": "Истекает",
+    "contract": "Договор",
+    "cancelled": "Отменена",
+    "reason": "Причина: {{reason}}",
+    "note": "Заметка"
+  },
+  "paymentSchedule": {
+    "title": "График платежей",
+    "progress": "{{paidCount}}/{{total}} оплачено · {{paidAmount}}/{{totalAmount}}",
+    "generate": "Создать график",
+    "emptyActive": "График платежей ещё не создан.",
+    "emptyInactive": "Доступно после активации сделки."
+  },
+  "paymentsHistory": {
+    "title": "Платежи",
+    "record": "Записать платёж",
+    "empty": "Платежи пока не зафиксированы."
+  },
+  "detailsPage": {
+    "dealNumber": "Сделка №{{number}}",
+    "contractNumber": "Договор №{{number}}",
+    "back": "Назад",
+    "extendReservation": "Продлить бронь",
+    "signContract": "Подписать договор",
+    "activateDeal": "Активировать сделку",
+    "moreActions": "Дополнительные действия",
+    "markCompleted": "Отметить завершённой",
+    "cancelDeal": "Отменить сделку",
+    "cancelDialogTitle": "Отменить сделку",
+    "reasonOptional": "Причина (необязательно)",
+    "confirmCancellation": "Подтвердить отмену",
+    "extendDialogTitle": "Продлить бронь",
+    "currentlyExpires": "Сейчас истекает {{date}}.",
+    "newDate": "Новая дата",
+    "extend": "Продлить",
+    "signDialogTitle": "Подписать договор",
+    "contractNumberLabel": "Номер договора",
+    "contractDateLabel": "Дата договора",
+    "sign": "Подписать",
+    "scheduleDialogTitle": "Создать график платежей",
+    "numberOfInstallments": "Количество платежей",
+    "firstPaymentDate": "Дата первого платежа",
+    "intervalMonths": "Интервал между платежами (мес.)",
+    "generate": "Создать",
+    "paymentDialogTitle": "Записать платёж",
+    "amount": "Сумма",
+    "paymentMethodLabel": "Способ оплаты",
+    "selectMethod": "Выберите способ",
+    "paymentTypeLabel": "Тип платежа",
+    "selectType": "Выберите тип",
+    "paymentDate": "Дата платежа",
+    "reference": "Референс (необязательно)",
+    "referencePlaceholder": "например, ID транзакции",
+    "record": "Записать"
+  },
+  "toasts": {
+    "unitReserved": "Юнит забронирован",
+    "unitReservedDescription": "Юнит №{{number}} забронирован.",
+    "reserveError": "Не удалось забронировать юнит",
+    "tryAgain": "Попробуйте снова.",
+    "reservationExtended": "Бронь продлена",
+    "extendError": "Не удалось продлить бронь",
+    "contractSigned": "Договор подписан",
+    "signError": "Не удалось подписать договор",
+    "dealActivated": "Сделка активирована",
+    "activateError": "Не удалось активировать сделку",
+    "dealCancelled": "Сделка отменена",
+    "cancelError": "Не удалось отменить сделку",
+    "scheduleGenerated": "График платежей создан",
+    "scheduleError": "Не удалось создать график",
+    "paymentRecorded": "Платёж записан",
+    "paymentError": "Не удалось записать платёж",
+    "dealCompleted": "Сделка завершена",
+    "completeError": "Не удалось завершить сделку"
+  },
+  "booking": {
+    "rooms": "{{count}} комн.",
+    "sheetTitle": "Бронирование юнита №{{number}}",
+    "existingClient": "Существующий клиент",
+    "newClient": "Новый клиент",
+    "fullName": "ФИО",
+    "fullNamePlaceholder": "ФИО клиента",
+    "phone": "Телефон",
+    "phonePlaceholder": "+996 XXX XXX XXX",
+    "whatsapp": "WhatsApp (необязательно)",
+    "email": "Email (необязательно)",
+    "passport": "Паспорт (необязательно)",
+    "pin": "ПИН (необязательно)",
+    "pinPlaceholder": "14-значный ПИН",
+    "manager": "Менеджер",
+    "selectManager": "Выберите менеджера",
+    "reservationExpires": "Бронь истекает",
+    "discountPercent": "Скидка (%)",
+    "deposit": "Депозит ({{currency}})",
+    "noteOptional": "Заметка (необязательно)",
+    "listPrice": "Цена по прайсу",
+    "discount": "Скидка",
+    "finalPrice": "Итоговая цена",
+    "remaining": "Остаток",
+    "client": "Клиент",
+    "expires": "Истекает",
+    "note": "Заметка",
+    "cancel": "Отмена",
+    "back": "Назад",
+    "next": "Далее",
+    "confirmReservation": "Подтвердить бронирование",
+    "selectClientError": "Выберите или создайте клиента.",
+    "reserveError": "Не удалось забронировать юнит. Попробуйте снова.",
+    "validation": {
+      "managerRequired": "Укажите менеджера",
+      "expiresRequired": "Укажите дату истечения брони",
+      "selectClient": "Выберите клиента.",
+      "fullNameRequired": "ФИО обязательно.",
+      "phoneRequired": "Номер телефона обязателен.",
+      "invalidEmail": "Некорректный email"
+    },
+    "depositPlain": "Депозит"
   }
 }

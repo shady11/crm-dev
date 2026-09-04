@@ -1,6 +1,7 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {toast} from "@/components/ui/toast";
 import {reserveUnit, type ReserveUnitPayload} from "@/features/deals/api/deals.api";
+import {useTranslation} from "react-i18next";
 
 interface UseBookUnitOptions {
     projectId: string;
@@ -8,6 +9,7 @@ interface UseBookUnitOptions {
 }
 
 export function useBookUnit({ projectId, onSuccess }: UseBookUnitOptions) {
+    const { t } = useTranslation("deals");
     const queryClient = useQueryClient();
 
     return useMutation({
@@ -18,8 +20,8 @@ export function useBookUnit({ projectId, onSuccess }: UseBookUnitOptions) {
             await queryClient.invalidateQueries({ queryKey: ["deals"] });
 
             toast.success({
-                title: "Unit reserved",
-                description: `Unit №${deal.unit.number} has been reserved.`,
+                title: t("toasts.unitReserved"),
+                description: t("toasts.unitReservedDescription", { number: deal.unit.number }),
             });
 
             onSuccess?.();
@@ -27,8 +29,8 @@ export function useBookUnit({ projectId, onSuccess }: UseBookUnitOptions) {
 
         onError: () => {
             toast.error({
-                title: "Failed to reserve unit",
-                description: "Please try again.",
+                title: t("toasts.reserveError"),
+                description: t("toasts.tryAgain"),
             });
         },
     });

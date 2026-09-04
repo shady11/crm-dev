@@ -11,8 +11,10 @@ import {
     type GeneratePaymentSchedulePayload,
     signContract
 } from "@/features/deals/api/deals.api";
+import {useTranslation} from "react-i18next";
 
 export function useDealActions(dealId: string) {
+    const { t } = useTranslation("deals");
     const queryClient = useQueryClient();
 
     const invalidate = async () => {
@@ -26,9 +28,9 @@ export function useDealActions(dealId: string) {
         mutationFn: (reservationExpiresAt: string) => extendReservation(dealId, reservationExpiresAt),
         onSuccess: async () => {
             await invalidate();
-            toast.success({ title: "Reservation extended" });
+            toast.success({ title: t("toasts.reservationExtended") });
         },
-        onError: () => toast.error({ title: "Failed to extend reservation" }),
+        onError: () => toast.error({ title: t("toasts.extendError") }),
     });
 
     const sign = useMutation({
@@ -36,54 +38,54 @@ export function useDealActions(dealId: string) {
             signContract(dealId, payload),
         onSuccess: async () => {
             await invalidate();
-            toast.success({ title: "Contract signed" });
+            toast.success({ title: t("toasts.contractSigned") });
         },
-        onError: () => toast.error({ title: "Failed to sign contract" }),
+        onError: () => toast.error({ title: t("toasts.signError") }),
     });
 
     const activate = useMutation({
         mutationFn: () => activateDeal(dealId),
         onSuccess: async () => {
             await invalidate();
-            toast.success({ title: "Deal activated" });
+            toast.success({ title: t("toasts.dealActivated") });
         },
-        onError: () => toast.error({ title: "Failed to activate deal" }),
+        onError: () => toast.error({ title: t("toasts.activateError") }),
     });
 
     const cancel = useMutation({
         mutationFn: (reason?: string) => cancelDeal(dealId, reason),
         onSuccess: async () => {
             await invalidate();
-            toast.success({ title: "Deal cancelled" });
+            toast.success({ title: t("toasts.dealCancelled") });
         },
-        onError: () => toast.error({ title: "Failed to cancel deal" }),
+        onError: () => toast.error({ title: t("toasts.cancelError") }),
     });
 
     const generateSchedule = useMutation({
         mutationFn: (payload: GeneratePaymentSchedulePayload) => generatePaymentSchedule(dealId, payload),
         onSuccess: async () => {
             await invalidate();
-            toast.success({ title: "Payment schedule generated" });
+            toast.success({ title: t("toasts.scheduleGenerated") });
         },
-        onError: () => toast.error({ title: "Failed to generate schedule" }),
+        onError: () => toast.error({ title: t("toasts.scheduleError") }),
     });
 
     const recordPayment = useMutation({
         mutationFn: (payload: CreatePaymentPayload) => createPayment(dealId, payload),
         onSuccess: async () => {
             await invalidate();
-            toast.success({ title: "Payment recorded" });
+            toast.success({ title: t("toasts.paymentRecorded") });
         },
-        onError: () => toast.error({ title: "Failed to record payment" }),
+        onError: () => toast.error({ title: t("toasts.paymentError") }),
     });
 
     const complete = useMutation({
         mutationFn: () => completeDeal(dealId),
         onSuccess: async () => {
             await invalidate();
-            toast.success({ title: "Deal completed" });
+            toast.success({ title: t("toasts.dealCompleted") });
         },
-        onError: () => toast.error({ title: "Failed to complete deal" }),
+        onError: () => toast.error({ title: t("toasts.completeError") }),
     });
 
     return { extend, sign, activate, cancel, generateSchedule, recordPayment, complete };

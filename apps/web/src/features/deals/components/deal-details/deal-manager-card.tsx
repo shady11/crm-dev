@@ -7,11 +7,11 @@ import {USER_ROLE_LABEL_KEYS} from "@/features/users/types/user.types.ts";
 import {useTranslation} from "react-i18next";
 
 export function DealManagerCard({ manager }: { manager: Deal["manager"] }) {
-    const { t } = useTranslation("users");
+    const { t } = useTranslation(["users", "deals"]);
 
     return (
         <Card className="border border-secondary shadow-none flex-1 pt-0">
-            <CardHeader title="Manager" className="py-4 border-b gap-0"></CardHeader>
+            <CardHeader title={t("managerCard.title", { ns: "deals" })} className="py-4 border-b gap-0"></CardHeader>
             <CardContent className="flex items-center gap-3">
                 <Avatar className="size-10">
                     <AvatarFallback>
@@ -19,7 +19,7 @@ export function DealManagerCard({ manager }: { manager: Deal["manager"] }) {
                     </AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col gap-1">
-                    <p className="font-medium">{manager?.fullName ?? "Unassigned"}</p>
+                    <p className="font-medium">{manager?.fullName ?? t("managerCard.unassigned", { ns: "deals" })}</p>
                     <p className="flex items-center gap-2 text-sm  text-muted-foreground">
                         {t(USER_ROLE_LABEL_KEYS[manager!.role])}
                     </p>

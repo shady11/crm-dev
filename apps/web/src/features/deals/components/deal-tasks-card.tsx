@@ -19,7 +19,7 @@ const ICONS: Record<string, typeof CircleIcon> = {
 };
 
 export function DealTasksCard({ dealId }: { dealId: string }) {
-    const { t } = useTranslation("tasks");
+    const { t, i18n } = useTranslation("tasks");
 
     const { tasks, isLoading } = useDealTasks(dealId);
     const actions = useTaskActions();
@@ -44,15 +44,15 @@ export function DealTasksCard({ dealId }: { dealId: string }) {
         <Card className="border border-secondary shadow-none pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
                 <CardTitle className="text-sm text-muted-foreground">
-                    Tasks{tasks.length > 0 && ` (${tasks.length})`}
+                    {tasks.length > 0 ? t("dealCard.titleWithCount", { count: tasks.length }) : t("dealCard.title")}
                 </CardTitle>
                 <Button variant="secondary" size="sm" onClick={openCreate}>
-                    Add task
+                    {t("dealCard.addTask")}
                 </Button>
             </CardHeader>
             <CardContent>
                 {isLoading ? null : tasks.length === 0 ? (
-                    <p className="py-6 text-center text-sm text-muted-foreground">No tasks linked to this deal.</p>
+                    <p className="py-6 text-center text-sm text-muted-foreground">{t("dealCard.empty")}</p>
                 ) : (
                     <div className="flex flex-col divide-y">
                         {tasks.map((task) => {
@@ -68,7 +68,7 @@ export function DealTasksCard({ dealId }: { dealId: string }) {
                                         <p className="truncate font-medium">{task.title}</p>
                                         <p className="truncate text-xs text-muted-foreground">
                                             {task.assignedTo.fullName}
-                                            {task.dueDate && ` · ${formatDate(task.dueDate).date}`}
+                                            {task.dueDate && ` · ${formatDate(task.dueDate, i18n.language).date}`}
                                         </p>
                                     </div>
                                     <Badge className={`${TASK_STATUS_CLASSES[task.status]} shrink-0 text-white`}>

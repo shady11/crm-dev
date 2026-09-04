@@ -4,14 +4,14 @@ import type {DealDetails} from "@/features/deals/api/deals.api.ts";
 import {useTranslation} from "react-i18next";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
-const PAYMENT_TYPE_LABEL_KEYS: Record<string, string> = {
+export const PAYMENT_TYPE_LABEL_KEYS: Record<string, string> = {
     DEPOSIT: "payments:type.deposit",
-    INSTALLMENT: "payments:type:installment",
+    INSTALLMENT: "payments:type.installment",
     FINAL: "payments:type.final_payment",
     REFUND: "payments:type.refund",
 };
 
-const PAYMENT_METHOD_LABEL_KEYS: Record<string, string> = {
+export const PAYMENT_METHOD_LABEL_KEYS: Record<string, string> = {
     CASH: "payments:method.cash",
     BANK_TRANSFER: "payments:method.bank_transfer",
     MBANK: "payments:method.mbank",
@@ -27,21 +27,21 @@ interface DealPaymentsHistoryCardProps {
 }
 
 export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPayment }: DealPaymentsHistoryCardProps) {
-    const { t } = useTranslation("payments");
+    const { t, i18n } = useTranslation(["payments", "deals"]);
     const { formatCurrency } = useCompanyFormatters();
     return (
         <Card className="border border-secondary shadow-none pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
-                <CardTitle>Payments</CardTitle>
+                <CardTitle>{t("paymentsHistory.title", { ns: "deals" })}</CardTitle>
                 {canRecordPayment && (
                     <Button size="xs" onClick={onRecordPayment}>
-                        Record payment
+                        {t("paymentsHistory.record", { ns: "deals" })}
                     </Button>
                 )}
             </CardHeader>
             <CardContent>
                 {payments.length === 0 ? (
-                    <p className="py-6 text-center text-sm text-muted-foreground">No payments recorded yet.</p>
+                    <p className="py-6 text-center text-sm text-muted-foreground">{t("paymentsHistory.empty", { ns: "deals" })}</p>
                 ) : (
                     <div className="flex flex-col divide-y">
                         {payments.map((p) => (
@@ -56,7 +56,7 @@ export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPa
                                 <div className="text-right">
                                     <p className="font-medium">{formatCurrency(p.amount)}</p>
                                     <p className="text-xs text-muted-foreground">
-                                        {new Date(p.paidAt).toLocaleDateString()}
+                                        {new Date(p.paidAt).toLocaleDateString(i18n.language)}
                                     </p>
                                 </div>
                             </div>

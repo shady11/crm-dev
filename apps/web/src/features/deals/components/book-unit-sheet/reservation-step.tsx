@@ -9,6 +9,7 @@ import type {BookingFormInput} from "@/features/deals/schemas/booking.schema.ts"
 import type {ApartmentSummary} from "@/features/deals/types/booking.types.ts";
 import {calculateBooking} from "@/features/deals/utils/booking-calculator.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
+import {useTranslation} from "react-i18next";
 
 interface Manager {
     id: string;
@@ -22,6 +23,7 @@ interface ReservationStepProps {
 }
 
 export function ReservationStep({ form, apartment, managers }: ReservationStepProps) {
+    const { t } = useTranslation("deals");
     const { formatCurrency, currencyCode } = useCompanyFormatters();
     const discountPercent = form.watch("reservation.discountPercent") || 0;
     const deposit = form.watch("reservation.deposit") || 0;
@@ -40,14 +42,14 @@ export function ReservationStep({ form, apartment, managers }: ReservationStepPr
                     name="reservation.managerId"
                     render={({ field, fieldState }) => (
                         <Field invalid={fieldState.invalid} orientation="responsive">
-                            <FieldLabel>Manager</FieldLabel>
+                            <FieldLabel>{t("booking.manager")}</FieldLabel>
                             <Select
                                 collection={managerCollection}
                                 value={field.value ? [field.value] : []}
                                 onValueChange={(item) => field.onChange(item.value[0])}
                             >
                                 <SelectTrigger className="w-full min-w-32">
-                                    <SelectValue placeholder="Select manager" />
+                                    <SelectValue placeholder={t("booking.selectManager")} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {managerCollection.items.map((item) => (
@@ -67,7 +69,7 @@ export function ReservationStep({ form, apartment, managers }: ReservationStepPr
                     name="reservation.expiresAt"
                     render={({ field, fieldState }) => (
                         <Field invalid={fieldState.invalid}>
-                            <FieldLabel>Reservation expires</FieldLabel>
+                            <FieldLabel>{t("booking.reservationExpires")}</FieldLabel>
                             <input
                                 type="date"
                                 className="h-9 rounded-md border px-3 text-sm"
@@ -84,7 +86,7 @@ export function ReservationStep({ form, apartment, managers }: ReservationStepPr
                     name="reservation.discountPercent"
                     render={({ field, fieldState }) => (
                         <Field invalid={fieldState.invalid}>
-                            <FieldLabel>Discount (%)</FieldLabel>
+                            <FieldLabel>{t("booking.discountPercent")}</FieldLabel>
                             <NumberInput
                                 value={field.value?.toString() ?? "0"}
                                 min={0}
@@ -105,7 +107,7 @@ export function ReservationStep({ form, apartment, managers }: ReservationStepPr
                     name="reservation.deposit"
                     render={({ field, fieldState }) => (
                         <Field invalid={fieldState.invalid}>
-                            <FieldLabel>Deposit ({currencyCode})</FieldLabel>
+                            <FieldLabel>{t("booking.deposit", { currency: currencyCode })}</FieldLabel>
                             <NumberInput
                                 value={field.value?.toString() ?? "0"}
                                 min={0}
@@ -125,7 +127,7 @@ export function ReservationStep({ form, apartment, managers }: ReservationStepPr
                     name="reservation.note"
                     render={({ field, fieldState }) => (
                         <Field invalid={fieldState.invalid}>
-                            <FieldLabel>Note (optional)</FieldLabel>
+                            <FieldLabel>{t("booking.noteOptional")}</FieldLabel>
                             <Textarea {...field} rows={3} />
                             <FieldError>{fieldState.error?.message}</FieldError>
                         </Field>
@@ -134,25 +136,25 @@ export function ReservationStep({ form, apartment, managers }: ReservationStepPr
 
                 <div className="space-y-1 rounded-lg border border-secondary p-3 text-sm">
                     <div className="flex justify-between">
-                        <span className="text-muted-foreground">List price</span>
+                        <span className="text-muted-foreground">{t("booking.listPrice")}</span>
                         <span>{formatCurrency(calculation.price)}</span>
                     </div>
                     <div className="flex justify-between">
-                        <span className="text-muted-foreground">Discount</span>
+                        <span className="text-muted-foreground">{t("booking.discount")}</span>
                         <span>
                             {calculation.discountAmount > 0 && `- ${formatCurrency(calculation.discountAmount)}`}
                         </span>
                     </div>
                     <div className="flex justify-between font-medium">
-                        <span>Final price</span>
+                        <span>{t("booking.finalPrice")}</span>
                         <span>{formatCurrency(calculation.finalPrice)}</span>
                     </div>
                     <div className="flex justify-between">
-                        <span className="text-muted-foreground">Deposit</span>
+                        <span className="text-muted-foreground">{t("booking.depositPlain")}</span>
                         <span>{formatCurrency(calculation.deposit)}</span>
                     </div>
                     <div className="flex justify-between font-medium">
-                        <span>Remaining</span>
+                        <span>{t("booking.remaining")}</span>
                         <span>{formatCurrency(calculation.remaining)}</span>
                     </div>
                 </div>

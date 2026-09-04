@@ -14,10 +14,208 @@
     "salePrice": "Sale price",
     "paid": "Paid",
     "remaining": "Remaining",
-    "financing": "Financing"
+    "financing": "Financing",
+    "unitSection": "Unit",
+    "dealSection": "Deal",
+    "discount": "Discount"
   },
   "unitCard": {
     "unitNumber": "Unit №{{number}}",
     "floor": "{{floor}}-floor"
+  },
+  "page": {
+    "title": "Deals"
+  },
+  "toolbar": {
+    "heading": "All Deals",
+    "allStatuses": "All statuses",
+    "allProjects": "All projects",
+    "allManagers": "All managers",
+    "projectPlaceholder": "Project",
+    "managerPlaceholder": "Manager",
+    "filterByStatus": "Filter by status",
+    "statusPlaceholder": "Status",
+    "searchPlaceholder": "Search by client, phone, unit..."
+  },
+  "table": {
+    "dealNumber": "Deal #",
+    "unit": "Unit",
+    "client": "Client",
+    "manager": "Manager",
+    "status": "Status",
+    "salePrice": "Sale price",
+    "created": "Created",
+    "emptyTitle": "No deals found",
+    "emptyDescription": "Try adjusting your filters or search."
+  },
+  "pagination": {
+    "rowsPerPage": "Rows per page"
+  },
+  "statusCard": {
+    "count_one": "{{count}} deal",
+    "count_few": "{{count}} deals",
+    "count_many": "{{count}} deals",
+    "count_other": "{{count}} deals"
+  },
+  "card": {
+    "client": "Client",
+    "reservedAt": "Reserved at",
+    "salePrice": "Sale price",
+    "expiresAt": "Expires at",
+    "deposit": "Deposit",
+    "manager": "Manager",
+    "dealDetails": "Deal details",
+    "daysLeft_one": "{{count}}d left",
+    "daysLeft_few": "{{count}}d left",
+    "daysLeft_many": "{{count}}d left",
+    "daysLeft_other": "{{count}}d left",
+    "expiresToday": "Expires today",
+    "expired": "Expired",
+    "headings": {
+      "reserved": "Reservation",
+      "contractSigned": "Contract signed",
+      "active": "Sale in progress",
+      "completed": "Sold",
+      "cancelled": "Cancelled",
+      "expired": "Expired"
+    }
+  },
+  "financing": {
+    "cash": "Cash",
+    "installment": "Installment",
+    "mortgage": "Mortgage"
+  },
+  "clientCard": {
+    "title": "Client Details"
+  },
+  "managerCard": {
+    "title": "Manager",
+    "unassigned": "Unassigned"
+  },
+  "historyCard": {
+    "title": "History",
+    "empty": "No activity recorded yet."
+  },
+  "timelineCard": {
+    "title": "Timeline",
+    "created": "Created",
+    "reserved": "Reserved",
+    "expires": "Expires",
+    "contract": "Contract",
+    "cancelled": "Cancelled",
+    "reason": "Reason: {{reason}}",
+    "note": "Note"
+  },
+  "paymentSchedule": {
+    "title": "Payment schedule",
+    "progress": "{{paidCount}}/{{total}} paid · {{paidAmount}}/{{totalAmount}}",
+    "generate": "Generate schedule",
+    "emptyActive": "No payment schedule yet.",
+    "emptyInactive": "Available once the deal is activated."
+  },
+  "paymentsHistory": {
+    "title": "Payments",
+    "record": "Record payment",
+    "empty": "No payments recorded yet."
+  },
+  "detailsPage": {
+    "dealNumber": "Deal #{{number}}",
+    "contractNumber": "Contract №{{number}}",
+    "back": "Back",
+    "extendReservation": "Extend reservation",
+    "signContract": "Sign contract",
+    "activateDeal": "Activate deal",
+    "moreActions": "More actions",
+    "markCompleted": "Mark as completed",
+    "cancelDeal": "Cancel deal",
+    "cancelDialogTitle": "Cancel deal",
+    "reasonOptional": "Reason (optional)",
+    "confirmCancellation": "Confirm cancellation",
+    "extendDialogTitle": "Extend reservation",
+    "currentlyExpires": "Currently expires {{date}}.",
+    "newDate": "New date",
+    "extend": "Extend",
+    "signDialogTitle": "Sign contract",
+    "contractNumberLabel": "Contract number",
+    "contractDateLabel": "Contract Date",
+    "sign": "Sign",
+    "scheduleDialogTitle": "Generate payment schedule",
+    "numberOfInstallments": "Number of installments",
+    "firstPaymentDate": "First payment date",
+    "intervalMonths": "Interval between payments (months)",
+    "generate": "Generate",
+    "paymentDialogTitle": "Record payment",
+    "amount": "Amount",
+    "paymentMethodLabel": "Payment method",
+    "selectMethod": "Select method",
+    "paymentTypeLabel": "Payment type",
+    "selectType": "Select type",
+    "paymentDate": "Payment date",
+    "reference": "Reference (optional)",
+    "referencePlaceholder": "e.g. transaction ID",
+    "record": "Record"
+  },
+  "toasts": {
+    "unitReserved": "Unit reserved",
+    "unitReservedDescription": "Unit №{{number}} has been reserved.",
+    "reserveError": "Failed to reserve unit",
+    "tryAgain": "Please try again.",
+    "reservationExtended": "Reservation extended",
+    "extendError": "Failed to extend reservation",
+    "contractSigned": "Contract signed",
+    "signError": "Failed to sign contract",
+    "dealActivated": "Deal activated",
+    "activateError": "Failed to activate deal",
+    "dealCancelled": "Deal cancelled",
+    "cancelError": "Failed to cancel deal",
+    "scheduleGenerated": "Payment schedule generated",
+    "scheduleError": "Failed to generate schedule",
+    "paymentRecorded": "Payment recorded",
+    "paymentError": "Failed to record payment",
+    "dealCompleted": "Deal completed",
+    "completeError": "Failed to complete deal"
+  },
+  "booking": {
+    "rooms": "{{count}} rooms",
+    "sheetTitle": "Book unit №{{number}}",
+    "existingClient": "Existing client",
+    "newClient": "New client",
+    "fullName": "Full name",
+    "fullNamePlaceholder": "Client full name",
+    "phone": "Phone",
+    "phonePlaceholder": "+996 XXX XXX XXX",
+    "whatsapp": "WhatsApp (optional)",
+    "email": "Email (optional)",
+    "passport": "Passport (optional)",
+    "pin": "PIN (optional)",
+    "pinPlaceholder": "14-digit PIN",
+    "manager": "Manager",
+    "selectManager": "Select manager",
+    "reservationExpires": "Reservation expires",
+    "discountPercent": "Discount (%)",
+    "deposit": "Deposit ({{currency}})",
+    "noteOptional": "Note (optional)",
+    "listPrice": "List price",
+    "discount": "Discount",
+    "finalPrice": "Final price",
+    "remaining": "Remaining",
+    "client": "Client",
+    "expires": "Expires",
+    "note": "Note",
+    "cancel": "Cancel",
+    "back": "Back",
+    "next": "Next",
+    "confirmReservation": "Confirm reservation",
+    "selectClientError": "Please select or create a client.",
+    "reserveError": "Failed to reserve unit. Please try again.",
+    "validation": {
+      "managerRequired": "Manager is required",
+      "expiresRequired": "Reservation expiration is required",
+      "selectClient": "Please select a client.",
+      "fullNameRequired": "Full name is required.",
+      "phoneRequired": "Phone number is required.",
+      "invalidEmail": "Invalid email"
+    },
+    "depositPlain": "Deposit"
   }
 }

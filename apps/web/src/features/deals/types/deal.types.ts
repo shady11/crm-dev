@@ -28,38 +28,44 @@ export const DEAL_STATUS_LABEL_KEYS: Record<DealStatus, string> = {
 
 export const DEAL_STATUS_VISUALS: Record<
     string,
-    { icon: typeof CheckCircle2Icon; heading: string; bg: string}
+    { icon: typeof CheckCircle2Icon; headingKey: string; bg: string}
 > = {
     RESERVED: {
         icon: CalendarCheckIcon,
-        heading: "Reservation",
+        headingKey: "deals:card.headings.reserved",
         bg: "bg-amber-400",
     },
     CONTRACT_SIGNED: {
         icon: CalendarIcon,
-        heading: "Contract signed",
+        headingKey: "deals:card.headings.contractSigned",
         bg: "bg-blue-400",
     },
     ACTIVE: {
         icon: CheckCircle2Icon,
-        heading: "Sale in progress",
+        headingKey: "deals:card.headings.active",
         bg: "bg-emerald-400",
     },
     COMPLETED: {
         icon: CheckCircle2Icon,
-        heading: "Sold",
+        headingKey: "deals:card.headings.completed",
         bg: "bg-emerald-400",
     },
     CANCELLED: {
         icon: XCircleIcon,
-        heading: "Cancelled",
+        headingKey: "deals:card.headings.cancelled",
         bg: "bg-gray-400",
     },
     EXPIRED: {
         icon: XCircleIcon,
-        heading: "Expired",
+        headingKey: "deals:card.headings.expired",
         bg: "bg-gray-400",
     },
+};
+
+export const FINANCING_TYPE_LABEL_KEYS: Record<string, string> = {
+    CASH: "deals:financing.cash",
+    INSTALLMENT: "deals:financing.installment",
+    MORTGAGE: "deals:financing.mortgage",
 };
 
 /**

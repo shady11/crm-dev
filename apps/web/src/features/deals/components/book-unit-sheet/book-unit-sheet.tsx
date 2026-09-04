@@ -10,10 +10,11 @@ import {ReservationStep} from "./reservation-step";
 import {SummaryStep} from "./summary-step";
 import {BookingFooter} from "./booking-footer";
 import {ApartmentCard} from "./apartment-card";
-import {type BookingForm, type BookingFormInput, bookingSchema} from "@/features/deals/schemas/booking.schema.ts";
+import {buildBookingSchema, type BookingForm, type BookingFormInput} from "@/features/deals/schemas/booking.schema.ts";
 import type {ApartmentSummary} from "@/features/deals/types/booking.types.ts";
 import {useBookUnit} from "@/features/deals/hooks/use-book-unit.ts";
 import type {Client} from "@/features/clients/types/client.types.ts";
+import {useTranslation} from "react-i18next";
 
 interface BookUnitSheetProps {
     unit: Unit;
@@ -40,6 +41,7 @@ const DEFAULT_VALUES: BookingFormInput = {
 };
 
 export function BookUnitSheet({ unit, floor, projectId, managers, open, onOpenChange }: BookUnitSheetProps) {
+    const { t } = useTranslation("deals");
     const [step, setStep] = useState(0);
     const [selectedClient, setSelectedClient] = useState<Client | null>(null);
     const [submitError, setSubmitError] = useState<string | undefined>();
@@ -59,6 +61,10 @@ export function BookUnitSheet({ unit, floor, projectId, managers, open, onOpenCh
         }),
         [unit, floor],
     );
+
+    // Rebuilt whenever the language changes, so a validation message that
+    // fired before a language switch doesn't stay frozen in the old language.
+    const bookingSchema = useMemo(() => buildBookingSchema(t), [t]);
 
     const form = useForm<BookingFormInput>({
         resolver: zodResolver(bookingSchema),
@@ -122,7 +128,7 @@ export function BookUnitSheet({ unit, floor, projectId, managers, open, onOpenCh
             }
 
             if (!clientId) {
-                setSubmitError("Please select or create a client.");
+                setSubmitError(t("booking.selectClientError"));
                 return;
             }
 
@@ -139,7 +145,7 @@ export function BookUnitSheet({ unit, floor, projectId, managers, open, onOpenCh
                 note: values.reservation.note || undefined,
             });
         } catch {
-            setSubmitError("Failed to reserve unit. Please try again.");
+            setSubmitError(t("booking.reserveError"));
         }
     });
 
@@ -148,7 +154,7 @@ export function BookUnitSheet({ unit, floor, projectId, managers, open, onOpenCh
         <Sheet open={open} onOpenChange={({ open }) => handleOpenChange(open)}>
             <SheetContent variant="inset" className="sm:max-w-md">
                 <SheetHeader>
-                    <SheetTitle>Book unit №{unit.number}</SheetTitle>
+                    <SheetTitle>{t("booking.sheetTitle", { number: unit.number })}</SheetTitle>
                 </SheetHeader>
 
                 <form

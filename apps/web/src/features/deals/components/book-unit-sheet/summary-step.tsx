@@ -6,6 +6,7 @@ import type {BookingFormInput} from "@/features/deals/schemas/booking.schema.ts"
 import type {ApartmentSummary} from "@/features/deals/types/booking.types.ts";
 import type {Client} from "@/features/clients/types/client.types.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
+import {useTranslation} from "react-i18next";
 
 interface SummaryStepProps {
     values: BookingFormInput;
@@ -15,6 +16,7 @@ interface SummaryStepProps {
 }
 
 export function SummaryStep({ values, apartment, selectedClient, managerName }: SummaryStepProps) {
+    const { t, i18n } = useTranslation("deals");
     const { formatCurrency } = useCompanyFormatters();
     const calculation = calculateBooking({
         price: apartment.price,
@@ -31,34 +33,34 @@ export function SummaryStep({ values, apartment, selectedClient, managerName }: 
 
                 <DataList className="divide-y">
                     <DataListItem>
-                        <DataListItemLabel>Client</DataListItemLabel>
+                        <DataListItemLabel>{t("booking.client")}</DataListItemLabel>
                         <DataListItemValue>{clientName}</DataListItemValue>
                     </DataListItem>
                     <DataListItem>
-                        <DataListItemLabel>Manager</DataListItemLabel>
+                        <DataListItemLabel>{t("booking.manager")}</DataListItemLabel>
                         <DataListItemValue>{managerName ?? "—"}</DataListItemValue>
                     </DataListItem>
                     <DataListItem>
-                        <DataListItemLabel>Expires</DataListItemLabel>
-                        <DataListItemValue>{values.reservation.expiresAt?.toLocaleDateString("ru-RU") ?? "—"}</DataListItemValue>
+                        <DataListItemLabel>{t("booking.expires")}</DataListItemLabel>
+                        <DataListItemValue>{values.reservation.expiresAt?.toLocaleDateString(i18n.language) ?? "—"}</DataListItemValue>
                     </DataListItem>
                     <DataListItem>
-                        <DataListItemLabel>Final price</DataListItemLabel>
+                        <DataListItemLabel>{t("booking.finalPrice")}</DataListItemLabel>
                         <DataListItemValue>{formatCurrency(calculation.finalPrice)}</DataListItemValue>
                     </DataListItem>
                     <DataListItem>
-                        <DataListItemLabel>Deposit</DataListItemLabel>
+                        <DataListItemLabel>{t("booking.depositPlain")}</DataListItemLabel>
                         <DataListItemValue>{formatCurrency(calculation.deposit)}</DataListItemValue>
                     </DataListItem>
                     <DataListItem>
-                        <DataListItemLabel>Remaining</DataListItemLabel>
+                        <DataListItemLabel>{t("booking.remaining")}</DataListItemLabel>
                         <DataListItemValue>{formatCurrency(calculation.remaining)}</DataListItemValue>
                     </DataListItem>
                 </DataList>
 
                 {values.reservation.note && (
                     <div className="text-sm text-muted-foreground">
-                        <p className="font-medium text-foreground">Note</p>
+                        <p className="font-medium text-foreground">{t("booking.note")}</p>
                         <p>{values.reservation.note}</p>
                     </div>
                 )}

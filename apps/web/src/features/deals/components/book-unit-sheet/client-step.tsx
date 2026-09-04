@@ -6,6 +6,7 @@ import {ClientSearch} from "@/features/clients/components/client-search";
 import {ClientCard} from "@/features/clients/components/client-card";
 import type {BookingFormInput} from "@/features/deals/schemas/booking.schema.ts";
 import type {Client} from "@/features/clients/types/client.types.ts";
+import {useTranslation} from "react-i18next";
 
 interface ClientStepProps {
     form: UseFormReturn<BookingFormInput>;
@@ -14,6 +15,7 @@ interface ClientStepProps {
 }
 
 export function ClientStep({ form, selectedClient, onSelectClient }: ClientStepProps) {
+    const { t } = useTranslation("deals");
     const clientMode = form.watch("clientMode");
 
     return (
@@ -25,7 +27,7 @@ export function ClientStep({ form, selectedClient, onSelectClient }: ClientStepP
                         className={`flex-1 rounded-md border border-secondary p-2 text-sm font-medium ${clientMode === "existing" ? "bg-secondary text-secondary-foreground" : ""}`}
                         onClick={() => form.setValue("clientMode", "existing")}
                     >
-                        Existing client
+                        {t("booking.existingClient")}
                     </button>
                     <button
                         type="button"
@@ -35,7 +37,7 @@ export function ClientStep({ form, selectedClient, onSelectClient }: ClientStepP
                             onSelectClient(null);
                         }}
                     >
-                        New client
+                        {t("booking.newClient")}
                     </button>
                 </div>
 
@@ -59,8 +61,8 @@ export function ClientStep({ form, selectedClient, onSelectClient }: ClientStepP
                             name="newClient.fullName"
                             render={({ field, fieldState }) => (
                                 <Field invalid={fieldState.invalid}>
-                                    <FieldLabel>Full name</FieldLabel>
-                                    <Input {...field} placeholder="Client full name" />
+                                    <FieldLabel>{t("booking.fullName")}</FieldLabel>
+                                    <Input {...field} placeholder={t("booking.fullNamePlaceholder")} />
                                     <FieldError>{fieldState.error?.message}</FieldError>
                                 </Field>
                             )}
@@ -70,8 +72,8 @@ export function ClientStep({ form, selectedClient, onSelectClient }: ClientStepP
                             name="newClient.phone"
                             render={({ field, fieldState }) => (
                                 <Field invalid={fieldState.invalid}>
-                                    <FieldLabel>Phone</FieldLabel>
-                                    <Input {...field} placeholder="+996 XXX XXX XXX" />
+                                    <FieldLabel>{t("booking.phone")}</FieldLabel>
+                                    <Input {...field} placeholder={t("booking.phonePlaceholder")} />
                                     <FieldError>{fieldState.error?.message}</FieldError>
                                 </Field>
                             )}
@@ -81,7 +83,7 @@ export function ClientStep({ form, selectedClient, onSelectClient }: ClientStepP
                             name="newClient.whatsapp"
                             render={({ field, fieldState }) => (
                                 <Field invalid={fieldState.invalid}>
-                                    <FieldLabel>WhatsApp (optional)</FieldLabel>
+                                    <FieldLabel>{t("booking.whatsapp")}</FieldLabel>
                                     <Input {...field} />
                                     <FieldError>{fieldState.error?.message}</FieldError>
                                 </Field>
@@ -92,7 +94,7 @@ export function ClientStep({ form, selectedClient, onSelectClient }: ClientStepP
                             name="newClient.email"
                             render={({ field, fieldState }) => (
                                 <Field invalid={fieldState.invalid}>
-                                    <FieldLabel>Email (optional)</FieldLabel>
+                                    <FieldLabel>{t("booking.email")}</FieldLabel>
                                     <Input {...field} />
                                     <FieldError>{fieldState.error?.message}</FieldError>
                                 </Field>
@@ -103,7 +105,7 @@ export function ClientStep({ form, selectedClient, onSelectClient }: ClientStepP
                             name="newClient.passport"
                             render={({ field, fieldState }) => (
                                 <Field invalid={fieldState.invalid}>
-                                    <FieldLabel>Passport (optional)</FieldLabel>
+                                    <FieldLabel>{t("booking.passport")}</FieldLabel>
                                     <Input {...field} />
                                     <FieldError>{fieldState.error?.message}</FieldError>
                                 </Field>
@@ -114,8 +116,8 @@ export function ClientStep({ form, selectedClient, onSelectClient }: ClientStepP
                             name="newClient.pin"
                             render={({ field, fieldState }) => (
                                 <Field invalid={fieldState.invalid}>
-                                    <FieldLabel>PIN (optional)</FieldLabel>
-                                    <Input {...field} placeholder="14-digit PIN" />
+                                    <FieldLabel>{t("booking.pin")}</FieldLabel>
+                                    <Input {...field} placeholder={t("booking.pinPlaceholder")} />
                                     <FieldError>{fieldState.error?.message}</FieldError>
                                 </Field>
                             )}

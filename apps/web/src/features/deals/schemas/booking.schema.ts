@@ -1,67 +1,75 @@
 import {z} from "zod";
 
-export const bookingSchema = z
-    .object({
-        clientMode: z.enum(["existing", "new"]),
+type TFunc = (key: string) => string;
 
-        existingClientId: z.string().optional(),
+// A function rather than a module-level constant so validation messages can
+// be rebuilt in the current language (see book-unit-sheet.tsx, which wraps
+// this in a useMemo keyed on `t`).
+export function buildBookingSchema(t: TFunc) {
+    return z
+        .object({
+            clientMode: z.enum(["existing", "new"]),
 
-        newClient: z.object({
-            fullName: z.string().trim().optional(),
-            phone: z.string().trim().optional(),
-            whatsapp: z.string().trim().optional(),
-            email: z
-                .email("Invalid email")
-                .optional()
-                .or(z.literal("")),
+            existingClientId: z.string().optional(),
 
-            passport: z.string().trim().optional(),
-            pin: z.string().trim().optional(),
-        }),
+            newClient: z.object({
+                fullName: z.string().trim().optional(),
+                phone: z.string().trim().optional(),
+                whatsapp: z.string().trim().optional(),
+                email: z
+                    .email(t("booking.validation.invalidEmail"))
+                    .optional()
+                    .or(z.literal("")),
 
-        reservation: z.object({
-            managerId: z.string().min(1, "Manager is required"),
-
-            expiresAt: z.date({
-                error: "Reservation expiration is required",
+                passport: z.string().trim().optional(),
+                pin: z.string().trim().optional(),
             }),
 
-            discountPercent: z.number().min(0).max(100),
+            reservation: z.object({
+                managerId: z.string().min(1, t("booking.validation.managerRequired")),
 
-            deposit: z.number().min(0),
+                expiresAt: z.date({
+                    error: t("booking.validation.expiresRequired"),
+                }),
 
-            note: z.string().optional(),
-        }),
-    })
-    .superRefine((data, ctx) => {
-        if (data.clientMode === "existing") {
-            if (!data.existingClientId) {
+                discountPercent: z.number().min(0).max(100),
+
+                deposit: z.number().min(0),
+
+                note: z.string().optional(),
+            }),
+        })
+        .superRefine((data, ctx) => {
+            if (data.clientMode === "existing") {
+                if (!data.existingClientId) {
+                    ctx.addIssue({
+                        code: z.ZodIssueCode.custom,
+                        path: ["existingClientId"],
+                        message: t("booking.validation.selectClient"),
+                    });
+                }
+
+                return;
+            }
+
+            if (!data.newClient.fullName) {
                 ctx.addIssue({
                     code: z.ZodIssueCode.custom,
-                    path: ["existingClientId"],
-                    message: "Please select a client.",
+                    path: ["newClient", "fullName"],
+                    message: t("booking.validation.fullNameRequired"),
                 });
             }
 
-            return;
-        }
+            if (!data.newClient.phone) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ["newClient", "phone"],
+                    message: t("booking.validation.phoneRequired"),
+                });
+            }
+        });
+}
 
-        if (!data.newClient.fullName) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ["newClient", "fullName"],
-                message: "Full name is required.",
-            });
-        }
-
-        if (!data.newClient.phone) {
-            ctx.addIssue({
-                code: z.ZodIssueCode.custom,
-                path: ["newClient", "phone"],
-                message: "Phone number is required.",
-            });
-        }
-    });
-
-export type BookingFormInput = z.input<typeof bookingSchema>;
-export type BookingForm = z.infer<typeof bookingSchema>;
+export type BookingSchema = ReturnType<typeof buildBookingSchema>;
+export type BookingFormInput = z.input<BookingSchema>;
+export type BookingForm = z.infer<BookingSchema>;

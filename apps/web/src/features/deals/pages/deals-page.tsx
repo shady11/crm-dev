@@ -3,14 +3,16 @@ import {DealsToolbar} from "@/features/deals/components/deals-toolbar.tsx";
 import {DealsTable} from "@/features/deals/components/deals-table.tsx";
 import {DealsPagination} from "@/features/deals/components/deals-pagination.tsx";
 import {useDealsList} from "@/features/deals/hooks/use-deals-list.ts";
+import {useTranslation} from "react-i18next";
 
 export function DealsPage() {
+    const { t } = useTranslation("deals");
     const { filters, pagination, table, statusSummary } = useDealsList();
 
     return (
         <div className="space-y-6">
             <div className="flex items-start justify-between gap-4">
-                <h2 className="text-2xl font-medium tracking-tight">Deals</h2>
+                <h2 className="text-2xl font-medium tracking-tight">{t("page.title")}</h2>
             </div>
 
             <DealStatusCardsGrid countsByStatus={statusSummary.countsByStatus} />

@@ -2,8 +2,10 @@ import {HouseIcon} from "lucide-react";
 import type {ApartmentSummary} from "@/features/deals/types/booking.types.ts";
 import {Separator} from "@/components/ui/separator.tsx";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
+import {useTranslation} from "react-i18next";
 
 export function ApartmentCard({ apartment }: { apartment: ApartmentSummary }) {
+    const { t } = useTranslation("deals");
     const { formatCurrency } = useCompanyFormatters();
 
     return (
@@ -13,12 +15,12 @@ export function ApartmentCard({ apartment }: { apartment: ApartmentSummary }) {
             </div>
             <div className="flex-1">
                 <div className="flex items-center gap-2">
-                    <h4 className="font-medium">Unit №{apartment.number}</h4>
+                    <h4 className="font-medium">{t("unitCard.unitNumber", { number: apartment.number })}</h4>
                 </div>
                 <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                    {apartment.floor}-floor
+                    {t("unitCard.floor", { floor: apartment.floor })}
                     <Separator className="h-2.5 bg-muted-foreground/50" orientation="vertical" />
-                    {apartment.rooms} rooms
+                    {t("booking.rooms", { count: apartment.rooms })}
                     <Separator className="h-2.5 bg-muted-foreground/50" orientation="vertical" />
                     {apartment.area.toFixed(1)} m²
                     <Separator className="h-2.5 bg-muted-foreground/50" orientation="vertical" />

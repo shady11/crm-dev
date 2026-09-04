@@ -17,7 +17,7 @@ interface DealsTableProps {
 }
 
 export function DealsTable({ deals, isLoading }: DealsTableProps) {
-    const { t } = useTranslation("deals");
+    const { t, i18n } = useTranslation("deals");
     const { formatCurrency } = useCompanyFormatters();
 
     const navigate = useNavigate();
@@ -37,8 +37,8 @@ export function DealsTable({ deals, isLoading }: DealsTableProps) {
                     <EmptyMedia variant="icon">
                         <BriefcaseIcon strokeWidth={1.25} />
                     </EmptyMedia>
-                    <EmptyTitle>No deals found</EmptyTitle>
-                    <EmptyDescription>Try adjusting your filters or search.</EmptyDescription>
+                    <EmptyTitle>{t("table.emptyTitle")}</EmptyTitle>
+                    <EmptyDescription>{t("table.emptyDescription")}</EmptyDescription>
                 </EmptyHeader>
             </Empty>
         );
@@ -49,19 +49,19 @@ export function DealsTable({ deals, isLoading }: DealsTableProps) {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="pl-4">Deal #</TableHead>
-                        <TableHead>Unit</TableHead>
-                        <TableHead>Client</TableHead>
-                        <TableHead>Manager</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Sale price</TableHead>
-                        <TableHead className="pr-4">Created</TableHead>
+                        <TableHead className="pl-4">{t("table.dealNumber")}</TableHead>
+                        <TableHead>{t("table.unit")}</TableHead>
+                        <TableHead>{t("table.client")}</TableHead>
+                        <TableHead>{t("table.manager")}</TableHead>
+                        <TableHead>{t("table.status")}</TableHead>
+                        <TableHead>{t("table.salePrice")}</TableHead>
+                        <TableHead className="pr-4">{t("table.created")}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {deals.map((deal) => {
                         const visual = DEAL_STATUS_VISUALS[deal.status];
-                        const created = formatCreatedAt(deal.createdAt);
+                        const created = formatCreatedAt(deal.createdAt, i18n.language);
 
                         return (
                             <TableRow key={deal.id} className="cursor-pointer" onClick={() => navigate(`/deals/${deal.id}`)}>

@@ -23,7 +23,7 @@ export function DealStatusCard({ status, count }: DealStatusCardProps) {
                 <div>
                     <h3 className="font-medium">{t(DEAL_STATUS_LABEL_KEYS[status])}</h3>
                     <p className="text-sm text-muted-foreground">
-                        {count} deal{count !== 1 ? "s" : ""}
+                        {t("statusCard.count", { count })}
                     </p>
                 </div>
             </CardContent>

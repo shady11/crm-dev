@@ -29,7 +29,7 @@ interface DealPaymentScheduleCardProps {
 }
 
 export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule }: DealPaymentScheduleCardProps) {
-    const { t } = useTranslation("payments");
+    const { t, i18n } = useTranslation(["payments", "deals"]);
     const { formatCurrency } = useCompanyFormatters();
 
     const canGenerate = status === "ACTIVE";
@@ -45,10 +45,10 @@ export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule 
         <Card className="border border-secondary shadow-none pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
                 <div>
-                    <CardTitle>Payment schedule</CardTitle>
+                    <CardTitle>{t("paymentSchedule.title", { ns: "deals" })}</CardTitle>
                     {schedules.length > 0 && (
                         <p className="mt-0.5 text-xs text-muted-foreground">
-                            {paidCount}/{schedules.length} paid · {formatCurrency(paidAmount)}/{formatCurrency(totalAmount)}
+                            {t("paymentSchedule.progress", { ns: "deals", paidCount, total: schedules.length, paidAmount: formatCurrency(paidAmount), totalAmount: formatCurrency(totalAmount) })}
                         </p>
                     )}
                 </div>
@@ -62,7 +62,7 @@ export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule 
                     )}
                     {schedules.length === 0 && canGenerate && (
                         <Button variant="secondary" size="xs" onClick={onGenerateSchedule}>
-                            Generate schedule
+                            {t("paymentSchedule.generate", { ns: "deals" })}
                         </Button>
                     )}
                 </div>
@@ -71,7 +71,7 @@ export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule 
             <CardContent>
                 {schedules.length === 0 ? (
                     <p className="py-6 text-center text-sm text-muted-foreground">
-                        {canGenerate ? "No payment schedule yet." : "Available once the deal is activated."}
+                        {canGenerate ? t("paymentSchedule.emptyActive", { ns: "deals" }) : t("paymentSchedule.emptyInactive", { ns: "deals" })}
                     </p>
                 ) : (
                     <div className="h-80 py-2">
@@ -89,7 +89,7 @@ export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule 
                                                 #{s.order}
                                             </TableCell>
                                             <TableCell>
-                                                {new Date(s.dueDate).toLocaleDateString()}
+                                                {new Date(s.dueDate).toLocaleDateString(i18n.language)}
                                             </TableCell>
                                             <TableCell>
                                                 {formatCurrency(s.paidAmount)} / {formatCurrency(s.amount)}

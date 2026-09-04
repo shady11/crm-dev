@@ -3,6 +3,7 @@ import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/co
 import type {DealDetails} from "@/features/deals/api/deals.api.ts";
 import {useTranslation} from "react-i18next";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
+import {FINANCING_TYPE_LABEL_KEYS} from "@/features/deals/types/deal.types.ts";
 
 interface DealFinancialsCardProps {
     deal: DealDetails;
@@ -27,7 +28,7 @@ export function DealFinancialsCard({ deal, totalPaid, remaining }: DealFinancial
         <Card className="border border-secondary shadow-none flex-1 pt-0">
             <CardHeader title={t("financials.title")} className="py-4 border-b gap-0"></CardHeader>
             <CardContent>
-                <div className="text-sm font-medium uppercase mb-2">Unit</div>
+                <div className="text-sm font-medium uppercase mb-2">{t("financials.unitSection")}</div>
                 <DataList className="divide-y mb-4">
                     <DataListItem className="justify-between">
                         <DataListItemLabel>{t("financials.listPrice")}</DataListItemLabel>
@@ -39,7 +40,7 @@ export function DealFinancialsCard({ deal, totalPaid, remaining }: DealFinancial
                     </DataListItem>
                 </DataList>
 
-                <div className="text-sm font-medium uppercase mb-2">Deal</div>
+                <div className="text-sm font-medium uppercase mb-2">{t("financials.dealSection")}</div>
                 <DataList className="divide-y mb-4">
                     <DataListItem className="justify-between">
                         <DataListItemLabel>{t("financials.salePrice")}</DataListItemLabel>
@@ -52,7 +53,7 @@ export function DealFinancialsCard({ deal, totalPaid, remaining }: DealFinancial
                     </DataListItem>
                     {deal.discountPercent != null && deal.discountPercent > 0 && (
                         <DataListItem className="justify-between">
-                            <DataListItemLabel>Discount</DataListItemLabel>
+                            <DataListItemLabel>{t("financials.discount")}</DataListItemLabel>
                             <DataListItemValue className="flex-none">
                                 {deal.discountPercent}%
                                 {deal.discountAmount != null && ` (${formatCurrency(deal.discountAmount)})`}
@@ -70,7 +71,7 @@ export function DealFinancialsCard({ deal, totalPaid, remaining }: DealFinancial
                     {deal.financingType && (
                         <DataListItem className="justify-between">
                             <DataListItemLabel>{t("financials.financing")}</DataListItemLabel>
-                            <DataListItemValue className="flex-none">{deal.financingType}</DataListItemValue>
+                            <DataListItemValue className="flex-none">{t(FINANCING_TYPE_LABEL_KEYS[deal.financingType])}</DataListItemValue>
                         </DataListItem>
                     )}
                 </DataList>

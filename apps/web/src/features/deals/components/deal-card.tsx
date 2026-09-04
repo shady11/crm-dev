@@ -6,8 +6,10 @@ import {formatDate} from "@/utils/date-formatter.ts";
 import {Button} from "@/components/ui/button.tsx";
 import {Link} from "react-router-dom";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
+import {useTranslation} from "react-i18next";
 
 export function DealCard({ deal }: { deal: UnitDealHistoryEntry }) {
+    const { t, i18n } = useTranslation("deals");
     const { formatCurrency } = useCompanyFormatters();
     const visual = DEAL_STATUS_VISUALS[deal.status];
     const Icon = visual?.icon ?? CheckCircle2Icon;
@@ -22,7 +24,7 @@ export function DealCard({ deal }: { deal: UnitDealHistoryEntry }) {
                     </div>
                     <div className="flex flex-col">
                         <div className="text-lg font-medium">
-                            {visual?.heading}
+                            {visual && t(visual.headingKey)}
                         </div>
                         <div className="flex items-center text-xs font-normal text-muted-foreground">
                             <p>#{deal.dealNumber}</p>
@@ -30,7 +32,7 @@ export function DealCard({ deal }: { deal: UnitDealHistoryEntry }) {
                                 <>
                                     <Dot size={16}/>
                                     <p>
-                                        {daysLeft > 0 ? `${daysLeft}d left` : daysLeft === 0 ? "Expires today" : "Expired"}
+                                        {daysLeft > 0 ? t("card.daysLeft", { count: daysLeft }) : daysLeft === 0 ? t("card.expiresToday") : t("card.expired")}
                                     </p>
                                 </>
                             )}
@@ -38,47 +40,47 @@ export function DealCard({ deal }: { deal: UnitDealHistoryEntry }) {
                     </div>
                 </div>
                 <Button variant="link" size="sm" className="ml-auto">
-                    <Link to={`/deals/${deal.id}`}>Deal details</Link>
+                    <Link to={`/deals/${deal.id}`}>{t("card.dealDetails")}</Link>
                 </Button>
             </div>
             <div className="flex justify-between gap-4">
                 <DataList orientation="vertical">
                     <DataListItem>
-                        <DataListItemLabel>Client</DataListItemLabel>
+                        <DataListItemLabel>{t("card.client")}</DataListItemLabel>
                         <DataListItemValue>
                             {deal.client.fullName}
                         </DataListItemValue>
                     </DataListItem>
                     <DataListItem>
-                        <DataListItemLabel>Reserved at</DataListItemLabel>
+                        <DataListItemLabel>{t("card.reservedAt")}</DataListItemLabel>
                         <DataListItemValue>
-                            {deal.reservedAt ? formatDate(deal.reservedAt).date : "—"}
+                            {deal.reservedAt ? formatDate(deal.reservedAt, i18n.language).date : "—"}
                         </DataListItemValue>
                     </DataListItem>
                 </DataList>
                 <DataList orientation="vertical">
                     <DataListItem>
-                        <DataListItemLabel>Sale price</DataListItemLabel>
+                        <DataListItemLabel>{t("card.salePrice")}</DataListItemLabel>
                         <DataListItemValue>
                             {formatCurrency(parseFloat(deal.salePrice))}
                         </DataListItemValue>
                     </DataListItem>
                     <DataListItem>
-                        <DataListItemLabel>Expires at</DataListItemLabel>
+                        <DataListItemLabel>{t("card.expiresAt")}</DataListItemLabel>
                         <DataListItemValue>
-                            {deal.reservationExpiresAt ? formatDate(deal.reservationExpiresAt).date : "—"}
+                            {deal.reservationExpiresAt ? formatDate(deal.reservationExpiresAt, i18n.language).date : "—"}
                         </DataListItemValue>
                     </DataListItem>
                 </DataList>
                 <DataList orientation="vertical">
                     <DataListItem>
-                        <DataListItemLabel>Deposit</DataListItemLabel>
+                        <DataListItemLabel>{t("card.deposit")}</DataListItemLabel>
                         <DataListItemValue>
                             {formatCurrency(deal.deposit ? parseFloat(deal.deposit) : 0)}
                         </DataListItemValue>
                     </DataListItem>
                     <DataListItem>
-                        <DataListItemLabel>Manager</DataListItemLabel>
+                        <DataListItemLabel>{t("card.manager")}</DataListItemLabel>
                         <DataListItemValue>
                             {deal.manager?.fullName ?? "—"}
                         </DataListItemValue>

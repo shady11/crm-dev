@@ -39,8 +39,11 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {DealTimelineCard} from "@/features/deals/components/deal-details/deal-timeline-card.tsx";
 import {DealTasksCard} from "@/features/deals/components/deal-tasks-card.tsx";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
+import {useTranslation} from "react-i18next";
+import {PAYMENT_METHOD_LABEL_KEYS, PAYMENT_TYPE_LABEL_KEYS} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
 
 export function DealDetailsPage() {
+    const { t, i18n } = useTranslation(["deals", "payments"]);
     const { dealId } = useParams<{ dealId: string }>();
     const navigate = useNavigate();
     const dealQuery = useDeal(dealId);
@@ -82,23 +85,11 @@ export function DealDetailsPage() {
     const daysLeft = deal.status === "RESERVED" ? daysUntil(deal.reservationExpiresAt) : null;
 
     const paymentMethodCollection = createListCollection({
-        items: [
-            { label: "Cash", value: "CASH" },
-            { label: "Bank transfer", value: "BANK_TRANSFER" },
-            { label: "MBank", value: "MBANK" },
-            { label: "Optima", value: "OPTIMA" },
-            { label: "Elkart", value: "ELKART" },
-            { label: "Other", value: "OTHER" },
-        ],
+        items: Object.entries(PAYMENT_METHOD_LABEL_KEYS).map(([value, key]) => ({ label: t(key), value })),
     });
 
     const paymentTypeCollection = createListCollection({
-        items: [
-            { label: "Deposit", value: "DEPOSIT" },
-            { label: "Installment", value: "INSTALLMENT" },
-            { label: "Final payment", value: "FINAL" },
-            { label: "Refund", value: "REFUND" },
-        ],
+        items: Object.entries(PAYMENT_TYPE_LABEL_KEYS).map(([value, key]) => ({ label: t(key), value })),
     });
 
     return (
@@ -107,20 +98,20 @@ export function DealDetailsPage() {
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                     <div className="flex flex-col gap-1.5">
                         <div className="flex flex-wrap items-center gap-2.5">
-                            <h1 className="text-2xl font-semibold">Deal #{deal.dealNumber}</h1>
+                            <h1 className="text-2xl font-semibold">{t("detailsPage.dealNumber", { number: deal.dealNumber })}</h1>
                         </div>
                         <div className="flex items-center text-sm text-muted-foreground gap-2">
-                            <Badge className={`${visual?.bg} text-white`}>{visual?.heading}</Badge>
+                            <Badge className={`${visual?.bg} text-white`}>{visual && t(visual.headingKey)}</Badge>
                             {daysLeft !== null && (
                                 <div className="flex items-center">
                                     <Dot />
                                     <span className={`text-sm font-medium ${daysLeft <= 1 ? "text-destructive" : "text-muted-foreground"}`}>
-                                        {daysLeft > 0 ? `${daysLeft}d left` : daysLeft === 0 ? "Expires today" : "Expired"}
+                                        {daysLeft > 0 ? t("card.daysLeft", { count: daysLeft }) : daysLeft === 0 ? t("card.expiresToday") : t("card.expired")}
                                     </span>
                                 </div>
                             )}
                             {deal.contractNumber && (
-                                <p className="text-sm text-muted-foreground">Contract №{deal.contractNumber}</p>
+                                <p className="text-sm text-muted-foreground">{t("detailsPage.contractNumber", { number: deal.contractNumber })}</p>
                             )}
                         </div>
                     </div>
@@ -128,36 +119,36 @@ export function DealDetailsPage() {
                     <div className="flex items-center gap-2">
                         <Button variant="ghost" onClick={() => navigate("/deals")}>
                             <ArrowLeft className="size-3"/>
-                            Back
+                            {t("detailsPage.back")}
                         </Button>
                         {deal.status === "RESERVED" && (
                             <>
                                 <Button variant="secondary" onClick={() => setExtendOpen(true)}>
-                                    Extend reservation
+                                    {t("detailsPage.extendReservation")}
                                 </Button>
-                                <Button onClick={() => setSignOpen(true)}>Sign contract</Button>
+                                <Button onClick={() => setSignOpen(true)}>{t("detailsPage.signContract")}</Button>
                             </>
                         )}
                         {deal.status === "CONTRACT_SIGNED" && (
                             <Button onClick={() => actions.activate.mutate()} disabled={actions.activate.isPending}>
-                                Activate deal
+                                {t("detailsPage.activateDeal")}
                             </Button>
                         )}
                         {["RESERVED", "CONTRACT_SIGNED", "ACTIVE"].includes(deal.status) && (
                             <Menu>
                                 <MenuTrigger asChild>
-                                    <Button variant="ghost" size="icon-sm" aria-label="More actions">
+                                    <Button variant="ghost" size="icon-sm" aria-label={t("detailsPage.moreActions")}>
                                         <MoreVerticalIcon className="size-4" />
                                     </Button>
                                 </MenuTrigger>
                                 <MenuContent>
                                     {deal.status === "ACTIVE" && (
                                         <MenuItem value="complete" onSelect={() => actions.complete.mutate()}>
-                                            Mark as completed
+                                            {t("detailsPage.markCompleted")}
                                         </MenuItem>
                                     )}
                                     <MenuItem value="cancel" variant="destructive" onSelect={() => setCancelOpen(true)}>
-                                        Cancel deal
+                                        {t("detailsPage.cancelDeal")}
                                     </MenuItem>
                                 </MenuContent>
                             </Menu>
@@ -201,12 +192,12 @@ export function DealDetailsPage() {
             {/* Cancel dialog */}
             <Dialog open={cancelOpen} onOpenChange={({ open }) => setCancelOpen(open)}>
                 <DialogContent size="sm">
-                    <DialogHeader title="Cancel deal"/>
+                    <DialogHeader title={t("detailsPage.cancelDialogTitle")}/>
                     <DialogBody>
                         <FieldSet className="pt-4">
                             <FieldGroup>
                                 <Field>
-                                    <FieldLabel>Reason (optional)</FieldLabel>
+                                    <FieldLabel>{t("detailsPage.reasonOptional")}</FieldLabel>
                                     <Textarea
                                         value={cancelReason}
                                         onChange={(e) => setCancelReason(e.target.value)}
@@ -217,7 +208,7 @@ export function DealDetailsPage() {
                     </DialogBody>
                     <DialogFooter>
                         <Button variant="secondary" onClick={() => setCancelOpen(false)}>
-                            Back
+                            {t("detailsPage.back")}
                         </Button>
                         <Button
                             variant="default"
@@ -231,7 +222,7 @@ export function DealDetailsPage() {
                                 })
                             }
                         >
-                            Confirm cancellation
+                            {t("detailsPage.confirmCancellation")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -241,14 +232,14 @@ export function DealDetailsPage() {
             <Dialog open={extendOpen} onOpenChange={({ open }) => setExtendOpen(open)}>
                 <DialogContent size="sm">
                     <DialogHeader
-                        description={deal.reservationExpiresAt ? `Currently expires ${formatDate(deal.reservationExpiresAt).date}.` : undefined}
-                        title="Extend reservation"
+                        description={deal.reservationExpiresAt ? t("detailsPage.currentlyExpires", { date: formatDate(deal.reservationExpiresAt, i18n.language).date }) : undefined}
+                        title={t("detailsPage.extendDialogTitle")}
                     />
                     <DialogBody>
                         <FieldSet className="pt-4">
                             <FieldGroup>
                                 <Field>
-                                    <FieldLabel>New date</FieldLabel>
+                                    <FieldLabel>{t("detailsPage.newDate")}</FieldLabel>
                                     <DatePicker
                                         onValueChange={({ value }) => setNewExpiry(value)}
                                         value={newExpiry}
@@ -256,7 +247,7 @@ export function DealDetailsPage() {
                                     >
                                         <DatePickerTrigger asChild>
                                             <Button className="w-full flex justify-between" variant="outline">
-                                                {formatDate(newExpiry[0].toString()).date}
+                                                {formatDate(newExpiry[0].toString(), i18n.language).date}
                                                 <CalendarIcon />
                                             </Button>
                                         </DatePickerTrigger>
@@ -279,7 +270,7 @@ export function DealDetailsPage() {
                     </DialogBody>
                     <DialogFooter>
                         <Button variant="secondary" onClick={() => setExtendOpen(false)}>
-                            Back
+                            {t("detailsPage.back")}
                         </Button>
                         <Button
                             disabled={!newExpiry || actions.extend.isPending}
@@ -292,7 +283,7 @@ export function DealDetailsPage() {
                                 })
                             }
                         >
-                            Extend
+                            {t("detailsPage.extend")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -301,24 +292,24 @@ export function DealDetailsPage() {
             {/* Sign contract dialog */}
             <Dialog open={signOpen} onOpenChange={({ open }) => setSignOpen(open)}>
                 <DialogContent size="sm">
-                    <DialogHeader title="Sign contract"/>
+                    <DialogHeader title={t("detailsPage.signDialogTitle")}/>
                     <DialogBody className="flex flex-col gap-3">
                         <FieldSet className="pt-4">
                             <FieldGroup>
                                 <Field>
-                                    <FieldLabel>Contract number</FieldLabel>
+                                    <FieldLabel>{t("detailsPage.contractNumberLabel")}</FieldLabel>
                                     <Input
-                                        placeholder="Contract number"
+                                        placeholder={t("detailsPage.contractNumberLabel")}
                                         value={contractNumber}
                                         onChange={(e) => setContractNumber(e.target.value)}
                                     />
                                 </Field>
                                 <Field>
-                                    <FieldLabel>Contract Date</FieldLabel>
+                                    <FieldLabel>{t("detailsPage.contractDateLabel")}</FieldLabel>
                                     <DatePicker onValueChange={({ value }) => setContractDate(value)} value={contractDate}>
                                         <DatePickerTrigger asChild>
                                             <Button className="w-full flex justify-between" variant="outline">
-                                                {formatDate(contractDate[0].toString()).date}
+                                                {formatDate(contractDate[0].toString(), i18n.language).date}
                                                 <CalendarIcon />
                                             </Button>
                                         </DatePickerTrigger>
@@ -341,7 +332,7 @@ export function DealDetailsPage() {
                     </DialogBody>
                     <DialogFooter>
                         <Button variant="secondary" onClick={() => setSignOpen(false)}>
-                            Back
+                            {t("detailsPage.back")}
                         </Button>
                         <Button
                             disabled={!contractNumber || !contractDate || actions.sign.isPending}
@@ -359,7 +350,7 @@ export function DealDetailsPage() {
                                 )
                             }
                         >
-                            Sign
+                            {t("detailsPage.sign")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -368,10 +359,10 @@ export function DealDetailsPage() {
             {/* Generate payment schedule dialog */}
             <Dialog open={scheduleOpen} onOpenChange={({ open }) => setScheduleOpen(open)}>
                 <DialogContent size="sm">
-                    <DialogHeader title="Generate payment schedule"/>
+                    <DialogHeader title={t("detailsPage.scheduleDialogTitle")}/>
                     <DialogBody className="flex flex-col gap-3">
                         <Field>
-                            <FieldLabel>Number of installments</FieldLabel>
+                            <FieldLabel>{t("detailsPage.numberOfInstallments")}</FieldLabel>
                             <NumberInput
                                 value={String(installments)}
                                 min={1}
@@ -381,11 +372,11 @@ export function DealDetailsPage() {
                             </NumberInput>
                         </Field>
                         <Field>
-                            <FieldLabel>First payment date</FieldLabel>
+                            <FieldLabel>{t("detailsPage.firstPaymentDate")}</FieldLabel>
                             <DatePicker onValueChange={({ value }) => setFirstPaymentDate(value)} value={firstPaymentDate ?? []}>
                                 <DatePickerTrigger asChild>
                                     <Button className="w-full flex justify-between" variant="outline">
-                                        {formatDate(firstPaymentDate[0].toString()).date}
+                                        {formatDate(firstPaymentDate[0].toString(), i18n.language).date}
                                         <CalendarIcon />
                                     </Button>
                                 </DatePickerTrigger>
@@ -404,7 +395,7 @@ export function DealDetailsPage() {
                             </DatePicker>
                         </Field>
                         <Field>
-                            <FieldLabel>Interval between payments (months)</FieldLabel>
+                            <FieldLabel>{t("detailsPage.intervalMonths")}</FieldLabel>
                             <NumberInput
                                 value={String(intervalMonths)}
                                 min={1}
@@ -415,7 +406,7 @@ export function DealDetailsPage() {
                         </Field>
                     </DialogBody>
                     <DialogFooter>
-                        <Button variant="secondary" onClick={() => setScheduleOpen(false)}>Back</Button>
+                        <Button variant="secondary" onClick={() => setScheduleOpen(false)}>{t("detailsPage.back")}</Button>
                         <Button
                             disabled={!installments || !firstPaymentDate || actions.generateSchedule.isPending}
                             onClick={() =>
@@ -425,7 +416,7 @@ export function DealDetailsPage() {
                                 )
                             }
                         >
-                            Generate
+                            {t("detailsPage.generate")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
@@ -434,10 +425,10 @@ export function DealDetailsPage() {
             {/* Record payment dialog */}
             <Dialog open={paymentOpen} onOpenChange={({ open }) => setPaymentOpen(open)}>
                 <DialogContent size="sm">
-                    <DialogHeader title="Record payment"/>
+                    <DialogHeader title={t("detailsPage.paymentDialogTitle")}/>
                     <DialogBody className="flex flex-col gap-3">
                         <Field>
-                            <FieldLabel>Amount</FieldLabel>
+                            <FieldLabel>{t("detailsPage.amount")}</FieldLabel>
                             <NumberInput
                                 value={String(paymentAmount)}
                                 min={0}
@@ -447,13 +438,13 @@ export function DealDetailsPage() {
                             </NumberInput>
                         </Field>
                         <Field>
-                            <FieldLabel>Payment method</FieldLabel>
+                            <FieldLabel>{t("detailsPage.paymentMethodLabel")}</FieldLabel>
                             <Select
                                 collection={paymentMethodCollection}
                                 value={paymentMethod ? [paymentMethod] : []}
                                 onValueChange={({ value }) => setPaymentMethod((value[0] as PaymentMethod) ?? "")}
                             >
-                                <SelectTrigger className="w-full"><SelectValue placeholder="Select method" /></SelectTrigger>
+                                <SelectTrigger className="w-full"><SelectValue placeholder={t("detailsPage.selectMethod")} /></SelectTrigger>
                                 <SelectContent>
                                     {paymentMethodCollection.items.map((item) => (
                                         <SelectItem key={item.value} item={item}>{item.label}</SelectItem>
@@ -462,13 +453,13 @@ export function DealDetailsPage() {
                             </Select>
                         </Field>
                         <Field>
-                            <FieldLabel>Payment type</FieldLabel>
+                            <FieldLabel>{t("detailsPage.paymentTypeLabel")}</FieldLabel>
                             <Select
                                 collection={paymentTypeCollection}
                                 value={paymentType ? [paymentType] : []}
                                 onValueChange={({ value }) => setPaymentType((value[0] as PaymentType) ?? "")}
                             >
-                                <SelectTrigger className="w-full"><SelectValue placeholder="Select type" /></SelectTrigger>
+                                <SelectTrigger className="w-full"><SelectValue placeholder={t("detailsPage.selectType")} /></SelectTrigger>
                                 <SelectContent>
                                     {paymentTypeCollection.items.map((item) => (
                                         <SelectItem key={item.value} item={item}>{item.label}</SelectItem>
@@ -477,11 +468,11 @@ export function DealDetailsPage() {
                             </Select>
                         </Field>
                         <Field>
-                            <FieldLabel>Payment date</FieldLabel>
+                            <FieldLabel>{t("detailsPage.paymentDate")}</FieldLabel>
                             <DatePicker onValueChange={({ value }) => setPaidAt(value)} value={paidAt ?? []}>
                                 <DatePickerTrigger asChild>
                                     <Button className="w-full flex justify-between" variant="outline">
-                                        {formatDate(paidAt[0].toString()).date}
+                                        {formatDate(paidAt[0].toString(), i18n.language).date}
                                         <CalendarIcon />
                                     </Button>
                                 </DatePickerTrigger>
@@ -500,12 +491,12 @@ export function DealDetailsPage() {
                             </DatePicker>
                         </Field>
                         <Field>
-                            <FieldLabel>Reference (optional)</FieldLabel>
-                            <Input placeholder="e.g. transaction ID" value={reference} onChange={(e) => setReference(e.target.value)} />
+                            <FieldLabel>{t("detailsPage.reference")}</FieldLabel>
+                            <Input placeholder={t("detailsPage.referencePlaceholder")} value={reference} onChange={(e) => setReference(e.target.value)} />
                         </Field>
                     </DialogBody>
                     <DialogFooter>
-                        <Button variant="secondary" onClick={() => setPaymentOpen(false)}>Back</Button>
+                        <Button variant="secondary" onClick={() => setPaymentOpen(false)}>{t("detailsPage.back")}</Button>
                         <Button
                             disabled={!paymentAmount || !paymentMethod || !paymentType || !paidAt || actions.recordPayment.isPending}
                             onClick={() =>
@@ -530,7 +521,7 @@ export function DealDetailsPage() {
                                 )
                             }
                         >
-                            Record
+                            {t("detailsPage.record")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>
