@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/menu.tsx";
 import {BadgeCheck, Bell, ChevronsUpDown, LogOut} from "lucide-react";
 import {disconnectNotificationsSocket} from "@/lib/socket.ts";
+import {useTranslation} from "react-i18next";
 
 export function NavUser({
                             user,
@@ -26,6 +27,7 @@ export function NavUser({
         avatar: string
     }
 }) {
+    const { t } = useTranslation("common");
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -76,17 +78,17 @@ export function NavUser({
                         <MenuGroup>
                             <MenuItem value="account">
                                 <BadgeCheck />
-                                Account
+                                {t("userMenu.account")}
                             </MenuItem>
                             <MenuItem value="notifications">
                                 <Bell />
-                                Notifications
+                                {t("userMenu.notifications")}
                             </MenuItem>
                         </MenuGroup>
                         <MenuSeparator />
                         <MenuItem value="logout" onClick={logout}>
                             <LogOut />
-                            Log out
+                            {t("userMenu.logOut")}
                         </MenuItem>
                     </MenuContent>
                 </Menu>

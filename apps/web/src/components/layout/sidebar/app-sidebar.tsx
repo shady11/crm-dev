@@ -11,6 +11,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar.tsx"
+import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {canAccess, type Feature} from "@/features/auth/access";
 import {
@@ -25,62 +26,33 @@ import {
     Users
 } from "lucide-react";
 
-const data = {
-    navMain: [
-        {
-            title: "Dashboard",
-            feature: "dashboard" as Feature,
-            url: "/dashboard",
-            icon: LayoutDashboard,
-        },
-        {
-            title: "Leads",
-            feature: "leads" as Feature,
-            url: "/leads",
-            icon: GalleryVerticalEnd,
-        },
-        {
-            title: "Tasks",
-            feature: "tasks" as Feature,
-            url: "/tasks",
-            icon: ListTodo,
-        },
-        {
-            title: "Clients",
-            feature: "clients" as Feature,
-            url: "/clients",
-            icon: SquareUser,
-        },
-        {
-            title: "Deals",
-            feature: "deals" as Feature,
-            url: "/deals",
-            icon: Handshake,
-        },
-        {
-            title: "Projects",
-            feature: "projects" as Feature,
-            url: "/projects",
-            icon: Building2,
-        },
-        {
-            title: "Companies",
-            feature: "companies" as Feature,
-            url: "/companies",
-            icon: Landmark,
-        },
-        {
-            title: "Users",
-            feature: "users" as Feature,
-            url: "/users",
-            icon: Users,
-        },
-    ],
-};
+// titleKey resolves against the "common" namespace via t() below - kept as a
+// key rather than the label itself so NavMain never renders an un-translated
+// English string regardless of which language is active.
+const NAV_ITEMS: {
+    titleKey: string;
+    feature: Feature;
+    url: string;
+    icon: typeof LayoutDashboard;
+}[] = [
+    { titleKey: "nav.dashboard", feature: "dashboard", url: "/dashboard", icon: LayoutDashboard },
+    { titleKey: "nav.leads", feature: "leads", url: "/leads", icon: GalleryVerticalEnd },
+    { titleKey: "nav.tasks", feature: "tasks", url: "/tasks", icon: ListTodo },
+    { titleKey: "nav.clients", feature: "clients", url: "/clients", icon: SquareUser },
+    { titleKey: "nav.deals", feature: "deals", url: "/deals", icon: Handshake },
+    { titleKey: "nav.projects", feature: "projects", url: "/projects", icon: Building2 },
+    { titleKey: "nav.companies", feature: "companies", url: "/companies", icon: Landmark },
+    { titleKey: "nav.users", feature: "users", url: "/users", icon: Users },
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
+    const { t } = useTranslation("common");
     const { user } = useAuth();
+
+    const navMain = NAV_ITEMS
+        .filter((item) => canAccess(user?.role, item.feature))
+        .map((item) => ({ title: t(item.titleKey), url: item.url, icon: item.icon }));
 
     return (
         <Sidebar className="h-full border-r-2" collapsible="icon" {...props}>
@@ -94,9 +66,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                 </div>
 
                                 <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                                    <span className="font-semibold">CRM Dev</span>
+                                    <span className="font-semibold">{t("nav.brandName")}</span>
                                     <span className="text-xs text-muted-foreground">
-                                        Real Estate CRM
+                                        {t("nav.brandTagline")}
                                       </span>
                                 </div>
                             </a>
@@ -108,12 +80,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarContent>
                 {/* Filtered by role so nobody is offered a link that RoleGuard
                     will bounce them straight back from. */}
-                <NavMain items={data.navMain.filter((item) => canAccess(user?.role, item.feature))} />
+                <NavMain items={navMain} />
             </SidebarContent>
 
             <SidebarFooter>
                 <NavUser user={{
-                    name: user?.name ?? "Loading...",
+                    name: user?.name ?? t("labels.loading"),
                     email: user?.email ?? "",
                     avatar: "/"
                 }} />

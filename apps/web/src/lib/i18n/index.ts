@@ -8,9 +8,17 @@ import unitsEn from "./locales/en/units.json";
 import projectsEn from "./locales/en/projects.json";
 import paymentsEn from "./locales/en/payments.json";
 import usersEn from "./locales/en/users.json";
+import companiesEn from "./locales/en/companies.json";
 import documentsEn from "./locales/en/documents.json";
+import notificationsEn from "./locales/en/notifications.json";
+import authEn from "./locales/en/auth.json";
 import leadsEn from "./locales/en/leads.json";
 import tasksEn from "./locales/en/tasks.json";
+import dashboardEn from "./locales/en/dashboard.json";
+import clientsEn from "./locales/en/clients.json";
+import blocksEn from "./locales/en/blocks.json";
+import entrancesEn from "./locales/en/entrances.json";
+import floorsEn from "./locales/en/floors.json";
 
 import commonRu from "./locales/ru/common.json";
 import dealsRu from "./locales/ru/deals.json";
@@ -18,9 +26,17 @@ import unitsRu from "./locales/ru/units.json";
 import projectsRu from "./locales/ru/projects.json";
 import paymentsRu from "./locales/ru/payments.json";
 import usersRu from "./locales/ru/users.json";
+import companiesRu from "./locales/ru/companies.json";
 import documentsRu from "./locales/ru/documents.json";
+import notificationsRu from "./locales/ru/notifications.json";
+import authRu from "./locales/ru/auth.json";
 import leadsRu from "./locales/ru/leads.json";
 import tasksRu from "./locales/ru/tasks.json";
+import dashboardRu from "./locales/ru/dashboard.json";
+import clientsRu from "./locales/ru/clients.json";
+import blocksRu from "./locales/ru/blocks.json";
+import entrancesRu from "./locales/ru/entrances.json";
+import floorsRu from "./locales/ru/floors.json";
 
 export const resources = {
     en: {
@@ -30,9 +46,17 @@ export const resources = {
         projects: projectsEn,
         payments: paymentsEn,
         users: usersEn,
+        companies: companiesEn,
         documents: documentsEn,
+        notifications: notificationsEn,
+        auth: authEn,
         leads: leadsEn,
         tasks: tasksEn,
+        dashboard: dashboardEn,
+        clients: clientsEn,
+        blocks: blocksEn,
+        entrances: entrancesEn,
+        floors: floorsEn,
     },
     ru: {
         common: commonRu,
@@ -41,9 +65,17 @@ export const resources = {
         projects: projectsRu,
         payments: paymentsRu,
         users: usersRu,
+        companies: companiesRu,
         documents: documentsRu,
+        notifications: notificationsRu,
+        auth: authRu,
         leads: leadsRu,
         tasks: tasksRu,
+        dashboard: dashboardRu,
+        clients: clientsRu,
+        blocks: blocksRu,
+        entrances: entrancesRu,
+        floors: floorsRu,
     },
 } as const;
 
@@ -77,12 +109,44 @@ i18n
         },
     });
 
+// Languages a person can pick from the header switcher. Kyrgyz shows in the
+// UI's own onboarding copy as a target market, but no ky/*.json bundle exists
+// yet - offering it here would repeat the exact bug this pass fixed elsewhere
+// (a switch that looks wired but silently does nothing). Add it once real
+// translations exist for every namespace.
+export const SUPPORTED_LANGUAGES = ["ru", "en"] as const;
+export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
+
+// Sits next to i18next-browser-languagedetector's own "i18nextLng" cache key
+// (see `caches` above) rather than reusing it, because that key can hold a
+// language nobody chose - only setUserLanguage sets this one, so its mere
+// presence means a person, not a guess or a company default, decided.
+const USER_OVERRIDE_KEY = "i18n_user_language_override";
+
+/**
+ * Sets the UI language from the signed-in user's company settings. This is a
+ * *default*, not a command: if the user already picked their own language
+ * with the header switcher (setUserLanguage below), that choice is left
+ * alone - otherwise every page reload would silently switch a user back to
+ * their company's language even after they explicitly chose another one.
+ */
 export function setCompanyLocale(locale: string | null | undefined) {
     if (!locale) return;
+    if (localStorage.getItem(USER_OVERRIDE_KEY) === "1") return;
     const lang = locale.split("-")[0]; // "ru-RU" -> "ru", matches resource keys above
     if (lang !== i18n.language) {
         void i18n.changeLanguage(lang);
     }
+}
+
+/**
+ * Called only by the header language switcher. Persists the choice as an
+ * explicit override so it survives reloads and future logins, and so it can
+ * never again be silently overwritten by setCompanyLocale above.
+ */
+export function setUserLanguage(lang: SupportedLanguage) {
+    localStorage.setItem(USER_OVERRIDE_KEY, "1");
+    void i18n.changeLanguage(lang);
 }
 
 export default i18n;

@@ -1,7 +1,7 @@
-export function formatDate(iso: string) {
+export function formatDate(iso: string, locale = "ru-RU") {
     const date = new Date(iso);
     return {
-        date: date.toLocaleDateString("ru-RU", { month: "short", day: "numeric", year: "numeric" }),
-        time: date.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }),
+        date: date.toLocaleDateString(locale, { month: "short", day: "numeric", year: "numeric" }),
+        time: date.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" }),
     };
 }

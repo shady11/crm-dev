@@ -7,13 +7,15 @@ import {Button} from "@/components/ui/button.tsx";
 import {useTheme} from "@/hooks/use-theme.ts";
 import {Languages, MoonStar, Sun} from "lucide-react";
 import {NotificationBell} from "@/features/notifications/components/notification-bell.tsx";
+import {useTranslation} from "react-i18next";
 
 export function AppHeader() {
 
+    const { t } = useTranslation("common");
     const location = useLocation();
     const { theme, toggleTheme } = useTheme();
 
-    const breadcrumbs = getBreadcrumbs(location.pathname);
+    const breadcrumbs = getBreadcrumbs(location.pathname, t);
 
     return (
         <header className="h-16 px-6 flex items-center justify-between sticky top-0 bg-background border-b-2 z-50">
@@ -50,7 +52,7 @@ export function AppHeader() {
                 <NotificationBell />
                 <LanguageDropdown
                     trigger={
-                        <Button variant="ghost" size="icon-md">
+                        <Button variant="ghost" size="icon-md" title={t("language.switchLabel")}>
                             <Languages />
                         </Button>
                     }
@@ -59,7 +61,7 @@ export function AppHeader() {
                     variant="ghost"
                     size="icon-md"
                     onClick={toggleTheme}
-                    title={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+                    title={theme === "dark" ? t("theme.switchToLight") : t("theme.switchToDark")}
                 >
                     {theme === "dark" ? <Sun /> : <MoonStar />}
                 </Button>

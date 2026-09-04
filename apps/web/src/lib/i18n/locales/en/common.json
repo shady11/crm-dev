@@ -12,7 +12,9 @@
     "saveChanges": "Save changes",
     "deleting": "Deleting...",
     "creating": "Creating...",
-    "saving": "Saving..."
+    "saving": "Saving...",
+    "duplicate": "Duplicate",
+    "duplicating": "Duplicating..."
   },
   "labels": {
     "status": "Status",
@@ -27,7 +29,8 @@
     "createdAt": "Created",
     "block": "Block",
     "entrance": "Entrance",
-    "floor": "Floor"
+    "floor": "Floor",
+    "loading": "Loading..."
   },
   "units": {
     "sqm": "m²",
@@ -37,5 +40,43 @@
     "genericTitle": "Something went wrong",
     "tryAgain": "Please try again.",
     "notFound": "Not found"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "leads": "Leads",
+    "tasks": "Tasks",
+    "clients": "Clients",
+    "deals": "Deals",
+    "projects": "Projects",
+    "companies": "Companies",
+    "users": "Users",
+    "brandName": "CRM Dev",
+    "brandTagline": "Real Estate CRM",
+    "chessboard": "Chessboard",
+    "overview": "Overview",
+    "builder": "Builder",
+    "sales": "Sales"
+  },
+  "language": {
+    "switchLabel": "Language",
+    "russian": "Русский",
+    "english": "English"
+  },
+  "theme": {
+    "switchToLight": "Switch to light mode",
+    "switchToDark": "Switch to dark mode"
+  },
+  "userMenu": {
+    "account": "Account",
+    "notifications": "Notifications",
+    "logOut": "Log out"
+  },
+  "placeholders": {
+    "select": "Select"
+  },
+  "notFoundPage": {
+    "title": "Page not found",
+    "description": "The page you're looking for doesn't exist or may have been moved.",
+    "goToDashboard": "Go to Dashboard"
   }
 }

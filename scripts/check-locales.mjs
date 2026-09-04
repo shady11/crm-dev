@@ -95,9 +95,9 @@ const resolve = (locale, ns, path) => {
     return typeof node === "string" ? node : null;
 };
 
-for (const file of walk(FEATURES_DIR).filter((f) => f.endsWith(".ts"))) {
+for (const file of walk(FEATURES_DIR).filter((f) => f.endsWith(".ts") || f.endsWith(".tsx"))) {
     const src = readFileSync(file, "utf8");
-    for (const [, block] of src.matchAll(/export const \w*LABEL_KEYS[^}]*\}/g).map((m) => [null, m[0]])) {
+    for (const [, block] of src.matchAll(/(?:export )?const \w*LABEL_KEYS[^}]*\}/g).map((m) => [null, m[0]])) {
         for (const [, key] of block.matchAll(/:\s*"([^"]+)"/g)) {
             const where = relative(process.cwd(), file);
             if (!key.includes(":")) {
