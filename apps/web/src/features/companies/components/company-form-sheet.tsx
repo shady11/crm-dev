@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import {useTranslation} from "react-i18next";
 import {Button} from "@/components/ui/button.tsx";
 import {Input, type InputProps} from "@/components/ui/input.tsx";
 import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
@@ -27,6 +28,8 @@ type Props = {
 };
 
 export function CompanyFormSheet({open, company, isSubmitting, onOpenChange, onSubmit}: Props) {
+    const {t} = useTranslation("companies");
+    const {t: tCommon} = useTranslation("common");
     const [form, setForm] = useState<CreateCompanyPayload>(EMPTY);
 
     useEffect(() => {
@@ -56,11 +59,11 @@ export function CompanyFormSheet({open, company, isSubmitting, onOpenChange, onS
         <Sheet open={open} onOpenChange={({open: isOpen}) => onOpenChange(isOpen)}>
             <SheetContent className="w-full sm:max-w-md">
                 <SheetHeader>
-                    <SheetTitle>{isEdit ? `Edit ${company.name}` : "New company"}</SheetTitle>
+                    <SheetTitle>
+                        {isEdit ? t("form.editTitle", {name: company.name}) : t("form.newTitle")}
+                    </SheetTitle>
                     <SheetDescription>
-                        {isEdit
-                            ? "Company settings. Currency and locale drive how money and dates appear for everyone in this tenant."
-                            : "The first administrator is created with the company — a tenant with no way in cannot create one for itself."}
+                        {isEdit ? t("form.editDescription") : t("form.newDescription")}
                     </SheetDescription>
                 </SheetHeader>
 
@@ -71,46 +74,71 @@ export function CompanyFormSheet({open, company, isSubmitting, onOpenChange, onS
                         onSubmit(form);
                     }}
                 >
-                    <Field label="Company name" required value={form.name} onChange={set("name")} />
-                    <Field label="Phone" value={form.phone ?? ""} onChange={set("phone")} />
-                    <Field label="Address" value={form.address ?? ""} onChange={set("address")} />
+                    <Field
+                        label={t("form.fields.name")}
+                        required
+                        value={form.name}
+                        onChange={set("name")}
+                    />
+                    <Field label={t("form.fields.phone")} value={form.phone ?? ""} onChange={set("phone")} />
+                    <Field
+                        label={t("form.fields.address")}
+                        value={form.address ?? ""}
+                        onChange={set("address")}
+                    />
 
                     <div className="grid grid-cols-3 gap-3">
-                        <Field label="Currency" value={form.currency ?? ""} onChange={set("currency")} />
-                        <Field label="Locale" value={form.locale ?? ""} onChange={set("locale")} />
-                        <Field label="Timezone" value={form.timezone ?? ""} onChange={set("timezone")} />
+                        <Field
+                            label={t("form.fields.currency")}
+                            value={form.currency ?? ""}
+                            onChange={set("currency")}
+                        />
+                        <Field
+                            label={t("form.fields.locale")}
+                            value={form.locale ?? ""}
+                            onChange={set("locale")}
+                        />
+                        <Field
+                            label={t("form.fields.timezone")}
+                            value={form.timezone ?? ""}
+                            onChange={set("timezone")}
+                        />
                     </div>
 
                     {isEdit ? null : (
                         <div className="border-t pt-4">
-                            <p className="mb-3 text-sm font-medium">First administrator</p>
+                            <p className="mb-3 text-sm font-medium">{t("form.adminSectionTitle")}</p>
                             <div className="space-y-4">
                                 <Field
-                                    label="Full name"
+                                    label={t("form.fields.adminFullName")}
                                     required
                                     value={form.adminFullName}
                                     onChange={set("adminFullName")}
                                 />
                                 <Field
-                                    label="Email"
+                                    label={t("form.fields.adminEmail")}
                                     type="email"
                                     required
                                     value={form.adminEmail}
                                     onChange={set("adminEmail")}
                                 />
                                 <Field
-                                    label="Password"
+                                    label={t("form.fields.adminPassword")}
                                     type="password"
                                     value={form.adminPassword ?? ""}
                                     onChange={set("adminPassword")}
-                                    hint="Leave blank to generate one. It is shown once."
+                                    hint={t("form.adminPasswordHint")}
                                 />
                             </div>
                         </div>
                     )}
 
                     <Button type="submit" className="w-full" disabled={isSubmitting}>
-                        {isSubmitting ? "Saving..." : isEdit ? "Save changes" : "Create company"}
+                        {isSubmitting
+                            ? tCommon("actions.saving")
+                            : isEdit
+                              ? tCommon("actions.saveChanges")
+                              : t("form.submit.create")}
                     </Button>
                 </form>
             </SheetContent>

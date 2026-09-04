@@ -2,6 +2,7 @@ import {useState} from "react";
 import {Link} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
+import {useTranslation} from "react-i18next";
 import {Building2, PauseCircle, Pencil, PlayCircle, Plus, Trash2} from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
@@ -37,6 +38,7 @@ import {CompanyFormSheet} from "../components/company-form-sheet";
 type Pending = {action: "suspend" | "resume" | "delete"; company: Company} | null;
 
 export function CompaniesPage() {
+    const {t} = useTranslation("companies");
     const queryClient = useQueryClient();
     const [search, setSearch] = useState("");
     const [formOpen, setFormOpen] = useState(false);
@@ -59,7 +61,7 @@ export function CompaniesPage() {
             setFormOpen(false);
 
             if (editing) {
-                toast.success("Company updated");
+                toast.success(t("page.toasts.updateSuccess"));
                 setEditing(null);
             } else {
                 // Held in state, not a toast: the generated password is shown
@@ -67,7 +69,8 @@ export function CompaniesPage() {
                 setCreated(result as CreateCompanyResult);
             }
         },
-        onError: () => toast.error(editing ? "Could not save the company" : "Could not create the company"),
+        onError: () =>
+            toast.error(editing ? t("page.toasts.updateError") : t("page.toasts.createError")),
     });
 
     const act = useMutation<unknown, Error, NonNullable<Pending>>({
@@ -82,13 +85,13 @@ export function CompaniesPage() {
             setPending(null);
             toast.success(
                 action === "suspend"
-                    ? `${company.name} suspended`
+                    ? t("page.toasts.suspended", {name: company.name})
                     : action === "resume"
-                      ? `${company.name} resumed`
-                      : `${company.name} deleted`,
+                      ? t("page.toasts.resumed", {name: company.name})
+                      : t("page.toasts.deleted", {name: company.name}),
             );
         },
-        onError: () => toast.error("That did not work"),
+        onError: () => toast.error(t("page.toasts.actionError")),
     });
 
     const items = companies.data?.items ?? [];
@@ -97,10 +100,8 @@ export function CompaniesPage() {
         <div className="space-y-6">
             <div className="flex items-start justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-medium tracking-tight">Companies</h2>
-                    <p className="text-muted-foreground text-sm">
-                        Tenants on this installation. Each has its own users, projects and deals.
-                    </p>
+                    <h2 className="text-2xl font-medium tracking-tight">{t("page.heading")}</h2>
+                    <p className="text-muted-foreground text-sm">{t("page.description")}</p>
                 </div>
                 <Button
                     onClick={() => {
@@ -109,42 +110,43 @@ export function CompaniesPage() {
                     }}
                 >
                     <Plus className="size-4" />
-                    New company
+                    {t("page.newCompany")}
                 </Button>
             </div>
 
             {created ? (
                 <Card className="border-emerald-500/40">
                     <CardHeader>
-                        <CardTitle>{created.company.name} is ready</CardTitle>
+                        <CardTitle>{t("page.created.title", {name: created.company.name})}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3 text-sm">
                         <p>
-                            Administrator: <span className="font-medium">{created.admin.email}</span>
+                            {t("page.created.administrator")}{" "}
+                            <span className="font-medium">{created.admin.email}</span>
                         </p>
                         {created.admin.generatedPassword ? (
                             <div className="space-y-1">
                                 <p className="text-muted-foreground">
-                                    Generated password — shown once, and not recoverable afterwards:
+                                    {t("page.created.generatedPasswordLabel")}
                                 </p>
                                 <code className="bg-muted block rounded px-3 py-2 font-mono text-base">
                                     {created.admin.generatedPassword}
                                 </code>
                                 <p className="text-muted-foreground">
-                                    Give it to them directly and have them change it at first login.
+                                    {t("page.created.generatedPasswordHint")}
                                 </p>
                             </div>
                         ) : null}
                         <Button variant="secondary" size="sm" onClick={() => setCreated(null)}>
-                            I have saved it
+                            {t("page.created.confirm")}
                         </Button>
                     </CardContent>
                 </Card>
             ) : null}
 
             <Input
-                placeholder="Search companies"
-                aria-label="Search companies"
+                placeholder={t("page.searchPlaceholder")}
+                aria-label={t("page.searchPlaceholder")}
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
                 className="max-w-sm"
@@ -160,10 +162,8 @@ export function CompaniesPage() {
                         <EmptyMedia variant="icon">
                             <Building2 />
                         </EmptyMedia>
-                        <EmptyTitle>No companies yet</EmptyTitle>
-                        <EmptyDescription>
-                            Create one to onboard a developer onto this installation.
-                        </EmptyDescription>
+                        <EmptyTitle>{t("page.empty.title")}</EmptyTitle>
+                        <EmptyDescription>{t("page.empty.description")}</EmptyDescription>
                     </EmptyHeader>
                 </Empty>
             ) : (
@@ -171,11 +171,13 @@ export function CompaniesPage() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Status</TableHead>
-                                <TableHead>Currency</TableHead>
-                                <TableHead className="text-right">Users</TableHead>
-                                <TableHead className="text-right">Projects</TableHead>
+                                <TableHead>{t("page.table.headers.name")}</TableHead>
+                                <TableHead>{t("page.table.headers.status")}</TableHead>
+                                <TableHead>{t("page.table.headers.currency")}</TableHead>
+                                <TableHead className="text-right">{t("page.table.headers.users")}</TableHead>
+                                <TableHead className="text-right">
+                                    {t("page.table.headers.projects")}
+                                </TableHead>
                                 <TableHead className="w-0" />
                             </TableRow>
                         </TableHeader>
@@ -192,7 +194,7 @@ export function CompaniesPage() {
                                         </TableCell>
                                         <TableCell>
                                             <Badge variant={suspended ? "destructive" : "secondary"}>
-                                                {suspended ? "Suspended" : "Active"}
+                                                {suspended ? t("status.suspended") : t("status.active")}
                                             </Badge>
                                         </TableCell>
                                         <TableCell>{company.currency ?? "—"}</TableCell>
@@ -207,7 +209,7 @@ export function CompaniesPage() {
                                                 <Button
                                                     size="icon-sm"
                                                     variant="ghost"
-                                                    aria-label={`Edit ${company.name}`}
+                                                    aria-label={t("page.rowActions.edit", {name: company.name})}
                                                     onClick={() => {
                                                         setEditing(company);
                                                         setFormOpen(true);
@@ -220,8 +222,8 @@ export function CompaniesPage() {
                                                     variant="ghost"
                                                     aria-label={
                                                         suspended
-                                                            ? `Resume ${company.name}`
-                                                            : `Suspend ${company.name}`
+                                                            ? t("page.rowActions.resume", {name: company.name})
+                                                            : t("page.rowActions.suspend", {name: company.name})
                                                     }
                                                     onClick={() =>
                                                         setPending({
@@ -239,7 +241,7 @@ export function CompaniesPage() {
                                                 <Button
                                                     size="icon-sm"
                                                     variant="ghost"
-                                                    aria-label={`Delete ${company.name}`}
+                                                    aria-label={t("page.rowActions.delete", {name: company.name})}
                                                     onClick={() => setPending({action: "delete", company})}
                                                 >
                                                     <Trash2 className="text-destructive size-3.5" />
@@ -275,23 +277,29 @@ export function CompaniesPage() {
     );
 }
 
-const COPY = {
-    suspend: {
-        title: "Suspend this company?",
-        body: "Everyone in this tenant is signed out and cannot log in until it is resumed. Their data is untouched.",
-        confirm: "Suspend",
-    },
-    resume: {
-        title: "Resume this company?",
-        body: "Its users will be able to log in again immediately.",
-        confirm: "Resume",
-    },
-    delete: {
-        title: "Delete this company?",
-        body: "It disappears from this list and its users can no longer log in. Their projects, deals and payment history are kept, but there is no way to undo this from the interface.",
-        confirm: "Delete",
-    },
-} as const;
+// Built inside the component (not at module scope) so its labels re-render
+// in the active language rather than freezing in whatever language was
+// active when the module first loaded.
+function useConfirmCopy() {
+    const {t} = useTranslation("companies");
+    return {
+        suspend: {
+            title: t("confirmDialog.suspend.title"),
+            body: t("confirmDialog.suspend.body"),
+            confirm: t("confirmDialog.suspend.confirm"),
+        },
+        resume: {
+            title: t("confirmDialog.resume.title"),
+            body: t("confirmDialog.resume.body"),
+            confirm: t("confirmDialog.resume.confirm"),
+        },
+        delete: {
+            title: t("confirmDialog.delete.title"),
+            body: t("confirmDialog.delete.body"),
+            confirm: t("confirmDialog.delete.confirm"),
+        },
+    } as const;
+}
 
 function ConfirmDialog({
     pending,
@@ -304,6 +312,9 @@ function ConfirmDialog({
     onCancel(): void;
     onConfirm(): void;
 }) {
+    const {t} = useTranslation("companies");
+    const {t: tCommon} = useTranslation("common");
+    const COPY = useConfirmCopy();
     const copy = pending ? COPY[pending.action] : null;
 
     return (
@@ -320,9 +331,9 @@ function ConfirmDialog({
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+                    <AlertDialogCancel disabled={isPending}>{tCommon("actions.cancel")}</AlertDialogCancel>
                     <AlertDialogAction disabled={isPending} onClick={onConfirm}>
-                        {isPending ? "Working..." : copy?.confirm}
+                        {isPending ? t("confirmDialog.working") : copy?.confirm}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

@@ -9,12 +9,13 @@ import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/co
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {USER_ROLE_LABEL_KEYS} from "@/features/users/types/user.types";
+import {formatDate} from "@/utils/date-formatter";
 import {getCompany} from "../api/companies.api";
 import {isSuspended} from "../types/company.types";
 
 export function CompanyDetailPage() {
     const {companyId} = useParams<{companyId: string}>();
-    const {t} = useTranslation("users");
+    const {t, i18n} = useTranslation(["companies", "users"]);
 
     const company = useQuery({
         queryKey: ["companies", companyId],
@@ -31,7 +32,7 @@ export function CompanyDetailPage() {
     }
 
     if (!company.data) {
-        return <p className="text-muted-foreground">Company not found.</p>;
+        return <p className="text-muted-foreground">{t("detail.notFound", {ns: "companies"})}</p>;
     }
 
     const data = company.data;
@@ -44,13 +45,15 @@ export function CompanyDetailPage() {
                     <Button asChild size="sm" variant="ghost" className="-ml-2">
                         <Link to="/companies">
                             <ArrowLeft className="size-4" />
-                            Companies
+                            {t("detail.backToCompanies", {ns: "companies"})}
                         </Link>
                     </Button>
                     <div className="flex items-center gap-3">
                         <h2 className="text-2xl font-medium tracking-tight">{data.name}</h2>
                         <Badge variant={suspended ? "destructive" : "secondary"}>
-                            {suspended ? "Suspended" : "Active"}
+                            {suspended
+                                ? t("status.suspended", {ns: "companies"})
+                                : t("status.active", {ns: "companies"})}
                         </Badge>
                     </div>
                 </div>
@@ -59,56 +62,74 @@ export function CompanyDetailPage() {
             {suspended ? (
                 <Card className="border-destructive/40">
                     <CardContent className="py-4 text-sm">
-                        Suspended on {new Date(data.suspendedAt as string).toLocaleDateString()}. Nobody in
-                        this tenant can log in until it is resumed. Their data is untouched.
+                        {t("detail.suspendedBanner", {
+                            ns: "companies",
+                            date: formatDate(data.suspendedAt as string, i18n.language).date,
+                        })}
                     </CardContent>
                 </Card>
             ) : null}
 
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                <Stat label="Projects" value={data.stats.projects} />
-                <Stat label="Units" value={data.stats.units} />
-                <Stat label="Clients" value={data.stats.clients} />
-                <Stat label="Leads" value={data.stats.leads} />
-                <Stat label="Deals" value={data.stats.deals} />
-                <Stat label="Deals in play" value={data.stats.activeDeals} hint="Reserved, signed or active" />
-                <Stat label="Users" value={data.stats.users} />
-                <Stat label="Active users" value={data.stats.activeUsers} />
+                <Stat label={t("detail.stats.projects", {ns: "companies"})} value={data.stats.projects} />
+                <Stat label={t("detail.stats.units", {ns: "companies"})} value={data.stats.units} />
+                <Stat label={t("detail.stats.clients", {ns: "companies"})} value={data.stats.clients} />
+                <Stat label={t("detail.stats.leads", {ns: "companies"})} value={data.stats.leads} />
+                <Stat label={t("detail.stats.deals", {ns: "companies"})} value={data.stats.deals} />
+                <Stat
+                    label={t("detail.stats.activeDeals", {ns: "companies"})}
+                    value={data.stats.activeDeals}
+                    hint={t("detail.stats.activeDealsHint", {ns: "companies"})}
+                />
+                <Stat label={t("detail.stats.users", {ns: "companies"})} value={data.stats.users} />
+                <Stat
+                    label={t("detail.stats.activeUsers", {ns: "companies"})}
+                    value={data.stats.activeUsers}
+                />
             </div>
 
             <div className="grid gap-4 lg:grid-cols-[1fr_2fr]">
                 <Card className="border-secondary shadow-none">
                     <CardHeader>
-                        <CardTitle>Settings</CardTitle>
+                        <CardTitle>{t("detail.settings.title", {ns: "companies"})}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <DataList className="divide-y">
-                            <Row label="Currency" value={data.currency} />
-                            <Row label="Locale" value={data.locale} />
-                            <Row label="Timezone" value={data.timezone} />
-                            <Row label="Phone" value={data.phone} />
-                            <Row label="Address" value={data.address} />
-                            <Row label="Created" value={new Date(data.createdAt).toLocaleDateString()} />
+                            <Row label={t("detail.settings.currency", {ns: "companies"})} value={data.currency} />
+                            <Row label={t("detail.settings.locale", {ns: "companies"})} value={data.locale} />
+                            <Row label={t("detail.settings.timezone", {ns: "companies"})} value={data.timezone} />
+                            <Row label={t("detail.settings.phone", {ns: "companies"})} value={data.phone} />
+                            <Row label={t("detail.settings.address", {ns: "companies"})} value={data.address} />
+                            <Row
+                                label={t("detail.settings.created", {ns: "companies"})}
+                                value={formatDate(data.createdAt, i18n.language).date}
+                            />
                         </DataList>
                     </CardContent>
                 </Card>
 
                 <Card className="border-secondary shadow-none">
                     <CardHeader>
-                        <CardTitle>Users</CardTitle>
+                        <CardTitle>{t("detail.usersCard.title", {ns: "companies"})}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         {data.users.length === 0 ? (
                             <p className="text-muted-foreground text-sm">
-                                No users. This tenant cannot be logged into.
+                                {t("detail.usersCard.empty", {ns: "companies"})}
                             </p>
                         ) : (
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Role</TableHead>
-                                        <TableHead>Status</TableHead>
+                                        <TableHead>
+                                            {t("detail.usersCard.headers.name", {ns: "companies"})}
+                                        </TableHead>
+                                        <TableHead>
+                                            {t("detail.usersCard.headers.role", {ns: "companies"})}
+                                        </TableHead>
+                                        <TableHead>
+                                            {t("detail.usersCard.headers.status", {ns: "companies"})}
+                                        </TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -118,10 +139,14 @@ export function CompanyDetailPage() {
                                                 <div className="font-medium">{user.fullName}</div>
                                                 <div className="text-muted-foreground text-xs">{user.email}</div>
                                             </TableCell>
-                                            <TableCell>{t(USER_ROLE_LABEL_KEYS[user.role])}</TableCell>
+                                            <TableCell>
+                                                {t(USER_ROLE_LABEL_KEYS[user.role])}
+                                            </TableCell>
                                             <TableCell>
                                                 <Badge variant={user.isActive ? "secondary" : "outline"}>
-                                                    {user.isActive ? "Active" : "Inactive"}
+                                                    {user.isActive
+                                                        ? t("status.active", {ns: "users"})
+                                                        : t("status.inactive", {ns: "users"})}
                                                 </Badge>
                                             </TableCell>
                                         </TableRow>

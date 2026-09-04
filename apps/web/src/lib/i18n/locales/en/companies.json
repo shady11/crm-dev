@@ -1,0 +1,121 @@
+{
+  "status": {
+    "active": "Active",
+    "suspended": "Suspended"
+  },
+  "page": {
+    "heading": "Companies",
+    "description": "Tenants on this installation. Each has its own users, projects and deals.",
+    "newCompany": "New company",
+    "searchPlaceholder": "Search companies",
+    "table": {
+      "headers": {
+        "name": "Name",
+        "status": "Status",
+        "currency": "Currency",
+        "users": "Users",
+        "projects": "Projects"
+      }
+    },
+    "empty": {
+      "title": "No companies yet",
+      "description": "Create one to onboard a developer onto this installation."
+    },
+    "rowActions": {
+      "edit": "Edit {{name}}",
+      "resume": "Resume {{name}}",
+      "suspend": "Suspend {{name}}",
+      "delete": "Delete {{name}}"
+    },
+    "created": {
+      "title": "{{name}} is ready",
+      "administrator": "Administrator:",
+      "generatedPasswordLabel": "Generated password — shown once, and not recoverable afterwards:",
+      "generatedPasswordHint": "Give it to them directly and have them change it at first login.",
+      "confirm": "I have saved it"
+    },
+    "toasts": {
+      "updateSuccess": "Company updated",
+      "updateError": "Could not save the company",
+      "createError": "Could not create the company",
+      "actionError": "That did not work",
+      "suspended": "{{name}} suspended",
+      "resumed": "{{name}} resumed",
+      "deleted": "{{name}} deleted"
+    }
+  },
+  "confirmDialog": {
+    "suspend": {
+      "title": "Suspend this company?",
+      "body": "Everyone in this tenant is signed out and cannot log in until it is resumed. Their data is untouched.",
+      "confirm": "Suspend"
+    },
+    "resume": {
+      "title": "Resume this company?",
+      "body": "Its users will be able to log in again immediately.",
+      "confirm": "Resume"
+    },
+    "delete": {
+      "title": "Delete this company?",
+      "body": "It disappears from this list and its users can no longer log in. Their projects, deals and payment history are kept, but there is no way to undo this from the interface.",
+      "confirm": "Delete"
+    },
+    "working": "Working..."
+  },
+  "form": {
+    "editTitle": "Edit {{name}}",
+    "newTitle": "New company",
+    "editDescription": "Company settings. Currency and locale drive how money and dates appear for everyone in this tenant.",
+    "newDescription": "The first administrator is created with the company — a tenant with no way in cannot create one for itself.",
+    "fields": {
+      "name": "Company name",
+      "phone": "Phone",
+      "address": "Address",
+      "currency": "Currency",
+      "locale": "Locale",
+      "timezone": "Timezone",
+      "adminFullName": "Full name",
+      "adminEmail": "Email",
+      "adminPassword": "Password"
+    },
+    "adminSectionTitle": "First administrator",
+    "adminPasswordHint": "Leave blank to generate one. It is shown once.",
+    "submit": {
+      "create": "Create company"
+    }
+  },
+  "detail": {
+    "backToCompanies": "Companies",
+    "notFound": "Company not found.",
+    "suspendedBanner": "Suspended on {{date}}. Nobody in this tenant can log in until it is resumed. Their data is untouched.",
+    "stats": {
+      "projects": "Projects",
+      "units": "Units",
+      "clients": "Clients",
+      "leads": "Leads",
+      "deals": "Deals",
+      "activeDeals": "Deals in play",
+      "activeDealsHint": "Reserved, signed or active",
+      "users": "Users",
+      "activeUsers": "Active users"
+    },
+    "settings": {
+      "title": "Settings",
+      "currency": "Currency",
+      "locale": "Locale",
+      "timezone": "Timezone",
+      "phone": "Phone",
+      "address": "Address",
+      "created": "Created"
+    },
+    "usersCard": {
+      "title": "Users",
+      "empty": "No users. This tenant cannot be logged into.",
+      "headers": {
+        "name": "Name",
+        "role": "Role",
+        "status": "Status"
+      }
+    }
+  }
+}
