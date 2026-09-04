@@ -2,6 +2,7 @@ import {api} from "@/lib/api";
 import type {PaginatedResponse} from "@/lib/api-types";
 import type {Client} from "../types/client.types";
 import type {DealStatus} from "@/features/deals/types/deal.types";
+import type {LeadStatus} from "@/features/leads/types/lead.types";
 
 export type GetClientsParams = {
     page?: number;
@@ -20,7 +21,7 @@ export type ClientLeadSummary = {
     fullName: string;
     phone: string;
     source: string | null;
-    status: string;
+    status: LeadStatus;
     createdAt: string;
 };
 

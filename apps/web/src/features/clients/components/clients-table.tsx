@@ -10,6 +10,7 @@ import type {Client} from "@/features/clients/types/client.types";
 import {formatCreatedAt, initials} from "@/features/clients/utils/format.ts";
 import {useNavigate} from "react-router-dom";
 import {paths} from "@/routes/paths.ts";
+import {useTranslation} from "react-i18next";
 
 interface ClientsTableProps {
     clients: Client[];
@@ -35,6 +36,7 @@ export function ClientsTable({
                                  isDeleting,
                              }: ClientsTableProps) {
 
+    const { t, i18n } = useTranslation("clients");
     const navigate = useNavigate();
 
     if (isLoading) {
@@ -52,8 +54,8 @@ export function ClientsTable({
                     <EmptyMedia variant="icon">
                         <UsersRoundIcon strokeWidth={1.25} />
                     </EmptyMedia>
-                    <EmptyTitle>No clients found</EmptyTitle>
-                    <EmptyDescription>Try adjusting your filters or search.</EmptyDescription>
+                    <EmptyTitle>{t("table.emptyTitle")}</EmptyTitle>
+                    <EmptyDescription>{t("table.emptyDescription")}</EmptyDescription>
                 </EmptyHeader>
             </Empty>
         );
@@ -70,19 +72,19 @@ export function ClientsTable({
                                 onCheckedChange={(details) => onToggleAll(details.checked === true)}
                             />
                         </TableHead>
-                        <TableHead>Client ID</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Phone</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Leads</TableHead>
-                        <TableHead>Deals</TableHead>
-                        <TableHead>Created</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead>{t("table.clientId")}</TableHead>
+                        <TableHead>{t("table.name")}</TableHead>
+                        <TableHead>{t("table.phone")}</TableHead>
+                        <TableHead>{t("table.email")}</TableHead>
+                        <TableHead>{t("table.leads")}</TableHead>
+                        <TableHead>{t("table.deals")}</TableHead>
+                        <TableHead>{t("table.created")}</TableHead>
+                        <TableHead className="text-right">{t("table.actions")}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {clients.map((client) => {
-                        const created = formatCreatedAt(client.createdAt);
+                        const created = formatCreatedAt(client.createdAt, i18n.language);
 
                         return (
                             <TableRow key={client.id} className="cursor-pointer" onClick={() => navigate(paths.clients.detail(client.id))}>

@@ -15,12 +15,13 @@ import {initials} from "@/features/clients/utils/format.ts";
 import {updateClient, type UpdateClientPayload} from "@/features/clients/api/clients.api.ts";
 import {ClientTasksCard} from "@/features/tasks/components/client-tasks-card.tsx";
 import {DEAL_STATUS_LABEL_KEYS, DEAL_STATUS_VISUALS} from "@/features/deals/types/deal.types.ts";
+import {LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
 import {paths} from "@/routes/paths.ts";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 export function ClientDetailsPage() {
-    const { t } = useTranslation("deals");
+    const { t, i18n } = useTranslation(["clients", "deals", "leads", "common"]);
     const { formatCurrency } = useCompanyFormatters();
     const { clientId } = useParams<{ clientId: string }>();
     const navigate = useNavigate();
@@ -33,11 +34,11 @@ export function ClientDetailsPage() {
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["client", clientId] });
             await queryClient.invalidateQueries({ queryKey: ["clients"] });
-            toast.success({ title: "Successfully updated", description: "The client has been updated." });
+            toast.success({ title: t("detail.updateSuccessTitle"), description: t("detail.updateSuccessDescription") });
             setEditOpen(false);
         },
         onError: () => {
-            toast.error({ title: "Failed to update client", description: "Please try again." });
+            toast.error({ title: t("detail.updateErrorTitle"), description: t("detail.updateErrorDescription") });
         },
     });
 
@@ -55,18 +56,18 @@ export function ClientDetailsPage() {
                         <div>
                             <h1 className="text-2xl font-semibold">{client.fullName}</h1>
                             <p className="text-sm text-muted-foreground">
-                                #{client.id.slice(0, 8).toUpperCase()} · Client since {new Date(client.createdAt).toLocaleDateString()}
+                                #{client.id.slice(0, 8).toUpperCase()} · {t("detail.clientSince", { date: new Date(client.createdAt).toLocaleDateString(i18n.language) })}
                             </p>
                         </div>
                     </div>
                     <div className="flex items-center gap-2">
                         <Button variant="ghost" onClick={() => navigate(paths.clients.root)}>
                             <ArrowLeft className="size-3"/>
-                            Back
+                            {t("actions.back", { ns: "common" })}
                         </Button>
                         <Button variant="default" onClick={() => setEditOpen(true)}>
                             <Pen className="size-3"/>
-                            Edit
+                            {t("actions.edit", { ns: "common" })}
                         </Button>
                     </div>
                 </div>
@@ -76,7 +77,7 @@ export function ClientDetailsPage() {
                 <CardContent>
                     <DataList className="divide-y">
                         <DataListItem>
-                            <DataListItemLabel>Phone</DataListItemLabel>
+                            <DataListItemLabel>{t("detail.phone")}</DataListItemLabel>
                             <DataListItemValue>
                                 <a href={`tel:${client.phone}`} className="flex items-center gap-1.5 hover:text-foreground">
                                     <PhoneIcon size={14} />{client.phone}
@@ -85,13 +86,13 @@ export function ClientDetailsPage() {
                         </DataListItem>
                         {client.whatsapp && (
                             <DataListItem>
-                                <DataListItemLabel>WhatsApp</DataListItemLabel>
+                                <DataListItemLabel>{t("detail.whatsapp")}</DataListItemLabel>
                                 <DataListItemValue>{client.whatsapp}</DataListItemValue>
                             </DataListItem>
                         )}
                         {client.email && (
                             <DataListItem>
-                                <DataListItemLabel>Email</DataListItemLabel>
+                                <DataListItemLabel>{t("detail.email")}</DataListItemLabel>
                                 <DataListItemValue>
                                     <a href={`mailto:${client.email}`} className="flex items-center gap-1.5 hover:text-foreground">
                                         <MailIcon size={14} />{client.email}
@@ -101,13 +102,13 @@ export function ClientDetailsPage() {
                         )}
                         {client.passport && (
                             <DataListItem>
-                                <DataListItemLabel>Passport</DataListItemLabel>
+                                <DataListItemLabel>{t("detail.passport")}</DataListItemLabel>
                                 <DataListItemValue>{client.passport}</DataListItemValue>
                             </DataListItem>
                         )}
                         {client.pin && (
                             <DataListItem>
-                                <DataListItemLabel>PIN</DataListItemLabel>
+                                <DataListItemLabel>{t("detail.pin")}</DataListItemLabel>
                                 <DataListItemValue>{client.pin}</DataListItemValue>
                             </DataListItem>
                         )}
@@ -119,12 +120,12 @@ export function ClientDetailsPage() {
                 <Card className="border border-secondary shadow-none pt-0">
                     <CardHeader className="border-b py-4">
                         <CardTitle className="text-sm text-muted-foreground">
-                            Deals{client.deals.length > 0 && ` (${client.deals.length})`}
+                            {client.deals.length > 0 ? t("detail.dealsWithCount", { count: client.deals.length }) : t("detail.deals")}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         {client.deals.length === 0 ? (
-                            <p className="py-6 text-center text-sm text-muted-foreground">No deals yet.</p>
+                            <p className="py-6 text-center text-sm text-muted-foreground">{t("detail.noDeals")}</p>
                         ) : (
                             <div className="flex flex-col divide-y">
                                 {client.deals.map((deal) => {
@@ -136,7 +137,7 @@ export function ClientDetailsPage() {
                                             className="flex items-center justify-between gap-3 py-2.5 text-sm hover:bg-secondary/40"
                                         >
                                             <div>
-                                                <p className="font-medium">{deal.dealNumber ?? `Unit №${deal.unit.number}`}</p>
+                                                <p className="font-medium">{deal.dealNumber ?? t("detail.unitFallback", { number: deal.unit.number })}</p>
                                                 <p className="text-xs text-muted-foreground">
                                                     {deal.unit.project?.name}
                                                 </p>
@@ -158,12 +159,12 @@ export function ClientDetailsPage() {
                 <Card className="border border-secondary shadow-none pt-0">
                     <CardHeader className="border-b py-4">
                         <CardTitle className="text-sm text-muted-foreground">
-                            Leads{client.leads.length > 0 && ` (${client.leads.length})`}
+                            {client.leads.length > 0 ? t("detail.leadsWithCount", { count: client.leads.length }) : t("table.leads")}
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
                         {client.leads.length === 0 ? (
-                            <p className="py-6 text-center text-sm text-muted-foreground">No leads yet.</p>
+                            <p className="py-6 text-center text-sm text-muted-foreground">{t("detail.noLeadsYet")}</p>
                         ) : (
                             <div className="flex flex-col divide-y">
                                 {client.leads.map((lead) => (
@@ -172,7 +173,7 @@ export function ClientDetailsPage() {
                                             <p className="font-medium">{lead.fullName}</p>
                                             {lead.source && <p className="text-xs text-muted-foreground">{lead.source}</p>}
                                         </div>
-                                        <Badge variant="secondary">{lead.status}</Badge>
+                                        <Badge variant="secondary">{t(LEAD_STATUS_LABEL_KEYS[lead.status])}</Badge>
                                     </div>
                                 ))}
                             </div>

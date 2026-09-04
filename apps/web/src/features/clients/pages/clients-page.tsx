@@ -4,14 +4,16 @@ import {ClientsPagination} from "@/features/clients/components/clients-paginatio
 import {ClientsActionBar} from "@/features/clients/components/clients-action-bar.tsx";
 import {ClientFormSheet} from "@/features/clients/components/client-form-sheet.tsx";
 import {useClientsList} from "@/features/clients/hooks/use-clients-list.ts";
+import {useTranslation} from "react-i18next";
 
 export function ClientsPage() {
+    const { t } = useTranslation("clients");
     const { filters, pagination, table, selection, form, actions } = useClientsList();
 
     return (
         <div className="space-y-6">
             <div className="flex items-start justify-between gap-4">
-                <h2 className="text-2xl font-medium tracking-tight">Clients</h2>
+                <h2 className="text-2xl font-medium tracking-tight">{t("page.title")}</h2>
             </div>
 
             <div className="space-y-4">

@@ -1,0 +1,91 @@
+{
+  "page": {
+    "title": "Clients"
+  },
+  "toolbar": {
+    "filterByProject": "Filter by project",
+    "searchPlaceholder": "Search for clients...",
+    "addClient": "Add New Client"
+  },
+  "table": {
+    "clientId": "Client ID",
+    "name": "Name",
+    "phone": "Phone",
+    "email": "Email",
+    "leads": "Leads",
+    "deals": "Deals",
+    "created": "Created",
+    "actions": "Actions",
+    "emptyTitle": "No clients found",
+    "emptyDescription": "Try adjusting your filters or search."
+  },
+  "pagination": {
+    "rowsPerPage": "Rows per page"
+  },
+  "actionBar": {
+    "selected": "{{count}} selected",
+    "delete": "Delete",
+    "clearSelection": "Clear selection"
+  },
+  "form": {
+    "editTitle": "Edit client",
+    "addTitle": "Add client",
+    "editDescription": "Update the client's details.",
+    "addDescription": "Add a new client record.",
+    "saveError": "Client could not be saved. Check the details and try again.",
+    "saveChanges": "Save changes",
+    "create": "Create client",
+    "fullName": "Full name",
+    "phone": "Phone",
+    "whatsapp": "WhatsApp (optional)",
+    "email": "Email (optional)",
+    "passport": "Passport (optional)",
+    "passportPlaceholder": "Passport number",
+    "pin": "PIN (optional)",
+    "validation": {
+      "nameMin": "Name must be at least 2 characters",
+      "phoneMin": "Phone must be at least 5 characters",
+      "invalidEmail": "Invalid email"
+    },
+    "whatsappPlaceholder": "WhatsApp number",
+    "pinPlaceholder": "PIN number"
+  },
+  "search": {
+    "placeholder": "Search by name or phone",
+    "empty": "No clients found for \"{{term}}\"",
+    "createNew": "Create new client"
+  },
+  "detail": {
+    "clientSince": "Client since {{date}}",
+    "phone": "Phone",
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "passport": "Passport",
+    "pin": "PIN",
+    "deals": "Deals",
+    "dealsWithCount": "Deals ({{count}})",
+    "noDeals": "No deals yet.",
+    "unitFallback": "Unit №{{number}}",
+    "leadsWithCount": "Leads ({{count}})",
+    "noLeadsYet": "No leads yet.",
+    "updateSuccessTitle": "Successfully updated",
+    "updateSuccessDescription": "The client has been updated.",
+    "updateErrorTitle": "Failed to update client",
+    "updateErrorDescription": "Please try again."
+  },
+  "toasts": {
+    "createSuccessTitle": "Successfully created",
+    "createSuccessDescription": "The new client has been added.",
+    "createErrorTitle": "Failed to create client",
+    "createErrorDescription": "Please check the details and try again.",
+    "deleteSuccessTitle": "Client deleted",
+    "deleteSuccessDescription": "The client has been removed.",
+    "deleteErrorTitle": "Failed to delete client",
+    "deleteErrorDescription": "Please try again.",
+    "bulkDeleteAllFailed": "None of the selected clients could be deleted.",
+    "bulkDeletePartialFailed": "{{failed}} of {{total}} selected clients could not be deleted.",
+    "bulkDeleteSuccessTitle": "Clients deleted",
+    "bulkDeleteSuccessDescription": "Selected clients have been removed.",
+    "bulkDeleteIssuesTitle": "Bulk delete had issues"
+  }
+}

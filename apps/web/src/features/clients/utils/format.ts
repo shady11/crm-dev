@@ -7,10 +7,10 @@ export function initials(fullName: string) {
         .join("");
 }
 
-export function formatCreatedAt(iso: string) {
+export function formatCreatedAt(iso: string, locale = "ru-RU") {
     const date = new Date(iso);
     return {
-        date: date.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
-        time: date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" }),
+        date: date.toLocaleDateString(locale, { month: "long", day: "numeric", year: "numeric" }),
+        time: date.toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" }),
     };
 }

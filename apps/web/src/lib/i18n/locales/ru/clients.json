@@ -1,0 +1,91 @@
+{
+  "page": {
+    "title": "Клиенты"
+  },
+  "toolbar": {
+    "filterByProject": "Фильтр по проекту",
+    "searchPlaceholder": "Поиск клиентов...",
+    "addClient": "Добавить клиента"
+  },
+  "table": {
+    "clientId": "ID клиента",
+    "name": "Имя",
+    "phone": "Телефон",
+    "email": "Email",
+    "leads": "Лиды",
+    "deals": "Сделки",
+    "created": "Создан",
+    "actions": "Действия",
+    "emptyTitle": "Клиенты не найдены",
+    "emptyDescription": "Попробуйте изменить фильтры или поиск."
+  },
+  "pagination": {
+    "rowsPerPage": "Строк на странице"
+  },
+  "actionBar": {
+    "selected": "Выбрано: {{count}}",
+    "delete": "Удалить",
+    "clearSelection": "Снять выделение"
+  },
+  "form": {
+    "editTitle": "Редактировать клиента",
+    "addTitle": "Добавить клиента",
+    "editDescription": "Обновите данные клиента.",
+    "addDescription": "Добавьте новую запись клиента.",
+    "saveError": "Не удалось сохранить клиента. Проверьте данные и попробуйте снова.",
+    "saveChanges": "Сохранить изменения",
+    "create": "Создать клиента",
+    "fullName": "ФИО",
+    "phone": "Телефон",
+    "whatsapp": "WhatsApp (необязательно)",
+    "email": "Email (необязательно)",
+    "passport": "Паспорт (необязательно)",
+    "passportPlaceholder": "Номер паспорта",
+    "pin": "ПИН (необязательно)",
+    "validation": {
+      "nameMin": "Имя должно содержать не менее 2 символов",
+      "phoneMin": "Телефон должен содержать не менее 5 символов",
+      "invalidEmail": "Некорректный email"
+    },
+    "whatsappPlaceholder": "Номер WhatsApp",
+    "pinPlaceholder": "Номер ПИН"
+  },
+  "search": {
+    "placeholder": "Поиск по имени или телефону",
+    "empty": "Клиенты по запросу «{{term}}» не найдены",
+    "createNew": "Создать нового клиента"
+  },
+  "detail": {
+    "clientSince": "Клиент с {{date}}",
+    "phone": "Телефон",
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "passport": "Паспорт",
+    "pin": "ПИН",
+    "deals": "Сделки",
+    "dealsWithCount": "Сделки ({{count}})",
+    "noDeals": "Пока нет сделок.",
+    "unitFallback": "Юнит №{{number}}",
+    "leadsWithCount": "Лиды ({{count}})",
+    "noLeadsYet": "Пока нет лидов.",
+    "updateSuccessTitle": "Успешно обновлено",
+    "updateSuccessDescription": "Данные клиента обновлены.",
+    "updateErrorTitle": "Не удалось обновить клиента",
+    "updateErrorDescription": "Попробуйте снова."
+  },
+  "toasts": {
+    "createSuccessTitle": "Успешно создано",
+    "createSuccessDescription": "Новый клиент добавлен.",
+    "createErrorTitle": "Не удалось создать клиента",
+    "createErrorDescription": "Проверьте данные и попробуйте снова.",
+    "deleteSuccessTitle": "Клиент удалён",
+    "deleteSuccessDescription": "Клиент был удалён.",
+    "deleteErrorTitle": "Не удалось удалить клиента",
+    "deleteErrorDescription": "Попробуйте снова.",
+    "bulkDeleteAllFailed": "Ни одного из выбранных клиентов не удалось удалить.",
+    "bulkDeletePartialFailed": "Не удалось удалить {{failed}} из {{total}} выбранных клиентов.",
+    "bulkDeleteSuccessTitle": "Клиенты удалены",
+    "bulkDeleteSuccessDescription": "Выбранные клиенты были удалены.",
+    "bulkDeleteIssuesTitle": "При массовом удалении возникли проблемы"
+  }
+}

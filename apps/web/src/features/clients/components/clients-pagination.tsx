@@ -1,6 +1,7 @@
 import {createListCollection} from "@ark-ui/react";
 import {Pagination, PaginationItems, PaginationNext, PaginationPrevious} from "@/components/ui/pagination.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
+import {useTranslation} from "react-i18next";
 
 interface ClientsPaginationProps {
     page: number;
@@ -19,6 +20,8 @@ const rowsCollection = createListCollection({
 });
 
 export function ClientsPagination({ page, limit, total, onPageChange, onLimitChange }: ClientsPaginationProps) {
+    const { t } = useTranslation("clients");
+
     if (total === 0) {
         return null;
     }
@@ -26,7 +29,7 @@ export function ClientsPagination({ page, limit, total, onPageChange, onLimitCha
     return (
         <div className="flex items-center justify-between gap-3 text-sm">
             <div className="flex items-center gap-2">
-                <span className="text-muted-foreground">Rows per page</span>
+                <span className="text-muted-foreground">{t("pagination.rowsPerPage")}</span>
                 <Select
                     collection={rowsCollection}
                     value={[String(limit)]}

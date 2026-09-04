@@ -10,10 +10,12 @@ import {
     type UpdateClientPayload,
 } from "@/features/clients/api/clients.api.ts";
 import type {Client} from "@/features/clients/types/client.types";
+import {useTranslation} from "react-i18next";
 
 export type ProjectFilterValue = string | "all";
 
 export function useClientsList() {
+    const { t } = useTranslation("clients");
     const queryClient = useQueryClient();
 
     const [search, setSearchState] = useState("");
@@ -40,11 +42,11 @@ export function useClientsList() {
         mutationFn: (payload: CreateClientPayload) => createClient(payload),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["clients"] });
-            toast.success({ title: "Successfully created", description: "The new client has been added." });
+            toast.success({ title: t("toasts.createSuccessTitle"), description: t("toasts.createSuccessDescription") });
             closeForm();
         },
         onError: () => {
-            toast.error({ title: "Failed to create client", description: "Please check the details and try again." });
+            toast.error({ title: t("toasts.createErrorTitle"), description: t("toasts.createErrorDescription") });
         },
     });
 
@@ -52,11 +54,11 @@ export function useClientsList() {
         mutationFn: ({ id, payload }: { id: string; payload: UpdateClientPayload }) => updateClient(id, payload),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["clients"] });
-            toast.success({ title: "Successfully updated", description: "The client has been updated." });
+            toast.success({ title: t("detail.updateSuccessTitle"), description: t("detail.updateSuccessDescription") });
             closeForm();
         },
         onError: () => {
-            toast.error({ title: "Failed to update client", description: "Please try again." });
+            toast.error({ title: t("detail.updateErrorTitle"), description: t("detail.updateErrorDescription") });
         },
     });
 
@@ -64,10 +66,10 @@ export function useClientsList() {
         mutationFn: deleteClient,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["clients"] });
-            toast.success({ title: "Client deleted", description: "The client has been removed." });
+            toast.success({ title: t("toasts.deleteSuccessTitle"), description: t("toasts.deleteSuccessDescription") });
         },
         onError: () => {
-            toast.error({ title: "Failed to delete client", description: "Please try again." });
+            toast.error({ title: t("toasts.deleteErrorTitle"), description: t("toasts.deleteErrorDescription") });
         },
     });
 
@@ -79,19 +81,19 @@ export function useClientsList() {
             if (failed > 0) {
                 throw new Error(
                     failed === ids.length
-                        ? "None of the selected clients could be deleted."
-                        : `${failed} of ${ids.length} selected clients could not be deleted.`,
+                        ? t("toasts.bulkDeleteAllFailed")
+                        : t("toasts.bulkDeletePartialFailed", { failed, total: ids.length }),
                 );
             }
         },
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["clients"] });
-            toast.success({ title: "Clients deleted", description: "Selected clients have been removed." });
+            toast.success({ title: t("toasts.bulkDeleteSuccessTitle"), description: t("toasts.bulkDeleteSuccessDescription") });
             setSelectedIds(new Set());
         },
         onError: async (error: Error) => {
             await queryClient.invalidateQueries({ queryKey: ["clients"] });
-            toast.error({ title: "Bulk delete had issues", description: error.message });
+            toast.error({ title: t("toasts.bulkDeleteIssuesTitle"), description: error.message });
             setSelectedIds(new Set());
         },
     });

@@ -5,6 +5,7 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {useProjectsFilter} from "@/features/projects/hooks/use-projects-filter.ts";
 import type {ProjectFilterValue} from "@/features/clients/hooks/use-clients-list.ts";
+import {useTranslation} from "react-i18next";
 
 interface ClientsToolbarProps {
     search: string;
@@ -21,18 +22,19 @@ export function ClientsToolbar({
                                    onProjectFilterChange,
                                    onAddClient,
                                }: ClientsToolbarProps) {
+    const { t } = useTranslation("clients");
     const { data: projects } = useProjectsFilter();
 
     const projectCollection = createListCollection({
         items: [
-            { label: "Filter by project", value: "all" },
+            { label: t("toolbar.filterByProject"), value: "all" },
             ...projects.map((project) => ({ label: project.name, value: project.id })),
         ],
     });
 
     return (
         <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-medium">All Clients</h2>
+            <h2 className="text-lg font-medium">{t("page.title")}</h2>
 
             <div className="flex flex-wrap items-center gap-2">
                 <Select
@@ -41,7 +43,7 @@ export function ClientsToolbar({
                     onValueChange={({ value }) => onProjectFilterChange((value[0] ?? "all") as ProjectFilterValue)}
                 >
                     <SelectTrigger className="w-48">
-                        <SelectValue placeholder="Filter by project" />
+                        <SelectValue placeholder={t("toolbar.filterByProject")} />
                     </SelectTrigger>
                     <SelectContent>
                         {projectCollection.items.map((item) => (
@@ -54,7 +56,7 @@ export function ClientsToolbar({
 
                 <InputGroup className="w-56">
                     <InputGroupInput
-                        placeholder="Search for clients..."
+                        placeholder={t("toolbar.searchPlaceholder")}
                         value={search}
                         onChange={(e) => onSearchChange(e.target.value)}
                     />
@@ -65,7 +67,7 @@ export function ClientsToolbar({
 
                 <Button onClick={onAddClient}>
                     <Plus className="size-3" />
-                    Add New Client
+                    {t("toolbar.addClient")}
                 </Button>
             </div>
         </div>

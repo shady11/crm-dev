@@ -8,6 +8,7 @@ import {
     ActionBarValue,
 } from "@/components/ui/action-bar.tsx";
 import {Button} from "@/components/ui/button.tsx";
+import {useTranslation} from "react-i18next";
 
 interface ClientsActionBarProps {
     selectedCount: number;
@@ -17,11 +18,13 @@ interface ClientsActionBarProps {
 }
 
 export function ClientsActionBar({ selectedCount, isProcessing, onClear, onDelete }: ClientsActionBarProps) {
+    const { t } = useTranslation("clients");
+
     return (
         <ActionBar open={selectedCount > 0} onOpenChange={(open) => !open && onClear()}>
             <ActionBarContent aria-labelledby="clients-action-bar-count">
                 <ActionBarValue id="clients-action-bar-count" count={selectedCount}>
-                    {selectedCount} selected
+                    {t("actionBar.selected", { count: selectedCount })}
                 </ActionBarValue>
 
                 <ActionBarSeparator />
@@ -36,11 +39,11 @@ export function ClientsActionBar({ selectedCount, isProcessing, onClear, onDelet
                         onClick={onDelete}
                     >
                         <Trash2 className="size-3.5" />
-                        Delete
+                        {t("actionBar.delete")}
                     </Button>
 
                     <ActionBarClose asChild>
-                        <Button variant="ghost" size="icon-sm" aria-label="Clear selection">
+                        <Button variant="ghost" size="icon-sm" aria-label={t("actionBar.clearSelection")}>
                             <X className="size-3.5" />
                         </Button>
                     </ActionBarClose>

@@ -1,8 +1,9 @@
-import {useEffect} from "react";
+import {useEffect, useMemo} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Loader2, TriangleAlert} from "lucide-react";
 import {Controller, useForm} from "react-hook-form";
 import {z} from "zod";
+import {useTranslation} from "react-i18next";
 
 import {Button} from "@/components/ui/button.tsx";
 import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field.tsx";
@@ -12,16 +13,14 @@ import {Alert, AlertTitle} from "@/components/ui/alert.tsx";
 import type {CreateClientPayload, UpdateClientPayload} from "@/features/clients/api/clients.api.ts";
 import type {Client} from "@/features/clients/types/client.types";
 
-const clientSchema = z.object({
-    fullName: z.string().trim().min(2, "Name must be at least 2 characters"),
-    phone: z.string().trim().min(5, "Phone must be at least 5 characters"),
-    whatsapp: z.string().trim().optional(),
-    email: z.string().trim().email("Invalid email").optional().or(z.literal("")),
-    passport: z.string().trim().optional(),
-    pin: z.string().trim().optional(),
-});
-
-type ClientFormValues = z.infer<typeof clientSchema>;
+type ClientFormValues = {
+    fullName: string;
+    phone: string;
+    whatsapp?: string;
+    email?: string;
+    passport?: string;
+    pin?: string;
+};
 
 type ClientFormProps = {
     client?: Client | null;
@@ -49,6 +48,19 @@ export function ClientForm({
                                onCancel,
                                onSubmit,
                            }: ClientFormProps) {
+    const { t } = useTranslation("clients");
+
+    // Rebuilt whenever the language changes, so a validation message that
+    // fired before a language switch doesn't stay frozen in the old language.
+    const clientSchema = useMemo(() => z.object({
+        fullName: z.string().trim().min(2, t("form.validation.nameMin")),
+        phone: z.string().trim().min(5, t("form.validation.phoneMin")),
+        whatsapp: z.string().trim().optional(),
+        email: z.string().trim().email(t("form.validation.invalidEmail")).optional().or(z.literal("")),
+        passport: z.string().trim().optional(),
+        pin: z.string().trim().optional(),
+    }), [t]);
+
     const form = useForm<ClientFormValues>({
         resolver: zodResolver(clientSchema),
         defaultValues: DEFAULT_VALUES,
@@ -85,8 +97,8 @@ export function ClientForm({
                         name="fullName"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Full name</FieldLabel>
-                                <Input {...field} placeholder="Full name" aria-label="Full name" />
+                                <FieldLabel>{t("form.fullName")}</FieldLabel>
+                                <Input {...field} placeholder={t("form.fullName")} aria-label={t("form.fullName")} />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}
@@ -97,8 +109,8 @@ export function ClientForm({
                         name="phone"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Phone</FieldLabel>
-                                <Input {...field} placeholder="Phone" aria-label="Phone" />
+                                <FieldLabel>{t("form.phone")}</FieldLabel>
+                                <Input {...field} placeholder={t("form.phone")} aria-label={t("form.phone")} />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}
@@ -109,8 +121,8 @@ export function ClientForm({
                         name="whatsapp"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>WhatsApp (optional)</FieldLabel>
-                                <Input {...field} placeholder="WhatsApp" aria-label="WhatsApp" />
+                                <FieldLabel>{t("form.whatsapp")}</FieldLabel>
+                                <Input {...field} placeholder={t("form.whatsappPlaceholder")} aria-label={t("form.whatsapp")} />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}
@@ -121,8 +133,8 @@ export function ClientForm({
                         name="email"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Email (optional)</FieldLabel>
-                                <Input {...field} type="email" placeholder="name@example.com" aria-label="Email" />
+                                <FieldLabel>{t("form.email")}</FieldLabel>
+                                <Input {...field} type="email" placeholder="name@example.com" aria-label={t("form.email")} />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}
@@ -133,8 +145,8 @@ export function ClientForm({
                         name="passport"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Passport (optional)</FieldLabel>
-                                <Input {...field} placeholder="Passport number" aria-label="Passport" />
+                                <FieldLabel>{t("form.passport")}</FieldLabel>
+                                <Input {...field} placeholder={t("form.passportPlaceholder")} aria-label={t("form.passport")} />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}
@@ -145,8 +157,8 @@ export function ClientForm({
                         name="pin"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>PIN (optional)</FieldLabel>
-                                <Input {...field} placeholder="PIN" aria-label="PIN" />
+                                <FieldLabel>{t("form.pin")}</FieldLabel>
+                                <Input {...field} placeholder={t("form.pinPlaceholder")} aria-label={t("form.pin")} />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}
@@ -164,13 +176,13 @@ export function ClientForm({
                 <SheetClose asChild>
                     {onCancel && (
                         <Button variant="secondary" className="flex-1" disabled={isSubmitting} onClick={onCancel}>
-                            Cancel
+                            {t("actions.cancel", { ns: "common" })}
                         </Button>
                     )}
                 </SheetClose>
                 <Button type="submit" className="flex-1" disabled={isSubmitting}>
                     {isSubmitting && <Loader2 className="animate-spin" />}
-                    {submitLabel ?? (client ? "Save changes" : "Create client")}
+                    {submitLabel ?? (client ? t("form.saveChanges") : t("form.create"))}
                 </Button>
             </SheetFooter>
         </form>

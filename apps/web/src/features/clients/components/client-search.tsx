@@ -5,6 +5,7 @@ import {Button} from "@/components/ui/button";
 import {useSearchClients} from "@/features/clients/hooks/use-search-clients";
 import {ClientCard} from "./client-card";
 import type {Client} from "@/features/clients/types/client.types";
+import {useTranslation} from "react-i18next";
 
 interface ClientSearchProps {
     selectedClientId?: string;
@@ -13,6 +14,7 @@ interface ClientSearchProps {
 }
 
 export function ClientSearch({ selectedClientId, onSelect, onCreateNew }: ClientSearchProps) {
+    const { t } = useTranslation("clients");
     const [term, setTerm] = useState("");
     const searchQuery = useSearchClients(term);
     const clients = searchQuery.data?.items ?? [];
@@ -24,7 +26,7 @@ export function ClientSearch({ selectedClientId, onSelect, onCreateNew }: Client
                     <SearchIcon className="size-4 text-muted-foreground" />
                 </InputGroupAddon>
                 <InputGroupInput
-                    placeholder="Search by name or phone"
+                    placeholder={t("search.placeholder")}
                     value={term}
                     onChange={(e) => setTerm(e.target.value)}
                 />
@@ -38,7 +40,7 @@ export function ClientSearch({ selectedClientId, onSelect, onCreateNew }: Client
 
             {!searchQuery.isFetching && term.trim().length >= 2 && clients.length === 0 && (
                 <p className="py-2 text-center text-sm text-muted-foreground">
-                    No clients found for "{term}"
+                    {t("search.empty", { term })}
                 </p>
             )}
 
@@ -55,7 +57,7 @@ export function ClientSearch({ selectedClientId, onSelect, onCreateNew }: Client
 
             <Button type="button" variant="outline" onClick={onCreateNew}>
                 <UserPlusIcon className="size-4" />
-                Create new client
+                {t("search.createNew")}
             </Button>
         </div>
     );
