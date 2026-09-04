@@ -5,5 +5,108 @@
     "sales_manager": "Sales Manager",
     "sales_head": "Sales Head",
     "finance": "Finance"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "page": {
+    "rolesHeading": "Roles"
+  },
+  "roleCard": {
+    "totalUsers_one": "Total {{count}} user",
+    "totalUsers_few": "Total {{count}} users",
+    "totalUsers_many": "Total {{count}} users",
+    "totalUsers_other": "Total {{count}} users"
+  },
+  "card": {
+    "deactivate": "Deactivate",
+    "deactivateDialog": {
+      "title": "Deactivate user?",
+      "description": "This will deactivate \"{{name}}\" and revoke their access. This can be reversed later by an admin.",
+      "confirm": "Deactivate"
+    }
+  },
+  "form": {
+    "fields": {
+      "fullName": "Full name",
+      "email": "Email",
+      "phone": "Phone (optional)",
+      "password": "Password",
+      "newPassword": "New password (optional)",
+      "role": "Role"
+    },
+    "placeholders": {
+      "fullName": "Full name",
+      "email": "name@company.com",
+      "phone": "Phone",
+      "password": "Password",
+      "keepCurrentPassword": "Leave blank to keep current password"
+    },
+    "validation": {
+      "nameMin": "Name must be at least 2 characters",
+      "invalidEmail": "Invalid email",
+      "roleRequired": "Select a role",
+      "passwordMin": "Password must be at least 6 characters"
+    },
+    "submit": {
+      "createUser": "Create user"
+    }
+  },
+  "formSheet": {
+    "editTitle": "Edit user",
+    "addTitle": "Add user",
+    "editDescription": "Update the team member's details.",
+    "addDescription": "Invite a new team member.",
+    "errorMessage": "User could not be saved. Check the details and try again."
+  },
+  "actionBar": {
+    "selected": "{{count}} selected",
+    "clearSelection": "Clear selection"
+  },
+  "pagination": {
+    "rowsPerPage": "Rows per page"
+  },
+  "table": {
+    "headers": {
+      "userId": "User ID",
+      "name": "Name",
+      "role": "Role",
+      "created": "Created",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "empty": {
+      "title": "No users found",
+      "description": "Try adjusting your filters or search."
+    }
+  },
+  "toolbar": {
+    "heading": "All Users",
+    "placeholders": {
+      "filterByStatus": "Filter by status",
+      "filterByRole": "Filter by role",
+      "searchUsers": "Search for users..."
+    },
+    "addUser": "Add New User"
+  },
+  "toasts": {
+    "createSuccessTitle": "Successfully created",
+    "createSuccessDescription": "The new user has been added.",
+    "createErrorTitle": "Failed to create user",
+    "createErrorDescription": "Please check the details and try again.",
+    "updateSuccessTitle": "Successfully updated",
+    "updateSuccessDescription": "The user has been updated.",
+    "updateErrorTitle": "Failed to update user",
+    "updateErrorDescription": "Please try again.",
+    "deactivateSuccessTitle": "User deactivated",
+    "deactivateSuccessDescription": "The user no longer has access.",
+    "deactivateErrorTitle": "Failed to deactivate user",
+    "deactivateErrorDescription": "Please try again.",
+    "bulkDeactivateSuccessTitle": "Users deactivated",
+    "bulkDeactivateSuccessDescription": "Selected users no longer have access.",
+    "bulkDeactivateErrorTitle": "Bulk deactivation had issues",
+    "bulkDeactivateAllFailed": "None of the selected users could be deactivated.",
+    "bulkDeactivatePartialFailed": "{{failed}} of {{count}} selected users could not be deactivated."
   }
 }

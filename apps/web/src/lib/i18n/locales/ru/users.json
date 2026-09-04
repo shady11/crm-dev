@@ -5,5 +5,108 @@
     "sales_manager": "Менеджер по продажам",
     "sales_head": "Руководитель отдела продаж",
     "finance": "Финансы"
+  },
+  "status": {
+    "active": "Активен",
+    "inactive": "Неактивен"
+  },
+  "page": {
+    "rolesHeading": "Роли"
+  },
+  "roleCard": {
+    "totalUsers_one": "Всего {{count}} пользователь",
+    "totalUsers_few": "Всего {{count}} пользователя",
+    "totalUsers_many": "Всего {{count}} пользователей",
+    "totalUsers_other": "Всего {{count}} пользователя"
+  },
+  "card": {
+    "deactivate": "Деактивировать",
+    "deactivateDialog": {
+      "title": "Деактивировать пользователя?",
+      "description": "Пользователь «{{name}}» будет деактивирован, доступ будет отозван. Позже это можно отменить через администратора.",
+      "confirm": "Деактивировать"
+    }
+  },
+  "form": {
+    "fields": {
+      "fullName": "Полное имя",
+      "email": "Email",
+      "phone": "Телефон (необязательно)",
+      "password": "Пароль",
+      "newPassword": "Новый пароль (необязательно)",
+      "role": "Роль"
+    },
+    "placeholders": {
+      "fullName": "Полное имя",
+      "email": "name@company.com",
+      "phone": "Телефон",
+      "password": "Пароль",
+      "keepCurrentPassword": "Оставьте пустым, чтобы сохранить текущий пароль"
+    },
+    "validation": {
+      "nameMin": "Имя должно содержать не менее 2 символов",
+      "invalidEmail": "Некорректный email",
+      "roleRequired": "Выберите роль",
+      "passwordMin": "Пароль должен содержать не менее 6 символов"
+    },
+    "submit": {
+      "createUser": "Создать пользователя"
+    }
+  },
+  "formSheet": {
+    "editTitle": "Изменить пользователя",
+    "addTitle": "Добавить пользователя",
+    "editDescription": "Обновите данные сотрудника.",
+    "addDescription": "Пригласите нового сотрудника.",
+    "errorMessage": "Не удалось сохранить пользователя. Проверьте данные и попробуйте снова."
+  },
+  "actionBar": {
+    "selected": "Выбрано: {{count}}",
+    "clearSelection": "Очистить выбор"
+  },
+  "pagination": {
+    "rowsPerPage": "Строк на странице"
+  },
+  "table": {
+    "headers": {
+      "userId": "ID пользователя",
+      "name": "Имя",
+      "role": "Роль",
+      "created": "Создан",
+      "status": "Статус",
+      "actions": "Действия"
+    },
+    "empty": {
+      "title": "Пользователи не найдены",
+      "description": "Попробуйте изменить фильтры или запрос поиска."
+    }
+  },
+  "toolbar": {
+    "heading": "Все пользователи",
+    "placeholders": {
+      "filterByStatus": "Фильтр по статусу",
+      "filterByRole": "Фильтр по роли",
+      "searchUsers": "Поиск пользователей..."
+    },
+    "addUser": "Добавить пользователя"
+  },
+  "toasts": {
+    "createSuccessTitle": "Успешно создано",
+    "createSuccessDescription": "Новый пользователь добавлен.",
+    "createErrorTitle": "Не удалось создать пользователя",
+    "createErrorDescription": "Проверьте данные и попробуйте снова.",
+    "updateSuccessTitle": "Успешно обновлено",
+    "updateSuccessDescription": "Пользователь обновлён.",
+    "updateErrorTitle": "Не удалось обновить пользователя",
+    "updateErrorDescription": "Попробуйте снова.",
+    "deactivateSuccessTitle": "Пользователь деактивирован",
+    "deactivateSuccessDescription": "У пользователя больше нет доступа.",
+    "deactivateErrorTitle": "Не удалось деактивировать пользователя",
+    "deactivateErrorDescription": "Попробуйте снова.",
+    "bulkDeactivateSuccessTitle": "Пользователи деактивированы",
+    "bulkDeactivateSuccessDescription": "У выбранных пользователей больше нет доступа.",
+    "bulkDeactivateErrorTitle": "Массовая деактивация выполнена с ошибками",
+    "bulkDeactivateAllFailed": "Ни одного из выбранных пользователей не удалось деактивировать.",
+    "bulkDeactivatePartialFailed": "{{failed}} из {{count}} выбранных пользователей не удалось деактивировать."
   }
 }

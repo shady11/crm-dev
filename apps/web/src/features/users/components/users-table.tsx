@@ -33,7 +33,7 @@ export function UsersTable({
                                onDelete,
                                isDeleting,
                            }: UsersTableProps) {
-    const { t } = useTranslation("users");
+    const { t, i18n } = useTranslation("users");
 
     if (isLoading) {
         return (
@@ -50,8 +50,8 @@ export function UsersTable({
                     <EmptyMedia variant="icon">
                         <UsersRoundIcon strokeWidth={1.25} />
                     </EmptyMedia>
-                    <EmptyTitle>No users found</EmptyTitle>
-                    <EmptyDescription>Try adjusting your filters or search.</EmptyDescription>
+                    <EmptyTitle>{t("table.empty.title")}</EmptyTitle>
+                    <EmptyDescription>{t("table.empty.description")}</EmptyDescription>
                 </EmptyHeader>
             </Empty>
         );
@@ -68,17 +68,17 @@ export function UsersTable({
                                 onCheckedChange={(details) => onToggleAll(details.checked === true)}
                             />
                         </TableHead>
-                        <TableHead>User ID</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Created</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
+                        <TableHead>{t("table.headers.userId")}</TableHead>
+                        <TableHead>{t("table.headers.name")}</TableHead>
+                        <TableHead>{t("table.headers.role")}</TableHead>
+                        <TableHead>{t("table.headers.created")}</TableHead>
+                        <TableHead>{t("table.headers.status")}</TableHead>
+                        <TableHead className="text-right">{t("table.headers.actions")}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {users.map((user) => {
-                        const created = formatCreatedAt(user.createdAt);
+                        const created = formatCreatedAt(user.createdAt, i18n.language);
 
                         return (
                             <TableRow key={user.id}>

@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Loader2, TriangleAlert} from "lucide-react";
 import {Controller, useForm} from "react-hook-form";
@@ -23,26 +23,24 @@ import {
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {useTranslation} from "react-i18next";
 
-const baseSchema = z.object({
-    fullName: z.string().trim().min(2, "Name must be at least 2 characters"),
-    email: z.string().trim().email("Invalid email"),
+// The schemas below are built inside the component (see useMemo further
+// down), not here at module scope, so their validation messages re-render
+// in the active language rather than freezing in whatever language was
+// active when the module first loaded.
+const baseSchemaShape = (t: (key: string) => string) => ({
+    fullName: z.string().trim().min(2, t("form.validation.nameMin")),
+    email: z.string().trim().email(t("form.validation.invalidEmail")),
     phone: z.string().trim().optional(),
-    role: z.enum(USER_ROLE_VALUES, "Select a role"),
+    role: z.enum(USER_ROLE_VALUES, t("form.validation.roleRequired")),
 });
 
-const createUserSchema = baseSchema.extend({
-    password: z.string().min(6, "Password must be at least 6 characters"),
-});
-
-const editUserSchema = baseSchema.extend({
-    password: z
-        .string()
-        .min(6, "Password must be at least 6 characters")
-        .optional()
-        .or(z.literal("")),
-});
-
-type UserFormValues = z.infer<typeof editUserSchema>;
+type UserFormValues = {
+    fullName: string;
+    email: string;
+    phone?: string;
+    role: UserRole;
+    password?: string;
+};
 
 type UserFormProps = {
     user?: User | null;
@@ -70,12 +68,33 @@ export function UserForm({
                              onSubmit,
                          }: UserFormProps) {
     const { t } = useTranslation("users");
+    const { t: tCommon } = useTranslation("common");
 
     const { user: currentUser } = useAuth();
     const visibleRoles = getVisibleRoles(currentUser?.role);
 
     const initialRole = normalizeUserRole(user?.role);
     const [, setSelectedRole] = useState<UserRole>(initialRole);
+
+    const createUserSchema = useMemo(() => {
+        const base = baseSchemaShape(t);
+        return z.object({
+            ...base,
+            password: z.string().min(6, t("form.validation.passwordMin")),
+        });
+    }, [t]);
+
+    const editUserSchema = useMemo(() => {
+        const base = baseSchemaShape(t);
+        return z.object({
+            ...base,
+            password: z
+                .string()
+                .min(6, t("form.validation.passwordMin"))
+                .optional()
+                .or(z.literal("")),
+        });
+    }, [t]);
 
     const form = useForm<UserFormValues>({
         resolver: zodResolver(user ? editUserSchema : createUserSchema),
@@ -129,8 +148,12 @@ export function UserForm({
                         name="fullName"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Full name</FieldLabel>
-                                <Input {...field} placeholder="Full name" aria-label="Full name" />
+                                <FieldLabel>{t("form.fields.fullName")}</FieldLabel>
+                                <Input
+                                    {...field}
+                                    placeholder={t("form.placeholders.fullName")}
+                                    aria-label={t("form.fields.fullName")}
+                                />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}
@@ -141,8 +164,13 @@ export function UserForm({
                         name="email"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Email</FieldLabel>
-                                <Input {...field} type="email" placeholder="name@company.com" aria-label="Email" />
+                                <FieldLabel>{t("form.fields.email")}</FieldLabel>
+                                <Input
+                                    {...field}
+                                    type="email"
+                                    placeholder={t("form.placeholders.email")}
+                                    aria-label={t("form.fields.email")}
+                                />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}
@@ -153,8 +181,12 @@ export function UserForm({
                         name="phone"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Phone (optional)</FieldLabel>
-                                <Input {...field} placeholder="Phone" aria-label="Phone" />
+                                <FieldLabel>{t("form.fields.phone")}</FieldLabel>
+                                <Input
+                                    {...field}
+                                    placeholder={t("form.placeholders.phone")}
+                                    aria-label={t("form.fields.phone")}
+                                />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}
@@ -165,12 +197,18 @@ export function UserForm({
                         name="password"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>{user ? "New password (optional)" : "Password"}</FieldLabel>
+                                <FieldLabel>
+                                    {user ? t("form.fields.newPassword") : t("form.fields.password")}
+                                </FieldLabel>
                                 <Input
                                     {...field}
                                     type="password"
-                                    placeholder={user ? "Leave blank to keep current password" : "Password"}
-                                    aria-label="Password"
+                                    placeholder={
+                                        user
+                                            ? t("form.placeholders.keepCurrentPassword")
+                                            : t("form.placeholders.password")
+                                    }
+                                    aria-label={t("form.fields.password")}
                                 />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
@@ -182,7 +220,7 @@ export function UserForm({
                         name="role"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid} orientation="responsive">
-                                <FieldLabel>Role</FieldLabel>
+                                <FieldLabel>{t("form.fields.role")}</FieldLabel>
                                 <Select
                                     collection={roleCollection}
                                     name={field.name}
@@ -197,7 +235,7 @@ export function UserForm({
                                     value={[field.value]}
                                 >
                                     <SelectTrigger className="w-full min-w-32">
-                                        <SelectValue placeholder="Select" />
+                                        <SelectValue placeholder={tCommon("placeholders.select")} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         {roleCollection.items.map((role) => (
@@ -224,13 +262,13 @@ export function UserForm({
                 <SheetClose asChild>
                     {onCancel && (
                         <Button variant="secondary" className="flex-1" disabled={isSubmitting} onClick={onCancel}>
-                            Cancel
+                            {tCommon("actions.cancel")}
                         </Button>
                     )}
                 </SheetClose>
                 <Button type="submit" className="flex-1" disabled={isSubmitting}>
                     {isSubmitting && <Loader2 className="animate-spin" />}
-                    {submitLabel ?? (user ? "Save changes" : "Create user")}
+                    {submitLabel ?? (user ? tCommon("actions.saveChanges") : t("form.submit.createUser"))}
                 </Button>
             </SheetFooter>
         </form>

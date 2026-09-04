@@ -5,14 +5,16 @@ import {UsersPagination} from "@/features/users/components/users-pagination.tsx"
 import {UserFormSheet} from "@/features/users/components/user-form-sheet.tsx";
 import {useUsersList} from "@/features/users/hooks/use-users-list.ts";
 import {UsersActionBar} from "@/features/users/components/users-action-bar.tsx";
+import {useTranslation} from "react-i18next";
 
 export function UsersPage() {
     const { visibleRoles, filters, pagination, table, selection, roleCards, form, actions } = useUsersList();
+    const { t } = useTranslation("users");
 
     return (
         <div className="space-y-6">
             <div className="flex items-start justify-between gap-4">
-                <h2 className="text-2xl font-medium tracking-tight">Roles</h2>
+                <h2 className="text-2xl font-medium tracking-tight">{t("page.rolesHeading")}</h2>
             </div>
 
             <RoleCardsGrid roles={visibleRoles} membersByRole={roleCards.membersByRole} />

@@ -13,11 +13,13 @@ import {
 } from "@/features/users/api/users.api.ts";
 import {getVisibleRoles, type User, type UserRole} from "@/features/users/types/user.types";
 import {initials} from "@/features/users/utils/format.ts";
+import {useTranslation} from "react-i18next";
 
 export type StatusFilter = "all" | "active" | "inactive";
 export type RoleFilterValue = UserRole | "all";
 
 export function useUsersList() {
+    const { t } = useTranslation("users");
     const { user: currentUser } = useAuth();
     const visibleRoles = useMemo(() => getVisibleRoles(currentUser?.role), [currentUser?.role]);
 
@@ -54,11 +56,17 @@ export function useUsersList() {
         mutationFn: (payload: CreateUserPayload) => createUser(payload),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["users"] });
-            toast.success({ title: "Successfully created", description: "The new user has been added." });
+            toast.success({
+                title: t("toasts.createSuccessTitle"),
+                description: t("toasts.createSuccessDescription"),
+            });
             closeForm();
         },
         onError: () => {
-            toast.error({ title: "Failed to create user", description: "Please check the details and try again." });
+            toast.error({
+                title: t("toasts.createErrorTitle"),
+                description: t("toasts.createErrorDescription"),
+            });
         },
     });
 
@@ -66,11 +74,17 @@ export function useUsersList() {
         mutationFn: ({ id, payload }: { id: string; payload: UpdateUserPayload }) => updateUser(id, payload),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["users"] });
-            toast.success({ title: "Successfully updated", description: "The user has been updated." });
+            toast.success({
+                title: t("toasts.updateSuccessTitle"),
+                description: t("toasts.updateSuccessDescription"),
+            });
             closeForm();
         },
         onError: () => {
-            toast.error({ title: "Failed to update user", description: "Please try again." });
+            toast.error({
+                title: t("toasts.updateErrorTitle"),
+                description: t("toasts.updateErrorDescription"),
+            });
         },
     });
 
@@ -78,10 +92,16 @@ export function useUsersList() {
         mutationFn: deleteUser,
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["users"] });
-            toast.success({ title: "User deactivated", description: "The user no longer has access." });
+            toast.success({
+                title: t("toasts.deactivateSuccessTitle"),
+                description: t("toasts.deactivateSuccessDescription"),
+            });
         },
         onError: () => {
-            toast.error({ title: "Failed to deactivate user", description: "Please try again." });
+            toast.error({
+                title: t("toasts.deactivateErrorTitle"),
+                description: t("toasts.deactivateErrorDescription"),
+            });
         },
     });
 
@@ -93,19 +113,22 @@ export function useUsersList() {
             if (failed > 0) {
                 throw new Error(
                     failed === ids.length
-                        ? "None of the selected users could be deactivated."
-                        : `${failed} of ${ids.length} selected users could not be deactivated.`,
+                        ? t("toasts.bulkDeactivateAllFailed")
+                        : t("toasts.bulkDeactivatePartialFailed", { failed, count: ids.length }),
                 );
             }
         },
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["users"] });
-            toast.success({ title: "Users deactivated", description: "Selected users no longer have access." });
+            toast.success({
+                title: t("toasts.bulkDeactivateSuccessTitle"),
+                description: t("toasts.bulkDeactivateSuccessDescription"),
+            });
             setSelectedIds(new Set());
         },
         onError: async (error: Error) => {
             await queryClient.invalidateQueries({ queryKey: ["users"] });
-            toast.error({ title: "Bulk deactivation had issues", description: error.message });
+            toast.error({ title: t("toasts.bulkDeactivateErrorTitle"), description: error.message });
             setSelectedIds(new Set());
         },
     });

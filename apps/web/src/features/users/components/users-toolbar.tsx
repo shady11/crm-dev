@@ -18,12 +18,8 @@ interface UsersToolbarProps {
     onAddUser(): void;
 }
 
-const statusCollection = createListCollection({
-    items: [
-        { label: "Active", value: "active" },
-        { label: "Inactive", value: "inactive" },
-    ],
-});
+// statusCollection is built inside the component (not here at module scope)
+// so its labels re-render when the active language changes.
 
 export function UsersToolbar({
                                  statusFilter,
@@ -37,9 +33,16 @@ export function UsersToolbar({
                              }: UsersToolbarProps) {
     const { t } = useTranslation("users");
 
+    const statusCollection = createListCollection({
+        items: [
+            { label: t("status.active"), value: "active" },
+            { label: t("status.inactive"), value: "inactive" },
+        ],
+    });
+
     const roleCollection = createListCollection({
         items: [
-            { label: "Filter by role", value: "all" },
+            { label: t("toolbar.placeholders.filterByRole"), value: "all" },
             ...visibleRoles.map(
                 (role) => ({
                     label: t(USER_ROLE_LABEL_KEYS[role]),
@@ -51,7 +54,7 @@ export function UsersToolbar({
 
     return (
         <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-medium">All Users</h2>
+            <h2 className="text-lg font-medium">{t("toolbar.heading")}</h2>
 
             <div className="flex flex-wrap items-center gap-2">
                 <Select
@@ -60,7 +63,7 @@ export function UsersToolbar({
                     onValueChange={({ value }) => onStatusFilterChange((value[0] ?? "all") as StatusFilter)}
                 >
                     <SelectTrigger className="w-40">
-                        <SelectValue placeholder="Filter by status" />
+                        <SelectValue placeholder={t("toolbar.placeholders.filterByStatus")} />
                     </SelectTrigger>
                     <SelectContent>
                         {statusCollection.items.map((item) => (
@@ -77,7 +80,7 @@ export function UsersToolbar({
                     onValueChange={({ value }) => onRoleFilterChange((value[0] ?? "all") as RoleFilterValue)}
                 >
                     <SelectTrigger className="w-44">
-                        <SelectValue placeholder="Filter by role" />
+                        <SelectValue placeholder={t("toolbar.placeholders.filterByRole")} />
                     </SelectTrigger>
                     <SelectContent>
                         {roleCollection.items.map((item) => (
@@ -90,7 +93,7 @@ export function UsersToolbar({
 
                 <InputGroup className="w-56">
                     <InputGroupInput
-                        placeholder="Search for users..."
+                        placeholder={t("toolbar.placeholders.searchUsers")}
                         value={search}
                         onChange={(e) => onSearchChange(e.target.value)}
                     />
@@ -101,7 +104,7 @@ export function UsersToolbar({
 
                 <Button onClick={onAddUser}>
                     <Plus className="size-3" />
-                    Add New User
+                    {t("toolbar.addUser")}
                 </Button>
             </div>
         </div>

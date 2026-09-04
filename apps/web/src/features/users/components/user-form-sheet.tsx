@@ -2,6 +2,7 @@ import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle} from "@/
 import {UserForm} from "@/features/users/components/user-form.tsx";
 import type {CreateUserPayload, UpdateUserPayload} from "@/features/users/api/users.api.ts";
 import type {User} from "@/features/users/types/user.types";
+import {useTranslation} from "react-i18next";
 
 interface UserFormSheetProps {
     open: boolean;
@@ -13,23 +14,24 @@ interface UserFormSheetProps {
 }
 
 export function UserFormSheet({ open, user, isSubmitting, hasError, onClose, onSubmit }: UserFormSheetProps) {
+    const { t } = useTranslation("users");
+    const { t: tCommon } = useTranslation("common");
+
     return (
         <Sheet onOpenChange={({ open: isOpen }) => !isOpen && onClose()} open={open}>
             <SheetContent variant="inset" className="sm:max-w-md">
                 <SheetHeader>
-                    <SheetTitle>{user ? "Edit user" : "Add user"}</SheetTitle>
+                    <SheetTitle>{user ? t("formSheet.editTitle") : t("formSheet.addTitle")}</SheetTitle>
                     <SheetDescription>
-                        {user ? "Update the team member's details." : "Invite a new team member."}
+                        {user ? t("formSheet.editDescription") : t("formSheet.addDescription")}
                     </SheetDescription>
                 </SheetHeader>
                 <UserForm
                     key={`${user?.id ?? "create-user"}-${open ? "open" : "closed"}`}
                     user={user}
-                    errorMessage={
-                        hasError ? "User could not be saved. Check the details and try again." : undefined
-                    }
+                    errorMessage={hasError ? t("formSheet.errorMessage") : undefined}
                     isSubmitting={isSubmitting}
-                    submitLabel={user ? "Save changes" : "Create user"}
+                    submitLabel={user ? tCommon("actions.saveChanges") : t("form.submit.createUser")}
                     onCancel={onClose}
                     onSubmit={onSubmit}
                 />

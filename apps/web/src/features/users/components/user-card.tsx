@@ -27,6 +27,7 @@ type Props = {
 
 export function UserCard({ user, onEdit, onDelete, isDeleting }: Props) {
     const { t } = useTranslation("users");
+    const { t: tCommon } = useTranslation("common");
     const [deactivateOpen, setDeactivateOpen] = useState(false);
 
     return (
@@ -63,11 +64,11 @@ export function UserCard({ user, onEdit, onDelete, isDeleting }: Props) {
                     <div className="flex items-center justify-end gap-2">
                         <Button variant="outline" size="sm" onClick={() => onEdit?.(user)}>
                             <Pen className="size-3" />
-                            Edit
+                            {tCommon("actions.edit")}
                         </Button>
                         <Button variant="destructive" size="sm" onClick={() => setDeactivateOpen(true)}>
                             <Trash2 className="size-3" />
-                            Deactivate
+                            {t("card.deactivate")}
                         </Button>
                     </div>
                 </div>
@@ -76,15 +77,14 @@ export function UserCard({ user, onEdit, onDelete, isDeleting }: Props) {
             <AlertDialog open={deactivateOpen} onOpenChange={({ open }) => setDeactivateOpen(open)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Deactivate user?</AlertDialogTitle>
+                        <AlertDialogTitle>{t("card.deactivateDialog.title")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will deactivate "{user.fullName}" and revoke their access. This can be reversed
-                            later by an admin.
+                            {t("card.deactivateDialog.description", { name: user.fullName })}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
 
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel disabled={isDeleting}>{tCommon("actions.cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                             variant="destructive"
                             disabled={isDeleting}
@@ -93,7 +93,7 @@ export function UserCard({ user, onEdit, onDelete, isDeleting }: Props) {
                                 setDeactivateOpen(false);
                             }}
                         >
-                            Deactivate
+                            {t("card.deactivate")}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

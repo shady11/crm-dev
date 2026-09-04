@@ -41,7 +41,7 @@ export function RoleCard({ role, memberCount, memberInitials }: RoleCardProps) {
                         )}
                     </div>
                     <span className="text-sm text-muted-foreground">
-                        Total {memberCount} user{memberCount !== 1 ? "s" : ""}
+                        {t("roleCard.totalUsers", { count: memberCount })}
                     </span>
                 </div>
             </CardContent>
