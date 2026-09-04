@@ -7,6 +7,7 @@ import {DeleteBlockButton} from "./delete-block-button.tsx";
 import {AddEntranceButton} from "@/features/entrances/components/add-entrance-button.tsx";
 import {EntranceItem} from "@/features/entrances/components/entrance-item.tsx";
 import {DuplicateBlockButton} from "@/features/blocks/components/duplicate-block-button.tsx";
+import {useTranslation} from "react-i18next";
 
 interface BlockItemProps {
     block: Block;
@@ -15,6 +16,8 @@ interface BlockItemProps {
 }
 
 export function BlockItem({ block, isExpanded, onToggle }: BlockItemProps) {
+    const { t } = useTranslation("blocks");
+
     return (
         <div>
             <Item
@@ -29,8 +32,8 @@ export function BlockItem({ block, isExpanded, onToggle }: BlockItemProps) {
                     <Building className="size-8" strokeWidth={1.25} />
                 </ItemMedia>
                 <ItemContent>
-                    <ItemTitle>Block {block.name}</ItemTitle>
-                    <ItemDescription>{block.entrances.length} entrances</ItemDescription>
+                    <ItemTitle>{t("item.titleWithName", { name: block.name })}</ItemTitle>
+                    <ItemDescription>{t("item.entrances", { count: block.entrances.length })}</ItemDescription>
                 </ItemContent>
                 <ItemActions onClick={(e) => e.stopPropagation()}>
                     <AddEntranceButton

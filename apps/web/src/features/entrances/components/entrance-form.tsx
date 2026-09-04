@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {Loader2, TriangleAlert} from "lucide-react";
 import {Controller, useForm} from "react-hook-form";
 import { z } from "zod";
+import {useTranslation} from "react-i18next";
 import { Button } from "@/components/ui/button.tsx";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field.tsx";
 import { Input } from "@/components/ui/input.tsx";
@@ -17,12 +18,10 @@ import {Alert, AlertTitle} from "@/components/ui/alert.tsx";
 //     NumberInputInput
 // } from "@/components/ui/number-input.tsx";
 
-const entranceSchema = z.object({
-    name: z.string().trim().min(1, "Entrance name is required"),
-    order: z.number().int().positive().optional(),
-});
-
-type EntranceFormValues = z.infer<typeof entranceSchema>;
+type EntranceFormValues = {
+    name: string;
+    order?: number;
+};
 
 type EntranceFormProps = {
     entrance?: Entrance | null;
@@ -43,6 +42,13 @@ export function EntranceForm({
                                  onCancel,
                                  onSubmit,
                              }: EntranceFormProps) {
+    const { t } = useTranslation("entrances");
+
+    const entranceSchema = useMemo(() => z.object({
+        name: z.string().trim().min(1, t("validation.nameRequired")),
+        order: z.number().int().positive().optional(),
+    }), [t]);
+
     const form = useForm<EntranceFormValues>({
         resolver: zodResolver(entranceSchema),
         defaultValues: {
@@ -79,11 +85,11 @@ export function EntranceForm({
                         name="name"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Name</FieldLabel>
+                                <FieldLabel>{t("form.nameLabel")}</FieldLabel>
                                 <Input
                                     {...field}
-                                    placeholder="Entrance name (e.g., 1, 2, Main)"
-                                    aria-label="Entrance name"
+                                    placeholder={t("form.namePlaceholder")}
+                                    aria-label={t("form.namePlaceholder")}
                                 />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
@@ -136,14 +142,12 @@ export function EntranceForm({
                             className="flex-1"
                             disabled={isSubmitting}
                             onClick={onCancel}
-                        >
-                            Cancel
-                        </Button>
+                        >{t("common:actions.cancel")}</Button>
                     )}
                 </SheetClose>
                 <Button type="submit" className="flex-1" disabled={isSubmitting}>
                     {isSubmitting && <Loader2 className="animate-spin"/>}
-                    {submitLabel ?? (entrance ? "Save changes" : "Create entrance")}
+                    {submitLabel ?? (entrance ? t("common:actions.saveChanges") : t("form.submitCreate"))}
                 </Button>
             </SheetFooter>
         </form>

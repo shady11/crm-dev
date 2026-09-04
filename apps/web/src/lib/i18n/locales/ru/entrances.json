@@ -1,0 +1,47 @@
+{
+  "actions": {
+    "addEntrance": "Добавить подъезд",
+    "createEntrance": "Создать подъезд",
+    "editEntrance": "Редактировать подъезд"
+  },
+  "addToBlock": "Добавить подъезд в блок {{name}}",
+  "form": {
+    "nameLabel": "Название",
+    "namePlaceholder": "Название подъезда (например, 1, 2, Главный)",
+    "orderLabel": "Порядок отображения (необязательно)",
+    "submitCreate": "Создать подъезд",
+    "errorCreate": "Не удалось создать подъезд. Проверьте данные и попробуйте снова.",
+    "errorSave": "Не удалось сохранить подъезд. Проверьте данные и попробуйте снова."
+  },
+  "validation": {
+    "nameRequired": "Название подъезда обязательно"
+  },
+  "item": {
+    "titleWithName": "Подъезд {{name}}",
+    "floors_one": "{{count}} этаж",
+    "floors_few": "{{count}} этажа",
+    "floors_many": "{{count}} этажей",
+    "floors_other": "{{count}} этажа"
+  },
+  "delete": {
+    "title": "Удалить подъезд?",
+    "description": "Подъезд {{name}} и все его этажи и юниты будут удалены безвозвратно. Это действие нельзя отменить."
+  },
+  "duplicate": {
+    "title": "Дублировать подъезд?",
+    "descriptionPrefix": "Будет создана копия ",
+    "nameLabel": "подъезда {{name}}",
+    "descriptionSuffix": " со всеми этажами и юнитами."
+  },
+  "toasts": {
+    "createdTitle": "Успешно создано",
+    "createdDescription": "Подъезд {{name}} создан.",
+    "createErrorTitle": "Не удалось создать подъезд",
+    "updatedTitle": "Успешно обновлено",
+    "updatedDescription": "Подъезд {{name}} обновлён.",
+    "deletedTitle": "Успешно удалено",
+    "deletedDescription": "Подъезд {{name}} удалён.",
+    "duplicatedTitle": "Успешно продублировано",
+    "duplicatedDescription": "Подъезд {{name}} продублирован."
+  }
+}

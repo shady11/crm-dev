@@ -15,12 +15,14 @@ import {
 import { api } from "@/lib/api.ts";
 import type { Floor } from "@/features/floors/types/floor.types.ts";
 import {toast} from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 
 interface DuplicateFloorButtonProps {
     floor: Floor;
 }
 
 export function DuplicateFloorButton({ floor }: DuplicateFloorButtonProps) {
+    const { t } = useTranslation("floors");
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -30,8 +32,7 @@ export function DuplicateFloorButton({ floor }: DuplicateFloorButtonProps) {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
 
             toast.success({
-                title: "Successfully duplicated",
-                // description: `Floor ${floor.name} has been duplicated.`,
+                title: t("toasts.duplicatedTitle"),
             });
 
             setOpen(false);
@@ -54,20 +55,16 @@ export function DuplicateFloorButton({ floor }: DuplicateFloorButtonProps) {
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Duplicate floor?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This will create a copy of Floor {floor.number} with all its units.
-                        </AlertDialogDescription>
+                        <AlertDialogTitle>{t("duplicate.title")}</AlertDialogTitle>
+                        <AlertDialogDescription>{t("duplicate.description", { number: floor.number })}</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={duplicateMutation.isPending}>
-                            Cancel
-                        </AlertDialogCancel>
+                        <AlertDialogCancel disabled={duplicateMutation.isPending}>{t("common:actions.cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                             disabled={duplicateMutation.isPending}
                             onClick={() => duplicateMutation.mutate()}
                         >
-                            {duplicateMutation.isPending ? "Duplicating..." : "Duplicate"}
+                            {duplicateMutation.isPending ? t("common:actions.duplicating") : t("common:actions.duplicate")}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

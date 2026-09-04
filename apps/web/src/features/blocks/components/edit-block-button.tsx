@@ -7,12 +7,14 @@ import { updateBlock } from "@/features/blocks/api/blocks.api.ts";
 import type { Block } from "@/features/blocks/types/block.types.ts";
 import { BlockForm } from "./block-form.tsx";
 import {toast} from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 
 interface EditBlockButtonProps {
     block: Block;
 }
 
 export function EditBlockButton({ block }: EditBlockButtonProps) {
+    const { t } = useTranslation("blocks");
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -24,8 +26,8 @@ export function EditBlockButton({ block }: EditBlockButtonProps) {
             await queryClient.invalidateQueries({ queryKey: ["project", block.projectId] });
 
             toast.success({
-                title: "Successfully updated",
-                description: `Block ${variables.name} has been updated.`,
+                title: t("toasts.updatedTitle"),
+                description: t("toasts.updatedDescription", { name: variables.name }),
             });
 
             setOpen(false);
@@ -51,18 +53,18 @@ export function EditBlockButton({ block }: EditBlockButtonProps) {
                     variant="inset"
                 >
                     <SheetHeader>
-                        <SheetTitle>Edit block</SheetTitle>
+                        <SheetTitle>{t("actions.editBlock")}</SheetTitle>
                     </SheetHeader>
                     <BlockForm
                         key={`block-${block.id}-${open ? "open" : "closed"}`}
                         block={block}
                         errorMessage={
                             updateBlockMutation.isError
-                                ? "Block could not be saved. Check the details and try again."
+                                ? t("form.errorGeneric")
                                 : undefined
                         }
                         isSubmitting={updateBlockMutation.isPending}
-                        submitLabel="Save changes"
+                        submitLabel={t("common:actions.saveChanges")}
                         onCancel={() => setOpen(false)}
                         onSubmit={(payload) => updateBlockMutation.mutate(payload)}
                     />

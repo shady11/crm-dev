@@ -1,0 +1,45 @@
+{
+  "actions": {
+    "addBlock": "Add Block",
+    "createBlock": "Create block",
+    "editBlock": "Edit block"
+  },
+  "form": {
+    "nameLabel": "Name",
+    "namePlaceholder": "Block name (e.g., A, B, C)",
+    "orderLabel": "Order (Optional)",
+    "submitCreate": "Create block",
+    "errorGeneric": "Block could not be saved. Check the details and try again."
+  },
+  "validation": {
+    "nameRequired": "Block name is required"
+  },
+  "item": {
+    "titleWithName": "Block {{name}}",
+    "entrances_one": "{{count}} entrance",
+    "entrances_few": "{{count}} entrances",
+    "entrances_many": "{{count}} entrances",
+    "entrances_other": "{{count}} entrances"
+  },
+  "delete": {
+    "title": "Delete block?",
+    "description": "This will permanently delete Block {{name}} and all its entrances, floors, and units. This action cannot be undone."
+  },
+  "duplicate": {
+    "title": "Duplicate block?",
+    "descriptionPrefix": "This will create a copy of ",
+    "nameLabel": "Block {{name}}",
+    "descriptionSuffix": " with all its entrances, floors, and units."
+  },
+  "toasts": {
+    "createdTitle": "Successfully created",
+    "createdDescription": "Block {{name}} has been added to the project.",
+    "createErrorTitle": "Failed to create block",
+    "updatedTitle": "Successfully updated",
+    "updatedDescription": "Block {{name}} has been updated.",
+    "deletedTitle": "Successfully deleted",
+    "deletedDescription": "Block {{name}} has been deleted.",
+    "duplicatedTitle": "Successfully created",
+    "duplicatedDescription": "Block {{name}} has been duplicated."
+  }
+}

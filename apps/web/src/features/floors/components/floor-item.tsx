@@ -9,6 +9,7 @@ import {UnitTable} from "@/features/units/components/unit-table.tsx";
 import {AddUnitsBulkButton} from "@/features/units/components/add-units-bulk-button.tsx";
 import type {Unit} from "@/features/units/types/unit.types.ts";
 import {DuplicateFloorButton} from "@/features/floors/components/duplicate-floor-button.tsx";
+import {useTranslation} from "react-i18next";
 
 interface FloorItemProps {
     floor: Floor;
@@ -19,6 +20,7 @@ export function FloorItem({
                               floor,
                               allBlockUnits = []
 }: FloorItemProps) {
+    const { t } = useTranslation("floors");
     const [isExpanded, setIsExpanded] = useState(false);
 
     return (
@@ -28,8 +30,8 @@ export function FloorItem({
                     <Layers2 className="size-4" />
                 </ItemMedia>
                 <ItemContent onClick={() => setIsExpanded(!isExpanded)}>
-                    <ItemTitle>Floor {floor.number}</ItemTitle>
-                    <ItemDescription>{floor.units?.length || 0} units</ItemDescription>
+                    <ItemTitle>{t("item.titleWithNumber", { number: floor.number })}</ItemTitle>
+                    <ItemDescription>{t("item.units", { count: floor.units?.length || 0 })}</ItemDescription>
                 </ItemContent>
                 <ItemActions>
                     <AddUnitButton floor={floor} />

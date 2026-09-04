@@ -15,12 +15,14 @@ import {
 import { deleteBlock } from "@/features/blocks/api/blocks.api.ts";
 import type { Block } from "@/features/blocks/types/block.types.ts";
 import {toast} from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 
 interface DeleteBlockButtonProps {
     block: Block;
 }
 
 export function DeleteBlockButton({ block }: DeleteBlockButtonProps) {
+    const { t } = useTranslation("blocks");
     const queryClient = useQueryClient();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -31,8 +33,8 @@ export function DeleteBlockButton({ block }: DeleteBlockButtonProps) {
             await queryClient.invalidateQueries({ queryKey: ["project", block.projectId] });
 
             toast.success({
-                title: "Successfully deleted",
-                description: `Block ${block.name} has been deleted.`,
+                title: t("toasts.deletedTitle"),
+                description: t("toasts.deletedDescription", { name: block.name }),
             });
 
             setIsOpen(false);
@@ -55,22 +57,17 @@ export function DeleteBlockButton({ block }: DeleteBlockButtonProps) {
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete block?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This will permanently delete Block {block.name} and all its entrances, floors, and units.
-                            This action cannot be undone.
-                        </AlertDialogDescription>
+                        <AlertDialogTitle>{t("delete.title")}</AlertDialogTitle>
+                        <AlertDialogDescription>{t("delete.description", { name: block.name })}</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={deleteBlockMutation.isPending}>
-                            Cancel
-                        </AlertDialogCancel>
+                        <AlertDialogCancel disabled={deleteBlockMutation.isPending}>{t("common:actions.cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                             variant="destructive"
                             disabled={deleteBlockMutation.isPending}
                             onClick={() => deleteBlockMutation.mutate()}
                         >
-                            {deleteBlockMutation.isPending ? "Deleting..." : "Delete"}
+                            {deleteBlockMutation.isPending ? t("common:actions.deleting") : t("common:actions.delete")}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

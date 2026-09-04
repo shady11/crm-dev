@@ -15,12 +15,14 @@ import {
 import { api } from "@/lib/api.ts";
 import type { Entrance } from "@/features/entrances/types/entrance.types.ts";
 import {toast} from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 
 interface DuplicateEntranceButtonProps {
     entrance: Entrance;
 }
 
 export function DuplicateEntranceButton({ entrance }: DuplicateEntranceButtonProps) {
+    const { t } = useTranslation("entrances");
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -30,8 +32,8 @@ export function DuplicateEntranceButton({ entrance }: DuplicateEntranceButtonPro
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
 
             toast.success({
-                title: "Successfully duplicated",
-                // description: `Entrance ${entrance.name} has been duplicated.`,
+                title: t("toasts.duplicatedTitle"),
+                description: t("toasts.duplicatedDescription", { name: entrance.name }),
             });
 
             setOpen(false);
@@ -54,20 +56,20 @@ export function DuplicateEntranceButton({ entrance }: DuplicateEntranceButtonPro
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Duplicate entrance?</AlertDialogTitle>
+                        <AlertDialogTitle>{t("duplicate.title")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will create a copy of <strong>Entrance {entrance.name}</strong> with all its floors and units.
+                            {t("duplicate.descriptionPrefix")}
+                            <strong>{t("duplicate.nameLabel", { name: entrance.name })}</strong>
+                            {t("duplicate.descriptionSuffix")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={duplicateMutation.isPending}>
-                            Cancel
-                        </AlertDialogCancel>
+                        <AlertDialogCancel disabled={duplicateMutation.isPending}>{t("common:actions.cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                             disabled={duplicateMutation.isPending}
                             onClick={() => duplicateMutation.mutate()}
                         >
-                            {duplicateMutation.isPending ? "Duplicating..." : "Duplicate"}
+                            {duplicateMutation.isPending ? t("common:actions.duplicating") : t("common:actions.duplicate")}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

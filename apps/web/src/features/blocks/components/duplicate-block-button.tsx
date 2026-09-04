@@ -15,12 +15,14 @@ import {
 import { api } from "@/lib/api.ts";
 import type { Block } from "@/features/blocks/types/block.types.ts";
 import {toast} from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 
 interface DuplicateBlockButtonProps {
     block: Block;
 }
 
 export function DuplicateBlockButton({ block }: DuplicateBlockButtonProps) {
+    const { t } = useTranslation("blocks");
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -31,8 +33,8 @@ export function DuplicateBlockButton({ block }: DuplicateBlockButtonProps) {
             await queryClient.invalidateQueries({ queryKey: ["project", block.projectId] });
 
             toast.success({
-                title: "Successfully created",
-                description: `Block ${block.name} has been duplicated.`,
+                title: t("toasts.duplicatedTitle"),
+                description: t("toasts.duplicatedDescription", { name: block.name }),
             });
 
             setOpen(false);
@@ -55,20 +57,20 @@ export function DuplicateBlockButton({ block }: DuplicateBlockButtonProps) {
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Duplicate block?</AlertDialogTitle>
+                        <AlertDialogTitle>{t("duplicate.title")}</AlertDialogTitle>
                         <AlertDialogDescription>
-                            This will create a copy of <strong>Block {block.name}</strong> with all its entrances, floors, and units.
+                            {t("duplicate.descriptionPrefix")}
+                            <strong>{t("duplicate.nameLabel", { name: block.name })}</strong>
+                            {t("duplicate.descriptionSuffix")}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={duplicateMutation.isPending}>
-                            Cancel
-                        </AlertDialogCancel>
+                        <AlertDialogCancel disabled={duplicateMutation.isPending}>{t("common:actions.cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                             disabled={duplicateMutation.isPending}
                             onClick={() => duplicateMutation.mutate()}
                         >
-                            {duplicateMutation.isPending ? "Duplicating..." : "Duplicate"}
+                            {duplicateMutation.isPending ? t("common:actions.duplicating") : t("common:actions.duplicate")}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

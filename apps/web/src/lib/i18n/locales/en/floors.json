@@ -1,0 +1,53 @@
+{
+  "actions": {
+    "addFloor": "Add Floor",
+    "bulkFloors": "Bulk Floors",
+    "createFloor": "Create floors",
+    "editFloor": "Edit floor"
+  },
+  "addToEntrance": "Add floor to Entrance {{name}}",
+  "form": {
+    "numberLabel": "Floor Number",
+    "submitCreate": "Create floors",
+    "errorGeneric": "Floor could not be created. Check the details and try again.",
+    "errorSave": "Floor could not be saved. Check the details and try again."
+  },
+  "validation": {
+    "numberPositive": "Floor number must be positive"
+  },
+  "item": {
+    "titleWithNumber": "Floor {{number}}",
+    "units_one": "{{count}} unit",
+    "units_few": "{{count}} units",
+    "units_many": "{{count}} units",
+    "units_other": "{{count}} units"
+  },
+  "bulk": {
+    "title": "Add multiple floors to Entrance {{name}}",
+    "floorsHeading": "Floors",
+    "existingFloors": "Existing floors: {{ranges}}",
+    "addFloor": "Add Floor",
+    "floorNumberLabel": "Floor Number",
+    "duplicateNumberError": "This floor number already exists.",
+    "duplicateNumbersAlert": "Duplicate floor numbers detected. Please fix them before creating.",
+    "submitCreate_one": "Create {{count}} Floor",
+    "submitCreate_few": "Create {{count}} Floors",
+    "submitCreate_many": "Create {{count}} Floors",
+    "submitCreate_other": "Create {{count}} Floors",
+    "errorGeneric": "Floors could not be created. Check the details and try again."
+  },
+  "delete": {
+    "title": "Delete floor?",
+    "description": "This will permanently delete Floor {{number}} and all its units. This action cannot be undone."
+  },
+  "duplicate": {
+    "title": "Duplicate floor?",
+    "description": "This will create a copy of Floor {{number}} with all its units."
+  },
+  "toasts": {
+    "createdTitle": "Successfully created",
+    "updatedTitle": "Successfully updated",
+    "deletedTitle": "Successfully deleted",
+    "duplicatedTitle": "Successfully duplicated"
+  }
+}

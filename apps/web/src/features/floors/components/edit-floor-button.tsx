@@ -7,12 +7,14 @@ import { updateFloor } from "@/features/floors/api/floors.api.ts";
 import type { Floor } from "@/features/floors/types/floor.types.ts";
 import { FloorForm } from "./floor-form.tsx";
 import {toast} from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 
 interface EditFloorButtonProps {
     floor: Floor;
 }
 
 export function EditFloorButton({ floor }: EditFloorButtonProps) {
+    const { t } = useTranslation("floors");
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -23,8 +25,7 @@ export function EditFloorButton({ floor }: EditFloorButtonProps) {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
 
             toast.success({
-                title: "Successfully updated",
-                // description: `Floor ${variables.name} has been updated.`,
+                title: t("toasts.updatedTitle"),
             });
 
             setOpen(false);
@@ -47,18 +48,18 @@ export function EditFloorButton({ floor }: EditFloorButtonProps) {
             >
                 <SheetContent className="sm:max-w-sm" variant="inset">
                     <SheetHeader>
-                        <SheetTitle>Edit floor</SheetTitle>
+                        <SheetTitle>{t("actions.editFloor")}</SheetTitle>
                     </SheetHeader>
                     <FloorForm
                         key={`floor-${floor.id}-${open ? "open" : "closed"}`}
                         floor={floor}
                         errorMessage={
                             updateFloorMutation.isError
-                                ? "Floor could not be saved. Check the details and try again."
+                                ? t("form.errorSave")
                                 : undefined
                         }
                         isSubmitting={updateFloorMutation.isPending}
-                        submitLabel="Save changes"
+                        submitLabel={t("common:actions.saveChanges")}
                         onCancel={() => setOpen(false)}
                         onSubmit={(payload) => updateFloorMutation.mutate(payload)}
                     />

@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {Loader2, TriangleAlert} from "lucide-react";
 import {Controller, useForm} from "react-hook-form";
 import { z } from "zod";
+import {useTranslation} from "react-i18next";
 import { Button } from "@/components/ui/button.tsx";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field.tsx";
 import { Input } from "@/components/ui/input.tsx";
@@ -17,12 +18,10 @@ import {
     NumberInputInput
 } from "@/components/ui/number-input.tsx";
 
-const blockSchema = z.object({
-    name: z.string().trim().min(1, "Block name is required"),
-    order: z.number().int().positive().optional(),
-});
-
-type BlockFormValues = z.infer<typeof blockSchema>;
+type BlockFormValues = {
+    name: string;
+    order?: number;
+};
 
 export type BlockPayload = {
     name: string;
@@ -48,6 +47,13 @@ export function BlockForm({
                               onCancel,
                               onSubmit,
                           }: BlockFormProps) {
+    const { t } = useTranslation("blocks");
+
+    const blockSchema = useMemo(() => z.object({
+        name: z.string().trim().min(1, t("validation.nameRequired")),
+        order: z.number().int().positive().optional(),
+    }), [t]);
+
     const form = useForm<BlockFormValues>({
         resolver: zodResolver(blockSchema),defaultValues: {
             name: "",
@@ -83,11 +89,11 @@ export function BlockForm({
                         name="name"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Name</FieldLabel>
+                                <FieldLabel>{t("form.nameLabel")}</FieldLabel>
                                 <Input
                                     {...field}
-                                    placeholder="Block name (e.g., A, B, C)"
-                                    aria-label="Block name"
+                                    placeholder={t("form.namePlaceholder")}
+                                    aria-label={t("form.namePlaceholder")}
                                 />
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
@@ -99,7 +105,7 @@ export function BlockForm({
                         name="order"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Order (Optional)</FieldLabel>
+                                <FieldLabel>{t("form.orderLabel")}</FieldLabel>
                                 <NumberInput
                                     value={field.value?.toString() ?? ""}
                                     min={1}
@@ -141,14 +147,12 @@ export function BlockForm({
                             className="flex-1"
                             disabled={isSubmitting}
                             onClick={onCancel}
-                        >
-                            Cancel
-                        </Button>
+                        >{t("common:actions.cancel")}</Button>
                     )}
                 </SheetClose>
                 <Button type="submit" className="flex-1" disabled={isSubmitting}>
                     {isSubmitting && <Loader2 className="animate-spin"/>}
-                    {submitLabel ?? (block ? "Save changes" : "Create block")}
+                    {submitLabel ?? (block ? t("common:actions.saveChanges") : t("form.submitCreate"))}
                 </Button>
             </SheetFooter>
         </form>

@@ -15,12 +15,14 @@ import {
 import { deleteEntrance } from "@/features/entrances/api/entrances.api.ts";
 import type { Entrance } from "@/features/entrances/types/entrance.types.ts";
 import {toast} from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 
 interface DeleteEntranceButtonProps {
     entrance: Entrance;
 }
 
 export function DeleteEntranceButton({ entrance }: DeleteEntranceButtonProps) {
+    const { t } = useTranslation("entrances");
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -30,8 +32,8 @@ export function DeleteEntranceButton({ entrance }: DeleteEntranceButtonProps) {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
 
             toast.success({
-                title: "Successfully deleted",
-                // description: `Entrance ${entrance.name} has been deleted.`,
+                title: t("toasts.deletedTitle"),
+                description: t("toasts.deletedDescription", { name: entrance.name }),
             });
 
             setOpen(false);
@@ -54,22 +56,17 @@ export function DeleteEntranceButton({ entrance }: DeleteEntranceButtonProps) {
             >
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Delete entrance?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This will permanently delete Entrance {entrance.name} and all its floors and units.
-                            This action cannot be undone.
-                        </AlertDialogDescription>
+                        <AlertDialogTitle>{t("delete.title")}</AlertDialogTitle>
+                        <AlertDialogDescription>{t("delete.description", { name: entrance.name })}</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={deleteEntranceMutation.isPending}>
-                            Cancel
-                        </AlertDialogCancel>
+                        <AlertDialogCancel disabled={deleteEntranceMutation.isPending}>{t("common:actions.cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                             variant="destructive"
                             disabled={deleteEntranceMutation.isPending}
                             onClick={() => deleteEntranceMutation.mutate()}
                         >
-                            {deleteEntranceMutation.isPending ? "Deleting..." : "Delete"}
+                            {deleteEntranceMutation.isPending ? t("common:actions.deleting") : t("common:actions.delete")}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

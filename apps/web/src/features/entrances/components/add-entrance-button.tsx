@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { createEntrance } from "@/features/entrances/api/entrances.api.ts";
 import { EntranceForm } from "./entrance-form.tsx";
 import {toast} from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 import type {Block} from "@/features/blocks/types/block.types.ts";
 
 interface AddEntranceButtonProps {
@@ -13,6 +14,7 @@ interface AddEntranceButtonProps {
 }
 
 export function AddEntranceButton({ block }: AddEntranceButtonProps) {
+    const { t } = useTranslation("entrances");
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -23,8 +25,8 @@ export function AddEntranceButton({ block }: AddEntranceButtonProps) {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
 
             toast.success({
-                title: "Successfully created",
-                description: `Entrance ${variables.name} has been created.`,
+                title: t("toasts.createdTitle"),
+                description: t("toasts.createdDescription", { name: variables.name }),
             });
 
             setOpen(false);
@@ -44,9 +46,7 @@ export function AddEntranceButton({ block }: AddEntranceButtonProps) {
                 variant="outline"
                 onClick={() => setOpen(true)}
             >
-                <Plus className="size-3" />
-                Add Entrance
-            </Button>
+                <Plus className="size-3" /> {t("actions.addEntrance")}</Button>
 
             <Sheet
                 onOpenChange={({ open: isOpen }) => setOpen(isOpen)}
@@ -54,18 +54,18 @@ export function AddEntranceButton({ block }: AddEntranceButtonProps) {
             >
                 <SheetContent className="sm:max-w-sm" variant="inset">
                     <SheetHeader>
-                        <SheetTitle>Add entrance to Block {block.name}</SheetTitle>
+                        <SheetTitle>{t("addToBlock", { name: block.name })}</SheetTitle>
                     </SheetHeader>
                     <EntranceForm
                         key={`entrance-new-${open ? "open" : "closed"}`}
                         defaultOrder={nextEntranceOrder}
                         errorMessage={
                             createEntranceMutation.isError
-                                ? "Entrance could not be created. Check the details and try again."
+                                ? t("form.errorCreate")
                                 : undefined
                         }
                         isSubmitting={createEntranceMutation.isPending}
-                        submitLabel="Create entrance"
+                        submitLabel={t("form.submitCreate")}
                         onCancel={() => setOpen(false)}
                         onSubmit={(payload) => createEntranceMutation.mutate(payload)}
                     />

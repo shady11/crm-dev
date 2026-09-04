@@ -1,0 +1,47 @@
+{
+  "actions": {
+    "addEntrance": "Add Entrance",
+    "createEntrance": "Create entrance",
+    "editEntrance": "Edit entrance"
+  },
+  "addToBlock": "Add entrance to Block {{name}}",
+  "form": {
+    "nameLabel": "Name",
+    "namePlaceholder": "Entrance name (e.g., 1, 2, Main)",
+    "orderLabel": "Display order (optional)",
+    "submitCreate": "Create entrance",
+    "errorCreate": "Entrance could not be created. Check the details and try again.",
+    "errorSave": "Entrance could not be saved. Check the details and try again."
+  },
+  "validation": {
+    "nameRequired": "Entrance name is required"
+  },
+  "item": {
+    "titleWithName": "Entrance {{name}}",
+    "floors_one": "{{count}} floor",
+    "floors_few": "{{count}} floors",
+    "floors_many": "{{count}} floors",
+    "floors_other": "{{count}} floors"
+  },
+  "delete": {
+    "title": "Delete entrance?",
+    "description": "This will permanently delete Entrance {{name}} and all its floors and units. This action cannot be undone."
+  },
+  "duplicate": {
+    "title": "Duplicate entrance?",
+    "descriptionPrefix": "This will create a copy of ",
+    "nameLabel": "Entrance {{name}}",
+    "descriptionSuffix": " with all its floors and units."
+  },
+  "toasts": {
+    "createdTitle": "Successfully created",
+    "createdDescription": "Entrance {{name}} has been created.",
+    "createErrorTitle": "Failed to create entrance",
+    "updatedTitle": "Successfully updated",
+    "updatedDescription": "Entrance {{name}} has been updated.",
+    "deletedTitle": "Successfully deleted",
+    "deletedDescription": "Entrance {{name}} has been deleted.",
+    "duplicatedTitle": "Successfully duplicated",
+    "duplicatedDescription": "Entrance {{name}} has been duplicated."
+  }
+}

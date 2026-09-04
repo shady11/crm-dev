@@ -1,0 +1,45 @@
+{
+  "actions": {
+    "addBlock": "Добавить блок",
+    "createBlock": "Создать блок",
+    "editBlock": "Редактировать блок"
+  },
+  "form": {
+    "nameLabel": "Название",
+    "namePlaceholder": "Название блока (например, A, B, C)",
+    "orderLabel": "Порядок (необязательно)",
+    "submitCreate": "Создать блок",
+    "errorGeneric": "Не удалось сохранить блок. Проверьте данные и попробуйте снова."
+  },
+  "validation": {
+    "nameRequired": "Название блока обязательно"
+  },
+  "item": {
+    "titleWithName": "Блок {{name}}",
+    "entrances_one": "{{count}} подъезд",
+    "entrances_few": "{{count}} подъезда",
+    "entrances_many": "{{count}} подъездов",
+    "entrances_other": "{{count}} подъезда"
+  },
+  "delete": {
+    "title": "Удалить блок?",
+    "description": "Блок {{name}} и все его подъезды, этажи и юниты будут удалены безвозвратно. Это действие нельзя отменить."
+  },
+  "duplicate": {
+    "title": "Дублировать блок?",
+    "descriptionPrefix": "Будет создана копия ",
+    "nameLabel": "блока {{name}}",
+    "descriptionSuffix": " со всеми подъездами, этажами и юнитами."
+  },
+  "toasts": {
+    "createdTitle": "Успешно создано",
+    "createdDescription": "Блок {{name}} добавлен в проект.",
+    "createErrorTitle": "Не удалось создать блок",
+    "updatedTitle": "Успешно обновлено",
+    "updatedDescription": "Блок {{name}} обновлён.",
+    "deletedTitle": "Успешно удалено",
+    "deletedDescription": "Блок {{name}} удалён.",
+    "duplicatedTitle": "Успешно создано",
+    "duplicatedDescription": "Блок {{name}} продублирован."
+  }
+}

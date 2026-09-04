@@ -9,12 +9,14 @@ import {AddFloorButton} from "@/features/floors/components/add-floor-button.tsx"
 import {FloorItem} from "@/features/floors/components/floor-item.tsx";
 import {AddFloorsBulkButton} from "@/features/floors/components/add-floors-bulk-button.tsx";
 import {DuplicateEntranceButton} from "@/features/entrances/components/duplicate-entrance-button.tsx";
+import {useTranslation} from "react-i18next";
 
 interface EntranceItemProps {
     entrance: Entrance;
 }
 
 export function EntranceItem({ entrance }: EntranceItemProps) {
+    const { t } = useTranslation("entrances");
     const [isExpanded, setIsExpanded] = useState(false);
 
     const allBlockUnits = entrance.floors?.flatMap(f => f.units || []) || [];
@@ -33,8 +35,8 @@ export function EntranceItem({ entrance }: EntranceItemProps) {
                     <SquareArrowRightEnterIcon className="size-6" strokeWidth={1.25}/>
                 </ItemMedia>
                 <ItemContent>
-                    <ItemTitle>Entrance {entrance.name}</ItemTitle>
-                    <ItemDescription>{entrance.floors?.length || 0} floors</ItemDescription>
+                    <ItemTitle>{t("item.titleWithName", { name: entrance.name })}</ItemTitle>
+                    <ItemDescription>{t("item.floors", { count: entrance.floors?.length || 0 })}</ItemDescription>
                 </ItemContent>
                 <ItemActions onClick={(e) => e.stopPropagation()}>
                     <AddFloorButton entrance={entrance} />

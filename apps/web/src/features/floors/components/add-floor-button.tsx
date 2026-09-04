@@ -7,12 +7,14 @@ import { createFloor } from "@/features/floors/api/floors.api.ts";
 import { FloorForm } from "./floor-form.tsx";
 import type {Entrance} from "@/features/entrances/types/entrance.types.ts";
 import {toast} from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 
 interface AddFloorButtonProps {
     entrance: Entrance;
 }
 
 export function AddFloorButton({ entrance }: AddFloorButtonProps) {
+    const { t } = useTranslation("floors");
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -23,8 +25,7 @@ export function AddFloorButton({ entrance }: AddFloorButtonProps) {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
 
             toast.success({
-                title: "Successfully created",
-                // description: `Floor ${variables.number} has been created.`,
+                title: t("toasts.createdTitle"),
             });
 
             setOpen(false);
@@ -50,9 +51,7 @@ export function AddFloorButton({ entrance }: AddFloorButtonProps) {
                 variant="outline"
                 onClick={() => setOpen(true)}
             >
-                <Plus className="size-3" />
-                Add Floor
-            </Button>
+                <Plus className="size-3" /> {t("actions.addFloor")}</Button>
 
             <Sheet
                 onOpenChange={({ open: isOpen }) => setOpen(isOpen)}
@@ -60,7 +59,7 @@ export function AddFloorButton({ entrance }: AddFloorButtonProps) {
             >
                 <SheetContent className="sm:max-w-sm" variant="inset">
                     <SheetHeader>
-                        <SheetTitle>Add floor to Entrance {entrance.name}</SheetTitle>
+                        <SheetTitle>{t("addToEntrance", { name: entrance.name })}</SheetTitle>
                     </SheetHeader>
                     <FloorForm
                         key={`floor-new-${open ? "open" : "closed"}`}
@@ -68,11 +67,11 @@ export function AddFloorButton({ entrance }: AddFloorButtonProps) {
                         defaultOrder={nextFloorOrder}
                         errorMessage={
                             createFloorMutation.isError
-                                ? "Floor could not be created. Check the details and try again."
+                                ? t("form.errorGeneric")
                                 : undefined
                         }
                         isSubmitting={createFloorMutation.isPending}
-                        submitLabel="Create floor"
+                        submitLabel={t("form.submitCreate")}
                         onCancel={() => setOpen(false)}
                         onSubmit={(payload) => createFloorMutation.mutate(payload)}
                     />

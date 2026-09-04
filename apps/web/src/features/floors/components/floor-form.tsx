@@ -1,8 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {Loader2, TriangleAlert} from "lucide-react";
 import {Controller, useForm} from "react-hook-form";
 import { z } from "zod";
+import {useTranslation} from "react-i18next";
 import { Button } from "@/components/ui/button.tsx";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field.tsx";
 import type { Floor } from "@/features/floors/types/floor.types.ts";
@@ -16,12 +17,10 @@ import {
 } from "@/components/ui/number-input.tsx";
 import {Alert, AlertTitle} from "@/components/ui/alert.tsx";
 
-const floorSchema = z.object({
-    number: z.number().min(1, "Floor number must be positive"),
-    order: z.number().int().positive().optional(),
-});
-
-type FloorFormValues = z.infer<typeof floorSchema>;
+type FloorFormValues = {
+    number: number;
+    order?: number;
+};
 
 type FloorFormProps = {
     floor?: Floor | null;
@@ -44,6 +43,13 @@ export function FloorForm({
                               onCancel,
                               onSubmit,
                           }: FloorFormProps) {
+    const { t } = useTranslation("floors");
+
+    const floorSchema = useMemo(() => z.object({
+        number: z.number().min(1, t("validation.numberPositive")),
+        order: z.number().int().positive().optional(),
+    }), [t]);
+
     const form = useForm<FloorFormValues>({
         resolver: zodResolver(floorSchema),
         defaultValues: {
@@ -82,7 +88,7 @@ export function FloorForm({
                         name="number"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid}>
-                                <FieldLabel>Floor Number</FieldLabel>
+                                <FieldLabel>{t("form.numberLabel")}</FieldLabel>
                                 <NumberInput
                                     value={field.value?.toString() ?? ""}
                                     min={1}
@@ -152,14 +158,12 @@ export function FloorForm({
                             className="flex-1"
                             disabled={isSubmitting}
                             onClick={onCancel}
-                        >
-                            Cancel
-                        </Button>
+                        >{t("common:actions.cancel")}</Button>
                     )}
                 </SheetClose>
                 <Button type="submit" className="flex-1" disabled={isSubmitting}>
                     {isSubmitting && <Loader2 className="animate-spin" />}
-                    {submitLabel ?? (floor ? "Save changes" : "Create floors")}
+                    {submitLabel ?? (floor ? t("common:actions.saveChanges") : t("form.submitCreate"))}
                 </Button>
             </SheetFooter>
         </form>

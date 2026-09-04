@@ -8,6 +8,7 @@ import { BulkFloorsForm } from "./bulk-floors-form.tsx";
 import type {Floor} from "@/features/floors/types/floor.types.ts";
 import type {Entrance} from "@/features/entrances/types/entrance.types.ts";
 import {toast} from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 
 interface AddFloorsBulkButtonProps {
     entrance: Entrance;
@@ -18,6 +19,7 @@ export function AddFloorsBulkButton({
                                         entrance,
                                         existingFloors = []
                                     }: AddFloorsBulkButtonProps) {
+    const { t } = useTranslation("floors");
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -28,8 +30,7 @@ export function AddFloorsBulkButton({
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
 
             toast.success({
-                title: "Successfully created",
-                // description: `Floors ${variables.floors} has been added.`,
+                title: t("toasts.createdTitle"),
             });
 
             setOpen(false);
@@ -43,9 +44,7 @@ export function AddFloorsBulkButton({
                 variant="outline"
                 onClick={() => setOpen(true)}
             >
-                <Layers2 className="size-3"/>
-                Bulk Floors
-            </Button>
+                <Layers2 className="size-3"/> {t("actions.bulkFloors")}</Button>
 
             <Sheet
                 onOpenChange={({ open: isOpen }) => setOpen(isOpen)}
@@ -53,13 +52,13 @@ export function AddFloorsBulkButton({
             >
                 <SheetContent className="sm:max-w-sm" variant="inset">
                     <SheetHeader>
-                        <SheetTitle>Add multiple floors to Entrance {entrance.name}</SheetTitle>
+                        <SheetTitle>{t("bulk.title", { name: entrance.name })}</SheetTitle>
                     </SheetHeader>
                     <BulkFloorsForm
                         existingFloors={existingFloors}
                         errorMessage={
                             createFloorsBulkMutation.isError
-                                ? "Floors could not be created. Check the details and try again."
+                                ? t("bulk.errorGeneric")
                                 : undefined
                         }
                         isSubmitting={createFloorsBulkMutation.isPending}

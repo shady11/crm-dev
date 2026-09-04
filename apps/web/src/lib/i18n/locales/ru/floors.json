@@ -1,0 +1,53 @@
+{
+  "actions": {
+    "addFloor": "Добавить этаж",
+    "bulkFloors": "Массовое добавление этажей",
+    "createFloor": "Создать этажи",
+    "editFloor": "Редактировать этаж"
+  },
+  "addToEntrance": "Добавить этаж в подъезд {{name}}",
+  "form": {
+    "numberLabel": "Номер этажа",
+    "submitCreate": "Создать этажи",
+    "errorGeneric": "Не удалось создать этаж. Проверьте данные и попробуйте снова.",
+    "errorSave": "Не удалось сохранить этаж. Проверьте данные и попробуйте снова."
+  },
+  "validation": {
+    "numberPositive": "Номер этажа должен быть положительным"
+  },
+  "item": {
+    "titleWithNumber": "Этаж {{number}}",
+    "units_one": "{{count}} юнит",
+    "units_few": "{{count}} юнита",
+    "units_many": "{{count}} юнитов",
+    "units_other": "{{count}} юнита"
+  },
+  "bulk": {
+    "title": "Добавить несколько этажей в подъезд {{name}}",
+    "floorsHeading": "Этажи",
+    "existingFloors": "Существующие этажи: {{ranges}}",
+    "addFloor": "Добавить этаж",
+    "floorNumberLabel": "Номер этажа",
+    "duplicateNumberError": "Этот номер этажа уже существует.",
+    "duplicateNumbersAlert": "Обнаружены повторяющиеся номера этажей. Исправьте их перед созданием.",
+    "submitCreate_one": "Создать {{count}} этаж",
+    "submitCreate_few": "Создать {{count}} этажа",
+    "submitCreate_many": "Создать {{count}} этажей",
+    "submitCreate_other": "Создать {{count}} этажа",
+    "errorGeneric": "Не удалось создать этажи. Проверьте данные и попробуйте снова."
+  },
+  "delete": {
+    "title": "Удалить этаж?",
+    "description": "Этаж {{number}} и все его юниты будут удалены безвозвратно. Это действие нельзя отменить."
+  },
+  "duplicate": {
+    "title": "Дублировать этаж?",
+    "description": "Будет создана копия этажа {{number}} со всеми юнитами."
+  },
+  "toasts": {
+    "createdTitle": "Успешно создано",
+    "updatedTitle": "Успешно обновлено",
+    "deletedTitle": "Успешно удалено",
+    "duplicatedTitle": "Успешно продублировано"
+  }
+}

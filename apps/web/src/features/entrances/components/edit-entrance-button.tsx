@@ -7,12 +7,14 @@ import { updateEntrance } from "@/features/entrances/api/entrances.api.ts";
 import type { Entrance } from "@/features/entrances/types/entrance.types.ts";
 import { EntranceForm } from "./entrance-form.tsx";
 import {toast} from "@/components/ui/toast.tsx";
+import {useTranslation} from "react-i18next";
 
 interface EditEntranceButtonProps {
     entrance: Entrance;
 }
 
 export function EditEntranceButton({ entrance }: EditEntranceButtonProps) {
+    const { t } = useTranslation("entrances");
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -23,8 +25,8 @@ export function EditEntranceButton({ entrance }: EditEntranceButtonProps) {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
 
             toast.success({
-                title: "Successfully updated",
-                // description: `Entrance ${variables.name} has been updated.`,
+                title: t("toasts.updatedTitle"),
+                description: t("toasts.updatedDescription", { name: entrance.name }),
             });
 
             setOpen(false);
@@ -50,18 +52,18 @@ export function EditEntranceButton({ entrance }: EditEntranceButtonProps) {
                     variant="inset"
                 >
                     <SheetHeader>
-                        <SheetTitle>Edit entrance</SheetTitle>
+                        <SheetTitle>{t("actions.editEntrance")}</SheetTitle>
                     </SheetHeader>
                     <EntranceForm
                         key={`entrance-${entrance.id}-${open ? "open" : "closed"}`}
                         entrance={entrance}
                         errorMessage={
                             updateEntranceMutation.isError
-                                ? "Entrance could not be saved. Check the details and try again."
+                                ? t("form.errorSave")
                                 : undefined
                         }
                         isSubmitting={updateEntranceMutation.isPending}
-                        submitLabel="Save changes"
+                        submitLabel={t("common:actions.saveChanges")}
                         onCancel={() => setOpen(false)}
                         onSubmit={(payload) => updateEntranceMutation.mutate(payload)}
                     />
