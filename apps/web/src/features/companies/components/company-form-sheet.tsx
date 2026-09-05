@@ -2,9 +2,18 @@ import {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {Button} from "@/components/ui/button.tsx";
 import {Input, type InputProps} from "@/components/ui/input.tsx";
-import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
+import {
+    Sheet,
+    SheetBody,
+    SheetContent,
+    SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle
+} from "@/components/ui/sheet.tsx";
 import type {CreateCompanyPayload} from "../api/companies.api";
 import type {Company} from "../types/company.types";
+import {FieldGroup} from "@/components/ui/field.tsx";
 
 const EMPTY: CreateCompanyPayload = {
     name: "",
@@ -57,7 +66,7 @@ export function CompanyFormSheet({open, company, isSubmitting, onOpenChange, onS
 
     return (
         <Sheet open={open} onOpenChange={({open: isOpen}) => onOpenChange(isOpen)}>
-            <SheetContent className="w-full sm:max-w-md">
+            <SheetContent className="sm:max-w-md" variant="inset">
                 <SheetHeader>
                     <SheetTitle>
                         {isEdit ? t("form.editTitle", {name: company.name}) : t("form.newTitle")}
@@ -68,78 +77,84 @@ export function CompanyFormSheet({open, company, isSubmitting, onOpenChange, onS
                 </SheetHeader>
 
                 <form
-                    className="space-y-4 overflow-y-auto px-4 pb-6"
+                    className="flex min-h-0 flex-1 flex-col"
                     onSubmit={(event) => {
                         event.preventDefault();
                         onSubmit(form);
                     }}
                 >
-                    <Field
-                        label={t("form.fields.name")}
-                        required
-                        value={form.name}
-                        onChange={set("name")}
-                    />
-                    <Field label={t("form.fields.phone")} value={form.phone ?? ""} onChange={set("phone")} />
-                    <Field
-                        label={t("form.fields.address")}
-                        value={form.address ?? ""}
-                        onChange={set("address")}
-                    />
+                    <SheetBody scrollFade>
+                        <FieldGroup className="gap-5 py-4">
+                            <Field
+                                label={t("form.fields.name")}
+                                required
+                                value={form.name}
+                                onChange={set("name")}
+                            />
+                            <Field label={t("form.fields.phone")} value={form.phone ?? ""} onChange={set("phone")} />
+                            <Field
+                                label={t("form.fields.address")}
+                                value={form.address ?? ""}
+                                onChange={set("address")}
+                            />
 
-                    <div className="grid grid-cols-3 gap-3">
-                        <Field
-                            label={t("form.fields.currency")}
-                            value={form.currency ?? ""}
-                            onChange={set("currency")}
-                        />
-                        <Field
-                            label={t("form.fields.locale")}
-                            value={form.locale ?? ""}
-                            onChange={set("locale")}
-                        />
-                        <Field
-                            label={t("form.fields.timezone")}
-                            value={form.timezone ?? ""}
-                            onChange={set("timezone")}
-                        />
-                    </div>
-
-                    {isEdit ? null : (
-                        <div className="border-t pt-4">
-                            <p className="mb-3 text-sm font-medium">{t("form.adminSectionTitle")}</p>
-                            <div className="space-y-4">
+                            <div className="grid grid-cols-3 gap-3">
                                 <Field
-                                    label={t("form.fields.adminFullName")}
-                                    required
-                                    value={form.adminFullName}
-                                    onChange={set("adminFullName")}
+                                    label={t("form.fields.currency")}
+                                    value={form.currency ?? ""}
+                                    onChange={set("currency")}
                                 />
                                 <Field
-                                    label={t("form.fields.adminEmail")}
-                                    type="email"
-                                    required
-                                    value={form.adminEmail}
-                                    onChange={set("adminEmail")}
+                                    label={t("form.fields.locale")}
+                                    value={form.locale ?? ""}
+                                    onChange={set("locale")}
                                 />
                                 <Field
-                                    label={t("form.fields.adminPassword")}
-                                    type="password"
-                                    value={form.adminPassword ?? ""}
-                                    onChange={set("adminPassword")}
-                                    hint={t("form.adminPasswordHint")}
+                                    label={t("form.fields.timezone")}
+                                    value={form.timezone ?? ""}
+                                    onChange={set("timezone")}
                                 />
                             </div>
-                        </div>
-                    )}
 
-                    <Button type="submit" className="w-full" disabled={isSubmitting}>
-                        {isSubmitting
-                            ? tCommon("actions.saving")
-                            : isEdit
-                              ? tCommon("actions.saveChanges")
-                              : t("form.submit.create")}
-                    </Button>
+                            {isEdit ? null : (
+                                <div className="border-t pt-4">
+                                    <p className="mb-3 text-sm font-medium">{t("form.adminSectionTitle")}</p>
+                                    <div className="space-y-4">
+                                        <Field
+                                            label={t("form.fields.adminFullName")}
+                                            required
+                                            value={form.adminFullName}
+                                            onChange={set("adminFullName")}
+                                        />
+                                        <Field
+                                            label={t("form.fields.adminEmail")}
+                                            type="email"
+                                            required
+                                            value={form.adminEmail}
+                                            onChange={set("adminEmail")}
+                                        />
+                                        <Field
+                                            label={t("form.fields.adminPassword")}
+                                            type="password"
+                                            value={form.adminPassword ?? ""}
+                                            onChange={set("adminPassword")}
+                                            hint={t("form.adminPasswordHint")}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                        </FieldGroup>
+                    </SheetBody>
+
+                    <SheetFooter>
+                        <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                            {isSubmitting
+                                ? tCommon("actions.saving")
+                                : isEdit
+                                    ? tCommon("actions.saveChanges")
+                                    : t("form.submit.create")}
+                        </Button>
+                    </SheetFooter>
                 </form>
             </SheetContent>
         </Sheet>
