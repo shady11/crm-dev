@@ -8,6 +8,7 @@ export type GetUsersParams = {
     search?: string;
     role?: UserRole;
     isActive?: boolean;
+    branchId?: string;
 };
 
 export type UserRoleSummaryItem = {

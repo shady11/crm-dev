@@ -29,6 +29,7 @@ export function useUsersList() {
 
     const [statusFilter, setStatusFilterState] = useState<StatusFilter>("all");
     const [roleFilter, setRoleFilterState] = useState<RoleFilterValue>("all");
+    const [branchFilter, setBranchFilterState] = useState<string | "all">("all");
     const [search, setSearchState] = useState("");
     const [page, setPage] = useState(1);
     const [limit, setLimitState] = useState(10);
@@ -40,13 +41,14 @@ export function useUsersList() {
     const [pendingTransfer, setPendingTransfer] = useState<User | null>(null);
 
     const tableQuery = useQuery({
-        queryKey: ["users", { statusFilter, roleFilter, search, page, limit }],
+        queryKey: ["users", { statusFilter, roleFilter, branchFilter, search, page, limit }],
         queryFn: () =>
             getUsers({
                 page,
                 limit,
                 role: roleFilter === "all" ? undefined : roleFilter,
                 isActive: statusFilter === "all" ? undefined : statusFilter === "active",
+                branchId: branchFilter === "all" ? undefined : branchFilter,
                 search: search || undefined,
             }),
     });
@@ -232,6 +234,11 @@ export function useUsersList() {
             roleFilter,
             setRoleFilter: (value: RoleFilterValue) => {
                 setRoleFilterState(value);
+                setPage(1);
+            },
+            branchFilter,
+            setBranchFilter: (value: string | "all") => {
+                setBranchFilterState(value);
                 setPage(1);
             },
             search,

@@ -27,7 +27,7 @@ export class BranchesController {
     @Roles(UserRole.COMPANY_ADMIN, UserRole.FINANCE)
     @Get(":id")
     findOne(@CurrentUser() user: AuthUser, @Param("id") id: string) {
-        return this.branchesService.findOne(user, id);
+        return this.branchesService.findOneWithUsers(user, id);
     }
 
     @Roles(UserRole.COMPANY_ADMIN)

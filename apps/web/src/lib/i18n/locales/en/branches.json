@@ -75,5 +75,33 @@
     "confirm": "Move",
     "success": "\"{{name}}\" moved to another branch.",
     "error": "Failed to move to another branch. Please try again."
+  },
+  "detail": {
+    "notFound": "Branch not found.",
+    "backToBranches": "Back to branches",
+    "edit": "Edit",
+    "deactivate": "Deactivate",
+    "reactivate": "Reactivate",
+    "stats": {
+      "users": "Users",
+      "activeUsers": "Active users"
+    },
+    "settings": {
+      "title": "Branch details",
+      "city": "City",
+      "address": "Address",
+      "phone": "Phone",
+      "created": "Created"
+    },
+    "usersCard": {
+      "title": "Assigned users",
+      "empty": "No users assigned",
+      "emptyDescription": "Assign this branch when creating or editing a SALES_HEAD or SALES_MANAGER user.",
+      "headers": {
+        "name": "Name",
+        "role": "Role",
+        "status": "Status"
+      }
+    }
   }
 }

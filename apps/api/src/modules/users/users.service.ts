@@ -74,6 +74,10 @@ export class UsersService {
             ];
         }
 
+        if (query.branchId) {
+            where.branchId = query.branchId;
+        }
+
         const [items, total] = await Promise.all([
             this.prisma.user.findMany({
                 where,

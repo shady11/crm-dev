@@ -74,6 +74,52 @@ export class BranchesService {
         return branch;
     }
 
+    /**
+     * Branch detail view: the branch itself plus the users assigned to it —
+     * same shape as CompaniesService.findOne() embedding a tenant's users for
+     * the SUPER_ADMIN company detail page, one level down.
+     */
+    async findOneWithUsers(user: AuthUser, id: string) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const branch = await this.prisma.branch.findFirst({
+            where: {id, companyId: user.companyId},
+            select: {
+                ...BRANCH_SELECT,
+                users: {
+                    where: {deletedAt: null},
+                    select: {
+                        id: true,
+                        fullName: true,
+                        email: true,
+                        phone: true,
+                        role: true,
+                        isActive: true,
+                        createdAt: true,
+                    },
+                    orderBy: [{role: "asc"}, {fullName: "asc"}],
+                },
+            },
+        });
+
+        if (!branch) {
+            throw new NotFoundException("Branch not found");
+        }
+
+        const {users, ...rest} = branch;
+
+        return {
+            ...rest,
+            users,
+            stats: {
+                users: users.length,
+                activeUsers: users.filter((u) => u.isActive).length,
+            },
+        };
+    }
+
     async create(user: AuthUser, dto: CreateBranchDto) {
         if (!user.companyId) {
             throw new ForbiddenException("User does not belong to a company");
