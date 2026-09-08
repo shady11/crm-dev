@@ -15,6 +15,20 @@
     "addUnit": "Add Unit",
     "bulkUnits": "Bulk Units"
   },
+  "import": {
+    "trigger": "Import units",
+    "toastSuccessTitle": "Units imported",
+    "toastSuccessDescription": "{{count}} unit(s) created.",
+    "toastErrorTitle": "Import failed",
+    "toastErrorDescription": "The file could not be processed. Please check it and try again.",
+    "resultTitle": "Import results",
+    "resultSummary": "{{created}} unit(s) created, {{failed}} row(s) failed.",
+    "errorsTable": {
+      "row": "Row",
+      "messages": "Issue"
+    },
+    "close": "Close"
+  },
   "sheets": {
     "addTitle": "Add Unit to Floor {{number}}",
     "bulkAddTitle": "Add multiple units to Floor {{number}}",

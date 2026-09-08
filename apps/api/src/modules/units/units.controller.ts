@@ -7,8 +7,11 @@ import {
     Patch,
     Post,
     Query,
+    UploadedFile,
     UseGuards,
+    UseInterceptors,
 } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
 import { UnitStatus, UserRole } from "@/generated/prisma/enums";
 import { JwtAuthGuard } from "@/modules/auth/guards/jwt-auth.guard";
 import { CompanyGuard } from "@/common/guards/company.guard";
@@ -17,16 +20,21 @@ import { Roles } from "@/common/decorators/roles.decorator";
 import { CurrentUser } from "@/common/decorators/current-user.decorator";
 import { AuthUser } from "@/common/types/auth-user.type";
 import { UnitsService } from "./units.service";
+import { UnitsImportService } from "./units-import.service";
 import { CreateUnitDto } from "./dto/create-unit.dto";
 import { UpdateUnitDto } from "./dto/update-unit.dto";
 import { QueryUnitsDto } from "./dto/query-units.dto";
 import {UpdateUnitStatusDto} from "@/modules/units/dto/update-unit-status.dto";
 import {CreateUnitsBulkDto} from "@/modules/units/dto/create-units-bulk.dto";
+import {unitsImportMulterOptions} from "@/modules/units/units-import.constants";
 
 @UseGuards(JwtAuthGuard, CompanyGuard, RolesGuard)
 @Controller()
 export class UnitsController {
-    constructor(private readonly unitsService: UnitsService) {}
+    constructor(
+        private readonly unitsService: UnitsService,
+        private readonly unitsImportService: UnitsImportService,
+    ) {}
 
     @Roles(
         UserRole.COMPANY_ADMIN,
@@ -103,6 +111,19 @@ export class UnitsController {
         @Body() dto: UpdateUnitStatusDto,
     ) {
         return this.unitsService.updateStatus(user, id, dto.status);
+    }
+
+    // CA-C1: bulk-create a project's units from an uploaded CSV/XLSX, resolving
+    // (and auto-creating) the block/entrance/floor hierarchy per row.
+    @Roles(UserRole.COMPANY_ADMIN)
+    @Post("projects/:projectId/units/import")
+    @UseInterceptors(FileInterceptor("file", unitsImportMulterOptions))
+    importUnits(
+        @CurrentUser() user: AuthUser,
+        @Param("projectId") projectId: string,
+        @UploadedFile() file: Express.Multer.File,
+    ) {
+        return this.unitsImportService.importFromFile(user, projectId, file);
     }
 
     @Roles(UserRole.COMPANY_ADMIN)

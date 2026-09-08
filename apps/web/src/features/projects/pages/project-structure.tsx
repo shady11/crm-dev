@@ -10,6 +10,7 @@ import type {ProjectTree} from "@/features/projects/types/project.types.ts";
 import {BlockItem} from "@/features/blocks/components/block-item.tsx";
 import {BlockForm} from "@/features/blocks/components/block-form.tsx";
 import {getProjectTree} from "@/features/projects/api/projects.api.ts";
+import {ImportUnitsButton} from "@/features/units/components/import-units-button.tsx";
 import {Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {toast} from "@/components/ui/toast";
 import {useTranslation} from "react-i18next";
@@ -91,8 +92,11 @@ export function ProjectStructure() {
         <div className="space-y-2">
             <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-medium">{t("structure.heading")}</h2>
-                <Button size="sm" variant="default" onClick={() => setOpen(true)}>
-                    <Plus className="size-3" /> {t("actions.addBlock", { ns: "blocks" })}</Button>
+                <div className="flex items-center gap-2">
+                    <ImportUnitsButton projectId={projectId!} />
+                    <Button size="sm" variant="default" onClick={() => setOpen(true)}>
+                        <Plus className="size-3" /> {t("actions.addBlock", { ns: "blocks" })}</Button>
+                </div>
             </div>
 
             <div className="space-y-4">

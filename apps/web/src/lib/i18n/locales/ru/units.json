@@ -15,6 +15,20 @@
     "addUnit": "Добавить юнит",
     "bulkUnits": "Массовое добавление"
   },
+  "import": {
+    "trigger": "Импорт юнитов",
+    "toastSuccessTitle": "Юниты импортированы",
+    "toastSuccessDescription": "Создано юнитов: {{count}}.",
+    "toastErrorTitle": "Ошибка импорта",
+    "toastErrorDescription": "Не удалось обработать файл. Проверьте его и попробуйте снова.",
+    "resultTitle": "Результат импорта",
+    "resultSummary": "Создано: {{created}}, ошибок в строках: {{failed}}.",
+    "errorsTable": {
+      "row": "Строка",
+      "messages": "Проблема"
+    },
+    "close": "Закрыть"
+  },
   "sheets": {
     "addTitle": "Добавить юнит на этаж {{number}}",
     "bulkAddTitle": "Добавить несколько юнитов на этаж {{number}}",
