@@ -9,6 +9,7 @@ import {ImpersonationService} from "@/modules/impersonation/impersonation.servic
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateCompanyDto} from "./dto/create-company.dto";
 import {UpdateCompanyDto} from "./dto/update-company.dto";
+import {UpdateOwnCompanyDto} from "./dto/update-own-company.dto";
 import {QueryCompaniesDto} from "./dto/query-companies.dto";
 
 /**
@@ -218,6 +219,43 @@ export class CompaniesService {
                 generatedPassword: dto.adminPassword ? undefined : password,
             },
         };
+    }
+
+    /**
+     * The COMPANY_ADMIN self-service counterpart to findOne()/update() below —
+     * scoped to the actor's own companyId, which comes from the JWT-derived
+     * AuthUser and never from a client-supplied id. That's what keeps a
+     * COMPANY_ADMIN from ever reading or editing a tenant other than their own
+     * through this path.
+     */
+    async findOwn(actor: AuthUser) {
+        if (!actor.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const company = await this.prisma.company.findFirst({
+            where: {id: actor.companyId, deletedAt: null},
+            select: COMPANY_SELECT,
+        });
+
+        if (!company) {
+            throw new NotFoundException("Company not found");
+        }
+
+        return company;
+    }
+
+    /**
+     * Same scoping as findOwn(), plus the narrower UpdateOwnCompanyDto (no
+     * phone/address) so a COMPANY_ADMIN can fix their own currency/locale/
+     * timezone/name without a support ticket to the platform operator.
+     */
+    async updateOwn(actor: AuthUser, dto: UpdateOwnCompanyDto) {
+        if (!actor.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        return this.update(actor.companyId, dto);
     }
 
     async update(id: string, dto: UpdateCompanyDto) {

@@ -12,6 +12,7 @@ import {tasksRoutes} from "@/features/tasks/tasks.routes.tsx";
 import {clientsRoutes} from "@/features/clients/clients.routes.tsx";
 import {DashboardPage} from "@/features/dashboard/pages/dashboard-page.tsx";
 import {companiesRoutes} from "@/features/companies/companies.routes";
+import {companySettingsRoutes} from "@/features/companies/company-settings.routes";
 import {auditLogRoutes} from "@/features/audit-log/audit-log.routes";
 import {RoleLanding} from "@/features/auth/pages/role-landing";
 import {RoleGuard} from "@/features/auth/pages/role-guard";
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
                         children: [{ index: true, element: <DashboardPage /> }],
                     },
                     companiesRoutes,
+                    companySettingsRoutes,
                     auditLogRoutes,
                     {
                         path: "leads",

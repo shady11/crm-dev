@@ -54,6 +54,10 @@ export const FEATURE_ROLES = {
     // one feature they can reach.
     companies: [UserRole.SUPER_ADMIN],
     auditLog: [UserRole.SUPER_ADMIN],
+    // A tenant's own admin editing their own company's name/currency/locale/
+    // timezone (CA-A1) — distinct from `companies` above, which is the
+    // SUPER_ADMIN's cross-tenant management screen.
+    companySettings: [UserRole.COMPANY_ADMIN],
 } as const satisfies Record<string, readonly UserRole[]>;
 
 export type Feature = keyof typeof FEATURE_ROLES;
