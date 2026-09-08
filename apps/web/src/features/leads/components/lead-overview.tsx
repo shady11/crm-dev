@@ -1,5 +1,6 @@
 import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/components/ui/data-list.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
+import {WhatsAppLink} from "@/components/shared/whatsapp-link.tsx";
 import type {Lead} from "@/features/leads/api/leads.api.ts";
 import {LEAD_STATUS_CLASSES, LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
 import {formatCreatedAt} from "@/features/leads/utils/format.ts";
@@ -23,7 +24,10 @@ export function LeadOverview({ lead }: LeadOverviewProps) {
                 </DataListItem>
                 <DataListItem>
                     <DataListItemLabel>{t("overview.phone")}</DataListItemLabel>
-                    <DataListItemValue>{lead.phone}</DataListItemValue>
+                    <DataListItemValue className="flex items-center gap-3">
+                        {lead.phone}
+                        <WhatsAppLink phone={lead.phone} />
+                    </DataListItemValue>
                 </DataListItem>
                 <DataListItem>
                     <DataListItemLabel>{t("overview.email")}</DataListItemLabel>

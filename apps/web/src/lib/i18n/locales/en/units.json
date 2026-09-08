@@ -94,7 +94,23 @@
     "overviewTab": "Overview",
     "dealsTab": "Deals",
     "noDeals": "No deals recorded for this unit yet.",
-    "bookButton": "Book"
+    "bookButton": "Book",
+    "infoSheetButton": "Info sheet"
+  },
+  "infoSheet": {
+    "title": "Unit №{{number}}",
+    "generatedAt": "Generated {{date}}",
+    "project": "Project",
+    "address": "Address",
+    "location": "Location",
+    "type": "Type",
+    "rooms": "Rooms",
+    "area": "Area",
+    "price": "Price",
+    "pricePerSqm": "Price per m²",
+    "status": "Status",
+    "printButton": "Print / Save as PDF",
+    "notFound": "Unit not found."
   },
   "chessboard": {
     "entranceLabel": "Entrance {{name}}",

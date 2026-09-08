@@ -71,3 +71,41 @@ export async function getTeamSnapshot() {
     const response = await api.get<TeamSnapshotItem[]>("/dashboard/team-snapshot");
     return response.data;
 }
+
+// SM-A2: a SALES_MANAGER's own "what needs doing today" view, SALES_MANAGER
+// only — leads waiting on follow-up, tasks due today, and deals waiting on
+// the client, all hardcoded to the caller's own records.
+export type MyWorkLead = {
+    id: string; fullName: string; phone: string; status: string; nextContactAt: string | null;
+};
+export type MyWorkTask = { id: string; title: string; dueDate: string | null; status: string };
+export type MyWorkDeal = {
+    id: string; dealNumber: string; status: string; reservationExpiresAt: string | null;
+    client: { id: string; fullName: string };
+    unit: { id: string; number: string };
+};
+export type MyWorkToday = {
+    leadsNeedingFollowUp: MyWorkLead[];
+    tasksDueToday: MyWorkTask[];
+    dealsWaitingOnClient: MyWorkDeal[];
+};
+
+export async function getMyWorkToday() {
+    const response = await api.get<MyWorkToday>("/dashboard/my-work-today");
+    return response.data;
+}
+
+// SM-D1: a SALES_MANAGER's own deal count and conversion rate over a period,
+// self-scoped only — SALES_MANAGER only.
+export type MyPerformance = {
+    periodDays: number;
+    leadsAssigned: number;
+    dealsCreated: number;
+    dealsWon: number;
+    conversionRate: number;
+};
+
+export async function getMyPerformance(days?: number) {
+    const response = await api.get<MyPerformance>("/dashboard/my-performance", { params: { days } });
+    return response.data;
+}

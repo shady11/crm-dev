@@ -5,6 +5,7 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx
 import type {Lead} from "@/features/leads/api/leads.api.ts";
 import {LeadOverview} from "@/features/leads/components/lead-overview.tsx";
 import {LeadClientTab} from "@/features/leads/components/lead-client-tab.tsx";
+import {LeadActivityTab} from "@/features/leads/components/lead-activity-tab.tsx";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {UserRole} from "@/features/users/types/user.types";
 import {useTranslation} from "react-i18next";
@@ -53,11 +54,16 @@ export function LeadDetailsSheet({
                         <Tabs defaultValue="overview" className="gap-6">
                             <TabsList>
                                 <TabsTrigger value="overview">{t("detailsSheet.overviewTab")}</TabsTrigger>
+                                <TabsTrigger value="activity">{t("detailsSheet.activityTab")}</TabsTrigger>
                                 <TabsTrigger value="client">{t("detailsSheet.clientTab")}</TabsTrigger>
                             </TabsList>
 
                             <TabsContent value="overview">
                                 <LeadOverview lead={lead} />
+                            </TabsContent>
+
+                            <TabsContent value="activity">
+                                <LeadActivityTab lead={lead} />
                             </TabsContent>
 
                             <TabsContent value="client">

@@ -25,6 +25,11 @@ export type AuthUser = {
     id: string;
     email: string;
     name: string;
+    // Optional rather than always-present: the JWT payload never carries it
+    // (SessionValidationService re-reads it fresh on every request, same as
+    // company settings below), so it only exists on the value returned from
+    // validate() — never on the object signed into a token.
+    phone?: string | null;
     role: UserRole;
     companyId: string | null;
     // Carried on every request (not baked into the JWT) so a currency/locale

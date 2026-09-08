@@ -2,6 +2,7 @@ import {Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, UseGuards} fro
 import {AuthService} from "@/modules/auth/auth.service";
 import {LoginDto} from "@/modules/auth/dto/login.dto";
 import {ChangePasswordDto} from "@/modules/auth/dto/change-password.dto";
+import {UpdateOwnProfileDto} from "@/modules/auth/dto/update-own-profile.dto";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {JwtAuthGuard} from "@/modules/auth/guards/jwt-auth.guard";
 import {CurrentUser} from "@/common/decorators/current-user.decorator";
@@ -24,6 +25,15 @@ export class AuthController {
     @Get("me")
     async me(@CurrentUser() user: AuthUser) {
         return user;
+    }
+
+    // SM-A1: self-service for name/phone, open to every role — narrower than
+    // UsersService.update() (no role/email/isActive), so it can't become an
+    // admin action in disguise.
+    @UseGuards(JwtAuthGuard)
+    @Patch("me")
+    async updateProfile(@CurrentUser() user: AuthUser, @Body() dto: UpdateOwnProfileDto) {
+        return this.authService.updateOwnProfile(user, dto);
     }
 
     // Same tight limit as login: this endpoint also checks a password, so it is

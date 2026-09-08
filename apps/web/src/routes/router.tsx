@@ -14,6 +14,8 @@ import {clientsRoutes} from "@/features/clients/clients.routes.tsx";
 import {DashboardPage} from "@/features/dashboard/pages/dashboard-page.tsx";
 import {companiesRoutes} from "@/features/companies/companies.routes";
 import {companySettingsRoutes} from "@/features/companies/company-settings.routes";
+import {ProfilePage} from "@/features/auth/pages/profile-page";
+import {UnitInfoSheetPage} from "@/features/units/pages/unit-info-sheet-page";
 import {auditLogRoutes} from "@/features/audit-log/audit-log.routes";
 import {RoleLanding} from "@/features/auth/pages/role-landing";
 import {RoleGuard} from "@/features/auth/pages/role-guard";
@@ -24,6 +26,10 @@ export const router = createBrowserRouter([
     {
         element: <ProtectedRoute />,
         children: [
+            // SM-C1: a print-ready unit info sheet, deliberately outside
+            // AppLayout — no sidebar/nav chrome to keep the printed page
+            // (and its browser print-to-PDF output) to one clean sheet.
+            { path: "units/:unitId/info-sheet", element: <UnitInfoSheetPage /> },
             {
                 path: "/",
                 element: <AppLayout />,
@@ -38,6 +44,9 @@ export const router = createBrowserRouter([
                     },
                     companiesRoutes,
                     companySettingsRoutes,
+                    // SM-A1: self-service name/phone edit, open to every role —
+                    // unlike companySettingsRoutes above, no RoleGuard here.
+                    {path: "profile", element: <ProfilePage />},
                     auditLogRoutes,
                     {
                         path: "leads",

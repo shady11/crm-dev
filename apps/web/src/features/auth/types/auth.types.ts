@@ -30,6 +30,8 @@ export type AuthUser = {
     id: string;
     email: string;
     name: string;
+    // Re-fetched fresh by the API on every request, same as `company` below.
+    phone?: string | null;
     role: UserRole;
     companyId: string | null;
     // Re-fetched by the API on every request (never baked into the JWT), so
