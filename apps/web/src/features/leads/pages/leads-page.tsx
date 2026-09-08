@@ -8,6 +8,7 @@ import {DeleteLeadsDialog} from "@/features/leads/components/delete-leads-dialog
 import {ConvertLeadDialog} from "@/features/leads/components/convert-lead-dialog.tsx";
 import {LeadDetailsSheet} from "@/features/leads/components/lead-details-sheet.tsx";
 import {MoveToBranchDialog} from "@/features/branches/components/move-to-branch-dialog.tsx";
+import {ReassignManagerDialog} from "@/features/users/components/reassign-manager-dialog.tsx";
 import {useLeadsList} from "@/features/leads/hooks/use-leads-list.ts";
 import {useTranslation} from "react-i18next";
 
@@ -24,6 +25,7 @@ export function LeadsPage() {
         convertDialog,
         detailsSheet,
         transferBranchDialog,
+        reassignDialog,
     } = useLeadsList();
 
     return (
@@ -109,6 +111,7 @@ export function LeadsPage() {
                 onRequestConvert={detailsSheet.onRequestConvert}
                 onRequestDelete={detailsSheet.onRequestDelete}
                 onRequestTransferBranch={detailsSheet.onRequestTransferBranch}
+                onRequestReassign={detailsSheet.onRequestReassign}
             />
 
             <MoveToBranchDialog
@@ -118,6 +121,16 @@ export function LeadsPage() {
                 isSubmitting={transferBranchDialog.isSubmitting}
                 onOpenChange={transferBranchDialog.onOpenChange}
                 onConfirm={transferBranchDialog.onConfirm}
+            />
+
+            <ReassignManagerDialog
+                open={reassignDialog.open}
+                entityName={reassignDialog.lead?.fullName ?? ""}
+                branchId={reassignDialog.lead?.branchId ?? null}
+                currentManagerId={reassignDialog.lead?.manager?.id ?? null}
+                isSubmitting={reassignDialog.isSubmitting}
+                onOpenChange={reassignDialog.onOpenChange}
+                onConfirm={reassignDialog.onConfirm}
             />
         </div>
     );

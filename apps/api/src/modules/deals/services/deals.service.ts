@@ -1,4 +1,4 @@
-import {ForbiddenException, Injectable,} from '@nestjs/common';
+import {BadRequestException, ForbiddenException, Injectable,} from '@nestjs/common';
 
 import {
   DealStatus,
@@ -8,7 +8,8 @@ import {
   PaymentScheduleStatus,
   PaymentType,
   Prisma,
-  UnitStatus
+  UnitStatus,
+  UserRole,
 } from '@/generated/prisma/client';
 import {PrismaService} from '@/database/prisma.service';
 import {isBranchScopedRole} from '@/common/constants/branch-scope.constants';
@@ -30,6 +31,7 @@ import {AuthUser} from "@/common/types/auth-user.type";
 import {ExtendReservationDto} from "@/modules/deals/dto/extend-reservation.dto";
 import {SignContractDto} from "@/modules/deals/dto/sign-contract.dto";
 import {CancelDealDto} from "@/modules/deals/dto/cancel-deal.dto";
+import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
 import {DbClient} from "@/database/prisma.types";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 import {DealNumberService} from "@/modules/deals/services/deal-number.service";
@@ -401,6 +403,66 @@ export class DealsService {
           entityId: deal.id,
         });
       }
+
+      return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
+    });
+
+    return this.mapper.toDetails(result);
+  }
+
+  /**
+   * SH-A1: lets a SALES_HEAD move a deal from one of their team's
+   * SALES_MANAGERs to another without going through COMPANY_ADMIN. Kept as
+   * its own endpoint, restricted to an active SALES_MANAGER on the deal's
+   * own branch — a dedicated, narrowly-scoped write action for team leads.
+   */
+  async reassignManager(user: AuthUser, id: string, dto: ReassignManagerDto) {
+    if (!user.companyId) {
+      throw new ForbiddenException("User does not belong to a company");
+    }
+
+    const companyId = user.companyId;
+
+    const result = await this.prisma.$transaction(async db => {
+      const deal = await db.deal.findFirst({
+        where: {
+          id,
+          companyId,
+          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+        },
+      });
+      if (!deal) throw new DealNotFoundException(id);
+
+      if (!deal.branchId) {
+        throw new BadRequestException("Deal is not assigned to a branch");
+      }
+
+      const manager = await db.user.findFirst({
+        where: {
+          id: dto.managerId,
+          companyId,
+          branchId: deal.branchId,
+          role: UserRole.SALES_MANAGER,
+          isActive: true,
+        },
+      });
+
+      if (!manager) {
+        throw new BadRequestException(
+            "Manager not assignable — must be an active SALES_MANAGER on the same branch",
+        );
+      }
+
+      await db.deal.update({
+        where: { id },
+        data: { managerId: dto.managerId },
+      });
+
+      await this.activityService.reassignManager({
+        db, companyId, userId: user.id,
+        dealId: deal.id, clientId: deal.clientId,
+        metadata: { fromManagerId: deal.managerId, toManagerId: dto.managerId },
+      });
 
       return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
     });

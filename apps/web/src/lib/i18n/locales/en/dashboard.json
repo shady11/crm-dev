@@ -40,5 +40,22 @@
     "minutesAgo": "{{count}}m ago",
     "hoursAgo": "{{count}}h ago",
     "daysAgo": "{{count}}d ago"
+  },
+  "teamSnapshot": {
+    "title": "Team snapshot",
+    "empty": "No managers on your team yet.",
+    "openLeads_one": "{{count}} open lead",
+    "openLeads_few": "{{count}} open leads",
+    "openLeads_many": "{{count}} open leads",
+    "openLeads_other": "{{count}} open leads",
+    "activeDeals_one": "{{count}} active deal",
+    "activeDeals_few": "{{count}} active deals",
+    "activeDeals_many": "{{count}} active deals",
+    "activeDeals_other": "{{count}} active deals",
+    "tasksDue_one": "{{count}} task due",
+    "tasksDue_few": "{{count}} tasks due",
+    "tasksDue_many": "{{count}} tasks due",
+    "tasksDue_other": "{{count}} tasks due",
+    "noActivity": "No activity yet"
   }
 }

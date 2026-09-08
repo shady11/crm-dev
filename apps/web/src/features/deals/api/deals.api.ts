@@ -30,6 +30,7 @@ export type Deal = {
     id: string;
     dealNumber: string;
     status: DealStatus;
+    branchId: string | null;
     financingType: FinancingType | null;
     listPrice: number;
     salePrice: number;
@@ -182,5 +183,11 @@ export async function createPayment(dealId: string, payload: CreatePaymentPayloa
 
 export async function completeDeal(dealId: string) {
     const response = await api.post<DealDetails>(`/deals/${dealId}/complete`, {});
+    return response.data;
+}
+
+// SH-A1: SALES_HEAD moving a deal between their own team's SALES_MANAGERs.
+export async function reassignDealManager(dealId: string, managerId: string) {
+    const response = await api.post<DealDetails>(`/deals/${dealId}/reassign`, { managerId });
     return response.data;
 }

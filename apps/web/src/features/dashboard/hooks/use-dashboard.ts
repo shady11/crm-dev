@@ -5,6 +5,7 @@ import {
     getDashboardKpis,
     getRecentActivity,
     getRevenueTrend,
+    getTeamSnapshot,
     getUnitsSummary
 } from "@/features/dashboard/api/dashboard.api.ts";
 import {getDealStatusSummary} from "@/features/deals/api/deals.api.ts";
@@ -26,6 +27,16 @@ export function useBranchComparison(enabled: boolean) {
     return useQuery({
         queryKey: ["dashboard", "branch-comparison"],
         queryFn: getBranchComparison,
+        enabled,
+    });
+}
+
+// SH-A2, SALES_HEAD only — same reasoning as useBranchComparison above: a
+// separate role-gated endpoint, not part of the shared dashboard query set.
+export function useTeamSnapshot(enabled: boolean) {
+    return useQuery({
+        queryKey: ["dashboard", "team-snapshot"],
+        queryFn: getTeamSnapshot,
         enabled,
     });
 }

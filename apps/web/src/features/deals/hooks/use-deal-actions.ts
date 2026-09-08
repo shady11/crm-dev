@@ -9,6 +9,7 @@ import {
     extendReservation,
     generatePaymentSchedule,
     type GeneratePaymentSchedulePayload,
+    reassignDealManager,
     signContract
 } from "@/features/deals/api/deals.api";
 import {useTranslation} from "react-i18next";
@@ -88,5 +89,15 @@ export function useDealActions(dealId: string) {
         onError: () => toast.error({ title: t("toasts.completeError") }),
     });
 
-    return { extend, sign, activate, cancel, generateSchedule, recordPayment, complete };
+    // SH-A1: SALES_HEAD moving a deal between their own team's SALES_MANAGERs.
+    const reassign = useMutation({
+        mutationFn: (managerId: string) => reassignDealManager(dealId, managerId),
+        onSuccess: async () => {
+            await invalidate();
+            toast.success({ title: t("reassignDialog.successTitle", { ns: "users" }) });
+        },
+        onError: () => toast.error({ title: t("reassignDialog.errorTitle", { ns: "users" }) }),
+    });
+
+    return { extend, sign, activate, cancel, generateSchedule, recordPayment, complete, reassign };
 }

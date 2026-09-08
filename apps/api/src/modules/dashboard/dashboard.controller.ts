@@ -65,4 +65,13 @@ export class DashboardController {
     getBranchComparison(@CurrentUser() user: AuthUser) {
         return this.dashboardService.getBranchComparison(user);
     }
+
+    // SH-A2: a SALES_HEAD's own-team snapshot. SALES_HEAD only — this is the
+    // team-lead's standup view, not a company-wide report COMPANY_ADMIN would
+    // reach for (they have branch-comparison above instead).
+    @Roles(UserRole.SALES_HEAD)
+    @Get("team-snapshot")
+    getTeamSnapshot(@CurrentUser() user: AuthUser) {
+        return this.dashboardService.getTeamSnapshot(user);
+    }
 }

@@ -94,6 +94,12 @@ export async function transferLeadBranch(id: string, branchId: string) {
     return response.data;
 }
 
+// SH-A1: SALES_HEAD moving a lead between their own team's SALES_MANAGERs.
+export async function reassignLeadManager(id: string, managerId: string) {
+    const response = await api.post<Lead>(`/leads/${id}/reassign`, { managerId });
+    return response.data;
+}
+
 export async function checkLeadDuplicates(phone: string, excludeLeadId?: string) {
     const response = await api.get<DuplicateLeadCheckResult>("/leads/duplicates", {
         params: { phone, excludeLeadId },

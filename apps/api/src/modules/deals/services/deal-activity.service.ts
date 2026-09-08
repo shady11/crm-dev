@@ -144,4 +144,15 @@ export class DealActivityService {
             title: 'Deal updated',
         });
     }
+
+    reassignManager(
+        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+    ) {
+        return this.create({
+            ...params,
+            action: ActivityAction.REASSIGNED,
+            type: ActivityType.DEAL_REASSIGNED,
+            title: 'Deal reassigned to another manager',
+        });
+    }
 }

@@ -13,6 +13,7 @@ import {UserRole} from "@/generated/prisma/enums";
 import {CompanyGuard} from "@/common/guards/company.guard";
 import {BranchGuard} from "@/common/guards/branch.guard";
 import {TransferBranchDto} from "@/common/dto/transfer-branch.dto";
+import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
 
 @UseGuards(JwtAuthGuard, CompanyGuard, BranchGuard, RolesGuard)
 @Controller("leads")
@@ -90,6 +91,21 @@ export class LeadsController {
     @Delete(":id")
     remove(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.leadsService.remove(user, id);
+    }
+
+    // SH-A1: a SALES_HEAD moving a lead between their own team's
+    // SALES_MANAGERs. COMPANY_ADMIN included for oversight parity with
+    // remove() above; SALES_MANAGER is deliberately excluded — this is a
+    // team-lead action, not the general edit any manager already has via
+    // PATCH.
+    @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD)
+    @Post(":id/reassign")
+    reassignManager(
+        @CurrentUser() user: AuthUser,
+        @Param("id") id: string,
+        @Body() dto: ReassignManagerDto,
+    ) {
+        return this.leadsService.reassignManager(user, id, dto);
     }
 
     // BR-D1: branch staff can't see across the boundary, so this can only

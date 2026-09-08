@@ -56,3 +56,18 @@ export async function getBranchComparison() {
     const response = await api.get<BranchComparisonItem[]>("/dashboard/branch-comparison");
     return response.data;
 }
+
+// SH-A2: a SALES_HEAD's own-team snapshot — counts and a last-activity
+// timestamp per SALES_MANAGER on their branch, SALES_HEAD only.
+export type TeamSnapshotItem = {
+    manager: { id: string; fullName: string; email: string };
+    openLeads: number;
+    activeDeals: number;
+    tasksDue: number;
+    lastActivityAt: string | null;
+};
+
+export async function getTeamSnapshot() {
+    const response = await api.get<TeamSnapshotItem[]>("/dashboard/team-snapshot");
+    return response.data;
+}

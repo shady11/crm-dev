@@ -6,6 +6,7 @@ import {ClientsService} from "@/modules/clients/clients.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {isBranchScopedRole} from "@/common/constants/branch-scope.constants";
 import {TransferBranchDto} from "@/common/dto/transfer-branch.dto";
+import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
 import {QueryLeadsDto} from "@/modules/leads/dto/query-leads.dto";
 import {CreateLeadDto} from "@/modules/leads/dto/create-lead.dto";
 import {UpdateLeadDto} from "@/modules/leads/dto/update-lead.dto";
@@ -423,6 +424,53 @@ export class LeadsService {
         return updated;
     }
 
+    /**
+     * SH-A1: lets a SALES_HEAD move a lead from one of their team's
+     * SALES_MANAGERs to another without going through COMPANY_ADMIN. Kept as
+     * its own endpoint rather than folded into update() — a dedicated,
+     * narrowly-scoped write action restricted to team leads, not the general
+     * edit any SALES_MANAGER can already do to their own leads.
+     */
+    async reassignManager(user: AuthUser, id: string, dto: ReassignManagerDto) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        // findOne() already 404s a lead outside the actor's own branch for a
+        // branch-scoped role (BR-B1) — the same boundary this write action
+        // must respect, so no separate check is needed here.
+        const lead = await this.findOne(user, id);
+
+        await this.ensureReassignable(user, lead.branchId, dto.managerId);
+
+        const updated = await this.prisma.lead.update({
+            where: { id },
+            data: { managerId: dto.managerId },
+            include: {
+                manager: {
+                    select: { id: true, fullName: true, email: true },
+                },
+                client: {
+                    select: { id: true, fullName: true, phone: true },
+                },
+            },
+        });
+
+        await this.prisma.activity.create({
+            data: {
+                companyId: user.companyId,
+                userId: user.id,
+                leadId: id,
+                action: ActivityAction.REASSIGNED,
+                type: ActivityType.LEAD_REASSIGNED,
+                title: "Lead reassigned to another manager",
+                metadata: { fromManagerId: lead.managerId, toManagerId: dto.managerId },
+            },
+        });
+
+        return updated;
+    }
+
     async remove(user: AuthUser, id: string) {
         if (!user.companyId) {
             throw new ForbiddenException("User does not belong to a company");
@@ -458,6 +506,35 @@ export class LeadsService {
 
         if (!manager) {
             throw new BadRequestException("Manager not assignable");
+        }
+    }
+
+    /**
+     * SH-A1's target check: the new manager must be an active SALES_MANAGER
+     * on the same branch as the lead itself, not just any assignable user —
+     * a stricter check than ensureManagerAssignable's, since this is
+     * specifically "move it to a different SALES_MANAGER on the team", not a
+     * general-purpose manager field edit.
+     */
+    private async ensureReassignable(user: AuthUser, leadBranchId: string | null, managerId: string) {
+        if (!leadBranchId) {
+            throw new BadRequestException("Lead is not assigned to a branch");
+        }
+
+        const manager = await this.prisma.user.findFirst({
+            where: {
+                id: managerId,
+                companyId: user.companyId,
+                branchId: leadBranchId,
+                role: UserRole.SALES_MANAGER,
+                isActive: true,
+            },
+        });
+
+        if (!manager) {
+            throw new BadRequestException(
+                "Manager not assignable — must be an active SALES_MANAGER on the same branch",
+            );
         }
     }
 

@@ -40,5 +40,22 @@
     "minutesAgo": "{{count}} мин. назад",
     "hoursAgo": "{{count}} ч. назад",
     "daysAgo": "{{count}} дн. назад"
+  },
+  "teamSnapshot": {
+    "title": "Сводка по команде",
+    "empty": "В вашей команде пока нет менеджеров.",
+    "openLeads_one": "{{count}} открытый лид",
+    "openLeads_few": "{{count}} открытых лида",
+    "openLeads_many": "{{count}} открытых лидов",
+    "openLeads_other": "{{count}} открытых лида",
+    "activeDeals_one": "{{count}} активная сделка",
+    "activeDeals_few": "{{count}} активные сделки",
+    "activeDeals_many": "{{count}} активных сделок",
+    "activeDeals_other": "{{count}} активной сделки",
+    "tasksDue_one": "{{count}} задача к сроку",
+    "tasksDue_few": "{{count}} задачи к сроку",
+    "tasksDue_many": "{{count}} задач к сроку",
+    "tasksDue_other": "{{count}} задачи к сроку",
+    "noActivity": "Пока нет активности"
   }
 }

@@ -10,6 +10,7 @@ import {
     deleteLead,
     getLeads,
     type Lead,
+    reassignLeadManager,
     transferLeadBranch,
     updateLead,
     type UpdateLeadPayload,
@@ -37,6 +38,7 @@ export function useLeadsList() {
     const [convertTarget, setConvertTarget] = useState<Lead | null>(null);
     const [detailsTarget, setDetailsTarget] = useState<Lead | null>(null);
     const [transferTarget, setTransferTarget] = useState<Lead | null>(null);
+    const [reassignTarget, setReassignTarget] = useState<Lead | null>(null);
 
     const tableQuery = useQuery({
         queryKey: ["leads", { search, statusFilter, branchFilter, page, limit }],
@@ -109,6 +111,19 @@ export function useLeadsList() {
         },
         onError: () => {
             toast.error({ title: t("detailsSheet.transferBranch.errorTitle") });
+        },
+    });
+
+    // SH-A1: SALES_HEAD moving a lead between their own team's SALES_MANAGERs.
+    const reassignMutation = useMutation({
+        mutationFn: ({ id, managerId }: { id: string; managerId: string }) => reassignLeadManager(id, managerId),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["leads"] });
+            toast.success({ title: t("reassignDialog.successTitle", { ns: "users" }) });
+            setReassignTarget(null);
+        },
+        onError: () => {
+            toast.error({ title: t("reassignDialog.errorTitle", { ns: "users" }) });
         },
     });
 
@@ -324,6 +339,9 @@ export function useLeadsList() {
             onRequestTransferBranch: () => {
                 if (detailsLead) setTransferTarget(detailsLead);
             },
+            onRequestReassign: () => {
+                if (detailsLead) setReassignTarget(detailsLead);
+            },
         },
 
         transferBranchDialog: {
@@ -336,6 +354,19 @@ export function useLeadsList() {
             onConfirm: (branchId: string) => {
                 if (!transferTarget) return;
                 transferBranchMutation.mutate({ id: transferTarget.id, branchId });
+            },
+        },
+
+        reassignDialog: {
+            lead: reassignTarget,
+            open: reassignTarget !== null,
+            isSubmitting: reassignMutation.isPending,
+            onOpenChange: (open: boolean) => {
+                if (!open) setReassignTarget(null);
+            },
+            onConfirm: (managerId: string) => {
+                if (!reassignTarget) return;
+                reassignMutation.mutate({ id: reassignTarget.id, managerId });
             },
         },
     };

@@ -41,6 +41,9 @@ import {DealTasksCard} from "@/features/deals/components/deal-tasks-card.tsx";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
 import {useTranslation} from "react-i18next";
 import {PAYMENT_METHOD_LABEL_KEYS, PAYMENT_TYPE_LABEL_KEYS} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types.ts";
+import {ReassignManagerDialog} from "@/features/users/components/reassign-manager-dialog.tsx";
 
 export function DealDetailsPage() {
     const { t, i18n } = useTranslation(["deals", "payments"]);
@@ -48,6 +51,10 @@ export function DealDetailsPage() {
     const navigate = useNavigate();
     const dealQuery = useDeal(dealId);
     const actions = useDealActions(dealId!);
+    const { user } = useAuth();
+    // SH-A1: reassignment is a team-lead action — SALES_HEAD only, not
+    // SALES_MANAGER or the general-purpose reserve/edit flows.
+    const isSalesHead = user?.role === UserRole.SALES_HEAD;
 
     const [cancelOpen, setCancelOpen] = useState(false);
     const [cancelReason, setCancelReason] = useState("");
@@ -70,6 +77,8 @@ export function DealDetailsPage() {
     const [paymentType, setPaymentType] = useState<PaymentType | "">("");
     const [paidAt, setPaidAt] = useState([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
     const [reference, setReference] = useState("");
+
+    const [reassignOpen, setReassignOpen] = useState(false);
 
     const deal = dealQuery.data;
     if (!deal) return null;
@@ -164,7 +173,11 @@ export function DealDetailsPage() {
 
                     <div className="grid gap-4 sm:grid-cols-2">
                         <DealClientCard client={deal.client} />
-                        <DealManagerCard manager={deal.manager} />
+                        <DealManagerCard
+                            manager={deal.manager}
+                            canReassign={isSalesHead}
+                            onReassign={() => setReassignOpen(true)}
+                        />
                     </div>
 
                     <div className="grid gap-4 lg:grid-cols-2">
@@ -526,6 +539,21 @@ export function DealDetailsPage() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
+
+            {/* Reassign manager dialog */}
+            <ReassignManagerDialog
+                open={reassignOpen}
+                entityName={deal.dealNumber}
+                branchId={deal.branchId}
+                currentManagerId={deal.manager?.id ?? null}
+                isSubmitting={actions.reassign.isPending}
+                onOpenChange={setReassignOpen}
+                onConfirm={(managerId) =>
+                    actions.reassign.mutate(managerId, {
+                        onSuccess: () => setReassignOpen(false),
+                    })
+                }
+            />
         </div>
     );
 }
