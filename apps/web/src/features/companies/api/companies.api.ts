@@ -57,6 +57,21 @@ export async function updateCompany(id: string, payload: UpdateCompanyPayload) {
     return response.data;
 }
 
+// Self-service for a COMPANY_ADMIN editing their own tenant — scoped server-side to the
+// caller's own companyId, never a client-supplied id. Deliberately narrower than
+// UpdateCompanyPayload above (no phone/address), matching CA-A1's scope.
+export type UpdateOwnCompanyPayload = Pick<CreateCompanyPayload, "name" | "currency" | "locale" | "timezone">;
+
+export async function getOwnCompany() {
+    const response = await api.get<Company>("/companies/me");
+    return response.data;
+}
+
+export async function updateOwnCompany(payload: Partial<UpdateOwnCompanyPayload>) {
+    const response = await api.patch<Company>("/companies/me", payload);
+    return response.data;
+}
+
 // Suspend and resume are separate endpoints rather than a status field, so a
 // mistyped payload cannot turn one into the other.
 export async function suspendCompany(id: string) {

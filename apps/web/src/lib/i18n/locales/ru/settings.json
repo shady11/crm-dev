@@ -1,0 +1,19 @@
+{
+  "page": {
+    "heading": "Настройки компании",
+    "description": "Название, валюта, локаль и часовой пояс вашего агентства.",
+    "formTitle": "Общие"
+  },
+  "fields": {
+    "name": "Название",
+    "currency": "Валюта",
+    "locale": "Локаль",
+    "timezone": "Часовой пояс"
+  },
+  "toasts": {
+    "updateSuccessTitle": "Настройки сохранены",
+    "updateSuccessDescription": "Настройки компании обновлены.",
+    "updateErrorTitle": "Не удалось сохранить настройки",
+    "updateErrorDescription": "Что-то пошло не так. Попробуйте ещё раз."
+  }
+}

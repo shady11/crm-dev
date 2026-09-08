@@ -18,7 +18,7 @@ interface UsersTableProps {
     onToggleAll(checked: boolean): void;
     onToggleOne(id: string, checked: boolean): void;
     onEdit(user: User): void;
-    onDelete(id: string): void;
+    onDelete(user: User): void;
     isDeleting(id: string): boolean;
 }
 
@@ -119,7 +119,7 @@ export function UsersTable({
                                             variant="ghost"
                                             size="icon-sm"
                                             disabled={!user.isActive || isDeleting(user.id)}
-                                            onClick={() => onDelete(user.id)}
+                                            onClick={() => onDelete(user)}
                                         >
                                             <Trash2 className="size-3.5" />
                                         </Button>

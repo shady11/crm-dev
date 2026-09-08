@@ -23,6 +23,7 @@ import {
     LayoutDashboard,
     ListTodo,
     ScrollText,
+    Settings,
     SquareUser,
     Users
 } from "lucide-react";
@@ -45,6 +46,7 @@ const NAV_ITEMS: {
     { titleKey: "nav.companies", feature: "companies", url: "/companies", icon: Landmark },
     { titleKey: "nav.users", feature: "users", url: "/users", icon: Users },
     { titleKey: "nav.auditLog", feature: "auditLog", url: "/audit-log", icon: ScrollText },
+    { titleKey: "nav.settings", feature: "companySettings", url: "/settings", icon: Settings },
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

@@ -1,4 +1,4 @@
-import {ConflictException} from "@nestjs/common";
+import {ConflictException, ForbiddenException, NotFoundException} from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import {UserRole} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
@@ -174,5 +174,64 @@ describe("CompaniesService suspension", () => {
         await service.remove(actor, "c1");
 
         expect(update.mock.calls[0][0].data).toEqual({deletedAt: expect.any(Date)});
+    });
+});
+
+describe("CompaniesService self-service (CA-A1)", () => {
+    const companyAdmin: AuthUser = {
+        id: "admin-1",
+        email: "admin@bishkekdev.kg",
+        name: "Aibek",
+        role: UserRole.COMPANY_ADMIN,
+        companyId: "company-1",
+        company: {id: "company-1", name: "Bishkek Dev", currency: "KGS", locale: "ru-RU", timezone: "Asia/Bishkek"},
+    };
+
+    const build = (company: unknown = {id: "company-1", name: "Bishkek Dev", users: []}) => {
+        const update = jest.fn().mockImplementation(({data}) => Promise.resolve({...(company as object), ...data}));
+        const findFirst = jest.fn().mockResolvedValue(company);
+        const prisma = {
+            company: {findFirst, update},
+            project: {count: jest.fn().mockResolvedValue(0)},
+            unit: {count: jest.fn().mockResolvedValue(0)},
+            client: {count: jest.fn().mockResolvedValue(0)},
+            lead: {count: jest.fn().mockResolvedValue(0)},
+            deal: {count: jest.fn().mockResolvedValue(0)},
+        } as unknown as PrismaService;
+
+        return {service: new CompaniesService(prisma, auditLog, impersonation), update, findFirst};
+    };
+
+    it("reads only the caller's own company, never one supplied by the client", async () => {
+        const {service, findFirst} = build();
+
+        await service.findOwn(companyAdmin);
+
+        expect(findFirst.mock.calls[0][0].where).toMatchObject({id: "company-1"});
+    });
+
+    it("refuses to read or edit for an actor with no company", async () => {
+        const {service} = build();
+        const noCompany: AuthUser = {...companyAdmin, companyId: null, company: null};
+
+        await expect(service.findOwn(noCompany)).rejects.toThrow(ForbiddenException);
+        await expect(service.updateOwn(noCompany, {currency: "USD"})).rejects.toThrow(ForbiddenException);
+    });
+
+    it("updates currency/locale/timezone/name scoped to the actor's own companyId", async () => {
+        const {service, update} = build();
+
+        await service.updateOwn(companyAdmin, {currency: "USD", locale: "en-US", timezone: "UTC"});
+
+        expect(update.mock.calls[0][0]).toMatchObject({
+            where: {id: "company-1"},
+            data: {currency: "USD", locale: "en-US", timezone: "UTC"},
+        });
+    });
+
+    it("404s rather than leaking existence of a company that is gone", async () => {
+        const {service} = build(null);
+
+        await expect(service.findOwn(companyAdmin)).rejects.toThrow(NotFoundException);
     });
 });

@@ -2,6 +2,7 @@ import {api} from "@/lib/api";
 import type {PaginatedResponse} from "@/lib/api-types.ts";
 import type {Unit, UnitStatus} from "@/features/units/types/unit.types";
 import type {CreateUnitPayload, UpdateUnitPayload} from "@/features/units/types/unit-payload.ts";
+import type {ImportUnitsResult} from "@/features/units/types/unit-import.types.ts";
 
 export async function getUnits(floorId: string) {
     const response = await api.get<PaginatedResponse<Unit>>(
@@ -50,4 +51,14 @@ export async function updateUnitStatus(
 
 export async function deleteUnit(unitId: string) {
     await api.delete(`/units/${unitId}`);
+}
+
+export async function importUnits(projectId: string, file: File) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await api.post<ImportUnitsResult>(`/projects/${projectId}/units/import`, formData, {
+        headers: {"Content-Type": "multipart/form-data"},
+    });
+    return response.data;
 }

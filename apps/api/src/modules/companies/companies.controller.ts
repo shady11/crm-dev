@@ -8,6 +8,7 @@ import {AuthUser} from "@/common/types/auth-user.type";
 import {CompaniesService} from "./companies.service";
 import {CreateCompanyDto} from "./dto/create-company.dto";
 import {UpdateCompanyDto} from "./dto/update-company.dto";
+import {UpdateOwnCompanyDto} from "./dto/update-own-company.dto";
 import {QueryCompaniesDto} from "./dto/query-companies.dto";
 
 /**
@@ -27,6 +28,22 @@ export class CompaniesController {
     @Get()
     findAll(@Query() query: QueryCompaniesDto) {
         return this.companiesService.findAll(query);
+    }
+
+    // Self-service for the tenant's own admin. Declared ahead of the ":id"
+    // routes below (and re-scoped with @Roles) so "me" is never swallowed by
+    // the :id param, and so a COMPANY_ADMIN — locked out of everything else on
+    // this controller — can reach exactly these two.
+    @Roles(UserRole.COMPANY_ADMIN)
+    @Get("me")
+    findOwn(@CurrentUser() actor: AuthUser) {
+        return this.companiesService.findOwn(actor);
+    }
+
+    @Roles(UserRole.COMPANY_ADMIN)
+    @Patch("me")
+    updateOwn(@CurrentUser() actor: AuthUser, @Body() dto: UpdateOwnCompanyDto) {
+        return this.companiesService.updateOwn(actor, dto);
     }
 
     @Get(":id")

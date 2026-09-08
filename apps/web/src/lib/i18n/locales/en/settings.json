@@ -1,0 +1,19 @@
+{
+  "page": {
+    "heading": "Company settings",
+    "description": "Your agency's own name, currency, locale and timezone.",
+    "formTitle": "General"
+  },
+  "fields": {
+    "name": "Name",
+    "currency": "Currency",
+    "locale": "Locale",
+    "timezone": "Timezone"
+  },
+  "toasts": {
+    "updateSuccessTitle": "Settings saved",
+    "updateSuccessDescription": "Your company settings were updated.",
+    "updateErrorTitle": "Could not save settings",
+    "updateErrorDescription": "Something went wrong. Please try again."
+  }
+}
