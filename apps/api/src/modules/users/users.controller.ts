@@ -11,6 +11,7 @@ import {CreateUserDto} from "./dto/create-user.dto";
 import {UpdateUserDto} from "./dto/update-user.dto";
 import {UpdateUserPasswordDto} from "./dto/update-user-password.dto";
 import {DeactivateUserDto} from "./dto/deactivate-user.dto";
+import {TransferUserBranchDto} from "./dto/transfer-user-branch.dto";
 import {QueryUsersDto} from "./dto/query-users.dto";
 
 @UseGuards(JwtAuthGuard, CompanyGuard, RolesGuard)
@@ -89,5 +90,23 @@ export class UsersController {
     @Delete(":id")
     remove(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.usersService.remove(user, id);
+    }
+
+    // Read before showing the branch-transfer confirmation — tells the caller
+    // whether this user still has open leads or active deals to reassign.
+    @Roles(UserRole.COMPANY_ADMIN)
+    @Get(":id/branch-transfer-impact")
+    getBranchTransferImpact(@CurrentUser() user: AuthUser, @Param("id") id: string) {
+        return this.usersService.getBranchTransferImpact(user, id);
+    }
+
+    @Roles(UserRole.COMPANY_ADMIN)
+    @Post(":id/transfer-branch")
+    transferBranch(
+        @CurrentUser() user: AuthUser,
+        @Param("id") id: string,
+        @Body() dto: TransferUserBranchDto,
+    ) {
+        return this.usersService.transferBranch(user, id, dto);
     }
 }

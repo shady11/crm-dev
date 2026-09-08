@@ -2,7 +2,7 @@ import {BadRequestException, Injectable, UnauthorizedException} from "@nestjs/co
 import { UsersService } from "@/modules/users/users.service";
 import {JwtService} from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
-import {AuthCompanySummary, AuthUser} from "@/common/types/auth-user.type";
+import {AuthBranchSummary, AuthCompanySummary, AuthUser} from "@/common/types/auth-user.type";
 import {PrismaService} from "@/database/prisma.service";
 import {ChangePasswordDto} from "@/modules/auth/dto/change-password.dto";
 
@@ -17,6 +17,15 @@ function toCompanySummary(company: { id: string; name: string; currency: string 
         currency: company.currency,
         locale: company.locale,
         timezone: company.timezone,
+    };
+}
+
+function toBranchSummary(branch: { id: string; name: string; city: string | null } | null): AuthBranchSummary | null {
+    if (!branch) return null;
+    return {
+        id: branch.id,
+        name: branch.name,
+        city: branch.city,
     };
 }
 
@@ -58,12 +67,13 @@ export class AuthService {
             throw new UnauthorizedException("This company is not active. Contact your administrator.");
         }
 
-        const payload: Omit<AuthUser, "company"> = {
+        const payload: Omit<AuthUser, "company" | "branch"> = {
             id: user.id,
             email: user.email,
             name: user.fullName,
             role: user.role,
             companyId: user.companyId,
+            branchId: user.branchId,
         };
 
         const accessToken = await this.jwtService.signAsync(payload);
@@ -78,6 +88,8 @@ export class AuthService {
                 role: user.role,
                 companyId: user.companyId,
                 company: toCompanySummary(user.company),
+                branchId: user.branchId,
+                branch: toBranchSummary(user.branch),
             },
         };
     }
@@ -117,12 +129,13 @@ export class AuthService {
             data: { passwordHash, sessionsValidFrom: new Date() },
         });
 
-        const payload: Omit<AuthUser, "company"> = {
+        const payload: Omit<AuthUser, "company" | "branch"> = {
             id: record.id,
             email: record.email,
             name: record.fullName,
             role: record.role,
             companyId: record.companyId,
+            branchId: record.branchId,
         };
 
         return { accessToken: await this.jwtService.signAsync(payload) };

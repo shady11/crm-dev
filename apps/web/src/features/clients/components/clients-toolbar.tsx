@@ -5,6 +5,7 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {useProjectsFilter} from "@/features/projects/hooks/use-projects-filter.ts";
 import type {ProjectFilterValue} from "@/features/clients/hooks/use-clients-list.ts";
+import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
 import {useTranslation} from "react-i18next";
 
 interface ClientsToolbarProps {
@@ -12,6 +13,8 @@ interface ClientsToolbarProps {
     onSearchChange(value: string): void;
     projectFilter: ProjectFilterValue;
     onProjectFilterChange(value: ProjectFilterValue): void;
+    branchFilter: string | "all";
+    onBranchFilterChange(value: string | "all"): void;
     onAddClient(): void;
 }
 
@@ -20,6 +23,8 @@ export function ClientsToolbar({
                                    onSearchChange,
                                    projectFilter,
                                    onProjectFilterChange,
+                                   branchFilter,
+                                   onBranchFilterChange,
                                    onAddClient,
                                }: ClientsToolbarProps) {
     const { t } = useTranslation("clients");
@@ -37,6 +42,8 @@ export function ClientsToolbar({
             <h2 className="text-lg font-medium">{t("page.title")}</h2>
 
             <div className="flex flex-wrap items-center gap-2">
+                <BranchFilterSelect value={branchFilter} onChange={onBranchFilterChange} />
+
                 <Select
                     collection={projectCollection}
                     value={[projectFilter]}

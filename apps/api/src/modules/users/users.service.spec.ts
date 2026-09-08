@@ -19,6 +19,8 @@ describe("UsersService — role boundaries", () => {
         role: UserRole.COMPANY_ADMIN,
         companyId: "company-1",
         company: null,
+        branchId: null,
+        branch: null,
     };
 
     const superAdminRow = {
@@ -41,6 +43,9 @@ describe("UsersService — role boundaries", () => {
                 count: jest.fn().mockResolvedValue(0),
                 create: jest.fn().mockResolvedValue({id: "new"}),
                 update: jest.fn().mockResolvedValue({id: "updated"}),
+            },
+            branch: {
+                findFirst: jest.fn().mockResolvedValue({id: "branch-1", companyId: "company-1", deactivatedAt: null}),
             },
         };
         return {service: new UsersService(prisma as unknown as PrismaService), prisma};
@@ -70,6 +75,7 @@ describe("UsersService — role boundaries", () => {
                 email: "aigul@crm.dev",
                 password: "secret123",
                 role: UserRole.SALES_MANAGER,
+                branchId: "branch-1",
             });
 
             expect(prisma.user.create).toHaveBeenCalled();
@@ -152,6 +158,8 @@ describe("UsersService — reassignment on deactivation (CA-B1)", () => {
         role: UserRole.COMPANY_ADMIN,
         companyId: "company-1",
         company: null,
+        branchId: null,
+        branch: null,
     };
 
     const departingManager = {

@@ -15,6 +15,7 @@ export type ImpersonationTarget = {
     fullName: string;
     role: AuthUser["role"];
     companyId: string;
+    branchId: string | null;
     phone: string | null;
 };
 
@@ -61,6 +62,7 @@ export class ImpersonationService {
             name: target.fullName,
             role: target.role,
             companyId: target.companyId,
+            branchId: target.branchId,
             impersonation: {sessionId: session.id, superAdminId: actor.id},
         };
 
@@ -86,6 +88,7 @@ export class ImpersonationService {
                 phone: target.phone,
                 role: target.role,
                 companyId: target.companyId,
+                branchId: target.branchId,
                 company,
             },
         };
@@ -130,6 +133,7 @@ export class ImpersonationService {
             name: superAdmin.fullName,
             role: superAdmin.role,
             companyId: superAdmin.companyId,
+            branchId: superAdmin.branchId,
         };
 
         return {accessToken: await this.jwtService.signAsync(payload)};

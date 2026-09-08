@@ -7,18 +7,29 @@ import {RevenueTrendChart} from "@/features/dashboard/components/revenue-trend-c
 import {UnitsInventoryChart} from "@/features/dashboard/components/units-inventory-chart.tsx";
 import {AttentionCard} from "@/features/dashboard/components/attention-card.tsx";
 import {RecentActivityCard} from "@/features/dashboard/components/recent-activity-card.tsx";
+import {BranchComparisonChart} from "@/features/dashboard/components/branch-comparison-chart.tsx";
 import {DealStatusCardsGrid} from "@/features/deals/components/deal-status-cards-grid.tsx";
-import {useDashboard} from "@/features/dashboard/hooks/use-dashboard.ts";
+import {useBranchComparison, useDashboard} from "@/features/dashboard/hooks/use-dashboard.ts";
 import {useProjectsFilter} from "@/features/projects/hooks/use-projects-filter.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
+import {UserRole} from "@/features/users/types/user.types";
 import {useTranslation} from "react-i18next";
 
 export function DashboardPage() {
     const { t } = useTranslation("dashboard");
+    const { user } = useAuth();
     const [projectId, setProjectId] = useState<string | undefined>();
+    const [branchId, setBranchId] = useState<string | "all">("all");
     const { formatCurrency } = useCompanyFormatters();
     const projects = useProjectsFilter();
-    const { kpis, revenueTrend, unitsSummary, attention, recentActivity, dealsStatus } = useDashboard(projectId);
+    const { kpis, revenueTrend, unitsSummary, attention, recentActivity, dealsStatus } = useDashboard(
+        projectId,
+        branchId === "all" ? undefined : branchId,
+    );
+    const isCompanyAdmin = user?.role === UserRole.COMPANY_ADMIN;
+    const branchComparison = useBranchComparison(isCompanyAdmin);
 
     const projectCollection = createListCollection({
         items: [{ label: t("allProjects"), value: "all" }, ...projects.data.map((p) => ({ label: p.name, value: p.id }))],
@@ -31,16 +42,20 @@ export function DashboardPage() {
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-2xl font-medium tracking-tight">{t("title")}</h2>
 
-                <Select
-                    collection={projectCollection}
-                    value={[projectId ?? "all"]}
-                    onValueChange={({ value }) => setProjectId(value[0] === "all" ? undefined : value[0])}
-                >
-                    <SelectTrigger className="w-56"><SelectValue placeholder={t("allProjects")} /></SelectTrigger>
-                    <SelectContent>
-                        {projectCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
-                    </SelectContent>
-                </Select>
+                <div className="flex flex-wrap items-center gap-2">
+                    <BranchFilterSelect value={branchId} onChange={setBranchId} />
+
+                    <Select
+                        collection={projectCollection}
+                        value={[projectId ?? "all"]}
+                        onValueChange={({ value }) => setProjectId(value[0] === "all" ? undefined : value[0])}
+                    >
+                        <SelectTrigger className="w-56"><SelectValue placeholder={t("allProjects")} /></SelectTrigger>
+                        <SelectContent>
+                            {projectCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -87,6 +102,8 @@ export function DashboardPage() {
                 <AttentionCard data={attention.data ?? { expiringDeals: [], urgentTasks: [] }} />
                 <RecentActivityCard activities={recentActivity.data ?? []} />
             </div>
+
+            {isCompanyAdmin ? <BranchComparisonChart data={branchComparison.data ?? []} /> : null}
         </div>
     );
 }

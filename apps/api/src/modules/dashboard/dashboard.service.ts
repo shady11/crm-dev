@@ -1,16 +1,33 @@
 import {ForbiddenException, Injectable} from "@nestjs/common";
-import {DealStatus, TaskStatus, UnitStatus} from "@/generated/prisma/client";
+import {DealStatus, Prisma, TaskStatus, UnitStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
+import {isBranchScopedRole} from "@/common/constants/branch-scope.constants";
 
 @Injectable()
 export class DashboardService {
     constructor(private readonly prisma: PrismaService) {}
 
-    async getKpis(user: AuthUser, projectId?: string) {
+    /**
+     * Resolves the branchId to filter deal/task/payment queries by: a
+     * branch-scoped role is always pinned to their own branch (BR-B1); a
+     * company-wide role may optionally narrow to one branch via the query
+     * param (BR-B3) — kept as a separate, later-checked branch so it can
+     * never be mistaken for the sales-role restriction above it.
+     */
+    private resolveBranchId(user: AuthUser, branchId?: string): string | undefined {
+        if (isBranchScopedRole(user.role)) {
+            return user.branchId ?? undefined;
+        }
+
+        return branchId;
+    }
+
+    async getKpis(user: AuthUser, projectId?: string, branchId?: string) {
         if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
         const companyId = user.companyId;
+        const effectiveBranchId = this.resolveBranchId(user, branchId);
 
         const startOfMonth = new Date();
         startOfMonth.setDate(1);
@@ -18,10 +35,18 @@ export class DashboardService {
 
         const [revenueAgg, activeDealsCount, unitsAgg, overdueTasksCount] = await Promise.all([
             this.prisma.payment.aggregate({
-                where: { deal: { companyId, projectId }, paidAt: { gte: startOfMonth }, deletedAt: null },
+                where: {
+                    deal: { companyId, projectId, branchId: effectiveBranchId },
+                    paidAt: { gte: startOfMonth },
+                    deletedAt: null,
+                },
                 _sum: { amount: true },
             }),
-            this.prisma.deal.count({ where: { companyId, projectId, status: { in: ACTIVE_DEAL_STATUSES } } }),
+            this.prisma.deal.count({
+                where: { companyId, projectId, branchId: effectiveBranchId, status: { in: ACTIVE_DEAL_STATUSES } },
+            }),
+            // Units are deliberately company-wide, not branch-scoped (BR-C1) —
+            // no branch filter here even for a branch-scoped viewer.
             this.prisma.unit.groupBy({
                 by: ["status"],
                 where: { project: { companyId, id: projectId }, deletedAt: null },
@@ -30,6 +55,7 @@ export class DashboardService {
             this.prisma.task.count({
                 where: {
                     companyId,
+                    branchId: effectiveBranchId,
                     deletedAt: null,
                     status: { in: [TaskStatus.TODO, TaskStatus.IN_PROGRESS] },
                     dueDate: { lt: new Date() },
@@ -50,8 +76,9 @@ export class DashboardService {
         };
     }
 
-    async getRevenueTrend(user: AuthUser, projectId?: string) {
+    async getRevenueTrend(user: AuthUser, projectId?: string, branchId?: string) {
         if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
+        const effectiveBranchId = this.resolveBranchId(user, branchId);
 
         const sixMonthsAgo = new Date();
         sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
@@ -59,7 +86,11 @@ export class DashboardService {
         sixMonthsAgo.setHours(0, 0, 0, 0);
 
         const payments = await this.prisma.payment.findMany({
-            where: { deal: { companyId: user.companyId, projectId }, paidAt: { gte: sixMonthsAgo }, deletedAt: null },
+            where: {
+                deal: { companyId: user.companyId, projectId, branchId: effectiveBranchId },
+                paidAt: { gte: sixMonthsAgo },
+                deletedAt: null,
+            },
             select: { amount: true, paidAt: true },
         });
 
@@ -81,6 +112,8 @@ export class DashboardService {
     async getUnitsSummary(user: AuthUser, projectId?: string) {
         if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
 
+        // Units are deliberately company-wide (BR-C1) — visible to every role
+        // regardless of branch, no filtering here.
         const counts = await this.prisma.unit.groupBy({
             by: ["status"],
             where: { project: { companyId: user.companyId, id: projectId }, deletedAt: null },
@@ -93,14 +126,21 @@ export class DashboardService {
         }));
     }
 
-    async getAttentionItems(user: AuthUser, projectId?: string) {
+    async getAttentionItems(user: AuthUser, projectId?: string, branchId?: string) {
         if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
         const companyId = user.companyId;
+        const effectiveBranchId = this.resolveBranchId(user, branchId);
         const in3Days = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
 
         const [expiringDeals, urgentTasks] = await Promise.all([
             this.prisma.deal.findMany({
-                where: { companyId, projectId, status: DealStatus.RESERVED, reservationExpiresAt: { lte: in3Days } },
+                where: {
+                    companyId,
+                    projectId,
+                    branchId: effectiveBranchId,
+                    status: DealStatus.RESERVED,
+                    reservationExpiresAt: { lte: in3Days },
+                },
                 select: {
                     id: true, dealNumber: true, reservationExpiresAt: true,
                     client: { select: { fullName: true } },
@@ -110,7 +150,9 @@ export class DashboardService {
             }),
             this.prisma.task.findMany({
                 where: {
-                    companyId, deletedAt: null,
+                    companyId,
+                    branchId: effectiveBranchId,
+                    deletedAt: null,
                     status: { in: [TaskStatus.TODO, TaskStatus.IN_PROGRESS] },
                     dueDate: { lte: in3Days },
                     ...(projectId ? { deal: { projectId } } : {}),
@@ -127,14 +169,28 @@ export class DashboardService {
         return { expiringDeals, urgentTasks };
     }
 
-    async getRecentActivity(user: AuthUser, projectId?: string) {
+    async getRecentActivity(user: AuthUser, projectId?: string, branchId?: string) {
         if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
+        const effectiveBranchId = this.resolveBranchId(user, branchId);
+
+        const where: Prisma.ActivityWhereInput = {
+            companyId: user.companyId,
+            ...(projectId ? { deal: { projectId } } : {}),
+        };
+
+        // Activity has no branchId of its own — filtered through whichever
+        // entity it's attached to. An activity with none of the three set
+        // never matches a branch filter, same as an unassigned record would.
+        if (effectiveBranchId) {
+            where.OR = [
+                { lead: { branchId: effectiveBranchId } },
+                { client: { branchId: effectiveBranchId } },
+                { deal: { branchId: effectiveBranchId } },
+            ];
+        }
 
         return this.prisma.activity.findMany({
-            where: {
-                companyId: user.companyId,
-                ...(projectId ? { deal: { projectId } } : {}),
-            },
+            where,
             orderBy: { createdAt: "desc" },
             take: 10,
             select: {
@@ -143,5 +199,47 @@ export class DashboardService {
                 deal: { select: { id: true, dealNumber: true } },
             },
         });
+    }
+
+    /**
+     * BR-E1: per-branch deal count and revenue comparison, for the
+     * COMPANY_ADMIN dashboard. Includes branches with zero deals.
+     */
+    async getBranchComparison(user: AuthUser) {
+        if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
+        const companyId = user.companyId;
+
+        const [branches, dealCounts] = await Promise.all([
+            this.prisma.branch.findMany({
+                where: { companyId },
+                select: { id: true, name: true },
+                orderBy: { name: "asc" },
+            }),
+            this.prisma.deal.groupBy({
+                by: ["branchId"],
+                where: { companyId, status: { in: ACTIVE_DEAL_STATUSES } },
+                _count: { _all: true },
+            }),
+        ]);
+
+        // Payment has no branchId of its own — revenue is summed per branch
+        // via its deals, mirroring getKpis's aggregate-per-slice style rather
+        // than adding a new column for one report.
+        const revenueByBranch = await Promise.all(
+            branches.map(async (branch) => {
+                const agg = await this.prisma.payment.aggregate({
+                    where: { deal: { companyId, branchId: branch.id }, deletedAt: null },
+                    _sum: { amount: true },
+                });
+                return { branchId: branch.id, revenue: agg._sum.amount ?? 0 };
+            }),
+        );
+
+        return branches.map((branch) => ({
+            branchId: branch.id,
+            branchName: branch.name,
+            dealCount: dealCounts.find((d) => d.branchId === branch.id)?._count._all ?? 0,
+            revenue: revenueByBranch.find((r) => r.branchId === branch.id)?.revenue ?? 0,
+        }));
     }
 }

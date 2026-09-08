@@ -1,6 +1,7 @@
 import {Body, Controller, Get, Param, Post, Query, UseGuards} from '@nestjs/common';
 import {JwtAuthGuard} from '@/modules/auth/guards/jwt-auth.guard';
 import {CompanyGuard} from '@/common/guards/company.guard';
+import {BranchGuard} from '@/common/guards/branch.guard';
 import {RolesGuard} from '@/common/guards/roles.guard';
 import {Roles} from '@/common/decorators/roles.decorator';
 import {CurrentUser} from '@/common/decorators/current-user.decorator';
@@ -18,7 +19,7 @@ import {CreatePaymentDto} from "@/modules/deals/dto/payments/create-payment.dto"
 import {PaymentScheduleService} from "@/modules/deals/services/payments/payment-schedule.service";
 import {PaymentService} from "@/modules/deals/services/payments/payment.service";
 
-@UseGuards(JwtAuthGuard, CompanyGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, CompanyGuard, BranchGuard, RolesGuard)
 @Controller('deals')
 export class DealsController {
   constructor(
@@ -55,8 +56,12 @@ export class DealsController {
       UserRole.FINANCE
   )
   @Get('status-summary')
-  getStatusSummary(@CurrentUser() user: AuthUser, @Query('projectId') projectId?: string) {
-    return this.dealsService.getStatusSummary(user, projectId);
+  getStatusSummary(
+      @CurrentUser() user: AuthUser,
+      @Query('projectId') projectId?: string,
+      @Query('branchId') branchId?: string,
+  ) {
+    return this.dealsService.getStatusSummary(user, projectId, branchId);
   }
 
   @Roles(

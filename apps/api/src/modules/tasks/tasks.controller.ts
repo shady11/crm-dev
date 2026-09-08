@@ -1,6 +1,7 @@
 import {Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards} from "@nestjs/common";
 import {JwtAuthGuard} from "@/modules/auth/guards/jwt-auth.guard";
 import {CompanyGuard} from "@/common/guards/company.guard";
+import {BranchGuard} from "@/common/guards/branch.guard";
 import {RolesGuard} from "@/common/guards/roles.guard";
 import {Roles} from "@/common/decorators/roles.decorator";
 import {CurrentUser} from "@/common/decorators/current-user.decorator";
@@ -12,7 +13,7 @@ import {UpdateTaskDto} from "./dto/update-task.dto";
 import {UpdateTaskStatusDto} from "./dto/update-task-status.dto";
 import {QueryTasksDto} from "./dto/query-tasks.dto";
 
-@UseGuards(JwtAuthGuard, CompanyGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, CompanyGuard, BranchGuard, RolesGuard)
 @Controller("tasks")
 export class TasksController {
     constructor(private readonly tasksService: TasksService) {}
@@ -25,8 +26,8 @@ export class TasksController {
 
     @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD, UserRole.SALES_MANAGER, UserRole.FINANCE)
     @Get("status-summary")
-    getStatusSummary(@CurrentUser() user: AuthUser) {
-        return this.tasksService.getStatusSummary(user);
+    getStatusSummary(@CurrentUser() user: AuthUser, @Query("branchId") branchId?: string) {
+        return this.tasksService.getStatusSummary(user, branchId);
     }
 
     @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD, UserRole.SALES_MANAGER, UserRole.FINANCE)

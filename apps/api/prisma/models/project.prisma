@@ -1,3 +1,8 @@
+// Inventory (Project/Block/Entrance/Floor/Unit) is deliberately NOT scoped to
+// a Branch. Decision: any branch can see and reserve any unit — the existing
+// atomic unit-booking logic stays company-scoped, untouched by branch
+// isolation. This is a decision, not an oversight; revisit only if real usage
+// shows branches stepping on each other's inventory.
 enum ProjectStatus {
   DRAFT
   PLANNING

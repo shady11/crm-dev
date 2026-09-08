@@ -22,12 +22,13 @@ import {applyTaskStatusOptimistically} from "@/features/tasks/utils/optimistic-s
 interface TaskKanbanBoardProps {
     search?: string;
     assignedToId?: string;
+    branchId?: string;
     onStatusChange(taskId: string, status: TaskStatus): void;
     onCardClick(task: Task): void;
 }
 
-export function TaskKanbanBoard({ search, assignedToId, onStatusChange, onCardClick }: TaskKanbanBoardProps) {
-    const { tasksByStatus, isLoading } = useTasksBoard({ search, assignedToId });
+export function TaskKanbanBoard({ search, assignedToId, branchId, onStatusChange, onCardClick }: TaskKanbanBoardProps) {
+    const { tasksByStatus, isLoading } = useTasksBoard({ search, assignedToId, branchId });
     const [activeTask, setActiveTask] = useState<Task | null>(null);
     const queryClient = useQueryClient();
 

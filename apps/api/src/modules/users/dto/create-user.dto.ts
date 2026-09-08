@@ -1,4 +1,4 @@
-import {IsEmail, IsEnum, IsOptional, IsString, MinLength} from "class-validator";
+import {IsEmail, IsEnum, IsOptional, IsString, IsUUID, MinLength} from "class-validator";
 import {UserRole} from "@/generated/prisma/enums";
 
 export class CreateUserDto {
@@ -19,4 +19,11 @@ export class CreateUserDto {
 
     @IsEnum(UserRole)
     role!: UserRole;
+
+    // Required for branch-scoped roles (SALES_HEAD, SALES_MANAGER); must be
+    // absent for company-wide roles — enforced in UsersService, not here,
+    // since the rule depends on the role field.
+    @IsOptional()
+    @IsUUID()
+    branchId?: string;
 }

@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {useTranslation} from "react-i18next";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {ArrowLeft, MailIcon, Pen, PhoneIcon} from "lucide-react";
+import {ArrowLeft, ArrowLeftRight, MailIcon, Pen, PhoneIcon} from "lucide-react";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {toast} from "@/components/ui/toast.tsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
@@ -12,22 +12,45 @@ import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/co
 import {ClientFormSheet} from "@/features/clients/components/client-form-sheet.tsx";
 import {useClient} from "@/features/clients/hooks/use-client.ts";
 import {initials} from "@/features/clients/utils/format.ts";
-import {updateClient, type UpdateClientPayload} from "@/features/clients/api/clients.api.ts";
+import {
+    transferClientBranch,
+    updateClient,
+    type UpdateClientPayload,
+} from "@/features/clients/api/clients.api.ts";
 import {ClientTasksCard} from "@/features/tasks/components/client-tasks-card.tsx";
 import {DEAL_STATUS_LABEL_KEYS, DEAL_STATUS_VISUALS} from "@/features/deals/types/deal.types.ts";
 import {LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
 import {paths} from "@/routes/paths.ts";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
+import {MoveToBranchDialog} from "@/features/branches/components/move-to-branch-dialog.tsx";
 
 export function ClientDetailsPage() {
-    const { t, i18n } = useTranslation(["clients", "deals", "leads", "common"]);
+    const { t, i18n } = useTranslation(["clients", "deals", "leads", "common", "branches"]);
     const { formatCurrency } = useCompanyFormatters();
+    const { user } = useAuth();
+    const isCompanyAdmin = user?.role === UserRole.COMPANY_ADMIN;
     const { clientId } = useParams<{ clientId: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const clientQuery = useClient(clientId);
     const [editOpen, setEditOpen] = useState(false);
+    const [transferOpen, setTransferOpen] = useState(false);
+
+    const transferBranchMutation = useMutation({
+        mutationFn: (branchId: string) => transferClientBranch(clientId!, branchId),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["client", clientId] });
+            await queryClient.invalidateQueries({ queryKey: ["clients"] });
+            toast.success({ title: t("moveDialog.success", { ns: "branches", name: clientQuery.data?.fullName }) });
+            setTransferOpen(false);
+        },
+        onError: () => {
+            toast.error({ title: t("moveDialog.error", { ns: "branches" }) });
+        },
+    });
 
     const updateMutation = useMutation({
         mutationFn: (payload: UpdateClientPayload) => updateClient(clientId!, payload),
@@ -65,6 +88,12 @@ export function ClientDetailsPage() {
                             <ArrowLeft className="size-3"/>
                             {t("actions.back", { ns: "common" })}
                         </Button>
+                        {isCompanyAdmin && (
+                            <Button variant="secondary" onClick={() => setTransferOpen(true)}>
+                                <ArrowLeftRight className="size-3" />
+                                {t("moveDialog.title", { ns: "branches" })}
+                            </Button>
+                        )}
                         <Button variant="default" onClick={() => setEditOpen(true)}>
                             <Pen className="size-3"/>
                             {t("actions.edit", { ns: "common" })}
@@ -192,6 +221,15 @@ export function ClientDetailsPage() {
                 hasError={updateMutation.isError}
                 onClose={() => setEditOpen(false)}
                 onSubmit={(payload) => updateMutation.mutate(payload as UpdateClientPayload)}
+            />
+
+            <MoveToBranchDialog
+                open={transferOpen}
+                entityName={client.fullName}
+                currentBranchId={client.branchId}
+                isSubmitting={transferBranchMutation.isPending}
+                onOpenChange={setTransferOpen}
+                onConfirm={(branchId) => transferBranchMutation.mutate(branchId)}
             />
         </div>
     );

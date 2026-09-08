@@ -11,6 +11,7 @@ import {
   UnitStatus
 } from '@/generated/prisma/client';
 import {PrismaService} from '@/database/prisma.service';
+import {isBranchScopedRole} from '@/common/constants/branch-scope.constants';
 
 import {
   ClientNotFoundException,
@@ -65,6 +66,13 @@ export class DealsService {
       managerId: query.managerId,
     };
 
+    // BR-B1 / BR-B3 — see leads.service.ts's findAll for the same pattern.
+    if (isBranchScopedRole(user.role)) {
+      where.branchId = user.branchId;
+    } else if (query.branchId) {
+      where.branchId = query.branchId;
+    }
+
     if (query.search) {
       where.OR = [
         { dealNumber: { contains: query.search, mode: "insensitive" } },
@@ -108,7 +116,7 @@ export class DealsService {
       throw new ForbiddenException("User does not belong to a company");
     }
 
-    const deal = await this.getDealOrThrow(id, user.companyId);
+    const deal = await this.getDealOrThrow(user, id);
 
     return this.mapper.toDetails(deal);
   }
@@ -126,8 +134,8 @@ export class DealsService {
     const managerId = dto.managerId ?? user.id;
 
     // Validate immutable entities before transaction
-    await this.getClientOrThrow(dto.clientId, companyId);
-    await this.getManagerOrThrow(managerId, companyId);
+    const client = await this.getClientOrThrow(user, dto.clientId);
+    await this.getManagerOrThrow(managerId, user);
 
     const result = await this.prisma.$transaction(async db => {
       const unit = await db.unit.findFirst({
@@ -182,6 +190,12 @@ export class DealsService {
         data: {
           companyId,
           dealNumber,
+
+          // Derived from the client's branch, not stamped from the acting
+          // user — a company-wide admin reserving on behalf of a branch's
+          // client should still produce a deal that branch can see. Null
+          // when the client itself is unassigned to a branch.
+          branchId: client.branchId,
 
           projectId: unit.projectId,
           unitId: unit.id,
@@ -266,7 +280,13 @@ export class DealsService {
     const companyId = user.companyId;
 
     const result = await this.prisma.$transaction(async db => {
-      const deal = await db.deal.findFirst({ where: { id, companyId } });
+      const deal = await db.deal.findFirst({
+        where: {
+          id,
+          companyId,
+          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+        },
+      });
       if (!deal) throw new DealNotFoundException(id);
 
       const newExpiresAt = new Date(dto.reservationExpiresAt);
@@ -297,7 +317,13 @@ export class DealsService {
     const companyId = user.companyId;
 
     const result = await this.prisma.$transaction(async db => {
-      const deal = await db.deal.findFirst({ where: { id, companyId } });
+      const deal = await db.deal.findFirst({
+        where: {
+          id,
+          companyId,
+          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+        },
+      });
       if (!deal) throw new DealNotFoundException(id);
 
       this.domain.ensureCanSignContract(deal);
@@ -343,7 +369,13 @@ export class DealsService {
     const companyId = user.companyId;
 
     const result = await this.prisma.$transaction(async db => {
-      const deal = await db.deal.findFirst({ where: { id, companyId } });
+      const deal = await db.deal.findFirst({
+        where: {
+          id,
+          companyId,
+          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+        },
+      });
       if (!deal) throw new DealNotFoundException(id);
 
       this.domain.ensureCanActivate(deal);
@@ -384,7 +416,13 @@ export class DealsService {
     const companyId = user.companyId;
 
     const result = await this.prisma.$transaction(async db => {
-      const deal = await db.deal.findFirst({ where: { id, companyId } });
+      const deal = await db.deal.findFirst({
+        where: {
+          id,
+          companyId,
+          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+        },
+      });
       if (!deal) throw new DealNotFoundException(id);
 
       this.domain.ensureCanCancel(deal);
@@ -443,7 +481,7 @@ export class DealsService {
     const companyId = user.companyId;
 
     const result = await this.prisma.$transaction(async db => {
-      await this.tryCompleteWithinTransaction(db, companyId, user.id, id, true);
+      await this.tryCompleteWithinTransaction(db, user, id, true);
       return db.deal.findUniqueOrThrow({ where: { id }, include: DEAL_DETAILS_INCLUDE });
     });
 
@@ -452,12 +490,17 @@ export class DealsService {
 
   async tryCompleteWithinTransaction(
       db: DbClient,
-      companyId: string,
-      userId: string,
+      user: AuthUser,
       dealId: string,
       throwOnIneligible = false,
   ): Promise<boolean> {
-    const deal = await db.deal.findFirst({ where: { id: dealId, companyId } });
+    const deal = await db.deal.findFirst({
+      where: {
+        id: dealId,
+        companyId: user.companyId,
+        ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+      },
+    });
     if (!deal) {
       if (throwOnIneligible) throw new DealNotFoundException(dealId);
       return false;
@@ -492,14 +535,14 @@ export class DealsService {
     });
 
     await this.activityService.dealUpdated({
-      db, companyId, userId,
+      db, companyId: deal.companyId, userId: user.id,
       dealId, clientId: deal.clientId,
       metadata: { status: 'COMPLETED' },
     });
 
     if (deal.managerId) {
       await this.notifications.create({
-        companyId,
+        companyId: deal.companyId,
         userId: deal.managerId,
         type: NotificationType.DEAL_STATUS_CHANGED,
         title: `Deal ${deal.dealNumber} is now ${this.domain.nextStatusAfterCompletion()}`,
@@ -524,9 +567,13 @@ export class DealsService {
     return entity;
   }
 
-  private async getDealOrThrow(id: string, companyId: string) {
+  private async getDealOrThrow(user: AuthUser, id: string) {
     const deal = await this.prisma.deal.findFirst({
-      where: { id, companyId },
+      where: {
+        id,
+        companyId: user.companyId,
+        ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+      },
       include: DEAL_DETAILS_INCLUDE,
     });
 
@@ -535,28 +582,55 @@ export class DealsService {
     return deal;
   }
 
-  private getClientOrThrow(id: string, companyId: string) {
+  /**
+   * BR-B1: a branch-scoped actor may only reserve for a client already
+   * visible to them — merged into this lookup rather than a separate check
+   * afterward, so an other-branch client 404s the same as an other-company
+   * one. This is also what keeps reserveUnit()'s derived Deal.branchId (see
+   * below) always something the actor was authorized to touch.
+   */
+  private getClientOrThrow(user: AuthUser, id: string) {
     return this.findOneOrThrow(
         this.prisma.client,
-        { id, companyId },
+        {
+          id,
+          companyId: user.companyId,
+          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+        },
         new ClientNotFoundException(id),
     );
   }
 
-  private async getManagerOrThrow(managerId: string, companyId: string) {
+  /**
+   * A branch-scoped actor may only assign a manager within their own branch
+   * — same reasoning as LeadsService.ensureManagerAssignable.
+   */
+  private async getManagerOrThrow(managerId: string, user: AuthUser) {
     return this.prisma.user.findFirstOrThrow({
-      where: { id: managerId, companyId },
+      where: {
+        id: managerId,
+        companyId: user.companyId,
+        ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+      },
     });
   }
 
-  async getStatusSummary(user: AuthUser, projectId?: string) {
+  async getStatusSummary(user: AuthUser, projectId?: string, branchId?: string) {
     if (!user.companyId) {
       throw new ForbiddenException("User does not belong to a company");
     }
 
+    const where: Prisma.DealWhereInput = { companyId: user.companyId, projectId };
+
+    if (isBranchScopedRole(user.role)) {
+      where.branchId = user.branchId;
+    } else if (branchId) {
+      where.branchId = branchId;
+    }
+
     const counts = await this.prisma.deal.groupBy({
       by: ['status'],
-      where: { companyId: user.companyId, projectId },
+      where,
       _count: { _all: true },
     });
 

@@ -9,6 +9,7 @@ import {
     deleteUser,
     getUserRoleSummary,
     getUsers,
+    transferUserBranch,
     updateUser,
     type UpdateUserPayload,
 } from "@/features/users/api/users.api.ts";
@@ -36,6 +37,7 @@ export function useUsersList() {
     const [formOpen, setFormOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [pendingDeactivate, setPendingDeactivate] = useState<User | null>(null);
+    const [pendingTransfer, setPendingTransfer] = useState<User | null>(null);
 
     const tableQuery = useQuery({
         queryKey: ["users", { statusFilter, roleFilter, search, page, limit }],
@@ -106,6 +108,21 @@ export function useUsersList() {
                 title: t("toasts.deactivateErrorTitle"),
                 description: t("toasts.deactivateErrorDescription"),
             });
+        },
+    });
+
+    const transferBranchMutation = useMutation({
+        mutationFn: ({ id, branchId, reassignToId }: { id: string; branchId: string; reassignToId?: string }) =>
+            transferUserBranch(id, branchId, reassignToId),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["users"] });
+            toast.success({
+                title: t("card.transferBranchDialog.success", { name: pendingTransfer?.fullName ?? "" }),
+            });
+            setPendingTransfer(null);
+        },
+        onError: () => {
+            toast.error({ title: t("card.transferBranchDialog.error") });
         },
     });
 
@@ -268,6 +285,7 @@ export function useUsersList() {
         actions: {
             requestDeactivate: (user: User) => setPendingDeactivate(user),
             isDeleting: (id: string) => deactivateMutation.isPending && deactivateMutation.variables?.id === id,
+            requestTransferBranch: (user: User) => setPendingTransfer(user),
         },
 
         deactivateDialog: {
@@ -280,6 +298,19 @@ export function useUsersList() {
             onConfirm: (reassignToId?: string) => {
                 if (!pendingDeactivate) return;
                 deactivateMutation.mutate({ id: pendingDeactivate.id, reassignToId });
+            },
+        },
+
+        transferBranchDialog: {
+            user: pendingTransfer,
+            open: pendingTransfer !== null,
+            isSubmitting: transferBranchMutation.isPending,
+            onOpenChange: (open: boolean) => {
+                if (!open) setPendingTransfer(null);
+            },
+            onConfirm: (branchId: string, reassignToId?: string) => {
+                if (!pendingTransfer) return;
+                transferBranchMutation.mutate({ id: pendingTransfer.id, branchId, reassignToId });
             },
         },
     };

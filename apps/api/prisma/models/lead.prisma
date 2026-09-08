@@ -34,6 +34,11 @@ model Lead {
   clientId String?
   client   Client? @relation(fields: [clientId], references: [id])
 
+  // Null means unassigned to any branch — visible only to company-wide roles
+  // until a COMPANY_ADMIN hands it off to a branch.
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id])
+
   activities Activity[]
   tasks      Task[]
 
@@ -44,5 +49,7 @@ model Lead {
   @@index([companyId])
   @@index([companyId, status])
   @@index([companyId, managerId])
+  @@index([companyId, branchId])
+  @@index([companyId, branchId, status])
   @@index([phone])
 }

@@ -59,6 +59,8 @@ export function TasksPage() {
                     onStatusFilterChange={filters.setStatusFilter}
                     assignedToId={filters.assignedToId}
                     onAssignedToIdChange={filters.setAssignedToId}
+                    branchId={filters.branchId}
+                    onBranchIdChange={filters.setBranchId}
                     search={filters.search}
                     onSearchChange={filters.setSearch}
                     onAddTask={openCreate}
@@ -80,6 +82,7 @@ export function TasksPage() {
                     <TaskKanbanBoard
                         search={filters.search}
                         assignedToId={filters.assignedToId}
+                        branchId={filters.branchId}
                         onStatusChange={(taskId, status) => actions.changeStatus.mutate({ id: taskId, status })}
                         onCardClick={openEdit}
                     />

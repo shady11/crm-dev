@@ -8,6 +8,7 @@ import unitsEn from "./locales/en/units.json";
 import projectsEn from "./locales/en/projects.json";
 import paymentsEn from "./locales/en/payments.json";
 import usersEn from "./locales/en/users.json";
+import branchesEn from "./locales/en/branches.json";
 import companiesEn from "./locales/en/companies.json";
 import documentsEn from "./locales/en/documents.json";
 import notificationsEn from "./locales/en/notifications.json";
@@ -28,6 +29,7 @@ import unitsRu from "./locales/ru/units.json";
 import projectsRu from "./locales/ru/projects.json";
 import paymentsRu from "./locales/ru/payments.json";
 import usersRu from "./locales/ru/users.json";
+import branchesRu from "./locales/ru/branches.json";
 import companiesRu from "./locales/ru/companies.json";
 import documentsRu from "./locales/ru/documents.json";
 import notificationsRu from "./locales/ru/notifications.json";
@@ -50,6 +52,7 @@ export const resources = {
         projects: projectsEn,
         payments: paymentsEn,
         users: usersEn,
+        branches: branchesEn,
         companies: companiesEn,
         documents: documentsEn,
         notifications: notificationsEn,
@@ -71,6 +74,7 @@ export const resources = {
         projects: projectsRu,
         payments: paymentsRu,
         users: usersRu,
+        branches: branchesRu,
         companies: companiesRu,
         documents: documentsRu,
         notifications: notificationsRu,

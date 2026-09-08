@@ -13,9 +13,10 @@ export function useDealsList() {
 
     const [projectId, setProjectIdState] = useState<string | undefined>();
     const [managerId, setManagerIdState] = useState<string | undefined>();
+    const [branchId, setBranchIdState] = useState<string | undefined>();
 
     const tableQuery = useQuery({
-        queryKey: ["deals", { statusFilter, search, projectId, managerId, page, limit }],
+        queryKey: ["deals", { statusFilter, search, projectId, managerId, branchId, page, limit }],
         queryFn: () =>
             getDeals({
                 page, limit,
@@ -23,12 +24,13 @@ export function useDealsList() {
                 search: search || undefined,
                 projectId,
                 managerId,
+                branchId,
             }),
     });
 
     const summaryQuery = useQuery({
-        queryKey: ["deals", "status-summary"],
-        queryFn: () => getDealStatusSummary(),
+        queryKey: ["deals", "status-summary", branchId],
+        queryFn: () => getDealStatusSummary(undefined, branchId),
     });
 
     const countsByStatus = useMemo(() => {
@@ -58,6 +60,8 @@ export function useDealsList() {
             setProjectId: (value: string | undefined) => { setProjectIdState(value); setPage(1); },
             managerId,
             setManagerId: (value: string | undefined) => { setManagerIdState(value); setPage(1); },
+            branchId,
+            setBranchId: (value: string | undefined) => { setBranchIdState(value); setPage(1); },
         },
         pagination: {
             page,

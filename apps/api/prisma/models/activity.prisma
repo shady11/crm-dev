@@ -19,6 +19,8 @@ enum ActivityAction {
   COMPLETED_TASK
 
   NOTE_ADDED
+
+  BRANCH_TRANSFERRED
 }
 
 enum ActivityType {
@@ -49,6 +51,9 @@ enum ActivityType {
   CALL
   MEETING
   EMAIL
+
+  LEAD_BRANCH_TRANSFERRED
+  CLIENT_BRANCH_TRANSFERRED
 }
 
 model Activity {

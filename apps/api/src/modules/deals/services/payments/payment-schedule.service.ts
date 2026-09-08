@@ -2,6 +2,7 @@ import {BadRequestException, ForbiddenException, Injectable} from '@nestjs/commo
 import {ActivityAction, ActivityType, DealStatus, PaymentScheduleStatus, Prisma} from '@/generated/prisma/client';
 import {PrismaService} from '@/database/prisma.service';
 import {AuthUser} from '@/common/types/auth-user.type';
+import {isBranchScopedRole} from '@/common/constants/branch-scope.constants';
 import {DealDomainService} from '../deal-domain.service';
 import {DealActivityService} from '../deal-activity.service';
 import {DealNotFoundException, PaymentScheduleAlreadyGeneratedException} from '../../exceptions';
@@ -26,7 +27,13 @@ export class PaymentScheduleService {
         const companyId = user.companyId;
 
         const result = await this.prisma.$transaction(async db => {
-            const deal = await db.deal.findFirst({ where: { id: dealId, companyId } });
+            const deal = await db.deal.findFirst({
+                where: {
+                    id: dealId,
+                    companyId,
+                    ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+                },
+            });
             if (!deal) throw new DealNotFoundException(dealId);
 
             this.domain.ensureStatus(deal, DealStatus.ACTIVE);

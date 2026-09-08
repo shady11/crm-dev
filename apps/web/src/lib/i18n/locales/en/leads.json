@@ -61,7 +61,12 @@
     "overviewTab": "Overview",
     "clientTab": "Client",
     "edit": "Edit",
-    "convert": "Convert"
+    "convert": "Convert",
+    "transferBranch": {
+      "action": "Move to another branch",
+      "successTitle": "Lead moved to another branch.",
+      "errorTitle": "Failed to move lead. Please try again."
+    }
   },
   "form": {
     "editTitle": "Edit lead",

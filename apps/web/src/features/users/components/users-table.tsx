@@ -1,4 +1,4 @@
-import {Pen, Trash2, UsersRoundIcon} from "lucide-react";
+import {ArrowLeftRight, Pen, Trash2, UsersRoundIcon} from "lucide-react";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
@@ -6,7 +6,7 @@ import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/co
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {UserStatusDot} from "@/features/users/components/user-status-dot.tsx";
-import {type User, USER_ROLE_LABEL_KEYS} from "@/features/users/types/user.types";
+import {isBranchScopedRole, type User, USER_ROLE_LABEL_KEYS} from "@/features/users/types/user.types";
 import {formatCreatedAt, initials} from "@/features/users/utils/format.ts";
 import {useTranslation} from "react-i18next";
 
@@ -20,6 +20,7 @@ interface UsersTableProps {
     onEdit(user: User): void;
     onDelete(user: User): void;
     isDeleting(id: string): boolean;
+    onTransferBranch(user: User): void;
 }
 
 export function UsersTable({
@@ -32,6 +33,7 @@ export function UsersTable({
                                onEdit,
                                onDelete,
                                isDeleting,
+                               onTransferBranch,
                            }: UsersTableProps) {
     const { t, i18n } = useTranslation("users");
 
@@ -71,6 +73,7 @@ export function UsersTable({
                         <TableHead>{t("table.headers.userId")}</TableHead>
                         <TableHead>{t("table.headers.name")}</TableHead>
                         <TableHead>{t("table.headers.role")}</TableHead>
+                        <TableHead>{t("table.headers.branch")}</TableHead>
                         <TableHead>{t("table.headers.created")}</TableHead>
                         <TableHead>{t("table.headers.status")}</TableHead>
                         <TableHead className="text-right">{t("table.headers.actions")}</TableHead>
@@ -103,6 +106,7 @@ export function UsersTable({
                                     </div>
                                 </TableCell>
                                 <TableCell>{t(USER_ROLE_LABEL_KEYS[user.role])}</TableCell>
+                                <TableCell className="text-muted-foreground">{user.branch?.name ?? "—"}</TableCell>
                                 <TableCell>
                                     <p>{created.date}</p>
                                     <p className="text-xs text-muted-foreground">{created.time}</p>
@@ -115,6 +119,16 @@ export function UsersTable({
                                         <Button variant="ghost" size="icon-sm" onClick={() => onEdit(user)}>
                                             <Pen className="size-3.5" />
                                         </Button>
+                                        {isBranchScopedRole(user.role) && (
+                                            <Button
+                                                variant="ghost"
+                                                size="icon-sm"
+                                                aria-label={t("card.transferBranch")}
+                                                onClick={() => onTransferBranch(user)}
+                                            >
+                                                <ArrowLeftRight className="size-3.5" />
+                                            </Button>
+                                        )}
                                         <Button
                                             variant="ghost"
                                             size="icon-sm"

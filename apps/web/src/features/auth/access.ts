@@ -49,6 +49,10 @@ export const FEATURE_ROLES = {
         UserRole.FINANCE,
     ],
     users: [UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD],
+    // Branch management (create/edit/deactivate) — COMPANY_ADMIN only, same
+    // as who may write to /branches. FINANCE can still read the list (used
+    // to populate their own filters) without this nav entry.
+    branches: [UserRole.COMPANY_ADMIN],
     // The platform operator, and only them. A SUPER_ADMIN belongs to no company
     // and is refused by CompanyGuard everywhere else in the app, so this is the
     // one feature they can reach.

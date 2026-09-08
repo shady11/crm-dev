@@ -13,7 +13,7 @@ const DEFAULT_SUPER_ADMIN_SESSION_MAX_AGE_MINUTES = 60;
 // signed claim carries only the session id and the acting SUPER_ADMIN's id -
 // their current email/name is always re-read from the database below, never
 // trusted from an old token.
-export interface JwtPayload extends Omit<AuthUser, 'company' | 'impersonation'> {
+export interface JwtPayload extends Omit<AuthUser, 'company' | 'branch' | 'impersonation'> {
     impersonation?: {
         sessionId: string;
         superAdminId: string;
@@ -38,6 +38,7 @@ export class SessionValidationService {
                 fullName: true,
                 role: true,
                 companyId: true,
+                branchId: true,
                 isActive: true,
                 sessionsValidFrom: true,
                 company: {
@@ -49,6 +50,13 @@ export class SessionValidationService {
                         timezone: true,
                         suspendedAt: true,
                         deletedAt: true,
+                    },
+                },
+                branch: {
+                    select: {
+                        id: true,
+                        name: true,
+                        city: true,
                     },
                 },
             },
@@ -143,6 +151,14 @@ export class SessionValidationService {
                       currency: user.company.currency,
                       locale: user.company.locale,
                       timezone: user.company.timezone,
+                  }
+                : null,
+            branchId: user.branchId,
+            branch: user.branch
+                ? {
+                      id: user.branch.id,
+                      name: user.branch.name,
+                      city: user.branch.city,
                   }
                 : null,
             impersonation,

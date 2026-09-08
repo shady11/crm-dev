@@ -1,23 +1,37 @@
 import {Controller, Get, Query, UseGuards} from "@nestjs/common";
 import {JwtAuthGuard} from "@/modules/auth/guards/jwt-auth.guard";
 import {CompanyGuard} from "@/common/guards/company.guard";
+import {RolesGuard} from "@/common/guards/roles.guard";
+import {Roles} from "@/common/decorators/roles.decorator";
+import {UserRole} from "@/generated/prisma/enums";
 import {CurrentUser} from "@/common/decorators/current-user.decorator";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {DashboardService} from "./dashboard.service";
 
-@UseGuards(JwtAuthGuard, CompanyGuard)
+// No BranchGuard here — branch filtering is applied conditionally inside the
+// service (BR-B1 auto-filter, BR-B3 optional branchId param), not via a
+// blanket controller guard. See tenant-boundary.spec.ts's NO_BRANCH_SCOPE.
+@UseGuards(JwtAuthGuard, CompanyGuard, RolesGuard)
 @Controller("dashboard")
 export class DashboardController {
     constructor(private readonly dashboardService: DashboardService) {}
 
     @Get("kpis")
-    getKpis(@CurrentUser() user: AuthUser, @Query("projectId") projectId?: string) {
-        return this.dashboardService.getKpis(user, projectId);
+    getKpis(
+        @CurrentUser() user: AuthUser,
+        @Query("projectId") projectId?: string,
+        @Query("branchId") branchId?: string,
+    ) {
+        return this.dashboardService.getKpis(user, projectId, branchId);
     }
 
     @Get("revenue-trend")
-    getRevenueTrend(@CurrentUser() user: AuthUser, @Query("projectId") projectId?: string) {
-        return this.dashboardService.getRevenueTrend(user, projectId);
+    getRevenueTrend(
+        @CurrentUser() user: AuthUser,
+        @Query("projectId") projectId?: string,
+        @Query("branchId") branchId?: string,
+    ) {
+        return this.dashboardService.getRevenueTrend(user, projectId, branchId);
     }
 
     @Get("units-summary")
@@ -26,12 +40,29 @@ export class DashboardController {
     }
 
     @Get("attention")
-    getAttentionItems(@CurrentUser() user: AuthUser, @Query("projectId") projectId?: string) {
-        return this.dashboardService.getAttentionItems(user, projectId);
+    getAttentionItems(
+        @CurrentUser() user: AuthUser,
+        @Query("projectId") projectId?: string,
+        @Query("branchId") branchId?: string,
+    ) {
+        return this.dashboardService.getAttentionItems(user, projectId, branchId);
     }
 
     @Get("recent-activity")
-    getRecentActivity(@CurrentUser() user: AuthUser, @Query("projectId") projectId?: string) {
-        return this.dashboardService.getRecentActivity(user, projectId);
+    getRecentActivity(
+        @CurrentUser() user: AuthUser,
+        @Query("projectId") projectId?: string,
+        @Query("branchId") branchId?: string,
+    ) {
+        return this.dashboardService.getRecentActivity(user, projectId, branchId);
+    }
+
+    // BR-E1: cross-branch comparison, COMPANY_ADMIN only — branch-scoped
+    // roles have no use for it and shouldn't be able to enumerate other
+    // branches' numbers.
+    @Roles(UserRole.COMPANY_ADMIN)
+    @Get("branch-comparison")
+    getBranchComparison(@CurrentUser() user: AuthUser) {
+        return this.dashboardService.getBranchComparison(user);
     }
 }

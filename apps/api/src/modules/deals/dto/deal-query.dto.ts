@@ -19,6 +19,12 @@ export class DealQueryDto {
     @IsUUID()
     clientId?: string;
 
+    // Admin-only cross-branch filter (BR-B3) — see leads' QueryLeadsDto for
+    // the same pattern and reasoning.
+    @IsOptional()
+    @IsUUID()
+    branchId?: string;
+
     @IsOptional()
     @IsString()
     search?: string;

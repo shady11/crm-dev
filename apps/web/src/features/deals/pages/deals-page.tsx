@@ -25,6 +25,8 @@ export function DealsPage() {
                     onProjectIdChange={filters.setProjectId}
                     managerId={filters.managerId}
                     onManagerIdChange={filters.setManagerId}
+                    branchId={filters.branchId}
+                    onBranchIdChange={filters.setBranchId}
                     search={filters.search}
                     onSearchChange={filters.setSearch}
                 />

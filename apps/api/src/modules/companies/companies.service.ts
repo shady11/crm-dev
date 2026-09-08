@@ -513,6 +513,7 @@ export class CompaniesService {
                 fullName: target.fullName,
                 role: target.role,
                 companyId,
+                branchId: target.branchId,
                 phone: target.phone,
             },
             {

@@ -28,6 +28,11 @@ model Task {
   dealId String?
   deal   Deal?   @relation(fields: [dealId], references: [id])
 
+  // Derived from assignedTo's branch, not stamped from the creating user —
+  // see TasksService.create.
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id])
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -38,4 +43,5 @@ model Task {
   @@index([dealId])
   @@index([clientId])
   @@index([leadId])
+  @@index([companyId, branchId])
 }

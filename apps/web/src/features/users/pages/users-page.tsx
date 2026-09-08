@@ -4,13 +4,24 @@ import {UsersTable} from "@/features/users/components/users-table.tsx";
 import {UsersPagination} from "@/features/users/components/users-pagination.tsx";
 import {UserFormSheet} from "@/features/users/components/user-form-sheet.tsx";
 import {DeactivateUserDialog} from "@/features/users/components/deactivate-user-dialog.tsx";
+import {TransferBranchDialog} from "@/features/users/components/transfer-branch-dialog.tsx";
 import {useUsersList} from "@/features/users/hooks/use-users-list.ts";
 import {UsersActionBar} from "@/features/users/components/users-action-bar.tsx";
 import {useTranslation} from "react-i18next";
 
 export function UsersPage() {
-    const { visibleRoles, filters, pagination, table, selection, roleCards, form, actions, deactivateDialog } =
-        useUsersList();
+    const {
+        visibleRoles,
+        filters,
+        pagination,
+        table,
+        selection,
+        roleCards,
+        form,
+        actions,
+        deactivateDialog,
+        transferBranchDialog,
+    } = useUsersList();
     const { t } = useTranslation("users");
 
     return (
@@ -43,6 +54,7 @@ export function UsersPage() {
                     onEdit={form.openEditForm}
                     onDelete={actions.requestDeactivate}
                     isDeleting={actions.isDeleting}
+                    onTransferBranch={actions.requestTransferBranch}
                 />
 
                 <UsersPagination
@@ -76,6 +88,14 @@ export function UsersPage() {
                 isSubmitting={deactivateDialog.isSubmitting}
                 onOpenChange={deactivateDialog.onOpenChange}
                 onConfirm={deactivateDialog.onConfirm}
+            />
+
+            <TransferBranchDialog
+                user={transferBranchDialog.user}
+                open={transferBranchDialog.open}
+                isSubmitting={transferBranchDialog.isSubmitting}
+                onOpenChange={transferBranchDialog.onOpenChange}
+                onConfirm={transferBranchDialog.onConfirm}
             />
         </div>
     );

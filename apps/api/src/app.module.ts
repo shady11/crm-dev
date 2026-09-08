@@ -9,6 +9,7 @@ import {CompaniesModule} from "@/modules/companies/companies.module";
 import {PrismaModule} from "@/database/prisma.module";
 import {AuthModule} from "@/modules/auth/auth.module";
 import {UsersModule} from "@/modules/users/users.module";
+import {BranchesModule} from "@/modules/branches/branches.module";
 import {LeadsModule} from "@/modules/leads/leads.module";
 import {ClientsModule} from '@/modules/clients/clients.module';
 import {ProjectsModule} from './modules/projects/projects.module';
@@ -51,6 +52,7 @@ import {ImpersonationAuditInterceptor} from "@/common/interceptors/impersonation
       PrismaModule,
       AuthModule,
       UsersModule,
+      BranchesModule,
       LeadsModule,
       ClientsModule,
       ProjectsModule,

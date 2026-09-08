@@ -32,6 +32,9 @@ export type CreateUserPayload = {
     phone?: string;
     password: string;
     role: UserRole;
+    // Required for branch-scoped roles (SALES_HEAD, SALES_MANAGER); must be
+    // absent for company-wide roles.
+    branchId?: string;
 };
 
 export async function createUser(payload: CreateUserPayload) {
@@ -76,5 +79,26 @@ export async function deactivateUser(id: string, reassignToId?: string) {
 
 export async function getUserRoleSummary() {
     const response = await api.get<UserRoleSummaryItem[]>("/users/role-summary");
+    return response.data;
+}
+
+export type BranchTransferImpact = {
+    openLeads: number;
+    activeDeals: number;
+};
+
+export async function getBranchTransferImpact(id: string) {
+    const response = await api.get<BranchTransferImpact>(`/users/${id}/branch-transfer-impact`);
+    return response.data;
+}
+
+// BR-A3: moves a branch-scoped user to another branch. Optionally reassigns
+// their open leads/active deals to a replacement — same shape as
+// deactivateUser's reassignToId above.
+export async function transferUserBranch(id: string, branchId: string, reassignToId?: string) {
+    const response = await api.post<User>(`/users/${id}/transfer-branch`, {
+        branchId,
+        ...(reassignToId ? {reassignToId} : {}),
+    });
     return response.data;
 }

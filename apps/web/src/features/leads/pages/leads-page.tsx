@@ -7,12 +7,24 @@ import {DeleteLeadDialog} from "@/features/leads/components/delete-lead-dialog.t
 import {DeleteLeadsDialog} from "@/features/leads/components/delete-leads-dialog.tsx";
 import {ConvertLeadDialog} from "@/features/leads/components/convert-lead-dialog.tsx";
 import {LeadDetailsSheet} from "@/features/leads/components/lead-details-sheet.tsx";
+import {MoveToBranchDialog} from "@/features/branches/components/move-to-branch-dialog.tsx";
 import {useLeadsList} from "@/features/leads/hooks/use-leads-list.ts";
 import {useTranslation} from "react-i18next";
 
 export function LeadsPage() {
     const { t } = useTranslation("leads");
-    const { filters, pagination, table, selection, form, deleteDialog, bulkDeleteDialog, convertDialog, detailsSheet } = useLeadsList();
+    const {
+        filters,
+        pagination,
+        table,
+        selection,
+        form,
+        deleteDialog,
+        bulkDeleteDialog,
+        convertDialog,
+        detailsSheet,
+        transferBranchDialog,
+    } = useLeadsList();
 
     return (
         <div className="space-y-6">
@@ -26,6 +38,8 @@ export function LeadsPage() {
                     onSearchChange={filters.setSearch}
                     statusFilter={filters.statusFilter}
                     onStatusFilterChange={filters.setStatusFilter}
+                    branchFilter={filters.branchFilter}
+                    onBranchFilterChange={filters.setBranchFilter}
                     onAddLead={form.openCreateForm}
                 />
 
@@ -94,6 +108,16 @@ export function LeadsPage() {
                 onEdit={detailsSheet.onEdit}
                 onRequestConvert={detailsSheet.onRequestConvert}
                 onRequestDelete={detailsSheet.onRequestDelete}
+                onRequestTransferBranch={detailsSheet.onRequestTransferBranch}
+            />
+
+            <MoveToBranchDialog
+                open={transferBranchDialog.open}
+                entityName={transferBranchDialog.lead?.fullName ?? ""}
+                currentBranchId={transferBranchDialog.lead?.branchId ?? null}
+                isSubmitting={transferBranchDialog.isSubmitting}
+                onOpenChange={transferBranchDialog.onOpenChange}
+                onConfirm={transferBranchDialog.onConfirm}
             />
         </div>
     );
