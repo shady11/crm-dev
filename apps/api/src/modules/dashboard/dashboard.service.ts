@@ -1,8 +1,9 @@
 import {ForbiddenException, Injectable} from "@nestjs/common";
-import {DealStatus, Prisma, TaskStatus, UnitStatus} from "@/generated/prisma/client";
+import {DealStatus, Prisma, TaskStatus, UnitStatus, UserRole} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
+import {OPEN_LEAD_STATUSES} from "@/modules/leads/lead.constants";
 import {isBranchScopedRole} from "@/common/constants/branch-scope.constants";
 
 @Injectable()
@@ -241,5 +242,75 @@ export class DashboardService {
             dealCount: dealCounts.find((d) => d.branchId === branch.id)?._count._all ?? 0,
             revenue: revenueByBranch.find((r) => r.branchId === branch.id)?.revenue ?? 0,
         }));
+    }
+
+    /**
+     * SH-A2: a SALES_HEAD's daily-standup view of their own team — open
+     * leads, active deals, tasks due, and a last-activity timestamp per
+     * SALES_MANAGER. Deliberately not full reporting, same spirit as
+     * getBranchComparison above but one level down: one branch's managers
+     * instead of a company-wide comparison. SALES_HEAD is always
+     * branch-scoped (BranchGuard), so there's no optional branchId param
+     * here the way the company-wide dashboard queries above take one.
+     */
+    async getTeamSnapshot(user: AuthUser) {
+        if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
+        if (!user.branchId) throw new ForbiddenException("User is not assigned to a branch");
+
+        const companyId = user.companyId;
+        const branchId = user.branchId;
+
+        const managers = await this.prisma.user.findMany({
+            where: { companyId, branchId, role: UserRole.SALES_MANAGER, isActive: true, deletedAt: null },
+            select: { id: true, fullName: true, email: true },
+            orderBy: { fullName: "asc" },
+        });
+
+        const now = new Date();
+
+        return Promise.all(
+            managers.map(async (manager) => {
+                const [openLeads, activeDeals, tasksDue, lastActivity] = await Promise.all([
+                    this.prisma.lead.count({
+                        where: {
+                            companyId, branchId,
+                            managerId: manager.id,
+                            deletedAt: null,
+                            status: { in: OPEN_LEAD_STATUSES },
+                        },
+                    }),
+                    this.prisma.deal.count({
+                        where: {
+                            companyId, branchId,
+                            managerId: manager.id,
+                            deletedAt: null,
+                            status: { in: ACTIVE_DEAL_STATUSES },
+                        },
+                    }),
+                    this.prisma.task.count({
+                        where: {
+                            companyId, branchId,
+                            assignedToId: manager.id,
+                            deletedAt: null,
+                            status: { in: [TaskStatus.TODO, TaskStatus.IN_PROGRESS] },
+                            dueDate: { lte: now },
+                        },
+                    }),
+                    this.prisma.activity.findFirst({
+                        where: { companyId, userId: manager.id },
+                        orderBy: { createdAt: "desc" },
+                        select: { createdAt: true },
+                    }),
+                ]);
+
+                return {
+                    manager,
+                    openLeads,
+                    activeDeals,
+                    tasksDue,
+                    lastActivityAt: lastActivity?.createdAt ?? null,
+                };
+            }),
+        );
     }
 }

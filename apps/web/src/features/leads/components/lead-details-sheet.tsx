@@ -1,4 +1,4 @@
-import {ArrowLeftRight, Pen, Trash2, UserPlusIcon} from "lucide-react";
+import {ArrowLeftRight, Pen, Repeat, Trash2, UserPlusIcon} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
@@ -17,6 +17,7 @@ interface LeadDetailsSheetProps {
     onRequestConvert(): void;
     onRequestDelete(): void;
     onRequestTransferBranch(): void;
+    onRequestReassign(): void;
 }
 
 export function LeadDetailsSheet({
@@ -27,10 +28,14 @@ export function LeadDetailsSheet({
                                       onRequestConvert,
                                       onRequestDelete,
                                       onRequestTransferBranch,
+                                      onRequestReassign,
                                   }: LeadDetailsSheetProps) {
     const { t } = useTranslation("leads");
     const { user } = useAuth();
     const isCompanyAdmin = user?.role === UserRole.COMPANY_ADMIN;
+    // SH-A1: reassignment is a team-lead action — SALES_HEAD only, not
+    // SALES_MANAGER (who already has a general edit form for their own leads).
+    const isSalesHead = user?.role === UserRole.SALES_HEAD;
 
     if (!lead) {
         return null;
@@ -74,6 +79,16 @@ export function LeadDetailsSheet({
                             onClick={onRequestTransferBranch}
                         >
                             <ArrowLeftRight className="size-4" />
+                        </Button>
+                    )}
+                    {isSalesHead && (
+                        <Button
+                            variant="secondary"
+                            size="icon-md"
+                            aria-label={t("detailsSheet.reassign.action")}
+                            onClick={onRequestReassign}
+                        >
+                            <Repeat className="size-4" />
                         </Button>
                     )}
                     <Button variant="secondary" className="flex-1" onClick={onEdit}>

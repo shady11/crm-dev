@@ -42,6 +42,15 @@
       "error": "Failed to transfer branch. Please try again."
     }
   },
+  "reassignDialog": {
+    "title": "Reassign to another manager",
+    "description": "Move \"{{name}}\" to a different manager on your team.",
+    "managerLabel": "New manager",
+    "placeholder": "Select a manager",
+    "confirm": "Reassign",
+    "successTitle": "Reassigned",
+    "errorTitle": "Failed to reassign. Please try again."
+  },
   "form": {
     "fields": {
       "fullName": "Full name",

@@ -66,6 +66,9 @@
       "action": "Move to another branch",
       "successTitle": "Lead moved to another branch.",
       "errorTitle": "Failed to move lead. Please try again."
+    },
+    "reassign": {
+      "action": "Reassign to another manager"
     }
   },
   "form": {

@@ -21,6 +21,7 @@ enum ActivityAction {
   NOTE_ADDED
 
   BRANCH_TRANSFERRED
+  REASSIGNED
 }
 
 enum ActivityType {
@@ -54,6 +55,9 @@ enum ActivityType {
 
   LEAD_BRANCH_TRANSFERRED
   CLIENT_BRANCH_TRANSFERRED
+
+  LEAD_REASSIGNED
+  DEAL_REASSIGNED
 }
 
 model Activity {

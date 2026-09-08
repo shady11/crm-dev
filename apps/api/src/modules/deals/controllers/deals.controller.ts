@@ -18,6 +18,7 @@ import {GeneratePaymentScheduleDto} from "@/modules/deals/dto/payments/generate-
 import {CreatePaymentDto} from "@/modules/deals/dto/payments/create-payment.dto";
 import {PaymentScheduleService} from "@/modules/deals/services/payments/payment-schedule.service";
 import {PaymentService} from "@/modules/deals/services/payments/payment.service";
+import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
 
 @UseGuards(JwtAuthGuard, CompanyGuard, BranchGuard, RolesGuard)
 @Controller('deals')
@@ -111,6 +112,23 @@ export class DealsController {
   @Post(':id/activate')
   activate(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     return this.dealsService.activate(user, id);
+  }
+
+  // SH-A1: a SALES_HEAD moving a deal between their own team's
+  // SALES_MANAGERs. COMPANY_ADMIN included for oversight parity with cancel
+  // below; SALES_MANAGER is deliberately excluded — this is a team-lead
+  // action, not something a rank-and-file manager grants themselves.
+  @Roles(
+      UserRole.COMPANY_ADMIN,
+      UserRole.SALES_HEAD
+  )
+  @Post(':id/reassign')
+  reassignManager(
+      @CurrentUser() user: AuthUser,
+      @Param('id') id: string,
+      @Body() dto: ReassignManagerDto,
+  ) {
+    return this.dealsService.reassignManager(user, id, dto);
   }
 
   @Roles(
