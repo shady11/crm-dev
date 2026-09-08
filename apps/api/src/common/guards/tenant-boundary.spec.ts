@@ -25,6 +25,7 @@ describe("tenant boundary", () => {
         references: "returns enum values only — no rows, nothing tenant-specific",
         "audit-log": "SUPER_ADMIN platform-wide audit trail, not data inside a tenant",
         impersonation: "acts on behalf of a SUPER_ADMIN, who has no companyId of their own",
+        "setting-options": "platform-wide currency/locale/timezone pool, not data inside a tenant",
     };
 
     /** Controllers reachable without a token, and why. */
@@ -107,6 +108,7 @@ describe("branch boundary", () => {
         references: "returns enum values only — no rows, nothing tenant-specific",
         "audit-log": "SUPER_ADMIN platform-wide audit trail, not data inside a tenant",
         impersonation: "acts on behalf of a SUPER_ADMIN, who has no companyId of their own",
+        "setting-options": "platform-wide currency/locale/timezone pool, not data inside a tenant",
 
         branches: "manages the branches themselves, not branch-scoped data",
         users: "branch assignment is a field on User, not row-level isolation",

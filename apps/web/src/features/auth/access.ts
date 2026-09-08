@@ -57,6 +57,9 @@ export const FEATURE_ROLES = {
     // and is refused by CompanyGuard everywhere else in the app, so this is the
     // one feature they can reach.
     companies: [UserRole.SUPER_ADMIN],
+    // The currency/locale/timezone options tenants can be assigned — a
+    // SUPER_ADMIN-only pool the company forms' pickers are built from.
+    settingOptions: [UserRole.SUPER_ADMIN],
     auditLog: [UserRole.SUPER_ADMIN],
     // A tenant's own admin editing their own company's name/currency/locale/
     // timezone (CA-A1) — distinct from `companies` above, which is the

@@ -1,0 +1,28 @@
+enum SettingOptionType {
+  CURRENCY
+  LOCALE
+  TIMEZONE
+}
+
+// The pool of currency/locale/timezone choices a SUPER_ADMIN can offer
+// tenants. `code` is what's actually stored on Company.currency/locale/
+// timezone and fed to Intl.NumberFormat/DateTimeFormat, so it must stay a
+// valid ISO-4217 / BCP-47 / IANA value; `label` is display-only.
+//
+// Deactivating (isActive = false) rather than deleting is the default way to
+// retire an option — a company already using it keeps working, it just drops
+// out of the picker for new selections.
+model SettingOption {
+  id String @id @default(uuid())
+
+  type  SettingOptionType
+  code  String
+  label String
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([type, code])
+}

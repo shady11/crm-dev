@@ -53,6 +53,7 @@
     "deals": "Deals",
     "projects": "Projects",
     "companies": "Companies",
+    "settingOptions": "Currency, locale & timezone",
     "users": "Users",
     "branches": "Branches",
     "auditLog": "Audit log",

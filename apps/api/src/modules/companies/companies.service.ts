@@ -6,6 +6,7 @@ import {PrismaService} from "@/database/prisma.service";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 import {AuditLogService} from "@/modules/audit-log/audit-log.service";
 import {ImpersonationService} from "@/modules/impersonation/impersonation.service";
+import {SettingOptionsService} from "@/modules/setting-options/setting-options.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateCompanyDto} from "./dto/create-company.dto";
 import {UpdateCompanyDto} from "./dto/update-company.dto";
@@ -42,7 +43,31 @@ export class CompaniesService {
         private readonly prisma: PrismaService,
         private readonly auditLog: AuditLogService,
         private readonly impersonation: ImpersonationService,
+        private readonly settingOptions: SettingOptionsService,
     ) {}
+
+    /**
+     * Rejects a currency/locale/timezone that isn't an active SettingOption —
+     * the same list the web pickers are built from — so a company can never
+     * end up with a value nobody could have actually selected.
+     */
+    private async assertValidSettings(dto: {
+        currency?: string;
+        locale?: string;
+        timezone?: string;
+    }): Promise<void> {
+        if (dto.currency) {
+            await this.settingOptions.assertActiveOption("CURRENCY", dto.currency.trim());
+        }
+
+        if (dto.locale) {
+            await this.settingOptions.assertActiveOption("LOCALE", dto.locale.trim());
+        }
+
+        if (dto.timezone) {
+            await this.settingOptions.assertActiveOption("TIMEZONE", dto.timezone.trim());
+        }
+    }
 
     async findAll(query: QueryCompaniesDto) {
         const page = query.page ?? 1;
@@ -172,6 +197,8 @@ export class CompaniesService {
             throw new ConflictException("A company with this name already exists");
         }
 
+        await this.assertValidSettings(dto);
+
         const password = dto.adminPassword?.trim() || randomBytes(18).toString("base64url");
         const passwordHash = await bcrypt.hash(password, 10);
 
@@ -260,6 +287,7 @@ export class CompaniesService {
 
     async update(id: string, dto: UpdateCompanyDto) {
         await this.findOne(id);
+        await this.assertValidSettings(dto);
 
         if (dto.name) {
             const clash = await this.prisma.company.findFirst({

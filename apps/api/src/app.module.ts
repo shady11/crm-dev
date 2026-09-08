@@ -19,6 +19,7 @@ import {FloorsModule} from './modules/floors/floors.module';
 import {UnitsModule} from './modules/units/units.module';
 import {ChessboardModule} from './modules/chessboard/chessboard.module';
 import {ReferencesModule} from './modules/references/references.module';
+import {SettingOptionsModule} from '@/modules/setting-options/setting-options.module';
 import {DealsModule} from "@/modules/deals/deals.module";
 import {TasksModule} from "@/modules/tasks/tasks.module";
 import {DocumentsModule} from "@/modules/documents/documents.module";
@@ -62,6 +63,7 @@ import {ImpersonationAuditInterceptor} from "@/common/interceptors/impersonation
       UnitsModule,
       ChessboardModule,
       ReferencesModule,
+      SettingOptionsModule,
       DealsModule,
       TasksModule,
       DocumentsModule,
