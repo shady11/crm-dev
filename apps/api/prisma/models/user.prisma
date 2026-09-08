@@ -20,6 +20,11 @@ model User {
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
 
+  // Required for branch-scoped roles (SALES_HEAD, SALES_MANAGER); left null
+  // for company-wide roles (COMPANY_ADMIN, FINANCE) and SUPER_ADMIN.
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id])
+
   leads         Lead[]
   managedLeads  Lead[]     @relation("LeadManager")
   deals         Deal[]
@@ -39,4 +44,6 @@ model User {
 
   impersonationsStarted  ImpersonationSession[] @relation("ImpersonationsStarted")
   impersonationsReceived ImpersonationSession[] @relation("ImpersonationsReceived")
+
+  @@index([companyId, branchId])
 }

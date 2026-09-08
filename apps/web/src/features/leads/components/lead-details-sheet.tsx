@@ -1,10 +1,12 @@
-import {Pen, Trash2, UserPlusIcon} from "lucide-react";
+import {ArrowLeftRight, Pen, Trash2, UserPlusIcon} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
 import type {Lead} from "@/features/leads/api/leads.api.ts";
 import {LeadOverview} from "@/features/leads/components/lead-overview.tsx";
 import {LeadClientTab} from "@/features/leads/components/lead-client-tab.tsx";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 import {useTranslation} from "react-i18next";
 
 interface LeadDetailsSheetProps {
@@ -14,6 +16,7 @@ interface LeadDetailsSheetProps {
     onEdit(): void;
     onRequestConvert(): void;
     onRequestDelete(): void;
+    onRequestTransferBranch(): void;
 }
 
 export function LeadDetailsSheet({
@@ -23,8 +26,11 @@ export function LeadDetailsSheet({
                                       onEdit,
                                       onRequestConvert,
                                       onRequestDelete,
+                                      onRequestTransferBranch,
                                   }: LeadDetailsSheetProps) {
     const { t } = useTranslation("leads");
+    const { user } = useAuth();
+    const isCompanyAdmin = user?.role === UserRole.COMPANY_ADMIN;
 
     if (!lead) {
         return null;
@@ -60,6 +66,16 @@ export function LeadDetailsSheet({
                     <Button variant="destructive" size="icon-md" onClick={onRequestDelete}>
                         <Trash2 className="size-4" />
                     </Button>
+                    {isCompanyAdmin && (
+                        <Button
+                            variant="secondary"
+                            size="icon-md"
+                            aria-label={t("detailsSheet.transferBranch.action")}
+                            onClick={onRequestTransferBranch}
+                        >
+                            <ArrowLeftRight className="size-4" />
+                        </Button>
+                    )}
                     <Button variant="secondary" className="flex-1" onClick={onEdit}>
                         <Pen className="size-4" />
                         {t("detailsSheet.edit")}

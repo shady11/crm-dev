@@ -7,12 +7,13 @@ import {TaskStatus} from "@/features/tasks/types/task.types.ts";
 interface UseTasksBoardParams {
     search?: string;
     assignedToId?: string;
+    branchId?: string;
 }
 
-export function useTasksBoard({ search, assignedToId }: UseTasksBoardParams) {
+export function useTasksBoard({ search, assignedToId, branchId }: UseTasksBoardParams) {
     const query = useQuery({
-        queryKey: ["tasks", "board", { search, assignedToId }],
-        queryFn: () => getTasks({ search, assignedToId, limit: 200, page: 1 }),
+        queryKey: ["tasks", "board", { search, assignedToId, branchId }],
+        queryFn: () => getTasks({ search, assignedToId, branchId, limit: 200, page: 1 }),
     });
 
     const tasksByStatus = useMemo(() => {

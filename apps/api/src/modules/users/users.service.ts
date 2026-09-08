@@ -11,10 +11,12 @@ import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 import {OPEN_LEAD_STATUSES} from "@/modules/leads/lead.constants";
+import {isBranchScopedRole} from "@/common/constants/branch-scope.constants";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UpdateUserDto} from "./dto/update-user.dto";
 import {UpdateUserPasswordDto} from "./dto/update-user-password.dto";
 import {DeactivateUserDto} from "./dto/deactivate-user.dto";
+import {TransferUserBranchDto} from "./dto/transfer-user-branch.dto";
 import {QueryUsersDto} from "./dto/query-users.dto";
 import {canActorSeeRole, getManageableRoles} from "@/modules/users/users.constants";
 
@@ -26,6 +28,10 @@ const USER_SAFE_SELECT = {
     role: true,
     isActive: true,
     companyId: true,
+    branchId: true,
+    branch: {
+        select: {id: true, name: true},
+    },
     createdAt: true,
     updatedAt: true,
 } satisfies Prisma.UserSelect;
@@ -81,6 +87,10 @@ export class UsersService {
                     phone: true,
                     role: true,
                     isActive: true,
+                    branchId: true,
+                    branch: {
+                        select: {id: true, name: true},
+                    },
                     createdAt: true,
                 },
             }),
@@ -124,6 +134,8 @@ export class UsersService {
 
         await this.ensureEmailIsUnique(dto.email);
 
+        await this.ensureBranchAssignmentValid(user.companyId, dto.role, dto.branchId);
+
         const passwordHash = await bcrypt.hash(dto.password, 10);
 
         return this.prisma.user.create({
@@ -134,6 +146,7 @@ export class UsersService {
                 passwordHash,
                 role: dto.role,
                 companyId: user.companyId,
+                branchId: dto.branchId,
             },
             select: USER_SAFE_SELECT,
         });
@@ -158,6 +171,12 @@ export class UsersService {
             throw new BadRequestException("You cannot deactivate your own account");
         }
 
+        if (dto.role !== undefined || dto.branchId !== undefined) {
+            const effectiveRole = dto.role ?? target.role;
+            const effectiveBranchId = dto.branchId !== undefined ? dto.branchId : target.branchId;
+            await this.ensureBranchAssignmentValid(user.companyId, effectiveRole, effectiveBranchId);
+        }
+
         const rolesChanged = dto.role !== undefined && dto.role !== target.role;
         const beingDeactivated = dto.isActive === false && target.isActive === true;
 
@@ -168,11 +187,121 @@ export class UsersService {
                 email: dto.email,
                 phone: dto.phone,
                 role: dto.role,
+                branchId: dto.branchId,
                 isActive: dto.isActive,
                 ...(rolesChanged || beingDeactivated ? { sessionsValidFrom: new Date() } : {}),
             },
             select: USER_SAFE_SELECT,
         });
+    }
+
+    /**
+     * Counts the open leads and active deals a user currently manages, so the
+     * caller can decide whether to reassign them before transferring the user
+     * to another branch — see transferBranch() below.
+     */
+    async getBranchTransferImpact(user: AuthUser, id: string) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        await this.getManageableTargetOrThrow(user, id);
+
+        const [openLeads, activeDeals] = await Promise.all([
+            this.prisma.lead.count({
+                where: {
+                    companyId: user.companyId,
+                    managerId: id,
+                    deletedAt: null,
+                    status: { in: OPEN_LEAD_STATUSES },
+                },
+            }),
+            this.prisma.deal.count({
+                where: {
+                    companyId: user.companyId,
+                    managerId: id,
+                    deletedAt: null,
+                    status: { in: ACTIVE_DEAL_STATUSES },
+                },
+            }),
+        ]);
+
+        return { openLeads, activeDeals };
+    }
+
+    /**
+     * Moves a branch-scoped user to another branch (BR-A3). Their existing
+     * open leads/active deals keep their current branchId and managerId
+     * unless a replacement is given — reassigning them is opt-in, exactly
+     * like remove()'s reassignment step, and runs in the same transaction as
+     * the branch change so a mid-way failure never leaves the user moved with
+     * half their pipeline unaccounted for.
+     */
+    async transferBranch(user: AuthUser, id: string, dto: TransferUserBranchDto) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const companyId = user.companyId;
+
+        const target = await this.getManageableTargetOrThrow(user, id);
+
+        if (!isBranchScopedRole(target.role)) {
+            throw new BadRequestException("This user's role is not branch-scoped");
+        }
+
+        const branch = await this.prisma.branch.findFirst({
+            where: { id: dto.branchId, companyId, deactivatedAt: null },
+        });
+
+        if (!branch) {
+            throw new BadRequestException("Branch does not belong to your company or is deactivated");
+        }
+
+        const reassignToId = dto.reassignToId;
+
+        if (reassignToId) {
+            if (reassignToId === id) {
+                throw new BadRequestException("Cannot reassign to the user being transferred");
+            }
+
+            const replacement = await this.getManageableTargetOrThrow(user, reassignToId);
+
+            if (!replacement.isActive) {
+                throw new BadRequestException("Cannot reassign to an inactive user");
+            }
+        }
+
+        await this.prisma.$transaction(async (db) => {
+            if (reassignToId) {
+                await db.lead.updateMany({
+                    where: {
+                        companyId,
+                        managerId: id,
+                        deletedAt: null,
+                        status: { in: OPEN_LEAD_STATUSES },
+                    },
+                    data: { managerId: reassignToId },
+                });
+
+                await db.deal.updateMany({
+                    where: {
+                        companyId,
+                        managerId: id,
+                        deletedAt: null,
+                        status: { in: ACTIVE_DEAL_STATUSES },
+                    },
+                    data: { managerId: reassignToId },
+                });
+            }
+
+            await db.user.update({
+                where: { id },
+                data: { branchId: dto.branchId },
+            });
+        });
+
+        return { success: true };
     }
 
     async updatePassword(user: AuthUser, id: string, dto: UpdateUserPasswordDto) {
@@ -321,14 +450,14 @@ export class UsersService {
     async findByEmail(email: string) {
         return this.prisma.user.findUnique({
             where: { email },
-            include: { company: true },
+            include: { company: true, branch: true },
         });
     }
 
     async findById(id: string) {
         const user = await this.prisma.user.findUnique({
             where: { id },
-            include: { company: true },
+            include: { company: true, branch: true },
         });
 
         if (!user) {
@@ -371,6 +500,37 @@ export class UsersService {
     private ensureCanAssignRole(actor: AuthUser, role: UserRole) {
         if (!canActorSeeRole(actor.role, role)) {
             throw new ForbiddenException("You cannot assign this role");
+        }
+    }
+
+    /**
+     * Branch-scoped roles (SALES_HEAD, SALES_MANAGER) must have a branch;
+     * company-wide roles (COMPANY_ADMIN, FINANCE) must not — an unscoped
+     * account is not a valid state to save for either.
+     */
+    private async ensureBranchAssignmentValid(
+        companyId: string | null,
+        role: UserRole,
+        branchId?: string | null,
+    ) {
+        if (!companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        if (isBranchScopedRole(role)) {
+            if (!branchId) {
+                throw new BadRequestException("This role requires a branch");
+            }
+
+            const branch = await this.prisma.branch.findFirst({
+                where: { id: branchId, companyId, deactivatedAt: null },
+            });
+
+            if (!branch) {
+                throw new BadRequestException("Branch does not belong to your company or is deactivated");
+            }
+        } else if (branchId) {
+            throw new BadRequestException("This role cannot be assigned to a branch");
         }
     }
 

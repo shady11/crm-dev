@@ -10,6 +10,7 @@ import {
     deleteLead,
     getLeads,
     type Lead,
+    transferLeadBranch,
     updateLead,
     type UpdateLeadPayload,
 } from "@/features/leads/api/leads.api.ts";
@@ -23,6 +24,7 @@ export function useLeadsList() {
 
     const [search, setSearchState] = useState("");
     const [statusFilter, setStatusFilterState] = useState<LeadStatusFilterValue>("all");
+    const [branchFilter, setBranchFilterState] = useState<string | "all">("all");
     const [page, setPage] = useState(1);
     const [limit, setLimitState] = useState(10);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -34,15 +36,17 @@ export function useLeadsList() {
     const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
     const [convertTarget, setConvertTarget] = useState<Lead | null>(null);
     const [detailsTarget, setDetailsTarget] = useState<Lead | null>(null);
+    const [transferTarget, setTransferTarget] = useState<Lead | null>(null);
 
     const tableQuery = useQuery({
-        queryKey: ["leads", { search, statusFilter, page, limit }],
+        queryKey: ["leads", { search, statusFilter, branchFilter, page, limit }],
         queryFn: () =>
             getLeads({
                 page,
                 limit,
                 search: search || undefined,
                 status: statusFilter === "all" ? undefined : statusFilter,
+                branchId: branchFilter === "all" ? undefined : branchFilter,
             }),
     });
 
@@ -93,6 +97,18 @@ export function useLeadsList() {
         },
         onError: () => {
             toast.error({ title: t("toasts.deleteErrorTitle"), description: t("toasts.deleteErrorDescription") });
+        },
+    });
+
+    const transferBranchMutation = useMutation({
+        mutationFn: ({ id, branchId }: { id: string; branchId: string }) => transferLeadBranch(id, branchId),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["leads"] });
+            toast.success({ title: t("detailsSheet.transferBranch.successTitle") });
+            setTransferTarget(null);
+        },
+        onError: () => {
+            toast.error({ title: t("detailsSheet.transferBranch.errorTitle") });
         },
     });
 
@@ -214,6 +230,11 @@ export function useLeadsList() {
                 setStatusFilterState(value);
                 setPage(1);
             },
+            branchFilter,
+            setBranchFilter: (value: string | "all") => {
+                setBranchFilterState(value);
+                setPage(1);
+            },
         },
 
         pagination: {
@@ -299,6 +320,22 @@ export function useLeadsList() {
             },
             onRequestDelete: () => {
                 if (detailsLead) requestDelete(detailsLead);
+            },
+            onRequestTransferBranch: () => {
+                if (detailsLead) setTransferTarget(detailsLead);
+            },
+        },
+
+        transferBranchDialog: {
+            lead: transferTarget,
+            open: transferTarget !== null,
+            isSubmitting: transferBranchMutation.isPending,
+            onOpenChange: (open: boolean) => {
+                if (!open) setTransferTarget(null);
+            },
+            onConfirm: (branchId: string) => {
+                if (!transferTarget) return;
+                transferBranchMutation.mutate({ id: transferTarget.id, branchId });
             },
         },
     };

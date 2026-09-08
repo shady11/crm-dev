@@ -14,6 +14,8 @@ const actor: AuthUser = {
     role: UserRole.SUPER_ADMIN,
     companyId: null,
     company: null,
+    branchId: null,
+    branch: null,
 };
 
 const auditLog = {record: jest.fn()} as unknown as AuditLogService;
@@ -185,6 +187,8 @@ describe("CompaniesService self-service (CA-A1)", () => {
         role: UserRole.COMPANY_ADMIN,
         companyId: "company-1",
         company: {id: "company-1", name: "Bishkek Dev", currency: "KGS", locale: "ru-RU", timezone: "Asia/Bishkek"},
+        branchId: null,
+        branch: null,
     };
 
     const build = (company: unknown = {id: "company-1", name: "Bishkek Dev", users: []}) => {

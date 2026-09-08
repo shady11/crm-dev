@@ -9,6 +9,7 @@ import {
 } from '@/generated/prisma/client';
 import {PrismaService} from '@/database/prisma.service';
 import {AuthUser} from '@/common/types/auth-user.type';
+import {isBranchScopedRole} from '@/common/constants/branch-scope.constants';
 import {DealDomainService} from '../deal-domain.service';
 import {DealActivityService} from '../deal-activity.service';
 import {DealsService} from '../deals.service';
@@ -38,7 +39,13 @@ export class PaymentService {
         const isRefund = dto.paymentType === PaymentType.REFUND;
 
         const result = await this.prisma.$transaction(async db => {
-            const deal = await db.deal.findFirst({ where: { id: dealId, companyId } });
+            const deal = await db.deal.findFirst({
+                where: {
+                    id: dealId,
+                    companyId,
+                    ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+                },
+            });
             if (!deal) throw new DealNotFoundException(dealId);
 
             this.domain.ensureStatus(deal, DealStatus.ACTIVE);
@@ -144,7 +151,7 @@ export class PaymentService {
 
                 // Only a forward payment can push a deal to completion — a refund
                 // reduces totalPaid, so it can never satisfy ensureCanComplete.
-                await this.dealsService.tryCompleteWithinTransaction(db, companyId, user.id, dealId);
+                await this.dealsService.tryCompleteWithinTransaction(db, user, dealId);
             }
 
             return db.deal.findUniqueOrThrow({ where: { id: dealId }, include: DEAL_DETAILS_INCLUDE });

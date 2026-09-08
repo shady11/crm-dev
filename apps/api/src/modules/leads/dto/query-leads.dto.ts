@@ -19,6 +19,13 @@ export class QueryLeadsDto {
     @IsUUID()
     managerId?: string;
 
+    // Admin-only cross-branch filter (BR-B3) — ignored for a branch-scoped
+    // caller, whose own branch filter already takes precedence. Kept as a
+    // separate query param rather than reusing the sales-role restriction.
+    @IsOptional()
+    @IsUUID()
+    branchId?: string;
+
     @IsOptional()
     @Transform(({ value }) => Number(value))
     @IsInt()

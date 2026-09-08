@@ -16,6 +16,12 @@
     "title": "Unit inventory",
     "totalUnits": "{{count}} units total"
   },
+  "branchComparison": {
+    "title": "Branch comparison",
+    "dealCountLabel": "Active deals",
+    "revenueLabel": "Revenue",
+    "empty": "No branches yet."
+  },
   "dealsByStage": "Deals by stage",
   "attention": {
     "title": "Needs attention",

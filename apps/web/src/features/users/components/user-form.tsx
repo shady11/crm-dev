@@ -14,6 +14,7 @@ import {Alert, AlertTitle} from "@/components/ui/alert.tsx";
 import type {CreateUserPayload, UpdateUserPayload} from "@/features/users/api/users.api";
 import {
     getVisibleRoles,
+    isBranchScopedRole,
     normalizeUserRole,
     type User,
     USER_ROLE_LABEL_KEYS,
@@ -21,6 +22,7 @@ import {
     UserRole,
 } from "@/features/users/types/user.types";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {useBranchesFilter} from "@/features/branches/hooks/use-branches-filter";
 import {useTranslation} from "react-i18next";
 
 // The schemas below are built inside the component (see useMemo further
@@ -32,13 +34,40 @@ const baseSchemaShape = (t: (key: string) => string) => ({
     email: z.string().trim().email(t("form.validation.invalidEmail")),
     phone: z.string().trim().optional(),
     role: z.enum(USER_ROLE_VALUES, t("form.validation.roleRequired")),
+    branchId: z.string().optional(),
 });
+
+// Branch-scoped role ⇒ branchId required; company-wide role ⇒ branchId must
+// be absent. Applied as a superRefine (not a plain per-field rule) since the
+// requirement depends on another field's value.
+function withBranchRule<Schema extends z.ZodType<{role: UserRole; branchId?: string}>>(
+    schema: Schema,
+    t: (key: string) => string,
+) {
+    return schema.superRefine((values, ctx) => {
+        if (isBranchScopedRole(values.role) && !values.branchId) {
+            ctx.addIssue({
+                code: "custom",
+                path: ["branchId"],
+                message: t("form.validation.branchRequired"),
+            });
+        }
+        if (!isBranchScopedRole(values.role) && values.branchId) {
+            ctx.addIssue({
+                code: "custom",
+                path: ["branchId"],
+                message: t("form.validation.branchNotAllowed"),
+            });
+        }
+    });
+}
 
 type UserFormValues = {
     fullName: string;
     email: string;
     phone?: string;
     role: UserRole;
+    branchId?: string;
     password?: string;
 };
 
@@ -57,6 +86,7 @@ const DEFAULT_VALUES: UserFormValues = {
     phone: "",
     password: "",
     role: UserRole.SALES_MANAGER,
+    branchId: undefined,
 };
 
 export function UserForm({
@@ -72,52 +102,64 @@ export function UserForm({
 
     const { user: currentUser } = useAuth();
     const visibleRoles = getVisibleRoles(currentUser?.role);
+    const branches = useBranchesFilter();
 
     const initialRole = normalizeUserRole(user?.role);
-    const [, setSelectedRole] = useState<UserRole>(initialRole);
+    const [selectedRole, setSelectedRole] = useState<UserRole>(initialRole);
 
     const createUserSchema = useMemo(() => {
         const base = baseSchemaShape(t);
-        return z.object({
-            ...base,
-            password: z.string().min(6, t("form.validation.passwordMin")),
-        });
+        return withBranchRule(
+            z.object({
+                ...base,
+                password: z.string().min(6, t("form.validation.passwordMin")),
+            }),
+            t,
+        );
     }, [t]);
 
     const editUserSchema = useMemo(() => {
         const base = baseSchemaShape(t);
-        return z.object({
-            ...base,
-            password: z
-                .string()
-                .min(6, t("form.validation.passwordMin"))
-                .optional()
-                .or(z.literal("")),
-        });
+        return withBranchRule(
+            z.object({
+                ...base,
+                password: z
+                    .string()
+                    .min(6, t("form.validation.passwordMin"))
+                    .optional()
+                    .or(z.literal("")),
+            }),
+            t,
+        );
     }, [t]);
 
     const form = useForm<UserFormValues>({
         resolver: zodResolver(user ? editUserSchema : createUserSchema),
-        defaultValues: { ...DEFAULT_VALUES, role: initialRole },
+        defaultValues: { ...DEFAULT_VALUES, role: initialRole, branchId: user?.branchId ?? undefined },
     });
 
     useEffect(() => {
+        setSelectedRole(initialRole);
         form.reset({
             fullName: user?.fullName ?? "",
             email: user?.email ?? "",
             phone: user?.phone ?? "",
             password: "",
             role: initialRole,
+            branchId: user?.branchId ?? undefined,
         });
     }, [form, initialRole, user]);
 
     const handleSubmit = (values: UserFormValues) => {
+        const branchId = isBranchScopedRole(values.role) ? values.branchId : undefined;
+
         if (user) {
             const payload: UpdateUserPayload = {
                 fullName: values.fullName.trim(),
                 email: values.email.trim(),
                 phone: values.phone?.trim() || undefined,
                 role: values.role,
+                branchId,
             };
             onSubmit(payload);
             return;
@@ -129,6 +171,7 @@ export function UserForm({
             phone: values.phone?.trim() || undefined,
             password: values.password!,
             role: values.role,
+            branchId,
         });
     };
 
@@ -137,6 +180,10 @@ export function UserForm({
             label: t(USER_ROLE_LABEL_KEYS[role]),
             value: role,
         })),
+    });
+
+    const branchCollection = createListCollection({
+        items: branches.data.map((branch) => ({ label: branch.name, value: branch.id })),
     });
 
     return (
@@ -249,6 +296,41 @@ export function UserForm({
                             </Field>
                         )}
                     />
+
+                    {isBranchScopedRole(selectedRole) ? (
+                        <Controller
+                            control={form.control}
+                            name="branchId"
+                            render={({ field, fieldState }) => (
+                                <Field invalid={fieldState.invalid} orientation="responsive">
+                                    <FieldLabel>{t("form.fields.branch")}</FieldLabel>
+                                    <Select
+                                        collection={branchCollection}
+                                        name={field.name}
+                                        onValueChange={(item) => {
+                                            form.setValue("branchId", item.value[0], {
+                                                shouldDirty: true,
+                                                shouldValidate: true,
+                                            });
+                                        }}
+                                        value={field.value ? [field.value] : []}
+                                    >
+                                        <SelectTrigger className="w-full min-w-32">
+                                            <SelectValue placeholder={tCommon("placeholders.select")} />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {branchCollection.items.map((branch) => (
+                                                <SelectItem key={branch.value} item={branch}>
+                                                    {branch.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FieldError>{fieldState.error?.message}</FieldError>
+                                </Field>
+                            )}
+                        />
+                    ) : null}
                 </FieldGroup>
 
                 {errorMessage && (

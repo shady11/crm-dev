@@ -6,6 +6,7 @@ import {Button} from "@/components/ui/button.tsx";
 import {TASK_STATUS_LABEL_KEYS, TaskStatus} from "@/features/tasks/types/task.types.ts";
 import type {TaskStatusFilter} from "@/features/tasks/hooks/use-tasks-list.ts";
 import {useAssignableUsers} from "@/features/users/hooks/use-assignable-users.ts";
+import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
 import {useTranslation} from "react-i18next";
 
 interface TasksToolbarProps {
@@ -13,13 +14,15 @@ interface TasksToolbarProps {
     onStatusFilterChange(value: TaskStatusFilter): void;
     assignedToId?: string;
     onAssignedToIdChange(value: string | undefined): void;
+    branchId?: string;
+    onBranchIdChange(value: string | undefined): void;
     search: string;
     onSearchChange(value: string): void;
     onAddTask(): void;
     hideStatusFilter?: boolean;
 }
 
-export function TasksToolbar({ statusFilter, onStatusFilterChange, assignedToId, onAssignedToIdChange, search, onSearchChange, onAddTask, hideStatusFilter }: TasksToolbarProps) {
+export function TasksToolbar({ statusFilter, onStatusFilterChange, assignedToId, onAssignedToIdChange, branchId, onBranchIdChange, search, onSearchChange, onAddTask, hideStatusFilter }: TasksToolbarProps) {
     const { t } = useTranslation("tasks");
 
     const assignableUsers = useAssignableUsers();
@@ -44,6 +47,11 @@ export function TasksToolbar({ statusFilter, onStatusFilterChange, assignedToId,
             <h2 className="text-lg font-medium">{t("toolbar.heading")}</h2>
 
             <div className="flex flex-wrap items-center gap-2">
+                <BranchFilterSelect
+                    value={branchId ?? "all"}
+                    onChange={(value) => onBranchIdChange(value === "all" ? undefined : value)}
+                />
+
                 <Select collection={assigneeCollection} value={[assignedToId ?? "all"]} onValueChange={({ value }) => onAssignedToIdChange(value[0] === "all" ? undefined : value[0])}>
                     <SelectTrigger className="w-44"><SelectValue placeholder={t("toolbar.assigneePlaceholder")} /></SelectTrigger>
                     <SelectContent>

@@ -9,23 +9,25 @@ export function useTasksList() {
     const [statusFilter, setStatusFilterState] = useState<TaskStatusFilter>("all");
     const [search, setSearchState] = useState("");
     const [assignedToId, setAssignedToIdState] = useState<string | undefined>();
+    const [branchId, setBranchIdState] = useState<string | undefined>();
     const [page, setPage] = useState(1);
     const [limit, setLimitState] = useState(10);
 
     const tableQuery = useQuery({
-        queryKey: ["tasks", { statusFilter, search, assignedToId, page, limit }],
+        queryKey: ["tasks", { statusFilter, search, assignedToId, branchId, page, limit }],
         queryFn: () =>
             getTasks({
                 page, limit,
                 status: statusFilter === "all" ? undefined : statusFilter,
                 search: search || undefined,
                 assignedToId,
+                branchId,
             }),
     });
 
     const summaryQuery = useQuery({
-        queryKey: ["tasks", "status-summary"],
-        queryFn: getTaskStatusSummary,
+        queryKey: ["tasks", "status-summary", branchId],
+        queryFn: () => getTaskStatusSummary(branchId),
     });
 
     const countsByStatus = useMemo(() => {
@@ -45,6 +47,8 @@ export function useTasksList() {
             setSearch: (v: string) => { setSearchState(v); setPage(1); },
             assignedToId,
             setAssignedToId: (v: string | undefined) => { setAssignedToIdState(v); setPage(1); },
+            branchId,
+            setBranchId: (v: string | undefined) => { setBranchIdState(v); setPage(1); },
         },
         pagination: {
             page, limit, total: meta?.total ?? 0,

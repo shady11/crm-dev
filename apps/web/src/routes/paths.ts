@@ -8,6 +8,7 @@ export const paths = {
         detail: (clientId: string) => `/clients/${clientId}`,
     },
     users: "/users",
+    branches: "/branches",
     settings: "/settings",
     projects: {
         root: "/projects",

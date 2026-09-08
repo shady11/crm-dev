@@ -19,6 +19,7 @@ model Company {
   deletedAt   DateTime?
 
   users      User[]
+  branches   Branch[]
   leads      Lead[]
   clients    Client[]
   projects   Project[]

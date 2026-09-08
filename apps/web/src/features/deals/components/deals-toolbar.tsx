@@ -6,6 +6,7 @@ import {DEAL_STATUS_LABEL_KEYS, DealStatus} from "@/features/deals/types/deal.ty
 import type {DealStatusFilter} from "@/features/deals/hooks/use-deals-list.ts";
 import {useProjectsFilter} from "@/features/projects/hooks/use-projects-filter.ts";
 import {useManagers} from "@/features/users/hooks/use-managers.ts";
+import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
 import {useTranslation} from "react-i18next";
 
 interface DealsToolbarProps {
@@ -15,11 +16,13 @@ interface DealsToolbarProps {
     onProjectIdChange(value: string | undefined): void;
     managerId?: string;
     onManagerIdChange(value: string | undefined): void;
+    branchId?: string;
+    onBranchIdChange(value: string | undefined): void;
     search: string;
     onSearchChange(value: string): void;
 }
 
-export function DealsToolbar({ statusFilter, onStatusFilterChange, projectId, onProjectIdChange, managerId, onManagerIdChange, search, onSearchChange }: DealsToolbarProps) {
+export function DealsToolbar({ statusFilter, onStatusFilterChange, projectId, onProjectIdChange, managerId, onManagerIdChange, branchId, onBranchIdChange, search, onSearchChange }: DealsToolbarProps) {
     const { t } = useTranslation("deals");
     const projects = useProjectsFilter();
     const managers = useManagers();
@@ -47,6 +50,11 @@ export function DealsToolbar({ statusFilter, onStatusFilterChange, projectId, on
             <h2 className="text-lg font-medium">{t("toolbar.heading")}</h2>
 
             <div className="flex flex-wrap items-center gap-2">
+                <BranchFilterSelect
+                    value={branchId ?? "all"}
+                    onChange={(value) => onBranchIdChange(value === "all" ? undefined : value)}
+                />
+
                 <Select
                     collection={projectCollection}
                     value={[projectId ?? "all"]}

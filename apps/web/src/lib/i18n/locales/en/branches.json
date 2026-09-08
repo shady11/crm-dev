@@ -1,0 +1,79 @@
+{
+  "status": {
+    "active": "Active",
+    "deactivated": "Deactivated"
+  },
+  "page": {
+    "heading": "Branches",
+    "description": "Sales offices in different cities or locations.",
+    "newBranch": "New branch",
+    "searchPlaceholder": "Search branches...",
+    "empty": {
+      "title": "No branches found",
+      "description": "Try adjusting your search, or create your first branch."
+    },
+    "table": {
+      "headers": {
+        "name": "Name",
+        "city": "City",
+        "phone": "Phone",
+        "status": "Status"
+      }
+    },
+    "rowActions": {
+      "edit": "Edit {{name}}",
+      "deactivate": "Deactivate {{name}}",
+      "reactivate": "Reactivate {{name}}"
+    },
+    "confirmDialog": {
+      "working": "Working…",
+      "deactivate": {
+        "title": "Deactivate branch?",
+        "body": "Blocks new assignments to this branch. Existing users and records stay attributed and readable.",
+        "confirm": "Deactivate"
+      },
+      "reactivate": {
+        "title": "Reactivate branch?",
+        "body": "This branch becomes selectable again when creating or editing users.",
+        "confirm": "Reactivate"
+      }
+    },
+    "toasts": {
+      "createSuccess": "Branch created.",
+      "createError": "Failed to create branch.",
+      "updateSuccess": "Branch updated.",
+      "updateError": "Failed to update branch.",
+      "deactivated": "\"{{name}}\" deactivated.",
+      "reactivated": "\"{{name}}\" reactivated.",
+      "actionError": "Something went wrong. Please try again."
+    }
+  },
+  "form": {
+    "newTitle": "New branch",
+    "editTitle": "Edit {{name}}",
+    "newDescription": "Add a sales office location.",
+    "editDescription": "Update this branch's details.",
+    "fields": {
+      "name": "Name",
+      "city": "City",
+      "address": "Address",
+      "phone": "Phone"
+    },
+    "submit": {
+      "create": "Create branch"
+    }
+  },
+  "select": {
+    "placeholder": "Select a branch",
+    "allBranches": "All branches",
+    "unassigned": "Unassigned"
+  },
+  "moveDialog": {
+    "title": "Move to another branch",
+    "description": "Move \"{{name}}\" to another branch.",
+    "branchLabel": "New branch",
+    "confirm": "Move",
+    "success": "\"{{name}}\" moved to another branch.",
+    "error": "Failed to move to another branch. Please try again."
+  }
+}

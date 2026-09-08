@@ -5,6 +5,7 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {LEAD_STATUS_LABEL_KEYS, LeadStatus} from "@/features/leads/types/lead.types.ts";
 import type {LeadStatusFilterValue} from "@/features/leads/hooks/use-leads-list.ts";
+import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
 import {useTranslation} from "react-i18next";
 
 interface LeadsToolbarProps {
@@ -12,6 +13,8 @@ interface LeadsToolbarProps {
     onSearchChange(value: string): void;
     statusFilter: LeadStatusFilterValue;
     onStatusFilterChange(value: LeadStatusFilterValue): void;
+    branchFilter: string | "all";
+    onBranchFilterChange(value: string | "all"): void;
     onAddLead(): void;
 }
 
@@ -20,6 +23,8 @@ export function LeadsToolbar({
                                   onSearchChange,
                                   statusFilter,
                                   onStatusFilterChange,
+                                  branchFilter,
+                                  onBranchFilterChange,
                                   onAddLead,
                               }: LeadsToolbarProps) {
     const { t } = useTranslation("leads");
@@ -41,6 +46,8 @@ export function LeadsToolbar({
             <h2 className="text-lg font-medium">{t("toolbar.heading")}</h2>
 
             <div className="flex flex-wrap items-center gap-2">
+                <BranchFilterSelect value={branchFilter} onChange={onBranchFilterChange} />
+
                 <Select
                     collection={statusCollection}
                     value={[statusFilter]}

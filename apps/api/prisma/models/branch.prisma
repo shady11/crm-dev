@@ -1,0 +1,36 @@
+// A Branch is a sales office within a Company (multi-location support).
+// Branch-scoped roles (SALES_HEAD, SALES_MANAGER) are isolated to their own
+// branch's leads, clients, deals, and tasks. Company-wide roles (COMPANY_ADMIN,
+// FINANCE) keep full visibility and are not required to have a branch.
+//
+// Deliberately NOT scoped to a branch: Project/Block/Entrance/Floor/Unit.
+// Inventory stays company-wide by decision — any branch can see and reserve
+// any unit, so the existing atomic unit-booking logic stays untouched.
+model Branch {
+  id String @id @default(uuid())
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  name    String
+  city    String?
+  address String?
+  phone   String?
+
+  // Reversible, not a boolean — mirrors Company.suspendedAt so "deactivated
+  // on <date>" stays answerable. There is no delete path for a branch, only
+  // deactivate/reactivate.
+  deactivatedAt DateTime?
+
+  users   User[]
+  leads   Lead[]
+  clients Client[]
+  deals   Deal[]
+  tasks   Task[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([companyId, name])
+  @@index([companyId])
+}

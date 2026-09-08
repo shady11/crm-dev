@@ -83,3 +83,74 @@ describe("tenant boundary", () => {
         expect(source).toContain("UserRole.SUPER_ADMIN");
     });
 });
+
+/**
+ * The branch boundary is enforced the same way, one level down: BranchGuard
+ * rejects a branch-scoped user (SALES_HEAD, SALES_MANAGER) with no branchId,
+ * on the controllers where a missing branch would otherwise leak another
+ * branch's leads, clients, deals, or tasks. Everything else either isn't
+ * branch-scoped data (inventory, branches themselves, user records) or
+ * applies branch filtering conditionally inside the service rather than via
+ * a blanket controller guard (dashboard) — each is whitelisted with why,
+ * mirroring NO_COMPANY_SCOPE above so this doesn't drift out of sync with it.
+ */
+describe("branch boundary", () => {
+    const MODULES_DIR = join(__dirname, "..", "..", "modules");
+
+    const NO_BRANCH_SCOPE: Record<string, string> = {
+        // Everything already exempt from company scope is exempt from branch
+        // scope too — none of it is tenant data a branch could be isolated
+        // within.
+        auth: "login happens before a company is known",
+        health: "returns no data; polled by an uptime monitor",
+        companies: "SUPER_ADMIN tenant administration, not data inside a tenant",
+        references: "returns enum values only — no rows, nothing tenant-specific",
+        "audit-log": "SUPER_ADMIN platform-wide audit trail, not data inside a tenant",
+        impersonation: "acts on behalf of a SUPER_ADMIN, who has no companyId of their own",
+
+        branches: "manages the branches themselves, not branch-scoped data",
+        users: "branch assignment is a field on User, not row-level isolation",
+
+        // Theme C — inventory stays company-wide, deliberately unscoped this
+        // phase (BR-C1). Any branch can see and reserve any unit.
+        projects: "inventory — see BR-C1 decision",
+        blocks: "inventory — see BR-C1 decision",
+        entrances: "inventory — see BR-C1 decision",
+        floors: "inventory — see BR-C1 decision",
+        units: "inventory — see BR-C1 decision",
+        chessboard: "inventory — see BR-C1 decision",
+
+        dashboard: "applies branchId conditionally via query param inside the service, not a blanket controller guard",
+        documents: "not scoped by this phase — Theme B covers leads, clients, deals, and tasks only",
+        notifications: "personal to the recipient user, not branch-scoped data",
+    };
+
+    const stripComments = (source: string) =>
+        source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+
+    const controllers: {module: string; path: string}[] = [];
+
+    const walk = (dir: string, moduleName: string) => {
+        for (const entry of readdirSync(dir)) {
+            const full = join(dir, entry);
+            if (statSync(full).isDirectory()) walk(full, moduleName);
+            else if (entry.endsWith(".controller.ts")) controllers.push({module: moduleName, path: full});
+        }
+    };
+
+    for (const moduleName of readdirSync(MODULES_DIR)) {
+        const moduleDir = join(MODULES_DIR, moduleName);
+        if (statSync(moduleDir).isDirectory()) walk(moduleDir, moduleName);
+    }
+
+    it("finds the controllers to check", () => {
+        expect(controllers.length).toBeGreaterThan(10);
+    });
+
+    it.each(controllers.map((c) => [c.module, c.path]))("%s is correctly branch-scoped", (module, path) => {
+        const source = stripComments(readFileSync(path as string, "utf8"));
+        const scoped = source.includes("BranchGuard");
+
+        expect([module, scoped]).toEqual([module, !(module in NO_BRANCH_SCOPE)]);
+    });
+});

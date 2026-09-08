@@ -106,6 +106,9 @@ export type GetDealsParams = {
     projectId?: string;
     clientId?: string;
     managerId?: string;
+    // Admin-only cross-branch filter (BR-B3); ignored server-side for a
+    // branch-scoped caller, whose own branch filter already takes precedence.
+    branchId?: string;
     search?: string;
     page?: number;
     limit?: number;
@@ -137,8 +140,8 @@ export async function getDeals(params?: GetDealsParams) {
     return response.data;
 }
 
-export async function getDealStatusSummary(projectId?: string) {
-    const response = await api.get<DealStatusSummaryItem[]>("/deals/status-summary", { params: { projectId } });
+export async function getDealStatusSummary(projectId?: string, branchId?: string) {
+    const response = await api.get<DealStatusSummaryItem[]>("/deals/status-summary", { params: { projectId, branchId } });
     return response.data;
 }
 

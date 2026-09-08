@@ -24,6 +24,9 @@ export type GetTasksParams = {
     dealId?: string;
     clientId?: string;
     leadId?: string;
+    // Admin-only cross-branch filter (BR-B3); ignored server-side for a
+    // branch-scoped caller, whose own branch filter already takes precedence.
+    branchId?: string;
     search?: string;
     overdue?: boolean;
     page?: number;
@@ -46,8 +49,8 @@ export async function getTasks(params?: GetTasksParams) {
     return response.data;
 }
 
-export async function getTaskStatusSummary() {
-    const response = await api.get<TaskStatusSummaryItem[]>("/tasks/status-summary");
+export async function getTaskStatusSummary(branchId?: string) {
+    const response = await api.get<TaskStatusSummaryItem[]>("/tasks/status-summary", { params: { branchId } });
     return response.data;
 }
 

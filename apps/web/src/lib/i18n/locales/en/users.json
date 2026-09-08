@@ -28,6 +28,18 @@
       "impact": "{{name}} still manages {{openLeads}} open lead(s) and {{activeDeals}} active deal(s).",
       "reassignLabel": "Reassign to",
       "noReassignOption": "Don't reassign — deactivate only"
+    },
+    "transferBranch": "Transfer branch",
+    "transferBranchDialog": {
+      "title": "Transfer branch",
+      "description": "Move \"{{name}}\" to another branch.",
+      "branchLabel": "New branch",
+      "confirm": "Transfer",
+      "impact": "{{name}} still manages {{openLeads}} open lead(s) and {{activeDeals}} active deal(s) at their current branch.",
+      "reassignLabel": "Reassign to",
+      "noReassignOption": "Don't reassign — they keep their old branch's records",
+      "success": "\"{{name}}\" moved to another branch.",
+      "error": "Failed to transfer branch. Please try again."
     }
   },
   "form": {
@@ -37,7 +49,8 @@
       "phone": "Phone (optional)",
       "password": "Password",
       "newPassword": "New password (optional)",
-      "role": "Role"
+      "role": "Role",
+      "branch": "Branch"
     },
     "placeholders": {
       "fullName": "Full name",
@@ -50,7 +63,9 @@
       "nameMin": "Name must be at least 2 characters",
       "invalidEmail": "Invalid email",
       "roleRequired": "Select a role",
-      "passwordMin": "Password must be at least 6 characters"
+      "passwordMin": "Password must be at least 6 characters",
+      "branchRequired": "This role requires a branch",
+      "branchNotAllowed": "This role cannot be assigned to a branch"
     },
     "submit": {
       "createUser": "Create user"
@@ -75,6 +90,7 @@
       "userId": "User ID",
       "name": "Name",
       "role": "Role",
+      "branch": "Branch",
       "created": "Created",
       "status": "Status",
       "actions": "Actions"

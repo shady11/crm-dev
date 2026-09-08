@@ -11,8 +11,10 @@ import {RolesGuard} from "@/common/guards/roles.guard";
 import {Roles} from "@/common/decorators/roles.decorator";
 import {UserRole} from "@/generated/prisma/enums";
 import {CompanyGuard} from "@/common/guards/company.guard";
+import {BranchGuard} from "@/common/guards/branch.guard";
+import {TransferBranchDto} from "@/common/dto/transfer-branch.dto";
 
-@UseGuards(JwtAuthGuard, CompanyGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, CompanyGuard, BranchGuard, RolesGuard)
 @Controller("leads")
 export class LeadsController {
     constructor(private readonly leadsService: LeadsService) {}
@@ -88,5 +90,17 @@ export class LeadsController {
     @Delete(":id")
     remove(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.leadsService.remove(user, id);
+    }
+
+    // BR-D1: branch staff can't see across the boundary, so this can only
+    // ever be reached by a company-wide role.
+    @Roles(UserRole.COMPANY_ADMIN)
+    @Post(":id/transfer-branch")
+    transferBranch(
+        @CurrentUser() user: AuthUser,
+        @Param("id") id: string,
+        @Body() dto: TransferBranchDto,
+    ) {
+        return this.leadsService.transferBranch(user, id, dto);
     }
 }

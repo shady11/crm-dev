@@ -22,6 +22,8 @@ export function ClientsPage() {
                     onSearchChange={filters.setSearch}
                     projectFilter={filters.projectFilter}
                     onProjectFilterChange={filters.setProjectFilter}
+                    branchFilter={filters.branchFilter}
+                    onBranchFilterChange={filters.setBranchFilter}
                     onAddClient={form.openCreateForm}
                 />
 

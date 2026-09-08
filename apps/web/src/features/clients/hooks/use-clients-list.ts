@@ -20,6 +20,7 @@ export function useClientsList() {
 
     const [search, setSearchState] = useState("");
     const [projectFilter, setProjectFilterState] = useState<ProjectFilterValue>("all");
+    const [branchFilter, setBranchFilterState] = useState<string | "all">("all");
     const [page, setPage] = useState(1);
     const [limit, setLimitState] = useState(10);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -28,13 +29,14 @@ export function useClientsList() {
     const [editingClient, setEditingClient] = useState<Client | null>(null);
 
     const tableQuery = useQuery({
-        queryKey: ["clients", { search, projectFilter, page, limit }],
+        queryKey: ["clients", { search, projectFilter, branchFilter, page, limit }],
         queryFn: () =>
             getClients({
                 page,
                 limit,
                 search: search || undefined,
                 projectId: projectFilter === "all" ? undefined : projectFilter,
+                branchId: branchFilter === "all" ? undefined : branchFilter,
             }),
     });
 
@@ -159,6 +161,11 @@ export function useClientsList() {
             projectFilter,
             setProjectFilter: (value: ProjectFilterValue) => {
                 setProjectFilterState(value);
+                setPage(1);
+            },
+            branchFilter,
+            setBranchFilter: (value: string | "all") => {
+                setBranchFilterState(value);
                 setPage(1);
             },
         },

@@ -9,6 +9,9 @@ export type GetClientsParams = {
     limit?: number;
     search?: string;
     projectId?: string;
+    // Admin-only cross-branch filter (BR-B3); ignored server-side for a
+    // branch-scoped caller, whose own branch filter already takes precedence.
+    branchId?: string;
 };
 
 export async function getClients(params?: GetClientsParams) {
@@ -89,5 +92,11 @@ export async function searchClients(search: string) {
     const response = await api.get<PaginatedResponse<Client>>("/clients", {
         params: { search, limit: 10 },
     });
+    return response.data;
+}
+
+// BR-D1: COMPANY_ADMIN-only handoff of a client to another branch.
+export async function transferClientBranch(id: string, branchId: string) {
+    const response = await api.post<Client>(`/clients/${id}/transfer-branch`, { branchId });
     return response.data;
 }

@@ -7,6 +7,7 @@ export interface Client {
     passport: string | null;
     pin: string | null;
     companyId: string;
+    branchId: string | null;
     createdAt: string;
     updatedAt: string;
     deletedAt: string | null;

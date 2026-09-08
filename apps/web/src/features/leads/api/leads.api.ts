@@ -17,6 +17,7 @@ export interface Lead {
     lastContactAt: string | null;
     assignedAt: string | null;
     companyId: string;
+    branchId: string | null;
     manager: LeadManager;
     client: LeadClient;
     createdAt: string;
@@ -29,6 +30,9 @@ export type GetLeadsParams = {
     search?: string;
     status?: LeadStatus;
     managerId?: string;
+    // Admin-only cross-branch filter (BR-B3); ignored server-side for a
+    // branch-scoped caller, whose own branch filter already takes precedence.
+    branchId?: string;
 };
 
 export async function getLeads(params?: GetLeadsParams) {
@@ -79,7 +83,16 @@ export async function convertLead(id: string, payload?: ConvertLeadPayload) {
 export type DuplicateLeadCheckResult = {
     leads: { id: string; fullName: string; phone: string; status: string; createdAt: string }[];
     clients: { id: string; fullName: string; phone: string; createdAt: string }[];
+    // BR-D2: populated only for a COMPANY_ADMIN caller — a heads-up that this
+    // phone already exists as a client at a different branch.
+    crossBranchClient: { id: string; branchId: string | null } | null;
 };
+
+// BR-D1: COMPANY_ADMIN-only handoff of a lead to another branch.
+export async function transferLeadBranch(id: string, branchId: string) {
+    const response = await api.post<Lead>(`/leads/${id}/transfer-branch`, { branchId });
+    return response.data;
+}
 
 export async function checkLeadDuplicates(phone: string, excludeLeadId?: string) {
     const response = await api.get<DuplicateLeadCheckResult>("/leads/duplicates", {

@@ -28,23 +28,31 @@ export type RecentActivity = {
     deal: { id: string; dealNumber: string } | null;
 };
 
-export async function getDashboardKpis(projectId?: string) {
-    const response = await api.get<DashboardKpis>("/dashboard/kpis", { params: { projectId } });
+export async function getDashboardKpis(projectId?: string, branchId?: string) {
+    const response = await api.get<DashboardKpis>("/dashboard/kpis", { params: { projectId, branchId } });
     return response.data;
 }
-export async function getRevenueTrend(projectId?: string) {
-    const response = await api.get<RevenueTrendPoint[]>("/dashboard/revenue-trend", { params: { projectId } });
+export async function getRevenueTrend(projectId?: string, branchId?: string) {
+    const response = await api.get<RevenueTrendPoint[]>("/dashboard/revenue-trend", { params: { projectId, branchId } });
     return response.data;
 }
 export async function getUnitsSummary(projectId?: string) {
     const response = await api.get<UnitsSummaryItem[]>("/dashboard/units-summary", { params: { projectId } });
     return response.data;
 }
-export async function getAttentionItems(projectId?: string) {
-    const response = await api.get<AttentionItems>("/dashboard/attention", { params: { projectId } });
+export async function getAttentionItems(projectId?: string, branchId?: string) {
+    const response = await api.get<AttentionItems>("/dashboard/attention", { params: { projectId, branchId } });
     return response.data;
 }
-export async function getRecentActivity(projectId?: string) {
-    const response = await api.get<RecentActivity[]>("/dashboard/recent-activity", { params: { projectId } });
+export async function getRecentActivity(projectId?: string, branchId?: string) {
+    const response = await api.get<RecentActivity[]>("/dashboard/recent-activity", { params: { projectId, branchId } });
+    return response.data;
+}
+
+// BR-E1: per-branch deal count and revenue comparison, COMPANY_ADMIN only.
+export type BranchComparisonItem = { branchId: string; branchName: string; dealCount: number; revenue: number };
+
+export async function getBranchComparison() {
+    const response = await api.get<BranchComparisonItem[]>("/dashboard/branch-comparison");
     return response.data;
 }

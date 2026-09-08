@@ -2,7 +2,9 @@ import {PrismaService} from "@/database/prisma.service";
 import {BadRequestException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {QueryClientsDto} from "@/modules/clients/dto/query-clients.dto";
-import {Prisma} from "@/generated/prisma/client";
+import {ActivityAction, ActivityType, Prisma} from "@/generated/prisma/client";
+import {isBranchScopedRole} from "@/common/constants/branch-scope.constants";
+import {TransferBranchDto} from "@/common/dto/transfer-branch.dto";
 import {CreateClientDto} from "@/modules/clients/dto/create-client.dto";
 import {UpdateClientDto} from "@/modules/clients/dto/update-client.dto";
 
@@ -23,6 +25,13 @@ export class ClientsService {
             companyId: user.companyId,
             deletedAt: null,
         };
+
+        // BR-B1 / BR-B3 — see leads.service.ts's findAll for the same pattern.
+        if (isBranchScopedRole(user.role)) {
+            where.branchId = user.branchId;
+        } else if (query.branchId) {
+            where.branchId = query.branchId;
+        }
 
         if (query.projectId) {
             where.deals = { some: { projectId: query.projectId } };
@@ -63,7 +72,12 @@ export class ClientsService {
         }
 
         const client = await this.prisma.client.findFirst({
-            where: { id, companyId: user.companyId, deletedAt: null },
+            where: {
+                id,
+                companyId: user.companyId,
+                deletedAt: null,
+                ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+            },
             include: {
                 leads: {
                     orderBy: { createdAt: "desc" },
@@ -109,7 +123,14 @@ export class ClientsService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
+        // Company-wide, not branch-scoped: two branches must not be able to
+        // create a duplicate client for the same phone just because they
+        // can't see each other's records — that's exactly what BR-D2's
+        // cross-branch warning exists to surface instead of silently allow.
         await this.ensurePhoneIsUniqueInsideCompany(dto.phone, user.companyId);
+
+        // BR-B2: stamped from the actor, never trusted from the request body.
+        const branchId = isBranchScopedRole(user.role) ? user.branchId : null;
 
         return this.prisma.client.create({
             data: {
@@ -120,6 +141,7 @@ export class ClientsService {
                 passport: dto.passport,
                 pin: dto.pin,
                 companyId: user.companyId,
+                branchId,
             },
         });
     }
@@ -154,7 +176,12 @@ export class ClientsService {
         }
 
         const client = await this.prisma.client.findFirst({
-            where: { id, companyId: user.companyId, deletedAt: null },
+            where: {
+                id,
+                companyId: user.companyId,
+                deletedAt: null,
+                ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+            },
         });
 
         if (!client) {
@@ -167,6 +194,52 @@ export class ClientsService {
         });
 
         return { success: true };
+    }
+
+    /**
+     * Hands a client off to another branch (BR-D1) — same shape as
+     * LeadsService.transferBranch. COMPANY_ADMIN only, so no branch filter on
+     * the lookup: an admin may move any client in their company.
+     */
+    async transferBranch(user: AuthUser, id: string, dto: TransferBranchDto) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const companyId = user.companyId;
+
+        const client = await this.prisma.client.findFirst({ where: { id, companyId, deletedAt: null } });
+
+        if (!client) {
+            throw new NotFoundException("Client not found");
+        }
+
+        const branch = await this.prisma.branch.findFirst({
+            where: { id: dto.branchId, companyId, deactivatedAt: null },
+        });
+
+        if (!branch) {
+            throw new BadRequestException("Branch does not belong to your company or is deactivated");
+        }
+
+        const updated = await this.prisma.client.update({
+            where: { id },
+            data: { branchId: dto.branchId },
+        });
+
+        await this.prisma.activity.create({
+            data: {
+                companyId,
+                userId: user.id,
+                clientId: id,
+                action: ActivityAction.BRANCH_TRANSFERRED,
+                type: ActivityType.CLIENT_BRANCH_TRANSFERRED,
+                title: "Client moved to another branch",
+                metadata: { fromBranchId: client.branchId, toBranchId: dto.branchId },
+            },
+        });
+
+        return updated;
     }
 
     private async ensurePhoneIsUniqueInsideCompany(phone: string, companyId: string, exceptClientId?: string) {

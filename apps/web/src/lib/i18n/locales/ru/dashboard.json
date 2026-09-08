@@ -16,6 +16,12 @@
     "title": "Остатки юнитов",
     "totalUnits": "Всего юнитов: {{count}}"
   },
+  "branchComparison": {
+    "title": "Сравнение филиалов",
+    "dealCountLabel": "Активные сделки",
+    "revenueLabel": "Выручка",
+    "empty": "Пока нет филиалов."
+  },
   "dealsByStage": "Сделки по этапам",
   "attention": {
     "title": "Требует внимания",

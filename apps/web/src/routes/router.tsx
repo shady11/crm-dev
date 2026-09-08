@@ -5,6 +5,7 @@ import {ProtectedRoute} from "@/features/auth/pages/protected-route";
 import {NotFoundPage} from "@/components/shared/not-found-page";
 import {projectsRoutes} from "@/features/projects/projects.routes";
 import {usersRoutes} from "@/features/users/users.routes";
+import {branchesRoutes} from "@/features/branches/branches.routes";
 import {paths} from "@/routes/paths";
 import {LeadsPage} from "@/features/leads";
 import {dealsRoutes} from "@/features/deals/deals.routes.tsx";
@@ -47,6 +48,7 @@ export const router = createBrowserRouter([
                     projectsRoutes,
                     dealsRoutes,
                     usersRoutes,
+                    branchesRoutes,
                     tasksRoutes,
                     { path: "*", element: <NotFoundPage /> },
                 ],

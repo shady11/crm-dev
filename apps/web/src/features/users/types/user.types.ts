@@ -50,6 +50,8 @@ export type User = {
     role: UserRole;
     isActive: boolean;
     companyId: string | null;
+    branchId: string | null;
+    branch: {id: string; name: string} | null;
     createdAt: string;
     updatedAt: string;
 };
@@ -60,4 +62,12 @@ export function getVisibleRoles(actorRole?: UserRole | null): UserRole[] {
     }
 
     return USER_ROLE_VALUES.filter((role) => role !== UserRole.SUPER_ADMIN);
+}
+
+// SALES_HEAD and SALES_MANAGER work at one location and are isolated to it —
+// mirrors the backend's branch-scope.constants.ts.
+const BRANCH_SCOPED_ROLES: UserRole[] = [UserRole.SALES_HEAD, UserRole.SALES_MANAGER];
+
+export function isBranchScopedRole(role: UserRole): boolean {
+    return BRANCH_SCOPED_ROLES.includes(role);
 }

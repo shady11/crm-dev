@@ -31,6 +31,12 @@ model Deal {
   managerId String?
   manager   User?   @relation(fields: [managerId], references: [id])
 
+  // Derived from the client's branch at reservation time, not stamped from
+  // the acting user — see DealsService.reserveUnit. Null when the client
+  // itself is unassigned to a branch.
+  branchId String?
+  branch   Branch? @relation(fields: [branchId], references: [id])
+
   dealNumber    String
   status        DealStatus     @default(RESERVED)
   financingType FinancingType?
@@ -75,6 +81,8 @@ model Deal {
   @@index([companyId, managerId])
   @@index([companyId, clientId])
   @@index([companyId, createdAt])
+  @@index([companyId, branchId])
+  @@index([companyId, branchId, status])
 }
 
 model DealNumberCounter {
