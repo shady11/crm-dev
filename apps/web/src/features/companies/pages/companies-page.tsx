@@ -3,7 +3,7 @@ import {Link} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
 import {useTranslation} from "react-i18next";
-import {Building2, PauseCircle, Pencil, PlayCircle, Plus, Trash2} from "lucide-react";
+import {Building2, PauseCircle, Pencil, PlayCircle, Plus, SlidersHorizontal, Trash2} from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
@@ -102,15 +102,23 @@ export function CompaniesPage() {
                 <div>
                     <h2 className="text-2xl font-medium tracking-tight">{t("page.heading")}</h2>
                 </div>
-                <Button
-                    onClick={() => {
-                        setEditing(null);
-                        setFormOpen(true);
-                    }}
-                >
-                    <Plus className="size-4" />
-                    {t("page.newCompany")}
-                </Button>
+                <div className="flex gap-2">
+                    <Button variant="secondary" asChild>
+                        <Link to="/setting-options">
+                            <SlidersHorizontal className="size-4" />
+                            {t("page.manageSettingOptions")}
+                        </Link>
+                    </Button>
+                    <Button
+                        onClick={() => {
+                            setEditing(null);
+                            setFormOpen(true);
+                        }}
+                    >
+                        <Plus className="size-4" />
+                        {t("page.newCompany")}
+                    </Button>
+                </div>
             </div>
 
             {created ? (

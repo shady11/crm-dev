@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, type ReactNode} from "react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {Button} from "@/components/ui/button.tsx";
@@ -11,6 +11,7 @@ import {
     updateOwnCompany,
     type UpdateOwnCompanyPayload,
 } from "@/features/companies/api/companies.api.ts";
+import {SettingOptionSelect} from "@/features/setting-options/components/setting-option-select.tsx";
 
 const EMPTY: UpdateOwnCompanyPayload = {name: "", currency: "", locale: "", timezone: ""};
 
@@ -94,9 +95,27 @@ export function CompanySettingsPage() {
                         />
 
                         <div className="grid grid-cols-3 gap-3">
-                            <Field label={t("fields.currency")} value={form.currency} onChange={set("currency")} />
-                            <Field label={t("fields.locale")} value={form.locale} onChange={set("locale")} />
-                            <Field label={t("fields.timezone")} value={form.timezone} onChange={set("timezone")} />
+                            <SelectField label={t("fields.currency")}>
+                                <SettingOptionSelect
+                                    type="CURRENCY"
+                                    value={form.currency ?? ""}
+                                    onChange={(value) => setForm((previous) => ({...previous, currency: value}))}
+                                />
+                            </SelectField>
+                            <SelectField label={t("fields.locale")}>
+                                <SettingOptionSelect
+                                    type="LOCALE"
+                                    value={form.locale ?? ""}
+                                    onChange={(value) => setForm((previous) => ({...previous, locale: value}))}
+                                />
+                            </SelectField>
+                            <SelectField label={t("fields.timezone")}>
+                                <SettingOptionSelect
+                                    type="TIMEZONE"
+                                    value={form.timezone ?? ""}
+                                    onChange={(value) => setForm((previous) => ({...previous, timezone: value}))}
+                                />
+                            </SelectField>
                         </div>
 
                         <Button type="submit" disabled={updateMutation.isPending}>
@@ -117,5 +136,14 @@ function Field({label, ...props}: FieldProps) {
             <span className="text-sm font-medium">{label}</span>
             <Input aria-label={label} {...props} />
         </label>
+    );
+}
+
+function SelectField({label, children}: {label: string; children: ReactNode}) {
+    return (
+        <div className="space-y-1.5">
+            <span className="text-sm font-medium">{label}</span>
+            {children}
+        </div>
     );
 }

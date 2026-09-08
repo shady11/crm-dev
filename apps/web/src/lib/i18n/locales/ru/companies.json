@@ -7,6 +7,7 @@
     "heading": "Компании",
     "description": "Тенанты на этой инсталляции. У каждого свои пользователи, проекты и сделки.",
     "newCompany": "Новая компания",
+    "manageSettingOptions": "Валюта, локаль и часовой пояс",
     "searchPlaceholder": "Поиск компаний",
     "table": {
       "headers": {

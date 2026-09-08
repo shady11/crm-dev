@@ -4,6 +4,7 @@ import {UserRole} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuditLogService} from "@/modules/audit-log/audit-log.service";
 import {ImpersonationService} from "@/modules/impersonation/impersonation.service";
+import {SettingOptionsService} from "@/modules/setting-options/setting-options.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CompaniesService} from "./companies.service";
 
@@ -20,6 +21,9 @@ const actor: AuthUser = {
 
 const auditLog = {record: jest.fn()} as unknown as AuditLogService;
 const impersonation = {} as unknown as ImpersonationService;
+const settingOptions = {
+    assertActiveOption: jest.fn().mockResolvedValue(undefined),
+} as unknown as SettingOptionsService;
 
 describe("CompaniesService", () => {
     const baseDto = {
@@ -52,7 +56,7 @@ describe("CompaniesService", () => {
             $transaction: jest.fn().mockImplementation((fn) => fn(tx)),
         } as unknown as PrismaService;
 
-        return {service: new CompaniesService(prisma, auditLog, impersonation), created};
+        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions), created};
     };
 
     it("creates the company and its first admin together", async () => {
@@ -128,7 +132,7 @@ describe("CompaniesService suspension", () => {
             deal: {count: jest.fn().mockResolvedValue(0)},
         } as unknown as PrismaService;
 
-        return {service: new CompaniesService(prisma, auditLog, impersonation), update};
+        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions), update};
     };
 
     const active = {id: "c1", name: "X", suspendedAt: null, users: []};
@@ -203,7 +207,7 @@ describe("CompaniesService self-service (CA-A1)", () => {
             deal: {count: jest.fn().mockResolvedValue(0)},
         } as unknown as PrismaService;
 
-        return {service: new CompaniesService(prisma, auditLog, impersonation), update, findFirst};
+        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions), update, findFirst};
     };
 
     it("reads only the caller's own company, never one supplied by the client", async () => {

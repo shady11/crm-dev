@@ -14,6 +14,7 @@ import {clientsRoutes} from "@/features/clients/clients.routes.tsx";
 import {DashboardPage} from "@/features/dashboard/pages/dashboard-page.tsx";
 import {companiesRoutes} from "@/features/companies/companies.routes";
 import {companySettingsRoutes} from "@/features/companies/company-settings.routes";
+import {settingOptionsRoutes} from "@/features/setting-options/setting-options.routes";
 import {ProfilePage} from "@/features/auth/pages/profile-page";
 import {UnitInfoSheetPage} from "@/features/units/pages/unit-info-sheet-page";
 import {auditLogRoutes} from "@/features/audit-log/audit-log.routes";
@@ -43,6 +44,7 @@ export const router = createBrowserRouter([
                         children: [{ index: true, element: <DashboardPage /> }],
                     },
                     companiesRoutes,
+                    settingOptionsRoutes,
                     companySettingsRoutes,
                     // SM-A1: self-service name/phone edit, open to every role —
                     // unlike companySettingsRoutes above, no RoleGuard here.

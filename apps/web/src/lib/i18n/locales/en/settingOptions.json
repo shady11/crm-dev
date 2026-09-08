@@ -1,0 +1,71 @@
+{
+  "types": {
+    "CURRENCY": "Currency",
+    "LOCALE": "Locale",
+    "TIMEZONE": "Timezone"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "page": {
+    "heading": "Currency, locale & timezone",
+    "description": "The currency, locale and timezone options tenants can choose from. Deactivate an option to hide it from new selections without breaking companies already using it.",
+    "newOption": "New option",
+    "table": {
+      "headers": {
+        "code": "Code",
+        "label": "Label",
+        "status": "Status"
+      }
+    },
+    "empty": {
+      "title": "No options yet",
+      "description": "Add one so it appears in the company currency/locale/timezone pickers."
+    },
+    "rowActions": {
+      "edit": "Edit {{code}}",
+      "delete": "Delete {{code}}",
+      "activate": "Activate {{code}}",
+      "deactivate": "Deactivate {{code}}"
+    }
+  },
+  "form": {
+    "newTitle": "New {{type}} option",
+    "editTitle": "Edit option",
+    "description": "The code is what's stored on a company and used to format its money and dates — it must be a real value the browser recognises.",
+    "fields": {
+      "code": "Code",
+      "label": "Label"
+    },
+    "codePlaceholders": {
+      "CURRENCY": "USD",
+      "LOCALE": "en-US",
+      "TIMEZONE": "Europe/London"
+    },
+    "codeHints": {
+      "CURRENCY": "ISO-4217 currency code.",
+      "LOCALE": "BCP-47 locale tag, e.g. en-US.",
+      "TIMEZONE": "IANA timezone name, e.g. Europe/London."
+    },
+    "submit": {
+      "create": "Add option"
+    }
+  },
+  "confirmDialog": {
+    "delete": {
+      "title": "Delete this option?",
+      "body": "It disappears from every picker. Refused if a company is currently using it — deactivate it instead.",
+      "confirm": "Delete"
+    },
+    "working": "Working..."
+  },
+  "toasts": {
+    "createSuccess": "Option added",
+    "createError": "Could not add the option",
+    "updateSuccess": "Option updated",
+    "updateError": "Could not save the option",
+    "deleteSuccess": "Option deleted",
+    "deleteError": "Could not delete the option — it may still be in use"
+  }
+}

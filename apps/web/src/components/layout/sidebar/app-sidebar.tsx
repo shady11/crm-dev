@@ -25,6 +25,7 @@ import {
     MapPin,
     ScrollText,
     Settings,
+    SlidersHorizontal,
     SquareUser,
     Users
 } from "lucide-react";
@@ -45,6 +46,7 @@ const NAV_ITEMS: {
     { titleKey: "nav.deals", feature: "deals", url: "/deals", icon: Handshake },
     { titleKey: "nav.projects", feature: "projects", url: "/projects", icon: Building2 },
     { titleKey: "nav.companies", feature: "companies", url: "/companies", icon: Landmark },
+    { titleKey: "nav.settingOptions", feature: "settingOptions", url: "/setting-options", icon: SlidersHorizontal },
     { titleKey: "nav.users", feature: "users", url: "/users", icon: Users },
     { titleKey: "nav.branches", feature: "branches", url: "/branches", icon: MapPin },
     { titleKey: "nav.auditLog", feature: "auditLog", url: "/audit-log", icon: ScrollText },

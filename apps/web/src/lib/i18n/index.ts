@@ -22,6 +22,7 @@ import entrancesEn from "./locales/en/entrances.json";
 import floorsEn from "./locales/en/floors.json";
 import auditLogEn from "./locales/en/auditLog.json";
 import settingsEn from "./locales/en/settings.json";
+import settingOptionsEn from "./locales/en/settingOptions.json";
 
 import commonRu from "./locales/ru/common.json";
 import dealsRu from "./locales/ru/deals.json";
@@ -43,6 +44,7 @@ import entrancesRu from "./locales/ru/entrances.json";
 import floorsRu from "./locales/ru/floors.json";
 import auditLogRu from "./locales/ru/auditLog.json";
 import settingsRu from "./locales/ru/settings.json";
+import settingOptionsRu from "./locales/ru/settingOptions.json";
 
 export const resources = {
     en: {
@@ -66,6 +68,7 @@ export const resources = {
         floors: floorsEn,
         auditLog: auditLogEn,
         settings: settingsEn,
+        settingOptions: settingOptionsEn,
     },
     ru: {
         common: commonRu,
@@ -88,6 +91,7 @@ export const resources = {
         floors: floorsRu,
         auditLog: auditLogRu,
         settings: settingsRu,
+        settingOptions: settingOptionsRu,
     },
 } as const;
 
