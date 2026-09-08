@@ -1,3 +1,4 @@
+import {FileTextIcon} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
@@ -6,6 +7,7 @@ import {type Unit,} from "@/features/units/types/unit.types.ts";
 import {DealCard} from "@/features/deals/components/deal-card.tsx";
 import {UnitOverview} from "@/features/units/components/unit-overview.tsx";
 import {useUnit} from "@/features/units/hooks/use-unit.ts";
+import {paths} from "@/routes/paths.ts";
 import {useTranslation} from "react-i18next";
 
 interface UnitDetailsSheetProps {
@@ -75,6 +77,14 @@ export function UnitDetailsSheet({
                 </SheetBody>
 
                 <SheetFooter>
+                    <Button
+                        variant="secondary"
+                        size="icon-md"
+                        aria-label={t("details.infoSheetButton")}
+                        onClick={() => window.open(paths.units.infoSheet(unit.id), "_blank", "noopener,noreferrer")}
+                    >
+                        <FileTextIcon className="size-4" />
+                    </Button>
                     <Button variant="secondary" className="flex-1" onClick={onEdit}>{t("common:actions.edit")}</Button>
                     {unit.status === "AVAILABLE" && (
                         <Button className="flex-1" onClick={onBook}>{t("details.bookButton")}</Button>

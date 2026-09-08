@@ -10,6 +10,7 @@ export const paths = {
     users: "/users",
     branches: "/branches",
     settings: "/settings",
+    profile: "/profile",
     projects: {
         root: "/projects",
         detail: (projectId: string) => `/projects/${projectId}`,
@@ -30,5 +31,8 @@ export const paths = {
     },
     tasks: {
         root: "/tasks",
+    },
+    units: {
+        infoSheet: (unitId: string) => `/units/${unitId}/info-sheet`,
     },
 } as const;

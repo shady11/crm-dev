@@ -14,6 +14,7 @@ import {CompanyGuard} from "@/common/guards/company.guard";
 import {BranchGuard} from "@/common/guards/branch.guard";
 import {TransferBranchDto} from "@/common/dto/transfer-branch.dto";
 import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
+import {LogContactAttemptDto} from "@/modules/leads/dto/log-contact-attempt.dto";
 
 @UseGuards(JwtAuthGuard, CompanyGuard, BranchGuard, RolesGuard)
 @Controller("leads")
@@ -118,5 +119,31 @@ export class LeadsController {
         @Body() dto: TransferBranchDto,
     ) {
         return this.leadsService.transferBranch(user, id, dto);
+    }
+
+    // SM-B1: a one-click log of a call/message/meeting, so a lead's follow-up
+    // history is visible even when nothing rises to the level of a task.
+    @Roles(
+        UserRole.COMPANY_ADMIN,
+        UserRole.SALES_HEAD,
+        UserRole.SALES_MANAGER,
+    )
+    @Get(":id/activities")
+    listActivities(@CurrentUser() user: AuthUser, @Param("id") id: string) {
+        return this.leadsService.listActivities(user, id);
+    }
+
+    @Roles(
+        UserRole.COMPANY_ADMIN,
+        UserRole.SALES_HEAD,
+        UserRole.SALES_MANAGER,
+    )
+    @Post(":id/activities")
+    logContactAttempt(
+        @CurrentUser() user: AuthUser,
+        @Param("id") id: string,
+        @Body() dto: LogContactAttemptDto,
+    ) {
+        return this.leadsService.logContactAttempt(user, id, dto);
     }
 }

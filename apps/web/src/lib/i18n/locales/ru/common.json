@@ -14,7 +14,11 @@
     "creating": "Создание...",
     "saving": "Сохранение...",
     "duplicate": "Дублировать",
-    "duplicating": "Дублирование..."
+    "duplicating": "Дублирование...",
+    "openWhatsApp": "WhatsApp",
+    "print": "Печать",
+    "copyLink": "Скопировать ссылку",
+    "linkCopied": "Ссылка скопирована"
   },
   "labels": {
     "status": "Статус",

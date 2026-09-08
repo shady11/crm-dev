@@ -16,6 +16,20 @@ export async function getMe() {
     return response.data;
 }
 
+// SM-A1: self-service name/phone edit, open to every role.
+export type UpdateOwnProfilePayload = {
+    fullName?: string;
+    phone?: string;
+};
+
+export async function updateOwnProfile(payload: UpdateOwnProfilePayload) {
+    const response = await api.patch<{id: string; fullName: string; email: string; phone: string | null}>(
+        "/auth/me",
+        payload,
+    );
+    return response.data;
+}
+
 export async function endImpersonation() {
     const response = await api.post<EndImpersonationResponse>("/auth/end-impersonation");
     return response.data;

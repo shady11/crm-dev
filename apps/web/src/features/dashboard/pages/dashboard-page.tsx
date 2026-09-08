@@ -9,8 +9,16 @@ import {AttentionCard} from "@/features/dashboard/components/attention-card.tsx"
 import {RecentActivityCard} from "@/features/dashboard/components/recent-activity-card.tsx";
 import {BranchComparisonChart} from "@/features/dashboard/components/branch-comparison-chart.tsx";
 import {TeamSnapshotCard} from "@/features/dashboard/components/team-snapshot-card.tsx";
+import {MyWorkTodayCard} from "@/features/dashboard/components/my-work-today-card.tsx";
+import {MyPerformanceCard} from "@/features/dashboard/components/my-performance-card.tsx";
 import {DealStatusCardsGrid} from "@/features/deals/components/deal-status-cards-grid.tsx";
-import {useBranchComparison, useDashboard, useTeamSnapshot} from "@/features/dashboard/hooks/use-dashboard.ts";
+import {
+    useBranchComparison,
+    useDashboard,
+    useMyPerformance,
+    useMyWorkToday,
+    useTeamSnapshot,
+} from "@/features/dashboard/hooks/use-dashboard.ts";
 import {useProjectsFilter} from "@/features/projects/hooks/use-projects-filter.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
@@ -33,6 +41,9 @@ export function DashboardPage() {
     const branchComparison = useBranchComparison(isCompanyAdmin);
     const isSalesHead = user?.role === UserRole.SALES_HEAD;
     const teamSnapshot = useTeamSnapshot(isSalesHead);
+    const isSalesManager = user?.role === UserRole.SALES_MANAGER;
+    const myWorkToday = useMyWorkToday(isSalesManager);
+    const myPerformance = useMyPerformance(isSalesManager);
 
     const projectCollection = createListCollection({
         items: [{ label: t("allProjects"), value: "all" }, ...projects.data.map((p) => ({ label: p.name, value: p.id }))],
@@ -108,6 +119,8 @@ export function DashboardPage() {
 
             {isCompanyAdmin ? <BranchComparisonChart data={branchComparison.data ?? []} /> : null}
             {isSalesHead ? <TeamSnapshotCard data={teamSnapshot.data ?? []} /> : null}
+            {isSalesManager && myWorkToday.data ? <MyWorkTodayCard data={myWorkToday.data} /> : null}
+            {isSalesManager && myPerformance.data ? <MyPerformanceCard data={myPerformance.data} /> : null}
         </div>
     );
 }

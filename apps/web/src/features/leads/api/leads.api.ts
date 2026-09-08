@@ -106,3 +106,38 @@ export async function checkLeadDuplicates(phone: string, excludeLeadId?: string)
     });
     return response.data;
 }
+
+// SM-B1: a one-click log of a call/message/meeting, appended to the lead's
+// timeline — visible even when nothing rises to the level of a task.
+export const ContactAttemptType = {
+    CALL: "CALL",
+    MESSAGE: "MESSAGE",
+    MEETING: "MEETING",
+} as const;
+
+export type ContactAttemptType = (typeof ContactAttemptType)[keyof typeof ContactAttemptType];
+
+export type LeadActivity = {
+    id: string;
+    type: string;
+    action: string;
+    title: string;
+    description: string | null;
+    createdAt: string;
+    user: { id: string; fullName: string } | null;
+};
+
+export type LogContactAttemptPayload = {
+    type: ContactAttemptType;
+    note?: string;
+};
+
+export async function getLeadActivities(id: string) {
+    const response = await api.get<LeadActivity[]>(`/leads/${id}/activities`);
+    return response.data;
+}
+
+export async function logLeadContactAttempt(id: string, payload: LogContactAttemptPayload) {
+    const response = await api.post<LeadActivity>(`/leads/${id}/activities`, payload);
+    return response.data;
+}

@@ -59,6 +59,7 @@
   },
   "detailsSheet": {
     "overviewTab": "Overview",
+    "activityTab": "Activity",
     "clientTab": "Client",
     "edit": "Edit",
     "convert": "Convert",
@@ -70,6 +71,20 @@
     "reassign": {
       "action": "Reassign to another manager"
     }
+  },
+  "activityTab": {
+    "type": {
+      "call": "Called",
+      "message": "Sent a message",
+      "meeting": "Held a meeting"
+    },
+    "notePlaceholder": "Optional note, e.g. \"no answer\" or \"sent the price list\"",
+    "logButton": "Log contact attempt",
+    "logging": "Logging...",
+    "logSuccess": "Contact attempt logged",
+    "logError": "Could not log contact attempt. Please try again.",
+    "empty": "No contact attempts logged yet.",
+    "system": "System"
   },
   "form": {
     "editTitle": "Edit lead",

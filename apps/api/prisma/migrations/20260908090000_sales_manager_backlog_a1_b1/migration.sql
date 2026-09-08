@@ -1,0 +1,5 @@
+-- AlterEnum
+ALTER TYPE "ActivityAction" ADD VALUE 'LOGGED_CONTACT_ATTEMPT';
+
+-- AlterEnum
+ALTER TYPE "ActivityType" ADD VALUE 'MESSAGE_SENT';

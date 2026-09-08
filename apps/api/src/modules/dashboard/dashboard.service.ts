@@ -313,4 +313,105 @@ export class DashboardService {
             }),
         );
     }
+
+    /**
+     * SM-A2: a SALES_MANAGER's own "what needs doing today" view — leads
+     * waiting on follow-up, tasks due today, and deals waiting on the client.
+     * Not a new data model, just findAll's own filters (OPEN_LEAD_STATUSES,
+     * ACTIVE_DEAL_STATUSES, due-today tasks) hardcoded to `self` instead of
+     * left as an optional query param, so this is guaranteed to be the
+     * manager's own work and not whatever they last filtered to.
+     */
+    async getMyWorkToday(user: AuthUser) {
+        if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
+        const companyId = user.companyId;
+        const managerId = user.id;
+
+        const endOfToday = new Date();
+        endOfToday.setHours(23, 59, 59, 999);
+
+        const [leadsNeedingFollowUp, tasksDueToday, dealsWaitingOnClient] = await Promise.all([
+            this.prisma.lead.findMany({
+                where: {
+                    companyId,
+                    managerId,
+                    deletedAt: null,
+                    status: { in: OPEN_LEAD_STATUSES },
+                    OR: [{ nextContactAt: null }, { nextContactAt: { lte: endOfToday } }],
+                },
+                select: { id: true, fullName: true, phone: true, status: true, nextContactAt: true },
+                orderBy: { nextContactAt: { sort: "asc", nulls: "first" } },
+                take: 10,
+            }),
+            this.prisma.task.findMany({
+                where: {
+                    companyId,
+                    assignedToId: managerId,
+                    deletedAt: null,
+                    status: { in: [TaskStatus.TODO, TaskStatus.IN_PROGRESS] },
+                    dueDate: { lte: endOfToday },
+                },
+                select: { id: true, title: true, dueDate: true, status: true },
+                orderBy: { dueDate: "asc" },
+                take: 10,
+            }),
+            this.prisma.deal.findMany({
+                where: {
+                    companyId,
+                    managerId,
+                    deletedAt: null,
+                    status: { in: ACTIVE_DEAL_STATUSES },
+                },
+                select: {
+                    id: true, dealNumber: true, status: true, reservationExpiresAt: true,
+                    client: { select: { id: true, fullName: true } },
+                    unit: { select: { id: true, number: true } },
+                },
+                orderBy: { reservationExpiresAt: { sort: "asc", nulls: "last" } },
+                take: 10,
+            }),
+        ]);
+
+        return { leadsNeedingFollowUp, tasksDueToday, dealsWaitingOnClient };
+    }
+
+    /**
+     * SM-D1: a SALES_MANAGER's own deal count and conversion rate over a
+     * period — deliberately self-scoped, no visibility into teammates. Kept
+     * separate from getTeamSnapshot (SALES_HEAD-only, cross-manager) so this
+     * can never turn into an informal leaderboard.
+     */
+    async getMyPerformance(user: AuthUser, days: number) {
+        if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
+        const companyId = user.companyId;
+        const managerId = user.id;
+
+        const since = new Date();
+        since.setDate(since.getDate() - days);
+        since.setHours(0, 0, 0, 0);
+
+        const [leadsAssigned, dealsCreated, dealsWon] = await Promise.all([
+            this.prisma.lead.count({
+                where: { companyId, managerId, deletedAt: null, createdAt: { gte: since } },
+            }),
+            this.prisma.deal.count({
+                where: { companyId, managerId, deletedAt: null, createdAt: { gte: since } },
+            }),
+            this.prisma.deal.count({
+                where: {
+                    companyId, managerId, deletedAt: null,
+                    status: DealStatus.COMPLETED,
+                    createdAt: { gte: since },
+                },
+            }),
+        ]);
+
+        return {
+            periodDays: days,
+            leadsAssigned,
+            dealsCreated,
+            dealsWon,
+            conversionRate: leadsAssigned > 0 ? dealsWon / leadsAssigned : 0,
+        };
+    }
 }

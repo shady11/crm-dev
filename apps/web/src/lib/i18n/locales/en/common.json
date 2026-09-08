@@ -14,7 +14,11 @@
     "creating": "Creating...",
     "saving": "Saving...",
     "duplicate": "Duplicate",
-    "duplicating": "Duplicating..."
+    "duplicating": "Duplicating...",
+    "openWhatsApp": "WhatsApp",
+    "print": "Print",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied to clipboard"
   },
   "labels": {
     "status": "Status",

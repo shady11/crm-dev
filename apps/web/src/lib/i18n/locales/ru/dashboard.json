@@ -57,5 +57,21 @@
     "tasksDue_many": "{{count}} задач к сроку",
     "tasksDue_other": "{{count}} задачи к сроку",
     "noActivity": "Пока нет активности"
+  },
+  "myWorkToday": {
+    "title": "Моя работа сегодня",
+    "leadsHeading": "Лиды, требующие связи ({{count}})",
+    "leadsEmpty": "Сейчас нет лидов, требующих связи.",
+    "tasksHeading": "Задачи на сегодня ({{count}})",
+    "tasksEmpty": "На сегодня нет задач.",
+    "dealsHeading": "Сделки в ожидании клиента ({{count}})",
+    "dealsEmpty": "Нет сделок в ожидании клиента.",
+    "noDate": "Без даты"
+  },
+  "myPerformance": {
+    "title": "Моя эффективность за последние {{days}} дн.",
+    "leadsAssigned": "Назначено лидов",
+    "dealsWon": "Сделок закрыто",
+    "conversionRate": "Конверсия"
   }
 }

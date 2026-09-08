@@ -17,6 +17,7 @@ import {
 import {BadgeCheck, Bell, ChevronsUpDown, LogOut} from "lucide-react";
 import {disconnectNotificationsSocket} from "@/lib/socket.ts";
 import {useTranslation} from "react-i18next";
+import {paths} from "@/routes/paths.ts";
 
 export function NavUser({
                             user,
@@ -76,7 +77,7 @@ export function NavUser({
                             </MenuGroupLabel>
                         </MenuGroup>
                         <MenuGroup>
-                            <MenuItem value="account">
+                            <MenuItem value="account" onClick={() => navigate(paths.profile)}>
                                 <BadgeCheck />
                                 {t("userMenu.account")}
                             </MenuItem>

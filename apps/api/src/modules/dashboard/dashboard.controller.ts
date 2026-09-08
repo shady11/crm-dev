@@ -74,4 +74,23 @@ export class DashboardController {
     getTeamSnapshot(@CurrentUser() user: AuthUser) {
         return this.dashboardService.getTeamSnapshot(user);
     }
+
+    // SM-A2: a SALES_MANAGER's own "what needs doing today" view.
+    // SALES_MANAGER only — this is the individual contributor's standup view,
+    // not the team-lead rollup SALES_HEAD gets from team-snapshot above.
+    @Roles(UserRole.SALES_MANAGER)
+    @Get("my-work-today")
+    getMyWorkToday(@CurrentUser() user: AuthUser) {
+        return this.dashboardService.getMyWorkToday(user);
+    }
+
+    // SM-D1: a SALES_MANAGER's own deal count and conversion rate over a
+    // period. Self-scoped only, deliberately with no cross-visibility into
+    // teammates — see DashboardService.getMyPerformance.
+    @Roles(UserRole.SALES_MANAGER)
+    @Get("my-performance")
+    getMyPerformance(@CurrentUser() user: AuthUser, @Query("days") days?: string) {
+        const parsed = Number(days);
+        return this.dashboardService.getMyPerformance(user, Number.isFinite(parsed) && parsed > 0 ? parsed : 30);
+    }
 }

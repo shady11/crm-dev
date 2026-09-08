@@ -22,6 +22,7 @@ import {DEAL_STATUS_LABEL_KEYS, DEAL_STATUS_VISUALS} from "@/features/deals/type
 import {LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
 import {paths} from "@/routes/paths.ts";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
+import {WhatsAppLink} from "@/components/shared/whatsapp-link.tsx";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {UserRole} from "@/features/users/types/user.types";
@@ -107,10 +108,11 @@ export function ClientDetailsPage() {
                     <DataList className="divide-y">
                         <DataListItem>
                             <DataListItemLabel>{t("detail.phone")}</DataListItemLabel>
-                            <DataListItemValue>
+                            <DataListItemValue className="flex items-center gap-3">
                                 <a href={`tel:${client.phone}`} className="flex items-center gap-1.5 hover:text-foreground">
                                     <PhoneIcon size={14} />{client.phone}
                                 </a>
+                                <WhatsAppLink phone={client.whatsapp || client.phone} />
                             </DataListItemValue>
                         </DataListItem>
                         {client.whatsapp && (

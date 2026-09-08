@@ -94,7 +94,23 @@
     "overviewTab": "Обзор",
     "dealsTab": "Сделки",
     "noDeals": "Для этого юнита пока нет сделок.",
-    "bookButton": "Забронировать"
+    "bookButton": "Забронировать",
+    "infoSheetButton": "Инфолист"
+  },
+  "infoSheet": {
+    "title": "Юнит №{{number}}",
+    "generatedAt": "Сформировано {{date}}",
+    "project": "Проект",
+    "address": "Адрес",
+    "location": "Расположение",
+    "type": "Тип",
+    "rooms": "Комнат",
+    "area": "Площадь",
+    "price": "Цена",
+    "pricePerSqm": "Цена за м²",
+    "status": "Статус",
+    "printButton": "Печать / Сохранить как PDF",
+    "notFound": "Юнит не найден."
   },
   "chessboard": {
     "entranceLabel": "Подъезд {{name}}",

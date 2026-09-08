@@ -57,5 +57,21 @@
     "tasksDue_many": "{{count}} tasks due",
     "tasksDue_other": "{{count}} tasks due",
     "noActivity": "No activity yet"
+  },
+  "myWorkToday": {
+    "title": "My work today",
+    "leadsHeading": "Leads needing follow-up ({{count}})",
+    "leadsEmpty": "No leads need follow-up right now.",
+    "tasksHeading": "Tasks due today ({{count}})",
+    "tasksEmpty": "No tasks due today.",
+    "dealsHeading": "Deals waiting on the client ({{count}})",
+    "dealsEmpty": "No deals waiting on a client.",
+    "noDate": "No date"
+  },
+  "myPerformance": {
+    "title": "My performance, last {{days}} days",
+    "leadsAssigned": "Leads assigned",
+    "dealsWon": "Deals won",
+    "conversionRate": "Conversion rate"
   }
 }

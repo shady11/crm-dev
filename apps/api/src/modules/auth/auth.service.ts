@@ -5,6 +5,7 @@ import * as bcrypt from "bcrypt";
 import {AuthBranchSummary, AuthCompanySummary, AuthUser} from "@/common/types/auth-user.type";
 import {PrismaService} from "@/database/prisma.service";
 import {ChangePasswordDto} from "@/modules/auth/dto/change-password.dto";
+import {UpdateOwnProfileDto} from "@/modules/auth/dto/update-own-profile.dto";
 
 // Shapes a full Prisma Company row down to the subset the client needs -
 // used for both the login response and (via SessionValidationService) every
@@ -139,5 +140,26 @@ export class AuthService {
         };
 
         return { accessToken: await this.jwtService.signAsync(payload) };
+    }
+
+    /**
+     * SM-A1: lets any signed-in user fix their own name/phone — until now the
+     * only self-service PATCH was the password one above, so a typo at
+     * onboarding meant filing a request with an admin. Deliberately uses
+     * UpdateOwnProfileDto rather than UsersService.update()'s admin DTO: role,
+     * email, and isActive are not fields this endpoint can ever touch, so it
+     * can't be widened into a privilege-escalation path later.
+     */
+    async updateOwnProfile(user: AuthUser, dto: UpdateOwnProfileDto) {
+        const updated = await this.prisma.user.update({
+            where: {id: user.id},
+            data: {
+                fullName: dto.fullName,
+                phone: dto.phone,
+            },
+            select: {id: true, fullName: true, email: true, phone: true, role: true},
+        });
+
+        return updated;
     }
 }

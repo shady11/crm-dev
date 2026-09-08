@@ -22,6 +22,8 @@ enum ActivityAction {
 
   BRANCH_TRANSFERRED
   REASSIGNED
+
+  LOGGED_CONTACT_ATTEMPT
 }
 
 enum ActivityType {
@@ -52,6 +54,7 @@ enum ActivityType {
   CALL
   MEETING
   EMAIL
+  MESSAGE_SENT
 
   LEAD_BRANCH_TRANSFERRED
   CLIENT_BRANCH_TRANSFERRED

@@ -36,6 +36,7 @@ export class SessionValidationService {
                 id: true,
                 email: true,
                 fullName: true,
+                phone: true,
                 role: true,
                 companyId: true,
                 branchId: true,
@@ -142,6 +143,7 @@ export class SessionValidationService {
             id: user.id,
             email: user.email,
             name: user.fullName,
+            phone: user.phone,
             role: user.role,
             companyId: user.companyId,
             company: user.company

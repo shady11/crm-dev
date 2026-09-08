@@ -15,5 +15,23 @@
     "updateSuccessDescription": "Настройки компании обновлены.",
     "updateErrorTitle": "Не удалось сохранить настройки",
     "updateErrorDescription": "Что-то пошло не так. Попробуйте ещё раз."
+  },
+  "profile": {
+    "page": {
+      "heading": "Мой профиль",
+      "description": "Обновите своё имя и номер телефона.",
+      "formTitle": "Личные данные"
+    },
+    "fields": {
+      "fullName": "ФИО",
+      "email": "Email",
+      "phone": "Телефон"
+    },
+    "toasts": {
+      "updateSuccessTitle": "Профиль сохранён",
+      "updateSuccessDescription": "Ваш профиль обновлён.",
+      "updateErrorTitle": "Не удалось сохранить профиль",
+      "updateErrorDescription": "Что-то пошло не так. Попробуйте ещё раз."
+    }
   }
 }

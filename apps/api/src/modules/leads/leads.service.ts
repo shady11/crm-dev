@@ -11,6 +11,13 @@ import {QueryLeadsDto} from "@/modules/leads/dto/query-leads.dto";
 import {CreateLeadDto} from "@/modules/leads/dto/create-lead.dto";
 import {UpdateLeadDto} from "@/modules/leads/dto/update-lead.dto";
 import {ConvertLeadDto} from "@/modules/leads/dto/convert-lead.dto";
+import {ContactAttemptType, LogContactAttemptDto} from "@/modules/leads/dto/log-contact-attempt.dto";
+
+const CONTACT_ATTEMPT_TYPE_MAP: Record<ContactAttemptType, ActivityType> = {
+    CALL: ActivityType.CALL,
+    MESSAGE: ActivityType.MESSAGE_SENT,
+    MEETING: ActivityType.MEETING,
+};
 
 @Injectable()
 export class LeadsService {
@@ -469,6 +476,59 @@ export class LeadsService {
         });
 
         return updated;
+    }
+
+    /**
+     * SM-B1: records a contact attempt — a call, a message, or a meeting —
+     * against a lead even when nothing rises to the level of a task. Before
+     * this, the only record of interaction was the single freeform `comment`
+     * field, so two months of a cold lead looked identical to one that was
+     * called five times and never answered. Appends to the lead's Activity
+     * timeline instead, which findOne()'s access check already scopes to the
+     * caller's company/branch.
+     */
+    async logContactAttempt(user: AuthUser, id: string, dto: LogContactAttemptDto) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        await this.findOne(user, id);
+
+        return this.prisma.activity.create({
+            data: {
+                companyId: user.companyId,
+                userId: user.id,
+                leadId: id,
+                action: ActivityAction.LOGGED_CONTACT_ATTEMPT,
+                type: CONTACT_ATTEMPT_TYPE_MAP[dto.type],
+                title: "Contact attempt logged",
+                description: dto.note,
+            },
+            include: {
+                user: {select: {id: true, fullName: true}},
+            },
+        });
+    }
+
+    /**
+     * The other half of SM-B1: the timeline logContactAttempt() above appends
+     * to. Access is enforced the same way — findOne() 404s a lead outside the
+     * caller's company/branch before any activity is ever read.
+     */
+    async listActivities(user: AuthUser, id: string) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        await this.findOne(user, id);
+
+        return this.prisma.activity.findMany({
+            where: {leadId: id},
+            orderBy: {createdAt: "desc"},
+            include: {
+                user: {select: {id: true, fullName: true}},
+            },
+        });
     }
 
     async remove(user: AuthUser, id: string) {

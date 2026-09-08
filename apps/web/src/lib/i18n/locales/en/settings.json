@@ -15,5 +15,23 @@
     "updateSuccessDescription": "Your company settings were updated.",
     "updateErrorTitle": "Could not save settings",
     "updateErrorDescription": "Something went wrong. Please try again."
+  },
+  "profile": {
+    "page": {
+      "heading": "My profile",
+      "description": "Update your own name and phone number.",
+      "formTitle": "Personal details"
+    },
+    "fields": {
+      "fullName": "Full name",
+      "email": "Email",
+      "phone": "Phone"
+    },
+    "toasts": {
+      "updateSuccessTitle": "Profile saved",
+      "updateSuccessDescription": "Your profile was updated.",
+      "updateErrorTitle": "Could not save profile",
+      "updateErrorDescription": "Something went wrong. Please try again."
+    }
   }
 }
