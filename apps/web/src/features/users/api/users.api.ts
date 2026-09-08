@@ -57,6 +57,23 @@ export async function deleteUser(id: string) {
     await api.delete(`/users/${id}`);
 }
 
+export type DeactivationImpact = {
+    openLeads: number;
+    activeDeals: number;
+};
+
+export async function getDeactivationImpact(id: string) {
+    const response = await api.get<DeactivationImpact>(`/users/${id}/deactivation-impact`);
+    return response.data;
+}
+
+// The reassignment-aware counterpart to deleteUser() above — same effect
+// (soft-delete/deactivate), plus an optional reassignToId that moves the
+// target's open leads and active deals to a replacement manager first.
+export async function deactivateUser(id: string, reassignToId?: string) {
+    await api.post(`/users/${id}/deactivate`, reassignToId ? {reassignToId} : {});
+}
+
 export async function getUserRoleSummary() {
     const response = await api.get<UserRoleSummaryItem[]>("/users/role-summary");
     return response.data;

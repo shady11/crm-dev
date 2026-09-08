@@ -5,6 +5,7 @@ import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {
     createUser,
     type CreateUserPayload,
+    deactivateUser,
     deleteUser,
     getUserRoleSummary,
     getUsers,
@@ -34,6 +35,7 @@ export function useUsersList() {
 
     const [formOpen, setFormOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
+    const [pendingDeactivate, setPendingDeactivate] = useState<User | null>(null);
 
     const tableQuery = useQuery({
         queryKey: ["users", { statusFilter, roleFilter, search, page, limit }],
@@ -88,14 +90,16 @@ export function useUsersList() {
         },
     });
 
-    const deleteMutation = useMutation({
-        mutationFn: deleteUser,
+    const deactivateMutation = useMutation({
+        mutationFn: ({ id, reassignToId }: { id: string; reassignToId?: string }) =>
+            deactivateUser(id, reassignToId),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["users"] });
             toast.success({
                 title: t("toasts.deactivateSuccessTitle"),
                 description: t("toasts.deactivateSuccessDescription"),
             });
+            setPendingDeactivate(null);
         },
         onError: () => {
             toast.error({
@@ -262,8 +266,21 @@ export function useUsersList() {
         },
 
         actions: {
-            deleteUser: (id: string) => deleteMutation.mutate(id),
-            isDeleting: (id: string) => deleteMutation.isPending && deleteMutation.variables === id,
+            requestDeactivate: (user: User) => setPendingDeactivate(user),
+            isDeleting: (id: string) => deactivateMutation.isPending && deactivateMutation.variables?.id === id,
+        },
+
+        deactivateDialog: {
+            user: pendingDeactivate,
+            open: pendingDeactivate !== null,
+            isSubmitting: deactivateMutation.isPending,
+            onOpenChange: (open: boolean) => {
+                if (!open) setPendingDeactivate(null);
+            },
+            onConfirm: (reassignToId?: string) => {
+                if (!pendingDeactivate) return;
+                deactivateMutation.mutate({ id: pendingDeactivate.id, reassignToId });
+            },
         },
     };
 }

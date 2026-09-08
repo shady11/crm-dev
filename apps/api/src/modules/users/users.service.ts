@@ -9,9 +9,12 @@ import * as bcrypt from "bcrypt";
 import {Prisma, UserRole} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
+import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
+import {OPEN_LEAD_STATUSES} from "@/modules/leads/lead.constants";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UpdateUserDto} from "./dto/update-user.dto";
 import {UpdateUserPasswordDto} from "./dto/update-user-password.dto";
+import {DeactivateUserDto} from "./dto/deactivate-user.dto";
 import {QueryUsersDto} from "./dto/query-users.dto";
 import {canActorSeeRole, getManageableRoles} from "@/modules/users/users.constants";
 
@@ -207,10 +210,54 @@ export class UsersService {
         return { success: true };
     }
 
-    async remove(user: AuthUser, id: string) {
+    /**
+     * Counts the open leads and active deals a user currently manages, so the
+     * caller can decide whether to reassign them before deactivating — see
+     * remove() below. Not itself a mutation; safe to poll from a confirmation
+     * dialog.
+     */
+    async getDeactivationImpact(user: AuthUser, id: string) {
         if (!user.companyId) {
             throw new ForbiddenException("User does not belong to a company");
         }
+
+        await this.getManageableTargetOrThrow(user, id);
+
+        const [openLeads, activeDeals] = await Promise.all([
+            this.prisma.lead.count({
+                where: {
+                    companyId: user.companyId,
+                    managerId: id,
+                    deletedAt: null,
+                    status: { in: OPEN_LEAD_STATUSES },
+                },
+            }),
+            this.prisma.deal.count({
+                where: {
+                    companyId: user.companyId,
+                    managerId: id,
+                    deletedAt: null,
+                    status: { in: ACTIVE_DEAL_STATUSES },
+                },
+            }),
+        ]);
+
+        return { openLeads, activeDeals };
+    }
+
+    /**
+     * Deactivates a user (soft-delete). Optionally reassigns their open leads
+     * and in-progress deals to a replacement manager first — in the same
+     * transaction, so a mid-way failure can never leave the user deactivated
+     * with half their pipeline moved. Reassignment is opt-in: pass nothing and
+     * the records simply keep their old managerId, same as before this story.
+     */
+    async remove(user: AuthUser, id: string, dto?: DeactivateUserDto) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const companyId = user.companyId;
 
         if (id === user.id) {
             throw new BadRequestException("You cannot delete your own account");
@@ -218,12 +265,50 @@ export class UsersService {
 
         await this.getManageableTargetOrThrow(user, id);
 
-        await this.prisma.user.update({
-            where: { id },
-            data: {
-                isActive: false,
-                deletedAt: new Date(),
-            },
+        const reassignToId = dto?.reassignToId;
+
+        if (reassignToId) {
+            if (reassignToId === id) {
+                throw new BadRequestException("Cannot reassign to the user being deactivated");
+            }
+
+            const replacement = await this.getManageableTargetOrThrow(user, reassignToId);
+
+            if (!replacement.isActive) {
+                throw new BadRequestException("Cannot reassign to an inactive user");
+            }
+        }
+
+        await this.prisma.$transaction(async (db) => {
+            if (reassignToId) {
+                await db.lead.updateMany({
+                    where: {
+                        companyId,
+                        managerId: id,
+                        deletedAt: null,
+                        status: { in: OPEN_LEAD_STATUSES },
+                    },
+                    data: { managerId: reassignToId },
+                });
+
+                await db.deal.updateMany({
+                    where: {
+                        companyId,
+                        managerId: id,
+                        deletedAt: null,
+                        status: { in: ACTIVE_DEAL_STATUSES },
+                    },
+                    data: { managerId: reassignToId },
+                });
+            }
+
+            await db.user.update({
+                where: { id },
+                data: {
+                    isActive: false,
+                    deletedAt: new Date(),
+                },
+            });
         });
 
         return { success: true };

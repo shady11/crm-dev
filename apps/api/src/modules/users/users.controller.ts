@@ -10,6 +10,7 @@ import {UsersService} from "./users.service";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UpdateUserDto} from "./dto/update-user.dto";
 import {UpdateUserPasswordDto} from "./dto/update-user-password.dto";
+import {DeactivateUserDto} from "./dto/deactivate-user.dto";
 import {QueryUsersDto} from "./dto/query-users.dto";
 
 @UseGuards(JwtAuthGuard, CompanyGuard, RolesGuard)
@@ -61,6 +62,27 @@ export class UsersController {
     @Post(":id/revoke-sessions")
     revokeSessions(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.usersService.revokeSessions(user, id);
+    }
+
+    // Read before showing the deactivation confirmation — tells the caller
+    // whether this user still has open leads or active deals to reassign.
+    @Roles(UserRole.COMPANY_ADMIN)
+    @Get(":id/deactivation-impact")
+    getDeactivationImpact(@CurrentUser() user: AuthUser, @Param("id") id: string) {
+        return this.usersService.getDeactivationImpact(user, id);
+    }
+
+    // Same effect as DELETE below, plus an optional reassignment step. Kept as
+    // its own POST endpoint rather than a DELETE body — a body on a DELETE
+    // request is not something every client/proxy carries reliably.
+    @Roles(UserRole.COMPANY_ADMIN)
+    @Post(":id/deactivate")
+    deactivate(
+        @CurrentUser() user: AuthUser,
+        @Param("id") id: string,
+        @Body() dto: DeactivateUserDto,
+    ) {
+        return this.usersService.remove(user, id, dto);
     }
 
     @Roles(UserRole.COMPANY_ADMIN)

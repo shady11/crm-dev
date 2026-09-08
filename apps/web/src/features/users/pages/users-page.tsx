@@ -3,12 +3,14 @@ import {UsersToolbar} from "@/features/users/components/users-toolbar.tsx";
 import {UsersTable} from "@/features/users/components/users-table.tsx";
 import {UsersPagination} from "@/features/users/components/users-pagination.tsx";
 import {UserFormSheet} from "@/features/users/components/user-form-sheet.tsx";
+import {DeactivateUserDialog} from "@/features/users/components/deactivate-user-dialog.tsx";
 import {useUsersList} from "@/features/users/hooks/use-users-list.ts";
 import {UsersActionBar} from "@/features/users/components/users-action-bar.tsx";
 import {useTranslation} from "react-i18next";
 
 export function UsersPage() {
-    const { visibleRoles, filters, pagination, table, selection, roleCards, form, actions } = useUsersList();
+    const { visibleRoles, filters, pagination, table, selection, roleCards, form, actions, deactivateDialog } =
+        useUsersList();
     const { t } = useTranslation("users");
 
     return (
@@ -39,7 +41,7 @@ export function UsersPage() {
                     onToggleAll={selection.toggleSelectAll}
                     onToggleOne={selection.toggleSelectOne}
                     onEdit={form.openEditForm}
-                    onDelete={actions.deleteUser}
+                    onDelete={actions.requestDeactivate}
                     isDeleting={actions.isDeleting}
                 />
 
@@ -66,6 +68,14 @@ export function UsersPage() {
                 hasError={form.hasError}
                 onClose={form.closeForm}
                 onSubmit={form.handleSubmit}
+            />
+
+            <DeactivateUserDialog
+                user={deactivateDialog.user}
+                open={deactivateDialog.open}
+                isSubmitting={deactivateDialog.isSubmitting}
+                onOpenChange={deactivateDialog.onOpenChange}
+                onConfirm={deactivateDialog.onConfirm}
             />
         </div>
     );

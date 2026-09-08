@@ -24,7 +24,10 @@
     "deactivateDialog": {
       "title": "Deactivate user?",
       "description": "This will deactivate \"{{name}}\" and revoke their access. This can be reversed later by an admin.",
-      "confirm": "Deactivate"
+      "confirm": "Deactivate",
+      "impact": "{{name}} still manages {{openLeads}} open lead(s) and {{activeDeals}} active deal(s).",
+      "reassignLabel": "Reassign to",
+      "noReassignOption": "Don't reassign — deactivate only"
     }
   },
   "form": {
