@@ -12,6 +12,10 @@ export class QueryUsersDto {
     role?: UserRole;
 
     @IsOptional()
+    @IsString()
+    branchId?: string;
+
+    @IsOptional()
     @Transform(({ value }) => {
         if (value === undefined) return undefined;
         if (typeof value === "boolean") return value;

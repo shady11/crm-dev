@@ -1,4 +1,5 @@
 import {useState} from "react";
+import {Link} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
 import {useTranslation} from "react-i18next";
@@ -30,6 +31,7 @@ import {
 import type {Branch} from "../types/branch.types";
 import {isDeactivated} from "../types/branch.types";
 import {BranchFormSheet} from "../components/branch-form-sheet";
+import {paths} from "@/routes/paths";
 
 type Pending = {action: "deactivate" | "reactivate"; branch: Branch} | null;
 
@@ -139,7 +141,11 @@ export function BranchesPage() {
 
                                 return (
                                     <TableRow key={branch.id} className={deactivated ? "opacity-60" : undefined}>
-                                        <TableCell className="font-medium">{branch.name}</TableCell>
+                                        <TableCell className="font-medium">
+                                            <Link className="hover:underline" to={paths.branches.detail(branch.id)}>
+                                                {branch.name}
+                                            </Link>
+                                        </TableCell>
                                         <TableCell>{branch.city ?? "—"}</TableCell>
                                         <TableCell>{branch.phone ?? "—"}</TableCell>
                                         <TableCell>

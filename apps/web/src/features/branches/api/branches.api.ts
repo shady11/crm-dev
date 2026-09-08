@@ -1,6 +1,6 @@
 import {api} from "@/lib/api";
 import type {PaginatedResponse} from "@/lib/api-types";
-import type {Branch} from "../types/branch.types";
+import type {Branch, BranchDetails} from "../types/branch.types";
 
 export type GetBranchesParams = {
     page?: number;
@@ -14,8 +14,10 @@ export async function getBranches(params?: GetBranchesParams) {
     return response.data;
 }
 
+// Returns the branch's own fields plus its assigned users — see the branch
+// detail page, the only caller.
 export async function getBranch(id: string) {
-    const response = await api.get<Branch>(`/branches/${id}`);
+    const response = await api.get<BranchDetails>(`/branches/${id}`);
     return response.data;
 }
 

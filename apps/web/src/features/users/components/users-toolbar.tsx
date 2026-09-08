@@ -5,6 +5,7 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {USER_ROLE_LABEL_KEYS, type UserRole} from "@/features/users/types/user.types";
 import type {RoleFilterValue, StatusFilter} from "@/features/users/hooks/use-users-list.ts";
+import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
 import {useTranslation} from "react-i18next";
 
 interface UsersToolbarProps {
@@ -13,6 +14,8 @@ interface UsersToolbarProps {
     roleFilter: RoleFilterValue;
     onRoleFilterChange(value: RoleFilterValue): void;
     visibleRoles: UserRole[];
+    branchFilter: string | "all";
+    onBranchFilterChange(value: string | "all"): void;
     search: string;
     onSearchChange(value: string): void;
     onAddUser(): void;
@@ -27,6 +30,8 @@ export function UsersToolbar({
                                  roleFilter,
                                  onRoleFilterChange,
                                  visibleRoles,
+                                 branchFilter,
+                                 onBranchFilterChange,
                                  search,
                                  onSearchChange,
                                  onAddUser,
@@ -57,6 +62,8 @@ export function UsersToolbar({
             <h2 className="text-lg font-medium">{t("toolbar.heading")}</h2>
 
             <div className="flex flex-wrap items-center gap-2">
+                <BranchFilterSelect value={branchFilter} onChange={onBranchFilterChange} />
+
                 <Select
                     collection={statusCollection}
                     value={[statusFilter]}

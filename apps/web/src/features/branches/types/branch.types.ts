@@ -1,3 +1,5 @@
+import type {UserRole} from "@/features/users/types/user.types";
+
 export type Branch = {
     id: string;
     companyId: string;
@@ -14,3 +16,23 @@ export type Branch = {
 export function isDeactivated(branch: Pick<Branch, "deactivatedAt">): boolean {
     return branch.deactivatedAt !== null;
 }
+
+export type BranchUser = {
+    id: string;
+    fullName: string;
+    email: string;
+    phone: string | null;
+    role: UserRole;
+    isActive: boolean;
+    createdAt: string;
+};
+
+export type BranchStats = {
+    users: number;
+    activeUsers: number;
+};
+
+export type BranchDetails = Branch & {
+    users: BranchUser[];
+    stats: BranchStats;
+};

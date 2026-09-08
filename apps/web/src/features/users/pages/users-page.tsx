@@ -39,6 +39,8 @@ export function UsersPage() {
                     roleFilter={filters.roleFilter}
                     onRoleFilterChange={filters.setRoleFilter}
                     visibleRoles={visibleRoles}
+                    branchFilter={filters.branchFilter}
+                    onBranchFilterChange={filters.setBranchFilter}
                     search={filters.search}
                     onSearchChange={filters.setSearch}
                     onAddUser={form.openCreateForm}
