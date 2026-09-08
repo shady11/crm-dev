@@ -1,0 +1,43 @@
+enum AuditAction {
+  TENANT_CREATED
+  TENANT_SUSPENDED
+  TENANT_RESUMED
+  TENANT_DELETED
+
+  TENANT_USER_DEACTIVATED
+  TENANT_USER_REACTIVATED
+  TENANT_USER_PASSWORD_RESET
+
+  IMPERSONATION_STARTED
+  IMPERSONATION_ENDED
+  IMPERSONATED_ACTION
+}
+
+// A platform-operator audit trail, separate from Activity (which is a
+// per-tenant CRM feed and requires a companyId). Append-only: no deletedAt,
+// no delete endpoint. actorEmail is denormalized so an entry stays readable
+// even if the actor's own account is later changed or deactivated.
+model AuditLog {
+  id String @id @default(uuid())
+
+  actorId    String
+  actor      User   @relation("AuditLogActor", fields: [actorId], references: [id])
+  actorEmail String
+
+  action AuditAction
+
+  targetType String
+  targetId   String?
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([companyId])
+  @@index([actorId])
+  @@index([action])
+  @@index([createdAt])
+}

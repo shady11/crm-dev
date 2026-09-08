@@ -2,7 +2,22 @@ import {ConflictException} from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import {UserRole} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
+import {AuditLogService} from "@/modules/audit-log/audit-log.service";
+import {ImpersonationService} from "@/modules/impersonation/impersonation.service";
+import {AuthUser} from "@/common/types/auth-user.type";
 import {CompaniesService} from "./companies.service";
+
+const actor: AuthUser = {
+    id: "super-1",
+    email: "ops@crm.dev",
+    name: "Ops",
+    role: UserRole.SUPER_ADMIN,
+    companyId: null,
+    company: null,
+};
+
+const auditLog = {record: jest.fn()} as unknown as AuditLogService;
+const impersonation = {} as unknown as ImpersonationService;
 
 describe("CompaniesService", () => {
     const baseDto = {
@@ -35,13 +50,13 @@ describe("CompaniesService", () => {
             $transaction: jest.fn().mockImplementation((fn) => fn(tx)),
         } as unknown as PrismaService;
 
-        return {service: new CompaniesService(prisma), created};
+        return {service: new CompaniesService(prisma, auditLog, impersonation), created};
     };
 
     it("creates the company and its first admin together", async () => {
         const {service, created} = build();
 
-        await service.create({...baseDto});
+        await service.create(actor, {...baseDto});
 
         expect(created.company).toMatchObject({name: "Bishkek Dev"});
         expect(created.user).toMatchObject({role: UserRole.COMPANY_ADMIN, companyId: "company-1"});
@@ -50,7 +65,7 @@ describe("CompaniesService", () => {
     it("normalises the admin email so a differently-cased duplicate cannot slip through", async () => {
         const {service, created} = build();
 
-        await service.create({...baseDto});
+        await service.create(actor, {...baseDto});
 
         expect(created.user.email).toBe("admin@bishkekdev.kg");
     });
@@ -60,7 +75,7 @@ describe("CompaniesService", () => {
         // the company actually is.
         const {service, created} = build();
 
-        await service.create({...baseDto});
+        await service.create(actor, {...baseDto});
 
         expect(created.company).toMatchObject({currency: "KGS", locale: "ru-RU"});
     });
@@ -68,7 +83,7 @@ describe("CompaniesService", () => {
     it("returns a generated password once and stores only its hash", async () => {
         const {service, created} = build();
 
-        const result = await service.create({...baseDto});
+        const result = await service.create(actor, {...baseDto});
         const password = result.admin.generatedPassword;
 
         expect(typeof password).toBe("string");
@@ -79,7 +94,7 @@ describe("CompaniesService", () => {
     it("does not echo a password the caller supplied", async () => {
         const {service} = build();
 
-        const result = await service.create({...baseDto, adminPassword: "chosen-password"});
+        const result = await service.create(actor, {...baseDto, adminPassword: "chosen-password"});
 
         expect(result.admin.generatedPassword).toBeUndefined();
     });
@@ -89,13 +104,13 @@ describe("CompaniesService", () => {
         // before the transaction or it fails on a raw constraint instead.
         const {service} = build({existingUser: {id: "someone"}});
 
-        await expect(service.create({...baseDto})).rejects.toThrow(ConflictException);
+        await expect(service.create(actor, {...baseDto})).rejects.toThrow(ConflictException);
     });
 
     it("refuses a duplicate company name", async () => {
         const {service} = build({existingCompany: {id: "company-9"}});
 
-        await expect(service.create({...baseDto})).rejects.toThrow(ConflictException);
+        await expect(service.create(actor, {...baseDto})).rejects.toThrow(ConflictException);
     });
 });
 
@@ -111,7 +126,7 @@ describe("CompaniesService suspension", () => {
             deal: {count: jest.fn().mockResolvedValue(0)},
         } as unknown as PrismaService;
 
-        return {service: new CompaniesService(prisma), update};
+        return {service: new CompaniesService(prisma, auditLog, impersonation), update};
     };
 
     const active = {id: "c1", name: "X", suspendedAt: null, users: []};
@@ -123,7 +138,7 @@ describe("CompaniesService suspension", () => {
         // makes suspension reversible without guessing prior account state.
         const {service, update} = build(active);
 
-        await service.suspend("c1");
+        await service.suspend(actor, "c1");
 
         expect(update).toHaveBeenCalledTimes(1);
         expect(update.mock.calls[0][0].data).toEqual({suspendedAt: expect.any(Date)});
@@ -132,14 +147,14 @@ describe("CompaniesService suspension", () => {
     it("refuses to suspend an already-suspended company", async () => {
         const {service, update} = build(suspended);
 
-        await expect(service.suspend("c1")).rejects.toThrow(ConflictException);
+        await expect(service.suspend(actor, "c1")).rejects.toThrow(ConflictException);
         expect(update).not.toHaveBeenCalled();
     });
 
     it("resuming clears the timestamp", async () => {
         const {service, update} = build(suspended);
 
-        await service.resume("c1");
+        await service.resume(actor, "c1");
 
         expect(update.mock.calls[0][0].data).toEqual({suspendedAt: null});
     });
@@ -147,7 +162,7 @@ describe("CompaniesService suspension", () => {
     it("refuses to resume a company that is not suspended", async () => {
         const {service} = build(active);
 
-        await expect(service.resume("c1")).rejects.toThrow(ConflictException);
+        await expect(service.resume(actor, "c1")).rejects.toThrow(ConflictException);
     });
 
     it("deleting sets deletedAt and leaves the tenant's data intact", async () => {
@@ -156,7 +171,7 @@ describe("CompaniesService suspension", () => {
         // be able to destroy them.
         const {service, update} = build(active);
 
-        await service.remove("c1");
+        await service.remove(actor, "c1");
 
         expect(update.mock.calls[0][0].data).toEqual({deletedAt: expect.any(Date)});
     });

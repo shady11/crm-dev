@@ -115,6 +115,46 @@
         "name": "Name",
         "role": "Role",
         "status": "Status"
+      },
+      "rowActions": {
+        "deactivate": "Deactivate {{name}}",
+        "reactivate": "Reactivate {{name}}",
+        "resetPassword": "Reset password for {{name}}",
+        "impersonate": "View as {{name}}"
+      },
+      "confirmDialog": {
+        "deactivate": {
+          "title": "Deactivate this user?",
+          "body": "They are signed out immediately and cannot log in until reactivated.",
+          "confirm": "Deactivate"
+        },
+        "reactivate": {
+          "title": "Reactivate this user?",
+          "body": "They will be able to log in again immediately.",
+          "confirm": "Reactivate"
+        },
+        "resetPassword": {
+          "title": "Reset this user's password?",
+          "body": "A new password is generated and shown once. Their existing sessions are signed out.",
+          "confirm": "Reset password"
+        },
+        "impersonate": {
+          "title": "View the app as this user?",
+          "body": "You will see exactly what they see, for a limited time. Actions you take are performed as them, and are logged against your account.",
+          "confirm": "View as this user"
+        }
+      },
+      "resetResult": {
+        "title": "Password reset",
+        "email": "User:",
+        "passwordLabel": "Generated password — shown once, and not recoverable afterwards:",
+        "passwordHint": "Give it to them directly and have them change it at first login.",
+        "confirm": "I have saved it"
+      },
+      "toasts": {
+        "deactivated": "{{name}} deactivated",
+        "reactivated": "{{name}} reactivated",
+        "actionError": "That did not work"
       }
     }
   }

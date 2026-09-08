@@ -53,6 +53,7 @@ export const FEATURE_ROLES = {
     // and is refused by CompanyGuard everywhere else in the app, so this is the
     // one feature they can reach.
     companies: [UserRole.SUPER_ADMIN],
+    auditLog: [UserRole.SUPER_ADMIN],
 } as const satisfies Record<string, readonly UserRole[]>;
 
 export type Feature = keyof typeof FEATURE_ROLES;

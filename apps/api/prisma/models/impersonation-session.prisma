@@ -1,0 +1,26 @@
+// Its own table rather than a reuse of the normal session/JWT mechanism —
+// impersonation is the single largest new risk surface a SUPER_ADMIN has, and
+// needs to be independently revocable, expirable, and auditable regardless of
+// what the issued JWT itself says.
+model ImpersonationSession {
+  id String @id @default(uuid())
+
+  superAdminId String
+  superAdmin   User   @relation("ImpersonationsStarted", fields: [superAdminId], references: [id])
+
+  targetUserId String
+  targetUser   User   @relation("ImpersonationsReceived", fields: [targetUserId], references: [id])
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  startedAt DateTime  @default(now())
+  expiresAt DateTime
+  endedAt   DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([superAdminId])
+  @@index([targetUserId])
+  @@index([companyId])
+}

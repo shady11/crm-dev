@@ -50,6 +50,7 @@
     "projects": "Projects",
     "companies": "Companies",
     "users": "Users",
+    "auditLog": "Audit log",
     "brandName": "CRM Dev",
     "brandTagline": "Real Estate CRM",
     "chessboard": "Chessboard",
@@ -78,5 +79,11 @@
     "title": "Page not found",
     "description": "The page you're looking for doesn't exist or may have been moved.",
     "goToDashboard": "Go to Dashboard"
+  },
+  "impersonation": {
+    "banner": "Viewing as {{name}} — {{company}}",
+    "exit": "Exit",
+    "exiting": "Exiting...",
+    "exitError": "Could not exit. Try again."
   }
 }

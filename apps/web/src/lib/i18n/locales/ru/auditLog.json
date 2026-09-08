@@ -1,0 +1,39 @@
+{
+  "page": {
+    "heading": "Журнал аудита",
+    "description": "Привилегированные действия на платформе по всем тенантам — только добавление, без удаления.",
+    "filters": {
+      "companyId": "ID тенанта",
+      "companyIdPlaceholder": "Фильтр по ID тенанта",
+      "action": "Действие",
+      "allActions": "Все действия",
+      "dateFrom": "С",
+      "dateTo": "По"
+    },
+    "table": {
+      "headers": {
+        "timestamp": "Когда",
+        "actor": "Кто",
+        "action": "Действие",
+        "target": "Объект",
+        "tenant": "Тенант"
+      }
+    },
+    "empty": {
+      "title": "Нет записей",
+      "description": "Ничего не соответствует этим фильтрам."
+    },
+    "actions": {
+      "TENANT_CREATED": "Тенант создан",
+      "TENANT_SUSPENDED": "Тенант приостановлен",
+      "TENANT_RESUMED": "Тенант возобновлён",
+      "TENANT_DELETED": "Тенант удалён",
+      "TENANT_USER_DEACTIVATED": "Пользователь деактивирован",
+      "TENANT_USER_REACTIVATED": "Пользователь активирован",
+      "TENANT_USER_PASSWORD_RESET": "Пароль сброшен",
+      "IMPERSONATION_STARTED": "Начат вход от имени пользователя",
+      "IMPERSONATION_ENDED": "Завершён вход от имени пользователя",
+      "IMPERSONATED_ACTION": "Действие от имени пользователя"
+    }
+  }
+}
