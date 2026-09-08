@@ -1,7 +1,7 @@
 import {Module} from '@nestjs/common';
 import {ConfigModule} from "@nestjs/config";
 import {validateEnv} from "@/config/env.config";
-import {APP_FILTER, APP_GUARD} from "@nestjs/core";
+import {APP_FILTER, APP_GUARD, APP_INTERCEPTOR} from "@nestjs/core";
 import {ThrottlerGuard, ThrottlerModule} from "@nestjs/throttler";
 import {AllExceptionsFilter} from "@/common/filters/all-exceptions.filter";
 import {HealthModule} from "@/modules/health/health.module";
@@ -24,6 +24,8 @@ import {DocumentsModule} from "@/modules/documents/documents.module";
 import {ScheduleModule} from "@nestjs/schedule";
 import {NotificationsModule} from "@/modules/notifications/notifications.module";
 import {DashboardModule} from "@/modules/dashboard/dashboard.module";
+import {AuditLogModule} from "@/modules/audit-log/audit-log.module";
+import {ImpersonationAuditInterceptor} from "@/common/interceptors/impersonation-audit.interceptor";
 
 @Module({
   imports: [
@@ -69,6 +71,8 @@ import {DashboardModule} from "@/modules/dashboard/dashboard.module";
       // Tenant administration. Unlike every other feature module this one is
       // not company-scoped — see companies.controller.ts.
       CompaniesModule,
+      // Platform-wide, append-only audit trail for SUPER_ADMIN actions.
+      AuditLogModule,
   ],
   providers: [
       {
@@ -78,6 +82,10 @@ import {DashboardModule} from "@/modules/dashboard/dashboard.module";
       {
           provide: APP_FILTER,
           useClass: AllExceptionsFilter,
+      },
+      {
+          provide: APP_INTERCEPTOR,
+          useClass: ImpersonationAuditInterceptor,
       },
   ],
 })

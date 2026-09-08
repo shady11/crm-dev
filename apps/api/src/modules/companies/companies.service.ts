@@ -1,9 +1,12 @@
-import {ConflictException, Injectable, NotFoundException} from "@nestjs/common";
+import {ConflictException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
 import {randomBytes} from "crypto";
 import * as bcrypt from "bcrypt";
-import {Prisma, UserRole} from "@/generated/prisma/client";
+import {AuditAction, Prisma, UserRole} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
+import {AuditLogService} from "@/modules/audit-log/audit-log.service";
+import {ImpersonationService} from "@/modules/impersonation/impersonation.service";
+import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateCompanyDto} from "./dto/create-company.dto";
 import {UpdateCompanyDto} from "./dto/update-company.dto";
 import {QueryCompaniesDto} from "./dto/query-companies.dto";
@@ -34,7 +37,11 @@ const COMPANY_SELECT = {
 
 @Injectable()
 export class CompaniesService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly auditLog: AuditLogService,
+        private readonly impersonation: ImpersonationService,
+    ) {}
 
     async findAll(query: QueryCompaniesDto) {
         const page = query.page ?? 1;
@@ -147,7 +154,7 @@ export class CompaniesService {
      * The generated password is returned exactly once, in this response. It is
      * never stored in plaintext and cannot be read back afterwards.
      */
-    async create(dto: CreateCompanyDto) {
+    async create(actor: AuthUser, dto: CreateCompanyDto) {
         const adminEmail = dto.adminEmail.trim().toLowerCase();
 
         const existingUser = await this.prisma.user.findUnique({where: {email: adminEmail}});
@@ -193,6 +200,16 @@ export class CompaniesService {
             return created;
         });
 
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.TENANT_CREATED,
+            targetType: "Company",
+            targetId: company.id,
+            companyId: company.id,
+            metadata: {name: company.name, adminEmail},
+        });
+
         return {
             company,
             admin: {
@@ -232,32 +249,54 @@ export class CompaniesService {
      * resuming does not have to reconstruct which accounts were already
      * inactive before the suspension.
      */
-    async suspend(id: string) {
+    async suspend(actor: AuthUser, id: string) {
         const company = await this.findOne(id);
 
         if (company.suspendedAt) {
             throw new ConflictException("This company is already suspended");
         }
 
-        return this.prisma.company.update({
+        const updated = await this.prisma.company.update({
             where: {id},
             data: {suspendedAt: new Date()},
             select: COMPANY_SELECT,
         });
+
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.TENANT_SUSPENDED,
+            targetType: "Company",
+            targetId: id,
+            companyId: id,
+        });
+
+        return updated;
     }
 
-    async resume(id: string) {
+    async resume(actor: AuthUser, id: string) {
         const company = await this.findOne(id);
 
         if (!company.suspendedAt) {
             throw new ConflictException("This company is not suspended");
         }
 
-        return this.prisma.company.update({
+        const updated = await this.prisma.company.update({
             where: {id},
             data: {suspendedAt: null},
             select: COMPANY_SELECT,
         });
+
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.TENANT_RESUMED,
+            targetType: "Company",
+            targetId: id,
+            companyId: id,
+        });
+
+        return updated;
     }
 
     /**
@@ -270,7 +309,7 @@ export class CompaniesService {
      * back or disputed something, and destroying them on one click is not a
      * decision this endpoint should be able to make.
      */
-    async remove(id: string) {
+    async remove(actor: AuthUser, id: string) {
         await this.findOne(id);
 
         await this.prisma.company.update({
@@ -278,6 +317,173 @@ export class CompaniesService {
             data: {deletedAt: new Date()},
         });
 
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.TENANT_DELETED,
+            targetType: "Company",
+            targetId: id,
+            companyId: id,
+        });
+
         return {success: true};
+    }
+
+    /**
+     * Loads a tenant's user, scoped to that tenant. Used by the three
+     * intervention actions below — deliberately requires companyId to match
+     * the URL's tenant, which is also what keeps a SUPER_ADMIN target (whose
+     * companyId is always null) unreachable through this path.
+     */
+    private async getTenantUserOrThrow(companyId: string, userId: string) {
+        const target = await this.prisma.user.findFirst({
+            where: {id: userId, companyId, deletedAt: null},
+        });
+
+        if (!target) {
+            throw new NotFoundException("User not found");
+        }
+
+        return target;
+    }
+
+    /**
+     * Deactivates a tenant's user. For when the tenant's own COMPANY_ADMIN is
+     * unreachable, or is the person locked out. Bumps sessionsValidFrom so any
+     * session the user already holds stops on its next request.
+     */
+    async deactivateUser(actor: AuthUser, companyId: string, userId: string) {
+        const target = await this.getTenantUserOrThrow(companyId, userId);
+
+        if (!target.isActive) {
+            throw new ConflictException("This user is already deactivated");
+        }
+
+        await this.prisma.user.update({
+            where: {id: userId},
+            data: {isActive: false, sessionsValidFrom: new Date()},
+        });
+
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.TENANT_USER_DEACTIVATED,
+            targetType: "User",
+            targetId: userId,
+            companyId,
+            metadata: {email: target.email},
+        });
+
+        return {success: true};
+    }
+
+    // Reverses deactivateUser, kept as a separate endpoint for the same reason
+    // suspend/resume are: a mistyped payload cannot turn one into the other.
+    async reactivateUser(actor: AuthUser, companyId: string, userId: string) {
+        const target = await this.getTenantUserOrThrow(companyId, userId);
+
+        if (target.isActive) {
+            throw new ConflictException("This user is not deactivated");
+        }
+
+        await this.prisma.user.update({
+            where: {id: userId},
+            data: {isActive: true},
+        });
+
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.TENANT_USER_REACTIVATED,
+            targetType: "User",
+            targetId: userId,
+            companyId,
+            metadata: {email: target.email},
+        });
+
+        return {success: true};
+    }
+
+    /**
+     * Resets a tenant user's password to a freshly generated one, returned
+     * exactly once — the same shape and never-stored-in-plaintext guarantee as
+     * the admin password generated on tenant creation. Never reads the old
+     * password; bumps sessionsValidFrom so a leaked old password stops working
+     * immediately.
+     */
+    async resetUserPassword(actor: AuthUser, companyId: string, userId: string) {
+        const target = await this.getTenantUserOrThrow(companyId, userId);
+
+        const password = randomBytes(18).toString("base64url");
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        await this.prisma.user.update({
+            where: {id: userId},
+            data: {passwordHash, sessionsValidFrom: new Date()},
+        });
+
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.TENANT_USER_PASSWORD_RESET,
+            targetType: "User",
+            targetId: userId,
+            companyId,
+            metadata: {email: target.email},
+        });
+
+        return {email: target.email, generatedPassword: password};
+    }
+
+    /**
+     * Starts a time-limited impersonation session for support: the SUPER_ADMIN
+     * gets a token scoped to exactly this user's own permissions, never
+     * elevated beyond what they have. Impersonating a SUPER_ADMIN account is
+     * never permitted, even by another SUPER_ADMIN — enforced explicitly here
+     * even though a SUPER_ADMIN target (companyId: null) could never match the
+     * tenant-scoped lookup below in the first place.
+     */
+    async impersonateUser(actor: AuthUser, companyId: string, userId: string) {
+        const company = await this.prisma.company.findFirst({
+            where: {id: companyId, deletedAt: null},
+            select: {id: true, name: true, currency: true, locale: true, timezone: true, suspendedAt: true},
+        });
+
+        if (!company) {
+            throw new NotFoundException("Company not found");
+        }
+
+        if (company.suspendedAt) {
+            throw new ConflictException("This company is suspended");
+        }
+
+        const target = await this.getTenantUserOrThrow(companyId, userId);
+
+        if (target.role === UserRole.SUPER_ADMIN) {
+            throw new ForbiddenException("SUPER_ADMIN accounts cannot be impersonated");
+        }
+
+        if (!target.isActive) {
+            throw new ConflictException("This user is deactivated");
+        }
+
+        return this.impersonation.start(
+            actor,
+            {
+                id: target.id,
+                email: target.email,
+                fullName: target.fullName,
+                role: target.role,
+                companyId,
+                phone: target.phone,
+            },
+            {
+                id: company.id,
+                name: company.name,
+                currency: company.currency,
+                locale: company.locale,
+                timezone: company.timezone,
+            },
+        );
     }
 }

@@ -23,6 +23,8 @@ describe("tenant boundary", () => {
         health: "returns no data; polled by an uptime monitor",
         companies: "SUPER_ADMIN tenant administration, not data inside a tenant",
         references: "returns enum values only — no rows, nothing tenant-specific",
+        "audit-log": "SUPER_ADMIN platform-wide audit trail, not data inside a tenant",
+        impersonation: "acts on behalf of a SUPER_ADMIN, who has no companyId of their own",
     };
 
     /** Controllers reachable without a token, and why. */

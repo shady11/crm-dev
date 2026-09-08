@@ -34,4 +34,9 @@ model User {
   deletedAt DateTime?
 
   notifications Notification[]
+
+  auditLogs AuditLog[] @relation("AuditLogActor")
+
+  impersonationsStarted  ImpersonationSession[] @relation("ImpersonationsStarted")
+  impersonationsReceived ImpersonationSession[] @relation("ImpersonationsReceived")
 }

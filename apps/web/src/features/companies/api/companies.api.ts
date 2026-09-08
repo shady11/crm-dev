@@ -1,5 +1,6 @@
 import {api} from "@/lib/api";
 import type {PaginatedResponse} from "@/lib/api-types";
+import type {ImpersonateResponse} from "@/features/auth/types/auth.types";
 import type {Company, CompanyDetails} from "../types/company.types";
 
 export type CompanyStatusFilter = "all" | "active" | "suspended";
@@ -70,5 +71,41 @@ export async function resumeCompany(id: string) {
 
 export async function deleteCompany(id: string) {
     const response = await api.delete<{success: boolean}>(`/companies/${id}`);
+    return response.data;
+}
+
+// Deactivate/reactivate are separate endpoints rather than an isActive field,
+// for the same reason suspend/resume are.
+export async function deactivateCompanyUser(companyId: string, userId: string) {
+    const response = await api.post<{success: boolean}>(
+        `/companies/${companyId}/users/${userId}/deactivate`,
+    );
+    return response.data;
+}
+
+export async function reactivateCompanyUser(companyId: string, userId: string) {
+    const response = await api.post<{success: boolean}>(
+        `/companies/${companyId}/users/${userId}/reactivate`,
+    );
+    return response.data;
+}
+
+export type ResetCompanyUserPasswordResult = {
+    email: string;
+    /** Shown once, never readable again. */
+    generatedPassword: string;
+};
+
+export async function resetCompanyUserPassword(companyId: string, userId: string) {
+    const response = await api.post<ResetCompanyUserPasswordResult>(
+        `/companies/${companyId}/users/${userId}/reset-password`,
+    );
+    return response.data;
+}
+
+export async function impersonateCompanyUser(companyId: string, userId: string) {
+    const response = await api.post<ImpersonateResponse>(
+        `/companies/${companyId}/users/${userId}/impersonate`,
+    );
     return response.data;
 }

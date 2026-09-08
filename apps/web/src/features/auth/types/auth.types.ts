@@ -13,6 +13,13 @@ export type AuthCompanySummary = {
     timezone: string | null;
 };
 
+export type AuthImpersonationSummary = {
+    sessionId: string;
+    superAdminId: string;
+    superAdminEmail: string;
+    superAdminName: string;
+};
+
 export type AuthUser = {
     id: string;
     email: string;
@@ -22,6 +29,8 @@ export type AuthUser = {
     // Re-fetched by the API on every request (never baked into the JWT), so
     // this always reflects the company's current settings.
     company: AuthCompanySummary | null;
+    // Present only while the active session is an impersonated one.
+    impersonation?: AuthImpersonationSummary | null;
 };
 
 export type LoginResponse = {
@@ -35,4 +44,14 @@ export type LoginResponse = {
         companyId: string | null;
         company: AuthCompanySummary | null;
     };
+};
+
+export type ImpersonateResponse = {
+    accessToken: string;
+    expiresAt: string;
+    user: LoginResponse["user"];
+};
+
+export type EndImpersonationResponse = {
+    accessToken: string;
 };

@@ -22,6 +22,7 @@ import {
     Handshake,
     LayoutDashboard,
     ListTodo,
+    ScrollText,
     SquareUser,
     Users
 } from "lucide-react";
@@ -43,6 +44,7 @@ const NAV_ITEMS: {
     { titleKey: "nav.projects", feature: "projects", url: "/projects", icon: Building2 },
     { titleKey: "nav.companies", feature: "companies", url: "/companies", icon: Landmark },
     { titleKey: "nav.users", feature: "users", url: "/users", icon: Users },
+    { titleKey: "nav.auditLog", feature: "auditLog", url: "/audit-log", icon: ScrollText },
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

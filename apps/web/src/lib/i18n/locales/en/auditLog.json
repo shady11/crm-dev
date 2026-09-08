@@ -1,0 +1,39 @@
+{
+  "page": {
+    "heading": "Audit log",
+    "description": "Privileged platform actions across every tenant — append-only, never deleted.",
+    "filters": {
+      "companyId": "Tenant ID",
+      "companyIdPlaceholder": "Filter by tenant ID",
+      "action": "Action",
+      "allActions": "All actions",
+      "dateFrom": "From",
+      "dateTo": "To"
+    },
+    "table": {
+      "headers": {
+        "timestamp": "When",
+        "actor": "Actor",
+        "action": "Action",
+        "target": "Target",
+        "tenant": "Tenant"
+      }
+    },
+    "empty": {
+      "title": "No entries",
+      "description": "Nothing matches these filters."
+    },
+    "actions": {
+      "TENANT_CREATED": "Tenant created",
+      "TENANT_SUSPENDED": "Tenant suspended",
+      "TENANT_RESUMED": "Tenant resumed",
+      "TENANT_DELETED": "Tenant deleted",
+      "TENANT_USER_DEACTIVATED": "User deactivated",
+      "TENANT_USER_REACTIVATED": "User reactivated",
+      "TENANT_USER_PASSWORD_RESET": "Password reset",
+      "IMPERSONATION_STARTED": "Impersonation started",
+      "IMPERSONATION_ENDED": "Impersonation ended",
+      "IMPERSONATED_ACTION": "Action while impersonating"
+    }
+  }
+}

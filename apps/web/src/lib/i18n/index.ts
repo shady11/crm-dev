@@ -19,6 +19,7 @@ import clientsEn from "./locales/en/clients.json";
 import blocksEn from "./locales/en/blocks.json";
 import entrancesEn from "./locales/en/entrances.json";
 import floorsEn from "./locales/en/floors.json";
+import auditLogEn from "./locales/en/auditLog.json";
 
 import commonRu from "./locales/ru/common.json";
 import dealsRu from "./locales/ru/deals.json";
@@ -37,6 +38,7 @@ import clientsRu from "./locales/ru/clients.json";
 import blocksRu from "./locales/ru/blocks.json";
 import entrancesRu from "./locales/ru/entrances.json";
 import floorsRu from "./locales/ru/floors.json";
+import auditLogRu from "./locales/ru/auditLog.json";
 
 export const resources = {
     en: {
@@ -57,6 +59,7 @@ export const resources = {
         blocks: blocksEn,
         entrances: entrancesEn,
         floors: floorsEn,
+        auditLog: auditLogEn,
     },
     ru: {
         common: commonRu,
@@ -76,6 +79,7 @@ export const resources = {
         blocks: blocksRu,
         entrances: entrancesRu,
         floors: floorsRu,
+        auditLog: auditLogRu,
     },
 } as const;
 

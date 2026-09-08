@@ -29,4 +29,8 @@ model Company {
 
   notifications      Notification[]
   dealNumberCounters DealNumberCounter[]
+
+  auditLogs AuditLog[]
+
+  impersonationSessions ImpersonationSession[]
 }

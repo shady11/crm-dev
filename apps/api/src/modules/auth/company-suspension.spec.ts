@@ -1,10 +1,13 @@
 import {UnauthorizedException} from "@nestjs/common";
+import {ConfigService} from "@nestjs/config";
 import {JwtService} from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
 import {PrismaService} from "@/database/prisma.service";
 import {UsersService} from "@/modules/users/users.service";
 import {AuthService} from "./auth.service";
 import {SessionValidationService, type JwtPayload} from "./session-validation.service";
+
+const configService = {get: jest.fn()} as unknown as ConfigService;
 
 /**
  * Suspending a tenant changes exactly one field on the company row. What makes
@@ -32,7 +35,7 @@ describe("company suspension is enforced at auth", () => {
             },
         } as unknown as PrismaService;
 
-        return new SessionValidationService(prisma);
+        return new SessionValidationService(prisma, configService);
     };
 
     it.each([
@@ -65,7 +68,7 @@ describe("company suspension is enforced at auth", () => {
         } as unknown as PrismaService;
 
         await expect(
-            new SessionValidationService(prisma).validate({...payload, id: "s1"}),
+            new SessionValidationService(prisma, configService).validate({...payload, id: "s1"}),
         ).resolves.toMatchObject({role: "SUPER_ADMIN", companyId: null});
     });
 

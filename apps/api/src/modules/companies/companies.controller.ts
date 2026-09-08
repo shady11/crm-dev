@@ -3,6 +3,8 @@ import {UserRole} from "@/generated/prisma/enums";
 import {JwtAuthGuard} from "@/modules/auth/guards/jwt-auth.guard";
 import {RolesGuard} from "@/common/guards/roles.guard";
 import {Roles} from "@/common/decorators/roles.decorator";
+import {CurrentUser} from "@/common/decorators/current-user.decorator";
+import {AuthUser} from "@/common/types/auth-user.type";
 import {CompaniesService} from "./companies.service";
 import {CreateCompanyDto} from "./dto/create-company.dto";
 import {UpdateCompanyDto} from "./dto/update-company.dto";
@@ -33,8 +35,8 @@ export class CompaniesController {
     }
 
     @Post()
-    create(@Body() dto: CreateCompanyDto) {
-        return this.companiesService.create(dto);
+    create(@CurrentUser() actor: AuthUser, @Body() dto: CreateCompanyDto) {
+        return this.companiesService.create(actor, dto);
     }
 
     @Patch(":id")
@@ -45,17 +47,57 @@ export class CompaniesController {
     // Suspension is reversible; deletion is not. Kept as separate endpoints so
     // a client cannot turn one into the other by changing a payload field.
     @Post(":id/suspend")
-    suspend(@Param("id") id: string) {
-        return this.companiesService.suspend(id);
+    suspend(@CurrentUser() actor: AuthUser, @Param("id") id: string) {
+        return this.companiesService.suspend(actor, id);
     }
 
     @Post(":id/resume")
-    resume(@Param("id") id: string) {
-        return this.companiesService.resume(id);
+    resume(@CurrentUser() actor: AuthUser, @Param("id") id: string) {
+        return this.companiesService.resume(actor, id);
     }
 
     @Delete(":id")
-    remove(@Param("id") id: string) {
-        return this.companiesService.remove(id);
+    remove(@CurrentUser() actor: AuthUser, @Param("id") id: string) {
+        return this.companiesService.remove(actor, id);
+    }
+
+    // Intervention on a tenant's own users, for when its COMPANY_ADMIN is
+    // unreachable or is the person locked out. Deactivate/reactivate are kept
+    // as separate endpoints for the same reason suspend/resume are: a mistyped
+    // payload cannot turn one into the other.
+    @Post(":id/users/:userId/deactivate")
+    deactivateUser(
+        @CurrentUser() actor: AuthUser,
+        @Param("id") id: string,
+        @Param("userId") userId: string,
+    ) {
+        return this.companiesService.deactivateUser(actor, id, userId);
+    }
+
+    @Post(":id/users/:userId/reactivate")
+    reactivateUser(
+        @CurrentUser() actor: AuthUser,
+        @Param("id") id: string,
+        @Param("userId") userId: string,
+    ) {
+        return this.companiesService.reactivateUser(actor, id, userId);
+    }
+
+    @Post(":id/users/:userId/reset-password")
+    resetUserPassword(
+        @CurrentUser() actor: AuthUser,
+        @Param("id") id: string,
+        @Param("userId") userId: string,
+    ) {
+        return this.companiesService.resetUserPassword(actor, id, userId);
+    }
+
+    @Post(":id/users/:userId/impersonate")
+    impersonateUser(
+        @CurrentUser() actor: AuthUser,
+        @Param("id") id: string,
+        @Param("userId") userId: string,
+    ) {
+        return this.companiesService.impersonateUser(actor, id, userId);
     }
 }
