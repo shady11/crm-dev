@@ -12,18 +12,13 @@
       "title": "No branches found",
       "description": "Try adjusting your search, or create your first branch."
     },
-    "table": {
-      "headers": {
-        "name": "Name",
-        "city": "City",
-        "phone": "Phone",
-        "status": "Status"
-      }
-    },
-    "rowActions": {
-      "edit": "Edit {{name}}",
-      "deactivate": "Deactivate {{name}}",
-      "reactivate": "Reactivate {{name}}"
+    "card": {
+      "phoneLabel": "Phone",
+      "noDetails": "No details added",
+      "edit": "Edit",
+      "deactivate": "Deactivate",
+      "reactivate": "Reactivate",
+      "view": "View"
     },
     "confirmDialog": {
       "working": "Working…",

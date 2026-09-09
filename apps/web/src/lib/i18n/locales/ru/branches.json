@@ -12,18 +12,13 @@
       "title": "Филиалы не найдены",
       "description": "Измените запрос поиска или создайте первый филиал."
     },
-    "table": {
-      "headers": {
-        "name": "Название",
-        "city": "Город",
-        "phone": "Телефон",
-        "status": "Статус"
-      }
-    },
-    "rowActions": {
-      "edit": "Редактировать {{name}}",
-      "deactivate": "Деактивировать {{name}}",
-      "reactivate": "Активировать {{name}}"
+    "card": {
+      "phoneLabel": "Телефон",
+      "noDetails": "Нет данных",
+      "edit": "Редактировать",
+      "deactivate": "Деактивировать",
+      "reactivate": "Активировать",
+      "view": "Просмотр"
     },
     "confirmDialog": {
       "working": "Выполняется…",
