@@ -155,4 +155,16 @@ export class DealActivityService {
             title: 'Deal reassigned to another manager',
         });
     }
+
+    documentGenerated(
+        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+        title: string,
+    ) {
+        return this.create({
+            ...params,
+            action: ActivityAction.GENERATED_DOCUMENT,
+            type: ActivityType.DOCUMENT_GENERATED,
+            title,
+        });
+    }
 }

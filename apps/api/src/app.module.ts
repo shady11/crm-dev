@@ -23,6 +23,7 @@ import {SettingOptionsModule} from '@/modules/setting-options/setting-options.mo
 import {DealsModule} from "@/modules/deals/deals.module";
 import {TasksModule} from "@/modules/tasks/tasks.module";
 import {DocumentsModule} from "@/modules/documents/documents.module";
+import {DocumentGenerationModule} from "@/modules/document-generation/document-generation.module";
 import {ScheduleModule} from "@nestjs/schedule";
 import {NotificationsModule} from "@/modules/notifications/notifications.module";
 import {DashboardModule} from "@/modules/dashboard/dashboard.module";
@@ -68,6 +69,7 @@ import {ImpersonationAuditInterceptor} from "@/common/interceptors/impersonation
       DealsModule,
       TasksModule,
       DocumentsModule,
+      DocumentGenerationModule,
       NotificationsModule,
       DashboardModule,
       // Company-wide activity feed: COMPANY_ADMIN sees the whole company,

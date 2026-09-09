@@ -9,6 +9,17 @@ model Company {
   timezone String?
   locale   String?
 
+  // Legal identity used on generated contracts/agreements — distinct from
+  // the trading `name` above, which is what the CRM shows in menus and
+  // headers. Nullable because a tenant can use the CRM fully before ever
+  // generating a document; DocumentGenerationService is what actually
+  // requires these to be filled in.
+  legalName      String?
+  taxId          String?
+  signatoryName  String?
+  signatoryTitle String?
+  letterheadUrl  String?
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
@@ -27,6 +38,7 @@ model Company {
   activities Activity[]
   tasks      Task[]
   documents  Document[]
+  documentTemplates DocumentTemplate[]
 
   notifications      Notification[]
   dealNumberCounters DealNumberCounter[]

@@ -1,4 +1,5 @@
-import {Body, Controller, Get, Param, Post, Query, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, Param, ParseEnumPipe, Post, Query, UseGuards} from '@nestjs/common';
+import {DocumentType} from '@/generated/prisma/client';
 import {JwtAuthGuard} from '@/modules/auth/guards/jwt-auth.guard';
 import {CompanyGuard} from '@/common/guards/company.guard';
 import {BranchGuard} from '@/common/guards/branch.guard';
@@ -182,5 +183,19 @@ export class DealsController {
   @Post(':id/complete')
   complete(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     return this.dealsService.complete(user, id);
+  }
+
+  @Roles(
+      UserRole.COMPANY_ADMIN,
+      UserRole.SALES_HEAD,
+      UserRole.SALES_MANAGER
+  )
+  @Post(':id/documents/:type/generate')
+  generateDocument(
+      @CurrentUser() user: AuthUser,
+      @Param('id') id: string,
+      @Param('type', new ParseEnumPipe(DocumentType)) type: DocumentType,
+  ) {
+    return this.dealsService.generateDocument(user, id, type);
   }
 }

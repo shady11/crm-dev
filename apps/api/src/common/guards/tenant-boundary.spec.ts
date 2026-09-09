@@ -125,6 +125,7 @@ describe("branch boundary", () => {
         dashboard: "applies branchId conditionally via query param inside the service, not a blanket controller guard",
         documents: "not scoped by this phase — Theme B covers leads, clients, deals, and tasks only",
         notifications: "personal to the recipient user, not branch-scoped data",
+        "document-generation": "COMPANY_ADMIN-only template definitions, company-wide like inventory — see BR-C1 decision",
     };
 
     const stripComments = (source: string) =>

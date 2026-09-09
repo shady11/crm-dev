@@ -27,4 +27,33 @@ export class UpdateOwnCompanyDto {
     @IsString()
     @MaxLength(64)
     timezone?: string;
+
+    // Legal identity for generated contracts/agreements (see
+    // DocumentGenerationService) — kept on this DTO rather than
+    // UpdateCompanyDto since it's the tenant's own business detail, not
+    // something the platform operator manages.
+    @IsOptional()
+    @IsString()
+    @MaxLength(200)
+    legalName?: string;
+
+    @IsOptional()
+    @IsString()
+    @MaxLength(50)
+    taxId?: string;
+
+    @IsOptional()
+    @IsString()
+    @MaxLength(200)
+    signatoryName?: string;
+
+    @IsOptional()
+    @IsString()
+    @MaxLength(200)
+    signatoryTitle?: string;
+
+    @IsOptional()
+    @IsString()
+    @MaxLength(2000)
+    letterheadUrl?: string;
 }
