@@ -27,6 +27,7 @@ import {ScheduleModule} from "@nestjs/schedule";
 import {NotificationsModule} from "@/modules/notifications/notifications.module";
 import {DashboardModule} from "@/modules/dashboard/dashboard.module";
 import {AuditLogModule} from "@/modules/audit-log/audit-log.module";
+import {ActivitiesModule} from "@/modules/activities/activities.module";
 import {ImpersonationAuditInterceptor} from "@/common/interceptors/impersonation-audit.interceptor";
 
 @Module({
@@ -69,6 +70,9 @@ import {ImpersonationAuditInterceptor} from "@/common/interceptors/impersonation
       DocumentsModule,
       NotificationsModule,
       DashboardModule,
+      // Company-wide activity feed: COMPANY_ADMIN sees the whole company,
+      // branch-scoped roles see only their own branch (see ActivitiesService).
+      ActivitiesModule,
       // Registered so /api/health exists at all — it was written but never
       // imported, so the endpoint returned 404 and nothing could monitor it.
       HealthModule,

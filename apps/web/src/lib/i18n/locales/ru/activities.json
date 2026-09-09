@@ -1,0 +1,25 @@
+{
+  "page": {
+    "heading": "Журнал активности",
+    "descriptionCompanyAdmin": "Вся активность сотрудников вашей компании.",
+    "descriptionBranchScoped": "Активность сотрудников вашего филиала.",
+    "filters": {
+      "branch": "Филиал",
+      "allBranches": "Все филиалы",
+      "dateFrom": "С",
+      "dateTo": "По"
+    },
+    "table": {
+      "headers": {
+        "timestamp": "Когда",
+        "user": "Сотрудник",
+        "activity": "Активность"
+      }
+    },
+    "empty": {
+      "title": "Нет активности",
+      "description": "Ничего не соответствует этим фильтрам."
+    },
+    "system": "Система"
+  }
+}

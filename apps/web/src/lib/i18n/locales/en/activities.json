@@ -1,0 +1,25 @@
+{
+  "page": {
+    "heading": "Activity log",
+    "descriptionCompanyAdmin": "Every activity raised by anyone in your company.",
+    "descriptionBranchScoped": "Activity raised by your branch's users.",
+    "filters": {
+      "branch": "Branch",
+      "allBranches": "All branches",
+      "dateFrom": "From",
+      "dateTo": "To"
+    },
+    "table": {
+      "headers": {
+        "timestamp": "When",
+        "user": "User",
+        "activity": "Activity"
+      }
+    },
+    "empty": {
+      "title": "No activity",
+      "description": "Nothing matches these filters."
+    },
+    "system": "System"
+  }
+}

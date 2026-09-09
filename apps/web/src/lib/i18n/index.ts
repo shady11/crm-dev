@@ -21,6 +21,7 @@ import blocksEn from "./locales/en/blocks.json";
 import entrancesEn from "./locales/en/entrances.json";
 import floorsEn from "./locales/en/floors.json";
 import auditLogEn from "./locales/en/auditLog.json";
+import activitiesEn from "./locales/en/activities.json";
 import settingsEn from "./locales/en/settings.json";
 import settingOptionsEn from "./locales/en/settingOptions.json";
 
@@ -43,6 +44,7 @@ import blocksRu from "./locales/ru/blocks.json";
 import entrancesRu from "./locales/ru/entrances.json";
 import floorsRu from "./locales/ru/floors.json";
 import auditLogRu from "./locales/ru/auditLog.json";
+import activitiesRu from "./locales/ru/activities.json";
 import settingsRu from "./locales/ru/settings.json";
 import settingOptionsRu from "./locales/ru/settingOptions.json";
 
@@ -67,6 +69,7 @@ export const resources = {
         entrances: entrancesEn,
         floors: floorsEn,
         auditLog: auditLogEn,
+        activities: activitiesEn,
         settings: settingsEn,
         settingOptions: settingOptionsEn,
     },
@@ -90,6 +93,7 @@ export const resources = {
         entrances: entrancesRu,
         floors: floorsRu,
         auditLog: auditLogRu,
+        activities: activitiesRu,
         settings: settingsRu,
         settingOptions: settingOptionsRu,
     },

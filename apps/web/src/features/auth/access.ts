@@ -61,6 +61,10 @@ export const FEATURE_ROLES = {
     // SUPER_ADMIN-only pool the company forms' pickers are built from.
     settingOptions: [UserRole.SUPER_ADMIN],
     auditLog: [UserRole.SUPER_ADMIN],
+    // Company-wide activity feed: COMPANY_ADMIN sees the whole company;
+    // SALES_HEAD/SALES_MANAGER see only their own branch (enforced by the
+    // API — see ActivitiesService.findAll).
+    activities: [UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD, UserRole.SALES_MANAGER],
     // A tenant's own admin editing their own company's name/currency/locale/
     // timezone (CA-A1) — distinct from `companies` above, which is the
     // SUPER_ADMIN's cross-tenant management screen.

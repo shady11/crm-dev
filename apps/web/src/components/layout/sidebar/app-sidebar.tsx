@@ -20,6 +20,7 @@ import {
     GalleryVerticalEnd,
     Landmark,
     Handshake,
+    History,
     LayoutDashboard,
     ListTodo,
     MapPin,
@@ -49,6 +50,7 @@ const NAV_ITEMS: {
     { titleKey: "nav.settingOptions", feature: "settingOptions", url: "/setting-options", icon: SlidersHorizontal },
     { titleKey: "nav.users", feature: "users", url: "/users", icon: Users },
     { titleKey: "nav.branches", feature: "branches", url: "/branches", icon: MapPin },
+    { titleKey: "nav.activityLog", feature: "activities", url: "/activity-log", icon: History },
     { titleKey: "nav.auditLog", feature: "auditLog", url: "/audit-log", icon: ScrollText },
     { titleKey: "nav.settings", feature: "companySettings", url: "/settings", icon: Settings },
 ];
