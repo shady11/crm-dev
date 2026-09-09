@@ -39,7 +39,8 @@ import {SessionValidationService} from "@/modules/auth/session-validation.servic
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, SessionValidationService],
   exports: [
-      JwtModule
+      JwtModule,
+      SessionValidationService,
   ]
 })
 export class AuthModule {}
