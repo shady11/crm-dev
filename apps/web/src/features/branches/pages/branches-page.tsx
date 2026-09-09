@@ -3,11 +3,12 @@ import {Link} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
 import {useTranslation} from "react-i18next";
-import {Building2, PauseCircle, Pencil, PlayCircle, Plus} from "lucide-react";
+import {Building2, Plus} from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Input} from "@/components/ui/input.tsx";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
+import {Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.tsx";
+import {Separator} from "@/components/ui/separator.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {
@@ -124,76 +125,75 @@ export function BranchesPage() {
                     </EmptyHeader>
                 </Empty>
             ) : (
-                <div className="rounded-lg border">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>{t("page.table.headers.name")}</TableHead>
-                                <TableHead>{t("page.table.headers.city")}</TableHead>
-                                <TableHead>{t("page.table.headers.phone")}</TableHead>
-                                <TableHead>{t("page.table.headers.status")}</TableHead>
-                                <TableHead className="w-0" />
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {items.map((branch) => {
-                                const deactivated = isDeactivated(branch);
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {items.map((branch) => {
+                        const deactivated = isDeactivated(branch);
+                        const hasDetails = branch.address || branch.city || branch.phone;
 
-                                return (
-                                    <TableRow key={branch.id} className={deactivated ? "opacity-60" : undefined}>
-                                        <TableCell className="font-medium">
-                                            <Link className="hover:underline" to={paths.branches.detail(branch.id)}>
-                                                {branch.name}
-                                            </Link>
-                                        </TableCell>
-                                        <TableCell>{branch.city ?? "—"}</TableCell>
-                                        <TableCell>{branch.phone ?? "—"}</TableCell>
-                                        <TableCell>
-                                            <Badge variant={deactivated ? "destructive" : "secondary"}>
-                                                {deactivated ? t("status.deactivated") : t("status.active")}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex justify-end gap-1">
-                                                <Button
-                                                    size="icon-sm"
-                                                    variant="ghost"
-                                                    aria-label={t("page.rowActions.edit", {name: branch.name})}
-                                                    onClick={() => {
-                                                        setEditing(branch);
-                                                        setFormOpen(true);
-                                                    }}
-                                                >
-                                                    <Pencil className="size-3.5" />
-                                                </Button>
-                                                <Button
-                                                    size="icon-sm"
-                                                    variant="ghost"
-                                                    aria-label={
-                                                        deactivated
-                                                            ? t("page.rowActions.reactivate", {name: branch.name})
-                                                            : t("page.rowActions.deactivate", {name: branch.name})
-                                                    }
-                                                    onClick={() =>
-                                                        setPending({
-                                                            action: deactivated ? "reactivate" : "deactivate",
-                                                            branch,
-                                                        })
-                                                    }
-                                                >
-                                                    {deactivated ? (
-                                                        <PlayCircle className="size-3.5" />
-                                                    ) : (
-                                                        <PauseCircle className="size-3.5" />
-                                                    )}
-                                                </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
+                        return (
+                            <Card key={branch.id} className={deactivated ? "opacity-60" : undefined}>
+                                <CardHeader>
+                                    <CardTitle>{branch.name}</CardTitle>
+                                    <CardAction>
+                                        <Badge variant={deactivated ? "destructive" : "secondary"}>
+                                            {deactivated ? t("status.deactivated") : t("status.active")}
+                                        </Badge>
+                                    </CardAction>
+                                </CardHeader>
+
+                                <Separator />
+
+                                <CardContent className="space-y-1 text-sm">
+                                    {branch.address ? <p>{branch.address}</p> : null}
+                                    {branch.city ? <p>{branch.city}</p> : null}
+                                    {branch.phone ? (
+                                        <p>
+                                            {t("page.card.phoneLabel")}: {branch.phone}
+                                        </p>
+                                    ) : null}
+                                    {!hasDetails ? (
+                                        <p className="text-muted-foreground">{t("page.card.noDetails")}</p>
+                                    ) : null}
+                                </CardContent>
+
+                                <CardFooter className="flex-wrap gap-2 bg-transparent">
+                                    <div className="flex flex-wrap gap-3">
+                                        <Button
+                                            variant="link"
+                                            size="sm"
+                                            className="h-auto p-0"
+                                            onClick={() => {
+                                                setEditing(branch);
+                                                setFormOpen(true);
+                                            }}
+                                        >
+                                            {t("page.card.edit")}
+                                        </Button>
+                                        <Button
+                                            variant="link"
+                                            size="sm"
+                                            className="h-auto p-0"
+                                            onClick={() =>
+                                                setPending({
+                                                    action: deactivated ? "reactivate" : "deactivate",
+                                                    branch,
+                                                })
+                                            }
+                                        >
+                                            {deactivated ? t("page.card.reactivate") : t("page.card.deactivate")}
+                                        </Button>
+                                    </div>
+                                    {/* ml-auto rather than the parent's justify-between: pushes this
+                                        button to the row's end when there's room, and to the end of
+                                        its own wrapped line when the card is too narrow for all three
+                                        controls on one line — avoids overflowing the card either way. */}
+                                    <Button variant="outline" size="sm" className="ml-auto" asChild>
+                                        <Link to={paths.branches.detail(branch.id)}>{t("page.card.view")}</Link>
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                        );
+                    })}
                 </div>
             )}
 
