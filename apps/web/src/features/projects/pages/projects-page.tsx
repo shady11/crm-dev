@@ -21,11 +21,16 @@ import {
 import {ProjectCard} from "@/features/projects/components/project-card.tsx";
 import {createListCollection} from "@ark-ui/react";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 
 type ProjectStatusFilter = ProjectStatus | "all";
 
 export function ProjectsPage() {
     const { t } = useTranslation("projects");
+    const { user } = useAuth();
+    // Creating a project is COMPANY_ADMIN only (POST /projects).
+    const canCreate = user?.role === UserRole.COMPANY_ADMIN;
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
     const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -129,8 +134,10 @@ export function ProjectsPage() {
                             ))}
                         </SelectContent>
                     </Select>
-                    <Button type="button" onClick={openCreateForm}>
-                        <Plus className="size-3"/> {t("tabs.addProject")}</Button>
+                    {canCreate && (
+                        <Button type="button" onClick={openCreateForm}>
+                            <Plus className="size-3"/> {t("tabs.addProject")}</Button>
+                    )}
                 </div>
             </div>
 

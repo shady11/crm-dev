@@ -8,6 +8,8 @@ import { EntranceForm } from "./entrance-form.tsx";
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
 import type {Block} from "@/features/blocks/types/block.types.ts";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 
 interface AddEntranceButtonProps {
     block: Block;
@@ -15,6 +17,7 @@ interface AddEntranceButtonProps {
 
 export function AddEntranceButton({ block }: AddEntranceButtonProps) {
     const { t } = useTranslation("entrances");
+    const { user } = useAuth();
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -38,6 +41,11 @@ export function AddEntranceButton({ block }: AddEntranceButtonProps) {
             0,
             ...(block.entrances ?? []).map((e) => Number(e.order) || 0)
         ) + 1;
+
+    // Creating an entrance is COMPANY_ADMIN only (POST /blocks/:id/entrances).
+    if (user?.role !== UserRole.COMPANY_ADMIN) {
+        return null;
+    }
 
     return (
         <>

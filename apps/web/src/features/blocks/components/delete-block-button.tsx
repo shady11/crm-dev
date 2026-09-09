@@ -16,6 +16,8 @@ import { deleteBlock } from "@/features/blocks/api/blocks.api.ts";
 import type { Block } from "@/features/blocks/types/block.types.ts";
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 
 interface DeleteBlockButtonProps {
     block: Block;
@@ -23,6 +25,7 @@ interface DeleteBlockButtonProps {
 
 export function DeleteBlockButton({ block }: DeleteBlockButtonProps) {
     const { t } = useTranslation("blocks");
+    const { user } = useAuth();
     const queryClient = useQueryClient();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -40,6 +43,11 @@ export function DeleteBlockButton({ block }: DeleteBlockButtonProps) {
             setIsOpen(false);
         },
     });
+
+    // Deleting a block is COMPANY_ADMIN only (DELETE /blocks/:id).
+    if (user?.role !== UserRole.COMPANY_ADMIN) {
+        return null;
+    }
 
     return (
         <>

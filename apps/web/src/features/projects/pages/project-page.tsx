@@ -22,9 +22,14 @@ import {deleteProject, getProject, updateProject} from "@/features/projects/api/
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 
 export function ProjectPage() {
     const { t } = useTranslation("projects");
+    const { user } = useAuth();
+    // Editing/deleting a project is COMPANY_ADMIN only (PATCH/DELETE /projects/:id).
+    const canManage = user?.role === UserRole.COMPANY_ADMIN;
 
     const {projectId} = useParams();
     const navigate = useNavigate();
@@ -97,33 +102,37 @@ export function ProjectPage() {
                     <Button variant="ghost" onClick={() => navigate("/projects")}>
                         <ArrowLeft className="size-3"/> {t("common:actions.back")}</Button>
 
-                    <Button onClick={() => setOpen(true)}>
-                        <Pen className="size-3"/> {t("common:actions.edit")}</Button>
+                    {canManage && (
+                        <Button onClick={() => setOpen(true)}>
+                            <Pen className="size-3"/> {t("common:actions.edit")}</Button>
+                    )}
 
-                    <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="destructive">
-                                <Trash2 className="size-3"/> {t("common:actions.delete")}</Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>{t("card.deleteTitle")}</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    {t("page.deleteDescription", { name: project.name })}
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel disabled={deleteMutation.isPending}>{t("common:actions.cancel")}</AlertDialogCancel>
-                                <AlertDialogAction
-                                    variant="destructive"
-                                    disabled={deleteMutation.isPending}
-                                    onClick={() => deleteMutation.mutate()}
-                                >
-                                    {deleteMutation.isPending ? t("common:actions.deleting") : t("common:actions.delete")}
-                                </AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
+                    {canManage && (
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="destructive">
+                                    <Trash2 className="size-3"/> {t("common:actions.delete")}</Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>{t("card.deleteTitle")}</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        {t("page.deleteDescription", { name: project.name })}
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel disabled={deleteMutation.isPending}>{t("common:actions.cancel")}</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        variant="destructive"
+                                        disabled={deleteMutation.isPending}
+                                        onClick={() => deleteMutation.mutate()}
+                                    >
+                                        {deleteMutation.isPending ? t("common:actions.deleting") : t("common:actions.delete")}
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    )}
                 </div>
             </div>
 
