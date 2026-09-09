@@ -17,6 +17,11 @@ export function isDeactivated(branch: Pick<Branch, "deactivatedAt">): boolean {
     return branch.deactivatedAt !== null;
 }
 
+export const BRANCH_STATUS_BADGE_CLASSES: Record<number, string> = {
+    0: "bg-emerald-400 text-white",
+    1: "bg-rose-400 text-white",
+};
+
 export type BranchUser = {
     id: string;
     fullName: string;

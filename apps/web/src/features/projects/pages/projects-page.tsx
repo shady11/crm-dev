@@ -1,34 +1,22 @@
-import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
-import { Button } from "@/components/ui/button.tsx";
+import {useState} from "react";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {Plus} from "lucide-react";
+import {Button} from "@/components/ui/button.tsx";
+import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle,} from "@/components/ui/sheet.tsx";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select.tsx";
+import {ProjectForm} from "@/features/projects/components/project-form";
 import {
-    Sheet,
-    SheetContent,
-    SheetDescription,
-    SheetHeader,
-    SheetTitle,
-} from "@/components/ui/sheet.tsx";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select.tsx";
-import { ProjectForm } from "@/features/projects/components/project-form";
-import {
+    type Project,
     PROJECT_STATUS_LABEL_KEYS,
     PROJECT_STATUS_VALUES,
-    type Project,
     type ProjectStatus,
 } from "@/features/projects/types/project.types";
 import {
     createProject,
     deleteProject,
     getProjects,
-    updateProject,
     type ProjectPayload,
+    updateProject,
 } from "@/features/projects/api/projects.api.ts";
 import {ProjectCard} from "@/features/projects/components/project-card.tsx";
 import {createListCollection} from "@ark-ui/react";

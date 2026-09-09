@@ -3,14 +3,14 @@ import {Link, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
 import {useTranslation} from "react-i18next";
-import {ArrowLeft, PauseCircle, Pencil, PlayCircle, UsersRoundIcon} from "lucide-react";
+import {ArrowLeft, PauseCircle, Pencil, PlayCircle, Users} from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/components/ui/data-list.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
-import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
+import {Empty, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -31,7 +31,7 @@ import {
     reactivateBranch,
     updateBranch,
 } from "../api/branches.api";
-import {type Branch, isDeactivated} from "../types/branch.types";
+import {type Branch, BRANCH_STATUS_BADGE_CLASSES, isDeactivated} from "../types/branch.types";
 import {BranchFormSheet} from "../components/branch-form-sheet";
 
 type PendingAction = "deactivate" | "reactivate" | null;
@@ -98,26 +98,25 @@ export function BranchDetailPage() {
         <div className="space-y-6">
             <div className="flex items-start justify-between gap-4">
                 <div className="space-y-1">
-                    <Button asChild size="sm" variant="ghost" className="-ml-2">
-                        <Link to={paths.branches.root}>
-                            <ArrowLeft className="size-4" />
-                            {t("detail.backToBranches")}
-                        </Link>
-                    </Button>
                     <div className="flex items-center gap-3">
                         <h2 className="text-2xl font-medium tracking-tight">{data.name}</h2>
-                        <Badge variant={deactivated ? "destructive" : "secondary"}>
+                        <Badge variant="default" className={BRANCH_STATUS_BADGE_CLASSES[deactivated ? 1 : 0]}>
                             {deactivated ? t("status.deactivated") : t("status.active")}
                         </Badge>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="secondary" onClick={() => setFormOpen(true)}>
+                    <Button asChild variant="ghost">
+                        <Link to={paths.branches.root}>
+                            <ArrowLeft className="size-3"/> {t("common:actions.back")}
+                        </Link>
+                    </Button>
+                    <Button variant="default" onClick={() => setFormOpen(true)}>
                         <Pencil className="size-3.5" />
                         {t("detail.edit")}
                     </Button>
                     <Button
-                        variant="secondary"
+                        variant="destructive"
                         onClick={() => setPending(deactivated ? "reactivate" : "deactivate")}
                     >
                         {deactivated ? <PlayCircle className="size-3.5" /> : <PauseCircle className="size-3.5" />}
@@ -158,10 +157,10 @@ export function BranchDetailPage() {
                             <Empty>
                                 <EmptyHeader>
                                     <EmptyMedia variant="icon">
-                                        <UsersRoundIcon strokeWidth={1.25} />
+                                        <Users strokeWidth={1.25} />
                                     </EmptyMedia>
                                     <EmptyTitle>{t("detail.usersCard.empty")}</EmptyTitle>
-                                    <EmptyDescription>{t("detail.usersCard.emptyDescription")}</EmptyDescription>
+                                    {/*<EmptyDescription>{t("detail.usersCard.emptyDescription")}</EmptyDescription>*/}
                                 </EmptyHeader>
                             </Empty>
                         ) : (

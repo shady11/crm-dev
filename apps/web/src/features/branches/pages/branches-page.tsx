@@ -3,12 +3,21 @@ import {Link} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
 import {useTranslation} from "react-i18next";
-import {Building2, Plus} from "lucide-react";
+import {
+    Building2,
+    EllipsisVertical,
+    InfoIcon,
+    MapPin,
+    PauseCircle,
+    PencilIcon,
+    Phone,
+    PlayCircle,
+    Plus
+} from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Input} from "@/components/ui/input.tsx";
-import {Card, CardAction, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.tsx";
-import {Separator} from "@/components/ui/separator.tsx";
+import {Card, CardAction, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {
@@ -22,17 +31,17 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog.tsx";
 import {
+    createBranch,
     type CreateBranchPayload,
     deactivateBranch,
-    createBranch,
     getBranches,
     reactivateBranch,
     updateBranch,
 } from "../api/branches.api";
-import type {Branch} from "../types/branch.types";
-import {isDeactivated} from "../types/branch.types";
+import {type Branch, BRANCH_STATUS_BADGE_CLASSES, isDeactivated} from "../types/branch.types";
 import {BranchFormSheet} from "../components/branch-form-sheet";
 import {paths} from "@/routes/paths";
+import {Menu, MenuContent, MenuItem, MenuTrigger} from "@/components/ui/menu.tsx";
 
 type Pending = {action: "deactivate" | "reactivate"; branch: Branch} | null;
 
@@ -89,26 +98,27 @@ export function BranchesPage() {
             <div className="flex items-start justify-between gap-4">
                 <div>
                     <h2 className="text-2xl font-medium tracking-tight">{t("page.heading")}</h2>
-                    <p className="text-sm text-muted-foreground">{t("page.description")}</p>
                 </div>
-                <Button
-                    onClick={() => {
-                        setEditing(null);
-                        setFormOpen(true);
-                    }}
-                >
-                    <Plus className="size-4" />
-                    {t("page.newBranch")}
-                </Button>
-            </div>
 
-            <Input
-                placeholder={t("page.searchPlaceholder")}
-                aria-label={t("page.searchPlaceholder")}
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                className="max-w-sm"
-            />
+                <div className="flex items-center gap-2">
+                    <Input
+                        placeholder={t("page.searchPlaceholder")}
+                        aria-label={t("page.searchPlaceholder")}
+                        value={search}
+                        onChange={(event) => setSearch(event.target.value)}
+                        className="max-w-sm"
+                    />
+                    <Button
+                        onClick={() => {
+                            setEditing(null);
+                            setFormOpen(true);
+                        }}
+                    >
+                        <Plus className="size-4" />
+                        {t("page.newBranch")}
+                    </Button>
+                </div>
+            </div>
 
             {branches.isLoading ? (
                 <div className="flex h-48 items-center justify-center">
@@ -125,72 +135,75 @@ export function BranchesPage() {
                     </EmptyHeader>
                 </Empty>
             ) : (
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3">
                     {items.map((branch) => {
                         const deactivated = isDeactivated(branch);
                         const hasDetails = branch.address || branch.city || branch.phone;
 
                         return (
                             <Card key={branch.id} className={deactivated ? "opacity-60" : undefined}>
-                                <CardHeader>
+                                <CardHeader className="flex justify-between items-center">
                                     <CardTitle>{branch.name}</CardTitle>
-                                    <CardAction>
-                                        <Badge variant={deactivated ? "destructive" : "secondary"}>
+                                    <CardAction className="flex items-center gap-3">
+                                        <Badge variant="default" className={BRANCH_STATUS_BADGE_CLASSES[deactivated ? 1 : 0]}>
                                             {deactivated ? t("status.deactivated") : t("status.active")}
                                         </Badge>
+                                        <Menu>
+                                            <MenuTrigger asChild>
+                                                <Button size="icon-xs" variant="ghost">
+                                                    <EllipsisVertical className="size-3.5"/>
+                                                </Button>
+                                            </MenuTrigger>
+                                            <MenuContent className="w-40">
+                                                <MenuItem value="copy" asChild>
+                                                    <Link to={paths.branches.detail(branch.id)}>
+                                                        <InfoIcon />
+                                                        {t("page.card.view")}
+                                                    </Link>
+                                                </MenuItem>
+                                                <MenuItem value="edit"
+                                                          onClick={() => {
+                                                              setEditing(branch);
+                                                              setFormOpen(true);
+                                                          }}>
+                                                    <PencilIcon />
+                                                    {t("page.card.edit")}
+                                                </MenuItem>
+                                                <MenuItem value="share"
+                                                          onClick={() =>
+                                                              setPending({
+                                                                  action: deactivated ? "reactivate" : "deactivate",
+                                                                  branch,
+                                                              })
+                                                          }>
+                                                    {deactivated ? <PlayCircle /> : <PauseCircle />}
+                                                    {deactivated ? t("page.card.reactivate") : t("page.card.deactivate")}
+                                                </MenuItem>
+                                            </MenuContent>
+                                        </Menu>
                                     </CardAction>
                                 </CardHeader>
 
-                                <Separator />
-
                                 <CardContent className="space-y-1 text-sm">
-                                    {branch.address ? <p>{branch.address}</p> : null}
-                                    {branch.city ? <p>{branch.city}</p> : null}
-                                    {branch.phone ? (
-                                        <p>
-                                            {t("page.card.phoneLabel")}: {branch.phone}
-                                        </p>
-                                    ) : null}
+                                    <div className="flex items-center gap-2">
+                                        <MapPin className="size-3.5"/>
+                                        <div className="flex gap-1">
+                                            {branch.city ? <span>{branch.city}</span> : null}
+                                            -
+                                            {branch.address ? <span>{branch.address}</span> : null}
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <Phone className="size-3.5"/>
+                                        <div className="flex gap-1">
+                                            {branch.phone ? <span>{branch.phone}</span> : null}
+                                        </div>
+                                    </div>
+
                                     {!hasDetails ? (
                                         <p className="text-muted-foreground">{t("page.card.noDetails")}</p>
                                     ) : null}
                                 </CardContent>
-
-                                <CardFooter className="flex-wrap gap-2 bg-transparent">
-                                    <div className="flex flex-wrap gap-3">
-                                        <Button
-                                            variant="link"
-                                            size="sm"
-                                            className="h-auto p-0"
-                                            onClick={() => {
-                                                setEditing(branch);
-                                                setFormOpen(true);
-                                            }}
-                                        >
-                                            {t("page.card.edit")}
-                                        </Button>
-                                        <Button
-                                            variant="link"
-                                            size="sm"
-                                            className="h-auto p-0"
-                                            onClick={() =>
-                                                setPending({
-                                                    action: deactivated ? "reactivate" : "deactivate",
-                                                    branch,
-                                                })
-                                            }
-                                        >
-                                            {deactivated ? t("page.card.reactivate") : t("page.card.deactivate")}
-                                        </Button>
-                                    </div>
-                                    {/* ml-auto rather than the parent's justify-between: pushes this
-                                        button to the row's end when there's room, and to the end of
-                                        its own wrapped line when the card is too narrow for all three
-                                        controls on one line — avoids overflowing the card either way. */}
-                                    <Button variant="outline" size="sm" className="ml-auto" asChild>
-                                        <Link to={paths.branches.detail(branch.id)}>{t("page.card.view")}</Link>
-                                    </Button>
-                                </CardFooter>
                             </Card>
                         );
                     })}
