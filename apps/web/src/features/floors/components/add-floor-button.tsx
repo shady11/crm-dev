@@ -8,6 +8,8 @@ import { FloorForm } from "./floor-form.tsx";
 import type {Entrance} from "@/features/entrances/types/entrance.types.ts";
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 
 interface AddFloorButtonProps {
     entrance: Entrance;
@@ -15,6 +17,7 @@ interface AddFloorButtonProps {
 
 export function AddFloorButton({ entrance }: AddFloorButtonProps) {
     const { t } = useTranslation("floors");
+    const { user } = useAuth();
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -43,6 +46,11 @@ export function AddFloorButton({ entrance }: AddFloorButtonProps) {
             0,
             ...(entrance.floors ?? []).map((e) => Number(e.number) || 0)
         ) + 1;
+
+    // Creating a floor is COMPANY_ADMIN only (POST /entrances/:id/floors).
+    if (user?.role !== UserRole.COMPANY_ADMIN) {
+        return null;
+    }
 
     return (
         <>

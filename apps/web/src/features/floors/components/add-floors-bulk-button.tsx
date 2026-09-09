@@ -9,6 +9,8 @@ import type {Floor} from "@/features/floors/types/floor.types.ts";
 import type {Entrance} from "@/features/entrances/types/entrance.types.ts";
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 
 interface AddFloorsBulkButtonProps {
     entrance: Entrance;
@@ -20,6 +22,7 @@ export function AddFloorsBulkButton({
                                         existingFloors = []
                                     }: AddFloorsBulkButtonProps) {
     const { t } = useTranslation("floors");
+    const { user } = useAuth();
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -36,6 +39,11 @@ export function AddFloorsBulkButton({
             setOpen(false);
         },
     });
+
+    // Bulk-creating floors is COMPANY_ADMIN only (POST /entrances/:id/floors/bulk).
+    if (user?.role !== UserRole.COMPANY_ADMIN) {
+        return null;
+    }
 
     return (
         <>

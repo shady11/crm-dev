@@ -29,6 +29,8 @@ import {Menu, MenuContent, MenuGroup, MenuItem, MenuSeparator, MenuTrigger} from
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 
 interface UnitTableProps {
     units: Unit[];
@@ -37,6 +39,13 @@ interface UnitTableProps {
 export function UnitTable({ units }: UnitTableProps) {
     const { t } = useTranslation("units");
     const { formatCurrency } = useCompanyFormatters();
+    const { user } = useAuth();
+    // Matches the API's per-endpoint @Roles: edit is COMPANY_ADMIN/SALES_HEAD
+    // (PATCH /units/:id), duplicate and delete are COMPANY_ADMIN only.
+    const canEdit = user?.role === UserRole.COMPANY_ADMIN || user?.role === UserRole.SALES_HEAD;
+    const canDuplicate = user?.role === UserRole.COMPANY_ADMIN;
+    const canDelete = user?.role === UserRole.COMPANY_ADMIN;
+    const hasAnyRowAction = canEdit || canDuplicate || canDelete;
 
     const queryClient = useQueryClient();
 
@@ -113,34 +122,46 @@ export function UnitTable({ units }: UnitTableProps) {
                                     <TableCell>{unit.area} {t("common:units.sqm")}</TableCell>
                                     <TableCell>{formatCurrency(parseFloat(unit.price))}</TableCell>
                                     <TableCell className="text-right">
-                                        <Menu>
-                                            <MenuTrigger asChild>
-                                                <Button variant="ghost" size="icon-sm">
-                                                    <MoreVertical />
-                                                </Button>
-                                            </MenuTrigger>
-                                            <MenuContent>
-                                                <MenuGroup>
-                                                    <MenuItem
-                                                        value="edit"
-                                                        onClick={() => setUnitSheet({
-                                                            open: true,
-                                                            unit: unit,
-                                                        })}
-                                                    >{t("common:actions.edit")}</MenuItem>
-                                                    <MenuItem
-                                                        value="diplicate"
-                                                        onClick={() => duplicateUnitMutation.mutate(unit.id)}
-                                                    >{t("common:actions.duplicate")}</MenuItem>
-                                                </MenuGroup>
-                                                <MenuSeparator />
-                                                <MenuItem
-                                                    value="delete"
-                                                    variant="destructive"
-                                                    onClick={() => setDeleteUnitDialog(unit)}
-                                                >{t("common:actions.delete")}</MenuItem>
-                                            </MenuContent>
-                                        </Menu>
+                                        {hasAnyRowAction && (
+                                            <Menu>
+                                                <MenuTrigger asChild>
+                                                    <Button variant="ghost" size="icon-sm">
+                                                        <MoreVertical />
+                                                    </Button>
+                                                </MenuTrigger>
+                                                <MenuContent>
+                                                    {(canEdit || canDuplicate) && (
+                                                        <MenuGroup>
+                                                            {canEdit && (
+                                                                <MenuItem
+                                                                    value="edit"
+                                                                    onClick={() => setUnitSheet({
+                                                                        open: true,
+                                                                        unit: unit,
+                                                                    })}
+                                                                >{t("common:actions.edit")}</MenuItem>
+                                                            )}
+                                                            {canDuplicate && (
+                                                                <MenuItem
+                                                                    value="diplicate"
+                                                                    onClick={() => duplicateUnitMutation.mutate(unit.id)}
+                                                                >{t("common:actions.duplicate")}</MenuItem>
+                                                            )}
+                                                        </MenuGroup>
+                                                    )}
+                                                    {canDelete && (
+                                                        <>
+                                                            <MenuSeparator />
+                                                            <MenuItem
+                                                                value="delete"
+                                                                variant="destructive"
+                                                                onClick={() => setDeleteUnitDialog(unit)}
+                                                            >{t("common:actions.delete")}</MenuItem>
+                                                        </>
+                                                    )}
+                                                </MenuContent>
+                                            </Menu>
+                                        )}
                                     </TableCell>
                                 </TableRow>
                             ))}

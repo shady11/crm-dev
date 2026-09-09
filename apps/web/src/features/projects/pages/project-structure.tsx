@@ -14,9 +14,14 @@ import {ImportUnitsButton} from "@/features/units/components/import-units-button
 import {Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {toast} from "@/components/ui/toast";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 
 export function ProjectStructure() {
     const { t } = useTranslation("projects");
+    const { user } = useAuth();
+    // Creating a block is COMPANY_ADMIN only (POST /projects/:id/blocks).
+    const canCreateBlock = user?.role === UserRole.COMPANY_ADMIN;
     const { projectId } = useParams<{ projectId: string }>();
     const queryClient = useQueryClient();
 
@@ -94,8 +99,10 @@ export function ProjectStructure() {
                 <h2 className="text-lg font-medium">{t("structure.heading")}</h2>
                 <div className="flex items-center gap-2">
                     <ImportUnitsButton projectId={projectId!} />
-                    <Button size="sm" variant="default" onClick={() => setOpen(true)}>
-                        <Plus className="size-3" /> {t("actions.addBlock", { ns: "blocks" })}</Button>
+                    {canCreateBlock && (
+                        <Button size="sm" variant="default" onClick={() => setOpen(true)}>
+                            <Plus className="size-3" /> {t("actions.addBlock", { ns: "blocks" })}</Button>
+                    )}
                 </div>
             </div>
 

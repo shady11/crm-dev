@@ -15,6 +15,8 @@ import {
 import { api } from "@/lib/api.ts";
 import type { Unit } from "@/features/units/types/unit.types.ts";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 
 interface DuplicateUnitButtonProps {
     unit: Unit;
@@ -22,6 +24,7 @@ interface DuplicateUnitButtonProps {
 
 export function DuplicateUnitButton({ unit }: DuplicateUnitButtonProps) {
     const { t } = useTranslation("units");
+    const { user } = useAuth();
     const queryClient = useQueryClient();
     const [isOpen, setIsOpen] = useState(false);
 
@@ -32,6 +35,11 @@ export function DuplicateUnitButton({ unit }: DuplicateUnitButtonProps) {
             setIsOpen(false);
         },
     });
+
+    // Duplicating a unit is COMPANY_ADMIN only (POST /units/:id/duplicate).
+    if (user?.role !== UserRole.COMPANY_ADMIN) {
+        return null;
+    }
 
     return (
         <>

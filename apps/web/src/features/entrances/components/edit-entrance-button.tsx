@@ -8,6 +8,8 @@ import type { Entrance } from "@/features/entrances/types/entrance.types.ts";
 import { EntranceForm } from "./entrance-form.tsx";
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 
 interface EditEntranceButtonProps {
     entrance: Entrance;
@@ -15,6 +17,7 @@ interface EditEntranceButtonProps {
 
 export function EditEntranceButton({ entrance }: EditEntranceButtonProps) {
     const { t } = useTranslation("entrances");
+    const { user } = useAuth();
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -32,6 +35,11 @@ export function EditEntranceButton({ entrance }: EditEntranceButtonProps) {
             setOpen(false);
         },
     });
+
+    // Editing an entrance is COMPANY_ADMIN only (PATCH /entrances/:id).
+    if (user?.role !== UserRole.COMPANY_ADMIN) {
+        return null;
+    }
 
     return (
         <>

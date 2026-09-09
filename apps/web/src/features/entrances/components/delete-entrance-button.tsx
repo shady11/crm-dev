@@ -16,6 +16,8 @@ import { deleteEntrance } from "@/features/entrances/api/entrances.api.ts";
 import type { Entrance } from "@/features/entrances/types/entrance.types.ts";
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 
 interface DeleteEntranceButtonProps {
     entrance: Entrance;
@@ -23,6 +25,7 @@ interface DeleteEntranceButtonProps {
 
 export function DeleteEntranceButton({ entrance }: DeleteEntranceButtonProps) {
     const { t } = useTranslation("entrances");
+    const { user } = useAuth();
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -39,6 +42,11 @@ export function DeleteEntranceButton({ entrance }: DeleteEntranceButtonProps) {
             setOpen(false);
         },
     });
+
+    // Deleting an entrance is COMPANY_ADMIN only (DELETE /entrances/:id).
+    if (user?.role !== UserRole.COMPANY_ADMIN) {
+        return null;
+    }
 
     return (
         <>

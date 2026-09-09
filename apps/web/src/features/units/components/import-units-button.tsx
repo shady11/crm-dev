@@ -16,6 +16,8 @@ import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/c
 import {toast} from "@/components/ui/toast.tsx";
 import {useImportUnits} from "@/features/units/hooks/use-import-units.ts";
 import type {ImportUnitsResult} from "@/features/units/types/unit-import.types.ts";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 
 type Props = {
     projectId: string;
@@ -23,6 +25,7 @@ type Props = {
 
 export function ImportUnitsButton({projectId}: Props) {
     const {t} = useTranslation("units");
+    const {user} = useAuth();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [result, setResult] = useState<ImportUnitsResult | null>(null);
     const importMutation = useImportUnits(projectId);
@@ -50,6 +53,11 @@ export function ImportUnitsButton({projectId}: Props) {
             },
         });
     };
+
+    // Importing units is COMPANY_ADMIN only (POST /projects/:id/units/import).
+    if (user?.role !== UserRole.COMPANY_ADMIN) {
+        return null;
+    }
 
     return (
         <>

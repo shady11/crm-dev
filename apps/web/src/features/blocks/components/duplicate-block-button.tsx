@@ -16,6 +16,8 @@ import { api } from "@/lib/api.ts";
 import type { Block } from "@/features/blocks/types/block.types.ts";
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 
 interface DuplicateBlockButtonProps {
     block: Block;
@@ -23,6 +25,7 @@ interface DuplicateBlockButtonProps {
 
 export function DuplicateBlockButton({ block }: DuplicateBlockButtonProps) {
     const { t } = useTranslation("blocks");
+    const { user } = useAuth();
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -40,6 +43,11 @@ export function DuplicateBlockButton({ block }: DuplicateBlockButtonProps) {
             setOpen(false);
         },
     });
+
+    // Duplicating a block is COMPANY_ADMIN only (POST /blocks/:id/duplicate).
+    if (user?.role !== UserRole.COMPANY_ADMIN) {
+        return null;
+    }
 
     return (
         <>

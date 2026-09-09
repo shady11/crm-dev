@@ -7,6 +7,8 @@ import { api } from "@/lib/api.ts";
 import {BulkUnitsForm} from "@/features/units/components/bulk-units-form.tsx";
 import type {Unit} from "@/features/units/types/unit.types.ts";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 
 interface AddUnitsBulkButtonProps {
     floorId: string;
@@ -20,6 +22,7 @@ export function AddUnitsBulkButton({
                                        allBlockUnits = []
                                    }: AddUnitsBulkButtonProps) {
     const { t } = useTranslation("units");
+    const { user } = useAuth();
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
 
@@ -35,6 +38,11 @@ export function AddUnitsBulkButton({
     const lastGlobalUnitNumber = allBlockUnits.length > 0
         ? Math.max(...allBlockUnits.map(u => parseInt(u.number) || 0))
         : 0;
+
+    // Bulk-creating units is COMPANY_ADMIN only (POST /floors/:id/units/bulk).
+    if (user?.role !== UserRole.COMPANY_ADMIN) {
+        return null;
+    }
 
     return (
         <>

@@ -9,6 +9,8 @@ import {UnitOverview} from "@/features/units/components/unit-overview.tsx";
 import {useUnit} from "@/features/units/hooks/use-unit.ts";
 import {paths} from "@/routes/paths.ts";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {UserRole} from "@/features/users/types/user.types";
 
 interface UnitDetailsSheetProps {
     unit: Unit | null;
@@ -31,8 +33,14 @@ export function UnitDetailsSheet({
                                  }: UnitDetailsSheetProps) {
 
     const { t } = useTranslation("units");
+    const { user } = useAuth();
     const unitDetailsQuery = useUnit(open ? unit?.id : undefined);
     const fullUnit = unitDetailsQuery.data ?? unit;
+
+    // Matches the API: editing a unit is COMPANY_ADMIN/SALES_HEAD, reserving
+    // one via a deal (POST /deals/reserve) excludes FINANCE.
+    const canEdit = user?.role === UserRole.COMPANY_ADMIN || user?.role === UserRole.SALES_HEAD;
+    const canBook = user?.role !== UserRole.FINANCE;
 
     if (!unit || !floor) {
         return null;
@@ -85,8 +93,10 @@ export function UnitDetailsSheet({
                     >
                         <FileTextIcon className="size-4" />
                     </Button>
-                    <Button variant="secondary" className="flex-1" onClick={onEdit}>{t("common:actions.edit")}</Button>
-                    {unit.status === "AVAILABLE" && (
+                    {canEdit && (
+                        <Button variant="secondary" className="flex-1" onClick={onEdit}>{t("common:actions.edit")}</Button>
+                    )}
+                    {unit.status === "AVAILABLE" && canBook && (
                         <Button className="flex-1" onClick={onBook}>{t("details.bookButton")}</Button>
                     )}
                 </SheetFooter>
