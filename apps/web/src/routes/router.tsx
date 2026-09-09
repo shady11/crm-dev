@@ -18,6 +18,7 @@ import {settingOptionsRoutes} from "@/features/setting-options/setting-options.r
 import {ProfilePage} from "@/features/auth/pages/profile-page";
 import {UnitInfoSheetPage} from "@/features/units/pages/unit-info-sheet-page";
 import {auditLogRoutes} from "@/features/audit-log/audit-log.routes";
+import {activitiesRoutes} from "@/features/activities/activities.routes";
 import {RoleLanding} from "@/features/auth/pages/role-landing";
 import {RoleGuard} from "@/features/auth/pages/role-guard";
 import {FEATURE_ROLES} from "@/features/auth/access";
@@ -50,6 +51,7 @@ export const router = createBrowserRouter([
                     // unlike companySettingsRoutes above, no RoleGuard here.
                     {path: "profile", element: <ProfilePage />},
                     auditLogRoutes,
+                    activitiesRoutes,
                     {
                         path: "leads",
                         element: <RoleGuard allow={[...FEATURE_ROLES.leads]} />,
