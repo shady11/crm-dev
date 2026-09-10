@@ -32,11 +32,11 @@ interface SendReminderParams {
 }
 
 /**
- * Preference order: WhatsApp, then email, then SMS. WhatsApp is still
- * logged-only (no gateway chosen yet), so in practice EMAIL is the channel
- * that actually reaches a client once SMTP is configured — prioritized
- * above SMS for that reason. Revisit this order once a real SMS/WhatsApp
- * provider exists.
+ * Preference order: WhatsApp, then email, then SMS — WhatsApp first because
+ * it's the channel clients actually check in this market, and it's real now
+ * that WhatsAppMessageProvider is wired in. SMS stays last since no SMS
+ * gateway has been chosen yet (still logged-only via CompositeProvider's
+ * fallback).
  */
 function pickChannel(client: ReminderClient): {
   channel: OutboundChannel;
@@ -77,7 +77,13 @@ export class OutboundMessageService {
     const { channel, to } = pickChannel(params.client);
 
     try {
-      const result = await this.provider.send({ channel, to, body });
+      const result = await this.provider.send({
+        channel,
+        to,
+        body,
+        templateKey: params.templateKey,
+        context,
+      });
 
       return this.prisma.outboundMessage.create({
         data: {
