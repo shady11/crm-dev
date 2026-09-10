@@ -2,6 +2,7 @@ import {BadRequestException, ForbiddenException, Injectable, Logger,} from '@nes
 
 import {
   DealStatus,
+  DiscountApprovalStatus,
   DocumentType,
   NotificationEntityType,
   NotificationType,
@@ -18,6 +19,8 @@ import {isBranchScopedRole} from '@/common/constants/branch-scope.constants';
 import {
   ClientNotFoundException,
   DealNotFoundException,
+  DiscountApprovalNotAllowedException,
+  DiscountNotPendingException,
   SalePriceMismatchException,
   UnitNotFoundException,
 } from '../exceptions';
@@ -32,6 +35,7 @@ import {AuthUser} from "@/common/types/auth-user.type";
 import {ExtendReservationDto} from "@/modules/deals/dto/extend-reservation.dto";
 import {SignContractDto} from "@/modules/deals/dto/sign-contract.dto";
 import {CancelDealDto} from "@/modules/deals/dto/cancel-deal.dto";
+import {RejectDiscountDto} from "@/modules/deals/dto/reject-discount.dto";
 import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
 import {DbClient} from "@/database/prisma.types";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
@@ -233,6 +237,20 @@ export class DealsService {
         );
       }
 
+      // The percent-equivalent of the discount, however it was expressed —
+      // company thresholds are percent-based, so an explicit discountAmount
+      // still needs converting before it can be compared against them.
+      const effectiveDiscountPercent = discountPercent.greaterThan(0)
+          ? discountPercent
+          : (listPrice.greaterThan(0)
+              ? computedDiscountAmount.dividedBy(listPrice).times(100)
+              : new Prisma.Decimal(0));
+
+      const company = await db.company.findUniqueOrThrow({where: {id: companyId}});
+
+      const requiresApproval = computedDiscountAmount.greaterThan(0) &&
+          this.domain.requiresDiscountApproval(effectiveDiscountPercent, user.role, company);
+
       const dealNumber = await this.dealNumberService.generateDealNumber(db, companyId);
 
       const deal = await db.deal.create({
@@ -256,10 +274,19 @@ export class DealsService {
           financingType: dto.financingType,
 
           listPrice: unit.price,
-          salePrice: computedSalePrice,
+          // Held at list price while a discount awaits approval — the deal
+          // and reservation proceed normally, only the discounted price is
+          // withheld until someone with the authority to grant it says yes.
+          salePrice: requiresApproval ? listPrice : computedSalePrice,
 
-          discountAmount: computedDiscountAmount,
-          discountPercent: discountPercent,
+          discountAmount: requiresApproval ? 0 : computedDiscountAmount,
+          discountPercent: requiresApproval ? 0 : discountPercent,
+
+          discountApprovalStatus: requiresApproval
+              ? DiscountApprovalStatus.PENDING
+              : DiscountApprovalStatus.NONE,
+          requestedDiscountPercent: requiresApproval ? effectiveDiscountPercent : null,
+          requestedDiscountAmount: requiresApproval ? computedDiscountAmount : null,
 
           deposit: dto.deposit ?? 0,
 
@@ -309,6 +336,42 @@ export class DealsService {
           unitNumber: unit.number,
         },
       });
+
+      if (requiresApproval) {
+        await this.activityService.discountRequested({
+          db, companyId, userId: user.id,
+          dealId: deal.id, clientId: dto.clientId,
+          metadata: {
+            requestedDiscountPercent: effectiveDiscountPercent.toNumber(),
+            requestedDiscountAmount: computedDiscountAmount.toNumber(),
+          },
+        });
+
+        // The same threshold that decided PENDING also decides who gets
+        // asked — a request within the sales head's own band goes to the
+        // branch's sales head(s); above it, straight to company admin(s).
+        const salesHeadCanDecide = this.domain.canDecideDiscount(
+            effectiveDiscountPercent, UserRole.SALES_HEAD, company,
+        );
+
+        const approvers = await db.user.findMany({
+          where: salesHeadCanDecide
+              ? {companyId, branchId: client.branchId, role: UserRole.SALES_HEAD, isActive: true}
+              : {companyId, role: UserRole.COMPANY_ADMIN, isActive: true},
+          select: {id: true},
+        });
+
+        for (const approver of approvers) {
+          await this.notifications.create({
+            companyId,
+            userId: approver.id,
+            type: NotificationType.DISCOUNT_APPROVAL_REQUESTED,
+            title: `Discount approval needed for deal ${dealNumber}`,
+            entityType: NotificationEntityType.DEAL,
+            entityId: deal.id,
+          });
+        }
+      }
 
       return db.deal.findUniqueOrThrow({
         where: {
@@ -464,6 +527,137 @@ export class DealsService {
           userId: deal.managerId,
           type: NotificationType.DEAL_STATUS_CHANGED,
           title: `Deal ${deal.dealNumber} is now ${this.domain.nextStatusAfterContract()}`,
+          entityType: NotificationEntityType.DEAL,
+          entityId: deal.id,
+        });
+      }
+
+      return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
+    });
+
+    return this.mapper.toDetails(result);
+  }
+
+  // --------------------------------------------------------------------------
+  // Discount approval
+  // --------------------------------------------------------------------------
+
+  async approveDiscount(user: AuthUser, id: string) {
+    if (!user.companyId) {
+      throw new ForbiddenException("User does not belong to a company");
+    }
+
+    const companyId = user.companyId;
+
+    const result = await this.prisma.$transaction(async db => {
+      const deal = await db.deal.findFirst({
+        where: {
+          id, companyId,
+          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+        },
+      });
+      if (!deal) throw new DealNotFoundException(id);
+
+      if (deal.discountApprovalStatus !== DiscountApprovalStatus.PENDING) {
+        throw new DiscountNotPendingException();
+      }
+
+      const company = await db.company.findUniqueOrThrow({ where: { id: companyId } });
+
+      if (!this.domain.canDecideDiscount(deal.requestedDiscountPercent, user.role, company)) {
+        throw new DiscountApprovalNotAllowedException();
+      }
+
+      await db.deal.update({
+        where: { id },
+        data: {
+          discountApprovalStatus: DiscountApprovalStatus.APPROVED,
+          discountApprovedById: user.id,
+          discountApprovedAt: new Date(),
+          discountAmount: deal.requestedDiscountAmount,
+          discountPercent: deal.requestedDiscountPercent,
+          salePrice: deal.listPrice.minus(deal.requestedDiscountAmount),
+        },
+      });
+
+      await this.activityService.discountApproved({
+        db, companyId, userId: user.id,
+        dealId: deal.id, clientId: deal.clientId,
+        metadata: { discountPercent: deal.requestedDiscountPercent.toNumber() },
+      });
+
+      if (deal.managerId && deal.managerId !== user.id) {
+        await this.notifications.create({
+          companyId,
+          userId: deal.managerId,
+          type: NotificationType.DISCOUNT_DECIDED,
+          title: `Discount approved for deal ${deal.dealNumber}`,
+          entityType: NotificationEntityType.DEAL,
+          entityId: deal.id,
+        });
+      }
+
+      return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
+    });
+
+    return this.mapper.toDetails(result);
+  }
+
+  /**
+   * Rejecting doesn't cancel the deal. The deal was already held at list
+   * price while the request was PENDING (see reserveUnit), so nothing about
+   * the price needs to change here — clearing PENDING is what unblocks
+   * signContract again, at list price, with the ask on record.
+   */
+  async rejectDiscount(user: AuthUser, id: string, dto: RejectDiscountDto) {
+    if (!user.companyId) {
+      throw new ForbiddenException("User does not belong to a company");
+    }
+
+    const companyId = user.companyId;
+
+    const result = await this.prisma.$transaction(async db => {
+      const deal = await db.deal.findFirst({
+        where: {
+          id, companyId,
+          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+        },
+      });
+      if (!deal) throw new DealNotFoundException(id);
+
+      if (deal.discountApprovalStatus !== DiscountApprovalStatus.PENDING) {
+        throw new DiscountNotPendingException();
+      }
+
+      const company = await db.company.findUniqueOrThrow({ where: { id: companyId } });
+
+      if (!this.domain.canDecideDiscount(deal.requestedDiscountPercent, user.role, company)) {
+        throw new DiscountApprovalNotAllowedException();
+      }
+
+      await db.deal.update({
+        where: { id },
+        data: {
+          discountApprovalStatus: DiscountApprovalStatus.REJECTED,
+          discountApprovedById: user.id,
+          discountApprovedAt: new Date(),
+          discountRejectionReason: dto.reason,
+        },
+      });
+
+      await this.activityService.discountRejected({
+        db, companyId, userId: user.id,
+        dealId: deal.id, clientId: deal.clientId,
+        metadata: { reason: dto.reason },
+      });
+
+      if (deal.managerId && deal.managerId !== user.id) {
+        await this.notifications.create({
+          companyId,
+          userId: deal.managerId,
+          type: NotificationType.DISCOUNT_DECIDED,
+          title: `Discount rejected for deal ${deal.dealNumber}`,
+          message: dto.reason,
           entityType: NotificationEntityType.DEAL,
           entityId: deal.id,
         });

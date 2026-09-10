@@ -1,4 +1,4 @@
-import {ConflictException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
+import {BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
 import {randomBytes} from "crypto";
 import * as bcrypt from "bcrypt";
 import {AuditAction, Prisma, UserRole} from "@/generated/prisma/client";
@@ -66,6 +66,39 @@ export class CompaniesService {
 
         if (dto.timezone) {
             await this.settingOptions.assertActiveOption("TIMEZONE", dto.timezone.trim());
+        }
+    }
+
+    /**
+     * salesHeadDiscountLimit must be >= salesManagerDiscountLimit — checked
+     * against the *effective* values, since a partial update can send either
+     * threshold alone (see UpdateOwnCompanyDto).
+     */
+    private async assertValidDiscountThresholds(id: string, dto: unknown): Promise<void> {
+        // UpdateCompanyDto (the platform operator's DTO) never carries these
+        // — only UpdateOwnCompanyDto does. Typed `unknown` and read
+        // defensively so update() can call this unconditionally for either.
+        const {salesManagerDiscountLimit, salesHeadDiscountLimit} = dto as {
+            salesManagerDiscountLimit?: number;
+            salesHeadDiscountLimit?: number;
+        };
+
+        if (salesManagerDiscountLimit === undefined && salesHeadDiscountLimit === undefined) {
+            return;
+        }
+
+        const current = await this.prisma.company.findUniqueOrThrow({
+            where: {id},
+            select: {salesManagerDiscountLimit: true, salesHeadDiscountLimit: true},
+        });
+
+        const managerLimit = salesManagerDiscountLimit ?? current.salesManagerDiscountLimit.toNumber();
+        const headLimit = salesHeadDiscountLimit ?? current.salesHeadDiscountLimit.toNumber();
+
+        if (headLimit < managerLimit) {
+            throw new BadRequestException(
+                "salesHeadDiscountLimit must be greater than or equal to salesManagerDiscountLimit",
+            );
         }
     }
 
@@ -288,6 +321,7 @@ export class CompaniesService {
     async update(id: string, dto: UpdateCompanyDto) {
         await this.findOne(id);
         await this.assertValidSettings(dto);
+        await this.assertValidDiscountThresholds(id, dto);
 
         if (dto.name) {
             const clash = await this.prisma.company.findFirst({

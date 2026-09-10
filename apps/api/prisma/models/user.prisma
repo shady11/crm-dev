@@ -29,6 +29,7 @@ model User {
   managedLeads  Lead[]     @relation("LeadManager")
   deals         Deal[]
   reservedDeals Deal[]     @relation("ReservedBy")
+  discountApprovals Deal[] @relation("DiscountApprovedBy")
   payments      Payment[]
   activities    Activity[]
   tasks         Task[]

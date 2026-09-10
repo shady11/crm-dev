@@ -15,6 +15,7 @@ import {ReserveUnitDto} from '../dto/reserve-unit.dto';
 import {ExtendReservationDto} from "@/modules/deals/dto/extend-reservation.dto";
 import {SignContractDto} from "@/modules/deals/dto/sign-contract.dto";
 import {CancelDealDto} from "@/modules/deals/dto/cancel-deal.dto";
+import {RejectDiscountDto} from "@/modules/deals/dto/reject-discount.dto";
 import {GeneratePaymentScheduleDto} from "@/modules/deals/dto/payments/generate-payment-schedule.dto";
 import {CreatePaymentDto} from "@/modules/deals/dto/payments/create-payment.dto";
 import {PaymentScheduleService} from "@/modules/deals/services/payments/payment-schedule.service";
@@ -130,6 +131,32 @@ export class DealsController {
       @Body() dto: ReassignManagerDto,
   ) {
     return this.dealsService.reassignManager(user, id, dto);
+  }
+
+  // SALES_MANAGER excluded — approving/rejecting a discount is exactly the
+  // authority this endpoint exists to check, so the requester can never be
+  // their own approver. DealsService.approveDiscount/rejectDiscount still
+  // check the requested amount against the actor's own band on top of this.
+  @Roles(
+      UserRole.COMPANY_ADMIN,
+      UserRole.SALES_HEAD
+  )
+  @Post(':id/discount/approve')
+  approveDiscount(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.dealsService.approveDiscount(user, id);
+  }
+
+  @Roles(
+      UserRole.COMPANY_ADMIN,
+      UserRole.SALES_HEAD
+  )
+  @Post(':id/discount/reject')
+  rejectDiscount(
+      @CurrentUser() user: AuthUser,
+      @Param('id') id: string,
+      @Body() dto: RejectDiscountDto,
+  ) {
+    return this.dealsService.rejectDiscount(user, id, dto);
   }
 
   @Roles(

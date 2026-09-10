@@ -23,6 +23,7 @@ model Client {
   deals      Deal[]
   activities Activity[]
   tasks      Task[]
+  outboundMessages OutboundMessage[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

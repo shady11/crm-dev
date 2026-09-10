@@ -26,6 +26,7 @@ import {DocumentsModule} from "@/modules/documents/documents.module";
 import {DocumentGenerationModule} from "@/modules/document-generation/document-generation.module";
 import {ScheduleModule} from "@nestjs/schedule";
 import {NotificationsModule} from "@/modules/notifications/notifications.module";
+import {PaymentRemindersModule} from "@/modules/payment-reminders/payment-reminders.module";
 import {DashboardModule} from "@/modules/dashboard/dashboard.module";
 import {AuditLogModule} from "@/modules/audit-log/audit-log.module";
 import {ActivitiesModule} from "@/modules/activities/activities.module";
@@ -71,6 +72,7 @@ import {ImpersonationAuditInterceptor} from "@/common/interceptors/impersonation
       DocumentsModule,
       DocumentGenerationModule,
       NotificationsModule,
+      PaymentRemindersModule,
       DashboardModule,
       // Company-wide activity feed: COMPANY_ADMIN sees the whole company,
       // branch-scoped roles see only their own branch (see ActivitiesService).
