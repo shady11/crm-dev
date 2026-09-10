@@ -1,16 +1,20 @@
 import {Injectable} from '@nestjs/common';
 import {
+    Company,
     Deal,
     DealStatus,
+    DiscountApprovalStatus,
     PaymentSchedule,
     PaymentScheduleStatus,
     Prisma,
     Unit,
-    UnitStatus
+    UnitStatus,
+    UserRole,
 } from '@/generated/prisma/client';
 
 import {
     ActiveDealExistsException,
+    DiscountPendingApprovalException,
     InvalidDealStateException,
     PaymentExceedsBalanceException,
     RefundExceedsPaidException,
@@ -65,6 +69,46 @@ export class DealDomainService {
 
     ensureCanSignContract(deal: Deal): void {
         this.ensureStatus(deal, DealStatus.RESERVED);
+
+        if (deal.discountApprovalStatus === DiscountApprovalStatus.PENDING) {
+            throw new DiscountPendingApprovalException();
+        }
+    }
+
+    /**
+     * A request at or below the requesting role's own discretionary limit
+     * never needs a decision — this is what keeps an ordinary small discount
+     * exactly as fast as it is today. COMPANY_ADMIN has no ceiling.
+     */
+    requiresDiscountApproval(
+        requestedPercent: Prisma.Decimal,
+        role: UserRole,
+        company: Pick<Company, 'salesManagerDiscountLimit' | 'salesHeadDiscountLimit'>,
+    ): boolean {
+        if (role === UserRole.COMPANY_ADMIN) return false;
+
+        const limit = role === UserRole.SALES_HEAD
+            ? new Prisma.Decimal(company.salesHeadDiscountLimit)
+            : new Prisma.Decimal(company.salesManagerDiscountLimit);
+
+        return requestedPercent.greaterThan(limit);
+    }
+
+    /**
+     * Who may decide a pending request: SALES_HEAD only up to their own
+     * limit (their own band), COMPANY_ADMIN for anything above it. A
+     * SALES_HEAD can't approve a request that would itself have needed
+     * COMPANY_ADMIN sign-off had the sales head requested it directly.
+     */
+    canDecideDiscount(
+        requestedPercent: Prisma.Decimal,
+        role: UserRole,
+        company: Pick<Company, 'salesHeadDiscountLimit'>,
+    ): boolean {
+        if (role === UserRole.COMPANY_ADMIN) return true;
+        if (role !== UserRole.SALES_HEAD) return false;
+
+        return requestedPercent.lessThanOrEqualTo(new Prisma.Decimal(company.salesHeadDiscountLimit));
     }
 
     ensureCanActivate(deal: Deal): void {

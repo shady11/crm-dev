@@ -8,6 +8,8 @@ enum NotificationType {
   DOCUMENT_UPLOADED
   PAYMENT_DUE_SOON
   PAYMENT_OVERDUE
+  DISCOUNT_APPROVAL_REQUESTED
+  DISCOUNT_DECIDED
 }
 
 enum NotificationEntityType {

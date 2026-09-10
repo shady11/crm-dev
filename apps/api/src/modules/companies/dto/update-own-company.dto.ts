@@ -1,4 +1,5 @@
-import {IsOptional, IsString, MaxLength, MinLength} from "class-validator";
+import {IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength} from "class-validator";
+import {Type} from "class-transformer";
 
 /**
  * Fields a COMPANY_ADMIN may change on their own tenant. Deliberately
@@ -56,4 +57,22 @@ export class UpdateOwnCompanyDto {
     @IsString()
     @MaxLength(2000)
     letterheadUrl?: string;
+
+    // Discount approval thresholds, in percent — see DealDomainService.
+    // requiresDiscountApproval/canDecideDiscount. salesHeadDiscountLimit
+    // must be >= salesManagerDiscountLimit; CompaniesService.update enforces
+    // that across a partial update, since either can be sent alone.
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber({maxDecimalPlaces: 2})
+    @Min(0)
+    @Max(100)
+    salesManagerDiscountLimit?: number;
+
+    @IsOptional()
+    @Type(() => Number)
+    @IsNumber({maxDecimalPlaces: 2})
+    @Min(0)
+    @Max(100)
+    salesHeadDiscountLimit?: number;
 }

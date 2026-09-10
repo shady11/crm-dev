@@ -13,6 +13,16 @@ enum FinancingType {
   MORTGAGE
 }
 
+// NONE covers both "no discount" and "discount within the requester's own
+// discretionary limit" — those never need a decision, so they never become
+// PENDING. See DealDomainService.requiresDiscountApproval.
+enum DiscountApprovalStatus {
+  NONE
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model Deal {
   id String @id @default(uuid())
 
@@ -48,6 +58,20 @@ model Deal {
   discountPercent Decimal? @db.Decimal(5, 2)
   deposit         Decimal? @db.Decimal(14, 2)
 
+  // While PENDING, the fields above stay at whatever the requester's own
+  // discretionary limit allows (0 if they have none) — the deal is held at
+  // that price, not the requested one, until a decision is made. The ask
+  // itself lives here instead, so approving it is "copy these onto the
+  // fields above," not a second round of price math.
+  discountApprovalStatus  DiscountApprovalStatus @default(NONE)
+  requestedDiscountPercent Decimal? @db.Decimal(5, 2)
+  requestedDiscountAmount Decimal? @db.Decimal(14, 2)
+
+  discountApprovedById String?
+  discountApprovedBy   User?   @relation("DiscountApprovedBy", fields: [discountApprovedById], references: [id])
+  discountApprovedAt   DateTime?
+  discountRejectionReason String?
+
   reservedAt           DateTime?
   reservationExpiresAt DateTime?
   reservedById         String?
@@ -72,6 +96,7 @@ model Deal {
   deletedAt DateTime?
 
   @@unique([companyId, dealNumber])
+  @@index([companyId, discountApprovalStatus])
   @@index([projectId])
   @@index([unitId])
   @@index([clientId])

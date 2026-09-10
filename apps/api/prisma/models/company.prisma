@@ -20,6 +20,14 @@ model Company {
   signatoryTitle String?
   letterheadUrl  String?
 
+  // Discretionary discount ceilings, in percent — a SALES_MANAGER/SALES_HEAD
+  // request at or below their own limit auto-applies; above it, it needs
+  // sign-off from the next band up. See DealDomainService.requiresDiscountApproval.
+  // Defaulted rather than nullable so a company that never configures this
+  // still has a real gate, not an accidental "everything auto-approves."
+  salesManagerDiscountLimit Decimal @default(5) @db.Decimal(5, 2)
+  salesHeadDiscountLimit    Decimal @default(15) @db.Decimal(5, 2)
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 

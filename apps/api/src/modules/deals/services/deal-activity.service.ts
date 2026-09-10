@@ -167,4 +167,37 @@ export class DealActivityService {
             title,
         });
     }
+
+    discountRequested(
+        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+    ) {
+        return this.create({
+            ...params,
+            action: ActivityAction.DISCOUNT_REQUESTED,
+            type: ActivityType.DISCOUNT_REQUESTED,
+            title: 'Discount requested approval',
+        });
+    }
+
+    discountApproved(
+        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+    ) {
+        return this.create({
+            ...params,
+            action: ActivityAction.DISCOUNT_APPROVED,
+            type: ActivityType.DISCOUNT_APPROVED,
+            title: 'Discount approved',
+        });
+    }
+
+    discountRejected(
+        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+    ) {
+        return this.create({
+            ...params,
+            action: ActivityAction.DISCOUNT_REJECTED,
+            type: ActivityType.DISCOUNT_REJECTED,
+            title: 'Discount rejected',
+        });
+    }
 }
