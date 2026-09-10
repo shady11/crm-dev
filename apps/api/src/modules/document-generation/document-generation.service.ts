@@ -1,11 +1,14 @@
 import { randomUUID } from 'crypto';
 import * as Handlebars from 'handlebars';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/database/prisma.service';
 import { DocumentOwnerType, DocumentType } from '@/generated/prisma/client';
 import { DEAL_DETAILS_INCLUDE } from '@/modules/deals/deal.constants';
-import { saveFileToDisk } from '@/modules/documents/documents.constants';
+import {
+  FILE_STORAGE_PROVIDER,
+  FileStorageProvider,
+} from '@/modules/documents/storage/file-storage.interface';
 
 import { DEFAULT_TEMPLATES } from './templates/default-templates';
 import { buildTemplateContext } from './template-context.builder';
@@ -24,7 +27,10 @@ interface GenerateForDealParams {
 
 @Injectable()
 export class DocumentGenerationService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    @Inject(FILE_STORAGE_PROVIDER) private readonly storage: FileStorageProvider,
+  ) {}
 
   /**
    * Renders a document for a deal and persists it as an ordinary Document
@@ -78,7 +84,7 @@ export class DocumentGenerationService {
     const pdfBuffer = await renderHtmlToPdf(html);
 
     const storedName = `${randomUUID()}.pdf`;
-    const relativePath = await saveFileToDisk(companyId, storedName, pdfBuffer);
+    const relativePath = await this.storage.save(companyId, storedName, pdfBuffer);
     const originalName = `${type.toLowerCase()}-${deal.dealNumber}.pdf`;
 
     return this.prisma.document.create({

@@ -76,6 +76,9 @@ export function LeadsPage() {
                 lead={form.editingLead}
                 isSubmitting={form.isSubmitting}
                 hasError={form.hasError}
+                duplicateWarning={form.duplicateWarning?.duplicates ?? null}
+                onConfirmDuplicate={form.onConfirmDuplicate}
+                onDismissDuplicate={form.onDismissDuplicate}
                 onClose={form.closeForm}
                 onSubmit={form.handleSubmit}
             />

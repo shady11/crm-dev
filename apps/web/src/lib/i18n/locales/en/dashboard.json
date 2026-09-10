@@ -23,6 +23,16 @@
     "empty": "No branches yet."
   },
   "dealsByStage": "Deals by stage",
+  "funnel": {
+    "title": "Conversion funnel",
+    "leadsSeriesLabel": "Leads",
+    "export": "Export to Excel",
+    "exportError": "Could not export the funnel report. Try again.",
+    "totalLeads": "Total leads",
+    "totalDeals": "Total deals",
+    "leadToDeal": "Lead → deal",
+    "leadToWon": "Lead → won"
+  },
   "attention": {
     "title": "Needs attention",
     "empty": "Nothing urgent right now.",

@@ -1,4 +1,4 @@
-import {BadRequestException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
+import {BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
 import {ActivityAction, ActivityType, Prisma, UserRole} from "@/generated/prisma/client";
 import {LeadStatus} from "@/generated/prisma/enums";
 import {PrismaService} from "@/database/prisma.service";
@@ -177,6 +177,10 @@ export class LeadsService {
 
         if (dto.clientId) {
             await this.ensureClientAssignable(dto.clientId, user);
+        }
+
+        if (!dto.confirmDuplicate) {
+            await this.rejectIfDuplicatePhone(user, dto.phone);
         }
 
         // BR-B2: stamped from the actor server-side, never trusted from the
@@ -547,6 +551,26 @@ export class LeadsService {
         return {
             success: true,
         };
+    }
+
+    /**
+     * The single most common data-quality problem on a multi-agent sales
+     * floor: the same walk-in or ad click gets entered as a second lead
+     * because nobody checked first. Reuses checkDuplicates()'s lookup so the
+     * warning shown by GET /leads/duplicates and the rule enforced here can
+     * never drift apart. Callers who have already seen the warning and want
+     * to proceed anyway pass dto.confirmDuplicate — this only blocks a
+     * silent duplicate, never a deliberate one.
+     */
+    private async rejectIfDuplicatePhone(user: AuthUser, phone: string) {
+        const { leads, clients } = await this.checkDuplicates(user, phone);
+
+        if (leads.length > 0 || clients.length > 0) {
+            throw new ConflictException({
+                message: "A lead or client with this phone number already exists",
+                duplicates: { leads, clients },
+            });
+        }
     }
 
     /**

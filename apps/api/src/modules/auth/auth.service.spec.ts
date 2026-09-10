@@ -5,6 +5,7 @@ import {UserRole} from "@/generated/prisma/client";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {PrismaService} from "@/database/prisma.service";
 import {UsersService} from "@/modules/users/users.service";
+import {TotpService} from "@/modules/auth/totp.service";
 import {AuthService} from "./auth.service";
 
 describe("AuthService.changeOwnPassword", () => {
@@ -43,7 +44,9 @@ describe("AuthService.changeOwnPassword", () => {
         const users = {findByEmail: jest.fn().mockResolvedValue(record)} as unknown as UsersService;
         const jwt = {signAsync: jest.fn().mockResolvedValue("new.jwt.token")} as unknown as JwtService;
 
-        return {service: new AuthService(users, jwt, prisma), update, jwt};
+        const totp = new TotpService();
+
+        return {service: new AuthService(users, jwt, prisma, totp), update, jwt};
     };
 
     it("rejects a wrong current password without writing anything", async () => {

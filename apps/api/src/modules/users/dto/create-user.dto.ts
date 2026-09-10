@@ -1,5 +1,6 @@
-import {IsEmail, IsEnum, IsOptional, IsString, IsUUID, MinLength} from "class-validator";
+import {IsEmail, IsEnum, IsOptional, IsString, IsStrongPassword, IsUUID, MinLength} from "class-validator";
 import {UserRole} from "@/generated/prisma/enums";
+import {STRONG_PASSWORD_OPTIONS} from "@/common/constants/password-policy.constants";
 
 export class CreateUserDto {
     @IsString()
@@ -13,8 +14,10 @@ export class CreateUserDto {
     @IsString()
     phone?: string;
 
-    @IsString()
-    @MinLength(8)
+    @IsStrongPassword(STRONG_PASSWORD_OPTIONS, {
+        message:
+            "Password must be at least 8 characters and include an uppercase letter, a lowercase letter and a number.",
+    })
     password!: string;
 
     @IsEnum(UserRole)

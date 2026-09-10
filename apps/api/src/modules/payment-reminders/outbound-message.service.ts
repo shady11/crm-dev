@@ -32,11 +32,11 @@ interface SendReminderParams {
 }
 
 /**
- * WhatsApp preferred, SMS next (Client.phone is required so this is always
- * reachable), email last. Matches the channel priority from the spec —
- * kept as a real fallback chain even though Client.phone being required
- * today makes the email branch effectively unreachable, in case that
- * constraint ever loosens.
+ * Preference order: WhatsApp, then email, then SMS. WhatsApp is still
+ * logged-only (no gateway chosen yet), so in practice EMAIL is the channel
+ * that actually reaches a client once SMTP is configured — prioritized
+ * above SMS for that reason. Revisit this order once a real SMS/WhatsApp
+ * provider exists.
  */
 function pickChannel(client: ReminderClient): {
   channel: OutboundChannel;
@@ -44,8 +44,8 @@ function pickChannel(client: ReminderClient): {
 } {
   if (client.whatsapp)
     return { channel: OutboundChannel.WHATSAPP, to: client.whatsapp };
-  if (client.phone) return { channel: OutboundChannel.SMS, to: client.phone };
-  return { channel: OutboundChannel.EMAIL, to: client.email ?? '' };
+  if (client.email) return { channel: OutboundChannel.EMAIL, to: client.email };
+  return { channel: OutboundChannel.SMS, to: client.phone };
 }
 
 @Injectable()

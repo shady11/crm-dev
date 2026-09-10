@@ -1,12 +1,13 @@
-import {IsString, MinLength} from "class-validator";
+import {IsStrongPassword, IsString} from "class-validator";
+import {STRONG_PASSWORD_OPTIONS} from "@/common/constants/password-policy.constants";
 
 export class ChangePasswordDto {
     @IsString()
     currentPassword!: string;
 
-    // Eight rather than the six used elsewhere: this is a password being set,
-    // not one being checked, so raising the floor here locks nobody out.
-    @IsString()
-    @MinLength(8)
+    @IsStrongPassword(STRONG_PASSWORD_OPTIONS, {
+        message:
+            "Password must be at least 8 characters and include an uppercase letter, a lowercase letter and a number.",
+    })
     newPassword!: string;
 }

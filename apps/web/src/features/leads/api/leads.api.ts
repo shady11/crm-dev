@@ -53,6 +53,9 @@ export type CreateLeadPayload = {
     status?: LeadStatus;
     comment?: string;
     managerId?: string;
+    // Set to bypass the server's duplicate-phone check after the caller has
+    // already seen the warning (409 response) and wants to create it anyway.
+    confirmDuplicate?: boolean;
 };
 
 export type UpdateLeadPayload = Partial<CreateLeadPayload>;
@@ -80,12 +83,22 @@ export async function convertLead(id: string, payload?: ConvertLeadPayload) {
     return response.data;
 }
 
+export type LeadDuplicateMatch = { id: string; fullName: string; phone: string; status: string; createdAt: string };
+export type ClientDuplicateMatch = { id: string; fullName: string; phone: string; createdAt: string };
+
 export type DuplicateLeadCheckResult = {
-    leads: { id: string; fullName: string; phone: string; status: string; createdAt: string }[];
-    clients: { id: string; fullName: string; phone: string; createdAt: string }[];
+    leads: LeadDuplicateMatch[];
+    clients: ClientDuplicateMatch[];
     // BR-D2: populated only for a COMPANY_ADMIN caller — a heads-up that this
     // phone already exists as a client at a different branch.
     crossBranchClient: { id: string; branchId: string | null } | null;
+};
+
+// Shape of the 409 response body when POST /leads finds a phone match —
+// same leads/clients arrays as DuplicateLeadCheckResult, no crossBranchClient.
+export type DuplicateLeadConflict = {
+    message: string;
+    duplicates: { leads: LeadDuplicateMatch[]; clients: ClientDuplicateMatch[] };
 };
 
 // BR-D1: COMPANY_ADMIN-only handoff of a lead to another branch.

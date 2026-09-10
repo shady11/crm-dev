@@ -1,5 +1,6 @@
 import {ForbiddenException, Injectable} from "@nestjs/common";
-import {DealStatus, Prisma, TaskStatus, UnitStatus, UserRole} from "@/generated/prisma/client";
+import * as XLSX from "xlsx";
+import {DealStatus, LeadStatus, Prisma, TaskStatus, UnitStatus, UserRole} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
@@ -413,5 +414,95 @@ export class DashboardService {
             dealsWon,
             conversionRate: leadsAssigned > 0 ? dealsWon / leadsAssigned : 0,
         };
+    }
+
+    /**
+     * Lead → deal → won conversion funnel, the first thing a pilot sponsor
+     * asks a CRM for and — until now — the one number this dashboard
+     * couldn't produce (getKpis/getMyPerformance only ever counted a single
+     * stage in isolation). Lead status counts and deal status counts are
+     * necessarily two separate breakdowns (a lead and its resulting deal are
+     * different rows), so the funnel below is assembled from both rather
+     * than a single groupBy.
+     */
+    async getFunnel(user: AuthUser, projectId?: string, branchId?: string) {
+        if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
+        const companyId = user.companyId;
+        const effectiveBranchId = this.resolveBranchId(user, branchId);
+
+        const [leadCounts, dealCounts, wonDeals, totalLeads] = await Promise.all([
+            this.prisma.lead.groupBy({
+                by: ["status"],
+                where: { companyId, branchId: effectiveBranchId, deletedAt: null },
+                _count: { _all: true },
+            }),
+            this.prisma.deal.groupBy({
+                by: ["status"],
+                where: { companyId, projectId, branchId: effectiveBranchId },
+                _count: { _all: true },
+            }),
+            this.prisma.deal.count({
+                where: { companyId, projectId, branchId: effectiveBranchId, status: DealStatus.COMPLETED },
+            }),
+            this.prisma.lead.count({
+                where: { companyId, branchId: effectiveBranchId, deletedAt: null },
+            }),
+        ]);
+
+        const leadsByStatus = Object.values(LeadStatus).map((status) => ({
+            status,
+            count: leadCounts.find((c) => c.status === status)?._count._all ?? 0,
+        }));
+
+        const dealsByStatus = Object.values(DealStatus).map((status) => ({
+            status,
+            count: dealCounts.find((c) => c.status === status)?._count._all ?? 0,
+        }));
+
+        return {
+            leadsByStatus,
+            dealsByStatus,
+            totalLeads,
+            totalDeals: dealCounts.reduce((sum, c) => sum + c._count._all, 0),
+            dealsWon: wonDeals,
+            leadToDealConversionRate: totalLeads > 0
+                ? dealCounts.reduce((sum, c) => sum + c._count._all, 0) / totalLeads
+                : 0,
+            leadToWonConversionRate: totalLeads > 0 ? wonDeals / totalLeads : 0,
+        };
+    }
+
+    /**
+     * Excel export of the funnel above — the second thing a pilot sponsor
+     * asks for after "what's our conversion rate", right before "can I get
+     * this in Excel". Reuses the xlsx dependency already in this project
+     * (see units-import.service.ts) rather than adding a CSV library for
+     * the same job.
+     */
+    async exportFunnelXlsx(user: AuthUser, projectId?: string, branchId?: string): Promise<Buffer> {
+        const funnel = await this.getFunnel(user, projectId, branchId);
+
+        const workbook = XLSX.utils.book_new();
+
+        const leadsSheet = XLSX.utils.json_to_sheet(
+            funnel.leadsByStatus.map((row) => ({ Status: row.status, Leads: row.count })),
+        );
+        XLSX.utils.book_append_sheet(workbook, leadsSheet, "Leads by status");
+
+        const dealsSheet = XLSX.utils.json_to_sheet(
+            funnel.dealsByStatus.map((row) => ({ Status: row.status, Deals: row.count })),
+        );
+        XLSX.utils.book_append_sheet(workbook, dealsSheet, "Deals by status");
+
+        const summarySheet = XLSX.utils.json_to_sheet([
+            { Metric: "Total leads", Value: funnel.totalLeads },
+            { Metric: "Total deals", Value: funnel.totalDeals },
+            { Metric: "Deals won", Value: funnel.dealsWon },
+            { Metric: "Lead → deal conversion rate", Value: funnel.leadToDealConversionRate },
+            { Metric: "Lead → won conversion rate", Value: funnel.leadToWonConversionRate },
+        ]);
+        XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary");
+
+        return XLSX.write(workbook, { type: "buffer", bookType: "xlsx" }) as Buffer;
     }
 }

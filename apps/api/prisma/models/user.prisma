@@ -17,6 +17,18 @@ model User {
   isActive          Boolean  @default(true)
   sessionsValidFrom DateTime @default(now())
 
+  // Account lockout: incremented on each failed login, reset on success.
+  // Once it reaches LOGIN_LOCKOUT_THRESHOLD, lockedUntil is set and login is
+  // refused (even with the correct password) until that time passes.
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+
+  // TOTP two-factor authentication. totpSecret is only ever set once the
+  // user has confirmed a code against it (see AuthController's /2fa/enable);
+  // totpEnabled gates whether login() requires a code at all.
+  totpSecret  String?
+  totpEnabled Boolean @default(false)
+
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
 

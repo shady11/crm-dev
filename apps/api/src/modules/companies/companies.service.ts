@@ -318,9 +318,43 @@ export class CompaniesService {
         return this.update(actor.companyId, dto);
     }
 
+    /**
+     * Every Payment/Deal amount is a plain Decimal with no currency column of
+     * its own — currency lives once, on Company. Changing it after deals
+     * exist doesn't convert anything already recorded, so a KGS deal would
+     * silently start reading as USD. Until the model supports a currency per
+     * deal, changing it once real deals exist is a data-corrupting operation,
+     * not a settings tweak — so it's refused rather than silently allowed.
+     */
+    private async assertCurrencyIsUnlocked(id: string, dto: {currency?: string}): Promise<void> {
+        if (!dto.currency) {
+            return;
+        }
+
+        const current = await this.prisma.company.findUniqueOrThrow({
+            where: {id},
+            select: {currency: true},
+        });
+
+        if (current.currency && dto.currency.trim() === current.currency) {
+            return;
+        }
+
+        const dealCount = await this.prisma.deal.count({where: {companyId: id}});
+
+        if (dealCount > 0) {
+            throw new BadRequestException(
+                "Currency cannot be changed once deals exist — amounts already recorded would be " +
+                "silently reinterpreted in the new currency. Contact support if this tenant genuinely " +
+                "needs to switch currencies.",
+            );
+        }
+    }
+
     async update(id: string, dto: UpdateCompanyDto) {
         await this.findOne(id);
         await this.assertValidSettings(dto);
+        await this.assertCurrencyIsUnlocked(id, dto);
         await this.assertValidDiscountThresholds(id, dto);
 
         if (dto.name) {

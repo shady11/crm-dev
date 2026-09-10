@@ -1,10 +1,6 @@
-import {mkdir, writeFile} from "fs/promises";
-import {join} from "path";
 import {BadRequestException} from "@nestjs/common";
 import {memoryStorage} from "multer";
 import type {MulterOptions} from "@nestjs/platform-express/multer/interfaces/multer-options.interface";
-
-export const UPLOADS_ROOT = process.env.UPLOADS_DIR ?? join(process.cwd(), "uploads", "documents");
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
 
@@ -27,10 +23,3 @@ export const documentMulterOptions: MulterOptions = {
         callback(null, true);
     },
 };
-
-export async function saveFileToDisk(companyId: string, storedName: string, buffer: Buffer): Promise<string> {
-    const dir = join(UPLOADS_ROOT, companyId);
-    await mkdir(dir, { recursive: true });
-    await writeFile(join(dir, storedName), buffer);
-    return join(companyId, storedName);
-}

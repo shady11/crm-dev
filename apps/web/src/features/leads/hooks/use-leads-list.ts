@@ -1,4 +1,5 @@
 import {useState} from "react";
+import {isAxiosError} from "axios";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
@@ -8,6 +9,7 @@ import {
     createLead,
     type CreateLeadPayload,
     deleteLead,
+    type DuplicateLeadConflict,
     getLeads,
     type Lead,
     reassignLeadManager,
@@ -32,6 +34,10 @@ export function useLeadsList() {
 
     const [formOpen, setFormOpen] = useState(false);
     const [editingLead, setEditingLead] = useState<Lead | null>(null);
+    const [duplicateWarning, setDuplicateWarning] = useState<{
+        payload: CreateLeadPayload;
+        duplicates: DuplicateLeadConflict["duplicates"];
+    } | null>(null);
 
     const [deleteTarget, setDeleteTarget] = useState<Lead | null>(null);
     const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
@@ -57,9 +63,14 @@ export function useLeadsList() {
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["leads"] });
             toast.success({ title: t("toasts.createSuccessTitle"), description: t("toasts.createSuccessDescription") });
+            setDuplicateWarning(null);
             closeForm();
         },
-        onError: () => {
+        onError: (error, payload) => {
+            if (isAxiosError<DuplicateLeadConflict>(error) && error.response?.status === 409) {
+                setDuplicateWarning({ payload, duplicates: error.response.data.duplicates });
+                return;
+            }
             toast.error({ title: t("toasts.createErrorTitle"), description: t("toasts.createErrorDescription") });
         },
     });
@@ -169,16 +180,23 @@ export function useLeadsList() {
     const closeForm = () => {
         setFormOpen(false);
         setEditingLead(null);
+        setDuplicateWarning(null);
         createMutation.reset();
         updateMutation.reset();
     };
 
     const handleSubmit = (payload: CreateLeadPayload | UpdateLeadPayload) => {
+        setDuplicateWarning(null);
         if (editingLead) {
             updateMutation.mutate({ id: editingLead.id, payload: payload as UpdateLeadPayload });
             return;
         }
         createMutation.mutate(payload as CreateLeadPayload);
+    };
+
+    const confirmCreateDuplicate = () => {
+        if (!duplicateWarning) return;
+        createMutation.mutate({ ...duplicateWarning.payload, confirmDuplicate: true });
     };
 
     const toggleSelectAll = (checked: boolean) => {
@@ -280,7 +298,10 @@ export function useLeadsList() {
             open: formOpen,
             editingLead,
             isSubmitting: createMutation.isPending || updateMutation.isPending,
-            hasError: createMutation.isError || updateMutation.isError,
+            hasError: (createMutation.isError && !duplicateWarning) || updateMutation.isError,
+            duplicateWarning,
+            onConfirmDuplicate: confirmCreateDuplicate,
+            onDismissDuplicate: () => setDuplicateWarning(null),
             openCreateForm,
             openEditForm,
             closeForm,

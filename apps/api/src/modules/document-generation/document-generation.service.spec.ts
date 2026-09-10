@@ -6,10 +6,6 @@ jest.mock('./pdf-renderer', () => ({
   renderHtmlToPdf: jest.fn().mockResolvedValue(Buffer.from('%PDF-fake')),
 }));
 
-jest.mock('@/modules/documents/documents.constants', () => ({
-  saveFileToDisk: jest.fn().mockResolvedValue('company-1/generated.pdf'),
-}));
-
 const baseDeal = {
   id: 'deal-1',
   dealNumber: '2026-0001',
@@ -77,8 +73,13 @@ function build() {
     },
   };
 
-  const service = new DocumentGenerationService(prisma as any);
-  return { service, prisma };
+  const storage = {
+    save: jest.fn().mockResolvedValue('company-1/generated.pdf'),
+    getStream: jest.fn(),
+  };
+
+  const service = new DocumentGenerationService(prisma as any, storage);
+  return { service, prisma, storage };
 }
 
 describe('DocumentGenerationService', () => {
