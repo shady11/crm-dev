@@ -1,0 +1,53 @@
+{
+  "actions": {
+    "addFloor": "Кабат кошуу",
+    "bulkFloors": "Кабаттарды массалык кошуу",
+    "createFloor": "Кабаттарды түзүү",
+    "editFloor": "Кабатты оңдоо"
+  },
+  "addToEntrance": "{{name}} кире беришине кабат кошуу",
+  "form": {
+    "numberLabel": "Кабат номери",
+    "submitCreate": "Кабаттарды түзүү",
+    "errorGeneric": "Кабатты түзүү мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз.",
+    "errorSave": "Кабатты сактоо мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз."
+  },
+  "validation": {
+    "numberPositive": "Кабат номери оң сан болушу керек"
+  },
+  "item": {
+    "titleWithNumber": "{{number}}-кабат",
+    "units_one": "{{count}} юнит",
+    "units_few": "{{count}} юнит",
+    "units_many": "{{count}} юнит",
+    "units_other": "{{count}} юнит"
+  },
+  "bulk": {
+    "title": "{{name}} кире беришине бир нече кабат кошуу",
+    "floorsHeading": "Кабаттар",
+    "existingFloors": "Учурдагы кабаттар: {{ranges}}",
+    "addFloor": "Кабат кошуу",
+    "floorNumberLabel": "Кабат номери",
+    "duplicateNumberError": "Бул кабат номери мурунтан бар.",
+    "duplicateNumbersAlert": "Кайталанган кабат номерлери табылды. Түзүүдөн мурун аларды оңдоңуз.",
+    "submitCreate_one": "{{count}} кабат түзүү",
+    "submitCreate_few": "{{count}} кабат түзүү",
+    "submitCreate_many": "{{count}} кабат түзүү",
+    "submitCreate_other": "{{count}} кабат түзүү",
+    "errorGeneric": "Кабаттарды түзүү мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз."
+  },
+  "delete": {
+    "title": "Кабатты өчүрөсүзбү?",
+    "description": "{{number}}-кабат жана анын бардык юниттери биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт."
+  },
+  "duplicate": {
+    "title": "Кабатты кайталайсызбы?",
+    "description": "{{number}}-кабаттын көчүрмөсү бардык юниттери менен түзүлөт."
+  },
+  "toasts": {
+    "createdTitle": "Ийгиликтүү түзүлдү",
+    "updatedTitle": "Ийгиликтүү жаңырды",
+    "deletedTitle": "Ийгиликтүү өчүрүлдү",
+    "duplicatedTitle": "Ийгиликтүү кайталанды"
+  }
+}

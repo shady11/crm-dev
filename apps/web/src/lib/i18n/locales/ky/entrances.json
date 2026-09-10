@@ -1,0 +1,47 @@
+{
+  "actions": {
+    "addEntrance": "Кире бериш кошуу",
+    "createEntrance": "Кире бериш түзүү",
+    "editEntrance": "Кире беришти оңдоо"
+  },
+  "addToBlock": "{{name}} блогуна кире бериш кошуу",
+  "form": {
+    "nameLabel": "Аталышы",
+    "namePlaceholder": "Кире беринин аталышы (мисалы, 1, 2, Негизги)",
+    "orderLabel": "Көрсөтүү тартиби (милдеттүү эмес)",
+    "submitCreate": "Кире бериш түзүү",
+    "errorCreate": "Кире беришти түзүү мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз.",
+    "errorSave": "Кире беришти сактоо мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз."
+  },
+  "validation": {
+    "nameRequired": "Кире беринин аталышы милдеттүү"
+  },
+  "item": {
+    "titleWithName": "{{name}} кире бериши",
+    "floors_one": "{{count}} кабат",
+    "floors_few": "{{count}} кабат",
+    "floors_many": "{{count}} кабат",
+    "floors_other": "{{count}} кабат"
+  },
+  "delete": {
+    "title": "Кире беришти өчүрөсүзбү?",
+    "description": "{{name}} кире бериши жана анын бардык кабаттары жана юниттери биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт."
+  },
+  "duplicate": {
+    "title": "Кире беришти кайталайсызбы?",
+    "descriptionPrefix": "Түзүлөт: ",
+    "nameLabel": "{{name}} кире беришинин көчүрмөсү",
+    "descriptionSuffix": " бардык кабаттар жана юниттер менен."
+  },
+  "toasts": {
+    "createdTitle": "Ийгиликтүү түзүлдү",
+    "createdDescription": "{{name}} кире бериши түзүлдү.",
+    "createErrorTitle": "Кире беришти түзүү мүмкүн болбоду",
+    "updatedTitle": "Ийгиликтүү жаңырды",
+    "updatedDescription": "{{name}} кире бериши жаңырды.",
+    "deletedTitle": "Ийгиликтүү өчүрүлдү",
+    "deletedDescription": "{{name}} кире бериши өчүрүлдү.",
+    "duplicatedTitle": "Ийгиликтүү кайталанды",
+    "duplicatedDescription": "{{name}} кире бериши кайталанды."
+  }
+}

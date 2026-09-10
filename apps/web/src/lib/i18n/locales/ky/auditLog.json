@@ -1,0 +1,39 @@
+{
+  "page": {
+    "heading": "Аудит журналы",
+    "description": "Платформадагы бардык тенанттар боюнча артыкчылыктуу аракеттер — бир гана кошуу, өчүрүү жок.",
+    "filters": {
+      "companyId": "Тенант ID",
+      "companyIdPlaceholder": "Тенант ID боюнча чыпка",
+      "action": "Аракет",
+      "allActions": "Бардык аракеттер",
+      "dateFrom": "Баштап",
+      "dateTo": "Чейин"
+    },
+    "table": {
+      "headers": {
+        "timestamp": "Качан",
+        "actor": "Ким",
+        "action": "Аракет",
+        "target": "Объект",
+        "tenant": "Тенант"
+      }
+    },
+    "empty": {
+      "title": "Жазуулар жок",
+      "description": "Бул чыпкаларга эч нерсе туура келбейт."
+    },
+    "actions": {
+      "TENANT_CREATED": "Тенант түзүлдү",
+      "TENANT_SUSPENDED": "Тенант токтотулду",
+      "TENANT_RESUMED": "Тенант кайра иштетилди",
+      "TENANT_DELETED": "Тенант өчүрүлдү",
+      "TENANT_USER_DEACTIVATED": "Колдонуучу деактивдештирилди",
+      "TENANT_USER_REACTIVATED": "Колдонуучу активдештирилди",
+      "TENANT_USER_PASSWORD_RESET": "Сырсөз кайра орнотулду",
+      "IMPERSONATION_STARTED": "Колдонуучунун атынан кирүү башталды",
+      "IMPERSONATION_ENDED": "Колдонуучунун атынан кирүү аяктады",
+      "IMPERSONATED_ACTION": "Колдонуучунун атынан жасалган аракет"
+    }
+  }
+}

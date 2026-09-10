@@ -1,0 +1,173 @@
+{
+  "status": {
+    "new": "Жаңы",
+    "contacted": "Байланышылды",
+    "qualified": "Квалификацияланган",
+    "meeting": "Жолугушуу",
+    "negotiation": "Сүйлөшүү",
+    "converted": "Конверттелди",
+    "lost": "Жоготулду"
+  },
+  "page": {
+    "title": "Лиддер"
+  },
+  "toolbar": {
+    "heading": "Бардык лиддер",
+    "filterByStatus": "Статус боюнча чыпка",
+    "searchPlaceholder": "Лиддерди издөө...",
+    "addLead": "Лид кошуу"
+  },
+  "table": {
+    "lead": "Лид",
+    "status": "Статус",
+    "manager": "Менеджер",
+    "created": "Түзүлдү",
+    "emptyTitle": "Лиддер табылган жок",
+    "emptyDescription": "Чыпкаларды же издөөнү өзгөртүп көрүңүз."
+  },
+  "pagination": {
+    "rowsPerPage": "Барактагы саптар"
+  },
+  "actionBar": {
+    "selected": "Тандалды: {{count}}",
+    "delete": "Өчүрүү",
+    "clearSelection": "Тандоону тазалоо"
+  },
+  "overview": {
+    "fullName": "Аты-жөнү",
+    "phone": "Телефон",
+    "email": "Email",
+    "status": "Статус",
+    "source": "Булак",
+    "manager": "Менеджер",
+    "unassigned": "Дайындалган эмес",
+    "comment": "Комментарий",
+    "created": "Түзүлдү",
+    "createdAt": "{{date}} күнү, {{time}}"
+  },
+  "clientTab": {
+    "notConverted": "Бул лид дагы клиентке конвертелген эмес.",
+    "convertToClient": "Клиентке конверттөө",
+    "loadError": "Байланышкан клиентти жүктөө мүмкүн болбоду.",
+    "fullName": "Аты-жөнү",
+    "phone": "Телефон",
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "passport": "Паспорт",
+    "leads": "Лиддер",
+    "deals": "Бүтүмдөр"
+  },
+  "detailsSheet": {
+    "overviewTab": "Жалпы көрүнүш",
+    "activityTab": "Активдүүлүк",
+    "clientTab": "Клиент",
+    "edit": "Оңдоо",
+    "convert": "Конверттөө",
+    "transferBranch": {
+      "action": "Башка филиалга которуу",
+      "successTitle": "Лид башка филиалга которулду.",
+      "errorTitle": "Лидди которуу мүмкүн болбоду. Кайра аракет кылыңыз."
+    },
+    "reassign": {
+      "action": "Башка менеджерге өткөрүп берүү"
+    }
+  },
+  "activityTab": {
+    "type": {
+      "call": "Чалуу",
+      "message": "Билдирүү",
+      "meeting": "Жолугушуу"
+    },
+    "notePlaceholder": "Милдеттүү эмес эскертүү, мисалы «жооп берген жок» же «прайс-лист жиберилди»",
+    "logButton": "Байланыш аракетин жаздыруу",
+    "logging": "Сакталып жатат...",
+    "logSuccess": "Байланыш аракети жаздырылды",
+    "logError": "Байланыш аракетин жаздырууга болбоду. Кайра аракет кылыңыз.",
+    "empty": "Азырынча катталган байланыш аракети жок.",
+    "system": "Система"
+  },
+  "form": {
+    "editTitle": "Лидди оңдоо",
+    "addTitle": "Лид кошуу",
+    "editDescription": "Лиддин дайындарын жаңыртыңыз.",
+    "addDescription": "Жаңы лид жазуусун кошуңуз.",
+    "saveError": "Лидди сактоо мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз.",
+    "duplicateWarningTitle": "Мүмкүн болгон кайталоо",
+    "duplicateWarningDescription": "Бул телефон номери {{count}} учурдагы лид же клиент менен дал келет.",
+    "duplicateWarningEdit": "Дайындарды өзгөртүү",
+    "duplicateWarningConfirm": "Баары бир түзүү",
+    "saveChanges": "Өзгөртүүлөрдү сактоо",
+    "create": "Лид түзүү",
+    "fullName": "Аты-жөнү",
+    "phone": "Телефон",
+    "email": "Email (милдеттүү эмес)",
+    "source": "Булак (милдеттүү эмес)",
+    "sourcePlaceholder": "мисалы, Instagram, сунуш, келүү",
+    "status": "Статус",
+    "manager": "Менеджер (милдеттүү эмес)",
+    "unassigned": "Дайындалган эмес",
+    "comment": "Комментарий (милдеттүү эмес)",
+    "commentPlaceholder": "Лид жөнүндө эскертүүлөр",
+    "cancel": "Жокко чыгаруу",
+    "validation": {
+      "nameMin": "Аты кеминде 2 белгиден турушу керек",
+      "phoneMin": "Телефон кеминде 5 белгиден турушу керек",
+      "invalidEmail": "Email туура эмес"
+    }
+  },
+  "convertDialog": {
+    "title": "Клиентке конверттөө",
+    "descriptionNamed": "{{name}} клиент жазуусуна айландырылат.",
+    "descriptionGeneric": "Бул лид клиент жазуусуна айландырылат.",
+    "createNew": "Жаңы клиент түзүү",
+    "linkExisting": "Учурдагы клиентти байланыштыруу",
+    "cancel": "Жокко чыгаруу",
+    "converting": "Конверттелип жатат...",
+    "convert": "Конверттөө",
+    "error": "Лидди конверттөө мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз."
+  },
+  "deleteDialog": {
+    "title": "Лидди өчүрөсүзбү?",
+    "description": "{{name}} биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт.",
+    "descriptionFallback": "Бул лид",
+    "cancel": "Жокко чыгаруу",
+    "deleting": "Өчүрүлүп жатат...",
+    "delete": "Өчүрүү"
+  },
+  "deleteLeads": {
+    "title_one": "{{count}} лидди өчүрөсүзбү?",
+    "title_few": "{{count}} лидди өчүрөсүзбү?",
+    "title_many": "{{count}} лидди өчүрөсүзбү?",
+    "title_other": "{{count}} лидди өчүрөсүзбү?",
+    "description_one": "Тандалган лид биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт.",
+    "description_few": "Тандалган лиддер биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт.",
+    "description_many": "Тандалган лиддер биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт.",
+    "description_other": "Тандалган лиддер биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт.",
+    "cancel": "Жокко чыгаруу",
+    "deleting": "Өчүрүлүп жатат...",
+    "delete": "Өчүрүү"
+  },
+  "toasts": {
+    "createSuccessTitle": "Ийгиликтүү түзүлдү",
+    "createSuccessDescription": "Жаңы лид кошулду.",
+    "createErrorTitle": "Лидди түзүү мүмкүн болбоду",
+    "createErrorDescription": "Дайындарды текшерип, кайра аракет кылыңыз.",
+    "updateSuccessTitle": "Ийгиликтүү жаңырды",
+    "updateSuccessDescription": "Лид жаңырды.",
+    "updateErrorTitle": "Лидди жаңыртуу мүмкүн болбоду",
+    "updateErrorDescription": "Кайра аракет кылыңыз.",
+    "convertSuccessTitle": "Лид конверттелди",
+    "convertSuccessDescription": "Эми бул клиент.",
+    "convertErrorTitle": "Лидди конверттөө мүмкүн болбоду",
+    "convertErrorDescription": "Кайра аракет кылыңыз.",
+    "deleteSuccessTitle": "Лид өчүрүлдү",
+    "deleteSuccessDescription": "Лид тизмеден өчүрүлдү.",
+    "deleteErrorTitle": "Лидди өчүрүү мүмкүн болбоду",
+    "deleteErrorDescription": "Кайра аракет кылыңыз.",
+    "bulkDeleteAllFailed": "Тандалган лиддердин бирин да өчүрүү мүмкүн болбоду.",
+    "bulkDeletePartialFailed": "Тандалган {{total}} лиддин {{failed}} өчүрүлбөй калды.",
+    "bulkDeleteSuccessTitle": "Лиддер өчүрүлдү",
+    "bulkDeleteSuccessDescription": "Тандалган лиддер өчүрүлдү.",
+    "bulkDeleteIssuesTitle": "Массалык өчүрүү учурунда көйгөйлөр пайда болду"
+  }
+}

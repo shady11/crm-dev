@@ -1,0 +1,98 @@
+{
+  "actions": {
+    "save": "Сактоо",
+    "cancel": "Жокко чыгаруу",
+    "delete": "Өчүрүү",
+    "edit": "Өзгөртүү",
+    "create": "Түзүү",
+    "confirm": "Ырастоо",
+    "back": "Артка",
+    "goBack": "Кайтуу",
+    "createAnyway": "Баары бир түзүү",
+    "saveChanges": "Өзгөртүүлөрдү сактоо",
+    "deleting": "Өчүрүлүп жатат...",
+    "creating": "Түзүлүп жатат...",
+    "saving": "Сакталып жатат...",
+    "duplicate": "Кайталоо",
+    "duplicating": "Кайталанып жатат...",
+    "openWhatsApp": "WhatsApp",
+    "print": "Басып чыгаруу",
+    "copyLink": "Шилтемени көчүрүү",
+    "linkCopied": "Шилтеме көчүрүлдү"
+  },
+  "labels": {
+    "status": "Статус",
+    "type": "Түрү",
+    "price": "Баасы",
+    "area": "Аянты",
+    "rooms": "Бөлмөлөр",
+    "phone": "Телефон",
+    "email": "Эл. почта",
+    "name": "Толук аты",
+    "notes": "Эскертүүлөр",
+    "createdAt": "Түзүлдү",
+    "block": "Блок",
+    "entrance": "Кире бериш",
+    "floor": "Кабат",
+    "loading": "Жүктөлүп жатат..."
+  },
+  "units": {
+    "sqm": "м²",
+    "pricePerSqm": "{{value}}/м²"
+  },
+  "errors": {
+    "genericTitle": "Бир нерсе туура эмес болду",
+    "tryAgain": "Сураныч, кайра аракет кылыңыз.",
+    "notFound": "Табылган жок"
+  },
+  "nav": {
+    "dashboard": "Дашборд",
+    "leads": "Лиддер",
+    "tasks": "Тапшырмалар",
+    "clients": "Клиенттер",
+    "deals": "Бүтүмдөр",
+    "projects": "Долбоорлор",
+    "companies": "Компаниялар",
+    "settingOptions": "Валюта, локаль жана убакыт алкагы",
+    "users": "Колдонуучулар",
+    "branches": "Филиалдар",
+    "activityLog": "Активдүүлүк журналы",
+    "auditLog": "Аудит журналы",
+    "settings": "Тууралоолор",
+    "brandName": "CRM Dev",
+    "brandTagline": "Кыймылсыз мүлк үчүн CRM",
+    "chessboard": "Шахматка",
+    "overview": "Жалпы көрүнүш",
+    "builder": "Конструктор",
+    "sales": "Сатуулар"
+  },
+  "language": {
+    "switchLabel": "Тил",
+    "russian": "Русский",
+    "english": "English",
+    "kyrgyz": "Кыргызча"
+  },
+  "theme": {
+    "switchToLight": "Ачык темага өтүү",
+    "switchToDark": "Караңгы темага өтүү"
+  },
+  "userMenu": {
+    "account": "Аккаунт",
+    "notifications": "Билдирмелер",
+    "logOut": "Чыгуу"
+  },
+  "placeholders": {
+    "select": "Тандоо"
+  },
+  "notFoundPage": {
+    "title": "Бет табылган жок",
+    "description": "Сиз издеп жаткан бет жок же башка жерге жылдырылган.",
+    "goToDashboard": "Башкы бетке"
+  },
+  "impersonation": {
+    "banner": "Сиз {{name}} — {{company}} катары кирдиңиз",
+    "exit": "Чыгуу",
+    "exiting": "Чыгылып жатат...",
+    "exitError": "Чыгуу мүмкүн болбоду. Кайра аракет кылыңыз."
+  }
+}

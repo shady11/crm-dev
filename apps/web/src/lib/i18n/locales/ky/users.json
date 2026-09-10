@@ -1,0 +1,140 @@
+{
+  "role": {
+    "super_admin": "Супер-администратор",
+    "company_admin": "Компания администратору",
+    "sales_manager": "Сатуу боюнча менеджер",
+    "sales_head": "Сатуу бөлүмүнүн башчысы",
+    "finance": "Каржы"
+  },
+  "status": {
+    "active": "Активдүү",
+    "inactive": "Активдүү эмес"
+  },
+  "page": {
+    "rolesHeading": "Ролдор"
+  },
+  "roleCard": {
+    "totalUsers_one": "Бардыгы {{count}} колдонуучу",
+    "totalUsers_few": "Бардыгы {{count}} колдонуучу",
+    "totalUsers_many": "Бардыгы {{count}} колдонуучу",
+    "totalUsers_other": "Бардыгы {{count}} колдонуучу"
+  },
+  "card": {
+    "deactivate": "Деактивдештирүү",
+    "deactivateDialog": {
+      "title": "Колдонуучуну деактивдештиресизби?",
+      "description": "«{{name}}» колдонуучусу деактивдештирилет, кирүү мүмкүнчүлүгү кайтарылып алынат. Кийинчерээк муну администратор аркылуу жокко чыгарууга болот.",
+      "confirm": "Деактивдештирүү",
+      "impact": "{{name}} колдонуучусунда {{openLeads}} ачык лид жана {{activeDeals}} активдүү бүтүм калат.",
+      "reassignLabel": "Өткөрүп берүү",
+      "noReassignOption": "Өткөрүп берилбесин — жөн эле деактивдештирүү"
+    },
+    "transferBranch": "Башка филиалга которуу",
+    "transferBranchDialog": {
+      "title": "Башка филиалга которуу",
+      "description": "«{{name}}» башка филиалга которулат.",
+      "branchLabel": "Жаңы филиал",
+      "confirm": "Которуу",
+      "impact": "{{name}} колдонуучусунда учурдагы филиалда {{openLeads}} ачык лид жана {{activeDeals}} активдүү бүтүм калат.",
+      "reassignLabel": "Өткөрүп берүү",
+      "noReassignOption": "Өткөрүп берилбесин — жазуулар эски филиалда калат",
+      "success": "«{{name}}» башка филиалга которулду.",
+      "error": "Башка филиалга которуу мүмкүн болбоду. Кайра аракет кылыңыз."
+    }
+  },
+  "reassignDialog": {
+    "title": "Башка менеджерге өткөрүп берүү",
+    "description": "«{{name}}» сиздин командаңыздагы башка менеджерге өткөрүп берилет.",
+    "managerLabel": "Жаңы менеджер",
+    "placeholder": "Менеджерди тандаңыз",
+    "confirm": "Өткөрүп берүү",
+    "successTitle": "Өткөрүлдү",
+    "errorTitle": "Өткөрүп берүү мүмкүн болбоду. Кайра аракет кылыңыз."
+  },
+  "form": {
+    "fields": {
+      "fullName": "Толук аты",
+      "email": "Email",
+      "phone": "Телефон (милдеттүү эмес)",
+      "password": "Сырсөз",
+      "newPassword": "Жаңы сырсөз (милдеттүү эмес)",
+      "role": "Ролу",
+      "branch": "Филиал"
+    },
+    "placeholders": {
+      "fullName": "Толук аты",
+      "email": "name@company.com",
+      "phone": "Телефон",
+      "password": "Сырсөз",
+      "keepCurrentPassword": "Учурдагы сырсөздү сактоо үчүн бош калтырыңыз"
+    },
+    "validation": {
+      "nameMin": "Аты кеминде 2 белгиден турушу керек",
+      "invalidEmail": "Email туура эмес",
+      "roleRequired": "Ролду тандаңыз",
+      "passwordMin": "Сырсөз кеминде 6 белгиден турушу керек",
+      "branchRequired": "Бул ролго филиал талап кылынат",
+      "branchNotAllowed": "Бул ролго филиал дайындоого болбойт"
+    },
+    "submit": {
+      "createUser": "Колдонуучу түзүү"
+    }
+  },
+  "formSheet": {
+    "editTitle": "Колдонуучуну өзгөртүү",
+    "addTitle": "Колдонуучу кошуу",
+    "editDescription": "Кызматкердин дайындарын жаңыртыңыз.",
+    "addDescription": "Жаңы кызматкерди чакырыңыз.",
+    "errorMessage": "Колдонуучуну сактоо мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз."
+  },
+  "actionBar": {
+    "selected": "Тандалды: {{count}}",
+    "clearSelection": "Тандоону тазалоо"
+  },
+  "pagination": {
+    "rowsPerPage": "Барактагы саптар"
+  },
+  "table": {
+    "headers": {
+      "userId": "Колдонуучу ID",
+      "name": "Аты",
+      "role": "Ролу",
+      "branch": "Филиал",
+      "created": "Түзүлдү",
+      "status": "Статусу",
+      "actions": "Аракеттер"
+    },
+    "empty": {
+      "title": "Колдонуучулар табылган жок",
+      "description": "Чыпкаларды же издөө сурамын өзгөртүп көрүңүз."
+    }
+  },
+  "toolbar": {
+    "heading": "Бардык колдонуучулар",
+    "placeholders": {
+      "filterByStatus": "Статус боюнча чыпка",
+      "filterByRole": "Ролу боюнча чыпка",
+      "searchUsers": "Колдонуучуларды издөө..."
+    },
+    "addUser": "Колдонуучу кошуу"
+  },
+  "toasts": {
+    "createSuccessTitle": "Ийгиликтүү түзүлдү",
+    "createSuccessDescription": "Жаңы колдонуучу кошулду.",
+    "createErrorTitle": "Колдонуучуну түзүү мүмкүн болбоду",
+    "createErrorDescription": "Дайындарды текшерип, кайра аракет кылыңыз.",
+    "updateSuccessTitle": "Ийгиликтүү жаңырды",
+    "updateSuccessDescription": "Колдонуучу жаңырды.",
+    "updateErrorTitle": "Колдонуучуну жаңыртуу мүмкүн болбоду",
+    "updateErrorDescription": "Кайра аракет кылыңыз.",
+    "deactivateSuccessTitle": "Колдонуучу деактивдештирилди",
+    "deactivateSuccessDescription": "Колдонуучунун эми кирүү мүмкүнчүлүгү жок.",
+    "deactivateErrorTitle": "Колдонуучуну деактивдештирүү мүмкүн болбоду",
+    "deactivateErrorDescription": "Кайра аракет кылыңыз.",
+    "bulkDeactivateSuccessTitle": "Колдонуучулар деактивдештирилди",
+    "bulkDeactivateSuccessDescription": "Тандалган колдонуучулардын эми кирүү мүмкүнчүлүгү жок.",
+    "bulkDeactivateErrorTitle": "Массалык деактивдештирүү каталар менен аткарылды",
+    "bulkDeactivateAllFailed": "Тандалган колдонуучулардын бирин да деактивдештирүү мүмкүн болбоду.",
+    "bulkDeactivatePartialFailed": "Тандалган {{count}} колдонуучунун {{failed}} деактивдештирилбей калды."
+  }
+}

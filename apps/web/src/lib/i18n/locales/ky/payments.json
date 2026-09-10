@@ -1,0 +1,24 @@
+{
+  "type": {
+    "deposit": "Күрөө акы",
+    "installment": "Бөлүп төлөө",
+    "final_payment": "Акыркы төлөм",
+    "refund": "Кайтарым"
+  },
+  "method": {
+    "cash": "Накталай",
+    "bank_transfer": "Банктык которуу",
+    "mbank": "MBank",
+    "optima": "Optima",
+    "elkart": "Элкарт",
+    "other": "Башка"
+  },
+  "schedule": {
+    "status": {
+      "pending": "Күтүлүп жатат",
+      "partial": "Жарым-жартылай төлөндү",
+      "paid": "Төлөндү",
+      "overdue": "Мөөнөтү өттү"
+    }
+  }
+}

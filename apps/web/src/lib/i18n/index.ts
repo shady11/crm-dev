@@ -48,6 +48,29 @@ import activitiesRu from "./locales/ru/activities.json";
 import settingsRu from "./locales/ru/settings.json";
 import settingOptionsRu from "./locales/ru/settingOptions.json";
 
+import commonKy from "./locales/ky/common.json";
+import dealsKy from "./locales/ky/deals.json";
+import unitsKy from "./locales/ky/units.json";
+import projectsKy from "./locales/ky/projects.json";
+import paymentsKy from "./locales/ky/payments.json";
+import usersKy from "./locales/ky/users.json";
+import branchesKy from "./locales/ky/branches.json";
+import companiesKy from "./locales/ky/companies.json";
+import documentsKy from "./locales/ky/documents.json";
+import notificationsKy from "./locales/ky/notifications.json";
+import authKy from "./locales/ky/auth.json";
+import leadsKy from "./locales/ky/leads.json";
+import tasksKy from "./locales/ky/tasks.json";
+import dashboardKy from "./locales/ky/dashboard.json";
+import clientsKy from "./locales/ky/clients.json";
+import blocksKy from "./locales/ky/blocks.json";
+import entrancesKy from "./locales/ky/entrances.json";
+import floorsKy from "./locales/ky/floors.json";
+import auditLogKy from "./locales/ky/auditLog.json";
+import activitiesKy from "./locales/ky/activities.json";
+import settingsKy from "./locales/ky/settings.json";
+import settingOptionsKy from "./locales/ky/settingOptions.json";
+
 export const resources = {
     en: {
         common: commonEn,
@@ -97,6 +120,30 @@ export const resources = {
         settings: settingsRu,
         settingOptions: settingOptionsRu,
     },
+    ky: {
+        common: commonKy,
+        deals: dealsKy,
+        units: unitsKy,
+        projects: projectsKy,
+        payments: paymentsKy,
+        users: usersKy,
+        branches: branchesKy,
+        companies: companiesKy,
+        documents: documentsKy,
+        notifications: notificationsKy,
+        auth: authKy,
+        leads: leadsKy,
+        tasks: tasksKy,
+        dashboard: dashboardKy,
+        clients: clientsKy,
+        blocks: blocksKy,
+        entrances: entrancesKy,
+        floors: floorsKy,
+        auditLog: auditLogKy,
+        activities: activitiesKy,
+        settings: settingsKy,
+        settingOptions: settingOptionsKy,
+    },
 } as const;
 
 i18n
@@ -129,12 +176,8 @@ i18n
         },
     });
 
-// Languages a person can pick from the header switcher. Kyrgyz shows in the
-// UI's own onboarding copy as a target market, but no ky/*.json bundle exists
-// yet - offering it here would repeat the exact bug this pass fixed elsewhere
-// (a switch that looks wired but silently does nothing). Add it once real
-// translations exist for every namespace.
-export const SUPPORTED_LANGUAGES = ["ru", "en"] as const;
+// Languages a person can pick from the header switcher.
+export const SUPPORTED_LANGUAGES = ["ru", "en", "ky"] as const;
 export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
 // Sits next to i18next-browser-languagedetector's own "i18nextLng" cache key

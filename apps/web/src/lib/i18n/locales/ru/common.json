@@ -69,7 +69,8 @@
   "language": {
     "switchLabel": "Язык",
     "russian": "Русский",
-    "english": "English"
+    "english": "English",
+    "kyrgyz": "Кыргызча"
   },
   "theme": {
     "switchToLight": "Переключить на светлую тему",

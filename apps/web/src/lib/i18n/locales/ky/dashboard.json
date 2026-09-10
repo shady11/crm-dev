@@ -1,0 +1,87 @@
+{
+  "title": "Дашборд",
+  "allProjects": "Бардык долбоорлор",
+  "kpi": {
+    "revenueThisMonth": "Айлык кирешe",
+    "activeDeals": "Активдүү бүтүмдөр",
+    "availableUnits": "Бош юниттер",
+    "unitsOfTotal": "жалпы {{total}} ичинен",
+    "overdueTasks": "Мөөнөтү өткөн тапшырмалар"
+  },
+  "revenueTrend": {
+    "title": "Акыркы 6 айдагы киреше",
+    "seriesLabel": "Киреше"
+  },
+  "unitsInventory": {
+    "title": "Юниттердин калдыгы",
+    "totalUnits": "Бардыгы юниттер: {{count}}"
+  },
+  "branchComparison": {
+    "title": "Филиалдарды салыштыруу",
+    "dealCountLabel": "Активдүү бүтүмдөр",
+    "revenueLabel": "Киреше",
+    "empty": "Азырынча филиал жок."
+  },
+  "dealsByStage": "Баскычтар боюнча бүтүмдөр",
+  "funnel": {
+    "title": "Конверсия тунели",
+    "leadsSeriesLabel": "Лиддер",
+    "export": "Excel-ге экспорттоо",
+    "exportError": "Тунел отчётун экспорттоо мүмкүн болбоду. Кайра аракет кылыңыз.",
+    "totalLeads": "Бардыгы лиддер",
+    "totalDeals": "Бардыгы бүтүмдөр",
+    "leadToDeal": "Лид → бүтүм",
+    "leadToWon": "Лид → ийгилик"
+  },
+  "attention": {
+    "title": "Көңүл буруу керек",
+    "empty": "Азырынча кечиктирүүчү нерсе жок.",
+    "reservationExpired": "Брондоонун мөөнөтү өттү",
+    "reservationExpiresIn": "Брондоо {{days}} күндөн кийин бүтөт",
+    "taskOverdue": "Мөөнөтү өттү",
+    "taskDueToday": "Мөөнөтү бүгүн",
+    "taskDueIn": "Мөөнөтү {{days}} күндөн кийин"
+  },
+  "recentActivity": {
+    "title": "Акыркы активдүүлүк",
+    "empty": "Азырынча активдүүлүк жок.",
+    "system": "Система",
+    "justNow": "азыр эле",
+    "minutesAgo": "{{count}} мүн. мурун",
+    "hoursAgo": "{{count}} саат мурун",
+    "daysAgo": "{{count}} күн мурун"
+  },
+  "teamSnapshot": {
+    "title": "Команда боюнча жыйынтык",
+    "empty": "Сиздин командаңызда азырынча менеджер жок.",
+    "openLeads_one": "{{count}} ачык лид",
+    "openLeads_few": "{{count}} ачык лид",
+    "openLeads_many": "{{count}} ачык лид",
+    "openLeads_other": "{{count}} ачык лид",
+    "activeDeals_one": "{{count}} активдүү бүтүм",
+    "activeDeals_few": "{{count}} активдүү бүтүм",
+    "activeDeals_many": "{{count}} активдүү бүтүм",
+    "activeDeals_other": "{{count}} активдүү бүтүм",
+    "tasksDue_one": "{{count}} мөөнөттүү тапшырма",
+    "tasksDue_few": "{{count}} мөөнөттүү тапшырма",
+    "tasksDue_many": "{{count}} мөөнөттүү тапшырма",
+    "tasksDue_other": "{{count}} мөөнөттүү тапшырма",
+    "noActivity": "Азырынча активдүүлүк жок"
+  },
+  "myWorkToday": {
+    "title": "Менин бүгүнкү ишим",
+    "leadsHeading": "Байланышуу керек лиддер ({{count}})",
+    "leadsEmpty": "Азырынча байланышуу керек лид жок.",
+    "tasksHeading": "Бүгүнкү тапшырмалар ({{count}})",
+    "tasksEmpty": "Бүгүн үчүн тапшырма жок.",
+    "dealsHeading": "Клиентти күтүп жаткан бүтүмдөр ({{count}})",
+    "dealsEmpty": "Клиентти күтүп жаткан бүтүм жок.",
+    "noDate": "Дата жок"
+  },
+  "myPerformance": {
+    "title": "Акыркы {{days}} күндөгү менин натыйжам",
+    "leadsAssigned": "Дайындалган лиддер",
+    "dealsWon": "Жабылган бүтүмдөр",
+    "conversionRate": "Конверсия"
+  }
+}
