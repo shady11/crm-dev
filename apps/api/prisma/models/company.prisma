@@ -39,6 +39,7 @@ model Company {
   tasks      Task[]
   documents  Document[]
   documentTemplates DocumentTemplate[]
+  outboundMessages  OutboundMessage[]
 
   notifications      Notification[]
   dealNumberCounters DealNumberCounter[]

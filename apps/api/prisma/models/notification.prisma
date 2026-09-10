@@ -6,6 +6,8 @@ enum NotificationType {
   RESERVATION_EXPIRING
   PAYMENT_RECEIVED
   DOCUMENT_UPLOADED
+  PAYMENT_DUE_SOON
+  PAYMENT_OVERDUE
 }
 
 enum NotificationEntityType {
@@ -13,6 +15,7 @@ enum NotificationEntityType {
   DEAL
   CLIENT
   DOCUMENT
+  PAYMENT_SCHEDULE
 }
 
 model Notification {

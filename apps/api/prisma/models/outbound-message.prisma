@@ -1,0 +1,55 @@
+enum OutboundChannel {
+  WHATSAPP
+  SMS
+  EMAIL
+}
+
+enum OutboundMessageStatus {
+  QUEUED
+  SENT
+  DELIVERED
+  FAILED
+}
+
+// A delivery log for client-facing outbound messages (payment reminders,
+// and any future outbound message type — kept generic rather than named
+// "PaymentReminder" for that reason). Separate from Notification, which
+// stays in-app-only: this is what answers "did the client actually get
+// it," not "does a CRM user have an unread badge."
+model OutboundMessage {
+  id String @id @default(uuid())
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  channel OutboundChannel
+
+  recipientClientId String
+  recipientClient   Client @relation(fields: [recipientClientId], references: [id])
+
+  // Nullable: this model isn't payment-reminder-specific, even though that's
+  // the only sender using it today.
+  paymentScheduleId String?
+  paymentSchedule   PaymentSchedule? @relation(fields: [paymentScheduleId], references: [id])
+
+  // Which template fired it, e.g. "payment_due_soon", "payment_overdue_30" —
+  // see reminder-templates.ts.
+  templateKey String
+
+  // The rendered text actually sent, kept verbatim for dispute resolution
+  // even if the template is edited later.
+  body String @db.Text
+
+  status            OutboundMessageStatus @default(QUEUED)
+  providerMessageId String?
+  failureReason     String?
+
+  sentAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([companyId])
+  @@index([recipientClientId])
+  @@index([paymentScheduleId])
+  @@index([createdAt])
+}
