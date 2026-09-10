@@ -33,6 +33,7 @@ model User {
   activities    Activity[]
   tasks         Task[]
   documents     Document[]
+  documentTemplates DocumentTemplate[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

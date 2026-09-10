@@ -12,9 +12,10 @@ import {DealDomainService} from "@/modules/deals/services/deal-domain.service";
 import {NotificationsModule} from "@/modules/notifications/notifications.module";
 import {DealExpiryService} from "@/modules/deals/services/deal-expiry.service";
 import { DealNumberService } from '@/modules/deals/services/deal-number.service';
+import {DocumentGenerationModule} from "@/modules/document-generation/document-generation.module";
 
 @Module({
-  imports: [PrismaModule, NotificationsModule],
+  imports: [PrismaModule, NotificationsModule, DocumentGenerationModule],
   controllers: [DealsController],
   providers: [
     DealsService,

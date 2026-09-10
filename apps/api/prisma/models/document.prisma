@@ -45,6 +45,14 @@ model Document {
 
   metadata Json?
 
+  // Set only for a system-generated file (see DocumentGenerationService);
+  // null for anything a user uploaded through the ordinary upload endpoint.
+  // This is what distinguishes "generated" from "uploaded" without a
+  // separate table, and traces a generated file back to the template
+  // version that produced it.
+  generatedFromTemplateId String?
+  generatedFromTemplate   DocumentTemplate? @relation(fields: [generatedFromTemplateId], references: [id])
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
@@ -54,4 +62,5 @@ model Document {
   @@index([type])
   @@index([uploadedById])
   @@index([createdAt])
+  @@index([generatedFromTemplateId])
 }

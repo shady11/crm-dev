@@ -1,7 +1,8 @@
-import {BadRequestException, ForbiddenException, Injectable,} from '@nestjs/common';
+import {BadRequestException, ForbiddenException, Injectable, Logger,} from '@nestjs/common';
 
 import {
   DealStatus,
+  DocumentType,
   NotificationEntityType,
   NotificationType,
   PaymentMethod,
@@ -35,9 +36,13 @@ import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
 import {DbClient} from "@/database/prisma.types";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 import {DealNumberService} from "@/modules/deals/services/deal-number.service";
+import {DocumentGenerationService} from "@/modules/document-generation/document-generation.service";
+import {GENERATABLE_DOCUMENT_TYPES} from "@/modules/document-generation/document-generation.constants";
 
 @Injectable()
 export class DealsService {
+  private readonly logger = new Logger(DealsService.name);
+
   constructor(
       private readonly prisma: PrismaService,
       private readonly mapper: DealMapper,
@@ -45,7 +50,49 @@ export class DealsService {
       private readonly activityService: DealActivityService,
       private readonly notifications: NotificationsService,
       private readonly dealNumberService: DealNumberService,
+      private readonly documentGeneration: DocumentGenerationService,
   ) {}
+
+  /**
+   * Best-effort: a broken template or a PDF-rendering failure must never
+   * block the deal transition that triggered it (reserving a unit, signing
+   * a contract) — those already committed in their own transaction by the
+   * time this runs. Failures are logged, not surfaced to the caller.
+   */
+  private async generateAndLogDocument(params: {
+    companyId: string;
+    dealId: string;
+    clientId: string;
+    type: DocumentType;
+    userId: string;
+    activityTitle: string;
+  }) {
+    try {
+      const document = await this.documentGeneration.generateForDeal({
+        companyId: params.companyId,
+        dealId: params.dealId,
+        type: params.type,
+        userId: params.userId,
+      });
+
+      await this.activityService.documentGenerated(
+          {
+            db: this.prisma,
+            companyId: params.companyId,
+            userId: params.userId,
+            dealId: params.dealId,
+            clientId: params.clientId,
+            metadata: {documentId: document.id, documentType: params.type},
+          },
+          params.activityTitle,
+      );
+    } catch (error) {
+      this.logger.error(
+          `Failed to generate ${params.type} document for deal ${params.dealId}`,
+          error instanceof Error ? error.stack : String(error),
+      );
+    }
+  }
 
   // --------------------------------------------------------------------------
   // Queries
@@ -271,6 +318,15 @@ export class DealsService {
       });
     });
 
+    await this.generateAndLogDocument({
+      companyId,
+      dealId: result.id,
+      clientId: result.clientId,
+      type: DocumentType.RESERVATION,
+      userId: user.id,
+      activityTitle: 'Reservation agreement generated',
+    });
+
     return this.mapper.toDetails(result);
   }
 
@@ -358,6 +414,15 @@ export class DealsService {
       }
 
       return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
+    });
+
+    await this.generateAndLogDocument({
+      companyId,
+      dealId: result.id,
+      clientId: result.clientId,
+      type: DocumentType.CONTRACT,
+      userId: user.id,
+      activityTitle: 'Sale contract generated',
     });
 
     return this.mapper.toDetails(result);
@@ -675,6 +740,47 @@ export class DealsService {
         ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
       },
     });
+  }
+
+  /**
+   * Manual re-generate — for a corrected note, a fixed template, or simply
+   * wanting a fresh printout without repeating the deal transition that
+   * auto-generated the first copy. Unlike generateAndLogDocument (used from
+   * reserveUnit/signContract), failures here surface to the caller: this is
+   * an explicit ask, not a side effect of another action succeeding.
+   */
+  async generateDocument(user: AuthUser, id: string, type: DocumentType) {
+    if (!user.companyId) {
+      throw new ForbiddenException("User does not belong to a company");
+    }
+
+    if (!GENERATABLE_DOCUMENT_TYPES.includes(type)) {
+      throw new BadRequestException(`"${type}" cannot be generated on demand.`);
+    }
+
+    const companyId = user.companyId;
+    const deal = await this.getDealOrThrow(user, id);
+
+    const document = await this.documentGeneration.generateForDeal({
+      companyId,
+      dealId: deal.id,
+      type,
+      userId: user.id,
+    });
+
+    await this.activityService.documentGenerated(
+        {
+          db: this.prisma,
+          companyId,
+          userId: user.id,
+          dealId: deal.id,
+          clientId: deal.clientId,
+          metadata: {documentId: document.id, documentType: type},
+        },
+        `${type} document regenerated`,
+    );
+
+    return document;
   }
 
   async getStatusSummary(user: AuthUser, projectId?: string, branchId?: string) {

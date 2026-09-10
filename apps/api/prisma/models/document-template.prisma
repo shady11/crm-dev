@@ -1,0 +1,47 @@
+// A company's own wording for a generated document type. Definitions, not
+// instances — a generated file is an ordinary Document row (see
+// Document.generatedFromTemplateId), this model only holds the source the
+// merge engine renders from. When a company has no active template for a
+// type, DocumentGenerationService falls back to a built-in default template
+// so generation works from day one without any admin setup.
+model DocumentTemplate {
+  id String @id @default(uuid())
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  type DocumentType
+
+  name String
+
+  // HTML + Handlebars-style {{field.token}} placeholders. See
+  // DocumentGenerationService's TEMPLATE_CONTEXT_FIELDS for the resolvable
+  // token vocabulary (deal.*, client.*, unit.*, company.*, schedule.rows).
+  bodyHtml String @db.Text
+
+  // Only one template may be active per (companyId, type) at a time; this is
+  // enforced in DocumentTemplatesService rather than a DB constraint, since
+  // "the previous one gets deactivated" is a write-time decision, not a
+  // structural one.
+  isActive Boolean @default(true)
+
+  // Incremented on every bodyHtml edit — a display/audit counter, not a
+  // version-history table. A Document's generatedFromTemplateId points at
+  // this row, so a later edit changes what re-opening an old generated
+  // file's "source template" shows; re-printing an exact historical copy is
+  // out of scope for this model (see spec's amendments risk).
+  version Int @default(1)
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  generatedDocuments Document[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([companyId])
+  @@index([companyId, type])
+  @@index([companyId, type, isActive])
+}
