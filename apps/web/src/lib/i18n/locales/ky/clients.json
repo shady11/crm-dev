@@ -1,0 +1,91 @@
+{
+  "page": {
+    "title": "Клиенттер"
+  },
+  "toolbar": {
+    "filterByProject": "Долбоор боюнча чыпка",
+    "searchPlaceholder": "Клиенттерди издөө...",
+    "addClient": "Клиент кошуу"
+  },
+  "table": {
+    "clientId": "Клиент ID",
+    "name": "Аты",
+    "phone": "Телефон",
+    "email": "Email",
+    "leads": "Лиддер",
+    "deals": "Бүтүмдөр",
+    "created": "Түзүлдү",
+    "actions": "Аракеттер",
+    "emptyTitle": "Клиенттер табылган жок",
+    "emptyDescription": "Чыпкаларды же издөөнү өзгөртүп көрүңүз."
+  },
+  "pagination": {
+    "rowsPerPage": "Барактагы саптар"
+  },
+  "actionBar": {
+    "selected": "Тандалды: {{count}}",
+    "delete": "Өчүрүү",
+    "clearSelection": "Тандоону алып салуу"
+  },
+  "form": {
+    "editTitle": "Клиентти оңдоо",
+    "addTitle": "Клиент кошуу",
+    "editDescription": "Клиенттин дайындарын жаңыртыңыз.",
+    "addDescription": "Жаңы клиент жазуусун кошуңуз.",
+    "saveError": "Клиентти сактоо мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз.",
+    "saveChanges": "Өзгөртүүлөрдү сактоо",
+    "create": "Клиент түзүү",
+    "fullName": "Аты-жөнү",
+    "phone": "Телефон",
+    "whatsapp": "WhatsApp (милдеттүү эмес)",
+    "email": "Email (милдеттүү эмес)",
+    "passport": "Паспорт (милдеттүү эмес)",
+    "passportPlaceholder": "Паспорт номери",
+    "pin": "ПИН (милдеттүү эмес)",
+    "validation": {
+      "nameMin": "Аты кеминде 2 белгиден турушу керек",
+      "phoneMin": "Телефон кеминде 5 белгиден турушу керек",
+      "invalidEmail": "Email туура эмес"
+    },
+    "whatsappPlaceholder": "WhatsApp номери",
+    "pinPlaceholder": "ПИН номери"
+  },
+  "search": {
+    "placeholder": "Аты же телефону боюнча издөө",
+    "empty": "«{{term}}» боюнча клиенттер табылган жок",
+    "createNew": "Жаңы клиент түзүү"
+  },
+  "detail": {
+    "clientSince": "{{date}} бери клиент",
+    "phone": "Телефон",
+    "whatsapp": "WhatsApp",
+    "email": "Email",
+    "passport": "Паспорт",
+    "pin": "ПИН",
+    "deals": "Бүтүмдөр",
+    "dealsWithCount": "Бүтүмдөр ({{count}})",
+    "noDeals": "Азырынча бүтүм жок.",
+    "unitFallback": "№{{number}} юнит",
+    "leadsWithCount": "Лиддер ({{count}})",
+    "noLeadsYet": "Азырынча лид жок.",
+    "updateSuccessTitle": "Ийгиликтүү жаңырды",
+    "updateSuccessDescription": "Клиенттин дайындары жаңырды.",
+    "updateErrorTitle": "Клиентти жаңыртуу мүмкүн болбоду",
+    "updateErrorDescription": "Кайра аракет кылыңыз."
+  },
+  "toasts": {
+    "createSuccessTitle": "Ийгиликтүү түзүлдү",
+    "createSuccessDescription": "Жаңы клиент кошулду.",
+    "createErrorTitle": "Клиентти түзүү мүмкүн болбоду",
+    "createErrorDescription": "Дайындарды текшерип, кайра аракет кылыңыз.",
+    "deleteSuccessTitle": "Клиент өчүрүлдү",
+    "deleteSuccessDescription": "Клиент өчүрүлдү.",
+    "deleteErrorTitle": "Клиентти өчүрүү мүмкүн болбоду",
+    "deleteErrorDescription": "Кайра аракет кылыңыз.",
+    "bulkDeleteAllFailed": "Тандалган клиенттердин бирин да өчүрүү мүмкүн болбоду.",
+    "bulkDeletePartialFailed": "Тандалган {{total}} клиенттин {{failed}} өчүрүлбөй калды.",
+    "bulkDeleteSuccessTitle": "Клиенттер өчүрүлдү",
+    "bulkDeleteSuccessDescription": "Тандалган клиенттер өчүрүлдү.",
+    "bulkDeleteIssuesTitle": "Массалык өчүрүү учурунда көйгөйлөр пайда болду"
+  }
+}

@@ -1,0 +1,155 @@
+{
+  "status": {
+    "available": "Бош",
+    "reserved": "Бронделген",
+    "sold": "Сатылды",
+    "unavailable": "Жеткиликсиз"
+  },
+  "type": {
+    "apartment": "Квартира",
+    "commercial": "Коммерциялык",
+    "parking": "Унаа токтотуучу жай",
+    "storage": "Кампа"
+  },
+  "actions": {
+    "addUnit": "Юнит кошуу",
+    "bulkUnits": "Массалык кошуу"
+  },
+  "import": {
+    "trigger": "Юниттерди импорттоо",
+    "toastSuccessTitle": "Юниттер импортолду",
+    "toastSuccessDescription": "Түзүлгөн юниттер: {{count}}.",
+    "toastErrorTitle": "Импорт катасы",
+    "toastErrorDescription": "Файлды иштетүү мүмкүн болбоду. Аны текшерип, кайра аракет кылыңыз.",
+    "resultTitle": "Импорттун натыйжасы",
+    "resultSummary": "Түзүлдү: {{created}}, каталуу саптар: {{failed}}.",
+    "errorsTable": {
+      "row": "Сап",
+      "messages": "Көйгөй"
+    },
+    "close": "Жабуу"
+  },
+  "sheets": {
+    "addTitle": "{{number}}-кабатка юнит кошуу",
+    "bulkAddTitle": "{{number}}-кабатка бир нече юнит кошуу",
+    "editTitle": "№{{number}} юнитти оңдоо",
+    "detailsTitle": "№{{number}} юнит"
+  },
+  "form": {
+    "numberLabel": "Юнит номери",
+    "numberPlaceholder": "мисалы, 1, 101, A-1",
+    "roomsLabel": "Бөлмөлөр (милдеттүү эмес)",
+    "areaLabel": "Аянты (м²)",
+    "submitCreate": "Юнит түзүү",
+    "errorCreate": "Юнитти түзүү мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз.",
+    "errorSave": "Юнитти сактоо мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз."
+  },
+  "bulk": {
+    "unitsHeading": "Юниттер",
+    "autoGenerate": "Автоматтык түзүү",
+    "autoGeneratePopoverTitle": "Юниттерди автоматтык түзүү",
+    "numberOfUnitsLabel": "Юниттердин саны",
+    "startingNumberLabel": "Баштапкы номер",
+    "roomsLabel": "Бөлмөлөр",
+    "areaLabel": "Аянты (м²)",
+    "priceLabel": "Баасы",
+    "generate": "Түзүү",
+    "addUnit": "Юнит кошуу",
+    "numberLabel": "Номер",
+    "duplicateNumberError": "Бул номер мурунтан бар",
+    "duplicateNumbersAlert": "Кайталанган юнит номерлери табылды. Түзүүдөн мурун аларды оңдоңуз.",
+    "priceLabelDollar": "Баасы, $",
+    "rowNumberLabel": "№{{number}}",
+    "errorGeneric": "Юниттерди түзүү мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз.",
+    "submitCreate_one": "{{count}} юнит түзүү",
+    "submitCreate_few": "{{count}} юнит түзүү",
+    "submitCreate_many": "{{count}} юнит түзүү",
+    "submitCreate_other": "{{count}} юнит түзүү"
+  },
+  "table": {
+    "numberHeader": "Номер",
+    "actionsHeader": "Аракеттер"
+  },
+  "delete": {
+    "title": "Юнитти өчүрөсүзбү?",
+    "description": "№{{number}} юнит биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт."
+  },
+  "duplicate": {
+    "title": "Юнитти кайталайсызбы?",
+    "description": "№{{number}} юниттин көчүрмөсү түзүлөт."
+  },
+  "toasts": {
+    "createdTitle": "Ийгиликтүү түзүлдү",
+    "createdDescription": "{{number}} юнити түзүлдү.",
+    "updatedTitle": "Ийгиликтүү жаңырды",
+    "duplicatedTitle": "Ийгиликтүү кайталанды",
+    "deletedTitle": "Ийгиликтүү өчүрүлдү"
+  },
+  "overview": {
+    "numberLabel": "Юнит номери",
+    "pricePerSqmLabel": "м² үчүн баасы",
+    "listPriceLabel": "Сатуу баасы"
+  },
+  "details": {
+    "overviewTab": "Жалпы көрүнүш",
+    "dealsTab": "Бүтүмдөр",
+    "noDeals": "Бул юнит үчүн азырынча бүтүм жок.",
+    "bookButton": "Брондоо",
+    "infoSheetButton": "Маалымат баракчасы"
+  },
+  "infoSheet": {
+    "title": "№{{number}} юнит",
+    "generatedAt": "{{date}} күнү түзүлдү",
+    "project": "Долбоор",
+    "address": "Дареги",
+    "location": "Жайгашкан жери",
+    "type": "Түрү",
+    "rooms": "Бөлмөлөр саны",
+    "area": "Аянты",
+    "price": "Баасы",
+    "pricePerSqm": "м² үчүн баасы",
+    "status": "Статус",
+    "printButton": "Басып чыгаруу / PDF катары сактоо",
+    "notFound": "Юнит табылган жок."
+  },
+  "chessboard": {
+    "entranceLabel": "{{name}} кире бериши",
+    "rooms_one": "{{count}} бөлмө",
+    "rooms_few": "{{count}} бөлмө",
+    "rooms_many": "{{count}} бөлмө",
+    "rooms_other": "{{count}} бөлмө",
+    "floors_one": "{{count}} кабат",
+    "floors_few": "{{count}} кабат",
+    "floors_many": "{{count}} кабат",
+    "floors_other": "{{count}} кабат",
+    "units_one": "{{count}} юнит",
+    "units_few": "{{count}} юнит",
+    "units_many": "{{count}} юнит",
+    "units_other": "{{count}} юнит"
+  },
+  "filters": {
+    "roomsSummary_one": "{{count}} бөлмө",
+    "roomsSummary_few": "{{count}} бөлмө",
+    "roomsSummary_many": "{{count}} бөлмө",
+    "roomsSummary_other": "{{count}} бөлмө",
+    "areaOver": "{{value}} м²-ден баштап",
+    "areaUnder": "{{value}} м²-ге чейин",
+    "areaRange": "{{min}}–{{max}} м²",
+    "priceOver": "{{value}}-ден баштап",
+    "priceUnder": "{{value}}-ге чейин",
+    "priceRange": "{{min}}–{{max}}",
+    "roomsCountLabel": "Бөлмөлөрдүн саны",
+    "rangeLabel": "Диапазон",
+    "presetsLabel": "Даяр варианттар",
+    "fromPlaceholder": "Баштап",
+    "toPlaceholder": "Чейин",
+    "unitsFound_one": "{{count}} юнит табылды",
+    "unitsFound_few": "{{count}} юнит табылды",
+    "unitsFound_many": "{{count}} юнит табылды",
+    "unitsFound_other": "{{count}} юнит табылды",
+    "clearAll": "Баарын тазалоо",
+    "pricePresetUnder": "{{value}}-ге чейин",
+    "pricePresetOver": "{{value}}-ден баштап",
+    "pricePresetRange": "{{min}} – {{max}}"
+  }
+}

@@ -1,0 +1,221 @@
+{
+  "status": {
+    "reserved": "Бронделген",
+    "contractSigned": "Келишим кол коюлган",
+    "active": "Иштеп жатат",
+    "completed": "Аякталды",
+    "cancelled": "Жокко чыгарылды",
+    "expired": "Мөөнөтү өттү"
+  },
+  "financials": {
+    "title": "Каржы",
+    "listPrice": "Негизги баасы",
+    "pricePerMeter": "м² үчүн баасы",
+    "salePrice": "Сатуу баасы",
+    "paid": "Төлөндү",
+    "remaining": "Калдык",
+    "financing": "Каржылоо",
+    "unitSection": "Юнит",
+    "dealSection": "Бүтүм",
+    "discount": "Арзандатуу"
+  },
+  "unitCard": {
+    "unitNumber": "№{{number}} юнит",
+    "floor": "{{floor}}-кабат"
+  },
+  "page": {
+    "title": "Бүтүмдөр"
+  },
+  "toolbar": {
+    "heading": "Бардык бүтүмдөр",
+    "allStatuses": "Бардык статустар",
+    "allProjects": "Бардык долбоорлор",
+    "allManagers": "Бардык менеджерлер",
+    "projectPlaceholder": "Долбоор",
+    "managerPlaceholder": "Менеджер",
+    "filterByStatus": "Статус боюнча чыпка",
+    "statusPlaceholder": "Статус",
+    "searchPlaceholder": "Клиент, телефон, юнит боюнча издөө..."
+  },
+  "table": {
+    "dealNumber": "Бүтүм №",
+    "unit": "Юнит",
+    "client": "Клиент",
+    "manager": "Менеджер",
+    "status": "Статус",
+    "salePrice": "Сатуу баасы",
+    "created": "Түзүлдү",
+    "emptyTitle": "Бүтүмдөр табылган жок",
+    "emptyDescription": "Чыпкаларды же издөөнү өзгөртүп көрүңүз."
+  },
+  "pagination": {
+    "rowsPerPage": "Барактагы саптар"
+  },
+  "statusCard": {
+    "count_one": "{{count}} бүтүм",
+    "count_few": "{{count}} бүтүм",
+    "count_many": "{{count}} бүтүм",
+    "count_other": "{{count}} бүтүм"
+  },
+  "card": {
+    "client": "Клиент",
+    "reservedAt": "Бронделди",
+    "salePrice": "Сатуу баасы",
+    "expiresAt": "Мөөнөтү бүтөт",
+    "deposit": "Депозит",
+    "manager": "Менеджер",
+    "dealDetails": "Бүтүмдүн чоо-жайы",
+    "daysLeft_one": "{{count}} күн калды",
+    "daysLeft_few": "{{count}} күн калды",
+    "daysLeft_many": "{{count}} күн калды",
+    "daysLeft_other": "{{count}} күн калды",
+    "expiresToday": "Мөөнөтү бүгүн бүтөт",
+    "expired": "Мөөнөтү өттү",
+    "headings": {
+      "reserved": "Брондоо",
+      "contractSigned": "Келишим кол коюлган",
+      "active": "Сатуу иштеп жатат",
+      "completed": "Сатылды",
+      "cancelled": "Жокко чыгарылды",
+      "expired": "Мөөнөтү өттү"
+    }
+  },
+  "financing": {
+    "cash": "Накталай",
+    "installment": "Бөлүп төлөө",
+    "mortgage": "Ипотека"
+  },
+  "clientCard": {
+    "title": "Клиенттин дайындары"
+  },
+  "managerCard": {
+    "title": "Менеджер",
+    "unassigned": "Дайындалган эмес"
+  },
+  "historyCard": {
+    "title": "Тарых",
+    "empty": "Азырынча активдүүлүк катталган жок."
+  },
+  "timelineCard": {
+    "title": "Хронология",
+    "created": "Түзүлдү",
+    "reserved": "Бронделди",
+    "expires": "Мөөнөтү бүтөт",
+    "contract": "Келишим",
+    "cancelled": "Жокко чыгарылды",
+    "reason": "Себеби: {{reason}}",
+    "note": "Эскертүү"
+  },
+  "paymentSchedule": {
+    "title": "Төлөм графиги",
+    "progress": "{{paidCount}}/{{total}} төлөндү · {{paidAmount}}/{{totalAmount}}",
+    "generate": "График түзүү",
+    "emptyActive": "Төлөм графиги азырынча түзүлгөн эмес.",
+    "emptyInactive": "Бүтүм активдештирилгенден кийин жеткиликтүү."
+  },
+  "paymentsHistory": {
+    "title": "Төлөмдөр",
+    "record": "Төлөм жаздыруу",
+    "empty": "Азырынча төлөм катталган жок."
+  },
+  "detailsPage": {
+    "dealNumber": "Бүтүм №{{number}}",
+    "contractNumber": "Келишим №{{number}}",
+    "back": "Артка",
+    "extendReservation": "Бронду узартуу",
+    "signContract": "Келишимге кол коюу",
+    "activateDeal": "Бүтүмдү активдештирүү",
+    "moreActions": "Кошумча аракеттер",
+    "markCompleted": "Аяктады деп белгилөө",
+    "cancelDeal": "Бүтүмдү жокко чыгаруу",
+    "cancelDialogTitle": "Бүтүмдү жокко чыгаруу",
+    "reasonOptional": "Себеби (милдеттүү эмес)",
+    "confirmCancellation": "Жокко чыгарууну ырастоо",
+    "extendDialogTitle": "Бронду узартуу",
+    "currentlyExpires": "Учурда {{date}} күнү бүтөт.",
+    "newDate": "Жаңы дата",
+    "extend": "Узартуу",
+    "signDialogTitle": "Келишимге кол коюу",
+    "contractNumberLabel": "Келишим номери",
+    "contractDateLabel": "Келишим датасы",
+    "sign": "Кол коюу",
+    "scheduleDialogTitle": "Төлөм графигин түзүү",
+    "numberOfInstallments": "Төлөмдөрдүн саны",
+    "firstPaymentDate": "Биринчи төлөмдүн датасы",
+    "intervalMonths": "Төлөмдөр аралыгы (ай)",
+    "generate": "Түзүү",
+    "paymentDialogTitle": "Төлөм жаздыруу",
+    "amount": "Суммасы",
+    "paymentMethodLabel": "Төлөм ыкмасы",
+    "selectMethod": "Ыкманы тандаңыз",
+    "paymentTypeLabel": "Төлөм түрү",
+    "selectType": "Түрдү тандаңыз",
+    "paymentDate": "Төлөм датасы",
+    "reference": "Шилтеме (милдеттүү эмес)",
+    "referencePlaceholder": "мисалы, транзакция ID",
+    "record": "Жаздыруу"
+  },
+  "toasts": {
+    "unitReserved": "Юнит бронделди",
+    "unitReservedDescription": "№{{number}} юнит бронделди.",
+    "reserveError": "Юнитти брондоо мүмкүн болбоду",
+    "tryAgain": "Кайра аракет кылыңыз.",
+    "reservationExtended": "Брон узартылды",
+    "extendError": "Бронду узартуу мүмкүн болбоду",
+    "contractSigned": "Келишимге кол коюлду",
+    "signError": "Келишимге кол коюу мүмкүн болбоду",
+    "dealActivated": "Бүтүм активдештирилди",
+    "activateError": "Бүтүмдү активдештирүү мүмкүн болбоду",
+    "dealCancelled": "Бүтүм жокко чыгарылды",
+    "cancelError": "Бүтүмдү жокко чыгаруу мүмкүн болбоду",
+    "scheduleGenerated": "Төлөм графиги түзүлдү",
+    "scheduleError": "Графикти түзүү мүмкүн болбоду",
+    "paymentRecorded": "Төлөм жаздырылды",
+    "paymentError": "Төлөмдү жаздыруу мүмкүн болбоду",
+    "dealCompleted": "Бүтүм аякталды",
+    "completeError": "Бүтүмдү аяктоо мүмкүн болбоду"
+  },
+  "booking": {
+    "rooms": "{{count}} бөлм.",
+    "sheetTitle": "№{{number}} юнитти брондоо",
+    "existingClient": "Учурдагы клиент",
+    "newClient": "Жаңы клиент",
+    "fullName": "Аты-жөнү",
+    "fullNamePlaceholder": "Клиенттин аты-жөнү",
+    "phone": "Телефон",
+    "phonePlaceholder": "+996 XXX XXX XXX",
+    "whatsapp": "WhatsApp (милдеттүү эмес)",
+    "email": "Email (милдеттүү эмес)",
+    "passport": "Паспорт (милдеттүү эмес)",
+    "pin": "ПИН (милдеттүү эмес)",
+    "pinPlaceholder": "14 орундуу ПИН",
+    "manager": "Менеджер",
+    "selectManager": "Менеджерди тандаңыз",
+    "reservationExpires": "Брон мөөнөтү бүтөт",
+    "discountPercent": "Арзандатуу (%)",
+    "deposit": "Депозит ({{currency}})",
+    "noteOptional": "Эскертүү (милдеттүү эмес)",
+    "listPrice": "Прайс боюнча баасы",
+    "discount": "Арзандатуу",
+    "finalPrice": "Жыйынтык баасы",
+    "remaining": "Калдык",
+    "client": "Клиент",
+    "expires": "Мөөнөтү бүтөт",
+    "note": "Эскертүү",
+    "cancel": "Жокко чыгаруу",
+    "back": "Артка",
+    "next": "Кийинки",
+    "confirmReservation": "Брондоону ырастоо",
+    "selectClientError": "Клиентти тандаңыз же түзүңүз.",
+    "reserveError": "Юнитти брондоо мүмкүн болбоду. Кайра аракет кылыңыз.",
+    "validation": {
+      "managerRequired": "Менеджерди көрсөтүңүз",
+      "expiresRequired": "Брондун мөөнөтүн көрсөтүңүз",
+      "selectClient": "Клиентти тандаңыз.",
+      "fullNameRequired": "Аты-жөнү милдеттүү.",
+      "phoneRequired": "Телефон номери милдеттүү.",
+      "invalidEmail": "Email туура эмес"
+    },
+    "depositPlain": "Депозит"
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "status": {
+    "draft": "Кара нуска",
+    "planning": "Пландоо",
+    "active": "Активдүү",
+    "paused": "Токтотулган",
+    "sold_out": "Сатылып бүттү",
+    "completed": "Аякталды",
+    "archived": "Архив"
+  },
+  "salesComingSoon": "Сатуулар (жакында)",
+  "tabs": {
+    "heading": "Долбоорлор",
+    "addProject": "Долбоор кошуу",
+    "statusAll": "Баары",
+    "statusFilterAriaLabel": "Долбоорлорду статус боюнча чыпкалоо"
+  },
+  "sheet": {
+    "addTitle": "Долбоор кошуу",
+    "editTitle": "Долбоорду оңдоо",
+    "addDescription": "Бул компания үчүн жаңы долбоор түзүү.",
+    "editDescription": "Долбоордун дайындарын жаңыртуу."
+  },
+  "form": {
+    "nameLabel": "Аталышы",
+    "namePlaceholder": "Долбоордун аталышы",
+    "addressLabel": "Дареги",
+    "addressPlaceholder": "Дареги",
+    "submitCreate": "Долбоор түзүү",
+    "errorGeneric": "Долбоорду сактоо мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз.",
+    "validation": {
+      "nameMin": "Долбоордун аталышы кеминде 2 белгиден турушу керек",
+      "statusRequired": "Статусту тандаңыз"
+    }
+  },
+  "counts": {
+    "blocksLabel": "Блоктор",
+    "unitsLabel": "Юниттер"
+  },
+  "card": {
+    "deleteTitle": "Долбоорду өчүрөсүзбү?",
+    "deleteDescription": "«{{name}}» долбоору биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт."
+  },
+  "page": {
+    "notFound": "Долбоор табылган жок",
+    "deleteDescription": "«{{name}}» долбоору жана анын бардык ички структуралык модели биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт.",
+    "toastUpdatedTitle": "Ийгиликтүү жаңырды",
+    "toastUpdatedDescription": "«{{name}}» долбоору жаңырды.",
+    "toastUpdateErrorTitle": "Долбоорду жаңыртуу мүмкүн болбоду"
+  },
+  "structure": {
+    "heading": "Долбоордун структурасы",
+    "notFound": "Долбоордун структурасы табылган жок",
+    "emptyTitle": "Азырынча блок жок",
+    "emptyDescriptionPrefix": "Биринчи блокту түзүүдөн баштаңыз.",
+    "emptyDescriptionSuffix": "Блоктор долбооруңуздагы кире беришибиш, кабаттарды жана юниттерди уюштурууга жардам берет.",
+    "toastCreateErrorTitle": "Блокту түзүү мүмкүн болбоду"
+  },
+  "overview": {
+    "heading": "Долбоордун жалпы көрүнүшү",
+    "notFound": "Долбоор табылган жок"
+  },
+  "chessboard": {
+    "blockLabel": "{{name}} блогу",
+    "entranceLabel": "{{name}} кире бериши",
+    "blockNotFound": "Блок табылган жок",
+    "selectBlockHeading": "Блокту тандаңыз",
+    "statEntrances": "Кире беришибиш",
+    "statFloors": "Кабаттар",
+    "statUnits": "Юниттер",
+    "noBlocksTitle": "Азырынча блок жок",
+    "noBlocksDescription": "Адегенде «Конструктор» бетинде блоктор түзүңүз",
+    "noUnitsTitle": "Юниттер табылган жок",
+    "noUnitsDescription": "Чыпкаларды өзгөртүп көрүңүз",
+    "updateUnitError": "Юнитти жаңыртуу мүмкүн болбоду.",
+    "floors_one": "{{count}} кабат",
+    "floors_few": "{{count}} кабат",
+    "floors_many": "{{count}} кабат",
+    "floors_other": "{{count}} кабат",
+    "units_one": "{{count}} юнит",
+    "units_few": "{{count}} юнит",
+    "units_many": "{{count}} юнит",
+    "units_other": "{{count}} юнит"
+  }
+}

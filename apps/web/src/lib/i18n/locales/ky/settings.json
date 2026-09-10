@@ -1,0 +1,37 @@
+{
+  "page": {
+    "heading": "Компаниянын тууралоолору",
+    "description": "Сиздин агенттигиңиздин аталышы, валютасы, локалы жана убакыт алкагы.",
+    "formTitle": "Жалпы"
+  },
+  "fields": {
+    "name": "Аталышы",
+    "currency": "Валюта",
+    "locale": "Локаль",
+    "timezone": "Убакыт алкагы"
+  },
+  "toasts": {
+    "updateSuccessTitle": "Тууралоолор сакталды",
+    "updateSuccessDescription": "Компаниянын тууралоолору жаңырды.",
+    "updateErrorTitle": "Тууралоолорду сактоо мүмкүн болбоду",
+    "updateErrorDescription": "Бир нерсе туура эмес болду. Кайра аракет кылыңыз."
+  },
+  "profile": {
+    "page": {
+      "heading": "Менин профилим",
+      "description": "Атыңызды жана телефон номериңизди жаңыртыңыз.",
+      "formTitle": "Жеке дайындар"
+    },
+    "fields": {
+      "fullName": "Аты-жөнү",
+      "email": "Email",
+      "phone": "Телефон"
+    },
+    "toasts": {
+      "updateSuccessTitle": "Профиль сакталды",
+      "updateSuccessDescription": "Сиздин профилиңиз жаңырды.",
+      "updateErrorTitle": "Профилди сактоо мүмкүн болбоду",
+      "updateErrorDescription": "Бир нерсе туура эмес болду. Кайра аракет кылыңыз."
+    }
+  }
+}

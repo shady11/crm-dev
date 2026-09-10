@@ -16,6 +16,7 @@ const LanguageDropdown = ({ defaultOpen, trigger }: Props) => {
     const labels: Record<SupportedLanguage, string> = {
         ru: t("language.russian"),
         en: t("language.english"),
+        ky: t("language.kyrgyz"),
     };
 
     return (

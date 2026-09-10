@@ -1,0 +1,45 @@
+{
+  "actions": {
+    "addBlock": "Блок кошуу",
+    "createBlock": "Блок түзүү",
+    "editBlock": "Блокту оңдоо"
+  },
+  "form": {
+    "nameLabel": "Аталышы",
+    "namePlaceholder": "Блоктун аталышы (мисалы, A, B, C)",
+    "orderLabel": "Тартиби (милдеттүү эмес)",
+    "submitCreate": "Блок түзүү",
+    "errorGeneric": "Блокту сактоо мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз."
+  },
+  "validation": {
+    "nameRequired": "Блоктун аталышы милдеттүү"
+  },
+  "item": {
+    "titleWithName": "{{name}} блогу",
+    "entrances_one": "{{count}} кире бериш",
+    "entrances_few": "{{count}} кире бериш",
+    "entrances_many": "{{count}} кире бериш",
+    "entrances_other": "{{count}} кире бериш"
+  },
+  "delete": {
+    "title": "Блокту өчүрөсүзбү?",
+    "description": "{{name}} блогу жана анын бардык кире беришибиш, кабаттары жана юниттери биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт."
+  },
+  "duplicate": {
+    "title": "Блокту кайталайсызбы?",
+    "descriptionPrefix": "Түзүлөт: ",
+    "nameLabel": "{{name}} блогунун көчүрмөсү",
+    "descriptionSuffix": " бардык кире беришибиш, кабаттар жана юниттер менен."
+  },
+  "toasts": {
+    "createdTitle": "Ийгиликтүү түзүлдү",
+    "createdDescription": "{{name}} блогу долбоорго кошулду.",
+    "createErrorTitle": "Блокту түзүү мүмкүн болбоду",
+    "updatedTitle": "Ийгиликтүү жаңырды",
+    "updatedDescription": "{{name}} блогу жаңырды.",
+    "deletedTitle": "Ийгиликтүү өчүрүлдү",
+    "deletedDescription": "{{name}} блогу өчүрүлдү.",
+    "duplicatedTitle": "Ийгиликтүү түзүлдү",
+    "duplicatedDescription": "{{name}} блогу кайталанды."
+  }
+}

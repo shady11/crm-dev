@@ -1,0 +1,90 @@
+{
+  "status": {
+    "to_do": "Аткарылышы керек",
+    "in_progress": "Иштеп жатат",
+    "done": "Аткарылды",
+    "cancelled": "Жокко чыгарылды"
+  },
+  "page": {
+    "title": "Тапшырмалар"
+  },
+  "toolbar": {
+    "heading": "Бардык тапшырмалар",
+    "everyone": "Баары",
+    "assigneePlaceholder": "Аткаруучу",
+    "allStatuses": "Бардык статустар",
+    "filterByStatus": "Статус боюнча чыпка",
+    "searchPlaceholder": "Тапшырмаларды издөө...",
+    "addTask": "Тапшырма кошуу"
+  },
+  "table": {
+    "title": "Аталышы",
+    "relatedTo": "Байланышкан",
+    "assignee": "Аткаруучу",
+    "dueDate": "Мөөнөтү",
+    "status": "Статус",
+    "emptyTitle": "Тапшырмалар табылган жок",
+    "emptyDescription": "Чыпкаларды же издөөнү өзгөртүп көрүңүз."
+  },
+  "pagination": {
+    "rowsPerPage": "Барактагы саптар"
+  },
+  "kanban": {
+    "noTasks": "Тапшырма жок",
+    "boardView": "Такта көрүнүшү",
+    "tableView": "Таблица көрүнүшү"
+  },
+  "statusCard": {
+    "count_one": "{{count}} тапшырма",
+    "count_few": "{{count}} тапшырма",
+    "count_many": "{{count}} тапшырма",
+    "count_other": "{{count}} тапшырма"
+  },
+  "related": {
+    "deal": "{{number}} бүтүм"
+  },
+  "form": {
+    "editTitle": "Тапшырманы оңдоо",
+    "addTitle": "Тапшырма кошуу",
+    "editDescription": "Тапшырманын дайындарын жаңыртыңыз.",
+    "addDescription": "Жаңы тапшырма түзүңүз.",
+    "saveError": "Тапшырманы сактоо мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз.",
+    "saveChanges": "Өзгөртүүлөрдү сактоо",
+    "create": "Тапшырма түзүү",
+    "save": "Сактоо",
+    "title": "Аталышы",
+    "titlePlaceholder": "мисалы, документтер боюнча клиентке чалуу",
+    "description": "Сүрөттөлүшү (милдеттүү эмес)",
+    "assignee": "Аткаруучу",
+    "selectAssignee": "Аткаруучуну тандаңыз",
+    "status": "Статус",
+    "dueDate": "Аткаруу мөөнөтү (милдеттүү эмес)",
+    "selectDueDate": "Датаны тандаңыз",
+    "cancel": "Жокко чыгаруу",
+    "validation": {
+      "titleMin": "Аталышы кеминде 2 белгиден турушу керек",
+      "selectAssignee": "Аткаруучуну тандаңыз"
+    }
+  },
+  "clientCard": {
+    "title": "Тапшырмалар",
+    "titleWithCount": "Тапшырмалар ({{count}})",
+    "addTask": "Тапшырма кошуу",
+    "empty": "Бул клиентке байланышкан тапшырма жок."
+  },
+  "toasts": {
+    "createSuccess": "Тапшырма түзүлдү",
+    "createError": "Тапшырманы түзүү мүмкүн болбоду",
+    "updateSuccess": "Тапшырма жаңырды",
+    "updateError": "Тапшырманы жаңыртуу мүмкүн болбоду",
+    "statusError": "Статусту жаңыртуу мүмкүн болбоду",
+    "deleteSuccess": "Тапшырма өчүрүлдү",
+    "deleteError": "Тапшырманы өчүрүү мүмкүн болбоду"
+  },
+  "dealCard": {
+    "title": "Тапшырмалар",
+    "titleWithCount": "Тапшырмалар ({{count}})",
+    "addTask": "Тапшырма кошуу",
+    "empty": "Бул бүтүмгө байланышкан тапшырма жок."
+  }
+}
