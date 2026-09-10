@@ -24,6 +24,7 @@ function build() {
     },
   };
   const provider = {
+    supports: jest.fn().mockReturnValue(true),
     send: jest.fn().mockResolvedValue({ providerMessageId: 'provider-123' }),
   };
 

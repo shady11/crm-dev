@@ -1,4 +1,5 @@
-import {Controller, Get, Query, UseGuards} from "@nestjs/common";
+import {Controller, Get, Query, Res, UseGuards} from "@nestjs/common";
+import type {Response} from "express";
 import {JwtAuthGuard} from "@/modules/auth/guards/jwt-auth.guard";
 import {CompanyGuard} from "@/common/guards/company.guard";
 import {RolesGuard} from "@/common/guards/roles.guard";
@@ -55,6 +56,36 @@ export class DashboardController {
         @Query("branchId") branchId?: string,
     ) {
         return this.dashboardService.getRecentActivity(user, projectId, branchId);
+    }
+
+    // Lead → deal → won conversion funnel. Open to the same roles as
+    // getKpis/getRevenueTrend above (no @Roles restriction) since it's the
+    // same kind of company/branch-scoped overview, not a cross-branch or
+    // team-lead-only report.
+    @Get("funnel")
+    getFunnel(
+        @CurrentUser() user: AuthUser,
+        @Query("projectId") projectId?: string,
+        @Query("branchId") branchId?: string,
+    ) {
+        return this.dashboardService.getFunnel(user, projectId, branchId);
+    }
+
+    @Get("funnel/export")
+    async exportFunnel(
+        @CurrentUser() user: AuthUser,
+        @Res({ passthrough: true }) res: Response,
+        @Query("projectId") projectId?: string,
+        @Query("branchId") branchId?: string,
+    ) {
+        const buffer = await this.dashboardService.exportFunnelXlsx(user, projectId, branchId);
+
+        res.set({
+            "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "Content-Disposition": `attachment; filename="funnel-${new Date().toISOString().slice(0, 10)}.xlsx"`,
+        });
+
+        return buffer;
     }
 
     // BR-E1: cross-branch comparison, COMPANY_ADMIN only — branch-scoped

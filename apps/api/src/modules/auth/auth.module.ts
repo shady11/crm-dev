@@ -9,6 +9,7 @@ import type {StringValue} from "ms";
 import {ConfigModule, ConfigService} from "@nestjs/config";
 import {PrismaModule} from "@/database/prisma.module";
 import {SessionValidationService} from "@/modules/auth/session-validation.service";
+import {TotpService} from "@/modules/auth/totp.service";
 
 @Module({
   imports: [
@@ -37,7 +38,7 @@ import {SessionValidationService} from "@/modules/auth/session-validation.servic
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, SessionValidationService],
+  providers: [AuthService, JwtStrategy, SessionValidationService, TotpService],
   exports: [
       JwtModule,
       SessionValidationService,

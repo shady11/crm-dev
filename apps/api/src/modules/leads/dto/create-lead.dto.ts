@@ -1,4 +1,4 @@
-import {IsEmail, IsEnum, IsOptional, IsString, IsUUID, MinLength} from "class-validator";
+import {IsBoolean, IsEmail, IsEnum, IsOptional, IsString, IsUUID, MinLength} from "class-validator";
 import {LeadStatus} from "@/generated/prisma/enums";
 
 export class CreateLeadDto {
@@ -33,4 +33,13 @@ export class CreateLeadDto {
     @IsOptional()
     @IsUUID()
     clientId?: string;
+
+    // Set once the caller has seen the duplicate warning (from
+    // GET /leads/duplicates) and wants to create the lead anyway — a repeat
+    // walk-in enquiry from the same number is a legitimate lead, not always
+    // a mistake. Without this flag, create() rejects a phone number that
+    // already matches an existing lead or client.
+    @IsOptional()
+    @IsBoolean()
+    confirmDuplicate?: boolean;
 }

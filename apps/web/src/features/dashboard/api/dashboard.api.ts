@@ -109,3 +109,36 @@ export async function getMyPerformance(days?: number) {
     const response = await api.get<MyPerformance>("/dashboard/my-performance", { params: { days } });
     return response.data;
 }
+
+// Lead → deal → won conversion funnel.
+export type FunnelStatusCount = { status: string; count: number };
+export type Funnel = {
+    leadsByStatus: FunnelStatusCount[];
+    dealsByStatus: FunnelStatusCount[];
+    totalLeads: number;
+    totalDeals: number;
+    dealsWon: number;
+    leadToDealConversionRate: number;
+    leadToWonConversionRate: number;
+};
+
+export async function getFunnel(projectId?: string, branchId?: string) {
+    const response = await api.get<Funnel>("/dashboard/funnel", { params: { projectId, branchId } });
+    return response.data;
+}
+
+export async function downloadFunnelExport(projectId?: string, branchId?: string) {
+    const response = await api.get<Blob>("/dashboard/funnel/export", {
+        params: { projectId, branchId },
+        responseType: "blob",
+    });
+
+    const url = URL.createObjectURL(response.data);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `funnel-${new Date().toISOString().slice(0, 10)}.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+}

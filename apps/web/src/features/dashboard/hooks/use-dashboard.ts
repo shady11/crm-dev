@@ -3,6 +3,7 @@ import {
     getAttentionItems,
     getBranchComparison,
     getDashboardKpis,
+    getFunnel,
     getMyPerformance,
     getMyWorkToday,
     getRecentActivity,
@@ -20,6 +21,7 @@ export function useDashboard(projectId?: string, branchId?: string) {
         attention: useQuery({ queryKey: ["dashboard", "attention", { projectId, branchId }], queryFn: () => getAttentionItems(projectId, branchId) }),
         recentActivity: useQuery({ queryKey: ["dashboard", "recent-activity", { projectId, branchId }], queryFn: () => getRecentActivity(projectId, branchId) }),
         dealsStatus: useQuery({ queryKey: ["deals", "status-summary", { projectId, branchId }], queryFn: () => getDealStatusSummary(projectId, branchId) }),
+        funnel: useQuery({ queryKey: ["dashboard", "funnel", { projectId, branchId }], queryFn: () => getFunnel(projectId, branchId) }),
     };
 }
 

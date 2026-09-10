@@ -1,7 +1,6 @@
 import {randomUUID} from "crypto";
-import {createReadStream} from "fs";
-import {extname, join} from "path";
-import {BadRequestException, ForbiddenException, Injectable} from "@nestjs/common";
+import {extname} from "path";
+import {BadRequestException, ForbiddenException, Inject, Injectable} from "@nestjs/common";
 import {
     DocumentOwnerType,
     DocumentType,
@@ -14,7 +13,7 @@ import {AuthUser} from "@/common/types/auth-user.type";
 import {UploadDocumentDto} from "./dto/upload-document.dto";
 import {QueryDocumentsDto} from "./dto/query-documents.dto";
 import {DocumentNotFoundException} from "./exceptions/document-not-found.exception";
-import {saveFileToDisk, UPLOADS_ROOT} from "./documents.constants";
+import {FILE_STORAGE_PROVIDER, FileStorageProvider} from "./storage/file-storage.interface";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 
 const DOCUMENT_INCLUDE = {
@@ -26,6 +25,7 @@ export class DocumentsService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly notifications: NotificationsService,
+        @Inject(FILE_STORAGE_PROVIDER) private readonly storage: FileStorageProvider,
     ) {}
 
     async findAll(user: AuthUser, query: QueryDocumentsDto) {
@@ -92,7 +92,7 @@ export class DocumentsService {
 
         const extension = extname(file.originalname).replace(".", "").toLowerCase();
         const storedName = `${randomUUID()}${extension ? `.${extension}` : ""}`;
-        const relativePath = await saveFileToDisk(companyId, storedName, file.buffer);
+        const relativePath = await this.storage.save(companyId, storedName, file.buffer);
 
         const document = await this.prisma.document.create({
             data: {
@@ -135,8 +135,8 @@ export class DocumentsService {
 
     async getFileForDownload(user: AuthUser, id: string) {
         const document = await this.findOne(user, id);
-        const absolutePath = join(UPLOADS_ROOT, document.path);
-        return { document, stream: createReadStream(absolutePath) };
+        const stream = await this.storage.getStream(document.path);
+        return { document, stream };
     }
 
     async remove(user: AuthUser, id: string) {

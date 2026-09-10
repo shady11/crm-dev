@@ -12,6 +12,7 @@ import {TeamSnapshotCard} from "@/features/dashboard/components/team-snapshot-ca
 import {MyWorkTodayCard} from "@/features/dashboard/components/my-work-today-card.tsx";
 import {MyPerformanceCard} from "@/features/dashboard/components/my-performance-card.tsx";
 import {DealStatusCardsGrid} from "@/features/deals/components/deal-status-cards-grid.tsx";
+import {FunnelCard} from "@/features/dashboard/components/funnel-card.tsx";
 import {
     useBranchComparison,
     useDashboard,
@@ -33,7 +34,7 @@ export function DashboardPage() {
     const [branchId, setBranchId] = useState<string | "all">("all");
     const { formatCurrency } = useCompanyFormatters();
     const projects = useProjectsFilter();
-    const { kpis, revenueTrend, unitsSummary, attention, recentActivity, dealsStatus } = useDashboard(
+    const { kpis, revenueTrend, unitsSummary, attention, recentActivity, dealsStatus, funnel } = useDashboard(
         projectId,
         branchId === "all" ? undefined : branchId,
     );
@@ -111,6 +112,10 @@ export function DashboardPage() {
                 <h3 className="text-sm font-medium text-muted-foreground">{t("dealsByStage")}</h3>
                 <DealStatusCardsGrid countsByStatus={countsByStatus} />
             </div>
+
+            {funnel.data ? (
+                <FunnelCard data={funnel.data} projectId={projectId} branchId={branchId === "all" ? undefined : branchId} />
+            ) : null}
 
             <div className="grid gap-4 lg:grid-cols-2">
                 <AttentionCard data={attention.data ?? { expiringDeals: [], urgentTasks: [] }} />

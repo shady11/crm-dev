@@ -28,6 +28,17 @@ const REQUIRED_ALWAYS = ["DATABASE_URL", "JWT_SECRET", "FRONTEND_URL"] as const;
 const REQUIRED_IN_PRODUCTION = ["UPLOADS_DIR"] as const;
 
 /**
+ * Only required when STORAGE_DRIVER=s3 — a half-configured S3 driver would
+ * otherwise fail on the first upload instead of at boot.
+ */
+const REQUIRED_FOR_S3_STORAGE = [
+    "AWS_S3_BUCKET",
+    "AWS_REGION",
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
+] as const;
+
+/**
  * Passed to ConfigModule.forRoot({ validate }), which calls this after loading
  * the .env file and before any provider is instantiated. Throwing here stops
  * the process at startup with a readable message, instead of letting it come
@@ -39,6 +50,7 @@ export function validateEnv(
     const required = [
         ...REQUIRED_ALWAYS,
         ...(config.NODE_ENV === "production" ? REQUIRED_IN_PRODUCTION : []),
+        ...(config.STORAGE_DRIVER === "s3" ? REQUIRED_FOR_S3_STORAGE : []),
     ];
 
     const missing = required.filter((key) => {

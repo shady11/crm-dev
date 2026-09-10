@@ -4,6 +4,7 @@ import {JwtService} from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
 import {PrismaService} from "@/database/prisma.service";
 import {UsersService} from "@/modules/users/users.service";
+import {TotpService} from "@/modules/auth/totp.service";
 import {AuthService} from "./auth.service";
 import {SessionValidationService, type JwtPayload} from "./session-validation.service";
 
@@ -90,13 +91,18 @@ describe("company suspension is enforced at auth", () => {
                     companyId: "company-1",
                     isActive: true,
                     passwordHash,
+                    failedLoginAttempts: 0,
+                    lockedUntil: null,
+                    totpEnabled: false,
                     company,
                 }),
             } as unknown as UsersService;
 
             const jwt = {signAsync: jest.fn().mockResolvedValue("token")} as unknown as JwtService;
+            const prisma = {user: {update: jest.fn()}} as unknown as PrismaService;
+            const totp = new TotpService();
 
-            return new AuthService(users, jwt, {} as PrismaService);
+            return new AuthService(users, jwt, prisma, totp);
         };
 
         it("refuses a suspended tenant and says why", async () => {

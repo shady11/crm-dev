@@ -1,4 +1,4 @@
-import {ConflictException, ForbiddenException, NotFoundException} from "@nestjs/common";
+import {BadRequestException, ConflictException, ForbiddenException, NotFoundException} from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import {UserRole} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
@@ -199,7 +199,11 @@ describe("CompaniesService self-service (CA-A1)", () => {
         const update = jest.fn().mockImplementation(({data}) => Promise.resolve({...(company as object), ...data}));
         const findFirst = jest.fn().mockResolvedValue(company);
         const prisma = {
-            company: {findFirst, update},
+            company: {
+                findFirst,
+                update,
+                findUniqueOrThrow: jest.fn().mockResolvedValue(company),
+            },
             project: {count: jest.fn().mockResolvedValue(0)},
             unit: {count: jest.fn().mockResolvedValue(0)},
             client: {count: jest.fn().mockResolvedValue(0)},
@@ -241,5 +245,31 @@ describe("CompaniesService self-service (CA-A1)", () => {
         const {service} = build(null);
 
         await expect(service.findOwn(companyAdmin)).rejects.toThrow(NotFoundException);
+    });
+
+    it("refuses to change currency once the company has real deals", async () => {
+        const {service} = build({id: "company-1", name: "Bishkek Dev", currency: "KGS", users: []});
+        const prisma = (service as unknown as {prisma: PrismaService}).prisma;
+        (prisma.deal.count as jest.Mock).mockResolvedValue(3);
+
+        await expect(service.updateOwn(companyAdmin, {currency: "USD"})).rejects.toThrow(BadRequestException);
+    });
+
+    it("allows a currency change while the company has no deals yet", async () => {
+        const {service, update} = build({id: "company-1", name: "Bishkek Dev", currency: "KGS", users: []});
+
+        await service.updateOwn(companyAdmin, {currency: "USD"});
+
+        expect(update).toHaveBeenCalled();
+    });
+
+    it("allows saving the same currency the company already has", async () => {
+        const {service, update} = build({id: "company-1", name: "Bishkek Dev", currency: "KGS", users: []});
+        const prisma = (service as unknown as {prisma: PrismaService}).prisma;
+        (prisma.deal.count as jest.Mock).mockResolvedValue(3);
+
+        await service.updateOwn(companyAdmin, {currency: "KGS"});
+
+        expect(update).toHaveBeenCalled();
     });
 });
