@@ -1,6 +1,7 @@
 import { DocumentGenerationService } from './document-generation.service';
 import { DocumentType } from '@/generated/prisma/client';
-import { UnsupportedDocumentTypeException } from './exceptions';
+import { TemplateRenderFailedException, UnsupportedDocumentTypeException } from './exceptions';
+import { renderHtmlToPdf } from './pdf-renderer';
 
 jest.mock('./pdf-renderer', () => ({
   renderHtmlToPdf: jest.fn().mockResolvedValue(Buffer.from('%PDF-fake')),
@@ -144,5 +145,134 @@ describe('DocumentGenerationService', () => {
         userId: 'user-1',
       }),
     ).rejects.toThrow(UnsupportedDocumentTypeException);
+  });
+
+  it('wraps a Handlebars compile/render failure in TemplateRenderFailedException instead of letting it propagate raw', async () => {
+    const { service, prisma } = build();
+    // Strict mode throws when a template dereferences a property on a
+    // missing object, rather than silently rendering nothing.
+    prisma.documentTemplate.findFirst.mockResolvedValue({
+      id: 'tpl-1',
+      bodyHtml: '<html>{{missing.nested}}</html>',
+    });
+
+    await expect(
+      service.generateForDeal({
+        companyId: 'company-1',
+        dealId: 'deal-1',
+        type: DocumentType.CONTRACT,
+        userId: 'user-1',
+      }),
+    ).rejects.toThrow(TemplateRenderFailedException);
+  });
+
+  it('never reaches PDF rendering or storage when the template fails to compile', async () => {
+    const { service, prisma, storage } = build();
+    prisma.documentTemplate.findFirst.mockResolvedValue({
+      id: 'tpl-1',
+      bodyHtml: '<html>{{missing.nested}}</html>',
+    });
+
+    await expect(
+      service.generateForDeal({
+        companyId: 'company-1',
+        dealId: 'deal-1',
+        type: DocumentType.CONTRACT,
+        userId: 'user-1',
+      }),
+    ).rejects.toThrow();
+
+    expect(storage.save).not.toHaveBeenCalled();
+    expect(prisma.document.create).not.toHaveBeenCalled();
+  });
+
+  it('renders the template with the built deal/company context substituted in', async () => {
+    const { service, prisma } = build();
+    prisma.documentTemplate.findFirst.mockResolvedValue({
+      id: 'tpl-1',
+      bodyHtml: '<html>{{deal.dealNumber}} / {{company.name}}</html>',
+    });
+
+    await service.generateForDeal({
+      companyId: 'company-1',
+      dealId: 'deal-1',
+      type: DocumentType.CONTRACT,
+      userId: 'user-1',
+    });
+
+    const calls = (renderHtmlToPdf as jest.Mock).mock.calls;
+    const renderedHtml = calls[calls.length - 1][0];
+    expect(renderedHtml).toContain('2026-0001');
+    expect(renderedHtml).toContain('Acme Homes');
+  });
+
+  it('saves the rendered PDF under the company and stores its returned relative path', async () => {
+    const { service, prisma, storage } = build();
+
+    await service.generateForDeal({
+      companyId: 'company-1',
+      dealId: 'deal-1',
+      type: DocumentType.RESERVATION,
+      userId: 'user-1',
+    });
+
+    expect(storage.save).toHaveBeenCalledWith(
+      'company-1',
+      expect.stringMatching(/^[0-9a-f-]+\.pdf$/i),
+      expect.any(Buffer),
+    );
+    expect(prisma.document.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ path: 'company-1/generated.pdf' }) }),
+    );
+  });
+
+  it('names the stored document from the document type and the deal number', async () => {
+    const { service, prisma } = build();
+
+    await service.generateForDeal({
+      companyId: 'company-1',
+      dealId: 'deal-1',
+      type: DocumentType.RESERVATION,
+      userId: 'user-1',
+    });
+
+    expect(prisma.document.create).toHaveBeenCalledWith(
+      expect.objectContaining({ data: expect.objectContaining({ originalName: 'reservation-2026-0001.pdf' }) }),
+    );
+  });
+
+  it('records the rendered PDF size and content type', async () => {
+    const { service, prisma } = build();
+
+    await service.generateForDeal({
+      companyId: 'company-1',
+      dealId: 'deal-1',
+      type: DocumentType.RESERVATION,
+      userId: 'user-1',
+    });
+
+    expect(prisma.document.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          mimeType: 'application/pdf',
+          extension: 'pdf',
+          size: Buffer.from('%PDF-fake').length,
+        }),
+      }),
+    );
+  });
+
+  it('picks the highest-version active template when more than one exists', async () => {
+    const { service, prisma } = build();
+    await service.generateForDeal({
+      companyId: 'company-1',
+      dealId: 'deal-1',
+      type: DocumentType.RESERVATION,
+      userId: 'user-1',
+    });
+
+    expect(prisma.documentTemplate.findFirst).toHaveBeenCalledWith(
+      expect.objectContaining({ orderBy: { version: 'desc' } }),
+    );
   });
 });

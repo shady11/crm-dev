@@ -1,3 +1,4 @@
+import {BadRequestException, ForbiddenException} from "@nestjs/common";
 import {PrismaService} from "@/database/prisma.service";
 import {UnitsImportService} from "./units-import.service";
 
@@ -152,5 +153,172 @@ describe("UnitsImportService (CA-C1)", () => {
         expect(tx.unit.create).toHaveBeenCalledWith(
             expect.objectContaining({data: expect.objectContaining({number: "501", price: 50000})}),
         );
+    });
+
+    it("rejects when the user has no company", async () => {
+        const {service} = build();
+        const file = csvFile([["block", "entrance", "floor", "number", "area", "price"]]);
+
+        await expect(
+            service.importFromFile({...actor, companyId: null}, "project-1", file),
+        ).rejects.toThrow(ForbiddenException);
+    });
+
+    it("rejects when no file was uploaded", async () => {
+        const {service} = build();
+        await expect(service.importFromFile(actor, "project-1", undefined as any)).rejects.toThrow(
+            BadRequestException,
+        );
+    });
+
+    it("rejects a project that does not belong to the caller's company", async () => {
+        const {service, prisma} = build();
+        prisma.project.findFirst.mockResolvedValue(null);
+        const file = csvFile([["block", "entrance", "floor", "number", "area", "price"]]);
+
+        await expect(service.importFromFile(actor, "other-project", file)).rejects.toThrow(BadRequestException);
+    });
+
+    it("reports every missing/invalid required field on a row as a distinct message", async () => {
+        const {service} = build();
+        const file = csvFile([
+            ["block", "entrance", "floor", "number", "area", "price"],
+            ["", "", "not-a-number", "", "not-a-number", "not-a-number"],
+        ]);
+
+        const result = await service.importFromFile(actor, "project-1", file);
+
+        expect(result.created).toBe(0);
+        expect(result.errors[0].messages).toEqual([
+            "Block is required",
+            "Entrance is required",
+            "Floor must be a whole number",
+            "Unit number is required",
+            "Area must be a positive number",
+            "Price must be a positive number",
+        ]);
+    });
+
+    it("rejects a non-positive area or price", async () => {
+        const {service} = build();
+        const file = csvFile([
+            ["block", "entrance", "floor", "number", "area", "price"],
+            ["A", "1", "5", "501", "0", "-100"],
+        ]);
+
+        const result = await service.importFromFile(actor, "project-1", file);
+
+        expect(result.errors[0].messages).toEqual(
+            expect.arrayContaining(["Area must be a positive number", "Price must be a positive number"]),
+        );
+    });
+
+    it("accepts an explicit unit type, normalized to uppercase", async () => {
+        const {service, tx} = build();
+        const file = csvFile([
+            ["block", "entrance", "floor", "number", "area", "price", "type"],
+            ["A", "1", "5", "501", "45.5", "50000", "commercial"],
+        ]);
+
+        const result = await service.importFromFile(actor, "project-1", file);
+
+        expect(result).toEqual({created: 1, failed: 0, errors: []});
+        expect(tx.unit.create).toHaveBeenCalledWith(
+            expect.objectContaining({data: expect.objectContaining({type: "COMMERCIAL"})}),
+        );
+    });
+
+    it("rejects an unrecognized unit type", async () => {
+        const {service} = build();
+        const file = csvFile([
+            ["block", "entrance", "floor", "number", "area", "price", "type"],
+            ["A", "1", "5", "501", "45.5", "50000", "MANSION"],
+        ]);
+
+        const result = await service.importFromFile(actor, "project-1", file);
+
+        expect(result.created).toBe(0);
+        expect(result.errors[0].messages[0]).toContain("Type must be one of");
+    });
+
+    it("parses an explicit rooms count and rejects a non-integer one", async () => {
+        const {service, tx} = build();
+        const good = csvFile([
+            ["block", "entrance", "floor", "number", "area", "price", "rooms"],
+            ["A", "1", "5", "501", "45.5", "50000", "3"],
+        ]);
+        await service.importFromFile(actor, "project-1", good);
+        expect(tx.unit.create).toHaveBeenCalledWith(expect.objectContaining({data: expect.objectContaining({rooms: 3})}));
+
+        const {service: service2} = build();
+        const bad = csvFile([
+            ["block", "entrance", "floor", "number", "area", "price", "rooms"],
+            ["A", "1", "5", "501", "45.5", "50000", "two"],
+        ]);
+        const result = await service2.importFromFile(actor, "project-1", bad);
+        expect(result.errors[0].messages).toContain("Rooms must be a whole number");
+    });
+
+    it("assigns increasing order to multiple newly created blocks within one import", async () => {
+        const {service, tx} = build();
+        const file = csvFile([
+            ["block", "entrance", "floor", "number", "area", "price"],
+            ["A", "1", "1", "101", "40", "40000"],
+            ["B", "1", "1", "101", "40", "40000"],
+        ]);
+
+        await service.importFromFile(actor, "project-1", file);
+
+        const orders = (tx.block.create as jest.Mock).mock.calls.map((call) => call[0].data.order);
+        expect(orders).toEqual([1, 2]);
+    });
+
+    it("continues block order numbering from the highest existing order in the project", async () => {
+        const {service, tx} = build({blocks: [{id: "b1", name: "A", order: 3}]});
+        const file = csvFile([
+            ["block", "entrance", "floor", "number", "area", "price"],
+            ["B", "1", "1", "101", "40", "40000"],
+        ]);
+
+        await service.importFromFile(actor, "project-1", file);
+
+        expect(tx.block.create).toHaveBeenCalledWith(expect.objectContaining({data: expect.objectContaining({order: 4})}));
+    });
+
+    it("falls back to a generic message for an unexpected (non-row) error during row creation", async () => {
+        const {service, tx} = build();
+        tx.unit.create.mockRejectedValueOnce(new Error("connection reset"));
+        const file = csvFile([
+            ["block", "entrance", "floor", "number", "area", "price"],
+            ["A", "1", "5", "501", "45.5", "50000"],
+        ]);
+
+        const result = await service.importFromFile(actor, "project-1", file);
+
+        expect(result.created).toBe(0);
+        expect(result.errors[0].messages[0]).toBe("Could not create this unit. Please check the row and try again.");
+    });
+
+    it("resolves the number column through its aliases in priority order", async () => {
+        const {service, tx} = build();
+        const file = csvFile([
+            ["block", "entrance", "floor", "unit_number", "unitnumber", "area", "price"],
+            ["A", "1", "5", "first-alias", "second-alias", "45.5", "50000"],
+        ]);
+
+        await service.importFromFile(actor, "project-1", file);
+
+        expect(tx.unit.create).toHaveBeenCalledWith(
+            expect.objectContaining({data: expect.objectContaining({number: "first-alias"})}),
+        );
+    });
+
+    it("returns an empty result for a workbook with no rows", async () => {
+        const {service} = build();
+        const file = csvFile([["block", "entrance", "floor", "number", "area", "price"]]);
+
+        const result = await service.importFromFile(actor, "project-1", file);
+
+        expect(result).toEqual({created: 0, failed: 0, errors: []});
     });
 });
