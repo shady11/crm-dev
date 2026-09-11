@@ -2,6 +2,9 @@ import {api} from "@/lib/api";
 import type {PaginatedResponse} from "@/lib/api-types";
 import type {User, UserRole} from "../types/user.types";
 
+// Kept in sync with USER_SORTABLE_FIELDS in the API's query-users.dto.ts.
+export type UserSortField = "fullName" | "role" | "createdAt";
+
 export type GetUsersParams = {
     page?: number;
     limit?: number;
@@ -9,6 +12,8 @@ export type GetUsersParams = {
     role?: UserRole;
     isActive?: boolean;
     branchId?: string;
+    sortBy?: UserSortField;
+    sortOrder?: "asc" | "desc";
 };
 
 export type UserRoleSummaryItem = {

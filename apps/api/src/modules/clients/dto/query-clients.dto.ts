@@ -1,5 +1,9 @@
-import {IsInt, IsOptional, IsString, IsUUID, Max, Min} from "class-validator";
+import {IsIn, IsInt, IsOptional, IsString, IsUUID, Max, Min} from "class-validator";
 import {Transform} from "class-transformer";
+
+// Columns the clients table lets a user sort by — kept in sync with the
+// column keys ClientsTable passes to SortableTableHead on the frontend.
+export const CLIENT_SORTABLE_FIELDS = ["fullName", "phone", "email", "createdAt"] as const;
 
 export class QueryClientsDto {
     @IsOptional()
@@ -15,6 +19,14 @@ export class QueryClientsDto {
     @IsOptional()
     @IsUUID()
     branchId?: string;
+
+    @IsOptional()
+    @IsIn(CLIENT_SORTABLE_FIELDS)
+    sortBy?: string;
+
+    @IsOptional()
+    @IsIn(["asc", "desc"])
+    sortOrder?: "asc" | "desc";
 
     @IsOptional()
     @Transform(({ value }) => Number(value))

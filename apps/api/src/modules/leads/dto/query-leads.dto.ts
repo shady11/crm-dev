@@ -1,6 +1,10 @@
-import {IsEnum, IsInt, IsOptional, IsString, IsUUID, Max, Min} from "class-validator";
+import {IsEnum, IsIn, IsInt, IsOptional, IsString, IsUUID, Max, Min} from "class-validator";
 import {LeadStatus} from "@/generated/prisma/enums";
 import {Transform} from "class-transformer";
+
+// Columns the leads table lets a user sort by — kept in sync with the
+// column keys LeadsTable passes to SortableTableHead on the frontend.
+export const LEAD_SORTABLE_FIELDS = ["fullName", "status", "createdAt"] as const;
 
 export class QueryLeadsDto {
     @IsOptional()
@@ -25,6 +29,14 @@ export class QueryLeadsDto {
     @IsOptional()
     @IsUUID()
     branchId?: string;
+
+    @IsOptional()
+    @IsIn(LEAD_SORTABLE_FIELDS)
+    sortBy?: string;
+
+    @IsOptional()
+    @IsIn(["asc", "desc"])
+    sortOrder?: "asc" | "desc";
 
     @IsOptional()
     @Transform(({ value }) => Number(value))

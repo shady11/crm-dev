@@ -5,15 +5,21 @@ import {Button} from "@/components/ui/button.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {DataTable} from "@/components/shared/data-table.tsx";
+import {SortableTableHead} from "@/components/shared/sortable-table-head.tsx";
+import type {ClientSortField} from "@/features/clients/api/clients.api.ts";
 import type {Client} from "@/features/clients/types/client.types";
 import {formatCreatedAt, initials} from "@/features/clients/utils/format.ts";
 import {useNavigate} from "react-router-dom";
 import {paths} from "@/routes/paths.ts";
 import {useTranslation} from "react-i18next";
+import type {SortOrder} from "@/hooks/use-sort.ts";
 
 interface ClientsTableProps {
     clients: Client[];
     isLoading: boolean;
+    sortBy: ClientSortField | undefined;
+    sortOrder: SortOrder | undefined;
+    onSort(field: ClientSortField): void;
     selectedIds: Set<string>;
     allSelected: boolean;
     onToggleAll(checked: boolean): void;
@@ -26,6 +32,9 @@ interface ClientsTableProps {
 export function ClientsTable({
                                  clients,
                                  isLoading,
+                                 sortBy,
+                                 sortOrder,
+                                 onSort,
                                  selectedIds,
                                  allSelected,
                                  onToggleAll,
@@ -55,12 +64,20 @@ export function ClientsTable({
                         />
                     </TableHead>
                     <TableHead>{t("table.clientId")}</TableHead>
-                    <TableHead>{t("table.name")}</TableHead>
-                    <TableHead>{t("table.phone")}</TableHead>
-                    <TableHead>{t("table.email")}</TableHead>
+                    <SortableTableHead field="fullName" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.name")}
+                    </SortableTableHead>
+                    <SortableTableHead field="phone" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.phone")}
+                    </SortableTableHead>
+                    <SortableTableHead field="email" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.email")}
+                    </SortableTableHead>
                     <TableHead>{t("table.leads")}</TableHead>
                     <TableHead>{t("table.deals")}</TableHead>
-                    <TableHead>{t("table.created")}</TableHead>
+                    <SortableTableHead field="createdAt" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.created")}
+                    </SortableTableHead>
                     <TableHead className="text-right">{t("table.actions")}</TableHead>
                 </TableRow>
             </TableHeader>

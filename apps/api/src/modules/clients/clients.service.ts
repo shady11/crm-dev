@@ -1,12 +1,13 @@
 import {PrismaService} from "@/database/prisma.service";
 import {BadRequestException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
 import {AuthUser} from "@/common/types/auth-user.type";
-import {QueryClientsDto} from "@/modules/clients/dto/query-clients.dto";
+import {CLIENT_SORTABLE_FIELDS, QueryClientsDto} from "@/modules/clients/dto/query-clients.dto";
 import {ActivityAction, ActivityType, Prisma} from "@/generated/prisma/client";
 import {isBranchScopedRole} from "@/common/constants/branch-scope.constants";
 import {TransferBranchDto} from "@/common/dto/transfer-branch.dto";
 import {CreateClientDto} from "@/modules/clients/dto/create-client.dto";
 import {UpdateClientDto} from "@/modules/clients/dto/update-client.dto";
+import {resolveOrderBy} from "@/common/utils/sort.util";
 
 @Injectable()
 export class ClientsService {
@@ -52,7 +53,12 @@ export class ClientsService {
                 where,
                 skip,
                 take: limit,
-                orderBy: { createdAt: "desc" },
+                orderBy: resolveOrderBy<Prisma.ClientOrderByWithRelationInput>(
+                    query.sortBy,
+                    query.sortOrder,
+                    CLIENT_SORTABLE_FIELDS,
+                    { createdAt: "desc" },
+                ),
                 include: {
                     _count: { select: { leads: true, deals: true } },
                 },

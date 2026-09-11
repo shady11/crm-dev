@@ -31,7 +31,13 @@ export function DealsPage() {
                     onSearchChange={filters.setSearch}
                 />
 
-                <DealsTable deals={table.deals} isLoading={table.isLoading} />
+                <DealsTable
+                    deals={table.deals}
+                    isLoading={table.isLoading}
+                    sortBy={table.sortBy}
+                    sortOrder={table.sortOrder}
+                    onSort={table.toggleSort}
+                />
 
                 <DealsPagination
                     page={pagination.page}

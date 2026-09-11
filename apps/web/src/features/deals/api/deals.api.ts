@@ -102,6 +102,9 @@ export type ReserveUnitPayload = {
 
 export type DealStatusSummaryItem = { status: DealStatus; count: number };
 
+// Kept in sync with DEAL_SORTABLE_FIELDS in the API's deal-query.dto.ts.
+export type DealSortField = "dealNumber" | "status" | "salePrice" | "createdAt";
+
 export type GetDealsParams = {
     status?: DealStatus;
     projectId?: string;
@@ -113,6 +116,8 @@ export type GetDealsParams = {
     search?: string;
     page?: number;
     limit?: number;
+    sortBy?: DealSortField;
+    sortOrder?: "asc" | "desc";
 };
 
 export type GeneratePaymentSchedulePayload = {

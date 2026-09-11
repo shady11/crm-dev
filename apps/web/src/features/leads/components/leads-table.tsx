@@ -4,14 +4,19 @@ import {Badge} from "@/components/ui/badge.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {DataTable} from "@/components/shared/data-table.tsx";
-import type {Lead} from "@/features/leads/api/leads.api.ts";
+import {SortableTableHead} from "@/components/shared/sortable-table-head.tsx";
+import type {Lead, LeadSortField} from "@/features/leads/api/leads.api.ts";
 import {LEAD_STATUS_CLASSES, LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
 import {formatCreatedAt, initials} from "@/features/leads/utils/format.ts";
 import {useTranslation} from "react-i18next";
+import type {SortOrder} from "@/hooks/use-sort.ts";
 
 interface LeadsTableProps {
     leads: Lead[];
     isLoading: boolean;
+    sortBy: LeadSortField | undefined;
+    sortOrder: SortOrder | undefined;
+    onSort(field: LeadSortField): void;
     selectedIds: Set<string>;
     allSelected: boolean;
     onToggleAll(checked: boolean): void;
@@ -22,6 +27,9 @@ interface LeadsTableProps {
 export function LeadsTable({
                                 leads,
                                 isLoading,
+                                sortBy,
+                                sortOrder,
+                                onSort,
                                 selectedIds,
                                 allSelected,
                                 onToggleAll,
@@ -46,10 +54,16 @@ export function LeadsTable({
                             onCheckedChange={(details) => onToggleAll(details.checked === true)}
                         />
                     </TableHead>
-                    <TableHead>{t("table.lead")}</TableHead>
-                    <TableHead>{t("table.status")}</TableHead>
+                    <SortableTableHead field="fullName" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.lead")}
+                    </SortableTableHead>
+                    <SortableTableHead field="status" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.status")}
+                    </SortableTableHead>
                     <TableHead>{t("table.manager")}</TableHead>
-                    <TableHead>{t("table.created")}</TableHead>
+                    <SortableTableHead field="createdAt" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.created")}
+                    </SortableTableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>

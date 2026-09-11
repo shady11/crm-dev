@@ -7,7 +7,8 @@ import {AuthUser} from "@/common/types/auth-user.type";
 import {isBranchScopedRole} from "@/common/constants/branch-scope.constants";
 import {TransferBranchDto} from "@/common/dto/transfer-branch.dto";
 import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
-import {QueryLeadsDto} from "@/modules/leads/dto/query-leads.dto";
+import {LEAD_SORTABLE_FIELDS, QueryLeadsDto} from "@/modules/leads/dto/query-leads.dto";
+import {resolveOrderBy} from "@/common/utils/sort.util";
 import {CreateLeadDto} from "@/modules/leads/dto/create-lead.dto";
 import {UpdateLeadDto} from "@/modules/leads/dto/update-lead.dto";
 import {ConvertLeadDto} from "@/modules/leads/dto/convert-lead.dto";
@@ -90,9 +91,12 @@ export class LeadsService {
                 where,
                 skip,
                 take: limit,
-                orderBy: {
-                    createdAt: "desc",
-                },
+                orderBy: resolveOrderBy<Prisma.LeadOrderByWithRelationInput>(
+                    query.sortBy,
+                    query.sortOrder,
+                    LEAD_SORTABLE_FIELDS,
+                    { createdAt: "desc" },
+                ),
                 include: {
                     manager: {
                         select: {

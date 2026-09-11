@@ -6,7 +6,8 @@ import {isBranchScopedRole} from "@/common/constants/branch-scope.constants";
 import {CreateTaskDto} from "./dto/create-task.dto";
 import {UpdateTaskDto} from "./dto/update-task.dto";
 import {UpdateTaskStatusDto} from "./dto/update-task-status.dto";
-import {QueryTasksDto} from "./dto/query-tasks.dto";
+import {QueryTasksDto, TASK_SORTABLE_FIELDS} from "./dto/query-tasks.dto";
+import {resolveOrderBy} from "@/common/utils/sort.util";
 import {TaskNotFoundException} from "./exceptions/task-not-found.exception";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 
@@ -64,7 +65,12 @@ export class TasksService {
                 where,
                 skip,
                 take: limit,
-                orderBy: [{ dueDate: "asc" }, { createdAt: "desc" }],
+                orderBy: resolveOrderBy<Prisma.TaskOrderByWithRelationInput | Prisma.TaskOrderByWithRelationInput[]>(
+                    query.sortBy,
+                    query.sortOrder,
+                    TASK_SORTABLE_FIELDS,
+                    [{ dueDate: "asc" }, { createdAt: "desc" }],
+                ),
                 include: TASK_INCLUDE,
             }),
             this.prisma.task.count({ where }),

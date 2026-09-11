@@ -1,6 +1,10 @@
-import {IsBoolean, IsEnum, IsInt, IsOptional, IsString, IsUUID, Max, Min} from "class-validator";
+import {IsBoolean, IsEnum, IsIn, IsInt, IsOptional, IsString, IsUUID, Max, Min} from "class-validator";
 import {Transform} from "class-transformer";
 import {TaskStatus} from "@/generated/prisma/client";
+
+// Columns the tasks table lets a user sort by — kept in sync with the
+// column keys TasksTable passes to SortableTableHead on the frontend.
+export const TASK_SORTABLE_FIELDS = ["title", "dueDate", "status"] as const;
 
 export class QueryTasksDto {
     @IsOptional()
@@ -37,6 +41,14 @@ export class QueryTasksDto {
     @Transform(({ value }) => value === "true" || value === true)
     @IsBoolean()
     overdue?: boolean;
+
+    @IsOptional()
+    @IsIn(TASK_SORTABLE_FIELDS)
+    sortBy?: string;
+
+    @IsOptional()
+    @IsIn(["asc", "desc"])
+    sortOrder?: "asc" | "desc";
 
     @IsOptional()
     @Transform(({ value }) => Number(value))

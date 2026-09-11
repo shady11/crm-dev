@@ -4,18 +4,23 @@ import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
 import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {DataTable} from "@/components/shared/data-table.tsx";
+import {SortableTableHead} from "@/components/shared/sortable-table-head.tsx";
 import {DEAL_STATUS_LABEL_KEYS, DEAL_STATUS_VISUALS} from "@/features/deals/types/deal.types";
-import type {Deal} from "@/features/deals/api/deals.api";
+import type {Deal, DealSortField} from "@/features/deals/api/deals.api";
 import {formatCreatedAt, initials} from "@/features/deals/utils/format.ts";
 import {useTranslation} from "react-i18next";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
+import type {SortOrder} from "@/hooks/use-sort.ts";
 
 interface DealsTableProps {
     deals: Deal[];
     isLoading: boolean;
+    sortBy: DealSortField | undefined;
+    sortOrder: SortOrder | undefined;
+    onSort(field: DealSortField): void;
 }
 
-export function DealsTable({ deals, isLoading }: DealsTableProps) {
+export function DealsTable({ deals, isLoading, sortBy, sortOrder, onSort }: DealsTableProps) {
     const { t, i18n } = useTranslation("deals");
     const { formatCurrency } = useCompanyFormatters();
 
@@ -31,13 +36,21 @@ export function DealsTable({ deals, isLoading }: DealsTableProps) {
         >
             <TableHeader>
                 <TableRow>
-                    <TableHead className="pl-4">{t("table.dealNumber")}</TableHead>
+                    <SortableTableHead field="dealNumber" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort} className="pl-4">
+                        {t("table.dealNumber")}
+                    </SortableTableHead>
                     <TableHead>{t("table.unit")}</TableHead>
                     <TableHead>{t("table.client")}</TableHead>
                     <TableHead>{t("table.manager")}</TableHead>
-                    <TableHead>{t("table.status")}</TableHead>
-                    <TableHead>{t("table.salePrice")}</TableHead>
-                    <TableHead className="pr-4">{t("table.created")}</TableHead>
+                    <SortableTableHead field="status" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.status")}
+                    </SortableTableHead>
+                    <SortableTableHead field="salePrice" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.salePrice")}
+                    </SortableTableHead>
+                    <SortableTableHead field="createdAt" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort} className="pr-4">
+                        {t("table.created")}
+                    </SortableTableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>

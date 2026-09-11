@@ -4,14 +4,20 @@ import {Button} from "@/components/ui/button.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {DataTable} from "@/components/shared/data-table.tsx";
+import {SortableTableHead} from "@/components/shared/sortable-table-head.tsx";
 import {UserStatusDot} from "@/features/users/components/user-status-dot.tsx";
 import {isBranchScopedRole, type User, USER_ROLE_LABEL_KEYS} from "@/features/users/types/user.types";
+import type {UserSortField} from "@/features/users/api/users.api.ts";
 import {formatCreatedAt, initials} from "@/features/users/utils/format.ts";
 import {useTranslation} from "react-i18next";
+import type {SortOrder} from "@/hooks/use-sort.ts";
 
 interface UsersTableProps {
     users: User[];
     isLoading: boolean;
+    sortBy: UserSortField | undefined;
+    sortOrder: SortOrder | undefined;
+    onSort(field: UserSortField): void;
     selectedIds: Set<string>;
     allSelected: boolean;
     onToggleAll(checked: boolean): void;
@@ -25,6 +31,9 @@ interface UsersTableProps {
 export function UsersTable({
                                users,
                                isLoading,
+                               sortBy,
+                               sortOrder,
+                               onSort,
                                selectedIds,
                                allSelected,
                                onToggleAll,
@@ -53,10 +62,16 @@ export function UsersTable({
                         />
                     </TableHead>
                     <TableHead>{t("table.headers.userId")}</TableHead>
-                    <TableHead>{t("table.headers.name")}</TableHead>
-                    <TableHead>{t("table.headers.role")}</TableHead>
+                    <SortableTableHead field="fullName" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.headers.name")}
+                    </SortableTableHead>
+                    <SortableTableHead field="role" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.headers.role")}
+                    </SortableTableHead>
                     <TableHead>{t("table.headers.branch")}</TableHead>
-                    <TableHead>{t("table.headers.created")}</TableHead>
+                    <SortableTableHead field="createdAt" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.headers.created")}
+                    </SortableTableHead>
                     <TableHead>{t("table.headers.status")}</TableHead>
                     <TableHead className="text-right">{t("table.headers.actions")}</TableHead>
                 </TableRow>

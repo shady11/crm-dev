@@ -69,7 +69,14 @@ export function TasksPage() {
 
                 {view === "table" ? (
                     <>
-                        <TasksTable tasks={table.tasks} isLoading={table.isLoading} onRowClick={openEdit} />
+                        <TasksTable
+                            tasks={table.tasks}
+                            isLoading={table.isLoading}
+                            sortBy={table.sortBy}
+                            sortOrder={table.sortOrder}
+                            onSort={table.toggleSort}
+                            onRowClick={openEdit}
+                        />
                         <TasksPagination
                             page={pagination.page}
                             limit={pagination.limit}

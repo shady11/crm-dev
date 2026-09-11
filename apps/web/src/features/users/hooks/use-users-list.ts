@@ -12,10 +12,12 @@ import {
     transferUserBranch,
     updateUser,
     type UpdateUserPayload,
+    type UserSortField,
 } from "@/features/users/api/users.api.ts";
 import {getVisibleRoles, type User, type UserRole} from "@/features/users/types/user.types";
 import {initials} from "@/features/users/utils/format.ts";
 import {useTranslation} from "react-i18next";
+import {useSort} from "@/hooks/use-sort.ts";
 
 export type StatusFilter = "all" | "active" | "inactive";
 export type RoleFilterValue = UserRole | "all";
@@ -34,6 +36,7 @@ export function useUsersList() {
     const [page, setPage] = useState(1);
     const [limit, setLimitState] = useState(10);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const {sortBy, sortOrder, toggleSort} = useSort<UserSortField>();
 
     const [formOpen, setFormOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -41,7 +44,7 @@ export function useUsersList() {
     const [pendingTransfer, setPendingTransfer] = useState<User | null>(null);
 
     const tableQuery = useQuery({
-        queryKey: ["users", { statusFilter, roleFilter, branchFilter, search, page, limit }],
+        queryKey: ["users", { statusFilter, roleFilter, branchFilter, search, page, limit, sortBy, sortOrder }],
         queryFn: () =>
             getUsers({
                 page,
@@ -50,6 +53,8 @@ export function useUsersList() {
                 isActive: statusFilter === "all" ? undefined : statusFilter === "active",
                 branchId: branchFilter === "all" ? undefined : branchFilter,
                 search: search || undefined,
+                sortBy,
+                sortOrder,
             }),
     });
 
@@ -262,6 +267,12 @@ export function useUsersList() {
         table: {
             users,
             isLoading: tableQuery.isLoading,
+            sortBy,
+            sortOrder,
+            toggleSort: (field: UserSortField) => {
+                toggleSort(field);
+                setPage(1);
+            },
         },
 
         selection: {

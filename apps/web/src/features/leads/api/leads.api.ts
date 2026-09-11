@@ -24,6 +24,9 @@ export interface Lead {
     updatedAt: string;
 }
 
+// Kept in sync with LEAD_SORTABLE_FIELDS in the API's query-leads.dto.ts.
+export type LeadSortField = "fullName" | "status" | "createdAt";
+
 export type GetLeadsParams = {
     page?: number;
     limit?: number;
@@ -33,6 +36,8 @@ export type GetLeadsParams = {
     // Admin-only cross-branch filter (BR-B3); ignored server-side for a
     // branch-scoped caller, whose own branch filter already takes precedence.
     branchId?: string;
+    sortBy?: LeadSortField;
+    sortOrder?: "asc" | "desc";
 };
 
 export async function getLeads(params?: GetLeadsParams) {

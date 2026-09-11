@@ -2,13 +2,18 @@ import {CalendarIcon, ClipboardListIcon} from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
 import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {DataTable} from "@/components/shared/data-table.tsx";
+import {SortableTableHead} from "@/components/shared/sortable-table-head.tsx";
 import {TASK_STATUS_CLASSES, TASK_STATUS_LABEL_KEYS} from "@/features/tasks/types/task.types.ts";
-import type {Task} from "@/features/tasks/api/tasks.api.ts";
+import type {Task, TaskSortField} from "@/features/tasks/api/tasks.api.ts";
 import {useTranslation} from "react-i18next";
+import type {SortOrder} from "@/hooks/use-sort.ts";
 
 interface TasksTableProps {
     tasks: Task[];
     isLoading: boolean;
+    sortBy: TaskSortField | undefined;
+    sortOrder: SortOrder | undefined;
+    onSort(field: TaskSortField): void;
     onRowClick(task: Task): void;
 }
 
@@ -16,7 +21,7 @@ function isOverdue(task: Task) {
     return !!task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "DONE" && task.status !== "CANCELLED";
 }
 
-export function TasksTable({ tasks, isLoading, onRowClick }: TasksTableProps) {
+export function TasksTable({ tasks, isLoading, sortBy, sortOrder, onSort, onRowClick }: TasksTableProps) {
     const { t, i18n } = useTranslation("tasks");
 
     return (
@@ -29,11 +34,17 @@ export function TasksTable({ tasks, isLoading, onRowClick }: TasksTableProps) {
         >
             <TableHeader>
                 <TableRow>
-                    <TableHead>{t("table.title")}</TableHead>
+                    <SortableTableHead field="title" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.title")}
+                    </SortableTableHead>
                     <TableHead>{t("table.relatedTo")}</TableHead>
                     <TableHead>{t("table.assignee")}</TableHead>
-                    <TableHead>{t("table.dueDate")}</TableHead>
-                    <TableHead>{t("table.status")}</TableHead>
+                    <SortableTableHead field="dueDate" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.dueDate")}
+                    </SortableTableHead>
+                    <SortableTableHead field="status" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.status")}
+                    </SortableTableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
