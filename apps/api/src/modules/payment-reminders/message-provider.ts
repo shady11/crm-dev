@@ -1,10 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OutboundChannel } from '@/generated/prisma/client';
+import { ReminderContext } from './reminder-context.builder';
 
 export interface SendMessageParams {
   channel: OutboundChannel;
   to: string;
+  /** Pre-rendered text — what SMTP/SMS/logging actually send. */
   body: string;
+  /**
+   * Which reminder this is and the structured values behind it. Optional
+   * because only WhatsApp needs it: business-initiated WhatsApp messages
+   * must use a pre-approved template with positional parameters, not
+   * arbitrary free text, so WhatsAppMessageProvider ignores `body` and
+   * builds the template call from these instead.
+   */
+  templateKey?: string;
+  context?: ReminderContext;
 }
 
 export interface SendMessageResult {
