@@ -31,6 +31,32 @@ export function TasksTable({ tasks, isLoading, sortBy, sortOrder, onSort, onRowC
             emptyIcon={<ClipboardListIcon strokeWidth={1.25} />}
             emptyTitle={t("table.emptyTitle")}
             emptyDescription={t("table.emptyDescription")}
+            cards={tasks.map((task) => (
+                <div
+                    key={task.id}
+                    className="cursor-pointer rounded-lg border border-secondary p-4"
+                    onClick={() => onRowClick(task)}
+                >
+                    <div className="flex items-start justify-between gap-3">
+                        <p className="font-medium">{task.title}</p>
+                        <Badge className={`${TASK_STATUS_CLASSES[task.status]} text-white`}>
+                            {t(TASK_STATUS_LABEL_KEYS[task.status])}
+                        </Badge>
+                    </div>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                        {task.deal ? t("related.deal", { number: task.deal.dealNumber }) : task.client ? task.client.fullName : task.lead ? task.lead.fullName : "—"}
+                    </p>
+                    <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
+                        <span>{task.assignedTo.fullName}</span>
+                        {task.dueDate ? (
+                            <span className={`flex items-center gap-1.5 ${isOverdue(task) ? "font-medium text-destructive" : ""}`}>
+                                <CalendarIcon size={14} />
+                                {new Date(task.dueDate).toLocaleDateString(i18n.language)}
+                            </span>
+                        ) : "—"}
+                    </div>
+                </div>
+            ))}
         >
             <TableHeader>
                 <TableRow>

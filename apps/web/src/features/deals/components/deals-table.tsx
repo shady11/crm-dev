@@ -33,6 +33,42 @@ export function DealsTable({ deals, isLoading, sortBy, sortOrder, onSort }: Deal
             emptyIcon={<BriefcaseIcon strokeWidth={1.25} />}
             emptyTitle={t("table.emptyTitle")}
             emptyDescription={t("table.emptyDescription")}
+            cards={deals.map((deal) => {
+                const visual = DEAL_STATUS_VISUALS[deal.status];
+                const created = formatCreatedAt(deal.createdAt, i18n.language);
+
+                return (
+                    <div
+                        key={deal.id}
+                        className="cursor-pointer rounded-lg border border-secondary p-4"
+                        onClick={() => navigate(`/deals/${deal.id}`)}
+                    >
+                        <div className="flex items-start justify-between gap-3">
+                            <div>
+                                <p className="font-medium">{deal.dealNumber}</p>
+                                <p className="text-xs text-muted-foreground">№{deal.unit.number} · {deal.project.name}</p>
+                            </div>
+                            <Badge className={`${visual?.bg} text-white`}>
+                                {t(DEAL_STATUS_LABEL_KEYS[deal.status])}
+                            </Badge>
+                        </div>
+                        <div className="mt-3 flex items-center gap-3">
+                            <Avatar className="size-9">
+                                <AvatarFallback>{initials(deal.client.fullName)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <p className="font-medium">{deal.client.fullName}</p>
+                                <p className="text-xs text-muted-foreground">{deal.client.phone}</p>
+                            </div>
+                        </div>
+                        <div className="mt-3 flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground">{deal.manager?.fullName ?? "—"}</span>
+                            <span className="font-medium">{formatCurrency(deal.salePrice)}</span>
+                        </div>
+                        <p className="mt-1 text-xs text-muted-foreground">{created.date}</p>
+                    </div>
+                );
+            })}
         >
             <TableHeader>
                 <TableRow>

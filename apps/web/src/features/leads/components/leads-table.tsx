@@ -45,6 +45,41 @@ export function LeadsTable({
             emptyIcon={<UsersRoundIcon strokeWidth={1.25} />}
             emptyTitle={t("table.emptyTitle")}
             emptyDescription={t("table.emptyDescription")}
+            cards={leads.map((lead) => {
+                const created = formatCreatedAt(lead.createdAt, i18n.language);
+
+                return (
+                    <div
+                        key={lead.id}
+                        className="cursor-pointer rounded-lg border border-secondary p-4"
+                        onClick={() => onRowClick(lead)}
+                    >
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                                <Checkbox
+                                    checked={selectedIds.has(lead.id)}
+                                    onCheckedChange={(details) => onToggleOne(lead.id, details.checked === true)}
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+                                <Avatar className="size-9">
+                                    <AvatarFallback>{initials(lead.fullName)}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p className="font-medium">{lead.fullName}</p>
+                                    <p className="text-xs text-muted-foreground">{lead.phone}</p>
+                                </div>
+                            </div>
+                            <Badge className={`${LEAD_STATUS_CLASSES[lead.status]} text-white`}>
+                                {t(LEAD_STATUS_LABEL_KEYS[lead.status])}
+                            </Badge>
+                        </div>
+                        <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
+                            <span>{lead.manager?.fullName ?? "—"}</span>
+                            <span>{created.date}</span>
+                        </div>
+                    </div>
+                );
+            })}
         >
             <TableHeader>
                 <TableRow>

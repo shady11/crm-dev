@@ -52,6 +52,59 @@ export function UsersTable({
             emptyIcon={<UsersRoundIcon strokeWidth={1.25} />}
             emptyTitle={t("table.empty.title")}
             emptyDescription={t("table.empty.description")}
+            cards={users.map((user) => {
+                const created = formatCreatedAt(user.createdAt, i18n.language);
+
+                return (
+                    <div key={user.id} className="rounded-lg border border-secondary p-4">
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="flex items-center gap-3">
+                                <Checkbox
+                                    checked={selectedIds.has(user.id)}
+                                    onCheckedChange={(details) => onToggleOne(user.id, details.checked === true)}
+                                />
+                                <Avatar className="size-9">
+                                    <AvatarFallback>{initials(user.fullName)}</AvatarFallback>
+                                </Avatar>
+                                <div>
+                                    <p className="font-medium">{user.fullName}</p>
+                                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                                </div>
+                            </div>
+                            <UserStatusDot isActive={user.isActive} />
+                        </div>
+                        <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
+                            <span>{t(USER_ROLE_LABEL_KEYS[user.role])}</span>
+                            <span>{user.branch?.name ?? "—"}</span>
+                            <span>{created.date}</span>
+                        </div>
+                        <div className="mt-3 flex items-center justify-end gap-1">
+                            <Button variant="ghost" size="icon-sm" onClick={() => onEdit(user)} aria-label={t("common:actions.edit")}>
+                                <Pen className="size-3.5" />
+                            </Button>
+                            {isBranchScopedRole(user.role) && (
+                                <Button
+                                    variant="ghost"
+                                    size="icon-sm"
+                                    aria-label={t("card.transferBranch")}
+                                    onClick={() => onTransferBranch(user)}
+                                >
+                                    <ArrowLeftRight className="size-3.5" />
+                                </Button>
+                            )}
+                            <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                disabled={!user.isActive || isDeleting(user.id)}
+                                onClick={() => onDelete(user)}
+                                aria-label={t("common:actions.delete")}
+                            >
+                                <Trash2 className="size-3.5" />
+                            </Button>
+                        </div>
+                    </div>
+                );
+            })}
         >
             <TableHeader>
                 <TableRow>
