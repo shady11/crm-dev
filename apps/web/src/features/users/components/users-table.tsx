@@ -116,7 +116,7 @@ export function UsersTable({
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex items-center justify-end gap-1">
-                                        <Button variant="ghost" size="icon-sm" onClick={() => onEdit(user)}>
+                                        <Button variant="ghost" size="icon-sm" onClick={() => onEdit(user)} aria-label={t("common:actions.edit")}>
                                             <Pen className="size-3.5" />
                                         </Button>
                                         {isBranchScopedRole(user.role) && (
@@ -134,6 +134,7 @@ export function UsersTable({
                                             size="icon-sm"
                                             disabled={!user.isActive || isDeleting(user.id)}
                                             onClick={() => onDelete(user)}
+                                            aria-label={t("common:actions.delete")}
                                         >
                                             <Trash2 className="size-3.5" />
                                         </Button>

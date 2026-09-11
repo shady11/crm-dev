@@ -18,7 +18,10 @@
     "openWhatsApp": "WhatsApp",
     "print": "Басып чыгаруу",
     "copyLink": "Шилтемени көчүрүү",
-    "linkCopied": "Шилтеме көчүрүлдү"
+    "linkCopied": "Шилтеме көчүрүлдү",
+    "reload": "Баракты жаңыртуу",
+    "moreActions": "Кошумча аракеттер",
+    "download": "Жүктөп алуу"
   },
   "labels": {
     "status": "Статус",

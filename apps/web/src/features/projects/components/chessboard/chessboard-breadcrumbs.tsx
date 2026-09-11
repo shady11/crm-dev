@@ -43,7 +43,7 @@ export function ChessboardBreadcrumbs({
             <BreadcrumbList>
                 <BreadcrumbItem>
                     <BreadcrumbLink asChild>
-                        <Button variant="outline" size="icon-sm" onClick={onBack}>
+                        <Button variant="outline" size="icon-sm" onClick={onBack} aria-label={t("common:actions.back")}>
                             <ArrowLeftIcon className="size-3" />
                         </Button>
                     </BreadcrumbLink>

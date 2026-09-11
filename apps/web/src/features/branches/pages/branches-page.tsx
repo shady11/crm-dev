@@ -150,7 +150,7 @@ export function BranchesPage() {
                                         </Badge>
                                         <Menu>
                                             <MenuTrigger asChild>
-                                                <Button size="icon-xs" variant="ghost">
+                                                <Button size="icon-xs" variant="ghost" aria-label={tCommon("actions.moreActions")}>
                                                     <EllipsisVertical className="size-3.5"/>
                                                 </Button>
                                             </MenuTrigger>

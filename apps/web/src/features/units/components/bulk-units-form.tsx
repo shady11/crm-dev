@@ -304,6 +304,7 @@ export function BulkUnitsForm({
                                             variant="destructive"
                                             onClick={() => removeUnit(index)}
                                             disabled={isSubmitting || units.length === 1}
+                                            aria-label={t("common:actions.delete")}
                                         >
                                             <Trash2 className="size-3" />
                                         </Button>

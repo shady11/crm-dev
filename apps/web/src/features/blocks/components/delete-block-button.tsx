@@ -55,6 +55,7 @@ export function DeleteBlockButton({ block }: DeleteBlockButtonProps) {
                 size="icon-sm"
                 variant="destructive"
                 onClick={() => setIsOpen(true)}
+                aria-label={t("common:actions.delete")}
             >
                 <Trash2 className="size-3" />
             </Button>

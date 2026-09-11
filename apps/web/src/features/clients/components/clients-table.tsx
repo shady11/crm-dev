@@ -88,7 +88,7 @@ export function ClientsTable({
 
                         return (
                             <TableRow key={client.id} className="cursor-pointer" onClick={() => navigate(paths.clients.detail(client.id))}>
-                                <TableCell>
+                                <TableCell onClick={(e) => e.stopPropagation()}>
                                     <Checkbox
                                         checked={selectedIds.has(client.id)}
                                         onCheckedChange={(details) => onToggleOne(client.id, details.checked === true)}
@@ -121,9 +121,9 @@ export function ClientsTable({
                                     <p>{created.date}</p>
                                     <p className="text-sm text-muted-foreground">{created.time}</p>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell onClick={(e) => e.stopPropagation()}>
                                     <div className="flex items-center justify-end gap-1">
-                                        <Button variant="ghost" size="icon-sm" onClick={() => onEdit(client)}>
+                                        <Button variant="ghost" size="icon-sm" onClick={() => onEdit(client)} aria-label={t("common:actions.edit")}>
                                             <Pen className="size-3.5" />
                                         </Button>
                                         <Button
@@ -131,6 +131,7 @@ export function ClientsTable({
                                             size="icon-sm"
                                             disabled={isDeleting(client.id)}
                                             onClick={() => onDelete(client.id)}
+                                            aria-label={t("common:actions.delete")}
                                         >
                                             <Trash2 className="size-3.5" />
                                         </Button>

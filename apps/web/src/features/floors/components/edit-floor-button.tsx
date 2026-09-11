@@ -46,6 +46,7 @@ export function EditFloorButton({ floor }: EditFloorButtonProps) {
                 size="icon-sm"
                 variant="secondary"
                 onClick={() => setOpen(true)}
+                aria-label={t("common:actions.edit")}
             >
                 <Pen className="size-3" />
             </Button>

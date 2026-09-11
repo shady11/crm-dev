@@ -176,6 +176,7 @@ export function BulkFloorsForm({
                                             variant="destructive"
                                             onClick={() => removeFloor(index)}
                                             disabled={isSubmitting || floors.length === 1}
+                                            aria-label={t("common:actions.delete")}
                                         >
                                             <Trash2 className="size-3" />
                                         </Button>

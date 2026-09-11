@@ -18,7 +18,10 @@
     "openWhatsApp": "WhatsApp",
     "print": "Print",
     "copyLink": "Copy link",
-    "linkCopied": "Link copied to clipboard"
+    "linkCopied": "Link copied to clipboard",
+    "reload": "Reload page",
+    "moreActions": "More actions",
+    "download": "Download"
   },
   "labels": {
     "status": "Status",

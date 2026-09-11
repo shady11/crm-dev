@@ -49,7 +49,7 @@ export function NotificationBell() {
     return (
         <>
             <div className="relative">
-                <Button variant="ghost" size="icon-md" className="relative" onClick={() => setOpen(true)}>
+                <Button variant="ghost" size="icon-md" className="relative" onClick={() => setOpen(true)} aria-label={t("bell.title")}>
                     <BellIcon />
                 </Button>
                 {unreadCount > 0 && (

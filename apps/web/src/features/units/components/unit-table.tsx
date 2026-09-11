@@ -125,7 +125,7 @@ export function UnitTable({ units }: UnitTableProps) {
                                         {hasAnyRowAction && (
                                             <Menu>
                                                 <MenuTrigger asChild>
-                                                    <Button variant="ghost" size="icon-sm">
+                                                    <Button variant="ghost" size="icon-sm" aria-label={t("common:actions.moreActions")}>
                                                         <MoreVertical />
                                                     </Button>
                                                 </MenuTrigger>
