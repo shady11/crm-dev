@@ -53,6 +53,7 @@ export function DeleteFloorButton({ floor }: DeleteFloorButtonProps) {
                 size="icon-sm"
                 variant="destructive"
                 onClick={() => setOpen(true)}
+                aria-label={t("common:actions.delete")}
             >
                 <Trash2 className="size-3" />
             </Button>

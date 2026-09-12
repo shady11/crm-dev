@@ -1,7 +1,8 @@
 import {useMemo, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
-import {getDeals, getDealStatusSummary} from "@/features/deals/api/deals.api";
+import {type DealSortField, getDeals, getDealStatusSummary} from "@/features/deals/api/deals.api";
 import {DealStatus} from "@/features/deals/types/deal.types";
+import {useSort} from "@/hooks/use-sort.ts";
 
 export type DealStatusFilter = DealStatus | "all";
 
@@ -14,9 +15,10 @@ export function useDealsList() {
     const [projectId, setProjectIdState] = useState<string | undefined>();
     const [managerId, setManagerIdState] = useState<string | undefined>();
     const [branchId, setBranchIdState] = useState<string | undefined>();
+    const {sortBy, sortOrder, toggleSort} = useSort<DealSortField>();
 
     const tableQuery = useQuery({
-        queryKey: ["deals", { statusFilter, search, projectId, managerId, branchId, page, limit }],
+        queryKey: ["deals", { statusFilter, search, projectId, managerId, branchId, page, limit, sortBy, sortOrder }],
         queryFn: () =>
             getDeals({
                 page, limit,
@@ -25,6 +27,8 @@ export function useDealsList() {
                 projectId,
                 managerId,
                 branchId,
+                sortBy,
+                sortOrder,
             }),
     });
 
@@ -76,6 +80,12 @@ export function useDealsList() {
         table: {
             deals,
             isLoading: tableQuery.isLoading,
+            sortBy,
+            sortOrder,
+            toggleSort: (field: DealSortField) => {
+                toggleSort(field);
+                setPage(1);
+            },
         },
         statusSummary: {
             countsByStatus,

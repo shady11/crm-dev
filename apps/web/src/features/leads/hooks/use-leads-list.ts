@@ -12,12 +12,14 @@ import {
     type DuplicateLeadConflict,
     getLeads,
     type Lead,
+    type LeadSortField,
     reassignLeadManager,
     transferLeadBranch,
     updateLead,
     type UpdateLeadPayload,
 } from "@/features/leads/api/leads.api.ts";
 import type {LeadStatus} from "@/features/leads/types/lead.types.ts";
+import {useSort} from "@/hooks/use-sort.ts";
 
 export type LeadStatusFilterValue = LeadStatus | "all";
 
@@ -31,6 +33,7 @@ export function useLeadsList() {
     const [page, setPage] = useState(1);
     const [limit, setLimitState] = useState(10);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const {sortBy, sortOrder, toggleSort} = useSort<LeadSortField>();
 
     const [formOpen, setFormOpen] = useState(false);
     const [editingLead, setEditingLead] = useState<Lead | null>(null);
@@ -47,7 +50,7 @@ export function useLeadsList() {
     const [reassignTarget, setReassignTarget] = useState<Lead | null>(null);
 
     const tableQuery = useQuery({
-        queryKey: ["leads", { search, statusFilter, branchFilter, page, limit }],
+        queryKey: ["leads", { search, statusFilter, branchFilter, page, limit, sortBy, sortOrder }],
         queryFn: () =>
             getLeads({
                 page,
@@ -55,6 +58,8 @@ export function useLeadsList() {
                 search: search || undefined,
                 status: statusFilter === "all" ? undefined : statusFilter,
                 branchId: branchFilter === "all" ? undefined : branchFilter,
+                sortBy,
+                sortOrder,
             }),
     });
 
@@ -284,6 +289,12 @@ export function useLeadsList() {
         table: {
             leads,
             isLoading: tableQuery.isLoading,
+            sortBy,
+            sortOrder,
+            toggleSort: (field: LeadSortField) => {
+                toggleSort(field);
+                setPage(1);
+            },
         },
 
         selection: {

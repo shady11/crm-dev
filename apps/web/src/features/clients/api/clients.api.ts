@@ -4,6 +4,9 @@ import type {Client} from "../types/client.types";
 import type {DealStatus} from "@/features/deals/types/deal.types";
 import type {LeadStatus} from "@/features/leads/types/lead.types";
 
+// Kept in sync with CLIENT_SORTABLE_FIELDS in the API's query-clients.dto.ts.
+export type ClientSortField = "fullName" | "phone" | "email" | "createdAt";
+
 export type GetClientsParams = {
     page?: number;
     limit?: number;
@@ -12,6 +15,8 @@ export type GetClientsParams = {
     // Admin-only cross-branch filter (BR-B3); ignored server-side for a
     // branch-scoped caller, whose own branch filter already takes precedence.
     branchId?: string;
+    sortBy?: ClientSortField;
+    sortOrder?: "asc" | "desc";
 };
 
 export async function getClients(params?: GetClientsParams) {

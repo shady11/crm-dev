@@ -1,6 +1,10 @@
-import {IsEnum, IsInt, IsOptional, IsString, IsUUID, Max, Min,} from 'class-validator';
+import {IsEnum, IsIn, IsInt, IsOptional, IsString, IsUUID, Max, Min,} from 'class-validator';
 import {DealStatus} from "@/generated/prisma/client";
 import {Transform} from "class-transformer";
+
+// Columns the deals table lets a user sort by — kept in sync with the
+// column keys DealsTable passes to SortableTableHead on the frontend.
+export const DEAL_SORTABLE_FIELDS = ["dealNumber", "status", "salePrice", "createdAt"] as const;
 
 export class DealQueryDto {
     @IsOptional()
@@ -28,6 +32,14 @@ export class DealQueryDto {
     @IsOptional()
     @IsString()
     search?: string;
+
+    @IsOptional()
+    @IsIn(DEAL_SORTABLE_FIELDS)
+    sortBy?: string;
+
+    @IsOptional()
+    @IsIn(["asc", "desc"])
+    sortOrder?: "asc" | "desc";
 
     @IsOptional()
     @Transform(({ value }) => Number(value))

@@ -18,6 +18,9 @@ export type Task = {
 
 export type TaskStatusSummaryItem = { status: TaskStatus; count: number };
 
+// Kept in sync with TASK_SORTABLE_FIELDS in the API's query-tasks.dto.ts.
+export type TaskSortField = "title" | "dueDate" | "status";
+
 export type GetTasksParams = {
     status?: TaskStatus;
     assignedToId?: string;
@@ -31,6 +34,8 @@ export type GetTasksParams = {
     overdue?: boolean;
     page?: number;
     limit?: number;
+    sortBy?: TaskSortField;
+    sortOrder?: "asc" | "desc";
 };
 
 export type TaskPayload = {

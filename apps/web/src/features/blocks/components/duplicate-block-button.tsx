@@ -55,6 +55,7 @@ export function DuplicateBlockButton({ block }: DuplicateBlockButtonProps) {
                 size="icon-sm"
                 variant="ghost"
                 onClick={() => setOpen(true)}
+                aria-label={t("common:actions.duplicate")}
             >
                 <Copy className="size-3" />
             </Button>

@@ -2,6 +2,7 @@ import {useState} from "react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "@/components/ui/toast.tsx";
 import {
+    type ClientSortField,
     createClient,
     type CreateClientPayload,
     deleteClient,
@@ -11,6 +12,7 @@ import {
 } from "@/features/clients/api/clients.api.ts";
 import type {Client} from "@/features/clients/types/client.types";
 import {useTranslation} from "react-i18next";
+import {useSort} from "@/hooks/use-sort.ts";
 
 export type ProjectFilterValue = string | "all";
 
@@ -24,12 +26,13 @@ export function useClientsList() {
     const [page, setPage] = useState(1);
     const [limit, setLimitState] = useState(10);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+    const {sortBy, sortOrder, toggleSort} = useSort<ClientSortField>();
 
     const [formOpen, setFormOpen] = useState(false);
     const [editingClient, setEditingClient] = useState<Client | null>(null);
 
     const tableQuery = useQuery({
-        queryKey: ["clients", { search, projectFilter, branchFilter, page, limit }],
+        queryKey: ["clients", { search, projectFilter, branchFilter, page, limit, sortBy, sortOrder }],
         queryFn: () =>
             getClients({
                 page,
@@ -37,6 +40,8 @@ export function useClientsList() {
                 search: search || undefined,
                 projectId: projectFilter === "all" ? undefined : projectFilter,
                 branchId: branchFilter === "all" ? undefined : branchFilter,
+                sortBy,
+                sortOrder,
             }),
     });
 
@@ -184,6 +189,12 @@ export function useClientsList() {
         table: {
             clients,
             isLoading: tableQuery.isLoading,
+            sortBy,
+            sortOrder,
+            toggleSort: (field: ClientSortField) => {
+                toggleSort(field);
+                setPage(1);
+            },
         },
 
         selection: {

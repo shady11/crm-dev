@@ -18,7 +18,10 @@
     "openWhatsApp": "WhatsApp",
     "print": "Печать",
     "copyLink": "Скопировать ссылку",
-    "linkCopied": "Ссылка скопирована"
+    "linkCopied": "Ссылка скопирована",
+    "reload": "Обновить страницу",
+    "moreActions": "Дополнительные действия",
+    "download": "Скачать"
   },
   "labels": {
     "status": "Статус",

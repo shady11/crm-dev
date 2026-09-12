@@ -54,6 +54,7 @@ export function DeleteEntranceButton({ entrance }: DeleteEntranceButtonProps) {
                 size="icon-sm"
                 variant="destructive"
                 onClick={() => setOpen(true)}
+                aria-label={t("common:actions.delete")}
             >
                 <Trash2 className="size-3" />
             </Button>

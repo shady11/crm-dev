@@ -47,6 +47,7 @@ export function EditEntranceButton({ entrance }: EditEntranceButtonProps) {
                 size="icon-sm"
                 variant="secondary"
                 onClick={() => setOpen(true)}
+                aria-label={t("common:actions.edit")}
             >
                 <Pen className="size-3" />
             </Button>

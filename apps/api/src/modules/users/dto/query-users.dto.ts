@@ -1,6 +1,10 @@
-import {IsBoolean, IsEnum, IsInt, IsOptional, IsString, Max, Min} from "class-validator";
+import {IsBoolean, IsEnum, IsIn, IsInt, IsOptional, IsString, Max, Min} from "class-validator";
 import {Transform} from "class-transformer";
 import {UserRole} from "@/generated/prisma/enums";
+
+// Columns the users table lets a user sort by — kept in sync with the
+// column keys UsersTable passes to SortableTableHead on the frontend.
+export const USER_SORTABLE_FIELDS = ["fullName", "role", "createdAt"] as const;
 
 export class QueryUsersDto {
     @IsOptional()
@@ -23,6 +27,14 @@ export class QueryUsersDto {
     })
     @IsBoolean()
     isActive?: boolean;
+
+    @IsOptional()
+    @IsIn(USER_SORTABLE_FIELDS)
+    sortBy?: string;
+
+    @IsOptional()
+    @IsIn(["asc", "desc"])
+    sortOrder?: "asc" | "desc";
 
     @IsOptional()
     @Transform(({ value }) => Number(value))

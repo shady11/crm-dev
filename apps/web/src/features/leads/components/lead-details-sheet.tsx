@@ -74,7 +74,7 @@ export function LeadDetailsSheet({
                 </SheetBody>
 
                 <SheetFooter>
-                    <Button variant="destructive" size="icon-md" onClick={onRequestDelete}>
+                    <Button variant="destructive" size="icon-md" onClick={onRequestDelete} aria-label={t("common:actions.delete")}>
                         <Trash2 className="size-4" />
                     </Button>
                     {isCompanyAdmin && (

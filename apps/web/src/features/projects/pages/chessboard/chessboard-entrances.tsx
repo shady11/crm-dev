@@ -53,7 +53,7 @@ export function ChessboardEntrances() {
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink asChild>
-                            <Button variant="outline" size="icon-sm" onClick={() => navigate("..")}>
+                            <Button variant="outline" size="icon-sm" onClick={() => navigate("..")} aria-label={t("common:actions.back")}>
                                 <ArrowLeftIcon className="size-3" />
                             </Button>
                         </BreadcrumbLink>

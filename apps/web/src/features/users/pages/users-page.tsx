@@ -49,6 +49,9 @@ export function UsersPage() {
                 <UsersTable
                     users={table.users}
                     isLoading={table.isLoading}
+                    sortBy={table.sortBy}
+                    sortOrder={table.sortOrder}
+                    onSort={table.toggleSort}
                     selectedIds={selection.selectedIds}
                     allSelected={selection.allSelected}
                     onToggleAll={selection.toggleSelectAll}

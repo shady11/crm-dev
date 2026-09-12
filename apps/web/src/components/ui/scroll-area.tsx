@@ -49,7 +49,12 @@ export const ScrollArea = (props: ScrollAreaProps) => {
         className={cn(scrollAreaVariants({ scrollFade }))}
         data-slot="scroll-area-viewport"
       >
-        <ArkScrollArea.Content data-slot="scroll-area-content">
+        {/* Ark sets an inline min-width: fit-content on Content for the
+            horizontal-scroll case; that makes this size to its widest
+            descendant instead of the viewport, which breaks flex-wrap
+            everywhere inside it. None of this app's ScrollArea usages want
+            that, so it's overridden back to a normal block width. */}
+        <ArkScrollArea.Content className="min-w-0!" data-slot="scroll-area-content">
           {children}
         </ArkScrollArea.Content>
       </ArkScrollArea.Viewport>

@@ -1,7 +1,8 @@
 import {useMemo, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
-import {getTasks, getTaskStatusSummary} from "@/features/tasks/api/tasks.api.ts";
+import {getTasks, getTaskStatusSummary, type TaskSortField} from "@/features/tasks/api/tasks.api.ts";
 import {TaskStatus} from "@/features/tasks/types/task.types.ts";
+import {useSort} from "@/hooks/use-sort.ts";
 
 export type TaskStatusFilter = TaskStatus | "all";
 
@@ -12,9 +13,10 @@ export function useTasksList() {
     const [branchId, setBranchIdState] = useState<string | undefined>();
     const [page, setPage] = useState(1);
     const [limit, setLimitState] = useState(10);
+    const {sortBy, sortOrder, toggleSort} = useSort<TaskSortField>();
 
     const tableQuery = useQuery({
-        queryKey: ["tasks", { statusFilter, search, assignedToId, branchId, page, limit }],
+        queryKey: ["tasks", { statusFilter, search, assignedToId, branchId, page, limit, sortBy, sortOrder }],
         queryFn: () =>
             getTasks({
                 page, limit,
@@ -22,6 +24,8 @@ export function useTasksList() {
                 search: search || undefined,
                 assignedToId,
                 branchId,
+                sortBy,
+                sortOrder,
             }),
     });
 
@@ -55,7 +59,16 @@ export function useTasksList() {
             setPage,
             setLimit: (v: number) => { setLimitState(v); setPage(1); },
         },
-        table: { tasks, isLoading: tableQuery.isLoading },
+        table: {
+            tasks,
+            isLoading: tableQuery.isLoading,
+            sortBy,
+            sortOrder,
+            toggleSort: (field: TaskSortField) => {
+                toggleSort(field);
+                setPage(1);
+            },
+        },
         statusSummary: { countsByStatus },
     };
 }

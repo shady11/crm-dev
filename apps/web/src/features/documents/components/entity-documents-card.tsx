@@ -81,7 +81,7 @@ export function EntityDocumentsCard({ ownerType, ownerId }: EntityDocumentsCardP
                                         {t(DOCUMENT_TYPE_LABEL_KEYS[doc.type])} · {formatFileSize(doc.size)} · {doc.uploadedBy.fullName}
                                     </p>
                                 </div>
-                                <Button variant="ghost" size="icon-sm" onClick={() => actions.download.mutate(doc)}>
+                                <Button variant="ghost" size="icon-sm" onClick={() => actions.download.mutate(doc)} aria-label={t("common:actions.download")}>
                                     <DownloadIcon className="size-3.5" />
                                 </Button>
                                 <Button
@@ -89,6 +89,7 @@ export function EntityDocumentsCard({ ownerType, ownerId }: EntityDocumentsCardP
                                     size="icon-sm"
                                     onClick={() => actions.remove.mutate(doc.id)}
                                     disabled={actions.remove.isPending}
+                                    aria-label={t("common:actions.delete")}
                                 >
                                     <Trash2Icon className="size-3.5 text-destructive" />
                                 </Button>

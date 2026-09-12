@@ -30,6 +30,7 @@ import {
     SquareUser,
     Users
 } from "lucide-react";
+import {Link} from "react-router-dom";
 
 // titleKey resolves against the "common" namespace via t() below - kept as a
 // key rather than the label itself so NavMain never renders an un-translated
@@ -70,7 +71,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <a href="/dashboard">
+                            <Link to="/dashboard">
                                 <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                                     <Box />
                                 </div>
@@ -81,7 +82,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                                         {t("nav.brandTagline")}
                                       </span>
                                 </div>
-                            </a>
+                            </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>

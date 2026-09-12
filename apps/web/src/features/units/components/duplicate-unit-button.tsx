@@ -47,6 +47,7 @@ export function DuplicateUnitButton({ unit }: DuplicateUnitButtonProps) {
                 size="icon-sm"
                 variant="ghost"
                 onClick={() => setIsOpen(true)}
+                aria-label={t("common:actions.duplicate")}
             >
                 <Copy className="size-3" />
             </Button>

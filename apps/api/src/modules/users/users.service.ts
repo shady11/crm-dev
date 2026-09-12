@@ -17,7 +17,8 @@ import {UpdateUserDto} from "./dto/update-user.dto";
 import {UpdateUserPasswordDto} from "./dto/update-user-password.dto";
 import {DeactivateUserDto} from "./dto/deactivate-user.dto";
 import {TransferUserBranchDto} from "./dto/transfer-user-branch.dto";
-import {QueryUsersDto} from "./dto/query-users.dto";
+import {QueryUsersDto, USER_SORTABLE_FIELDS} from "./dto/query-users.dto";
+import {resolveOrderBy} from "@/common/utils/sort.util";
 import {canActorSeeRole, getManageableRoles} from "@/modules/users/users.constants";
 
 const USER_SAFE_SELECT = {
@@ -83,7 +84,12 @@ export class UsersService {
                 where,
                 skip,
                 take: limit,
-                orderBy: { fullName: "asc" },
+                orderBy: resolveOrderBy<Prisma.UserOrderByWithRelationInput>(
+                    query.sortBy,
+                    query.sortOrder,
+                    USER_SORTABLE_FIELDS,
+                    { fullName: "asc" },
+                ),
                 select: {
                     id: true,
                     fullName: true,

@@ -26,7 +26,8 @@ import {
 } from '../exceptions';
 
 import {DealMapper} from '../mappers/deal.mapper';
-import {DealQueryDto} from '../dto/deal-query.dto';
+import {DEAL_SORTABLE_FIELDS, DealQueryDto} from '../dto/deal-query.dto';
+import {resolveOrderBy} from '@/common/utils/sort.util';
 import {DealDomainService} from './deal-domain.service';
 import {DealActivityService} from './deal-activity.service';
 import {ACTIVE_DEAL_STATUSES, DEAL_DETAILS_INCLUDE} from "../deal.constants";
@@ -148,7 +149,12 @@ export class DealsService {
             include: { block: true, entrance: true, floor: true },
           },
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: resolveOrderBy<Prisma.DealOrderByWithRelationInput>(
+          query.sortBy,
+          query.sortOrder,
+          DEAL_SORTABLE_FIELDS,
+          { createdAt: 'desc' },
+        ),
       }),
       this.prisma.deal.count({ where }),
     ]);
