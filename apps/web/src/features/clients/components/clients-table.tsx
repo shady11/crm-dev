@@ -64,21 +64,21 @@ export function ClientsTable({
                         onClick={() => navigate(paths.clients.detail(client.id))}
                     >
                         <div className="flex items-start justify-between gap-3">
-                            <div className="flex items-center gap-3">
+                            <div className="flex min-w-0 items-center gap-3">
                                 <Checkbox
                                     checked={selectedIds.has(client.id)}
                                     onCheckedChange={(details) => onToggleOne(client.id, details.checked === true)}
                                     onClick={(e) => e.stopPropagation()}
                                 />
-                                <Avatar className="size-9">
+                                <Avatar className="size-9 shrink-0">
                                     <AvatarFallback>{initials(client.fullName)}</AvatarFallback>
                                 </Avatar>
-                                <div>
-                                    <p className="font-medium">{client.fullName}</p>
-                                    <p className="text-xs text-muted-foreground">#{client.id.slice(0, 4).toUpperCase()}</p>
+                                <div className="min-w-0">
+                                    <p className="truncate font-medium">{client.fullName}</p>
+                                    <p className="truncate text-xs text-muted-foreground">#{client.id.slice(0, 4).toUpperCase()}</p>
                                 </div>
                             </div>
-                            <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                            <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
                                 <Button variant="ghost" size="icon-sm" onClick={() => onEdit(client)} aria-label={t("common:actions.edit")}>
                                     <Pen className="size-3.5" />
                                 </Button>
@@ -94,10 +94,10 @@ export function ClientsTable({
                             </div>
                         </div>
                         <div className="mt-3 space-y-1 text-sm text-muted-foreground">
-                            <p>{client.phone}</p>
-                            <p>{client.email}</p>
+                            <p className="truncate">{client.phone}</p>
+                            <p className="truncate">{client.email}</p>
                         </div>
-                        <div className="mt-3 flex items-center gap-2">
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
                             <Badge variant="secondary">{t("table.leads")}: {client._count.leads}</Badge>
                             <Badge variant="secondary">{t("table.deals")}: {client._count.deals}</Badge>
                             <span className="ml-auto text-xs text-muted-foreground">{created.date}</span>

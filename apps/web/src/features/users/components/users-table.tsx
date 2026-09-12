@@ -58,25 +58,25 @@ export function UsersTable({
                 return (
                     <div key={user.id} className="rounded-lg border border-secondary p-4">
                         <div className="flex items-start justify-between gap-3">
-                            <div className="flex items-center gap-3">
+                            <div className="flex min-w-0 items-center gap-3">
                                 <Checkbox
                                     checked={selectedIds.has(user.id)}
                                     onCheckedChange={(details) => onToggleOne(user.id, details.checked === true)}
                                 />
-                                <Avatar className="size-9">
+                                <Avatar className="size-9 shrink-0">
                                     <AvatarFallback>{initials(user.fullName)}</AvatarFallback>
                                 </Avatar>
-                                <div>
-                                    <p className="font-medium">{user.fullName}</p>
-                                    <p className="text-xs text-muted-foreground">{user.email}</p>
+                                <div className="min-w-0">
+                                    <p className="truncate font-medium">{user.fullName}</p>
+                                    <p className="truncate text-xs text-muted-foreground">{user.email}</p>
                                 </div>
                             </div>
                             <UserStatusDot isActive={user.isActive} />
                         </div>
-                        <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
+                        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
                             <span>{t(USER_ROLE_LABEL_KEYS[user.role])}</span>
                             <span>{user.branch?.name ?? "—"}</span>
-                            <span>{created.date}</span>
+                            <span className="ml-auto">{created.date}</span>
                         </div>
                         <div className="mt-3 flex items-center justify-end gap-1">
                             <Button variant="ghost" size="icon-sm" onClick={() => onEdit(user)} aria-label={t("common:actions.edit")}>

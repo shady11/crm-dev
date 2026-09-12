@@ -38,22 +38,22 @@ export function TasksTable({ tasks, isLoading, sortBy, sortOrder, onSort, onRowC
                     onClick={() => onRowClick(task)}
                 >
                     <div className="flex items-start justify-between gap-3">
-                        <p className="font-medium">{task.title}</p>
-                        <Badge className={`${TASK_STATUS_CLASSES[task.status]} text-white`}>
+                        <p className="min-w-0 truncate font-medium">{task.title}</p>
+                        <Badge className={`shrink-0 ${TASK_STATUS_CLASSES[task.status]} text-white`}>
                             {t(TASK_STATUS_LABEL_KEYS[task.status])}
                         </Badge>
                     </div>
-                    <p className="mt-1 text-sm text-muted-foreground">
+                    <p className="mt-1 truncate text-sm text-muted-foreground">
                         {task.deal ? t("related.deal", { number: task.deal.dealNumber }) : task.client ? task.client.fullName : task.lead ? task.lead.fullName : "—"}
                     </p>
-                    <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
-                        <span>{task.assignedTo.fullName}</span>
+                    <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+                        <span className="truncate">{task.assignedTo.fullName}</span>
                         {task.dueDate ? (
-                            <span className={`flex items-center gap-1.5 ${isOverdue(task) ? "font-medium text-destructive" : ""}`}>
+                            <span className={`ml-auto flex items-center gap-1.5 ${isOverdue(task) ? "font-medium text-destructive" : ""}`}>
                                 <CalendarIcon size={14} />
                                 {new Date(task.dueDate).toLocaleDateString(i18n.language)}
                             </span>
-                        ) : "—"}
+                        ) : <span className="ml-auto">—</span>}
                     </div>
                 </div>
             ))}

@@ -55,27 +55,27 @@ export function LeadsTable({
                         onClick={() => onRowClick(lead)}
                     >
                         <div className="flex items-start justify-between gap-3">
-                            <div className="flex items-center gap-3">
+                            <div className="flex min-w-0 items-center gap-3">
                                 <Checkbox
                                     checked={selectedIds.has(lead.id)}
                                     onCheckedChange={(details) => onToggleOne(lead.id, details.checked === true)}
                                     onClick={(e) => e.stopPropagation()}
                                 />
-                                <Avatar className="size-9">
+                                <Avatar className="size-9 shrink-0">
                                     <AvatarFallback>{initials(lead.fullName)}</AvatarFallback>
                                 </Avatar>
-                                <div>
-                                    <p className="font-medium">{lead.fullName}</p>
-                                    <p className="text-xs text-muted-foreground">{lead.phone}</p>
+                                <div className="min-w-0">
+                                    <p className="truncate font-medium">{lead.fullName}</p>
+                                    <p className="truncate text-xs text-muted-foreground">{lead.phone}</p>
                                 </div>
                             </div>
-                            <Badge className={`${LEAD_STATUS_CLASSES[lead.status]} text-white`}>
+                            <Badge className={`shrink-0 ${LEAD_STATUS_CLASSES[lead.status]} text-white`}>
                                 {t(LEAD_STATUS_LABEL_KEYS[lead.status])}
                             </Badge>
                         </div>
-                        <div className="mt-3 flex items-center justify-between text-sm text-muted-foreground">
-                            <span>{lead.manager?.fullName ?? "—"}</span>
-                            <span>{created.date}</span>
+                        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+                            <span className="truncate">{lead.manager?.fullName ?? "—"}</span>
+                            <span className="ml-auto">{created.date}</span>
                         </div>
                     </div>
                 );

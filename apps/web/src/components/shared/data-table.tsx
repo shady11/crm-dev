@@ -53,7 +53,7 @@ export function DataTable({isLoading, isEmpty, emptyIcon, emptyTitle, emptyDescr
             <div className="hidden rounded-lg border border-secondary md:block">
                 <Table>{children}</Table>
             </div>
-            <div className="grid gap-3 md:hidden">{cards}</div>
+            <div className="grid grid-cols-1 gap-3 md:hidden">{cards}</div>
         </>
     );
 }

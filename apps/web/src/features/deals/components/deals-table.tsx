@@ -44,26 +44,26 @@ export function DealsTable({ deals, isLoading, sortBy, sortOrder, onSort }: Deal
                         onClick={() => navigate(`/deals/${deal.id}`)}
                     >
                         <div className="flex items-start justify-between gap-3">
-                            <div>
-                                <p className="font-medium">{deal.dealNumber}</p>
-                                <p className="text-xs text-muted-foreground">№{deal.unit.number} · {deal.project.name}</p>
+                            <div className="min-w-0">
+                                <p className="truncate font-medium">{deal.dealNumber}</p>
+                                <p className="truncate text-xs text-muted-foreground">№{deal.unit.number} · {deal.project.name}</p>
                             </div>
-                            <Badge className={`${visual?.bg} text-white`}>
+                            <Badge className={`shrink-0 ${visual?.bg} text-white`}>
                                 {t(DEAL_STATUS_LABEL_KEYS[deal.status])}
                             </Badge>
                         </div>
-                        <div className="mt-3 flex items-center gap-3">
-                            <Avatar className="size-9">
+                        <div className="mt-3 flex min-w-0 items-center gap-3">
+                            <Avatar className="size-9 shrink-0">
                                 <AvatarFallback>{initials(deal.client.fullName)}</AvatarFallback>
                             </Avatar>
-                            <div>
-                                <p className="font-medium">{deal.client.fullName}</p>
-                                <p className="text-xs text-muted-foreground">{deal.client.phone}</p>
+                            <div className="min-w-0">
+                                <p className="truncate font-medium">{deal.client.fullName}</p>
+                                <p className="truncate text-xs text-muted-foreground">{deal.client.phone}</p>
                             </div>
                         </div>
-                        <div className="mt-3 flex items-center justify-between text-sm">
-                            <span className="text-muted-foreground">{deal.manager?.fullName ?? "—"}</span>
-                            <span className="font-medium">{formatCurrency(deal.salePrice)}</span>
+                        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+                            <span className="truncate text-muted-foreground">{deal.manager?.fullName ?? "—"}</span>
+                            <span className="ml-auto font-medium">{formatCurrency(deal.salePrice)}</span>
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground">{created.date}</p>
                     </div>
