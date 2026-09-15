@@ -59,5 +59,7 @@ model User {
   impersonationsStarted  ImpersonationSession[] @relation("ImpersonationsStarted")
   impersonationsReceived ImpersonationSession[] @relation("ImpersonationsReceived")
 
+  roleAssignments UserRoleAssignment[]
+
   @@index([companyId, branchId])
 }

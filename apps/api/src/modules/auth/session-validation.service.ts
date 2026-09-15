@@ -3,6 +3,7 @@ import {ConfigService} from '@nestjs/config';
 import {UserRole} from '@/generated/prisma/client';
 import {PrismaService} from '@/database/prisma.service';
 import {AuthUser} from '@/common/types/auth-user.type';
+import {RbacService} from '@/modules/rbac/rbac.service';
 
 const DEFAULT_SUPER_ADMIN_SESSION_MAX_AGE_MINUTES = 60;
 
@@ -13,7 +14,11 @@ const DEFAULT_SUPER_ADMIN_SESSION_MAX_AGE_MINUTES = 60;
 // signed claim carries only the session id and the acting SUPER_ADMIN's id -
 // their current email/name is always re-read from the database below, never
 // trusted from an old token.
-export interface JwtPayload extends Omit<AuthUser, 'company' | 'branch' | 'impersonation'> {
+// `permissions` is also never signed into the token, for the same reason:
+// validate() below always recomputes it from the current Role assignments,
+// so granting/revoking a permission takes effect on the very next request
+// instead of waiting for every outstanding token to expire.
+export interface JwtPayload extends Omit<AuthUser, 'company' | 'branch' | 'impersonation' | 'permissions'> {
     impersonation?: {
         sessionId: string;
         superAdminId: string;
@@ -27,6 +32,7 @@ export class SessionValidationService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly configService: ConfigService,
+        private readonly rbacService: RbacService,
     ) {}
 
     async validate(payload: JwtPayload): Promise<AuthUser> {
@@ -139,12 +145,24 @@ export class SessionValidationService {
             };
         }
 
+        // SUPER_ADMIN is exempt from permission checks entirely (see
+        // PermissionsGuard) rather than needing a Role that lists every
+        // permission, which would silently go stale as new permissions are
+        // added. Every other role's permissions are the union of every Role
+        // assigned to them via UserRoleAssignment, recomputed on every
+        // request so a grant/revoke takes effect immediately.
+        const permissions =
+            user.role === UserRole.SUPER_ADMIN
+                ? ['*']
+                : await this.rbacService.getEffectivePermissions(user.id);
+
         return {
             id: user.id,
             email: user.email,
             name: user.fullName,
             phone: user.phone,
             role: user.role,
+            permissions,
             companyId: user.companyId,
             company: user.company
                 ? {

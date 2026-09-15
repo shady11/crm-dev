@@ -22,6 +22,7 @@ import {activitiesRoutes} from "@/features/activities/activities.routes";
 import {RoleLanding} from "@/features/auth/pages/role-landing";
 import {RoleGuard} from "@/features/auth/pages/role-guard";
 import {FEATURE_ROLES} from "@/features/auth/access";
+import {rbacRoutes} from "@/features/rbac/rbac.routes";
 
 export const router = createBrowserRouter([
     { path: paths.login, element: <LoginPage /> },
@@ -61,6 +62,7 @@ export const router = createBrowserRouter([
                     projectsRoutes,
                     dealsRoutes,
                     usersRoutes,
+                    rbacRoutes,
                     branchesRoutes,
                     tasksRoutes,
                     { path: "*", element: <NotFoundPage /> },

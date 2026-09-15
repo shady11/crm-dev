@@ -1,4 +1,5 @@
 import {UserRole} from "@/features/users/types/user.types";
+import type {AuthUser} from "@/features/auth/types/auth.types";
 
 /**
  * Which roles may reach each feature, in one place.
@@ -75,6 +76,17 @@ export type Feature = keyof typeof FEATURE_ROLES;
 
 export function canAccess(role: UserRole | undefined, feature: Feature): boolean {
     return role !== undefined && (FEATURE_ROLES[feature] as readonly UserRole[]).includes(role);
+}
+
+/**
+ * Fine-grained permission check, for the one part of the app (role & permission
+ * administration itself) that has to reflect a tenant's own custom roles
+ * rather than the fixed five legacy roles FEATURE_ROLES above is keyed on.
+ * SUPER_ADMIN carries ["*"] from the API and always passes.
+ */
+export function hasPermission(user: Pick<AuthUser, "permissions"> | undefined, permission: string): boolean {
+    if (!user) return false;
+    return user.permissions.includes("*") || user.permissions.includes(permission);
 }
 
 /**

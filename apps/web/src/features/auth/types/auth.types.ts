@@ -33,6 +33,11 @@ export type AuthUser = {
     // Re-fetched fresh by the API on every request, same as `company` below.
     phone?: string | null;
     role: UserRole;
+    // Effective fine-grained permissions (the union of every Role assigned
+    // to this user), recomputed by the API on every /auth/me fetch. Drives
+    // fine-grained UI gating (see hasPermission in access.ts); SUPER_ADMIN
+    // gets ["*"].
+    permissions: string[];
     companyId: string | null;
     // Re-fetched by the API on every request (never baked into the JWT), so
     // this always reflects the company's current settings.

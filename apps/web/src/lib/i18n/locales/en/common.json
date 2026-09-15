@@ -58,6 +58,7 @@
     "companies": "Companies",
     "settingOptions": "Currency, locale & timezone",
     "users": "Users",
+    "rolesPermissions": "Roles & permissions",
     "branches": "Branches",
     "activityLog": "Activity log",
     "auditLog": "Audit log",

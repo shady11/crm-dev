@@ -2,59 +2,58 @@ import {Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards} fro
 import {JwtAuthGuard} from "@/modules/auth/guards/jwt-auth.guard";
 import {CompanyGuard} from "@/common/guards/company.guard";
 import {BranchGuard} from "@/common/guards/branch.guard";
-import {RolesGuard} from "@/common/guards/roles.guard";
-import {Roles} from "@/common/decorators/roles.decorator";
+import {PermissionsGuard} from "@/common/guards/permissions.guard";
+import {RequirePermissions} from "@/common/decorators/permissions.decorator";
 import {CurrentUser} from "@/common/decorators/current-user.decorator";
 import {AuthUser} from "@/common/types/auth-user.type";
-import {UserRole} from "@/generated/prisma/enums";
 import {TasksService} from "./tasks.service";
 import {CreateTaskDto} from "./dto/create-task.dto";
 import {UpdateTaskDto} from "./dto/update-task.dto";
 import {UpdateTaskStatusDto} from "./dto/update-task-status.dto";
 import {QueryTasksDto} from "./dto/query-tasks.dto";
 
-@UseGuards(JwtAuthGuard, CompanyGuard, BranchGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, CompanyGuard, BranchGuard, PermissionsGuard)
 @Controller("tasks")
 export class TasksController {
     constructor(private readonly tasksService: TasksService) {}
 
-    @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD, UserRole.SALES_MANAGER, UserRole.FINANCE)
+    @RequirePermissions("tasks.view")
     @Get()
     findAll(@CurrentUser() user: AuthUser, @Query() query: QueryTasksDto) {
         return this.tasksService.findAll(user, query);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD, UserRole.SALES_MANAGER, UserRole.FINANCE)
+    @RequirePermissions("tasks.view")
     @Get("status-summary")
     getStatusSummary(@CurrentUser() user: AuthUser, @Query("branchId") branchId?: string) {
         return this.tasksService.getStatusSummary(user, branchId);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD, UserRole.SALES_MANAGER, UserRole.FINANCE)
+    @RequirePermissions("tasks.view")
     @Get(":id")
     findOne(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.tasksService.findOne(user, id);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD, UserRole.SALES_MANAGER, UserRole.FINANCE)
+    @RequirePermissions("tasks.create")
     @Post()
     create(@CurrentUser() user: AuthUser, @Body() dto: CreateTaskDto) {
         return this.tasksService.create(user, dto);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD, UserRole.SALES_MANAGER, UserRole.FINANCE)
+    @RequirePermissions("tasks.edit")
     @Patch(":id")
     update(@CurrentUser() user: AuthUser, @Param("id") id: string, @Body() dto: UpdateTaskDto) {
         return this.tasksService.update(user, id, dto);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD, UserRole.SALES_MANAGER, UserRole.FINANCE)
+    @RequirePermissions("tasks.edit")
     @Patch(":id/status")
     updateStatus(@CurrentUser() user: AuthUser, @Param("id") id: string, @Body() dto: UpdateTaskStatusDto) {
         return this.tasksService.updateStatus(user, id, dto);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD)
+    @RequirePermissions("tasks.delete")
     @Delete(":id")
     remove(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.tasksService.remove(user, id);

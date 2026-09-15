@@ -1,0 +1,86 @@
+// Dynamic RBAC layer, additive to the legacy `User.role` enum.
+//
+// The enum keeps every existing @Roles()-guarded endpoint working unchanged.
+// This layer sits alongside it: a Permission is a fine-grained capability
+// ("leads.create"), a Role is a named bundle of permissions, and a user can
+// be assigned any number of Roles. Effective permissions are the union of
+// every assigned Role's permissions. SUPER_ADMIN is exempt from this check
+// entirely (see PermissionsGuard) rather than needing a role that lists
+// every permission.
+//
+// A Role with companyId == null is a *system* role: seeded once, shared
+// across every tenant, and only editable by SUPER_ADMIN (see RbacService).
+// A Role with companyId set is a tenant's own custom role, created by that
+// tenant's COMPANY_ADMIN to slice up access more finely than the five
+// built-in roles allow — the actual "easily add a new role" path.
+model Permission {
+  id String @id @default(uuid())
+
+  // Stable machine key, "<module>.<action>", e.g. "leads.create". Never
+  // renamed once shipped — RolePermission rows and seed data reference it.
+  key         String @unique
+  module      String
+  action      String
+  description String
+
+  roles RolePermission[]
+
+  createdAt DateTime @default(now())
+
+  @@index([module])
+}
+
+model Role {
+  id String @id @default(uuid())
+
+  name        String
+  description String?
+
+  // Seeded, shared across all tenants, and not deletable/renamable. See
+  // RbacService.assertMutable.
+  isSystem Boolean @default(false)
+
+  // null = system role (global). Set = one tenant's own custom role.
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  permissions RolePermission[]
+  users       UserRoleAssignment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Role names only need to be unique within the scope they're offered in:
+  // a tenant's custom "Auditor" role can't collide with another custom role
+  // in the same tenant, but two different tenants can each have their own.
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  assignedAt DateTime @default(now())
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+}
+
+// Many-to-many: a user can hold several roles at once (e.g. a tenant-custom
+// "Auditor" role layered on top of their base SALES_MANAGER access).
+model UserRoleAssignment {
+  userId String
+  roleId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  assignedAt DateTime @default(now())
+
+  @@id([userId, roleId])
+  @@index([roleId])
+}

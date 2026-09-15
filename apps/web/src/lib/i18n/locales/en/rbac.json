@@ -1,0 +1,64 @@
+{
+  "badges": {
+    "system": "System",
+    "custom": "Custom"
+  },
+  "page": {
+    "heading": "Roles & permissions",
+    "description": "Built-in roles cover most cases. Add a custom role when you need a narrower or different slice of access — pick exactly the permissions it should have, then assign it to any user.",
+    "newRole": "New role",
+    "table": {
+      "headers": {
+        "name": "Role",
+        "type": "Type",
+        "permissions": "Permissions",
+        "users": "Users"
+      },
+      "permissionCount": "{{count}} permission",
+      "permissionCount_other": "{{count}} permissions",
+      "userCount": "{{count}} user",
+      "userCount_other": "{{count}} users"
+    },
+    "rowActions": {
+      "manageUsers": "Manage users for {{name}}",
+      "delete": "Delete {{name}}"
+    }
+  },
+  "form": {
+    "newTitle": "New role",
+    "editTitle": "Edit role",
+    "description": "Pick exactly the permissions this role should grant. A system role's permissions are fixed — clone them into a new role to start from one.",
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "permissions": "Permissions"
+    },
+    "submit": {
+      "create": "Create role"
+    }
+  },
+  "usersDialog": {
+    "title": "Users with the \"{{name}}\" role",
+    "description": "Check a user to grant this role, uncheck to revoke it. Takes effect on their next request.",
+    "searchPlaceholder": "Search users...",
+    "toasts": {
+      "error": "Could not update this user's role"
+    }
+  },
+  "confirmDialog": {
+    "delete": {
+      "title": "Delete this role?",
+      "body": "Removed from every user who has it. This cannot be undone.",
+      "confirm": "Delete"
+    },
+    "working": "Working..."
+  },
+  "toasts": {
+    "createSuccess": "Role created",
+    "createError": "Could not create the role",
+    "updateSuccess": "Role updated",
+    "updateError": "Could not save the role",
+    "deleteSuccess": "Role deleted",
+    "deleteError": "Could not delete the role"
+  }
+}

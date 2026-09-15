@@ -9,6 +9,7 @@ import {AuthService} from "./auth.service";
 import {SessionValidationService, type JwtPayload} from "./session-validation.service";
 
 const configService = {get: jest.fn()} as unknown as ConfigService;
+const rbacService = {getEffectivePermissions: jest.fn().mockResolvedValue([])} as any;
 
 /**
  * Suspending a tenant changes exactly one field on the company row. What makes
@@ -36,7 +37,7 @@ describe("company suspension is enforced at auth", () => {
             },
         } as unknown as PrismaService;
 
-        return new SessionValidationService(prisma, configService);
+        return new SessionValidationService(prisma, configService, rbacService);
     };
 
     it.each([
@@ -69,7 +70,7 @@ describe("company suspension is enforced at auth", () => {
         } as unknown as PrismaService;
 
         await expect(
-            new SessionValidationService(prisma, configService).validate({...payload, id: "s1"}),
+            new SessionValidationService(prisma, configService, rbacService).validate({...payload, id: "s1"}),
         ).resolves.toMatchObject({role: "SUPER_ADMIN", companyId: null});
     });
 

@@ -9,11 +9,10 @@ import {
     Query,
     UseGuards,
 } from "@nestjs/common";
-import { UserRole } from "@/generated/prisma/enums";
 import { JwtAuthGuard } from "@/modules/auth/guards/jwt-auth.guard";
 import { CompanyGuard } from "@/common/guards/company.guard";
-import { RolesGuard } from "@/common/guards/roles.guard";
-import { Roles } from "@/common/decorators/roles.decorator";
+import { PermissionsGuard } from "@/common/guards/permissions.guard";
+import { RequirePermissions } from "@/common/decorators/permissions.decorator";
 import { CurrentUser } from "@/common/decorators/current-user.decorator";
 import { AuthUser } from "@/common/types/auth-user.type";
 import { FloorsService } from "./floors.service";
@@ -22,17 +21,12 @@ import { UpdateFloorDto } from "./dto/update-floor.dto";
 import { QueryFloorsDto } from "./dto/query-floors.dto";
 import {CreateFloorsBulkDto} from "@/modules/floors/dto/create-floors-bulk.dto";
 
-@UseGuards(JwtAuthGuard, CompanyGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, CompanyGuard, PermissionsGuard)
 @Controller()
 export class FloorsController {
     constructor(private readonly floorsService: FloorsService) {}
 
-    @Roles(
-        UserRole.COMPANY_ADMIN,
-        UserRole.SALES_HEAD,
-        UserRole.SALES_MANAGER,
-        UserRole.FINANCE,
-    )
+    @RequirePermissions("inventory.view")
     @Get("entrances/:entranceId/floors")
     findByEntrance(
         @CurrentUser() user: AuthUser,
@@ -42,18 +36,13 @@ export class FloorsController {
         return this.floorsService.findByEntrance(user, entranceId, query);
     }
 
-    @Roles(
-        UserRole.COMPANY_ADMIN,
-        UserRole.SALES_HEAD,
-        UserRole.SALES_MANAGER,
-        UserRole.FINANCE,
-    )
+    @RequirePermissions("inventory.view")
     @Get("floors/:id")
     findOne(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.floorsService.findOne(user, id);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN)
+    @RequirePermissions("inventory.manage")
     @Post("entrances/:entranceId/floors")
     create(
         @CurrentUser() user: AuthUser,
@@ -63,7 +52,7 @@ export class FloorsController {
         return this.floorsService.create(user, entranceId, dto);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN)
+    @RequirePermissions("inventory.manage")
     @Post("entrances/:entranceId/floors/bulk")
     createBulk(
         @CurrentUser() user: AuthUser,
@@ -73,7 +62,7 @@ export class FloorsController {
         return this.floorsService.createBulk(user, entranceId, dto);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN)
+    @RequirePermissions("inventory.manage")
     @Patch("floors/:id")
     update(
         @CurrentUser() user: AuthUser,
@@ -83,13 +72,13 @@ export class FloorsController {
         return this.floorsService.update(user, id, dto);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN)
+    @RequirePermissions("inventory.manage")
     @Post("floors/:id/duplicate")
     duplicate(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.floorsService.duplicate(user, id);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN)
+    @RequirePermissions("inventory.manage")
     @Delete("floors/:id")
     remove(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.floorsService.remove(user, id);

@@ -31,6 +31,7 @@ import {DashboardModule} from "@/modules/dashboard/dashboard.module";
 import {AuditLogModule} from "@/modules/audit-log/audit-log.module";
 import {ActivitiesModule} from "@/modules/activities/activities.module";
 import {ImpersonationAuditInterceptor} from "@/common/interceptors/impersonation-audit.interceptor";
+import {RbacModule} from "@/modules/rbac/rbac.module";
 
 @Module({
   imports: [
@@ -54,6 +55,11 @@ import {ImpersonationAuditInterceptor} from "@/common/interceptors/impersonation
           },
       ]),
       PrismaModule,
+      // Dynamic role & permission engine backing every @RequirePermissions()
+      // guard in the app. Imported ahead of AuthModule since
+      // SessionValidationService depends on it to compute a request's
+      // effective permissions.
+      RbacModule,
       AuthModule,
       UsersModule,
       BranchesModule,

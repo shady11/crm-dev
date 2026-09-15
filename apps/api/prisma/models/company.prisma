@@ -55,4 +55,8 @@ model Company {
   auditLogs AuditLog[]
 
   impersonationSessions ImpersonationSession[]
+
+  // Custom roles this tenant defined for itself (companyId != null). System
+  // roles (companyId == null) are not related to any one Company.
+  roles Role[]
 }

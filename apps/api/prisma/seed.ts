@@ -2,6 +2,7 @@ import "dotenv/config";
 import {PrismaClient, UnitStatus, UnitType, UserRole,} from "@/generated/prisma/client";
 import {PrismaPg} from "@prisma/adapter-pg";
 import * as bcrypt from "bcrypt";
+import {RbacService} from "@/modules/rbac/rbac.service";
 
 const adapter = new PrismaPg({
     connectionString: process.env.DATABASE_URL!,
@@ -122,6 +123,15 @@ async function main() {
             });
         }
     }
+
+    // Same RBAC bootstrap RbacService runs on every API boot (permission
+    // catalog, system roles, backfilling every user without a Role
+    // assignment yet) — run here too so a seed-only setup (no server ever
+    // started) still ends up with a usable role/permission baseline.
+    const rbacService = new RbacService(prisma as never);
+    await rbacService.syncCatalog();
+    await rbacService.syncSystemRoles();
+    await rbacService.backfillUserRoleAssignments();
 
     console.log("Database seeded successfully");
     console.log("Admin login: admin@crm.dev");

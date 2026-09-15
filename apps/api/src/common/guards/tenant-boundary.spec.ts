@@ -26,6 +26,7 @@ describe("tenant boundary", () => {
         "audit-log": "SUPER_ADMIN platform-wide audit trail, not data inside a tenant",
         impersonation: "acts on behalf of a SUPER_ADMIN, who has no companyId of their own",
         "setting-options": "platform-wide currency/locale/timezone pool, not data inside a tenant",
+        rbac: "spans system, global-custom and tenant-custom roles; scoped internally by RbacService instead",
     };
 
     /** Controllers reachable without a token, and why. */
@@ -75,13 +76,15 @@ describe("tenant boundary", () => {
 
     it("companies is locked to the platform operator", () => {
         // Dropping CompanyGuard without this would make tenant administration
-        // reachable by every logged-in user.
+        // reachable by every logged-in user. companies.manage is granted to
+        // no Role except via SUPER_ADMIN's unconditional PermissionsGuard
+        // bypass — see RbacService's default role permissions.
         const source = stripComments(
             readFileSync(controllers.find((c) => c.module === "companies")!.path, "utf8"),
         );
 
-        expect(source).toContain("RolesGuard");
-        expect(source).toContain("UserRole.SUPER_ADMIN");
+        expect(source).toContain("PermissionsGuard");
+        expect(source).toContain("companies.manage");
     });
 });
 
@@ -126,6 +129,7 @@ describe("branch boundary", () => {
         documents: "not scoped by this phase — Theme B covers leads, clients, deals, and tasks only",
         notifications: "personal to the recipient user, not branch-scoped data",
         "document-generation": "COMPANY_ADMIN-only template definitions, company-wide like inventory — see BR-C1 decision",
+        rbac: "spans system, global-custom and tenant-custom roles; scoped internally by RbacService instead",
     };
 
     const stripComments = (source: string) =>

@@ -56,7 +56,11 @@ describe('SessionValidationService.validate', () => {
             get: jest.fn((key: string) => configValues[key]),
         } as unknown as ConfigService;
 
-        const service = new SessionValidationService(prisma as any, configService);
+        const rbacService = {
+            getEffectivePermissions: jest.fn().mockResolvedValue([]),
+        };
+
+        const service = new SessionValidationService(prisma as any, configService, rbacService as any);
         return {service, prisma};
     }
 

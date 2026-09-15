@@ -31,6 +31,19 @@ export type AuthUser = {
     // validate() — never on the object signed into a token.
     phone?: string | null;
     role: UserRole;
+    // Effective fine-grained permissions: the union of every Role assigned
+    // to this user via UserRoleAssignment. Recomputed fresh on every request
+    // by SessionValidationService (never baked into the JWT), so granting or
+    // revoking a permission takes effect on the very next request instead of
+    // waiting for the token to expire. SUPER_ADMIN gets ["*"] — see
+    // PermissionsGuard, which treats it as an unconditional pass.
+    //
+    // Optional rather than always-present so the many service-layer unit
+    // tests that build a partial AuthUser fixture (to exercise business
+    // logic keyed off `role`, not access control) don't all need updating —
+    // PermissionsGuard is the only reader that matters at runtime, and it
+    // treats a missing array as no permissions rather than throwing.
+    permissions?: string[];
     companyId: string | null;
     // Carried on every request (not baked into the JWT) so a currency/locale
     // change on the Company takes effect on the very next request instead of
