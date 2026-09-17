@@ -60,31 +60,11 @@ export class RbacController {
         return this.rbacService.deleteRole(actor, id);
     }
 
-    @Get("roles/:id/users")
-    listRoleUserIds(@CurrentUser() actor: AuthUser, @Param("id") id: string) {
-        return this.rbacService.listRoleUserIds(actor, id);
-    }
-
-    @Get("users/:userId/roles")
-    listUserRoles(@CurrentUser() actor: AuthUser, @Param("userId") userId: string) {
-        return this.rbacService.listUserRoles(actor, userId);
-    }
-
-    @Post("users/:userId/roles/:roleId")
-    assignRoleToUser(
-        @CurrentUser() actor: AuthUser,
-        @Param("userId") userId: string,
-        @Param("roleId") roleId: string,
-    ) {
-        return this.rbacService.assignRoleToUser(actor, userId, roleId);
-    }
-
-    @Delete("users/:userId/roles/:roleId")
-    revokeRoleFromUser(
-        @CurrentUser() actor: AuthUser,
-        @Param("userId") userId: string,
-        @Param("roleId") roleId: string,
-    ) {
-        return this.rbacService.revokeRoleFromUser(actor, userId, roleId);
+    // Read-only: every user has exactly one Role, so "who has this role"
+    // is reassigned via UsersController's edit-user flow (roleId is just
+    // another field there), not by checking boxes in this panel.
+    @Get("roles/:id/members")
+    listRoleMembers(@CurrentUser() actor: AuthUser, @Param("id") id: string) {
+        return this.rbacService.listRoleMembers(actor, id);
     }
 }

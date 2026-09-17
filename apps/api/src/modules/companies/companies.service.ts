@@ -1,12 +1,14 @@
 import {BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
 import {randomBytes} from "crypto";
 import * as bcrypt from "bcrypt";
-import {AuditAction, Prisma, UserRole} from "@/generated/prisma/client";
+import {AuditAction, Prisma} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 import {AuditLogService} from "@/modules/audit-log/audit-log.service";
 import {ImpersonationService} from "@/modules/impersonation/impersonation.service";
 import {SettingOptionsService} from "@/modules/setting-options/setting-options.service";
+import {RbacService} from "@/modules/rbac/rbac.service";
+import {LEGACY_ROLE_NAMES} from "@/modules/rbac/legacy-role-names";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateCompanyDto} from "./dto/create-company.dto";
 import {UpdateCompanyDto} from "./dto/update-company.dto";
@@ -44,6 +46,7 @@ export class CompaniesService {
         private readonly auditLog: AuditLogService,
         private readonly impersonation: ImpersonationService,
         private readonly settingOptions: SettingOptionsService,
+        private readonly rbacService: RbacService,
     ) {}
 
     /**
@@ -159,11 +162,12 @@ export class CompaniesService {
                         fullName: true,
                         email: true,
                         phone: true,
-                        role: true,
+                        roleId: true,
+                        role: {select: {id: true, name: true}},
                         isActive: true,
                         createdAt: true,
                     },
-                    orderBy: [{role: "asc"}, {fullName: "asc"}],
+                    orderBy: [{role: {name: "asc"}}, {fullName: "asc"}],
                 },
             },
         });
@@ -234,6 +238,7 @@ export class CompaniesService {
 
         const password = dto.adminPassword?.trim() || randomBytes(18).toString("base64url");
         const passwordHash = await bcrypt.hash(password, 10);
+        const companyAdminRoleId = await this.rbacService.getSystemRoleId(LEGACY_ROLE_NAMES.COMPANY_ADMIN);
 
         const company = await this.prisma.$transaction(async (db) => {
             const created = await db.company.create({
@@ -253,7 +258,7 @@ export class CompaniesService {
                     fullName: dto.adminFullName,
                     email: adminEmail,
                     passwordHash,
-                    role: UserRole.COMPANY_ADMIN,
+                    roleId: companyAdminRoleId,
                     companyId: created.id,
                 },
             });
@@ -472,6 +477,7 @@ export class CompaniesService {
     private async getTenantUserOrThrow(companyId: string, userId: string) {
         const target = await this.prisma.user.findFirst({
             where: {id: userId, companyId, deletedAt: null},
+            include: {role: {select: {name: true, isBranchScoped: true}}},
         });
 
         if (!target) {
@@ -593,7 +599,7 @@ export class CompaniesService {
 
         const target = await this.getTenantUserOrThrow(companyId, userId);
 
-        if (target.role === UserRole.SUPER_ADMIN) {
+        if (target.isSuperAdmin) {
             throw new ForbiddenException("SUPER_ADMIN accounts cannot be impersonated");
         }
 
@@ -607,7 +613,10 @@ export class CompaniesService {
                 id: target.id,
                 email: target.email,
                 fullName: target.fullName,
-                role: target.role,
+                roleId: target.roleId,
+                roleName: target.role.name,
+                isSuperAdmin: target.isSuperAdmin,
+                isBranchScoped: target.role.isBranchScoped,
                 companyId,
                 branchId: target.branchId,
                 phone: target.phone,

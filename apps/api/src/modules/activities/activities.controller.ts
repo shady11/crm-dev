@@ -16,7 +16,7 @@ export class ActivitiesController {
 
     // COMPANY_ADMIN sees every activity in the company; SALES_HEAD and
     // SALES_MANAGER (branch-scoped roles) see only their own branch's —
-    // enforced in ActivitiesService.findAll via isBranchScopedRole.
+    // enforced in ActivitiesService.findAll via user.isBranchScoped.
     // activities.view is not in FINANCE's default bundle.
     @RequirePermissions("activities.view")
     @Get()

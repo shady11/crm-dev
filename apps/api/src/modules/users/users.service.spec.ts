@@ -1,5 +1,4 @@
 import {BadRequestException, ForbiddenException, NotFoundException} from "@nestjs/common";
-import {UserRole} from "@/generated/prisma/client";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {PrismaService} from "@/database/prisma.service";
 import {UsersService} from "./users.service";
@@ -16,26 +15,43 @@ describe("UsersService — role boundaries", () => {
         id: "admin-1",
         email: "admin@crm.dev",
         name: "Company Admin",
-        role: UserRole.COMPANY_ADMIN,
+        roleId: "role-company-admin",
+        roleName: "Company Admin",
         companyId: "company-1",
         company: null,
         branchId: null,
         branch: null,
     };
 
+    const superAdminRole = {id: "role-super-admin", name: "Super Admin", companyId: null, isBranchScoped: false};
+    const salesManagerRole = {id: "role-sales-manager", name: "Sales Manager", companyId: null, isBranchScoped: true};
+
     const superAdminRow = {
         id: "super-1",
-        role: UserRole.SUPER_ADMIN,
+        roleId: superAdminRole.id,
+        role: superAdminRole,
+        isSuperAdmin: true,
         companyId: "company-1",
         email: "root@crm.dev",
         isActive: true,
         deletedAt: null,
     };
 
-    const managerRow = {...superAdminRow, id: "manager-1", role: UserRole.SALES_MANAGER};
+    const managerRow = {
+        ...superAdminRow,
+        id: "manager-1",
+        roleId: salesManagerRole.id,
+        role: salesManagerRole,
+        isSuperAdmin: false,
+    };
 
     /** `found` is what user.findFirst resolves to for the target lookup. */
     const build = (found: unknown = null) => {
+        const roleById = new Map([
+            [superAdminRole.id, superAdminRole],
+            [salesManagerRole.id, salesManagerRole],
+        ]);
+
         const prisma = {
             user: {
                 findFirst: jest.fn().mockResolvedValue(found),
@@ -43,6 +59,16 @@ describe("UsersService — role boundaries", () => {
                 count: jest.fn().mockResolvedValue(0),
                 create: jest.fn().mockResolvedValue({id: "new"}),
                 update: jest.fn().mockResolvedValue({id: "updated"}),
+            },
+            role: {
+                findUnique: jest.fn().mockImplementation(({where}: any) =>
+                    Promise.resolve(roleById.get(where.id) ?? null),
+                ),
+                findUniqueOrThrow: jest.fn().mockImplementation(({where}: any) => {
+                    const role = roleById.get(where.id);
+                    if (!role) throw new Error("not found");
+                    return Promise.resolve(role);
+                }),
             },
             branch: {
                 findFirst: jest.fn().mockResolvedValue({id: "branch-1", companyId: "company-1", deactivatedAt: null}),
@@ -60,7 +86,7 @@ describe("UsersService — role boundaries", () => {
                     fullName: "Root",
                     email: "root@crm.dev",
                     password: "secret123",
-                    role: UserRole.SUPER_ADMIN,
+                    roleId: superAdminRole.id,
                 }),
             ).rejects.toThrow(ForbiddenException);
 
@@ -74,7 +100,7 @@ describe("UsersService — role boundaries", () => {
                 fullName: "Aigul",
                 email: "aigul@crm.dev",
                 password: "secret123",
-                role: UserRole.SALES_MANAGER,
+                roleId: salesManagerRole.id,
                 branchId: "branch-1",
             });
 
@@ -87,7 +113,7 @@ describe("UsersService — role boundaries", () => {
             const {service, prisma} = build(managerRow);
 
             await expect(
-                service.update(admin, managerRow.id, {role: UserRole.SUPER_ADMIN}),
+                service.update(admin, managerRow.id, {roleId: superAdminRole.id}),
             ).rejects.toThrow(ForbiddenException);
 
             expect(prisma.user.update).not.toHaveBeenCalled();
@@ -130,22 +156,14 @@ describe("UsersService — role boundaries", () => {
     });
 
     describe("findAll", () => {
-        it("scopes the query to manageable roles and excludes deleted users", async () => {
+        it("scopes the query to non-SUPER_ADMIN users and excludes deleted users", async () => {
             const {service, prisma} = build();
 
             await service.findAll(admin, {});
 
             const where = prisma.user.findMany.mock.calls[0][0].where;
             expect(where.deletedAt).toBeNull();
-            expect(where.role.in).not.toContain(UserRole.SUPER_ADMIN);
-            expect(where.role.in).toContain(UserRole.SALES_MANAGER);
-        });
-
-        it("refuses an explicit filter on a role the actor cannot see", async () => {
-            const {service} = build();
-
-            await expect(service.findAll(admin, {role: UserRole.SUPER_ADMIN}))
-                .rejects.toThrow(ForbiddenException);
+            expect(where.isSuperAdmin).toBe(false);
         });
     });
 });
@@ -155,7 +173,8 @@ describe("UsersService — reassignment on deactivation (CA-B1)", () => {
         id: "admin-1",
         email: "admin@crm.dev",
         name: "Company Admin",
-        role: UserRole.COMPANY_ADMIN,
+        roleId: "role-company-admin",
+        roleName: "Company Admin",
         companyId: "company-1",
         company: null,
         branchId: null,
@@ -164,7 +183,8 @@ describe("UsersService — reassignment on deactivation (CA-B1)", () => {
 
     const departingManager = {
         id: "manager-1",
-        role: UserRole.SALES_MANAGER,
+        roleId: "role-sales-manager",
+        isSuperAdmin: false,
         companyId: "company-1",
         email: "leaving@crm.dev",
         isActive: true,
@@ -173,7 +193,8 @@ describe("UsersService — reassignment on deactivation (CA-B1)", () => {
 
     const replacementManager = {
         id: "manager-2",
-        role: UserRole.SALES_MANAGER,
+        roleId: "role-sales-manager",
+        isSuperAdmin: false,
         companyId: "company-1",
         email: "staying@crm.dev",
         isActive: true,

@@ -1,15 +1,15 @@
 import {api} from "@/lib/api";
 import type {PaginatedResponse} from "@/lib/api-types";
-import type {User, UserRole} from "../types/user.types";
+import type {User} from "../types/user.types";
 
 // Kept in sync with USER_SORTABLE_FIELDS in the API's query-users.dto.ts.
-export type UserSortField = "fullName" | "role" | "createdAt";
+export type UserSortField = "fullName" | "roleId" | "createdAt";
 
 export type GetUsersParams = {
     page?: number;
     limit?: number;
     search?: string;
-    role?: UserRole;
+    roleId?: string;
     isActive?: boolean;
     branchId?: string;
     sortBy?: UserSortField;
@@ -17,7 +17,8 @@ export type GetUsersParams = {
 };
 
 export type UserRoleSummaryItem = {
-    role: UserRole;
+    roleId: string;
+    roleName: string;
     count: number;
     sample: { id: string; fullName: string }[];
 };
@@ -37,9 +38,9 @@ export type CreateUserPayload = {
     email: string;
     phone?: string;
     password: string;
-    role: UserRole;
-    // Required for branch-scoped roles (SALES_HEAD, SALES_MANAGER); must be
-    // absent for company-wide roles.
+    roleId: string;
+    // Required when the chosen role is branch-scoped; must be absent for
+    // company-wide roles.
     branchId?: string;
 };
 

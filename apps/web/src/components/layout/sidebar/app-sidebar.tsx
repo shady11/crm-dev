@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sidebar.tsx"
 import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {canAccess, hasPermission, type Feature} from "@/features/auth/access";
+import {canAccess, type Feature} from "@/features/auth/access";
 import {
     Box,
     Building2,
@@ -38,14 +38,7 @@ import {Link} from "react-router-dom";
 // English string regardless of which language is active.
 const NAV_ITEMS: {
     titleKey: string;
-    feature?: Feature;
-    /**
-     * Gated by an RBAC permission instead of a fixed role — unlike every
-     * other entry (mirroring the legacy roles a fixed feature set), this one
-     * has to reflect a tenant's own custom roles too, since rbac.manage can
-     * be granted to any role, not just COMPANY_ADMIN.
-     */
-    permission?: string;
+    feature: Feature;
     url: string;
     icon: typeof LayoutDashboard;
 }[] = [
@@ -58,7 +51,7 @@ const NAV_ITEMS: {
     { titleKey: "nav.companies", feature: "companies", url: "/companies", icon: Landmark },
     { titleKey: "nav.settingOptions", feature: "settingOptions", url: "/setting-options", icon: SlidersHorizontal },
     { titleKey: "nav.users", feature: "users", url: "/users", icon: Users },
-    { titleKey: "nav.rolesPermissions", permission: "rbac.manage", url: "/roles-permissions", icon: ShieldCheck },
+    { titleKey: "nav.rolesPermissions", feature: "rolesPermissions", url: "/roles-permissions", icon: ShieldCheck },
     { titleKey: "nav.branches", feature: "branches", url: "/branches", icon: MapPin },
     { titleKey: "nav.activityLog", feature: "activities", url: "/activity-log", icon: History },
     { titleKey: "nav.auditLog", feature: "auditLog", url: "/audit-log", icon: ScrollText },
@@ -71,9 +64,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { user } = useAuth();
 
     const navMain = NAV_ITEMS
-        .filter((item) =>
-            item.permission ? hasPermission(user, item.permission) : canAccess(user?.role, item.feature!),
-        )
+        .filter((item) => canAccess(user, item.feature))
         .map((item) => ({ title: t(item.titleKey), url: item.url, icon: item.icon }));
 
     return (

@@ -1,10 +1,11 @@
 import {BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
-import {ActivityAction, ActivityType, Prisma, UserRole} from "@/generated/prisma/client";
+import {ActivityAction, ActivityType, Prisma} from "@/generated/prisma/client";
 import {LeadStatus} from "@/generated/prisma/enums";
 import {PrismaService} from "@/database/prisma.service";
 import {ClientsService} from "@/modules/clients/clients.service";
+import {RbacService} from "@/modules/rbac/rbac.service";
+import {LEGACY_ROLE_NAMES} from "@/modules/rbac/legacy-role-names";
 import {AuthUser} from "@/common/types/auth-user.type";
-import {isBranchScopedRole} from "@/common/constants/branch-scope.constants";
 import {TransferBranchDto} from "@/common/dto/transfer-branch.dto";
 import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
 import {LEAD_SORTABLE_FIELDS, QueryLeadsDto} from "@/modules/leads/dto/query-leads.dto";
@@ -25,6 +26,7 @@ export class LeadsService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly clientsService: ClientsService,
+        private readonly rbacService: RbacService,
     ) {}
 
     async findAll(user: AuthUser, query: QueryLeadsDto) {
@@ -41,7 +43,7 @@ export class LeadsService {
         };
 
         // BR-B1: branch-scoped roles see only their own branch's leads.
-        if (isBranchScopedRole(user.role)) {
+        if (user.isBranchScoped) {
             where.branchId = user.branchId;
         } else if (query.branchId) {
             // BR-B3: a company-wide role may narrow to one branch. Kept as a
@@ -143,7 +145,7 @@ export class LeadsService {
                 // a lead in another branch 404s exactly like a lead in
                 // another company — never a separate 403 that would confirm
                 // the record exists.
-                ...(isBranchScopedRole(user.role) ? {branchId: user.branchId} : {}),
+                ...(user.isBranchScoped ? {branchId: user.branchId} : {}),
             },
             include: {
                 manager: {
@@ -191,7 +193,7 @@ export class LeadsService {
         // request body — there is no branchId field on CreateLeadDto at all.
         // Company-wide roles leave it unassigned until a COMPANY_ADMIN hands
         // the lead to a branch (BR-D1).
-        const branchId = isBranchScopedRole(user.role) ? user.branchId : null;
+        const branchId = user.isBranchScoped ? user.branchId : null;
 
         return this.prisma.lead.create({
             data: {
@@ -336,7 +338,7 @@ export class LeadsService {
         }
 
         const companyId = user.companyId;
-        const branchScoped = isBranchScopedRole(user.role);
+        const branchScoped = user.isBranchScoped;
 
         const [leads, clients] = await Promise.all([
             this.prisma.lead.findMany({
@@ -381,7 +383,7 @@ export class LeadsService {
         // this must never share code with the BR-B1 restriction above.
         let crossBranchClient: { id: string; branchId: string | null } | null = null;
 
-        if (user.role === UserRole.COMPANY_ADMIN) {
+        if (user.roleName === LEGACY_ROLE_NAMES.COMPANY_ADMIN) {
             crossBranchClient = await this.prisma.client.findFirst({
                 where: { companyId, phone, deletedAt: null },
                 select: { id: true, branchId: true },
@@ -588,7 +590,7 @@ export class LeadsService {
                 id: managerId,
                 companyId: user.companyId,
                 isActive: true,
-                ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+                ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
             },
         });
 
@@ -614,7 +616,7 @@ export class LeadsService {
                 id: managerId,
                 companyId: user.companyId,
                 branchId: leadBranchId,
-                role: UserRole.SALES_MANAGER,
+                roleId: await this.rbacService.getSystemRoleId(LEGACY_ROLE_NAMES.SALES_MANAGER),
                 isActive: true,
             },
         });
@@ -637,7 +639,7 @@ export class LeadsService {
             where: {
                 id: clientId,
                 companyId: user.companyId,
-                ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+                ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
             },
         });
 

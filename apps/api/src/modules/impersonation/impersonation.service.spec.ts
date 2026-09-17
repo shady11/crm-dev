@@ -1,7 +1,7 @@
 import {BadRequestException, UnauthorizedException} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 import {JwtService} from '@nestjs/jwt';
-import {AuditAction, UserRole} from '@/generated/prisma/client';
+import {AuditAction} from '@/generated/prisma/client';
 import {ImpersonationService, type ImpersonationTarget} from './impersonation.service';
 
 /**
@@ -16,7 +16,9 @@ describe('ImpersonationService', () => {
         id: 'admin-1',
         email: 'admin@crm.dev',
         name: 'Admin',
-        role: UserRole.SUPER_ADMIN,
+        roleId: 'role-super-admin',
+        roleName: 'Super Admin',
+        isSuperAdmin: true,
         companyId: null,
         company: null,
         branchId: null,
@@ -27,7 +29,10 @@ describe('ImpersonationService', () => {
         id: 'target-1',
         email: 'manager@crm.dev',
         fullName: 'Manager',
-        role: UserRole.SALES_MANAGER,
+        roleId: 'role-sales-manager',
+        roleName: 'Sales Manager',
+        isSuperAdmin: false,
+        isBranchScoped: true,
         companyId: 'company-1',
         branchId: 'branch-1',
         phone: '+996700000000',
@@ -93,7 +98,7 @@ describe('ImpersonationService', () => {
 
             const payload = (jwtService.signAsync as jest.Mock).mock.calls[0][0];
             expect(payload.id).toBe('target-1');
-            expect(payload.role).toBe(UserRole.SALES_MANAGER);
+            expect(payload.roleName).toBe('Sales Manager');
             expect(payload.impersonation).toEqual({sessionId: 'session-1', superAdminId: 'admin-1'});
         });
 
@@ -125,7 +130,8 @@ describe('ImpersonationService', () => {
             id: 'target-1',
             email: 'manager@crm.dev',
             name: 'Manager',
-            role: UserRole.SALES_MANAGER,
+            roleId: 'role-sales-manager',
+            roleName: 'Sales Manager',
             companyId: 'company-1',
             company: companySummary,
             branchId: 'branch-1',
@@ -138,6 +144,19 @@ describe('ImpersonationService', () => {
             },
         } as any;
 
+        const superAdminRow = (overrides: Record<string, unknown> = {}) => ({
+            id: 'admin-1',
+            email: 'admin@crm.dev',
+            fullName: 'Admin',
+            roleId: 'role-super-admin',
+            role: {name: 'Super Admin', isBranchScoped: false},
+            isSuperAdmin: true,
+            companyId: null,
+            branchId: null,
+            isActive: true,
+            ...overrides,
+        });
+
         it('rejects ending when the current session is not impersonating anyone', async () => {
             const {service} = build();
             await expect(service.end({...impersonatedUser, impersonation: undefined})).rejects.toThrow(
@@ -147,15 +166,7 @@ describe('ImpersonationService', () => {
 
         it('marks only the live session as ended (guarded by endedAt: null)', async () => {
             const {service, prisma} = build();
-            prisma.user.findUnique.mockResolvedValue({
-                id: 'admin-1',
-                email: 'admin@crm.dev',
-                fullName: 'Admin',
-                role: UserRole.SUPER_ADMIN,
-                companyId: null,
-                branchId: null,
-                isActive: true,
-            });
+            prisma.user.findUnique.mockResolvedValue(superAdminRow());
 
             await service.end(impersonatedUser);
 
@@ -167,10 +178,7 @@ describe('ImpersonationService', () => {
 
         it('audits the end under the original super admin identity', async () => {
             const {service, prisma, auditLog} = build();
-            prisma.user.findUnique.mockResolvedValue({
-                id: 'admin-1', email: 'admin@crm.dev', fullName: 'Admin', role: UserRole.SUPER_ADMIN,
-                companyId: null, branchId: null, isActive: true,
-            });
+            prisma.user.findUnique.mockResolvedValue(superAdminRow());
 
             await service.end(impersonatedUser);
 
@@ -185,10 +193,7 @@ describe('ImpersonationService', () => {
 
         it('rejects if the original super admin account has since been deactivated', async () => {
             const {service, prisma} = build();
-            prisma.user.findUnique.mockResolvedValue({
-                id: 'admin-1', email: 'admin@crm.dev', fullName: 'Admin', role: UserRole.SUPER_ADMIN,
-                companyId: null, branchId: null, isActive: false,
-            });
+            prisma.user.findUnique.mockResolvedValue(superAdminRow({isActive: false}));
 
             await expect(service.end(impersonatedUser)).rejects.toThrow(UnauthorizedException);
         });
@@ -202,10 +207,7 @@ describe('ImpersonationService', () => {
 
         it('signs a fresh token for the super admin, without an impersonation claim', async () => {
             const {service, prisma, jwtService} = build();
-            prisma.user.findUnique.mockResolvedValue({
-                id: 'admin-1', email: 'admin@crm.dev', fullName: 'Admin', role: UserRole.SUPER_ADMIN,
-                companyId: null, branchId: null, isActive: true,
-            });
+            prisma.user.findUnique.mockResolvedValue(superAdminRow());
 
             const result = await service.end(impersonatedUser);
 

@@ -6,7 +6,7 @@ import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/componen
 import {DataTable} from "@/components/shared/data-table.tsx";
 import {SortableTableHead} from "@/components/shared/sortable-table-head.tsx";
 import {UserStatusDot} from "@/features/users/components/user-status-dot.tsx";
-import {isBranchScopedRole, type User, USER_ROLE_LABEL_KEYS} from "@/features/users/types/user.types";
+import type {User} from "@/features/users/types/user.types";
 import type {UserSortField} from "@/features/users/api/users.api.ts";
 import {formatCreatedAt, initials} from "@/features/users/utils/format.ts";
 import {useTranslation} from "react-i18next";
@@ -74,7 +74,7 @@ export function UsersTable({
                             <UserStatusDot isActive={user.isActive} />
                         </div>
                         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-                            <span>{t(USER_ROLE_LABEL_KEYS[user.role])}</span>
+                            <span>{user.role.name}</span>
                             <span>{user.branch?.name ?? "—"}</span>
                             <span className="ml-auto">{created.date}</span>
                         </div>
@@ -82,7 +82,7 @@ export function UsersTable({
                             <Button variant="ghost" size="icon-sm" onClick={() => onEdit(user)} aria-label={t("common:actions.edit")}>
                                 <Pen className="size-3.5" />
                             </Button>
-                            {isBranchScopedRole(user.role) && (
+                            {user.role.isBranchScoped && (
                                 <Button
                                     variant="ghost"
                                     size="icon-sm"
@@ -118,7 +118,7 @@ export function UsersTable({
                     <SortableTableHead field="fullName" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
                         {t("table.headers.name")}
                     </SortableTableHead>
-                    <SortableTableHead field="role" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                    <SortableTableHead field="roleId" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
                         {t("table.headers.role")}
                     </SortableTableHead>
                     <TableHead>{t("table.headers.branch")}</TableHead>
@@ -155,7 +155,7 @@ export function UsersTable({
                                     </div>
                                 </div>
                             </TableCell>
-                            <TableCell>{t(USER_ROLE_LABEL_KEYS[user.role])}</TableCell>
+                            <TableCell>{user.role.name}</TableCell>
                             <TableCell className="text-muted-foreground">{user.branch?.name ?? "—"}</TableCell>
                             <TableCell>
                                 <p>{created.date}</p>
@@ -169,7 +169,7 @@ export function UsersTable({
                                     <Button variant="ghost" size="icon-sm" onClick={() => onEdit(user)} aria-label={t("common:actions.edit")}>
                                         <Pen className="size-3.5" />
                                     </Button>
-                                    {isBranchScopedRole(user.role) && (
+                                    {user.role.isBranchScoped && (
                                         <Button
                                             variant="ghost"
                                             size="icon-sm"

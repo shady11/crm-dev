@@ -5,7 +5,6 @@ import {
     Injectable,
 } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
-import { UserRole } from "@/generated/prisma/client";
 import { PERMISSIONS_KEY } from "@/common/decorators/permissions.decorator";
 import { AuthUser } from "@/common/types/auth-user.type";
 
@@ -34,7 +33,7 @@ export class PermissionsGuard implements CanActivate {
         // Role can be scoped to it, so it always passes rather than needing
         // a role that lists every permission (which would silently go stale
         // as new permissions are added).
-        if (user.role === UserRole.SUPER_ADMIN) {
+        if (user.isSuperAdmin) {
             return true;
         }
 

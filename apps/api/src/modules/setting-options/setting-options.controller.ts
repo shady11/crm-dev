@@ -1,5 +1,4 @@
 import {Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards} from "@nestjs/common";
-import {UserRole} from "@/generated/prisma/enums";
 import {JwtAuthGuard} from "@/modules/auth/guards/jwt-auth.guard";
 import {PermissionsGuard} from "@/common/guards/permissions.guard";
 import {RequirePermissions} from "@/common/decorators/permissions.decorator";
@@ -31,7 +30,7 @@ export class SettingOptionsController {
         // anyone else's dropdown only ever needs what's still offered.
         return this.settingOptionsService.findAll({
             ...query,
-            includeInactive: query.includeInactive && actor.role === UserRole.SUPER_ADMIN,
+            includeInactive: query.includeInactive && Boolean(actor.isSuperAdmin),
         });
     }
 

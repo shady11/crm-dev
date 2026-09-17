@@ -1,5 +1,5 @@
 import {BadRequestException, ForbiddenException} from '@nestjs/common';
-import {DocumentOwnerType, DocumentType, NotificationType, UserRole} from '@/generated/prisma/client';
+import {DocumentOwnerType, DocumentType, NotificationType} from '@/generated/prisma/client';
 import {AuthUser} from '@/common/types/auth-user.type';
 import {DocumentsService} from './documents.service';
 import {DocumentNotFoundException} from './exceptions/document-not-found.exception';
@@ -17,7 +17,8 @@ describe('DocumentsService', () => {
         id: 'user-1',
         email: 'user@crm.dev',
         name: 'User',
-        role: UserRole.SALES_MANAGER,
+        roleId: 'role-sales-manager',
+        roleName: 'Sales Manager',
         companyId: 'company-1',
         company: null,
         branchId: 'branch-1',

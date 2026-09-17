@@ -1,8 +1,9 @@
 import "dotenv/config";
-import {PrismaClient, UnitStatus, UnitType, UserRole,} from "@/generated/prisma/client";
+import {PrismaClient, UnitStatus, UnitType,} from "@/generated/prisma/client";
 import {PrismaPg} from "@prisma/adapter-pg";
 import * as bcrypt from "bcrypt";
 import {RbacService} from "@/modules/rbac/rbac.service";
+import {LEGACY_ROLE_NAMES} from "@/modules/rbac/legacy-role-names";
 
 const adapter = new PrismaPg({
     connectionString: process.env.DATABASE_URL!,
@@ -38,6 +39,15 @@ function assertNotProduction() {
 async function main() {
     assertNotProduction();
 
+    // Same RBAC bootstrap RbacService runs on every API boot (permission
+    // catalog, system roles) — run it here too, before creating the demo
+    // admin below, so there's a real "Company Admin" Role row to point
+    // roleId at even on a database that has never booted the app.
+    const rbacService = new RbacService(prisma as never);
+    await rbacService.syncCatalog();
+    await rbacService.syncSystemRoles();
+    const companyAdminRoleId = await rbacService.getSystemRoleId(LEGACY_ROLE_NAMES.COMPANY_ADMIN);
+
     const passwordHash = await bcrypt.hash("password123", 10);
 
     const company = await prisma.company.upsert({
@@ -65,7 +75,7 @@ async function main() {
             email: "admin@crm.dev",
             phone: "+996700000001",
             passwordHash,
-            role: UserRole.COMPANY_ADMIN,
+            roleId: companyAdminRoleId,
             companyId: company.id,
         },
     });
@@ -123,15 +133,6 @@ async function main() {
             });
         }
     }
-
-    // Same RBAC bootstrap RbacService runs on every API boot (permission
-    // catalog, system roles, backfilling every user without a Role
-    // assignment yet) — run here too so a seed-only setup (no server ever
-    // started) still ends up with a usable role/permission baseline.
-    const rbacService = new RbacService(prisma as never);
-    await rbacService.syncCatalog();
-    await rbacService.syncSystemRoles();
-    await rbacService.backfillUserRoleAssignments();
 
     console.log("Database seeded successfully");
     console.log("Admin login: admin@crm.dev");

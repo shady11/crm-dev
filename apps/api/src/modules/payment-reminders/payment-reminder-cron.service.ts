@@ -6,9 +6,10 @@ import {
   NotificationEntityType,
   NotificationType,
   PaymentScheduleStatus,
-  UserRole,
 } from '@/generated/prisma/client';
 import { NotificationsService } from '@/modules/notifications/notifications.service';
+import { RbacService } from '@/modules/rbac/rbac.service';
+import { LEGACY_ROLE_NAMES } from '@/modules/rbac/legacy-role-names';
 
 import { REMINDER_STAGES } from './payment-reminders.constants';
 import { OutboundMessageService } from './outbound-message.service';
@@ -29,6 +30,7 @@ export class PaymentReminderCronService {
     private readonly prisma: PrismaService,
     private readonly outboundMessages: OutboundMessageService,
     private readonly notifications: NotificationsService,
+    private readonly rbacService: RbacService,
   ) {}
 
   /**
@@ -111,7 +113,7 @@ export class PaymentReminderCronService {
           where: {
             companyId: deal.companyId,
             branchId: deal.branchId,
-            role: UserRole.SALES_HEAD,
+            roleId: await this.rbacService.getSystemRoleId(LEGACY_ROLE_NAMES.SALES_HEAD),
             isActive: true,
           },
           select: { id: true },

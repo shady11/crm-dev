@@ -1,6 +1,5 @@
-import {BadRequestException, ForbiddenException, NotFoundException} from "@nestjs/common";
+import {BadRequestException, ConflictException, ForbiddenException, NotFoundException} from "@nestjs/common";
 import {AuthUser} from "@/common/types/auth-user.type";
-import {UserRole} from "@/generated/prisma/client";
 import {RbacService} from "./rbac.service";
 
 /**
@@ -15,7 +14,8 @@ describe("RbacService", () => {
         id: "admin-1",
         email: "admin@crm.dev",
         name: "Admin",
-        role: UserRole.COMPANY_ADMIN,
+        roleId: "role-company-admin",
+        roleName: "Company Admin",
         companyId: "company-1",
         company: null,
         branchId: null,
@@ -26,7 +26,9 @@ describe("RbacService", () => {
         id: "super-1",
         email: "ops@crm.dev",
         name: "Ops",
-        role: UserRole.SUPER_ADMIN,
+        roleId: "role-super-admin",
+        roleName: "Super Admin",
+        isSuperAdmin: true,
         companyId: null,
         company: null,
         branchId: null,
@@ -50,15 +52,10 @@ describe("RbacService", () => {
                 deleteMany: jest.fn(),
                 createMany: jest.fn(),
             },
-            userRoleAssignment: {
-                findMany: jest.fn().mockResolvedValue([]),
-                upsert: jest.fn(),
-                deleteMany: jest.fn(),
-                createMany: jest.fn(),
-            },
             user: {
                 findMany: jest.fn().mockResolvedValue([]),
                 findUnique: jest.fn(),
+                count: jest.fn().mockResolvedValue(0),
             },
             $transaction: jest.fn().mockImplementation((ops: unknown[]) => Promise.all(ops)),
         };
@@ -68,20 +65,20 @@ describe("RbacService", () => {
     }
 
     describe("getEffectivePermissions", () => {
-        it("unions permissions across every Role assigned to the user, de-duplicated", async () => {
+        it("returns the user's Role's permission set", async () => {
             const {service, prisma} = build();
-            prisma.userRoleAssignment.findMany.mockResolvedValue([
-                {role: {permissions: [{permission: {key: "leads.view"}}, {permission: {key: "leads.create"}}]}},
-                {role: {permissions: [{permission: {key: "leads.view"}}, {permission: {key: "deals.view"}}]}},
-            ]);
+            prisma.user.findUnique.mockResolvedValue({
+                role: {permissions: [{permission: {key: "leads.view"}}, {permission: {key: "leads.create"}}]},
+            });
 
             const permissions = await service.getEffectivePermissions("user-1");
 
-            expect(permissions.sort()).toEqual(["deals.view", "leads.create", "leads.view"]);
+            expect(permissions.sort()).toEqual(["leads.create", "leads.view"]);
         });
 
-        it("returns an empty array for a user with no Role assignments", async () => {
-            const {service} = build();
+        it("returns an empty array when the user no longer exists", async () => {
+            const {service, prisma} = build();
+            prisma.user.findUnique.mockResolvedValue(null);
             await expect(service.getEffectivePermissions("user-1")).resolves.toEqual([]);
         });
     });
@@ -149,6 +146,36 @@ describe("RbacService", () => {
         });
     });
 
+    describe("deleteRole", () => {
+        it("refuses to delete a custom role that users still hold", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue({
+                id: "role-custom",
+                name: "Auditor",
+                isSystem: false,
+                companyId: "company-1",
+            });
+            prisma.user.count.mockResolvedValue(3);
+
+            await expect(service.deleteRole(companyAdmin, "role-custom")).rejects.toThrow(ConflictException);
+            expect(prisma.role.delete).not.toHaveBeenCalled();
+        });
+
+        it("deletes a custom role with no holders", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue({
+                id: "role-custom",
+                name: "Auditor",
+                isSystem: false,
+                companyId: "company-1",
+            });
+            prisma.user.count.mockResolvedValue(0);
+
+            await service.deleteRole(companyAdmin, "role-custom");
+            expect(prisma.role.delete).toHaveBeenCalledWith({where: {id: "role-custom"}});
+        });
+    });
+
     describe("tenant isolation", () => {
         const otherCompanysRole = {
             id: "role-other",
@@ -166,15 +193,6 @@ describe("RbacService", () => {
             ).rejects.toThrow(NotFoundException);
         });
 
-        it("refuses to assign a user outside the actor's company", async () => {
-            const {service, prisma} = build();
-            prisma.user.findUnique.mockResolvedValue({id: "user-2", companyId: "company-2"});
-
-            await expect(
-                service.assignRoleToUser(companyAdmin, "user-2", "role-1"),
-            ).rejects.toThrow(NotFoundException);
-        });
-
         it("lets a SUPER_ADMIN reach any company's role", async () => {
             const {service, prisma} = build();
             prisma.role.findUnique.mockResolvedValue(otherCompanysRole);
@@ -185,17 +203,17 @@ describe("RbacService", () => {
         });
     });
 
-    describe("listRoleUserIds", () => {
+    describe("listRoleMembers", () => {
         it("scopes a COMPANY_ADMIN's lookup to their own company's users", async () => {
             const {service, prisma} = build();
             prisma.role.findUnique.mockResolvedValue({id: "role-1", companyId: "company-1", isSystem: false});
-            prisma.userRoleAssignment.findMany.mockResolvedValue([{userId: "u1"}, {userId: "u2"}]);
+            prisma.user.findMany.mockResolvedValue([{id: "u1", fullName: "A", email: "a@crm.dev"}]);
 
-            await service.listRoleUserIds(companyAdmin, "role-1");
+            await service.listRoleMembers(companyAdmin, "role-1");
 
-            expect(prisma.userRoleAssignment.findMany).toHaveBeenCalledWith(
+            expect(prisma.user.findMany).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    where: expect.objectContaining({roleId: "role-1", user: {companyId: "company-1"}}),
+                    where: {roleId: "role-1", companyId: "company-1"},
                 }),
             );
         });

@@ -3,7 +3,6 @@ import {BadRequestException, ForbiddenException, Injectable, NotFoundException} 
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CLIENT_SORTABLE_FIELDS, QueryClientsDto} from "@/modules/clients/dto/query-clients.dto";
 import {ActivityAction, ActivityType, Prisma} from "@/generated/prisma/client";
-import {isBranchScopedRole} from "@/common/constants/branch-scope.constants";
 import {TransferBranchDto} from "@/common/dto/transfer-branch.dto";
 import {CreateClientDto} from "@/modules/clients/dto/create-client.dto";
 import {UpdateClientDto} from "@/modules/clients/dto/update-client.dto";
@@ -28,7 +27,7 @@ export class ClientsService {
         };
 
         // BR-B1 / BR-B3 — see leads.service.ts's findAll for the same pattern.
-        if (isBranchScopedRole(user.role)) {
+        if (user.isBranchScoped) {
             where.branchId = user.branchId;
         } else if (query.branchId) {
             where.branchId = query.branchId;
@@ -82,7 +81,7 @@ export class ClientsService {
                 id,
                 companyId: user.companyId,
                 deletedAt: null,
-                ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+                ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
             },
             include: {
                 leads: {
@@ -136,7 +135,7 @@ export class ClientsService {
         await this.ensurePhoneIsUniqueInsideCompany(dto.phone, user.companyId);
 
         // BR-B2: stamped from the actor, never trusted from the request body.
-        const branchId = isBranchScopedRole(user.role) ? user.branchId : null;
+        const branchId = user.isBranchScoped ? user.branchId : null;
 
         return this.prisma.client.create({
             data: {
@@ -186,7 +185,7 @@ export class ClientsService {
                 id,
                 companyId: user.companyId,
                 deletedAt: null,
-                ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+                ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
             },
         });
 

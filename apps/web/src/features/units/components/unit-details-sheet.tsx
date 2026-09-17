@@ -10,7 +10,7 @@ import {useUnit} from "@/features/units/hooks/use-unit.ts";
 import {paths} from "@/routes/paths.ts";
 import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 
 interface UnitDetailsSheetProps {
     unit: Unit | null;
@@ -37,10 +37,10 @@ export function UnitDetailsSheet({
     const unitDetailsQuery = useUnit(open ? unit?.id : undefined);
     const fullUnit = unitDetailsQuery.data ?? unit;
 
-    // Matches the API: editing a unit is COMPANY_ADMIN/SALES_HEAD, reserving
-    // one via a deal (POST /deals/reserve) excludes FINANCE.
-    const canEdit = user?.role === UserRole.COMPANY_ADMIN || user?.role === UserRole.SALES_HEAD;
-    const canBook = user?.role !== UserRole.FINANCE;
+    // Matches the API: editing a unit needs units.edit, reserving one via a
+    // deal (POST /deals/reserve) needs deals.create.
+    const canEdit = hasPermission(user, "units.edit");
+    const canBook = hasPermission(user, "deals.create");
 
     if (!unit || !floor) {
         return null;

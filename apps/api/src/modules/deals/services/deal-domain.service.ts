@@ -9,8 +9,8 @@ import {
     Prisma,
     Unit,
     UnitStatus,
-    UserRole,
 } from '@/generated/prisma/client';
+import {LEGACY_ROLE_NAMES} from '@/modules/rbac/legacy-role-names';
 
 import {
     ActiveDealExistsException,
@@ -82,12 +82,12 @@ export class DealDomainService {
      */
     requiresDiscountApproval(
         requestedPercent: Prisma.Decimal,
-        role: UserRole,
+        roleName: string,
         company: Pick<Company, 'salesManagerDiscountLimit' | 'salesHeadDiscountLimit'>,
     ): boolean {
-        if (role === UserRole.COMPANY_ADMIN) return false;
+        if (roleName === LEGACY_ROLE_NAMES.COMPANY_ADMIN) return false;
 
-        const limit = role === UserRole.SALES_HEAD
+        const limit = roleName === LEGACY_ROLE_NAMES.SALES_HEAD
             ? new Prisma.Decimal(company.salesHeadDiscountLimit)
             : new Prisma.Decimal(company.salesManagerDiscountLimit);
 
@@ -102,11 +102,11 @@ export class DealDomainService {
      */
     canDecideDiscount(
         requestedPercent: Prisma.Decimal,
-        role: UserRole,
+        roleName: string,
         company: Pick<Company, 'salesHeadDiscountLimit'>,
     ): boolean {
-        if (role === UserRole.COMPANY_ADMIN) return true;
-        if (role !== UserRole.SALES_HEAD) return false;
+        if (roleName === LEGACY_ROLE_NAMES.COMPANY_ADMIN) return true;
+        if (roleName !== LEGACY_ROLE_NAMES.SALES_HEAD) return false;
 
         return requestedPercent.lessThanOrEqualTo(new Prisma.Decimal(company.salesHeadDiscountLimit));
     }

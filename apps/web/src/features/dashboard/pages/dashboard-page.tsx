@@ -24,7 +24,7 @@ import {useProjectsFilter} from "@/features/projects/hooks/use-projects-filter.t
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 import {useTranslation} from "react-i18next";
 
 export function DashboardPage() {
@@ -38,13 +38,13 @@ export function DashboardPage() {
         projectId,
         branchId === "all" ? undefined : branchId,
     );
-    const isCompanyAdmin = user?.role === UserRole.COMPANY_ADMIN;
-    const branchComparison = useBranchComparison(isCompanyAdmin);
-    const isSalesHead = user?.role === UserRole.SALES_HEAD;
-    const teamSnapshot = useTeamSnapshot(isSalesHead);
-    const isSalesManager = user?.role === UserRole.SALES_MANAGER;
-    const myWorkToday = useMyWorkToday(isSalesManager);
-    const myPerformance = useMyPerformance(isSalesManager);
+    const canViewBranchComparison = hasPermission(user, "dashboard.branch_comparison");
+    const branchComparison = useBranchComparison(canViewBranchComparison);
+    const canViewTeamSnapshot = hasPermission(user, "dashboard.team_snapshot");
+    const teamSnapshot = useTeamSnapshot(canViewTeamSnapshot);
+    const canViewMyPerformance = hasPermission(user, "dashboard.my_performance");
+    const myWorkToday = useMyWorkToday(canViewMyPerformance);
+    const myPerformance = useMyPerformance(canViewMyPerformance);
 
     const projectCollection = createListCollection({
         items: [{ label: t("allProjects"), value: "all" }, ...projects.data.map((p) => ({ label: p.name, value: p.id }))],
@@ -122,10 +122,10 @@ export function DashboardPage() {
                 <RecentActivityCard activities={recentActivity.data ?? []} />
             </div>
 
-            {isCompanyAdmin ? <BranchComparisonChart data={branchComparison.data ?? []} /> : null}
-            {isSalesHead ? <TeamSnapshotCard data={teamSnapshot.data ?? []} /> : null}
-            {isSalesManager && myWorkToday.data ? <MyWorkTodayCard data={myWorkToday.data} /> : null}
-            {isSalesManager && myPerformance.data ? <MyPerformanceCard data={myPerformance.data} /> : null}
+            {canViewBranchComparison ? <BranchComparisonChart data={branchComparison.data ?? []} /> : null}
+            {canViewTeamSnapshot ? <TeamSnapshotCard data={teamSnapshot.data ?? []} /> : null}
+            {canViewMyPerformance && myWorkToday.data ? <MyWorkTodayCard data={myWorkToday.data} /> : null}
+            {canViewMyPerformance && myPerformance.data ? <MyPerformanceCard data={myPerformance.data} /> : null}
         </div>
     );
 }

@@ -9,7 +9,7 @@ import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
 import type {Block} from "@/features/blocks/types/block.types.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 
 interface AddEntranceButtonProps {
     block: Block;
@@ -43,7 +43,7 @@ export function AddEntranceButton({ block }: AddEntranceButtonProps) {
         ) + 1;
 
     // Creating an entrance is COMPANY_ADMIN only (POST /blocks/:id/entrances).
-    if (user?.role !== UserRole.COMPANY_ADMIN) {
+    if (!hasPermission(user, "inventory.manage")) {
         return null;
     }
 

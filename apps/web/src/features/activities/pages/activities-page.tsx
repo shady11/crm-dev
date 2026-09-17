@@ -11,19 +11,18 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {Input} from "@/components/ui/input.tsx";
 import {formatDate} from "@/utils/date-formatter";
 import {useAuth} from "@/features/auth/hooks/use-auth";
-import {UserRole} from "@/features/users/types/user.types";
 import {getBranches} from "@/features/branches/api/branches.api";
 import {getActivities} from "../api/activities.api";
 
-// Company-wide activity feed. COMPANY_ADMIN sees every company user's
-// activity; SALES_HEAD/SALES_MANAGER only see their own branch's — the
-// branch filter below is admin-only (BR-B3-style narrowing), mirroring the
-// same pattern used on the leads and clients list pages. The server enforces
-// this regardless of what's sent from here.
+// Company-wide activity feed. A company-wide (non-branch-scoped) role sees
+// every company user's activity; a branch-scoped role only sees their own
+// branch's — the branch filter below is admin-only (BR-B3-style narrowing),
+// mirroring the same pattern used on the leads and clients list pages. The
+// server enforces this regardless of what's sent from here.
 export function ActivitiesPage() {
     const {t, i18n} = useTranslation("activities");
     const {user} = useAuth();
-    const isCompanyAdmin = user?.role === UserRole.COMPANY_ADMIN;
+    const isCompanyWide = !!user && !user.isBranchScoped;
 
     const [branchId, setBranchId] = useState("");
     const [dateFrom, setDateFrom] = useState("");
@@ -34,14 +33,14 @@ export function ActivitiesPage() {
     const branchesQuery = useQuery({
         queryKey: ["branches", "all"],
         queryFn: () => getBranches({limit: 100}),
-        enabled: isCompanyAdmin,
+        enabled: isCompanyWide,
     });
 
     const activitiesQuery = useQuery({
         queryKey: ["activities", {branchId, dateFrom, dateTo, page}],
         queryFn: () =>
             getActivities({
-                branchId: isCompanyAdmin && branchId ? branchId : undefined,
+                branchId: isCompanyWide && branchId ? branchId : undefined,
                 dateFrom: dateFrom || undefined,
                 dateTo: dateTo || undefined,
                 page,
@@ -64,12 +63,12 @@ export function ActivitiesPage() {
             <div>
                 <h2 className="text-2xl font-medium tracking-tight">{t("page.heading")}</h2>
                 <p className="text-muted-foreground text-sm">
-                    {isCompanyAdmin ? t("page.descriptionCompanyAdmin") : t("page.descriptionBranchScoped")}
+                    {isCompanyWide ? t("page.descriptionCompanyAdmin") : t("page.descriptionBranchScoped")}
                 </p>
             </div>
 
             <div className="flex flex-wrap items-end gap-3">
-                {isCompanyAdmin ? (
+                {isCompanyWide ? (
                     <label className="block space-y-1.5">
                         <span className="text-sm font-medium">{t("page.filters.branch")}</span>
                         <Select

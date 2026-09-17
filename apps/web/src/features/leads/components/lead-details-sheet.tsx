@@ -7,7 +7,7 @@ import {LeadOverview} from "@/features/leads/components/lead-overview.tsx";
 import {LeadClientTab} from "@/features/leads/components/lead-client-tab.tsx";
 import {LeadActivityTab} from "@/features/leads/components/lead-activity-tab.tsx";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {LEGACY_ROLE_NAMES} from "@/lib/legacy-role-names";
 import {useTranslation} from "react-i18next";
 
 interface LeadDetailsSheetProps {
@@ -33,10 +33,10 @@ export function LeadDetailsSheet({
                                   }: LeadDetailsSheetProps) {
     const { t } = useTranslation("leads");
     const { user } = useAuth();
-    const isCompanyAdmin = user?.role === UserRole.COMPANY_ADMIN;
-    // SH-A1: reassignment is a team-lead action — SALES_HEAD only, not
-    // SALES_MANAGER (who already has a general edit form for their own leads).
-    const isSalesHead = user?.role === UserRole.SALES_HEAD;
+    const isCompanyAdmin = user?.roleName === LEGACY_ROLE_NAMES.COMPANY_ADMIN;
+    // SH-A1: reassignment is a team-lead action — Sales Head only, not
+    // Sales Manager (who already has a general edit form for their own leads).
+    const isSalesHead = user?.roleName === LEGACY_ROLE_NAMES.SALES_HEAD;
 
     if (!lead) {
         return null;

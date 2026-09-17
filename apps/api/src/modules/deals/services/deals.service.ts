@@ -11,10 +11,10 @@ import {
   PaymentType,
   Prisma,
   UnitStatus,
-  UserRole,
 } from '@/generated/prisma/client';
 import {PrismaService} from '@/database/prisma.service';
-import {isBranchScopedRole} from '@/common/constants/branch-scope.constants';
+import {RbacService} from '@/modules/rbac/rbac.service';
+import {LEGACY_ROLE_NAMES} from '@/modules/rbac/legacy-role-names';
 
 import {
   ClientNotFoundException,
@@ -56,6 +56,7 @@ export class DealsService {
       private readonly notifications: NotificationsService,
       private readonly dealNumberService: DealNumberService,
       private readonly documentGeneration: DocumentGenerationService,
+      private readonly rbacService: RbacService,
   ) {}
 
   /**
@@ -121,7 +122,7 @@ export class DealsService {
     };
 
     // BR-B1 / BR-B3 — see leads.service.ts's findAll for the same pattern.
-    if (isBranchScopedRole(user.role)) {
+    if (user.isBranchScoped) {
       where.branchId = user.branchId;
     } else if (query.branchId) {
       where.branchId = query.branchId;
@@ -143,7 +144,7 @@ export class DealsService {
         take: limit,
         include: {
           client: true,
-          manager: true,
+          manager: { include: { role: true } },
           project: true,
           unit: {
             include: { block: true, entrance: true, floor: true },
@@ -255,7 +256,7 @@ export class DealsService {
       const company = await db.company.findUniqueOrThrow({where: {id: companyId}});
 
       const requiresApproval = computedDiscountAmount.greaterThan(0) &&
-          this.domain.requiresDiscountApproval(effectiveDiscountPercent, user.role, company);
+          this.domain.requiresDiscountApproval(effectiveDiscountPercent, user.roleName, company);
 
       const dealNumber = await this.dealNumberService.generateDealNumber(db, companyId);
 
@@ -357,13 +358,13 @@ export class DealsService {
         // asked — a request within the sales head's own band goes to the
         // branch's sales head(s); above it, straight to company admin(s).
         const salesHeadCanDecide = this.domain.canDecideDiscount(
-            effectiveDiscountPercent, UserRole.SALES_HEAD, company,
+            effectiveDiscountPercent, LEGACY_ROLE_NAMES.SALES_HEAD, company,
         );
 
         const approvers = await db.user.findMany({
           where: salesHeadCanDecide
-              ? {companyId, branchId: client.branchId, role: UserRole.SALES_HEAD, isActive: true}
-              : {companyId, role: UserRole.COMPANY_ADMIN, isActive: true},
+              ? {companyId, branchId: client.branchId, roleId: await this.rbacService.getSystemRoleId(LEGACY_ROLE_NAMES.SALES_HEAD), isActive: true}
+              : {companyId, roleId: await this.rbacService.getSystemRoleId(LEGACY_ROLE_NAMES.COMPANY_ADMIN), isActive: true},
           select: {id: true},
         });
 
@@ -411,7 +412,7 @@ export class DealsService {
         where: {
           id,
           companyId,
-          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+          ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
         },
       });
       if (!deal) throw new DealNotFoundException(id);
@@ -448,7 +449,7 @@ export class DealsService {
         where: {
           id,
           companyId,
-          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+          ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
         },
       });
       if (!deal) throw new DealNotFoundException(id);
@@ -509,7 +510,7 @@ export class DealsService {
         where: {
           id,
           companyId,
-          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+          ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
         },
       });
       if (!deal) throw new DealNotFoundException(id);
@@ -559,7 +560,7 @@ export class DealsService {
       const deal = await db.deal.findFirst({
         where: {
           id, companyId,
-          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+          ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
         },
       });
       if (!deal) throw new DealNotFoundException(id);
@@ -570,7 +571,7 @@ export class DealsService {
 
       const company = await db.company.findUniqueOrThrow({ where: { id: companyId } });
 
-      if (!this.domain.canDecideDiscount(deal.requestedDiscountPercent, user.role, company)) {
+      if (!this.domain.canDecideDiscount(deal.requestedDiscountPercent, user.roleName, company)) {
         throw new DiscountApprovalNotAllowedException();
       }
 
@@ -626,7 +627,7 @@ export class DealsService {
       const deal = await db.deal.findFirst({
         where: {
           id, companyId,
-          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+          ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
         },
       });
       if (!deal) throw new DealNotFoundException(id);
@@ -637,7 +638,7 @@ export class DealsService {
 
       const company = await db.company.findUniqueOrThrow({ where: { id: companyId } });
 
-      if (!this.domain.canDecideDiscount(deal.requestedDiscountPercent, user.role, company)) {
+      if (!this.domain.canDecideDiscount(deal.requestedDiscountPercent, user.roleName, company)) {
         throw new DiscountApprovalNotAllowedException();
       }
 
@@ -693,7 +694,7 @@ export class DealsService {
         where: {
           id,
           companyId,
-          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+          ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
         },
       });
       if (!deal) throw new DealNotFoundException(id);
@@ -707,7 +708,7 @@ export class DealsService {
           id: dto.managerId,
           companyId,
           branchId: deal.branchId,
-          role: UserRole.SALES_MANAGER,
+          roleId: await this.rbacService.getSystemRoleId(LEGACY_ROLE_NAMES.SALES_MANAGER),
           isActive: true,
         },
       });
@@ -747,7 +748,7 @@ export class DealsService {
         where: {
           id,
           companyId,
-          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+          ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
         },
       });
       if (!deal) throw new DealNotFoundException(id);
@@ -825,7 +826,7 @@ export class DealsService {
       where: {
         id: dealId,
         companyId: user.companyId,
-        ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+        ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
       },
     });
     if (!deal) {
@@ -899,7 +900,7 @@ export class DealsService {
       where: {
         id,
         companyId: user.companyId,
-        ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+        ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
       },
       include: DEAL_DETAILS_INCLUDE,
     });
@@ -922,7 +923,7 @@ export class DealsService {
         {
           id,
           companyId: user.companyId,
-          ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+          ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
         },
         new ClientNotFoundException(id),
     );
@@ -937,7 +938,7 @@ export class DealsService {
       where: {
         id: managerId,
         companyId: user.companyId,
-        ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+        ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
       },
     });
   }
@@ -990,7 +991,7 @@ export class DealsService {
 
     const where: Prisma.DealWhereInput = { companyId: user.companyId, projectId };
 
-    if (isBranchScopedRole(user.role)) {
+    if (user.isBranchScoped) {
       where.branchId = user.branchId;
     } else if (branchId) {
       where.branchId = branchId;

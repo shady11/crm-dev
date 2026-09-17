@@ -2,7 +2,6 @@ import {BadRequestException, ForbiddenException, Injectable} from "@nestjs/commo
 import {NotificationEntityType, NotificationType, Prisma, TaskStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
-import {isBranchScopedRole} from "@/common/constants/branch-scope.constants";
 import {CreateTaskDto} from "./dto/create-task.dto";
 import {UpdateTaskDto} from "./dto/update-task.dto";
 import {UpdateTaskStatusDto} from "./dto/update-task-status.dto";
@@ -45,7 +44,7 @@ export class TasksService {
         };
 
         // BR-B1 / BR-B3 — see leads.service.ts's findAll for the same pattern.
-        if (isBranchScopedRole(user.role)) {
+        if (user.isBranchScoped) {
             where.branchId = user.branchId;
         } else if (query.branchId) {
             where.branchId = query.branchId;
@@ -92,7 +91,7 @@ export class TasksService {
                 id,
                 companyId: user.companyId,
                 deletedAt: null,
-                ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+                ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
             },
             include: TASK_INCLUDE,
         });
@@ -230,7 +229,7 @@ export class TasksService {
 
         const where: Prisma.TaskWhereInput = { companyId: user.companyId, deletedAt: null };
 
-        if (isBranchScopedRole(user.role)) {
+        if (user.isBranchScoped) {
             where.branchId = user.branchId;
         } else if (branchId) {
             where.branchId = branchId;
@@ -264,7 +263,7 @@ export class TasksService {
             where: {
                 id: assignedToId,
                 companyId: user.companyId,
-                ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+                ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
             },
         });
 

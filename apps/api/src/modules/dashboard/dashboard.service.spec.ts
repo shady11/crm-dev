@@ -1,6 +1,6 @@
 import {ForbiddenException} from '@nestjs/common';
 import * as XLSX from 'xlsx';
-import {DealStatus, LeadStatus, UnitStatus, UserRole} from '@/generated/prisma/client';
+import {DealStatus, LeadStatus, UnitStatus} from '@/generated/prisma/client';
 import {AuthUser} from '@/common/types/auth-user.type';
 import {DashboardService} from './dashboard.service';
 
@@ -17,7 +17,9 @@ describe('DashboardService', () => {
         id: 'manager-1',
         email: 'manager@crm.dev',
         name: 'Manager',
-        role: UserRole.SALES_MANAGER,
+        roleId: 'role-sales-manager',
+        roleName: 'Sales Manager',
+        isBranchScoped: true,
         companyId: 'company-1',
         company: null,
         branchId: 'branch-1',
@@ -27,11 +29,13 @@ describe('DashboardService', () => {
     const adminUser: AuthUser = {
         ...branchUser,
         id: 'admin-1',
-        role: UserRole.COMPANY_ADMIN,
+        roleId: 'role-company-admin',
+        roleName: 'Company Admin',
+        isBranchScoped: false,
         branchId: null,
     };
 
-    const salesHeadUser: AuthUser = {...branchUser, id: 'head-1', role: UserRole.SALES_HEAD};
+    const salesHeadUser: AuthUser = {...branchUser, id: 'head-1', roleId: 'role-sales-head', roleName: 'Sales Head'};
 
     function build() {
         const prisma = {
@@ -52,7 +56,8 @@ describe('DashboardService', () => {
             lead: {count: jest.fn().mockResolvedValue(0), findMany: jest.fn().mockResolvedValue([]), groupBy: jest.fn().mockResolvedValue([])},
         };
 
-        const service = new DashboardService(prisma as any);
+        const rbacService = {getSystemRoleId: jest.fn().mockResolvedValue('role-sales-manager')};
+        const service = new DashboardService(prisma as any, rbacService as any);
         return {service, prisma};
     }
 

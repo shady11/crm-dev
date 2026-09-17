@@ -11,6 +11,7 @@ export type Role = {
     name: string;
     description: string | null;
     isSystem: boolean;
+    isBranchScoped: boolean;
     companyId: string | null;
     userCount: number;
     /** Up to 4 users holding this role, for the card grid's avatar preview. */
@@ -20,7 +21,8 @@ export type Role = {
     updatedAt: string;
 };
 
-export type UserRolesResponse = {
-    roles: {id: string; name: string; isSystem: boolean; companyId: string | null}[];
-    permissions: string[];
+export type RoleMember = {
+    id: string;
+    fullName: string;
+    email: string;
 };

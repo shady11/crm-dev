@@ -25,14 +25,14 @@ import {EntityDocumentsCard} from "@/features/documents/components/entity-docume
 import {WhatsAppLink} from "@/components/shared/whatsapp-link.tsx";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 import {MoveToBranchDialog} from "@/features/branches/components/move-to-branch-dialog.tsx";
 
 export function ClientDetailsPage() {
     const { t, i18n } = useTranslation(["clients", "deals", "leads", "common", "branches"]);
     const { formatCurrency } = useCompanyFormatters();
     const { user } = useAuth();
-    const isCompanyAdmin = user?.role === UserRole.COMPANY_ADMIN;
+    const canTransferBranch = hasPermission(user, "clients.transfer_branch");
     const { clientId } = useParams<{ clientId: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -89,7 +89,7 @@ export function ClientDetailsPage() {
                             <ArrowLeft className="size-3"/>
                             {t("actions.back", { ns: "common" })}
                         </Button>
-                        {isCompanyAdmin && (
+                        {canTransferBranch && (
                             <Button variant="secondary" onClick={() => setTransferOpen(true)}>
                                 <ArrowLeftRight className="size-3" />
                                 {t("moveDialog.title", { ns: "branches" })}

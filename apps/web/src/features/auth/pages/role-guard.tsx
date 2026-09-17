@@ -1,13 +1,12 @@
 import {Navigate, Outlet} from "react-router-dom";
 import {useAuth} from "@/features/auth/hooks/use-auth";
-import {landingPathFor} from "@/features/auth/access";
-import type {UserRole} from "@/features/users/types/user.types";
+import {canAccess, landingPathFor, type Feature} from "@/features/auth/access";
 
-export function RoleGuard({ allow }: { allow: UserRole[] }) {
+export function RoleGuard({ feature }: { feature: Feature }) {
     const { user } = useAuth();
 
-    if (!user || !allow.includes(user.role)) {
-        return <Navigate to={landingPathFor(user?.role)} replace />;
+    if (!canAccess(user, feature)) {
+        return <Navigate to={landingPathFor(user)} replace />;
     }
 
     return <Outlet />;

@@ -1,5 +1,4 @@
-import {IsEmail, IsEnum, IsOptional, IsString, IsStrongPassword, IsUUID, MinLength} from "class-validator";
-import {UserRole} from "@/generated/prisma/enums";
+import {IsEmail, IsOptional, IsString, IsStrongPassword, IsUUID, MinLength} from "class-validator";
 import {STRONG_PASSWORD_OPTIONS} from "@/common/constants/password-policy.constants";
 
 export class CreateUserDto {
@@ -20,12 +19,15 @@ export class CreateUserDto {
     })
     password!: string;
 
-    @IsEnum(UserRole)
-    role!: UserRole;
+    // A Role id from GET /rbac/roles (a system role, or one of the actor's
+    // own company's custom roles) — validated against that visible set in
+    // UsersService, not here.
+    @IsUUID()
+    roleId!: string;
 
-    // Required for branch-scoped roles (SALES_HEAD, SALES_MANAGER); must be
-    // absent for company-wide roles — enforced in UsersService, not here,
-    // since the rule depends on the role field.
+    // Required when the chosen Role is branch-scoped (Role.isBranchScoped);
+    // must be absent otherwise — enforced in UsersService, not here, since
+    // the rule depends on which role was picked.
     @IsOptional()
     @IsUUID()
     branchId?: string;

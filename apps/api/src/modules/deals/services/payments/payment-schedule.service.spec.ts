@@ -1,5 +1,5 @@
 import {BadRequestException} from '@nestjs/common';
-import {DealStatus, PaymentScheduleStatus, Prisma, UserRole} from '@/generated/prisma/client';
+import {DealStatus, PaymentScheduleStatus, Prisma} from '@/generated/prisma/client';
 import {PaymentScheduleService} from './payment-schedule.service';
 import {DealDomainService} from '../deal-domain.service';
 import {DealNotFoundException, PaymentScheduleAlreadyGeneratedException} from '../../exceptions';
@@ -15,7 +15,8 @@ import {DealNotFoundException, PaymentScheduleAlreadyGeneratedException} from '.
 describe('PaymentScheduleService.generate', () => {
     const user = {
         id: 'user-1',
-        role: UserRole.COMPANY_ADMIN,
+        roleId: 'role-company-admin',
+        roleName: 'Company Admin',
         companyId: 'company-1',
         branchId: null,
     } as any;
@@ -124,7 +125,7 @@ describe('PaymentScheduleService.generate', () => {
     });
 
     it('scopes the deal lookup to the requesting branch for branch-scoped roles', async () => {
-        const branchUser = {id: 'u2', role: UserRole.SALES_MANAGER, companyId: 'company-1', branchId: 'branch-9'} as any;
+        const branchUser = {id: 'u2', roleId: 'role-sales-manager', roleName: 'Sales Manager', isBranchScoped: true, companyId: 'company-1', branchId: 'branch-9'} as any;
         const {service, prisma} = build({status: DealStatus.ACTIVE, salePrice: new Prisma.Decimal(300)}, 0);
         await service.generate(branchUser, 'deal-1', dto({installments: 1}));
 

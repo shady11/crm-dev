@@ -1,5 +1,5 @@
 import {api} from "@/lib/api";
-import type {Permission, Role, UserRolesResponse} from "../types/rbac.types";
+import type {Permission, Role, RoleMember} from "../types/rbac.types";
 
 export async function getPermissions() {
     const response = await api.get<Permission[]>("/rbac/permissions");
@@ -34,26 +34,11 @@ export async function setRolePermissions(id: string, permissionKeys: string[]) {
     return response.data;
 }
 
-export async function getRoleUserIds(id: string) {
-    const response = await api.get<string[]>(`/rbac/roles/${id}/users`);
+export async function getRoleMembers(id: string) {
+    const response = await api.get<RoleMember[]>(`/rbac/roles/${id}/members`);
     return response.data;
 }
 
 export async function deleteRole(id: string) {
     await api.delete(`/rbac/roles/${id}`);
-}
-
-export async function getUserRoles(userId: string) {
-    const response = await api.get<UserRolesResponse>(`/rbac/users/${userId}/roles`);
-    return response.data;
-}
-
-export async function assignRoleToUser(userId: string, roleId: string) {
-    const response = await api.post<UserRolesResponse>(`/rbac/users/${userId}/roles/${roleId}`);
-    return response.data;
-}
-
-export async function revokeRoleFromUser(userId: string, roleId: string) {
-    const response = await api.delete<UserRolesResponse>(`/rbac/users/${userId}/roles/${roleId}`);
-    return response.data;
 }

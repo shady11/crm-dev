@@ -1,5 +1,5 @@
 import {BadRequestException, ForbiddenException} from '@nestjs/common';
-import {TaskStatus, UserRole} from '@/generated/prisma/client';
+import {TaskStatus} from '@/generated/prisma/client';
 import {AuthUser} from '@/common/types/auth-user.type';
 import {TasksService} from './tasks.service';
 import {TaskNotFoundException} from './exceptions/task-not-found.exception';
@@ -16,7 +16,9 @@ describe('TasksService', () => {
         id: 'user-1',
         email: 'manager@crm.dev',
         name: 'Manager',
-        role: UserRole.SALES_MANAGER,
+        roleId: 'role-sales-manager',
+        roleName: 'Sales Manager',
+        isBranchScoped: true,
         companyId: 'company-1',
         company: null,
         branchId: 'branch-1',
@@ -26,7 +28,9 @@ describe('TasksService', () => {
     const adminUser: AuthUser = {
         ...branchUser,
         id: 'admin-1',
-        role: UserRole.COMPANY_ADMIN,
+        roleId: 'role-company-admin',
+        roleName: 'Company Admin',
+        isBranchScoped: false,
         branchId: null,
     };
 

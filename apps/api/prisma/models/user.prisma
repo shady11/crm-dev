@@ -1,11 +1,3 @@
-enum UserRole {
-  SUPER_ADMIN
-  COMPANY_ADMIN
-  SALES_MANAGER
-  SALES_HEAD
-  FINANCE
-}
-
 model User {
   id String @id @default(uuid())
 
@@ -13,9 +5,21 @@ model User {
   email             String   @unique
   phone             String?
   passwordHash      String
-  role              UserRole
   isActive          Boolean  @default(true)
   sessionsValidFrom DateTime @default(now())
+
+  // The platform operator flag. Independent of the Role/permission system
+  // entirely (see PermissionsGuard's unconditional bypass) rather than a
+  // seeded "Super Admin" Role being special-cased by name — SUPER_ADMIN
+  // belongs to no company and no Role can be meaningfully scoped to it.
+  isSuperAdmin Boolean @default(false)
+
+  // Every user has exactly one Role, dynamic rather than a fixed enum — see
+  // prisma/models/rbac.prisma. RESTRICT on delete: a Role that's still
+  // someone's role cannot be deleted (RbacService.deleteRole checks this
+  // itself first, for a friendlier error than the FK violation).
+  roleId String
+  role   Role   @relation("UserPrimaryRole", fields: [roleId], references: [id], onDelete: Restrict)
 
   // Account lockout: incremented on each failed login, reset on success.
   // Once it reaches LOGIN_LOCKOUT_THRESHOLD, lockedUntil is set and login is
@@ -32,8 +36,8 @@ model User {
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
 
-  // Required for branch-scoped roles (SALES_HEAD, SALES_MANAGER); left null
-  // for company-wide roles (COMPANY_ADMIN, FINANCE) and SUPER_ADMIN.
+  // Required when the assigned Role is branch-scoped (Role.isBranchScoped);
+  // left null for company-wide roles and SUPER_ADMIN.
   branchId String?
   branch   Branch? @relation(fields: [branchId], references: [id])
 
@@ -59,7 +63,6 @@ model User {
   impersonationsStarted  ImpersonationSession[] @relation("ImpersonationsStarted")
   impersonationsReceived ImpersonationSession[] @relation("ImpersonationsReceived")
 
-  roleAssignments UserRoleAssignment[]
-
   @@index([companyId, branchId])
+  @@index([roleId])
 }

@@ -45,11 +45,9 @@
   },
   "usersDialog": {
     "title": "Users with the \"{{name}}\" role",
-    "description": "Check a user to grant this role, uncheck to revoke it. Takes effect on their next request.",
+    "description": "To move a user to a different role, edit them from the Users page.",
     "searchPlaceholder": "Search users...",
-    "toasts": {
-      "error": "Could not update this user's role"
-    }
+    "empty": "No users have this role yet."
   },
   "confirmDialog": {
     "delete": {

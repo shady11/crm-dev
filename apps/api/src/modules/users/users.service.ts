@@ -6,12 +6,12 @@ import {
     NotFoundException,
 } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
-import {Prisma, UserRole} from "@/generated/prisma/client";
+import {Prisma} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 import {OPEN_LEAD_STATUSES} from "@/modules/leads/lead.constants";
-import {isBranchScopedRole} from "@/common/constants/branch-scope.constants";
+import {LEGACY_ROLE_NAMES} from "@/modules/rbac/legacy-role-names";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UpdateUserDto} from "./dto/update-user.dto";
 import {UpdateUserPasswordDto} from "./dto/update-user-password.dto";
@@ -19,14 +19,16 @@ import {DeactivateUserDto} from "./dto/deactivate-user.dto";
 import {TransferUserBranchDto} from "./dto/transfer-user-branch.dto";
 import {QueryUsersDto, USER_SORTABLE_FIELDS} from "./dto/query-users.dto";
 import {resolveOrderBy} from "@/common/utils/sort.util";
-import {canActorSeeRole, getManageableRoles} from "@/modules/users/users.constants";
+import {canActorSeeUser} from "@/modules/users/users.constants";
 
 const USER_SAFE_SELECT = {
     id: true,
     fullName: true,
     email: true,
     phone: true,
-    role: true,
+    roleId: true,
+    role: {select: {id: true, name: true, isBranchScoped: true}},
+    isSuperAdmin: true,
     isActive: true,
     companyId: true,
     branchId: true,
@@ -50,22 +52,18 @@ export class UsersService {
         const limit = query.limit ?? 20;
         const skip = (page - 1) * limit;
 
-        const manageableRoles = getManageableRoles(user.role);
-
         const where: Prisma.UserWhereInput = {
             companyId: user.companyId,
             deletedAt: null,
             isActive: query.isActive ?? true,
-            // Without this a COMPANY_ADMIN can enumerate SUPER_ADMIN accounts,
-            // which findOne() already refuses to return.
-            role: { in: manageableRoles },
+            // Without this a COMPANY_ADMIN could enumerate a SUPER_ADMIN
+            // account (a data anomaly — SUPER_ADMIN never has a companyId —
+            // but worth guarding explicitly rather than trusting that).
+            isSuperAdmin: user.isSuperAdmin ? undefined : false,
         };
 
-        if (query.role) {
-            if (!manageableRoles.includes(query.role)) {
-                throw new ForbiddenException("You cannot view users with this role");
-            }
-            where.role = query.role;
+        if (query.roleId) {
+            where.roleId = query.roleId;
         }
 
         if (query.search) {
@@ -95,7 +93,8 @@ export class UsersService {
                     fullName: true,
                     email: true,
                     phone: true,
-                    role: true,
+                    roleId: true,
+                    role: {select: {id: true, name: true, isBranchScoped: true}},
                     isActive: true,
                     branchId: true,
                     branch: {
@@ -128,7 +127,7 @@ export class UsersService {
             select: USER_SAFE_SELECT,
         });
 
-        if (!target || !canActorSeeRole(user.role, target.role)) {
+        if (!target || !canActorSeeUser(user, target)) {
             throw new NotFoundException("User not found");
         }
 
@@ -140,11 +139,11 @@ export class UsersService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        this.ensureCanAssignRole(user, dto.role);
+        const role = await this.ensureCanAssignRole(user, dto.roleId);
 
         await this.ensureEmailIsUnique(dto.email);
 
-        await this.ensureBranchAssignmentValid(user.companyId, dto.role, dto.branchId);
+        await this.ensureBranchAssignmentValid(user.companyId, role, dto.branchId);
 
         const passwordHash = await bcrypt.hash(dto.password, 10);
 
@@ -154,7 +153,7 @@ export class UsersService {
                 email: dto.email,
                 phone: dto.phone,
                 passwordHash,
-                role: dto.role,
+                roleId: dto.roleId,
                 companyId: user.companyId,
                 branchId: dto.branchId,
             },
@@ -169,8 +168,8 @@ export class UsersService {
 
         const target = await this.getManageableTargetOrThrow(user, id);
 
-        if (dto.role !== undefined) {
-            this.ensureCanAssignRole(user, dto.role);
+        if (dto.roleId !== undefined) {
+            await this.ensureCanAssignRole(user, dto.roleId);
         }
 
         if (dto.email && dto.email !== target.email) {
@@ -181,13 +180,17 @@ export class UsersService {
             throw new BadRequestException("You cannot deactivate your own account");
         }
 
-        if (dto.role !== undefined || dto.branchId !== undefined) {
-            const effectiveRole = dto.role ?? target.role;
+        if (dto.roleId !== undefined || dto.branchId !== undefined) {
+            const effectiveRoleId = dto.roleId ?? target.roleId;
             const effectiveBranchId = dto.branchId !== undefined ? dto.branchId : target.branchId;
+            const effectiveRole = await this.prisma.role.findUniqueOrThrow({
+                where: { id: effectiveRoleId },
+                select: { isBranchScoped: true },
+            });
             await this.ensureBranchAssignmentValid(user.companyId, effectiveRole, effectiveBranchId);
         }
 
-        const rolesChanged = dto.role !== undefined && dto.role !== target.role;
+        const roleChanged = dto.roleId !== undefined && dto.roleId !== target.roleId;
         const beingDeactivated = dto.isActive === false && target.isActive === true;
 
         return this.prisma.user.update({
@@ -196,10 +199,10 @@ export class UsersService {
                 fullName: dto.fullName,
                 email: dto.email,
                 phone: dto.phone,
-                role: dto.role,
+                roleId: dto.roleId,
                 branchId: dto.branchId,
                 isActive: dto.isActive,
-                ...(rolesChanged || beingDeactivated ? { sessionsValidFrom: new Date() } : {}),
+                ...(roleChanged || beingDeactivated ? { sessionsValidFrom: new Date() } : {}),
             },
             select: USER_SAFE_SELECT,
         });
@@ -256,7 +259,7 @@ export class UsersService {
 
         const target = await this.getManageableTargetOrThrow(user, id);
 
-        if (!isBranchScopedRole(target.role)) {
+        if (!target.role.isBranchScoped) {
             throw new BadRequestException("This user's role is not branch-scoped");
         }
 
@@ -460,14 +463,14 @@ export class UsersService {
     async findByEmail(email: string) {
         return this.prisma.user.findUnique({
             where: { email },
-            include: { company: true, branch: true },
+            include: { company: true, branch: true, role: true },
         });
     }
 
     async findById(id: string) {
         const user = await this.prisma.user.findUnique({
             where: { id },
-            include: { company: true, branch: true },
+            include: { company: true, branch: true, role: true },
         });
 
         if (!user) {
@@ -482,20 +485,22 @@ export class UsersService {
      *
      * Three conditions, all of which were missing from update(),
      * updatePassword(), revokeSessions() and remove(): the target must be in
-     * the actor's company, must not already be soft-deleted, and must hold a
-     * role the actor may manage. Without the last one a COMPANY_ADMIN could
-     * reset a SUPER_ADMIN's password or delete the account outright.
+     * the actor's company, must not already be soft-deleted, and must not be
+     * a SUPER_ADMIN the actor cannot see. Without the last one a
+     * COMPANY_ADMIN could reset a SUPER_ADMIN's password or delete the
+     * account outright.
      *
-     * Returns 404 rather than 403 for a role the actor may not see, matching
-     * findOne() — a company admin should not be able to discover that a
-     * SUPER_ADMIN exists by probing ids.
+     * Returns 404 rather than 403 for a target the actor may not see,
+     * matching findOne() — a company admin should not be able to discover
+     * that a SUPER_ADMIN exists by probing ids.
      */
     private async getManageableTargetOrThrow(actor: AuthUser, id: string) {
         const target = await this.prisma.user.findFirst({
             where: { id, companyId: actor.companyId, deletedAt: null },
+            select: USER_SAFE_SELECT,
         });
 
-        if (!target || !canActorSeeRole(actor.role, target.role)) {
+        if (!target || !canActorSeeUser(actor, target)) {
             throw new NotFoundException("User not found");
         }
 
@@ -503,31 +508,47 @@ export class UsersService {
     }
 
     /**
-     * A user can never grant a role they could not otherwise manage. This is
-     * what stops a COMPANY_ADMIN creating a SUPER_ADMIN, or promoting a second
-     * account of their own to one.
+     * A Role can only be assigned if it's visible to the actor (a system
+     * role, or one of their own company's custom roles), and the "Super
+     * Admin" system role can never be assigned here at all — reserved for
+     * `prisma/provision-super-admin.ts`, since a user created through this
+     * (company-scoped) flow always gets a companyId, and SUPER_ADMIN never
+     * has one.
      */
-    private ensureCanAssignRole(actor: AuthUser, role: UserRole) {
-        if (!canActorSeeRole(actor.role, role)) {
+    private async ensureCanAssignRole(actor: AuthUser, roleId: string) {
+        const role = await this.prisma.role.findUnique({ where: { id: roleId } });
+
+        if (!role) {
+            throw new BadRequestException("Role not found");
+        }
+
+        if (role.name === LEGACY_ROLE_NAMES.SUPER_ADMIN) {
             throw new ForbiddenException("You cannot assign this role");
         }
+
+        const visible = role.companyId === null || role.companyId === actor.companyId;
+        if (!visible) {
+            throw new ForbiddenException("You cannot assign this role");
+        }
+
+        return role;
     }
 
     /**
-     * Branch-scoped roles (SALES_HEAD, SALES_MANAGER) must have a branch;
-     * company-wide roles (COMPANY_ADMIN, FINANCE) must not — an unscoped
-     * account is not a valid state to save for either.
+     * A branch-scoped role's user must have a branch; a company-wide role's
+     * user must not — an unscoped account is not a valid state to save for
+     * either.
      */
     private async ensureBranchAssignmentValid(
         companyId: string | null,
-        role: UserRole,
+        role: { isBranchScoped: boolean },
         branchId?: string | null,
     ) {
         if (!companyId) {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        if (isBranchScopedRole(role)) {
+        if (role.isBranchScoped) {
             if (!branchId) {
                 throw new BadRequestException("This role requires a branch");
             }
@@ -562,40 +583,42 @@ export class UsersService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        const visibleRoles = getManageableRoles(user.role);
+        const companyId = user.companyId;
 
-        const [counts, samples] = await Promise.all([
+        const [counts, roles] = await Promise.all([
             this.prisma.user.groupBy({
-                by: ["role"],
+                by: ["roleId"],
                 where: {
-                    companyId: user.companyId,
-                    role: { in: visibleRoles },
+                    companyId,
+                    isSuperAdmin: user.isSuperAdmin ? undefined : false,
                     deletedAt: null,
                 },
                 _count: { _all: true },
             }),
-            
-            Promise.all(
-                visibleRoles.map((role) =>
-                    this.prisma.user.findMany({
-                        where: {
-                            companyId: user.companyId,
-                            role,
-                            deletedAt: null,
-                        },
-                        orderBy: { createdAt: "desc" },
-                        take: 3,
-                        select: { id: true, fullName: true },
-                    }),
-                ),
-            ),
+            this.prisma.role.findMany({
+                where: { OR: [{ companyId: null }, { companyId }] },
+                select: { id: true, name: true },
+            }),
         ]);
 
-        const countByRole = new Map(counts.map((c) => [c.role, c._count._all]));
+        const countByRoleId = new Map(counts.map((c) => [c.roleId, c._count._all]));
+        const rolesWithMembers = roles.filter((r) => (countByRoleId.get(r.id) ?? 0) > 0);
 
-        return visibleRoles.map((role, index) => ({
-            role,
-            count: countByRole.get(role) ?? 0,
+        const samples = await Promise.all(
+            rolesWithMembers.map((role) =>
+                this.prisma.user.findMany({
+                    where: { companyId, roleId: role.id, deletedAt: null },
+                    orderBy: { createdAt: "desc" },
+                    take: 3,
+                    select: { id: true, fullName: true },
+                }),
+            ),
+        );
+
+        return rolesWithMembers.map((role, index) => ({
+            roleId: role.id,
+            roleName: role.name,
+            count: countByRoleId.get(role.id) ?? 0,
             sample: samples[index],
         }));
     }

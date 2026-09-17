@@ -21,7 +21,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog.tsx";
-import {USER_ROLE_LABEL_KEYS} from "@/features/users/types/user.types";
 import {formatDate} from "@/utils/date-formatter";
 import {paths} from "@/routes/paths";
 import {
@@ -179,7 +178,7 @@ export function BranchDetailPage() {
                                                 <div className="font-medium">{user.fullName}</div>
                                                 <div className="text-muted-foreground text-xs">{user.email}</div>
                                             </TableCell>
-                                            <TableCell>{t(USER_ROLE_LABEL_KEYS[user.role])}</TableCell>
+                                            <TableCell>{user.role.name}</TableCell>
                                             <TableCell>
                                                 <Badge variant={user.isActive ? "secondary" : "outline"}>
                                                     {user.isActive

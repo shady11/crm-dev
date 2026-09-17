@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PrismaModule } from '@/database/prisma.module';
 import { NotificationsModule } from '@/modules/notifications/notifications.module';
+import { RbacModule } from '@/modules/rbac/rbac.module';
 
 import { PaymentReminderCronService } from './payment-reminder-cron.service';
 import { OutboundMessageService } from './outbound-message.service';
@@ -14,7 +15,7 @@ import { WhatsAppMessageProvider } from './whatsapp-message.provider';
 import { CompositeMessageProvider } from './composite-message.provider';
 
 @Module({
-  imports: [PrismaModule, NotificationsModule],
+  imports: [PrismaModule, NotificationsModule, RbacModule],
   providers: [
     PaymentReminderCronService,
     OutboundMessageService,

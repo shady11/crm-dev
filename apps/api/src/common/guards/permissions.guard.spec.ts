@@ -2,10 +2,9 @@ import {ForbiddenException} from "@nestjs/common";
 import {Reflector} from "@nestjs/core";
 import {PermissionsGuard} from "./permissions.guard";
 import {PERMISSIONS_KEY} from "@/common/decorators/permissions.decorator";
-import {UserRole} from "@/generated/prisma/client";
 
 function contextWith(
-    user: {role: UserRole; permissions?: string[]} | undefined,
+    user: {isSuperAdmin?: boolean; permissions?: string[]} | undefined,
     requiredPermissions: string[] | undefined,
 ) {
     const handler = () => undefined;
@@ -28,20 +27,20 @@ describe("PermissionsGuard", () => {
     const guard = new PermissionsGuard(new Reflector());
 
     it("allows the request through when the endpoint declares no @RequirePermissions", () => {
-        const context = contextWith({role: UserRole.SALES_MANAGER, permissions: []}, undefined);
+        const context = contextWith({permissions: []}, undefined);
 
         expect(guard.canActivate(context)).toBe(true);
     });
 
     it("allows the request through when @RequirePermissions is an empty list", () => {
-        const context = contextWith({role: UserRole.SALES_MANAGER, permissions: []}, []);
+        const context = contextWith({permissions: []}, []);
 
         expect(guard.canActivate(context)).toBe(true);
     });
 
     it("allows a user who holds one of the required permissions", () => {
         const context = contextWith(
-            {role: UserRole.COMPANY_ADMIN, permissions: ["leads.view", "leads.create"]},
+            {permissions: ["leads.view", "leads.create"]},
             ["leads.create", "leads.delete"],
         );
 
@@ -50,7 +49,7 @@ describe("PermissionsGuard", () => {
 
     it("rejects a user who holds none of the required permissions", () => {
         const context = contextWith(
-            {role: UserRole.FINANCE, permissions: ["leads.view"]},
+            {permissions: ["leads.view"]},
             ["leads.create", "leads.delete"],
         );
 
@@ -59,7 +58,7 @@ describe("PermissionsGuard", () => {
 
     it("always allows SUPER_ADMIN, regardless of its permissions array", () => {
         const context = contextWith(
-            {role: UserRole.SUPER_ADMIN, permissions: []},
+            {isSuperAdmin: true, permissions: []},
             ["rbac.manage"],
         );
 

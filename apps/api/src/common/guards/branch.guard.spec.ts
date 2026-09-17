@@ -1,6 +1,5 @@
 import {ForbiddenException} from "@nestjs/common";
 import {BranchGuard} from "./branch.guard";
-import {UserRole} from "@/generated/prisma/client";
 
 function contextWith(user: unknown) {
     return {
@@ -23,27 +22,22 @@ describe("BranchGuard", () => {
     });
 
     it("rejects a branch-scoped role with no branchId assigned", () => {
-        const context = contextWith({role: UserRole.SALES_MANAGER, branchId: null});
+        const context = contextWith({isBranchScoped: true, branchId: null});
         expect(() => guard.canActivate(context)).toThrow(ForbiddenException);
     });
 
     it("allows a branch-scoped role that has a branchId", () => {
-        const context = contextWith({role: UserRole.SALES_MANAGER, branchId: "branch-1"});
-        expect(guard.canActivate(context)).toBe(true);
-    });
-
-    it("allows SALES_HEAD with a branchId", () => {
-        const context = contextWith({role: UserRole.SALES_HEAD, branchId: "branch-1"});
+        const context = contextWith({isBranchScoped: true, branchId: "branch-1"});
         expect(guard.canActivate(context)).toBe(true);
     });
 
     it("is a no-op for a company-wide role even with no branchId", () => {
-        const context = contextWith({role: UserRole.COMPANY_ADMIN, branchId: null});
+        const context = contextWith({isBranchScoped: false, branchId: null});
         expect(guard.canActivate(context)).toBe(true);
     });
 
     it("is a no-op for SUPER_ADMIN, who has no branch at all", () => {
-        const context = contextWith({role: UserRole.SUPER_ADMIN, branchId: null});
+        const context = contextWith({isBranchScoped: false, isSuperAdmin: true, branchId: null});
         expect(guard.canActivate(context)).toBe(true);
     });
 });

@@ -3,10 +3,10 @@ import {
   DealStatus,
   DiscountApprovalStatus,
   Prisma,
-  UserRole,
 } from '@/generated/prisma/client';
 import { DealDomainService } from './deal-domain.service';
 import { DiscountPendingApprovalException } from '@/modules/deals/exceptions';
+import { LEGACY_ROLE_NAMES } from '@/modules/rbac/legacy-role-names';
 
 describe('DealDomainService discount approval', () => {
   const service = new DealDomainService();
@@ -20,7 +20,7 @@ describe('DealDomainService discount approval', () => {
       expect(
         service.requiresDiscountApproval(
           new Prisma.Decimal(5),
-          UserRole.SALES_MANAGER,
+          LEGACY_ROLE_NAMES.SALES_MANAGER,
           company,
         ),
       ).toBe(false);
@@ -30,7 +30,7 @@ describe('DealDomainService discount approval', () => {
       expect(
         service.requiresDiscountApproval(
           new Prisma.Decimal(5.01),
-          UserRole.SALES_MANAGER,
+          LEGACY_ROLE_NAMES.SALES_MANAGER,
           company,
         ),
       ).toBe(true);
@@ -40,7 +40,7 @@ describe('DealDomainService discount approval', () => {
       expect(
         service.requiresDiscountApproval(
           new Prisma.Decimal(15),
-          UserRole.SALES_HEAD,
+          LEGACY_ROLE_NAMES.SALES_HEAD,
           company,
         ),
       ).toBe(false);
@@ -50,7 +50,7 @@ describe('DealDomainService discount approval', () => {
       expect(
         service.requiresDiscountApproval(
           new Prisma.Decimal(15.01),
-          UserRole.SALES_HEAD,
+          LEGACY_ROLE_NAMES.SALES_HEAD,
           company,
         ),
       ).toBe(true);
@@ -60,7 +60,7 @@ describe('DealDomainService discount approval', () => {
       expect(
         service.requiresDiscountApproval(
           new Prisma.Decimal(99),
-          UserRole.COMPANY_ADMIN,
+          LEGACY_ROLE_NAMES.COMPANY_ADMIN,
           company,
         ),
       ).toBe(false);
@@ -72,7 +72,7 @@ describe('DealDomainService discount approval', () => {
       expect(
         service.canDecideDiscount(
           new Prisma.Decimal(15),
-          UserRole.SALES_HEAD,
+          LEGACY_ROLE_NAMES.SALES_HEAD,
           company,
         ),
       ).toBe(true);
@@ -82,7 +82,7 @@ describe('DealDomainService discount approval', () => {
       expect(
         service.canDecideDiscount(
           new Prisma.Decimal(15.01),
-          UserRole.SALES_HEAD,
+          LEGACY_ROLE_NAMES.SALES_HEAD,
           company,
         ),
       ).toBe(false);
@@ -92,7 +92,7 @@ describe('DealDomainService discount approval', () => {
       expect(
         service.canDecideDiscount(
           new Prisma.Decimal(99),
-          UserRole.COMPANY_ADMIN,
+          LEGACY_ROLE_NAMES.COMPANY_ADMIN,
           company,
         ),
       ).toBe(true);
@@ -102,7 +102,7 @@ describe('DealDomainService discount approval', () => {
       expect(
         service.canDecideDiscount(
           new Prisma.Decimal(1),
-          UserRole.SALES_MANAGER,
+          LEGACY_ROLE_NAMES.SALES_MANAGER,
           company,
         ),
       ).toBe(false);

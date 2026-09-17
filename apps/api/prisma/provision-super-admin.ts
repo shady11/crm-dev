@@ -14,8 +14,9 @@
 import "dotenv/config";
 import {randomBytes} from "crypto";
 import * as bcrypt from "bcrypt";
-import {PrismaClient, UserRole} from "@/generated/prisma/client";
+import {PrismaClient} from "@/generated/prisma/client";
 import {PrismaPg} from "@prisma/adapter-pg";
+import {LEGACY_ROLE_NAMES} from "@/modules/rbac/legacy-role-names";
 
 function fail(message: string): never {
     console.error(`\n  provision-super-admin: ${message}\n`);
@@ -53,13 +54,13 @@ async function main() {
     });
 
     try {
-        const existing = await prisma.user.findUnique({where: {email}});
+        const existing = await prisma.user.findUnique({where: {email}, include: {role: true}});
 
         if (existing) {
             console.log(
-                existing.role === UserRole.SUPER_ADMIN
+                existing.isSuperAdmin
                     ? `\n  ${email} is already a SUPER_ADMIN — password left unchanged.\n`
-                    : `\n  ${email} already exists with role ${existing.role}. Refusing to change it.\n`,
+                    : `\n  ${email} already exists with role ${existing.role.name}. Refusing to change it.\n`,
             );
             return;
         }
@@ -69,12 +70,29 @@ async function main() {
 
         if (password.length < 8) fail("ADMIN_PASSWORD must be at least 8 characters");
 
+        // The "Super Admin" system Role may not exist yet — this script can
+        // run against a database that has never booted the app (and so
+        // never ran RbacService.syncSystemRoles). find-or-create, same
+        // pattern as RbacService itself; it needs no permissions, since
+        // isSuperAdmin below bypasses the permission system entirely.
+        const superAdminRole =
+            (await prisma.role.findFirst({where: {companyId: null, name: LEGACY_ROLE_NAMES.SUPER_ADMIN}})) ??
+            (await prisma.role.create({
+                data: {
+                    name: LEGACY_ROLE_NAMES.SUPER_ADMIN,
+                    description: `Built-in role matching the legacy "SUPER_ADMIN" access level.`,
+                    isSystem: true,
+                    companyId: null,
+                },
+            }));
+
         await prisma.user.create({
             data: {
                 fullName: name,
                 email,
                 passwordHash: await bcrypt.hash(password, 10),
-                role: UserRole.SUPER_ADMIN,
+                roleId: superAdminRole.id,
+                isSuperAdmin: true,
                 // No company, deliberately. CompanyGuard rejects a user without
                 // one, which is what keeps this account out of tenant data.
                 companyId: null,

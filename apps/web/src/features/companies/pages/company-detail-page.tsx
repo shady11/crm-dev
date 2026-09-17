@@ -21,7 +21,6 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog.tsx";
 import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog.tsx";
-import {USER_ROLE_LABEL_KEYS} from "@/features/users/types/user.types";
 import {formatDate} from "@/utils/date-formatter";
 import {authStorage} from "@/features/auth/utils/auth-storage";
 import {landingPathFor} from "@/features/auth/access";
@@ -88,7 +87,7 @@ export function CompanyDetailPage() {
             authStorage.setToken(result.accessToken);
             void queryClient.invalidateQueries({queryKey: ["auth", "me"]});
             setPendingImpersonate(null);
-            navigate(landingPathFor(result.user.role));
+            navigate(landingPathFor(result.user));
         },
         onError: () => toast.error(t("detail.usersCard.toasts.actionError", {ns: "companies"})),
     });
@@ -211,7 +210,7 @@ export function CompanyDetailPage() {
                                                 <div className="text-muted-foreground text-xs">{user.email}</div>
                                             </TableCell>
                                             <TableCell>
-                                                {t(USER_ROLE_LABEL_KEYS[user.role])}
+                                                {user.role.name}
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant={user.isActive ? "secondary" : "outline"}>

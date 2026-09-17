@@ -20,8 +20,9 @@
 import "dotenv/config";
 import {randomBytes} from "crypto";
 import * as bcrypt from "bcrypt";
-import {PrismaClient, UserRole} from "@/generated/prisma/client";
+import {PrismaClient} from "@/generated/prisma/client";
 import {PrismaPg} from "@prisma/adapter-pg";
+import {LEGACY_ROLE_NAMES} from "@/modules/rbac/legacy-role-names";
 
 type Args = {
     company: string;
@@ -140,12 +141,27 @@ async function main() {
             fail("ADMIN_PASSWORD must be at least 8 characters");
         }
 
+        // The "Company Admin" system Role may not exist yet — this script
+        // can run against a database that has never booted the app (and so
+        // never ran RbacService.syncSystemRoles). find-or-create, same
+        // pattern as RbacService itself.
+        const companyAdminRole =
+            (await prisma.role.findFirst({where: {companyId: null, name: LEGACY_ROLE_NAMES.COMPANY_ADMIN}})) ??
+            (await prisma.role.create({
+                data: {
+                    name: LEGACY_ROLE_NAMES.COMPANY_ADMIN,
+                    description: `Built-in role matching the legacy "COMPANY_ADMIN" access level.`,
+                    isSystem: true,
+                    companyId: null,
+                },
+            }));
+
         await prisma.user.create({
             data: {
                 fullName: args.adminName,
                 email: args.adminEmail,
                 passwordHash: await bcrypt.hash(password, 10),
-                role: UserRole.COMPANY_ADMIN,
+                roleId: companyAdminRole.id,
                 companyId: company.id,
             },
         });

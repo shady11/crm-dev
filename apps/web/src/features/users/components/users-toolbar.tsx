@@ -3,7 +3,6 @@ import {createListCollection} from "@ark-ui/react";
 import {Button} from "@/components/ui/button.tsx";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
-import {USER_ROLE_LABEL_KEYS, type UserRole} from "@/features/users/types/user.types";
 import type {RoleFilterValue, StatusFilter} from "@/features/users/hooks/use-users-list.ts";
 import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
 import {useTranslation} from "react-i18next";
@@ -13,7 +12,7 @@ interface UsersToolbarProps {
     onStatusFilterChange(value: StatusFilter): void;
     roleFilter: RoleFilterValue;
     onRoleFilterChange(value: RoleFilterValue): void;
-    visibleRoles: UserRole[];
+    visibleRoles: {id: string; name: string}[];
     branchFilter: string | "all";
     onBranchFilterChange(value: string | "all"): void;
     search: string;
@@ -50,8 +49,8 @@ export function UsersToolbar({
             { label: t("toolbar.placeholders.filterByRole"), value: "all" },
             ...visibleRoles.map(
                 (role) => ({
-                    label: t(USER_ROLE_LABEL_KEYS[role]),
-                    value: role
+                    label: role.name,
+                    value: role.id
                 })
             ),
         ],

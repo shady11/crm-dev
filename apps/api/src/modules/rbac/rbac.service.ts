@@ -1,5 +1,6 @@
 import {
     BadRequestException,
+    ConflictException,
     ForbiddenException,
     Injectable,
     NotFoundException,
@@ -7,23 +8,19 @@ import {
 } from "@nestjs/common";
 import { PrismaService } from "@/database/prisma.service";
 import { AuthUser } from "@/common/types/auth-user.type";
-import { UserRole } from "@/generated/prisma/client";
 import { PERMISSIONS_CATALOG, PERMISSION_KEYS } from "./permissions.catalog";
-import { DEFAULT_ROLE_PERMISSIONS } from "./default-role-permissions";
+import { BRANCH_SCOPED_SYSTEM_ROLES, DEFAULT_ROLE_PERMISSIONS } from "./default-role-permissions";
 import { CreateRoleDto } from "./dto/create-role.dto";
 import { UpdateRoleDto } from "./dto/update-role.dto";
 
-// Human-readable names for the system Role seeded per legacy UserRole.
-const SYSTEM_ROLE_NAMES: Record<UserRole, string> = {
-    SUPER_ADMIN: "Super Admin",
-    COMPANY_ADMIN: "Company Admin",
-    SALES_HEAD: "Sales Head",
-    SALES_MANAGER: "Sales Manager",
-    FINANCE: "Finance",
-};
-
 @Injectable()
 export class RbacService implements OnModuleInit {
+    // Populated by syncSystemRoles on boot; read by getSystemRoleId so the
+    // handful of places that still need to find users by a specific legacy
+    // role (branch/discount lookups, "notify the sales head" queries) don't
+    // each re-query Role by name.
+    private readonly systemRoleIdsByName = new Map<string, string>();
+
     constructor(private readonly prisma: PrismaService) {}
 
     /**
@@ -36,7 +33,6 @@ export class RbacService implements OnModuleInit {
     async onModuleInit() {
         await this.syncCatalog();
         await this.syncSystemRoles();
-        await this.backfillUserRoleAssignments();
     }
 
     async syncCatalog(): Promise<void> {
@@ -54,10 +50,7 @@ export class RbacService implements OnModuleInit {
     }
 
     async syncSystemRoles(): Promise<void> {
-        for (const [role, permissionKeys] of Object.entries(DEFAULT_ROLE_PERMISSIONS) as [
-            UserRole,
-            string[],
-        ][]) {
+        for (const [name, permissionKeys] of Object.entries(DEFAULT_ROLE_PERMISSIONS)) {
             // Not `role.upsert` with a companyId_name where clause: Prisma
             // refuses null in a compound unique lookup at runtime (it can't
             // express "companyId IS NULL AND name = ..." through that key),
@@ -65,18 +58,25 @@ export class RbacService implements OnModuleInit {
             // and name together, nulls included. find-then-create/update
             // instead.
             const existing = await this.prisma.role.findFirst({
-                where: { companyId: null, name: SYSTEM_ROLE_NAMES[role] },
+                where: { companyId: null, name },
             });
+            const isBranchScoped = BRANCH_SCOPED_SYSTEM_ROLES.includes(name);
             const systemRole = existing
-                ? existing
+                ? await this.prisma.role.update({
+                      where: { id: existing.id },
+                      data: { isBranchScoped },
+                  })
                 : await this.prisma.role.create({
                       data: {
-                          name: SYSTEM_ROLE_NAMES[role],
-                          description: `Built-in role matching the legacy "${role}" access level.`,
+                          name,
+                          description: `Built-in role matching the legacy "${name}" access level.`,
                           isSystem: true,
+                          isBranchScoped,
                           companyId: null,
                       },
                   });
+
+            this.systemRoleIdsByName.set(name, systemRole.id);
 
             const permissions = await this.prisma.permission.findMany({
                 where: { key: { in: permissionKeys } },
@@ -94,63 +94,35 @@ export class RbacService implements OnModuleInit {
     }
 
     /**
-     * Every user without a single Role assignment yet (a fresh environment,
-     * or a user created before this module existed) is given the system
-     * role matching their legacy `role` enum column — so access doesn't
-     * change the moment this module ships. Safe to call repeatedly: a user
-     * who already has at least one Role assignment is left untouched, even
-     * if it no longer matches their `role` column.
+     * The id of a seeded system Role by its exact name (see
+     * legacy-role-names.ts) — for the handful of places still tied to a
+     * specific legacy role rather than a permission. Throws rather than
+     * returning undefined: every name in LEGACY_ROLE_NAMES is guaranteed
+     * seeded by syncSystemRoles before the app finishes booting, so a miss
+     * here means that invariant broke, not a normal "not found".
      */
-    async backfillUserRoleAssignments(): Promise<number> {
-        const users = await this.prisma.user.findMany({
-            where: { roleAssignments: { none: {} } },
-            select: { id: true, role: true },
-        });
+    async getSystemRoleId(name: string): Promise<string> {
+        const cached = this.systemRoleIdsByName.get(name);
+        if (cached) return cached;
 
-        if (users.length === 0) {
-            return 0;
+        const role = await this.prisma.role.findFirst({ where: { companyId: null, name } });
+        if (!role) {
+            throw new Error(`System role "${name}" not found — has RbacService.syncSystemRoles run?`);
         }
 
-        const systemRoles = await this.prisma.role.findMany({
-            where: { isSystem: true, companyId: null },
-            select: { id: true, name: true },
-        });
-        const roleIdByUserRole = new Map(
-            (Object.entries(SYSTEM_ROLE_NAMES) as [UserRole, string][])
-                .map(([userRole, name]) => [userRole, systemRoles.find((r) => r.name === name)?.id])
-                .filter((entry): entry is [UserRole, string] => Boolean(entry[1])),
-        );
-
-        const rows = users
-            .map((u) => ({ userId: u.id, roleId: roleIdByUserRole.get(u.role) }))
-            .filter((row): row is { userId: string; roleId: string } => Boolean(row.roleId));
-
-        if (rows.length === 0) {
-            return 0;
-        }
-
-        await this.prisma.userRoleAssignment.createMany({ data: rows, skipDuplicates: true });
-        return rows.length;
+        this.systemRoleIdsByName.set(name, role.id);
+        return role.id;
     }
 
     async getEffectivePermissions(userId: string): Promise<string[]> {
-        const assignments = await this.prisma.userRoleAssignment.findMany({
-            where: { userId },
-            select: {
-                role: {
-                    select: { permissions: { select: { permission: { select: { key: true } } } } },
-                },
-            },
+        const user = await this.prisma.user.findUnique({
+            where: { id: userId },
+            select: { role: { select: { permissions: { select: { permission: { select: { key: true } } } } } } },
         });
 
-        const keys = new Set<string>();
-        for (const { role } of assignments) {
-            for (const { permission } of role.permissions) {
-                keys.add(permission.key);
-            }
-        }
+        if (!user) return [];
 
-        return Array.from(keys);
+        return user.role.permissions.map((p) => p.permission.key);
     }
 
     listPermissions() {
@@ -165,37 +137,34 @@ export class RbacService implements OnModuleInit {
      */
     async listRoles(actor: AuthUser) {
         const roles = await this.prisma.role.findMany({
-            where:
-                actor.role === UserRole.SUPER_ADMIN
-                    ? { companyId: null }
-                    : { OR: [{ companyId: null }, { companyId: actor.companyId }] },
+            where: actor.isSuperAdmin ? { companyId: null } : { OR: [{ companyId: null }, { companyId: actor.companyId }] },
             include: {
                 permissions: { select: { permission: { select: { key: true } } } },
             },
             orderBy: [{ isSystem: "desc" }, { name: "asc" }],
         });
 
-        // Not `_count`/`include: { users }` on the Role query above: a system
-        // or global custom role's UserRoleAssignment rows span every tenant
-        // that uses it, and a COMPANY_ADMIN must only ever see their own
-        // company's slice of that — otherwise this leaks another company's
-        // user count and names for a shared role. Scoped explicitly here
-        // instead, and capped to a handful per role for the card grid's
-        // avatar preview rather than fetching every assignee.
+        // Not `_count`/`include: { users }` on the Role query above: a
+        // system or global custom role's users span every tenant that uses
+        // it, and a COMPANY_ADMIN must only ever see their own company's
+        // slice of that — otherwise this leaks another company's user count
+        // and names for a shared role. Scoped explicitly here instead, and
+        // capped to a handful per role for the card grid's avatar preview
+        // rather than fetching every holder.
         const SAMPLE_SIZE = 4;
-        const assignments = await this.prisma.userRoleAssignment.findMany({
+        const holders = await this.prisma.user.findMany({
             where: {
                 roleId: { in: roles.map((r) => r.id) },
-                user: actor.role === UserRole.SUPER_ADMIN ? {} : { companyId: actor.companyId },
+                ...(actor.isSuperAdmin ? {} : { companyId: actor.companyId }),
             },
-            select: { roleId: true, user: { select: { id: true, fullName: true } } },
+            select: { id: true, fullName: true, roleId: true },
         });
 
         const usersByRole = new Map<string, { id: string; fullName: string }[]>();
-        for (const a of assignments) {
-            const list = usersByRole.get(a.roleId) ?? [];
-            list.push(a.user);
-            usersByRole.set(a.roleId, list);
+        for (const holder of holders) {
+            const list = usersByRole.get(holder.roleId) ?? [];
+            list.push({ id: holder.id, fullName: holder.fullName });
+            usersByRole.set(holder.roleId, list);
         }
 
         return roles.map((r) => {
@@ -206,6 +175,7 @@ export class RbacService implements OnModuleInit {
                 name: r.name,
                 description: r.description,
                 isSystem: r.isSystem,
+                isBranchScoped: r.isBranchScoped,
                 companyId: r.companyId,
                 userCount: users.length,
                 sample: users.slice(0, SAMPLE_SIZE),
@@ -223,10 +193,7 @@ export class RbacService implements OnModuleInit {
             throw new NotFoundException("Role not found");
         }
 
-        const visible =
-            role.companyId === null ||
-            actor.role === UserRole.SUPER_ADMIN ||
-            role.companyId === actor.companyId;
+        const visible = role.companyId === null || actor.isSuperAdmin || role.companyId === actor.companyId;
 
         if (!visible) {
             throw new NotFoundException("Role not found");
@@ -251,7 +218,7 @@ export class RbacService implements OnModuleInit {
     async createRole(actor: AuthUser, dto: CreateRoleDto) {
         this.assertPermissionKeysExist(dto.permissionKeys);
 
-        const companyId = actor.role === UserRole.SUPER_ADMIN ? null : actor.companyId;
+        const companyId = actor.isSuperAdmin ? null : actor.companyId;
 
         if (companyId === undefined) {
             throw new ForbiddenException("Actor has no company to scope this role to");
@@ -283,7 +250,7 @@ export class RbacService implements OnModuleInit {
             throw new ForbiddenException("System roles cannot be renamed");
         }
 
-        if (role.companyId !== null && role.companyId !== actor.companyId && actor.role !== UserRole.SUPER_ADMIN) {
+        if (role.companyId !== null && role.companyId !== actor.companyId && !actor.isSuperAdmin) {
             throw new ForbiddenException("Cannot edit another company's role");
         }
 
@@ -306,7 +273,7 @@ export class RbacService implements OnModuleInit {
             );
         }
 
-        if (role.companyId !== null && role.companyId !== actor.companyId && actor.role !== UserRole.SUPER_ADMIN) {
+        if (role.companyId !== null && role.companyId !== actor.companyId && !actor.isSuperAdmin) {
             throw new ForbiddenException("Cannot edit another company's role");
         }
 
@@ -332,77 +299,35 @@ export class RbacService implements OnModuleInit {
             throw new ForbiddenException("System roles cannot be deleted");
         }
 
-        if (role.companyId !== null && role.companyId !== actor.companyId && actor.role !== UserRole.SUPER_ADMIN) {
+        if (role.companyId !== null && role.companyId !== actor.companyId && !actor.isSuperAdmin) {
             throw new ForbiddenException("Cannot delete another company's role");
+        }
+
+        // Every user has exactly one Role (User.roleId, required) — the DB's
+        // own RESTRICT foreign key would refuse this anyway, but a clear
+        // ConflictException beats a raw constraint-violation error reaching
+        // the client.
+        const holderCount = await this.prisma.user.count({ where: { roleId } });
+        if (holderCount > 0) {
+            throw new ConflictException(
+                `${holderCount} user(s) still have this role — reassign them to another role first`,
+            );
         }
 
         await this.prisma.role.delete({ where: { id: roleId } });
     }
 
-    private async assertUserInScope(actor: AuthUser, userId: string) {
-        const user = await this.prisma.user.findUnique({
-            where: { id: userId },
-            select: { id: true, companyId: true },
-        });
-
-        if (!user) {
-            throw new NotFoundException("User not found");
-        }
-
-        if (actor.role !== UserRole.SUPER_ADMIN && user.companyId !== actor.companyId) {
-            throw new NotFoundException("User not found");
-        }
-
-        return user;
-    }
-
-    async listUserRoles(actor: AuthUser, userId: string) {
-        await this.assertUserInScope(actor, userId);
-
-        const assignments = await this.prisma.userRoleAssignment.findMany({
-            where: { userId },
-            include: { role: { select: { id: true, name: true, isSystem: true, companyId: true } } },
-        });
-
-        return {
-            roles: assignments.map((a) => a.role),
-            permissions: await this.getEffectivePermissions(userId),
-        };
-    }
-
-    /** The ids of every user in scope for `actor` who currently holds `roleId` — backs the "who has this role" picker. */
-    async listRoleUserIds(actor: AuthUser, roleId: string): Promise<string[]> {
+    /** Every user in scope for `actor` who currently holds `roleId` — backs the "who has this role" panel. */
+    async listRoleMembers(actor: AuthUser, roleId: string) {
         await this.getVisibleRole(actor, roleId);
 
-        const assignments = await this.prisma.userRoleAssignment.findMany({
+        return this.prisma.user.findMany({
             where: {
                 roleId,
-                user: actor.role === UserRole.SUPER_ADMIN ? {} : { companyId: actor.companyId },
+                ...(actor.isSuperAdmin ? {} : { companyId: actor.companyId }),
             },
-            select: { userId: true },
+            select: { id: true, fullName: true, email: true },
+            orderBy: { fullName: "asc" },
         });
-
-        return assignments.map((a) => a.userId);
-    }
-
-    async assignRoleToUser(actor: AuthUser, userId: string, roleId: string) {
-        await this.assertUserInScope(actor, userId);
-        await this.getVisibleRole(actor, roleId);
-
-        await this.prisma.userRoleAssignment.upsert({
-            where: { userId_roleId: { userId, roleId } },
-            update: {},
-            create: { userId, roleId },
-        });
-
-        return this.listUserRoles(actor, userId);
-    }
-
-    async revokeRoleFromUser(actor: AuthUser, userId: string, roleId: string) {
-        await this.assertUserInScope(actor, userId);
-
-        await this.prisma.userRoleAssignment.deleteMany({ where: { userId, roleId } });
-
-        return this.listUserRoles(actor, userId);
     }
 }

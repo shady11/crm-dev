@@ -1,10 +1,10 @@
 import {BadRequestException, ConflictException, ForbiddenException, NotFoundException} from "@nestjs/common";
 import * as bcrypt from "bcrypt";
-import {UserRole} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuditLogService} from "@/modules/audit-log/audit-log.service";
 import {ImpersonationService} from "@/modules/impersonation/impersonation.service";
 import {SettingOptionsService} from "@/modules/setting-options/setting-options.service";
+import {RbacService} from "@/modules/rbac/rbac.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CompaniesService} from "./companies.service";
 
@@ -12,7 +12,9 @@ const actor: AuthUser = {
     id: "super-1",
     email: "ops@crm.dev",
     name: "Ops",
-    role: UserRole.SUPER_ADMIN,
+    roleId: "role-super-admin",
+    roleName: "Super Admin",
+    isSuperAdmin: true,
     companyId: null,
     company: null,
     branchId: null,
@@ -24,6 +26,9 @@ const impersonation = {} as unknown as ImpersonationService;
 const settingOptions = {
     assertActiveOption: jest.fn().mockResolvedValue(undefined),
 } as unknown as SettingOptionsService;
+const rbacService = {
+    getSystemRoleId: jest.fn().mockResolvedValue("role-company-admin"),
+} as unknown as RbacService;
 
 describe("CompaniesService", () => {
     const baseDto = {
@@ -56,7 +61,7 @@ describe("CompaniesService", () => {
             $transaction: jest.fn().mockImplementation((fn) => fn(tx)),
         } as unknown as PrismaService;
 
-        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions), created};
+        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions, rbacService), created};
     };
 
     it("creates the company and its first admin together", async () => {
@@ -65,7 +70,7 @@ describe("CompaniesService", () => {
         await service.create(actor, {...baseDto});
 
         expect(created.company).toMatchObject({name: "Bishkek Dev"});
-        expect(created.user).toMatchObject({role: UserRole.COMPANY_ADMIN, companyId: "company-1"});
+        expect(created.user).toMatchObject({roleId: "role-company-admin", companyId: "company-1"});
     });
 
     it("normalises the admin email so a differently-cased duplicate cannot slip through", async () => {
@@ -132,7 +137,7 @@ describe("CompaniesService suspension", () => {
             deal: {count: jest.fn().mockResolvedValue(0)},
         } as unknown as PrismaService;
 
-        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions), update};
+        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions, rbacService), update};
     };
 
     const active = {id: "c1", name: "X", suspendedAt: null, users: []};
@@ -188,7 +193,8 @@ describe("CompaniesService self-service (CA-A1)", () => {
         id: "admin-1",
         email: "admin@bishkekdev.kg",
         name: "Aibek",
-        role: UserRole.COMPANY_ADMIN,
+        roleId: "role-company-admin",
+        roleName: "Company Admin",
         companyId: "company-1",
         company: {id: "company-1", name: "Bishkek Dev", currency: "KGS", locale: "ru-RU", timezone: "Asia/Bishkek"},
         branchId: null,
@@ -211,7 +217,7 @@ describe("CompaniesService self-service (CA-A1)", () => {
             deal: {count: jest.fn().mockResolvedValue(0)},
         } as unknown as PrismaService;
 
-        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions), update, findFirst};
+        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions, rbacService), update, findFirst};
     };
 
     it("reads only the caller's own company, never one supplied by the client", async () => {
