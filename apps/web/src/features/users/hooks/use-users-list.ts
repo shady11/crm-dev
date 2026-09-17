@@ -22,10 +22,6 @@ import {useSort} from "@/hooks/use-sort.ts";
 export type StatusFilter = "all" | "active" | "inactive";
 export type RoleFilterValue = string | "all";
 
-// The Super Admin system role belongs to no company and is never
-// assignable/filterable from a company's Users page.
-const SUPER_ADMIN_ROLE_NAME = "Super Admin";
-
 export function useUsersList() {
     const { t } = useTranslation("users");
 
@@ -33,7 +29,7 @@ export function useUsersList() {
 
     const rolesQuery = useQuery({ queryKey: ["rbac", "roles"], queryFn: getRoles });
     const visibleRoles = useMemo(
-        () => (rolesQuery.data ?? []).filter((role) => role.name !== SUPER_ADMIN_ROLE_NAME),
+        () => (rolesQuery.data ?? []).filter((role) => !role.isPlatformRole),
         [rolesQuery.data],
     );
 

@@ -15,11 +15,14 @@ import {
 import {FieldGroup} from "@/components/ui/field.tsx";
 import {PermissionPicker} from "./permission-picker";
 import type {Permission, Role} from "../types/rbac.types";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 
 export type RoleFormValues = {
     name: string;
     description: string;
     permissionKeys: string[];
+    /** Own discretionary discount ceiling, in percent. null = unlimited. */
+    discountLimit: number | null;
 };
 
 type Props = {
@@ -35,22 +38,28 @@ type Props = {
 export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChange, onSubmit}: Props) {
     const {t} = useTranslation("rbac");
     const {t: tCommon} = useTranslation("common");
+    const {user} = useAuth();
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [selected, setSelected] = useState<Set<string>>(new Set());
+    const [discountLimit, setDiscountLimit] = useState("");
 
     useEffect(() => {
         if (!open) return;
         setName(role?.name ?? "");
         setDescription(role?.description ?? "");
         setSelected(new Set(role?.permissionKeys ?? []));
+        setDiscountLimit(role?.discountLimit === null || role?.discountLimit === undefined ? "" : String(role.discountLimit));
     }, [open, role]);
 
     const isEdit = role !== null;
-    // A system role's name and permissions are fixed (see RbacService) — the
-    // dialog still opens for one, but read-only, so its permission set stays
-    // inspectable without implying it can be changed here.
-    const readOnly = role?.isSystem ?? false;
+    // A global role (companyId null — every built-in role, plus any a
+    // platform administrator has added) can only be managed by a platform
+    // administrator; a tenant's own custom role by that tenant. The dialog
+    // still opens for a role the viewer can't edit, but read-only, so its
+    // permission set stays inspectable without implying it can be changed
+    // here. See RbacService.assertCanManageRole.
+    const readOnly = role !== null && role.companyId === null && !user?.isSuperAdmin;
 
     return (
         <Dialog open={open} onOpenChange={({open: isOpen}) => onOpenChange(isOpen)}>
@@ -66,7 +75,12 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
                     className="flex min-h-0 flex-1 flex-col"
                     onSubmit={(event) => {
                         event.preventDefault();
-                        onSubmit({name, description, permissionKeys: Array.from(selected)});
+                        onSubmit({
+                            name,
+                            description,
+                            permissionKeys: Array.from(selected),
+                            discountLimit: discountLimit.trim() === "" ? null : Number(discountLimit),
+                        });
                     }}
                 >
                     <DialogBody className="space-y-5">
@@ -90,7 +104,32 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
                                         onChange={(event) => setDescription(event.target.value)}
                                     />
                                 </label>
+
+                                <label className="block space-y-1.5">
+                                    <span className="text-sm font-medium">{t("form.fields.discountLimit")}</span>
+                                    <Input
+                                        aria-label={t("form.fields.discountLimit")}
+                                        type="number"
+                                        min={0}
+                                        max={100}
+                                        step={0.01}
+                                        placeholder={t("form.placeholders.discountLimitUnlimited")}
+                                        value={discountLimit}
+                                        onChange={(event) => setDiscountLimit(event.target.value)}
+                                    />
+                                    <span className="text-muted-foreground text-xs">
+                                        {t("form.hints.discountLimit")}
+                                    </span>
+                                </label>
                             </FieldGroup>
+                        )}
+
+                        {readOnly && (
+                            <p className="text-muted-foreground text-sm">
+                                {role?.discountLimit === null
+                                    ? t("form.hints.discountLimitReadOnlyUnlimited")
+                                    : t("form.hints.discountLimitReadOnly", {limit: role?.discountLimit})}
+                            </p>
                         )}
 
                         <div className="space-y-2">

@@ -33,6 +33,7 @@ describe('LeadsService', () => {
         roleName: 'Company Admin',
         isBranchScoped: false,
         branchId: null,
+        permissions: ['clients.transfer_branch'],
     };
 
     const salesHeadUser: AuthUser = {
@@ -85,7 +86,7 @@ describe('LeadsService', () => {
             create: jest.fn().mockResolvedValue({id: 'client-created'}),
         } as unknown as ClientsService;
 
-        const rbacService = {getSystemRoleId: jest.fn().mockResolvedValue('role-sales-manager')};
+        const rbacService = {findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-manager'])};
         const service = new LeadsService(prisma as any, clientsService, rbacService as any);
         return {service, prisma, clientsService};
     }

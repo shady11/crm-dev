@@ -16,7 +16,7 @@ import {randomBytes} from "crypto";
 import * as bcrypt from "bcrypt";
 import {PrismaClient} from "@/generated/prisma/client";
 import {PrismaPg} from "@prisma/adapter-pg";
-import {LEGACY_ROLE_NAMES} from "@/modules/rbac/legacy-role-names";
+import {RbacService} from "@/modules/rbac/rbac.service";
 
 function fail(message: string): never {
     console.error(`\n  provision-super-admin: ${message}\n`);
@@ -70,21 +70,15 @@ async function main() {
 
         if (password.length < 8) fail("ADMIN_PASSWORD must be at least 8 characters");
 
-        // The "Super Admin" system Role may not exist yet — this script can
-        // run against a database that has never booted the app (and so
-        // never ran RbacService.syncSystemRoles). find-or-create, same
-        // pattern as RbacService itself; it needs no permissions, since
-        // isSuperAdmin below bypasses the permission system entirely.
-        const superAdminRole =
-            (await prisma.role.findFirst({where: {companyId: null, name: LEGACY_ROLE_NAMES.SUPER_ADMIN}})) ??
-            (await prisma.role.create({
-                data: {
-                    name: LEGACY_ROLE_NAMES.SUPER_ADMIN,
-                    description: `Built-in role matching the legacy "SUPER_ADMIN" access level.`,
-                    isSystem: true,
-                    companyId: null,
-                },
-            }));
+        // The "Super Admin" role may not exist yet — this script can run
+        // against a database that has never booted the app (and so never
+        // seeded it). Run the same seeding RbacService runs on every boot,
+        // then look the role up by its isPlatformRole marker rather than by
+        // name, since a platform administrator may have renamed it.
+        const rbacService = new RbacService(prisma as never);
+        await rbacService.syncCatalog();
+        await rbacService.seedDefaultRolesIfMissing();
+        const superAdminRole = await prisma.role.findFirstOrThrow({where: {isPlatformRole: true}});
 
         await prisma.user.create({
             data: {

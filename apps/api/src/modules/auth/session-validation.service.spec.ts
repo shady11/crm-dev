@@ -30,7 +30,7 @@ describe('SessionValidationService.validate', () => {
         fullName: 'User',
         phone: null,
         roleId: 'role-sales-manager',
-        role: {name: 'Sales Manager', isBranchScoped: true},
+        role: {name: 'Sales Manager', isBranchScoped: true, discountLimit: {toNumber: () => 5}},
         isSuperAdmin: false,
         companyId: 'company-1',
         branchId: 'branch-1',
@@ -52,7 +52,7 @@ describe('SessionValidationService.validate', () => {
     const superAdminUser = (overrides: Record<string, unknown> = {}) =>
         baseUser({
             roleId: 'role-super-admin',
-            role: {name: 'Super Admin', isBranchScoped: false},
+            role: {name: 'Super Admin', isBranchScoped: false, discountLimit: null},
             isSuperAdmin: true,
             companyId: null,
             company: null,

@@ -6,8 +6,9 @@ import {RbacService} from "./rbac.service";
  * RbacService is the entire access-control layer's source of truth: every
  * @RequirePermissions() guard check ultimately depends on
  * getEffectivePermissions returning the right set, and every role mutation
- * has to respect two boundaries — system roles are read-only, and a
- * COMPANY_ADMIN can never reach into another tenant's roles or users.
+ * has to respect two boundaries — a global (companyId null) role can only
+ * be managed by a platform administrator, and a COMPANY_ADMIN can never
+ * reach into another tenant's roles or users.
  */
 describe("RbacService", () => {
     const companyAdmin: AuthUser = {
@@ -112,37 +113,69 @@ describe("RbacService", () => {
         });
     });
 
-    describe("system role protection", () => {
-        const systemRole = {
-            id: "role-system",
+    describe("global role protection", () => {
+        // isSystem is an informational "Built-in" label only — the actual
+        // gate is companyId === null (a global role), which only a platform
+        // administrator may manage. A COMPANY_ADMIN can't touch it whether
+        // or not it happens to be one of the five seeded built-in roles.
+        const globalRole = {
+            id: "role-global",
             name: "Sales Head",
             isSystem: true,
             companyId: null,
         };
 
-        it("refuses to rename a system role", async () => {
+        it("refuses a COMPANY_ADMIN renaming a global role", async () => {
             const {service, prisma} = build();
-            prisma.role.findUnique.mockResolvedValue(systemRole);
+            prisma.role.findUnique.mockResolvedValue(globalRole);
 
             await expect(
-                service.updateRole(companyAdmin, "role-system", {name: "Renamed"}),
+                service.updateRole(companyAdmin, "role-global", {name: "Renamed"}),
             ).rejects.toThrow(ForbiddenException);
         });
 
-        it("refuses to change a system role's permissions", async () => {
+        it("refuses a COMPANY_ADMIN changing a global role's permissions", async () => {
             const {service, prisma} = build();
-            prisma.role.findUnique.mockResolvedValue(systemRole);
+            prisma.role.findUnique.mockResolvedValue(globalRole);
 
             await expect(
-                service.setRolePermissions(companyAdmin, "role-system", ["leads.view"]),
+                service.setRolePermissions(companyAdmin, "role-global", ["leads.view"]),
             ).rejects.toThrow(ForbiddenException);
         });
 
-        it("refuses to delete a system role", async () => {
+        it("refuses a COMPANY_ADMIN deleting a global role", async () => {
             const {service, prisma} = build();
-            prisma.role.findUnique.mockResolvedValue(systemRole);
+            prisma.role.findUnique.mockResolvedValue(globalRole);
 
-            await expect(service.deleteRole(companyAdmin, "role-system")).rejects.toThrow(ForbiddenException);
+            await expect(service.deleteRole(companyAdmin, "role-global")).rejects.toThrow(ForbiddenException);
+        });
+
+        it("lets a SUPER_ADMIN rename a global (built-in) role", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue(globalRole);
+
+            const updated = await service.updateRole(superAdmin, "role-global", {name: "Regional Lead"});
+
+            expect(updated).toEqual(expect.objectContaining({name: "Regional Lead"}));
+        });
+
+        it("lets a SUPER_ADMIN change a global (built-in) role's permissions", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue(globalRole);
+
+            await service.setRolePermissions(superAdmin, "role-global", ["leads.view"]);
+
+            expect(prisma.rolePermission.deleteMany).toHaveBeenCalledWith({where: {roleId: "role-global"}});
+        });
+
+        it("lets a SUPER_ADMIN delete a global (built-in) role with no holders", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue(globalRole);
+            prisma.user.count.mockResolvedValue(0);
+
+            await service.deleteRole(superAdmin, "role-global");
+
+            expect(prisma.role.delete).toHaveBeenCalledWith({where: {id: "role-global"}});
         });
     });
 
@@ -216,6 +249,29 @@ describe("RbacService", () => {
                     where: {roleId: "role-1", companyId: "company-1"},
                 }),
             );
+        });
+    });
+
+    describe("seedDefaultRolesIfMissing", () => {
+        it("creates a built-in role that doesn't exist yet", async () => {
+            const {service, prisma} = build();
+            prisma.role.findFirst.mockResolvedValue(null);
+            prisma.permission.findMany.mockResolvedValue([{id: "perm-1"}]);
+
+            await service.seedDefaultRolesIfMissing();
+
+            expect(prisma.role.create).toHaveBeenCalled();
+        });
+
+        it("never touches a built-in role that already exists — no reconciling drift back to defaults", async () => {
+            const {service, prisma} = build();
+            prisma.role.findFirst.mockResolvedValue({id: "role-existing"});
+
+            await service.seedDefaultRolesIfMissing();
+
+            expect(prisma.role.create).not.toHaveBeenCalled();
+            expect(prisma.role.update).not.toHaveBeenCalled();
+            expect(prisma.rolePermission.deleteMany).not.toHaveBeenCalled();
         });
     });
 });

@@ -45,6 +45,16 @@ export type AuthUser = {
     // From the assigned Role's isBranchScoped flag — replaces the old
     // hardcoded isBranchScopedRole(SALES_HEAD | SALES_MANAGER) check.
     isBranchScoped?: boolean;
+    // From the assigned Role's own discountLimit — the user's own
+    // discretionary discount ceiling, in percent. null means unlimited
+    // (never needs approval for their own request); a set number is their
+    // own band. See DealDomainService.requiresDiscountApproval/
+    // canDecideDiscount. Optional like the other Role-derived flags above,
+    // for the same test-fixture-compatibility reason — but unlike those
+    // boolean flags, a *missing* value must never read as "unlimited", so
+    // callers treat `undefined` as the most restrictive case (0), not as
+    // `null`.
+    discountLimit?: number | null;
     // Effective fine-grained permissions: this user's Role's permission
     // set. Recomputed fresh on every request by SessionValidationService
     // (never baked into the JWT), so granting or revoking a permission

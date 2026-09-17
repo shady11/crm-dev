@@ -27,7 +27,7 @@ const settingOptions = {
     assertActiveOption: jest.fn().mockResolvedValue(undefined),
 } as unknown as SettingOptionsService;
 const rbacService = {
-    getSystemRoleId: jest.fn().mockResolvedValue("role-company-admin"),
+    findDefaultCompanyAdminRoleId: jest.fn().mockResolvedValue("role-company-admin"),
 } as unknown as RbacService;
 
 describe("CompaniesService", () => {

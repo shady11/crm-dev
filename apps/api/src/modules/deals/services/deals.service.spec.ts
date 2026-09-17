@@ -41,6 +41,8 @@ describe('DealsService', () => {
         company: null,
         branchId: 'branch-1',
         branch: null,
+        discountLimit: 5,
+        permissions: [],
     };
 
     const adminUser: AuthUser = {
@@ -50,6 +52,8 @@ describe('DealsService', () => {
         roleName: 'Company Admin',
         isBranchScoped: false,
         branchId: null,
+        discountLimit: null,
+        permissions: ['deals.approve_discount'],
     };
 
     const salesHeadUser: AuthUser = {
@@ -57,6 +61,8 @@ describe('DealsService', () => {
         id: 'head-1',
         roleId: 'role-sales-head',
         roleName: 'Sales Head',
+        discountLimit: 15,
+        permissions: ['deals.approve_discount'],
     };
 
     const company = (overrides: Record<string, unknown> = {}) => ({
@@ -103,7 +109,13 @@ describe('DealsService', () => {
         const notifications = {create: jest.fn().mockResolvedValue({})};
         const dealNumberService = {generateDealNumber: jest.fn().mockResolvedValue('2026-0001')};
         const documentGeneration = {generateForDeal: jest.fn().mockResolvedValue({id: 'doc-1'})};
-        const rbacService = {getSystemRoleId: jest.fn().mockImplementation((name: string) => Promise.resolve(`role-${name.toLowerCase().replace(/ /g, '-')}`))};
+        const rbacService = {
+            findApproverRoles: jest.fn().mockResolvedValue([
+                {id: 'role-sales-head', isBranchScoped: true, discountLimit: 15},
+                {id: 'role-company-admin', isBranchScoped: false, discountLimit: null},
+            ]),
+            findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-manager']),
+        };
 
         const service = new DealsService(
             prisma, mapper, domain, activityService as any, notifications as any,
@@ -235,7 +247,7 @@ describe('DealsService', () => {
             await service.reserveUnit(managerUser, reserveDto({discountPercent: 10, salePrice: 90000}));
 
             expect(prisma.user.findMany).toHaveBeenCalledWith(
-                expect.objectContaining({where: expect.objectContaining({roleId: 'role-sales-head', branchId: 'branch-1'})}),
+                expect.objectContaining({where: expect.objectContaining({roleId: {in: ['role-sales-head']}, branchId: 'branch-1'})}),
             );
         });
 
@@ -247,7 +259,7 @@ describe('DealsService', () => {
             await service.reserveUnit(managerUser, reserveDto({discountPercent: 20, salePrice: 80000}));
 
             expect(prisma.user.findMany).toHaveBeenCalledWith(
-                expect.objectContaining({where: expect.objectContaining({roleId: 'role-company-admin'})}),
+                expect.objectContaining({where: expect.objectContaining({roleId: {in: ['role-company-admin']}})}),
             );
         });
 

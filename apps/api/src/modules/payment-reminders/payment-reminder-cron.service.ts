@@ -9,7 +9,6 @@ import {
 } from '@/generated/prisma/client';
 import { NotificationsService } from '@/modules/notifications/notifications.service';
 import { RbacService } from '@/modules/rbac/rbac.service';
-import { LEGACY_ROLE_NAMES } from '@/modules/rbac/legacy-role-names';
 
 import { REMINDER_STAGES } from './payment-reminders.constants';
 import { OutboundMessageService } from './outbound-message.service';
@@ -109,11 +108,17 @@ export class PaymentReminderCronService {
       }
 
       if (stage.notifySalesHead && deal.branchId) {
+        // The branch's team lead(s) — whoever holds deals.reassign, the
+        // permission that marks a role as a team lead rather than an
+        // individual contributor (see RbacService.findRoleIdsWithPermission
+        // and its other callers).
+        const teamLeadRoleIds = await this.rbacService.findRoleIdsWithPermission(deal.companyId, 'deals.reassign');
+
         const salesHeads = await this.prisma.user.findMany({
           where: {
             companyId: deal.companyId,
             branchId: deal.branchId,
-            roleId: await this.rbacService.getSystemRoleId(LEGACY_ROLE_NAMES.SALES_HEAD),
+            roleId: {in: teamLeadRoleIds},
             isActive: true,
           },
           select: { id: true },

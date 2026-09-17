@@ -48,8 +48,16 @@ export function RolesPermissionsPage() {
     const save = useMutation({
         mutationFn: async (values: RoleFormValues) => {
             if (editing) {
-                if (values.name !== editing.name || values.description !== (editing.description ?? "")) {
-                    await updateRole(editing.id, {name: values.name, description: values.description});
+                if (
+                    values.name !== editing.name ||
+                    values.description !== (editing.description ?? "") ||
+                    values.discountLimit !== editing.discountLimit
+                ) {
+                    await updateRole(editing.id, {
+                        name: values.name,
+                        description: values.description,
+                        discountLimit: values.discountLimit,
+                    });
                 }
                 return setRolePermissions(editing.id, values.permissionKeys);
             }
@@ -58,6 +66,7 @@ export function RolesPermissionsPage() {
                 name: values.name,
                 description: values.description || undefined,
                 permissionKeys: values.permissionKeys,
+                discountLimit: values.discountLimit,
             });
         },
         onSuccess: () => {

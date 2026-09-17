@@ -15,6 +15,8 @@ export type CreateRolePayload = {
     name: string;
     description?: string;
     permissionKeys: string[];
+    /** Own discretionary discount ceiling, in percent. Omitted/null = unlimited. */
+    discountLimit?: number | null;
 };
 
 export async function createRole(payload: CreateRolePayload) {
@@ -22,7 +24,7 @@ export async function createRole(payload: CreateRolePayload) {
     return response.data;
 }
 
-export type UpdateRolePayload = Partial<{name: string; description: string}>;
+export type UpdateRolePayload = Partial<{name: string; description: string; discountLimit: number | null}>;
 
 export async function updateRole(id: string, payload: UpdateRolePayload) {
     const response = await api.patch<Role>(`/rbac/roles/${id}`, payload);

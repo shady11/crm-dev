@@ -6,7 +6,6 @@ import {AuthUser} from "@/common/types/auth-user.type";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 import {OPEN_LEAD_STATUSES} from "@/modules/leads/lead.constants";
 import {RbacService} from "@/modules/rbac/rbac.service";
-import {LEGACY_ROLE_NAMES} from "@/modules/rbac/legacy-role-names";
 
 @Injectable()
 export class DashboardService {
@@ -265,11 +264,13 @@ export class DashboardService {
         const companyId = user.companyId;
         const branchId = user.branchId;
 
+        const targetRoleIds = await this.rbacService.findRoleIdsWithPermission(companyId, "deals.manage", "deals.reassign");
+
         const managers = await this.prisma.user.findMany({
             where: {
                 companyId,
                 branchId,
-                roleId: await this.rbacService.getSystemRoleId(LEGACY_ROLE_NAMES.SALES_MANAGER),
+                roleId: {in: targetRoleIds},
                 isActive: true,
                 deletedAt: null,
             },

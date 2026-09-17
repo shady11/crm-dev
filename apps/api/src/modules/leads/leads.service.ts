@@ -4,7 +4,7 @@ import {LeadStatus} from "@/generated/prisma/enums";
 import {PrismaService} from "@/database/prisma.service";
 import {ClientsService} from "@/modules/clients/clients.service";
 import {RbacService} from "@/modules/rbac/rbac.service";
-import {LEGACY_ROLE_NAMES} from "@/modules/rbac/legacy-role-names";
+import {hasPermission} from "@/common/utils/permissions.util";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {TransferBranchDto} from "@/common/dto/transfer-branch.dto";
 import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
@@ -377,13 +377,14 @@ export class LeadsService {
             }),
         ]);
 
-        // BR-D2: a COMPANY_ADMIN-only heads-up that this phone already exists
-        // as a client at a *different* branch. Deliberately not derived from
-        // `!branchScoped` — FINANCE has no reason to see this either, and
-        // this must never share code with the BR-B1 restriction above.
+        // BR-D2: a clients.transfer_branch-only heads-up that this phone
+        // already exists as a client at a *different* branch. Deliberately
+        // not derived from `!branchScoped` — FINANCE has no reason to see
+        // this either, and this must never share code with the BR-B1
+        // restriction above.
         let crossBranchClient: { id: string; branchId: string | null } | null = null;
 
-        if (user.roleName === LEGACY_ROLE_NAMES.COMPANY_ADMIN) {
+        if (hasPermission(user, "clients.transfer_branch")) {
             crossBranchClient = await this.prisma.client.findFirst({
                 where: { companyId, phone, deletedAt: null },
                 select: { id: true, branchId: true },
@@ -600,10 +601,11 @@ export class LeadsService {
     }
 
     /**
-     * SH-A1's target check: the new manager must be an active SALES_MANAGER
-     * on the same branch as the lead itself, not just any assignable user —
-     * a stricter check than ensureManagerAssignable's, since this is
-     * specifically "move it to a different SALES_MANAGER on the team", not a
+     * SH-A1's target check: the new manager must be an active individual
+     * contributor (leads.edit without leads.assign — not itself a team
+     * lead) on the same branch as the lead itself, not just any assignable
+     * user — a stricter check than ensureManagerAssignable's, since this is
+     * specifically "move it to a different team member", not a
      * general-purpose manager field edit.
      */
     private async ensureReassignable(user: AuthUser, leadBranchId: string | null, managerId: string) {
@@ -611,19 +613,21 @@ export class LeadsService {
             throw new BadRequestException("Lead is not assigned to a branch");
         }
 
+        const targetRoleIds = await this.rbacService.findRoleIdsWithPermission(user.companyId!, "leads.edit", "leads.assign");
+
         const manager = await this.prisma.user.findFirst({
             where: {
                 id: managerId,
                 companyId: user.companyId,
                 branchId: leadBranchId,
-                roleId: await this.rbacService.getSystemRoleId(LEGACY_ROLE_NAMES.SALES_MANAGER),
+                roleId: {in: targetRoleIds},
                 isActive: true,
             },
         });
 
         if (!manager) {
             throw new BadRequestException(
-                "Manager not assignable — must be an active SALES_MANAGER on the same branch",
+                "Manager not assignable — must be an active individual contributor on the same branch",
             );
         }
     }

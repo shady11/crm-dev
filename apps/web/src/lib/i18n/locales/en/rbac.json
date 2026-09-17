@@ -32,12 +32,21 @@
   "form": {
     "newTitle": "New role",
     "editTitle": "Edit role",
-    "description": "Pick exactly the permissions this role should grant. A system role's permissions are fixed — clone them into a new role to start from one.",
-    "readOnlyDescription": "A system role's permissions are fixed. Clone them into a new role to start from this set.",
+    "description": "Pick exactly the permissions this role should grant.",
+    "readOnlyDescription": "This is a global role, shared by every company. Only a platform administrator can edit it — clone it into a new role to start from this set.",
     "fields": {
       "name": "Name",
       "description": "Description",
-      "permissions": "Permissions"
+      "permissions": "Permissions",
+      "discountLimit": "Discount limit (%)"
+    },
+    "placeholders": {
+      "discountLimitUnlimited": "Unlimited"
+    },
+    "hints": {
+      "discountLimit": "The highest discount a holder of this role can approve on their own, without sign-off. Leave blank for no limit.",
+      "discountLimitReadOnly": "Own discount limit: {{limit}}%",
+      "discountLimitReadOnlyUnlimited": "Own discount limit: unlimited"
     },
     "submit": {
       "create": "Create role"

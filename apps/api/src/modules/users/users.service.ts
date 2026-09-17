@@ -11,7 +11,6 @@ import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 import {OPEN_LEAD_STATUSES} from "@/modules/leads/lead.constants";
-import {LEGACY_ROLE_NAMES} from "@/modules/rbac/legacy-role-names";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UpdateUserDto} from "./dto/update-user.dto";
 import {UpdateUserPasswordDto} from "./dto/update-user-password.dto";
@@ -508,12 +507,12 @@ export class UsersService {
     }
 
     /**
-     * A Role can only be assigned if it's visible to the actor (a system
-     * role, or one of their own company's custom roles), and the "Super
-     * Admin" system role can never be assigned here at all — reserved for
-     * `prisma/provision-super-admin.ts`, since a user created through this
-     * (company-scoped) flow always gets a companyId, and SUPER_ADMIN never
-     * has one.
+     * A Role can only be assigned if it's visible to the actor (a global
+     * role, or one of their own company's custom roles), and the platform
+     * role (isPlatformRole — the "Super Admin" role) can never be assigned
+     * here at all — reserved for `prisma/provision-super-admin.ts`, since a
+     * user created through this (company-scoped) flow always gets a
+     * companyId, and the platform role never has one.
      */
     private async ensureCanAssignRole(actor: AuthUser, roleId: string) {
         const role = await this.prisma.role.findUnique({ where: { id: roleId } });
@@ -522,7 +521,7 @@ export class UsersService {
             throw new BadRequestException("Role not found");
         }
 
-        if (role.name === LEGACY_ROLE_NAMES.SUPER_ADMIN) {
+        if (role.isPlatformRole) {
             throw new ForbiddenException("You cannot assign this role");
         }
 

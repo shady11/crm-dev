@@ -42,7 +42,7 @@ import {EntityDocumentsCard} from "@/features/documents/components/entity-docume
 import {useTranslation} from "react-i18next";
 import {PAYMENT_METHOD_LABEL_KEYS, PAYMENT_TYPE_LABEL_KEYS} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {LEGACY_ROLE_NAMES} from "@/lib/legacy-role-names";
+import {hasPermission} from "@/features/auth/access";
 import {ReassignManagerDialog} from "@/features/users/components/reassign-manager-dialog.tsx";
 
 export function DealDetailsPage() {
@@ -52,9 +52,9 @@ export function DealDetailsPage() {
     const dealQuery = useDeal(dealId);
     const actions = useDealActions(dealId!);
     const { user } = useAuth();
-    // SH-A1: reassignment is a team-lead action — Sales Head only, not
-    // Sales Manager or the general-purpose reserve/edit flows.
-    const isSalesHead = user?.roleName === LEGACY_ROLE_NAMES.SALES_HEAD;
+    // SH-A1: reassignment is a team-lead action, gated the same way the
+    // backend endpoint is (deals.reassign) rather than by a specific role name.
+    const canReassign = hasPermission(user, "deals.reassign");
 
     const [cancelOpen, setCancelOpen] = useState(false);
     const [cancelReason, setCancelReason] = useState("");
@@ -175,7 +175,7 @@ export function DealDetailsPage() {
                         <DealClientCard client={deal.client} />
                         <DealManagerCard
                             manager={deal.manager}
-                            canReassign={isSalesHead}
+                            canReassign={canReassign}
                             onReassign={() => setReassignOpen(true)}
                         />
                     </div>

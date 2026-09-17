@@ -58,7 +58,7 @@ function build(schedules: ReturnType<typeof scheduleRow>[]) {
   };
 
   const rbacService = {
-    getSystemRoleId: jest.fn().mockResolvedValue('role-sales-head'),
+    findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-head']),
   };
   const service = new PaymentReminderCronService(
     prisma as any,
@@ -168,7 +168,7 @@ describe('PaymentReminderCronService', () => {
     ];
     expect(findManyArgs.where).toMatchObject({
       branchId: 'branch-1',
-      roleId: 'role-sales-head',
+      roleId: {in: ['role-sales-head']},
       isActive: true,
     });
     expect(notifications.create).toHaveBeenCalledWith(

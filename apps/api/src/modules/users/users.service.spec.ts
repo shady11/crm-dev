@@ -23,7 +23,7 @@ describe("UsersService — role boundaries", () => {
         branch: null,
     };
 
-    const superAdminRole = {id: "role-super-admin", name: "Super Admin", companyId: null, isBranchScoped: false};
+    const superAdminRole = {id: "role-super-admin", name: "Super Admin", companyId: null, isBranchScoped: false, isPlatformRole: true};
     const salesManagerRole = {id: "role-sales-manager", name: "Sales Manager", companyId: null, isBranchScoped: true};
 
     const superAdminRow = {

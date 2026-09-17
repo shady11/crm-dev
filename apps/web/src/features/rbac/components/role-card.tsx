@@ -7,6 +7,7 @@ import {Badge} from "@/components/ui/badge.tsx";
 import {Menu, MenuContent, MenuItem, MenuTrigger} from "@/components/ui/menu.tsx";
 import {initials} from "@/features/users/utils/format";
 import type {Role} from "../types/rbac.types";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 
 // Cycled by card position so an arbitrary, growing list of roles (system +
 // however many a tenant has created) still reads as a varied grid rather
@@ -37,6 +38,12 @@ export function RoleCard({
 }) {
     const {t} = useTranslation("rbac");
     const {t: tCommon} = useTranslation("common");
+    const {user} = useAuth();
+
+    // A global role (companyId null) can only be managed by a platform
+    // administrator — see RbacService.assertCanManageRole and
+    // RoleFormSheet's matching `readOnly` check.
+    const canManage = role.companyId !== null || Boolean(user?.isSuperAdmin);
 
     const shown = role.sample.slice(0, 4);
     const extra = role.userCount - shown.length;
@@ -70,7 +77,7 @@ export function RoleCard({
                             <MenuItem value="users" onClick={onManageUsers}>
                                 {t("page.rowActions.manageUsers", {name: role.name})}
                             </MenuItem>
-                            {!role.isSystem && (
+                            {canManage && (
                                 <>
                                     <MenuItem value="edit" onClick={onEdit}>
                                         {tCommon("actions.edit")}
@@ -103,7 +110,7 @@ export function RoleCard({
                 </div>
 
                 <Button variant="outline" className="w-full" onClick={onEdit}>
-                    {role.isSystem ? t("page.card.view") : t("page.card.editRole")}
+                    {canManage ? t("page.card.editRole") : t("page.card.view")}
                 </Button>
             </CardContent>
         </Card>

@@ -9,30 +9,29 @@ import {
 import { PrismaService } from "@/database/prisma.service";
 import { AuthUser } from "@/common/types/auth-user.type";
 import { PERMISSIONS_CATALOG, PERMISSION_KEYS } from "./permissions.catalog";
-import { BRANCH_SCOPED_SYSTEM_ROLES, DEFAULT_ROLE_PERMISSIONS } from "./default-role-permissions";
+import { DEFAULT_ROLES } from "./default-role-permissions";
 import { CreateRoleDto } from "./dto/create-role.dto";
 import { UpdateRoleDto } from "./dto/update-role.dto";
 
 @Injectable()
 export class RbacService implements OnModuleInit {
-    // Populated by syncSystemRoles on boot; read by getSystemRoleId so the
-    // handful of places that still need to find users by a specific legacy
-    // role (branch/discount lookups, "notify the sales head" queries) don't
-    // each re-query Role by name.
-    private readonly systemRoleIdsByName = new Map<string, string>();
-
     constructor(private readonly prisma: PrismaService) {}
 
     /**
-     * Idempotently brings the database in line with the code-defined catalog
-     * and default role bundles. Runs on every boot (and from prisma/seed.ts)
-     * so a fresh environment, and one that's been running for months, both
-     * end up with the same baseline — new permissions in the catalog appear
-     * automatically, existing rows are never touched.
+     * Idempotently brings the database in line with the code-defined
+     * permission catalog, and seeds the five built-in roles the first time
+     * this ever runs against a database. Runs on every boot (and from
+     * prisma/seed.ts and the provisioning scripts) so a fresh environment
+     * ends up with a working baseline — but, unlike the permission catalog,
+     * a role that already exists is never touched again after it's
+     * created: once seeded, a role is just an ordinary Role row a platform
+     * administrator can freely rename, re-permission, or delete, and this
+     * method must never fight that by resetting it back to its defaults on
+     * the next boot.
      */
     async onModuleInit() {
         await this.syncCatalog();
-        await this.syncSystemRoles();
+        await this.seedDefaultRolesIfMissing();
     }
 
     async syncCatalog(): Promise<void> {
@@ -49,69 +48,41 @@ export class RbacService implements OnModuleInit {
         }
     }
 
-    async syncSystemRoles(): Promise<void> {
-        for (const [name, permissionKeys] of Object.entries(DEFAULT_ROLE_PERMISSIONS)) {
+    async seedDefaultRolesIfMissing(): Promise<void> {
+        for (const seed of DEFAULT_ROLES) {
             // Not `role.upsert` with a companyId_name where clause: Prisma
             // refuses null in a compound unique lookup at runtime (it can't
             // express "companyId IS NULL AND name = ..." through that key),
             // even though the schema's own unique index treats companyId
-            // and name together, nulls included. find-then-create/update
-            // instead.
+            // and name together, nulls included.
             const existing = await this.prisma.role.findFirst({
-                where: { companyId: null, name },
+                where: { companyId: null, name: seed.name },
             });
-            const isBranchScoped = BRANCH_SCOPED_SYSTEM_ROLES.includes(name);
-            const systemRole = existing
-                ? await this.prisma.role.update({
-                      where: { id: existing.id },
-                      data: { isBranchScoped },
-                  })
-                : await this.prisma.role.create({
-                      data: {
-                          name,
-                          description: `Built-in role matching the legacy "${name}" access level.`,
-                          isSystem: true,
-                          isBranchScoped,
-                          companyId: null,
-                      },
-                  });
 
-            this.systemRoleIdsByName.set(name, systemRole.id);
+            if (existing) continue;
 
             const permissions = await this.prisma.permission.findMany({
-                where: { key: { in: permissionKeys } },
-                select: { id: true, key: true },
+                where: { key: { in: seed.permissionKeys } },
+                select: { id: true },
             });
 
-            // Replace wholesale: this is the source-controlled definition of
-            // the system role, so it should always match DEFAULT_ROLE_PERMISSIONS
-            // exactly rather than drift from stale rows.
-            await this.prisma.rolePermission.deleteMany({ where: { roleId: systemRole.id } });
+            const role = await this.prisma.role.create({
+                data: {
+                    name: seed.name,
+                    description: seed.description,
+                    isSystem: true,
+                    isBranchScoped: seed.isBranchScoped ?? false,
+                    discountLimit: seed.discountLimit ?? null,
+                    isDefaultCompanyAdmin: seed.isDefaultCompanyAdmin ?? false,
+                    isPlatformRole: seed.isPlatformRole ?? false,
+                    companyId: null,
+                },
+            });
+
             await this.prisma.rolePermission.createMany({
-                data: permissions.map((p) => ({ roleId: systemRole.id, permissionId: p.id })),
+                data: permissions.map((p) => ({ roleId: role.id, permissionId: p.id })),
             });
         }
-    }
-
-    /**
-     * The id of a seeded system Role by its exact name (see
-     * legacy-role-names.ts) — for the handful of places still tied to a
-     * specific legacy role rather than a permission. Throws rather than
-     * returning undefined: every name in LEGACY_ROLE_NAMES is guaranteed
-     * seeded by syncSystemRoles before the app finishes booting, so a miss
-     * here means that invariant broke, not a normal "not found".
-     */
-    async getSystemRoleId(name: string): Promise<string> {
-        const cached = this.systemRoleIdsByName.get(name);
-        if (cached) return cached;
-
-        const role = await this.prisma.role.findFirst({ where: { companyId: null, name } });
-        if (!role) {
-            throw new Error(`System role "${name}" not found — has RbacService.syncSystemRoles run?`);
-        }
-
-        this.systemRoleIdsByName.set(name, role.id);
-        return role.id;
     }
 
     async getEffectivePermissions(userId: string): Promise<string[]> {
@@ -130,10 +101,70 @@ export class RbacService implements OnModuleInit {
     }
 
     /**
-     * Roles a caller may see: the shared system roles, every global custom
-     * role (companyId null, isSystem false — SUPER_ADMIN-authored, offered
-     * to every tenant), and, for a tenant actor, that tenant's own custom
-     * roles.
+     * Ids of roles visible in `companyId`'s scope that grant `includeKey`
+     * and, when given, do not also grant `excludeKey` — the general
+     * "individual contributor with this capability, not also a team lead"
+     * pattern used to find valid reassignment/snapshot targets without
+     * naming a role. See DealsService.reassignManager, LeadsService's
+     * SH-A1 reassignment, and DashboardService.getTeamSnapshot.
+     */
+    async findRoleIdsWithPermission(companyId: string, includeKey: string, excludeKey?: string): Promise<string[]> {
+        const roles = await this.prisma.role.findMany({
+            where: {
+                OR: [{ companyId: null }, { companyId }],
+                permissions: { some: { permission: { key: includeKey } } },
+            },
+            select: {
+                id: true,
+                permissions: { select: { permission: { select: { key: true } } } },
+            },
+        });
+
+        if (!excludeKey) return roles.map((r) => r.id);
+
+        return roles
+            .filter((r) => !r.permissions.some((p) => p.permission.key === excludeKey))
+            .map((r) => r.id);
+    }
+
+    /**
+     * Roles visible in `companyId`'s scope that grant `permissionKey`, with
+     * enough shape (own discount ceiling, branch scoping) for
+     * DealsService to work out who should be asked to decide a pending
+     * discount request without naming a role.
+     */
+    async findApproverRoles(companyId: string, permissionKey: string) {
+        return this.prisma.role.findMany({
+            where: {
+                OR: [{ companyId: null }, { companyId }],
+                permissions: { some: { permission: { key: permissionKey } } },
+            },
+            select: { id: true, isBranchScoped: true, discountLimit: true },
+        });
+    }
+
+    /**
+     * The role a brand-new tenant's first administrator is assigned — see
+     * CompaniesService.create. Exactly one global role should carry this
+     * flag; seeded onto "Company Admin" and never touched again afterward.
+     */
+    async findDefaultCompanyAdminRoleId(): Promise<string> {
+        const role = await this.prisma.role.findFirst({
+            where: { isDefaultCompanyAdmin: true },
+            select: { id: true },
+        });
+
+        if (!role) {
+            throw new Error("No role is marked isDefaultCompanyAdmin — has RbacService.seedDefaultRolesIfMissing run?");
+        }
+
+        return role.id;
+    }
+
+    /**
+     * Roles a caller may see: every global role (companyId null — the
+     * built-in roles plus any a SUPER_ADMIN has added) and, for a tenant
+     * actor, that tenant's own custom roles.
      */
     async listRoles(actor: AuthUser) {
         const roles = await this.prisma.role.findMany({
@@ -145,10 +176,10 @@ export class RbacService implements OnModuleInit {
         });
 
         // Not `_count`/`include: { users }` on the Role query above: a
-        // system or global custom role's users span every tenant that uses
-        // it, and a COMPANY_ADMIN must only ever see their own company's
-        // slice of that — otherwise this leaks another company's user count
-        // and names for a shared role. Scoped explicitly here instead, and
+        // global role's users span every tenant that uses it, and a
+        // COMPANY_ADMIN must only ever see their own company's slice of
+        // that — otherwise this leaks another company's user count and
+        // names for a shared role. Scoped explicitly here instead, and
         // capped to a handful per role for the card grid's avatar preview
         // rather than fetching every holder.
         const SAMPLE_SIZE = 4;
@@ -176,6 +207,11 @@ export class RbacService implements OnModuleInit {
                 description: r.description,
                 isSystem: r.isSystem,
                 isBranchScoped: r.isBranchScoped,
+                discountLimit: r.discountLimit === null ? null : r.discountLimit.toNumber(),
+                // Read-only, never part of Create/UpdateRoleDto: a UI-facing
+                // marker for the one role Users pages must never offer as
+                // assignable — see UsersService.ensureCanAssignRole.
+                isPlatformRole: r.isPlatformRole,
                 companyId: r.companyId,
                 userCount: users.length,
                 sample: users.slice(0, SAMPLE_SIZE),
@@ -202,6 +238,28 @@ export class RbacService implements OnModuleInit {
         return role;
     }
 
+    /**
+     * A global role (companyId null) may only be managed by a platform
+     * administrator; a tenant's own custom role only by that tenant (or a
+     * platform administrator). Shared by updateRole/setRolePermissions/
+     * deleteRole below — the three mutations that used to also check
+     * `role.isSystem` and refuse outright. That lock is gone: a global role
+     * is otherwise exactly as editable as a custom one, just scoped to
+     * whoever may touch the global namespace.
+     */
+    private assertCanManageRole(actor: AuthUser, role: { companyId: string | null }) {
+        if (role.companyId === null) {
+            if (!actor.isSuperAdmin) {
+                throw new ForbiddenException("Only a platform administrator can manage a global role");
+            }
+            return;
+        }
+
+        if (role.companyId !== actor.companyId && !actor.isSuperAdmin) {
+            throw new ForbiddenException("Cannot manage another company's role");
+        }
+    }
+
     private assertPermissionKeysExist(permissionKeys: string[]) {
         const invalid = permissionKeys.filter((k) => !PERMISSION_KEYS.includes(k));
 
@@ -212,8 +270,8 @@ export class RbacService implements OnModuleInit {
 
     /**
      * COMPANY_ADMIN creates a role scoped to their own tenant. SUPER_ADMIN
-     * creates a global custom role, offered to every tenant alongside the
-     * built-in system roles — the platform-level "add a new role" path.
+     * creates a global role, offered to every tenant alongside the
+     * built-in ones — the platform-level "add a new role" path.
      */
     async createRole(actor: AuthUser, dto: CreateRoleDto) {
         this.assertPermissionKeysExist(dto.permissionKeys);
@@ -234,6 +292,7 @@ export class RbacService implements OnModuleInit {
                 name: dto.name.trim(),
                 description: dto.description?.trim() || null,
                 isSystem: false,
+                discountLimit: dto.discountLimit ?? null,
                 companyId,
                 permissions: {
                     create: permissions.map((p) => ({ permissionId: p.id })),
@@ -245,20 +304,14 @@ export class RbacService implements OnModuleInit {
 
     async updateRole(actor: AuthUser, roleId: string, dto: UpdateRoleDto) {
         const role = await this.getVisibleRole(actor, roleId);
-
-        if (role.isSystem) {
-            throw new ForbiddenException("System roles cannot be renamed");
-        }
-
-        if (role.companyId !== null && role.companyId !== actor.companyId && !actor.isSuperAdmin) {
-            throw new ForbiddenException("Cannot edit another company's role");
-        }
+        this.assertCanManageRole(actor, role);
 
         return this.prisma.role.update({
             where: { id: roleId },
             data: {
                 ...(dto.name !== undefined ? { name: dto.name.trim() } : {}),
                 ...(dto.description !== undefined ? { description: dto.description.trim() || null } : {}),
+                ...(dto.discountLimit !== undefined ? { discountLimit: dto.discountLimit } : {}),
             },
         });
     }
@@ -266,16 +319,7 @@ export class RbacService implements OnModuleInit {
     async setRolePermissions(actor: AuthUser, roleId: string, permissionKeys: string[]) {
         this.assertPermissionKeysExist(permissionKeys);
         const role = await this.getVisibleRole(actor, roleId);
-
-        if (role.isSystem) {
-            throw new ForbiddenException(
-                "System roles' permissions are fixed — clone one into a custom role to adjust it",
-            );
-        }
-
-        if (role.companyId !== null && role.companyId !== actor.companyId && !actor.isSuperAdmin) {
-            throw new ForbiddenException("Cannot edit another company's role");
-        }
+        this.assertCanManageRole(actor, role);
 
         const permissions = await this.prisma.permission.findMany({
             where: { key: { in: permissionKeys } },
@@ -294,14 +338,7 @@ export class RbacService implements OnModuleInit {
 
     async deleteRole(actor: AuthUser, roleId: string) {
         const role = await this.getVisibleRole(actor, roleId);
-
-        if (role.isSystem) {
-            throw new ForbiddenException("System roles cannot be deleted");
-        }
-
-        if (role.companyId !== null && role.companyId !== actor.companyId && !actor.isSuperAdmin) {
-            throw new ForbiddenException("Cannot delete another company's role");
-        }
+        this.assertCanManageRole(actor, role);
 
         // Every user has exactly one Role (User.roleId, required) — the DB's
         // own RESTRICT foreign key would refuse this anyway, but a clear

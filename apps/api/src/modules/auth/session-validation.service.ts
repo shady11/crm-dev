@@ -44,7 +44,7 @@ export class SessionValidationService {
                 phone: true,
                 isSuperAdmin: true,
                 roleId: true,
-                role: { select: { name: true, isBranchScoped: true } },
+                role: { select: { name: true, isBranchScoped: true, discountLimit: true } },
                 companyId: true,
                 branchId: true,
                 isActive: true,
@@ -165,6 +165,7 @@ export class SessionValidationService {
             roleName: user.role.name,
             isSuperAdmin: user.isSuperAdmin,
             isBranchScoped: user.role.isBranchScoped,
+            discountLimit: user.role.discountLimit === null ? null : user.role.discountLimit.toNumber(),
             permissions,
             companyId: user.companyId,
             company: user.company

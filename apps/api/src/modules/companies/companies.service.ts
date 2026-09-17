@@ -8,7 +8,6 @@ import {AuditLogService} from "@/modules/audit-log/audit-log.service";
 import {ImpersonationService} from "@/modules/impersonation/impersonation.service";
 import {SettingOptionsService} from "@/modules/setting-options/setting-options.service";
 import {RbacService} from "@/modules/rbac/rbac.service";
-import {LEGACY_ROLE_NAMES} from "@/modules/rbac/legacy-role-names";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateCompanyDto} from "./dto/create-company.dto";
 import {UpdateCompanyDto} from "./dto/update-company.dto";
@@ -69,39 +68,6 @@ export class CompaniesService {
 
         if (dto.timezone) {
             await this.settingOptions.assertActiveOption("TIMEZONE", dto.timezone.trim());
-        }
-    }
-
-    /**
-     * salesHeadDiscountLimit must be >= salesManagerDiscountLimit — checked
-     * against the *effective* values, since a partial update can send either
-     * threshold alone (see UpdateOwnCompanyDto).
-     */
-    private async assertValidDiscountThresholds(id: string, dto: unknown): Promise<void> {
-        // UpdateCompanyDto (the platform operator's DTO) never carries these
-        // — only UpdateOwnCompanyDto does. Typed `unknown` and read
-        // defensively so update() can call this unconditionally for either.
-        const {salesManagerDiscountLimit, salesHeadDiscountLimit} = dto as {
-            salesManagerDiscountLimit?: number;
-            salesHeadDiscountLimit?: number;
-        };
-
-        if (salesManagerDiscountLimit === undefined && salesHeadDiscountLimit === undefined) {
-            return;
-        }
-
-        const current = await this.prisma.company.findUniqueOrThrow({
-            where: {id},
-            select: {salesManagerDiscountLimit: true, salesHeadDiscountLimit: true},
-        });
-
-        const managerLimit = salesManagerDiscountLimit ?? current.salesManagerDiscountLimit.toNumber();
-        const headLimit = salesHeadDiscountLimit ?? current.salesHeadDiscountLimit.toNumber();
-
-        if (headLimit < managerLimit) {
-            throw new BadRequestException(
-                "salesHeadDiscountLimit must be greater than or equal to salesManagerDiscountLimit",
-            );
         }
     }
 
@@ -238,7 +204,7 @@ export class CompaniesService {
 
         const password = dto.adminPassword?.trim() || randomBytes(18).toString("base64url");
         const passwordHash = await bcrypt.hash(password, 10);
-        const companyAdminRoleId = await this.rbacService.getSystemRoleId(LEGACY_ROLE_NAMES.COMPANY_ADMIN);
+        const companyAdminRoleId = await this.rbacService.findDefaultCompanyAdminRoleId();
 
         const company = await this.prisma.$transaction(async (db) => {
             const created = await db.company.create({
@@ -360,7 +326,6 @@ export class CompaniesService {
         await this.findOne(id);
         await this.assertValidSettings(dto);
         await this.assertCurrencyIsUnlocked(id, dto);
-        await this.assertValidDiscountThresholds(id, dto);
 
         if (dto.name) {
             const clash = await this.prisma.company.findFirst({

@@ -22,7 +22,7 @@ import {randomBytes} from "crypto";
 import * as bcrypt from "bcrypt";
 import {PrismaClient} from "@/generated/prisma/client";
 import {PrismaPg} from "@prisma/adapter-pg";
-import {LEGACY_ROLE_NAMES} from "@/modules/rbac/legacy-role-names";
+import {RbacService} from "@/modules/rbac/rbac.service";
 
 type Args = {
     company: string;
@@ -141,20 +141,15 @@ async function main() {
             fail("ADMIN_PASSWORD must be at least 8 characters");
         }
 
-        // The "Company Admin" system Role may not exist yet — this script
-        // can run against a database that has never booted the app (and so
-        // never ran RbacService.syncSystemRoles). find-or-create, same
-        // pattern as RbacService itself.
-        const companyAdminRole =
-            (await prisma.role.findFirst({where: {companyId: null, name: LEGACY_ROLE_NAMES.COMPANY_ADMIN}})) ??
-            (await prisma.role.create({
-                data: {
-                    name: LEGACY_ROLE_NAMES.COMPANY_ADMIN,
-                    description: `Built-in role matching the legacy "COMPANY_ADMIN" access level.`,
-                    isSystem: true,
-                    companyId: null,
-                },
-            }));
+        // The "Company Admin" role may not exist yet — this script can run
+        // against a database that has never booted the app (and so never
+        // seeded it). Run the same seeding RbacService runs on every boot,
+        // then look the role up by its isDefaultCompanyAdmin marker rather
+        // than by name, since a platform administrator may have renamed it.
+        const rbacService = new RbacService(prisma as never);
+        await rbacService.syncCatalog();
+        await rbacService.seedDefaultRolesIfMissing();
+        const companyAdminRole = await prisma.role.findFirstOrThrow({where: {isDefaultCompanyAdmin: true}});
 
         await prisma.user.create({
             data: {

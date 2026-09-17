@@ -18,10 +18,6 @@ import {getRoles} from "@/features/rbac/api/rbac.api";
 import {useBranchesFilter} from "@/features/branches/hooks/use-branches-filter";
 import {useTranslation} from "react-i18next";
 
-// The Super Admin system role belongs to no company and is never
-// assignable from the Users page.
-const SUPER_ADMIN_ROLE_NAME = "Super Admin";
-
 // The schemas below are built inside the component (see useMemo further
 // down), not here at module scope, so their validation messages re-render
 // in the active language rather than freezing in whatever language was
@@ -102,7 +98,7 @@ export function UserForm({
 
     const rolesQuery = useQuery({ queryKey: ["rbac", "roles"], queryFn: getRoles });
     const roles = useMemo(
-        () => (rolesQuery.data ?? []).filter((role) => role.name !== SUPER_ADMIN_ROLE_NAME),
+        () => (rolesQuery.data ?? []).filter((role) => !role.isPlatformRole),
         [rolesQuery.data],
     );
     const branchScopedRoleIds = useMemo(

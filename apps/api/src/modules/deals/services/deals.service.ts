@@ -14,7 +14,7 @@ import {
 } from '@/generated/prisma/client';
 import {PrismaService} from '@/database/prisma.service';
 import {RbacService} from '@/modules/rbac/rbac.service';
-import {LEGACY_ROLE_NAMES} from '@/modules/rbac/legacy-role-names';
+import {hasPermission} from '@/common/utils/permissions.util';
 
 import {
   ClientNotFoundException,
@@ -253,10 +253,8 @@ export class DealsService {
               ? computedDiscountAmount.dividedBy(listPrice).times(100)
               : new Prisma.Decimal(0));
 
-      const company = await db.company.findUniqueOrThrow({where: {id: companyId}});
-
       const requiresApproval = computedDiscountAmount.greaterThan(0) &&
-          this.domain.requiresDiscountApproval(effectiveDiscountPercent, user.roleName, company);
+          this.domain.requiresDiscountApproval(effectiveDiscountPercent, user.discountLimit);
 
       const dealNumber = await this.dealNumberService.generateDealNumber(db, companyId);
 
@@ -355,16 +353,24 @@ export class DealsService {
         });
 
         // The same threshold that decided PENDING also decides who gets
-        // asked — a request within the sales head's own band goes to the
-        // branch's sales head(s); above it, straight to company admin(s).
-        const salesHeadCanDecide = this.domain.canDecideDiscount(
-            effectiveDiscountPercent, LEGACY_ROLE_NAMES.SALES_HEAD, company,
+        // asked — a request a branch-scoped approver's own band already
+        // covers goes to that branch's holder(s); otherwise it needs
+        // someone whose ceiling isn't branch-scoped (company-wide).
+        const approverRoles = await this.rbacService.findApproverRoles(companyId, 'deals.approve_discount');
+        const qualifying = approverRoles.filter(
+            (r) => r.discountLimit === null || new Prisma.Decimal(r.discountLimit).greaterThanOrEqualTo(effectiveDiscountPercent),
         );
+        const branchScopedRoleIds = qualifying.filter((r) => r.isBranchScoped).map((r) => r.id);
+        const companyWideRoleIds = qualifying.filter((r) => !r.isBranchScoped).map((r) => r.id);
+        const targetRoleIds = branchScopedRoleIds.length > 0 ? branchScopedRoleIds : companyWideRoleIds;
 
         const approvers = await db.user.findMany({
-          where: salesHeadCanDecide
-              ? {companyId, branchId: client.branchId, roleId: await this.rbacService.getSystemRoleId(LEGACY_ROLE_NAMES.SALES_HEAD), isActive: true}
-              : {companyId, roleId: await this.rbacService.getSystemRoleId(LEGACY_ROLE_NAMES.COMPANY_ADMIN), isActive: true},
+          where: {
+            companyId,
+            roleId: {in: targetRoleIds},
+            isActive: true,
+            ...(branchScopedRoleIds.length > 0 ? {branchId: client.branchId} : {}),
+          },
           select: {id: true},
         });
 
@@ -569,9 +575,7 @@ export class DealsService {
         throw new DiscountNotPendingException();
       }
 
-      const company = await db.company.findUniqueOrThrow({ where: { id: companyId } });
-
-      if (!this.domain.canDecideDiscount(deal.requestedDiscountPercent, user.roleName, company)) {
+      if (!this.domain.canDecideDiscount(deal.requestedDiscountPercent, hasPermission(user, 'deals.approve_discount'), user.discountLimit)) {
         throw new DiscountApprovalNotAllowedException();
       }
 
@@ -636,9 +640,7 @@ export class DealsService {
         throw new DiscountNotPendingException();
       }
 
-      const company = await db.company.findUniqueOrThrow({ where: { id: companyId } });
-
-      if (!this.domain.canDecideDiscount(deal.requestedDiscountPercent, user.roleName, company)) {
+      if (!this.domain.canDecideDiscount(deal.requestedDiscountPercent, hasPermission(user, 'deals.approve_discount'), user.discountLimit)) {
         throw new DiscountApprovalNotAllowedException();
       }
 
@@ -677,10 +679,12 @@ export class DealsService {
   }
 
   /**
-   * SH-A1: lets a SALES_HEAD move a deal from one of their team's
-   * SALES_MANAGERs to another without going through COMPANY_ADMIN. Kept as
-   * its own endpoint, restricted to an active SALES_MANAGER on the deal's
-   * own branch — a dedicated, narrowly-scoped write action for team leads.
+   * SH-A1: lets a team lead move a deal from one of their team's individual
+   * contributors to another without going through a company-wide admin.
+   * Kept as its own endpoint, restricted to an active user on the deal's
+   * own branch whose role can manage deals but isn't itself a team lead
+   * (deals.manage without deals.reassign) — a dedicated, narrowly-scoped
+   * write action for team leads.
    */
   async reassignManager(user: AuthUser, id: string, dto: ReassignManagerDto) {
     if (!user.companyId) {
@@ -703,19 +707,21 @@ export class DealsService {
         throw new BadRequestException("Deal is not assigned to a branch");
       }
 
+      const targetRoleIds = await this.rbacService.findRoleIdsWithPermission(companyId, 'deals.manage', 'deals.reassign');
+
       const manager = await db.user.findFirst({
         where: {
           id: dto.managerId,
           companyId,
           branchId: deal.branchId,
-          roleId: await this.rbacService.getSystemRoleId(LEGACY_ROLE_NAMES.SALES_MANAGER),
+          roleId: {in: targetRoleIds},
           isActive: true,
         },
       });
 
       if (!manager) {
         throw new BadRequestException(
-            "Manager not assignable — must be an active SALES_MANAGER on the same branch",
+            "Manager not assignable — must be an active individual contributor on the same branch",
         );
       }
 

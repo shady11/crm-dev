@@ -3,7 +3,6 @@ import {PrismaClient, UnitStatus, UnitType,} from "@/generated/prisma/client";
 import {PrismaPg} from "@prisma/adapter-pg";
 import * as bcrypt from "bcrypt";
 import {RbacService} from "@/modules/rbac/rbac.service";
-import {LEGACY_ROLE_NAMES} from "@/modules/rbac/legacy-role-names";
 
 const adapter = new PrismaPg({
     connectionString: process.env.DATABASE_URL!,
@@ -40,13 +39,14 @@ async function main() {
     assertNotProduction();
 
     // Same RBAC bootstrap RbacService runs on every API boot (permission
-    // catalog, system roles) — run it here too, before creating the demo
+    // catalog, default roles) — run it here too, before creating the demo
     // admin below, so there's a real "Company Admin" Role row to point
     // roleId at even on a database that has never booted the app.
     const rbacService = new RbacService(prisma as never);
     await rbacService.syncCatalog();
-    await rbacService.syncSystemRoles();
-    const companyAdminRoleId = await rbacService.getSystemRoleId(LEGACY_ROLE_NAMES.COMPANY_ADMIN);
+    await rbacService.seedDefaultRolesIfMissing();
+    const companyAdminRole = await prisma.role.findFirstOrThrow({where: {isDefaultCompanyAdmin: true}});
+    const companyAdminRoleId = companyAdminRole.id;
 
     const passwordHash = await bcrypt.hash("password123", 10);
 

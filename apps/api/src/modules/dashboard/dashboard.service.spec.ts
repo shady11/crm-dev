@@ -56,7 +56,7 @@ describe('DashboardService', () => {
             lead: {count: jest.fn().mockResolvedValue(0), findMany: jest.fn().mockResolvedValue([]), groupBy: jest.fn().mockResolvedValue([])},
         };
 
-        const rbacService = {getSystemRoleId: jest.fn().mockResolvedValue('role-sales-manager')};
+        const rbacService = {findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-manager'])};
         const service = new DashboardService(prisma as any, rbacService as any);
         return {service, prisma};
     }
