@@ -164,11 +164,18 @@ export class RbacService implements OnModuleInit {
     /**
      * Roles a caller may see: every global role (companyId null — the
      * built-in roles plus any a SUPER_ADMIN has added) and, for a tenant
-     * actor, that tenant's own custom roles.
+     * actor, that tenant's own custom roles. The platform role
+     * (isPlatformRole — "Super Admin") is never shown to a tenant actor:
+     * it grants no permissions of its own (SUPER_ADMIN bypasses the
+     * permission system entirely via User.isSuperAdmin) and is never
+     * assignable to one of their users — see UsersService.ensureCanAssignRole
+     * — so surfacing it here would only expose who else runs the platform.
      */
     async listRoles(actor: AuthUser) {
         const roles = await this.prisma.role.findMany({
-            where: actor.isSuperAdmin ? { companyId: null } : { OR: [{ companyId: null }, { companyId: actor.companyId }] },
+            where: actor.isSuperAdmin
+                ? { companyId: null }
+                : { isPlatformRole: false, OR: [{ companyId: null }, { companyId: actor.companyId }] },
             include: {
                 permissions: { select: { permission: { select: { key: true } } } },
             },
@@ -226,6 +233,12 @@ export class RbacService implements OnModuleInit {
         const role = await this.prisma.role.findUnique({ where: { id: roleId } });
 
         if (!role) {
+            throw new NotFoundException("Role not found");
+        }
+
+        // The platform role is never visible to a tenant actor, by id or
+        // otherwise — same reasoning as listRoles above.
+        if (role.isPlatformRole && !actor.isSuperAdmin) {
             throw new NotFoundException("Role not found");
         }
 

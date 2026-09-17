@@ -250,6 +250,44 @@ describe("RbacService", () => {
                 }),
             );
         });
+
+        it("hides the platform role from a COMPANY_ADMIN behind NotFoundException", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue({
+                id: "role-super-admin",
+                companyId: null,
+                isSystem: true,
+                isPlatformRole: true,
+            });
+
+            await expect(service.listRoleMembers(companyAdmin, "role-super-admin")).rejects.toThrow(
+                NotFoundException,
+            );
+        });
+    });
+
+    describe("listRoles", () => {
+        it("excludes the platform role from a COMPANY_ADMIN's list", async () => {
+            const {service, prisma} = build();
+
+            await service.listRoles(companyAdmin);
+
+            expect(prisma.role.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    where: expect.objectContaining({isPlatformRole: false}),
+                }),
+            );
+        });
+
+        it("does not filter by isPlatformRole for a SUPER_ADMIN's own list", async () => {
+            const {service, prisma} = build();
+
+            await service.listRoles(superAdmin);
+
+            expect(prisma.role.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({where: {companyId: null}}),
+            );
+        });
     });
 
     describe("seedDefaultRolesIfMissing", () => {
