@@ -510,8 +510,8 @@ export class UsersService {
      * A Role can only be assigned if it's visible to the actor (a global
      * role, or one of their own company's custom roles), and the platform
      * role (isPlatformRole — the "Super Admin" role) can never be assigned
-     * here at all — reserved for `prisma/provision-super-admin.ts`, since a
-     * user created through this (company-scoped) flow always gets a
+     * here at all — reserved for `prisma/seed.ts --mode provision-super-admin`,
+     * since a user created through this (company-scoped) flow always gets a
      * companyId, and the platform role never has one.
      */
     private async ensureCanAssignRole(actor: AuthUser, roleId: string) {
