@@ -7,18 +7,50 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
 import {Loader2} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
-import {Card, CardContent, CardHeader, CardTitle, CardDescription} from "@/components/ui/card.tsx";
+import {Card, CardContent, CardHeader, CardDescription} from "@/components/ui/card.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field.tsx";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
 import {toast} from "@/components/ui/toast.tsx";
 import {changeOwnPassword, updateOwnProfile, type UpdateOwnProfilePayload} from "@/features/auth/api/auth.api.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {authStorage} from "@/features/auth/utils/auth-storage.ts";
 
+type ProfileTab = "general" | "password";
+
 // SM-A1: lets any signed-in user fix their own name/phone — previously the
 // only self-service action was changing a password, so a typo at onboarding
 // meant filing a request with an admin.
 export function ProfilePage() {
+    const {t} = useTranslation("settings");
+    const [activeTab, setActiveTab] = useState<ProfileTab>("general");
+
+    return (
+        <div className="space-y-6">
+            <div>
+                <h2 className="text-2xl font-medium tracking-tight">{t("profile.page.heading")}</h2>
+                <p className="text-sm text-muted-foreground">{t("profile.page.description")}</p>
+            </div>
+
+            <Tabs value={activeTab} onValueChange={({value}) => setActiveTab(value as ProfileTab)}>
+                <TabsList>
+                    <TabsTrigger value="general">{t("profile.tabs.general")}</TabsTrigger>
+                    <TabsTrigger value="password">{t("profile.tabs.password")}</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="general">
+                    <GeneralPanel />
+                </TabsContent>
+
+                <TabsContent value="password">
+                    <ChangePasswordCard />
+                </TabsContent>
+            </Tabs>
+        </div>
+    );
+}
+
+function GeneralPanel() {
     const {t} = useTranslation("settings");
     const {t: tCommon} = useTranslation("common");
     const queryClient = useQueryClient();
@@ -49,56 +81,44 @@ export function ProfilePage() {
     });
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h2 className="text-2xl font-medium tracking-tight">{t("profile.page.heading")}</h2>
-                <p className="text-sm text-muted-foreground">{t("profile.page.description")}</p>
-            </div>
+        <Card className="max-w-xl border border-secondary shadow-none">
+            <CardContent>
+                <form
+                    className="space-y-5"
+                    onSubmit={(event) => {
+                        event.preventDefault();
+                        updateMutation.mutate(form);
+                    }}
+                >
+                    <label className="block space-y-1.5">
+                        <span className="text-sm font-medium">{t("profile.fields.fullName")}</span>
+                        <Input
+                            aria-label={t("profile.fields.fullName")}
+                            value={form.fullName}
+                            onChange={(event) => setForm((prev) => ({...prev, fullName: event.target.value}))}
+                        />
+                    </label>
 
-            <Card className="max-w-xl border border-secondary shadow-none">
-                <CardHeader>
-                    <CardTitle className="text-base">{t("profile.page.formTitle")}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <form
-                        className="space-y-5"
-                        onSubmit={(event) => {
-                            event.preventDefault();
-                            updateMutation.mutate(form);
-                        }}
-                    >
-                        <label className="block space-y-1.5">
-                            <span className="text-sm font-medium">{t("profile.fields.fullName")}</span>
-                            <Input
-                                aria-label={t("profile.fields.fullName")}
-                                value={form.fullName}
-                                onChange={(event) => setForm((prev) => ({...prev, fullName: event.target.value}))}
-                            />
-                        </label>
+                    <label className="block space-y-1.5">
+                        <span className="text-sm font-medium">{t("profile.fields.email")}</span>
+                        <Input aria-label={t("profile.fields.email")} value={user?.email ?? ""} disabled />
+                    </label>
 
-                        <label className="block space-y-1.5">
-                            <span className="text-sm font-medium">{t("profile.fields.email")}</span>
-                            <Input aria-label={t("profile.fields.email")} value={user?.email ?? ""} disabled />
-                        </label>
+                    <label className="block space-y-1.5">
+                        <span className="text-sm font-medium">{t("profile.fields.phone")}</span>
+                        <Input
+                            aria-label={t("profile.fields.phone")}
+                            value={form.phone}
+                            onChange={(event) => setForm((prev) => ({...prev, phone: event.target.value}))}
+                        />
+                    </label>
 
-                        <label className="block space-y-1.5">
-                            <span className="text-sm font-medium">{t("profile.fields.phone")}</span>
-                            <Input
-                                aria-label={t("profile.fields.phone")}
-                                value={form.phone}
-                                onChange={(event) => setForm((prev) => ({...prev, phone: event.target.value}))}
-                            />
-                        </label>
-
-                        <Button type="submit" disabled={updateMutation.isPending}>
-                            {updateMutation.isPending ? tCommon("actions.saving") : tCommon("actions.saveChanges")}
-                        </Button>
-                    </form>
-                </CardContent>
-            </Card>
-
-            <ChangePasswordCard />
-        </div>
+                    <Button type="submit" disabled={updateMutation.isPending}>
+                        {updateMutation.isPending ? tCommon("actions.saving") : tCommon("actions.saveChanges")}
+                    </Button>
+                </form>
+            </CardContent>
+        </Card>
     );
 }
 
@@ -178,7 +198,6 @@ function ChangePasswordCard() {
     return (
         <Card className="max-w-xl border border-secondary shadow-none">
             <CardHeader>
-                <CardTitle className="text-base">{t("profile.password.formTitle")}</CardTitle>
                 <CardDescription>{t("profile.password.description")}</CardDescription>
             </CardHeader>
             <CardContent>

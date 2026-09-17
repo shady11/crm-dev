@@ -19,8 +19,11 @@
   "profile": {
     "page": {
       "heading": "My profile",
-      "description": "Update your own name and phone number.",
-      "formTitle": "Personal details"
+      "description": "Manage your own account details and password."
+    },
+    "tabs": {
+      "general": "General",
+      "password": "Password"
     },
     "fields": {
       "fullName": "Full name",
@@ -34,7 +37,6 @@
       "updateErrorDescription": "Something went wrong. Please try again."
     },
     "password": {
-      "formTitle": "Password",
       "description": "Changing it signs you out of every other device.",
       "fields": {
         "currentPassword": "Current password",
