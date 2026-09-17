@@ -32,6 +32,26 @@
       "updateSuccessDescription": "Ваш профиль обновлён.",
       "updateErrorTitle": "Не удалось сохранить профиль",
       "updateErrorDescription": "Что-то пошло не так. Попробуйте ещё раз."
+    },
+    "password": {
+      "formTitle": "Пароль",
+      "description": "При смене пароля вы будете выведены из всех остальных устройств.",
+      "fields": {
+        "currentPassword": "Текущий пароль",
+        "newPassword": "Новый пароль",
+        "confirmNewPassword": "Подтвердите новый пароль"
+      },
+      "hint": "Минимум 8 символов, с заглавной и строчной буквой и цифрой.",
+      "mismatch": "Пароли не совпадают",
+      "submit": "Изменить пароль",
+      "toasts": {
+        "updateSuccessTitle": "Пароль изменён",
+        "updateSuccessDescription": "Используйте новый пароль при следующем входе.",
+        "incorrectCurrentPassword": "Текущий пароль неверен",
+        "sameAsCurrentPassword": "Новый пароль должен отличаться от текущего",
+        "updateErrorTitle": "Не удалось изменить пароль",
+        "updateErrorDescription": "Что-то пошло не так. Попробуйте ещё раз."
+      }
     }
   }
 }

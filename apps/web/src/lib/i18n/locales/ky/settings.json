@@ -32,6 +32,26 @@
       "updateSuccessDescription": "Сиздин профилиңиз жаңырды.",
       "updateErrorTitle": "Профилди сактоо мүмкүн болбоду",
       "updateErrorDescription": "Бир нерсе туура эмес болду. Кайра аракет кылыңыз."
+    },
+    "password": {
+      "formTitle": "Сырсөз",
+      "description": "Сырсөздү өзгөрткөндө башка бардык түзмөктөрдөн чыгасыз.",
+      "fields": {
+        "currentPassword": "Учурдагы сырсөз",
+        "newPassword": "Жаңы сырсөз",
+        "confirmNewPassword": "Жаңы сырсөздү ырастаңыз"
+      },
+      "hint": "Кеминде 8 белги, баш тамга, кичине тамга жана сан менен.",
+      "mismatch": "Сырсөздөр дал келген жок",
+      "submit": "Сырсөздү өзгөртүү",
+      "toasts": {
+        "updateSuccessTitle": "Сырсөз өзгөртүлдү",
+        "updateSuccessDescription": "Кийинки жолу кирүүдө жаңы сырсөздү колдонуңуз.",
+        "incorrectCurrentPassword": "Учурдагы сырсөз туура эмес",
+        "sameAsCurrentPassword": "Жаңы сырсөз учурдагысынан айырмаланышы керек",
+        "updateErrorTitle": "Сырсөздү өзгөртүү мүмкүн болбоду",
+        "updateErrorDescription": "Бир нерсе туура эмес болду. Кайра аракет кылыңыз."
+      }
     }
   }
 }
