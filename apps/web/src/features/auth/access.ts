@@ -43,6 +43,17 @@ export const FEATURE_PERMISSIONS = {
 export type Feature = keyof typeof FEATURE_PERMISSIONS;
 
 /**
+ * Features that work with no companyId — everything a SUPER_ADMIN's
+ * account actually has. Every other feature's API is behind CompanyGuard
+ * (or an equivalent service-level `if (!actor.companyId) throw...` check),
+ * which rejects a SUPER_ADMIN outright. hasPermission's unconditional "*"
+ * bypass would otherwise make canAccess offer a SUPER_ADMIN a nav link and
+ * a route for every one of those too — a door that opens onto a 403 or
+ * ForbiddenException, not a page. See CompaniesController's guard comment.
+ */
+const SUPER_ADMIN_FEATURES: readonly Feature[] = ["companies", "settingOptions", "auditLog", "rolesPermissions"];
+
+/**
  * Fine-grained permission check. SUPER_ADMIN carries ["*"] from the API and
  * always passes.
  */
@@ -51,7 +62,11 @@ export function hasPermission(user: Pick<AuthUser, "permissions"> | undefined, p
     return user.permissions.includes("*") || user.permissions.includes(permission);
 }
 
-export function canAccess(user: Pick<AuthUser, "permissions"> | undefined, feature: Feature): boolean {
+export function canAccess(user: Pick<AuthUser, "permissions" | "isSuperAdmin"> | undefined, feature: Feature): boolean {
+    if (user?.isSuperAdmin) {
+        return SUPER_ADMIN_FEATURES.includes(feature);
+    }
+
     return hasPermission(user, FEATURE_PERMISSIONS[feature]);
 }
 
