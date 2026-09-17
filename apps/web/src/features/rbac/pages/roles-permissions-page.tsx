@@ -2,10 +2,8 @@ import {useState} from "react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "sonner";
 import {useTranslation} from "react-i18next";
-import {Lock, Plus, ShieldCheck, Trash2, Users as UsersIcon} from "lucide-react";
-import {Badge} from "@/components/ui/badge.tsx";
+import {Plus} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {
     AlertDialog,
@@ -28,6 +26,7 @@ import {
 import type {Role} from "../types/rbac.types";
 import {RoleFormSheet, type RoleFormValues} from "../components/role-form-sheet";
 import {RoleUsersDialog} from "../components/role-users-dialog";
+import {RoleCard} from "../components/role-card";
 
 type Pending = {action: "delete"; role: Role} | null;
 
@@ -91,8 +90,8 @@ export function RolesPermissionsPage() {
         <div className="space-y-6">
             <div className="flex items-start justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-medium tracking-tight">{t("page.heading")}</h2>
-                    <p className="text-sm text-muted-foreground">{t("page.description")}</p>
+                    <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
+                    <p className="text-muted-foreground text-sm">{t("page.breadcrumb")}</p>
                 </div>
                 <Button
                     onClick={() => {
@@ -110,81 +109,20 @@ export function RolesPermissionsPage() {
                     <Spinner />
                 </div>
             ) : (
-                <div className="rounded-lg border">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>{t("page.table.headers.name")}</TableHead>
-                                <TableHead>{t("page.table.headers.type")}</TableHead>
-                                <TableHead>{t("page.table.headers.permissions")}</TableHead>
-                                <TableHead>{t("page.table.headers.users")}</TableHead>
-                                <TableHead className="w-0" />
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {roles.map((role) => (
-                                <TableRow key={role.id}>
-                                    <TableCell>
-                                        <div className="font-medium">{role.name}</div>
-                                        {role.description ? (
-                                            <div className="text-muted-foreground text-xs">{role.description}</div>
-                                        ) : null}
-                                    </TableCell>
-                                    <TableCell>
-                                        <Badge variant={role.isSystem ? "outline" : "secondary"} className="gap-1">
-                                            {role.isSystem ? <Lock className="size-3" /> : <ShieldCheck className="size-3" />}
-                                            {role.isSystem ? t("badges.system") : t("badges.custom")}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell className="text-muted-foreground text-sm">
-                                        {t("page.table.permissionCount", {count: role.permissionKeys.length})}
-                                    </TableCell>
-                                    <TableCell className="text-muted-foreground text-sm">
-                                        <button
-                                            className="hover:text-foreground hover:underline"
-                                            onClick={() => setUsersDialogRole(role)}
-                                        >
-                                            {t("page.table.userCount", {count: role.userCount})}
-                                        </button>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex justify-end gap-1">
-                                            <Button
-                                                size="icon-sm"
-                                                variant="ghost"
-                                                aria-label={t("page.rowActions.manageUsers", {name: role.name})}
-                                                onClick={() => setUsersDialogRole(role)}
-                                            >
-                                                <UsersIcon className="size-3.5" />
-                                            </Button>
-                                            {!role.isSystem && (
-                                                <>
-                                                    <Button
-                                                        size="sm"
-                                                        variant="ghost"
-                                                        onClick={() => {
-                                                            setEditing(role);
-                                                            setFormOpen(true);
-                                                        }}
-                                                    >
-                                                        {tCommon("actions.edit")}
-                                                    </Button>
-                                                    <Button
-                                                        size="icon-sm"
-                                                        variant="ghost"
-                                                        aria-label={t("page.rowActions.delete", {name: role.name})}
-                                                        onClick={() => setPending({action: "delete", role})}
-                                                    >
-                                                        <Trash2 className="text-destructive size-3.5" />
-                                                    </Button>
-                                                </>
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {roles.map((role, index) => (
+                        <RoleCard
+                            key={role.id}
+                            role={role}
+                            colorIndex={index}
+                            onManageUsers={() => setUsersDialogRole(role)}
+                            onEdit={() => {
+                                setEditing(role);
+                                setFormOpen(true);
+                            }}
+                            onDelete={() => setPending({action: "delete", role})}
+                        />
+                    ))}
                 </div>
             )}
 

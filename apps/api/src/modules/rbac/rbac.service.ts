@@ -171,22 +171,49 @@ export class RbacService implements OnModuleInit {
                     : { OR: [{ companyId: null }, { companyId: actor.companyId }] },
             include: {
                 permissions: { select: { permission: { select: { key: true } } } },
-                _count: { select: { users: true } },
             },
             orderBy: [{ isSystem: "desc" }, { name: "asc" }],
         });
 
-        return roles.map((r) => ({
-            id: r.id,
-            name: r.name,
-            description: r.description,
-            isSystem: r.isSystem,
-            companyId: r.companyId,
-            userCount: r._count.users,
-            permissionKeys: r.permissions.map((p) => p.permission.key),
-            createdAt: r.createdAt,
-            updatedAt: r.updatedAt,
-        }));
+        // Not `_count`/`include: { users }` on the Role query above: a system
+        // or global custom role's UserRoleAssignment rows span every tenant
+        // that uses it, and a COMPANY_ADMIN must only ever see their own
+        // company's slice of that — otherwise this leaks another company's
+        // user count and names for a shared role. Scoped explicitly here
+        // instead, and capped to a handful per role for the card grid's
+        // avatar preview rather than fetching every assignee.
+        const SAMPLE_SIZE = 4;
+        const assignments = await this.prisma.userRoleAssignment.findMany({
+            where: {
+                roleId: { in: roles.map((r) => r.id) },
+                user: actor.role === UserRole.SUPER_ADMIN ? {} : { companyId: actor.companyId },
+            },
+            select: { roleId: true, user: { select: { id: true, fullName: true } } },
+        });
+
+        const usersByRole = new Map<string, { id: string; fullName: string }[]>();
+        for (const a of assignments) {
+            const list = usersByRole.get(a.roleId) ?? [];
+            list.push(a.user);
+            usersByRole.set(a.roleId, list);
+        }
+
+        return roles.map((r) => {
+            const users = usersByRole.get(r.id) ?? [];
+
+            return {
+                id: r.id,
+                name: r.name,
+                description: r.description,
+                isSystem: r.isSystem,
+                companyId: r.companyId,
+                userCount: users.length,
+                sample: users.slice(0, SAMPLE_SIZE),
+                permissionKeys: r.permissions.map((p) => p.permission.key),
+                createdAt: r.createdAt,
+                updatedAt: r.updatedAt,
+            };
+        });
     }
 
     private async getVisibleRole(actor: AuthUser, roleId: string) {

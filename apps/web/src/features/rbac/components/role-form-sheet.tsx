@@ -4,14 +4,14 @@ import {Button} from "@/components/ui/button.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {
-    Sheet,
-    SheetBody,
-    SheetContent,
-    SheetDescription,
-    SheetFooter,
-    SheetHeader,
-    SheetTitle,
-} from "@/components/ui/sheet.tsx";
+    Dialog,
+    DialogBody,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog.tsx";
 import {FieldGroup} from "@/components/ui/field.tsx";
 import {PermissionPicker} from "./permission-picker";
 import type {Permission, Role} from "../types/rbac.types";
@@ -47,14 +47,20 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
     }, [open, role]);
 
     const isEdit = role !== null;
+    // A system role's name and permissions are fixed (see RbacService) — the
+    // dialog still opens for one, but read-only, so its permission set stays
+    // inspectable without implying it can be changed here.
+    const readOnly = role?.isSystem ?? false;
 
     return (
-        <Sheet open={open} onOpenChange={({open: isOpen}) => onOpenChange(isOpen)}>
-            <SheetContent className="sm:max-w-lg" variant="inset">
-                <SheetHeader>
-                    <SheetTitle>{isEdit ? t("form.editTitle") : t("form.newTitle")}</SheetTitle>
-                    <SheetDescription>{t("form.description")}</SheetDescription>
-                </SheetHeader>
+        <Dialog open={open} onOpenChange={({open: isOpen}) => onOpenChange(isOpen)}>
+            <DialogContent className="sm:max-w-xl">
+                <DialogHeader>
+                    <DialogTitle>{readOnly ? (role?.name ?? "") : isEdit ? t("form.editTitle") : t("form.newTitle")}</DialogTitle>
+                    <DialogDescription>
+                        {readOnly ? t("form.readOnlyDescription") : t("form.description")}
+                    </DialogDescription>
+                </DialogHeader>
 
                 <form
                     className="flex min-h-0 flex-1 flex-col"
@@ -63,45 +69,57 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
                         onSubmit({name, description, permissionKeys: Array.from(selected)});
                     }}
                 >
-                    <SheetBody scrollFade>
-                        <FieldGroup className="gap-5 py-4">
-                            <label className="block space-y-1.5">
-                                <span className="text-sm font-medium">{t("form.fields.name")}</span>
-                                <Input
-                                    aria-label={t("form.fields.name")}
-                                    required
-                                    value={name}
-                                    onChange={(event) => setName(event.target.value)}
-                                />
-                            </label>
+                    <DialogBody className="space-y-5">
+                        {!readOnly && (
+                            <FieldGroup className="gap-4">
+                                <label className="block space-y-1.5">
+                                    <span className="text-sm font-medium">{t("form.fields.name")}</span>
+                                    <Input
+                                        aria-label={t("form.fields.name")}
+                                        required
+                                        value={name}
+                                        onChange={(event) => setName(event.target.value)}
+                                    />
+                                </label>
 
-                            <label className="block space-y-1.5">
-                                <span className="text-sm font-medium">{t("form.fields.description")}</span>
-                                <Textarea
-                                    aria-label={t("form.fields.description")}
-                                    value={description}
-                                    onChange={(event) => setDescription(event.target.value)}
-                                />
-                            </label>
+                                <label className="block space-y-1.5">
+                                    <span className="text-sm font-medium">{t("form.fields.description")}</span>
+                                    <Textarea
+                                        aria-label={t("form.fields.description")}
+                                        value={description}
+                                        onChange={(event) => setDescription(event.target.value)}
+                                    />
+                                </label>
+                            </FieldGroup>
+                        )}
 
-                            <div className="space-y-1.5">
-                                <span className="text-sm font-medium">{t("form.fields.permissions")}</span>
-                                <PermissionPicker permissions={permissions} selected={selected} onChange={setSelected} />
-                            </div>
-                        </FieldGroup>
-                    </SheetBody>
+                        <div className="space-y-2">
+                            <span className="text-sm font-semibold">{t("form.fields.permissions")}</span>
+                            <PermissionPicker
+                                permissions={permissions}
+                                selected={selected}
+                                onChange={setSelected}
+                                disabled={readOnly}
+                            />
+                        </div>
+                    </DialogBody>
 
-                    <SheetFooter>
-                        <Button type="submit" className="flex-1" disabled={isSubmitting}>
-                            {isSubmitting
-                                ? tCommon("actions.saving")
-                                : isEdit
-                                  ? tCommon("actions.saveChanges")
-                                  : t("form.submit.create")}
+                    <DialogFooter>
+                        <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
+                            {readOnly ? tCommon("actions.close") : tCommon("actions.cancel")}
                         </Button>
-                    </SheetFooter>
+                        {!readOnly && (
+                            <Button type="submit" disabled={isSubmitting}>
+                                {isSubmitting
+                                    ? tCommon("actions.saving")
+                                    : isEdit
+                                      ? tCommon("actions.saveChanges")
+                                      : t("form.submit.create")}
+                            </Button>
+                        )}
+                    </DialogFooter>
                 </form>
-            </SheetContent>
-        </Sheet>
+            </DialogContent>
+        </Dialog>
     );
 }

@@ -6,6 +6,7 @@
   "page": {
     "heading": "Roles & permissions",
     "description": "Built-in roles cover most cases. Add a custom role when you need a narrower or different slice of access — pick exactly the permissions it should have, then assign it to any user.",
+    "breadcrumb": "Dashboard • Role management & permissions",
     "newRole": "New role",
     "table": {
       "headers": {
@@ -22,12 +23,17 @@
     "rowActions": {
       "manageUsers": "Manage users for {{name}}",
       "delete": "Delete {{name}}"
+    },
+    "card": {
+      "view": "View permissions",
+      "editRole": "Edit role"
     }
   },
   "form": {
     "newTitle": "New role",
     "editTitle": "Edit role",
     "description": "Pick exactly the permissions this role should grant. A system role's permissions are fixed — clone them into a new role to start from one.",
+    "readOnlyDescription": "A system role's permissions are fixed. Clone them into a new role to start from this set.",
     "fields": {
       "name": "Name",
       "description": "Description",

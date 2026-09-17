@@ -1,10 +1,13 @@
 import {useMemo} from "react";
-import {Checkbox} from "@/components/ui/checkbox";
+import {Check} from "lucide-react";
+import {cn} from "@/lib/utils";
 import type {Permission} from "../types/rbac.types";
 
 /**
- * Grouped by module (leads, deals, ...) so a form with 50+ permissions stays
- * scannable — matches how RbacController's catalog is organized server-side.
+ * One row per module (leads, deals, ...), a pill toggle per permission in
+ * that module — mirrors the Read/Write/Delete segmented-button pattern from
+ * the design reference, generalized to however many actions a module
+ * actually has (not every module is a fixed three).
  */
 export function PermissionPicker({
     permissions,
@@ -34,48 +37,42 @@ export function PermissionPicker({
         onChange(next);
     };
 
-    const toggleModule = (modulePermissions: Permission[], allSelected: boolean) => {
-        const next = new Set(selected);
-        for (const p of modulePermissions) {
-            if (allSelected) next.delete(p.key);
-            else next.add(p.key);
-        }
-        onChange(next);
-    };
-
     return (
-        <div className="space-y-4">
-            {grouped.map(([module, modulePermissions]) => {
-                const allSelected = modulePermissions.every((p) => selected.has(p.key));
+        <div className="divide-y rounded-lg border">
+            {grouped.map(([module, modulePermissions]) => (
+                <div
+                    key={module}
+                    className="flex flex-col gap-2.5 p-3 sm:flex-row sm:items-center sm:justify-between"
+                >
+                    <span className="text-sm font-medium capitalize">{module.replace(/_/g, " ")}</span>
+                    <div className="flex flex-wrap gap-2">
+                        {modulePermissions.map((permission) => {
+                            const isSelected = selected.has(permission.key);
 
-                return (
-                    <div key={module} className="rounded-lg border p-3">
-                        <div className="mb-2 flex items-center gap-2">
-                            <Checkbox
-                                checked={allSelected}
-                                disabled={disabled}
-                                onCheckedChange={() => toggleModule(modulePermissions, allSelected)}
-                            />
-                            <span className="text-sm font-medium capitalize">{module.replace(/_/g, " ")}</span>
-                        </div>
-                        <div className="grid grid-cols-1 gap-1.5 pl-6 sm:grid-cols-2">
-                            {modulePermissions.map((permission) => (
-                                <label
+                            return (
+                                <button
                                     key={permission.key}
-                                    className="flex items-start gap-2 text-sm text-muted-foreground"
+                                    type="button"
+                                    disabled={disabled}
+                                    title={permission.description}
+                                    aria-pressed={isSelected}
+                                    onClick={() => toggle(permission.key)}
+                                    className={cn(
+                                        "inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium capitalize transition-colors",
+                                        "disabled:pointer-events-none disabled:opacity-64",
+                                        isSelected
+                                            ? "border-primary text-primary bg-primary/5"
+                                            : "border-input text-muted-foreground hover:bg-accent",
+                                    )}
                                 >
-                                    <Checkbox
-                                        checked={selected.has(permission.key)}
-                                        disabled={disabled}
-                                        onCheckedChange={() => toggle(permission.key)}
-                                    />
-                                    <span>{permission.description}</span>
-                                </label>
-                            ))}
-                        </div>
+                                    {isSelected && <Check className="size-3" />}
+                                    {permission.action.replace(/_/g, " ")}
+                                </button>
+                            );
+                        })}
                     </div>
-                );
-            })}
+                </div>
+            ))}
         </div>
     );
 }

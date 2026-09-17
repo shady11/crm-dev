@@ -13,6 +13,8 @@ export type Role = {
     isSystem: boolean;
     companyId: string | null;
     userCount: number;
+    /** Up to 4 users holding this role, for the card grid's avatar preview. */
+    sample: {id: string; fullName: string}[];
     permissionKeys: string[];
     createdAt: string;
     updatedAt: string;
