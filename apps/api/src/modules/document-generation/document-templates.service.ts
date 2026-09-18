@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@/database/prisma.service';
-import { DocumentType } from '@/generated/prisma/client';
+import { ActivityAction, ActivityType, DocumentType } from '@/generated/prisma/client';
 import { AuthUser } from '@/common/types/auth-user.type';
 
 import { UpsertDocumentTemplateDto } from './dto/upsert-document-template.dto';
@@ -49,7 +49,7 @@ export class DocumentTemplatesService {
 
     const companyId = user.companyId;
 
-    return this.prisma.$transaction(async (db) => {
+    const created = await this.prisma.$transaction(async (db) => {
       const previous = await db.documentTemplate.findFirst({
         where: { companyId, type: dto.type, isActive: true, deletedAt: null },
       });
@@ -72,5 +72,18 @@ export class DocumentTemplatesService {
         },
       });
     });
+
+    await this.prisma.activity.create({
+      data: {
+        companyId,
+        userId: user.id,
+        action: ActivityAction.UPDATED_DOCUMENT_TEMPLATE,
+        type: ActivityType.DOCUMENT_TEMPLATE_UPDATED,
+        title: `Document template "${created.name}" updated`,
+        metadata: { documentTemplateId: created.id, documentType: created.type, version: created.version },
+      },
+    });
+
+    return created;
   }
 }

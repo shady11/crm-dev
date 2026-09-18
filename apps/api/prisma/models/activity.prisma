@@ -56,6 +56,10 @@ enum ActivityAction {
   REACTIVATED_BRANCH
 
   DELETED_TASK
+
+  UPLOADED_DOCUMENT
+  DELETED_DOCUMENT
+  UPDATED_DOCUMENT_TEMPLATE
 }
 
 enum ActivityType {
@@ -126,6 +130,10 @@ enum ActivityType {
   BRANCH_UPDATED
   BRANCH_DEACTIVATED
   BRANCH_REACTIVATED
+
+  DOCUMENT_UPLOADED
+  DOCUMENT_DELETED
+  DOCUMENT_TEMPLATE_UPDATED
 }
 
 model Activity {
@@ -156,6 +164,9 @@ model Activity {
 
   taskId String?
   task   Task?   @relation(fields: [taskId], references: [id])
+
+  documentId String?
+  document   Document? @relation(fields: [documentId], references: [id])
 
   unitId String?
   unit   Unit?   @relation(fields: [unitId], references: [id])
@@ -189,4 +200,5 @@ model Activity {
   @@index([projectId])
   @@index([targetBranchId])
   @@index([taskId])
+  @@index([documentId])
 }

@@ -53,6 +53,8 @@ model Document {
   generatedFromTemplateId String?
   generatedFromTemplate   DocumentTemplate? @relation(fields: [generatedFromTemplateId], references: [id])
 
+  activities Activity[]
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?

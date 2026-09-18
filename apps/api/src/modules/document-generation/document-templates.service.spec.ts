@@ -30,6 +30,7 @@ describe('DocumentTemplatesService', () => {
                 update: jest.fn().mockResolvedValue({}),
                 create: jest.fn().mockImplementation(({data}) => Promise.resolve({id: 'tpl-new', ...data})),
             },
+            activity: {create: jest.fn().mockResolvedValue({id: 'activity-1'})},
             $transaction: jest.fn(async (fn: any) => fn(prisma)),
         };
 

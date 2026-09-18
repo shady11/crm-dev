@@ -42,6 +42,7 @@ describe('DocumentsService', () => {
             },
             project: {findFirst: jest.fn().mockResolvedValue(opts.owner ?? null)},
             unit: {findFirst: jest.fn().mockResolvedValue(opts.owner ?? null)},
+            activity: {create: jest.fn().mockResolvedValue({id: 'activity-1'})},
         };
 
         const notifications = {create: jest.fn().mockResolvedValue({})};
