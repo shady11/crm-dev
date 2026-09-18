@@ -36,6 +36,7 @@ import * as bcrypt from "bcrypt";
 import {PrismaClient, UnitStatus, UnitType} from "@/generated/prisma/client";
 import {PrismaPg} from "@prisma/adapter-pg";
 import {RbacService} from "@/modules/rbac/rbac.service";
+import {DEFAULT_ROLES} from "@/modules/rbac/default-role-permissions";
 
 const prisma = new PrismaClient({
     adapter: new PrismaPg({connectionString: process.env.DATABASE_URL!}),
@@ -44,6 +45,46 @@ const prisma = new PrismaClient({
 function fail(message: string): never {
     console.error(`\n  seed: ${message}\n`);
     process.exit(1);
+}
+
+/**
+ * RbacService.seedDefaultRolesIfMissing() only assigns permissions to a
+ * default role it creates itself — it treats a role that already exists
+ * (by companyId+name) as already fully seeded and never touches it again,
+ * by design (see its own docstring). But the system Role rows for all five
+ * default roles are also created directly by the
+ * 20260917051144_remove_user_role_enum migration, with no permissions at
+ * all, to backfill roleId for pre-existing users. On any database that ran
+ * that migration, seedDefaultRolesIfMissing() finds those rows already
+ * present and skips them — so a role provisioned this way is stuck with
+ * zero permissions until something explicitly assigns them.
+ *
+ * This does that: for each default role, add whatever of its catalog
+ * permissions aren't already attached. It's additive only (skipDuplicates),
+ * so it never strips a permission a platform administrator has since
+ * removed from one of these roles — it only fills in what's missing.
+ */
+async function ensureDefaultRolePermissions(prisma: PrismaClient): Promise<void> {
+    for (const seed of DEFAULT_ROLES) {
+        if (seed.permissionKeys.length === 0) continue;
+
+        const role = await prisma.role.findFirst({
+            where: {companyId: null, name: seed.name},
+            select: {id: true},
+        });
+
+        if (!role) continue;
+
+        const permissions = await prisma.permission.findMany({
+            where: {key: {in: seed.permissionKeys}},
+            select: {id: true},
+        });
+
+        await prisma.rolePermission.createMany({
+            data: permissions.map((p) => ({roleId: role.id, permissionId: p.id})),
+            skipDuplicates: true,
+        });
+    }
 }
 
 function parseFlags(argv: string[]): Map<string, string> {
@@ -106,6 +147,7 @@ async function seedDemo() {
     const rbacService = new RbacService(prisma as never);
     await rbacService.syncCatalog();
     await rbacService.seedDefaultRolesIfMissing();
+    await ensureDefaultRolePermissions(prisma);
     const companyAdminRole = await prisma.role.findFirstOrThrow({where: {isDefaultCompanyAdmin: true}});
 
     const passwordHash = await bcrypt.hash("password123", 10);
@@ -279,6 +321,7 @@ async function provisionTenant(flags: Map<string, string>) {
     const rbacService = new RbacService(prisma as never);
     await rbacService.syncCatalog();
     await rbacService.seedDefaultRolesIfMissing();
+    await ensureDefaultRolePermissions(prisma);
     const companyAdminRole = await prisma.role.findFirstOrThrow({where: {isDefaultCompanyAdmin: true}});
 
     await prisma.user.create({
@@ -338,6 +381,7 @@ async function provisionSuperAdmin(flags: Map<string, string>) {
     const rbacService = new RbacService(prisma as never);
     await rbacService.syncCatalog();
     await rbacService.seedDefaultRolesIfMissing();
+    await ensureDefaultRolePermissions(prisma);
     const superAdminRole = await prisma.role.findFirstOrThrow({where: {isPlatformRole: true}});
 
     await prisma.user.create({
