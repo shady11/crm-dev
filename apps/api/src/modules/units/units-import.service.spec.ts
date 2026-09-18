@@ -48,6 +48,7 @@ function build(seed: {blocks?: SeedRow[]; entrances?: SeedRow[]; floors?: SeedRo
         floor: {findMany: jest.fn().mockResolvedValue(seed.floors ?? [])},
         unit: {findMany: jest.fn().mockResolvedValue(seed.units ?? [])},
         $transaction: jest.fn().mockImplementation((fn: (tx: unknown) => unknown) => fn(tx)),
+        activity: {create: jest.fn().mockResolvedValue({id: "activity-1"})},
     };
 
     return {service: new UnitsImportService(prisma as unknown as PrismaService), prisma, tx};

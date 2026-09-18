@@ -36,7 +36,8 @@ model Unit {
   floorId String
   floor   Floor  @relation(fields: [floorId], references: [id])
 
-  deals Deal[]
+  deals      Deal[]
+  activities Activity[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

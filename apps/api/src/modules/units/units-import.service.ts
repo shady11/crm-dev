@@ -1,6 +1,6 @@
 import {BadRequestException, ForbiddenException, Injectable} from "@nestjs/common";
 import * as XLSX from "xlsx";
-import {UnitType} from "@/generated/prisma/client";
+import {ActivityAction, ActivityType, UnitType} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {UNIT_IMPORT_COLUMN_ALIASES} from "./units-import.constants";
@@ -72,6 +72,19 @@ export class UnitsImportService {
                         : "Could not create this unit. Please check the row and try again.";
                 errors.push({row: rowNumber, messages: [message]});
             }
+        }
+
+        if (created > 0) {
+            await this.prisma.activity.create({
+                data: {
+                    companyId: user.companyId,
+                    userId: user.id,
+                    action: ActivityAction.IMPORTED_UNITS,
+                    type: ActivityType.UNITS_IMPORTED,
+                    title: `${created} units imported`,
+                    metadata: {projectId, created, failed: errors.length},
+                },
+            });
         }
 
         return {created, failed: errors.length, errors};

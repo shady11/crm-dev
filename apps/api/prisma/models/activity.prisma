@@ -36,6 +36,12 @@ enum ActivityAction {
   DEACTIVATED_USER
   RESET_PASSWORD
   REVOKED_SESSIONS
+
+  CREATED_UNIT
+  UPDATED_UNIT
+  CHANGED_UNIT_STATUS
+  DELETED_UNIT
+  IMPORTED_UNITS
 }
 
 enum ActivityType {
@@ -86,6 +92,12 @@ enum ActivityType {
   USER_DEACTIVATED
   USER_PASSWORD_RESET
   USER_SESSIONS_REVOKED
+
+  UNIT_CREATED
+  UNIT_UPDATED
+  UNIT_STATUS_CHANGED
+  UNIT_DELETED
+  UNITS_IMPORTED
 }
 
 model Activity {
@@ -114,6 +126,9 @@ model Activity {
   dealId String?
   deal   Deal?   @relation(fields: [dealId], references: [id])
 
+  unitId String?
+  unit   Unit?   @relation(fields: [unitId], references: [id])
+
   // The user acted upon, for USER_* activity types (e.g. the user created,
   // deactivated, or transferred) — distinct from userId, which is always the
   // actor. Null for every other activity type.
@@ -130,4 +145,5 @@ model Activity {
   @@index([clientId])
   @@index([leadId])
   @@index([targetUserId])
+  @@index([unitId])
 }

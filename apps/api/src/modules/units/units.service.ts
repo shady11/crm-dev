@@ -1,5 +1,5 @@
 import {BadRequestException, ForbiddenException, Injectable, NotFoundException,} from "@nestjs/common";
-import {Prisma, UnitStatus} from "@/generated/prisma/client";
+import {ActivityAction, ActivityType, Prisma, UnitStatus} from "@/generated/prisma/client";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateUnitDto} from "./dto/create-unit.dto";
 import {UpdateUnitDto} from "./dto/update-unit.dto";
@@ -10,6 +10,35 @@ import {PrismaService} from "@/database/prisma.service";
 @Injectable()
 export class UnitsService {
     constructor(private readonly prisma: PrismaService) {}
+
+    /**
+     * Records a company-scoped inventory activity, same idea as
+     * logUserActivity in UsersService — a fire-and-forget insert alongside
+     * the mutation rather than part of its transaction. unitId is left out
+     * for a unit that's already been hard-deleted, since Activity.unitId is
+     * a real FK and the row it would point to no longer exists.
+     */
+    private logUnitActivity(params: {
+        companyId: string;
+        actorId: string;
+        unitId?: string;
+        action: ActivityAction;
+        type: ActivityType;
+        title: string;
+        metadata?: Prisma.InputJsonValue;
+    }) {
+        return this.prisma.activity.create({
+            data: {
+                companyId: params.companyId,
+                userId: params.actorId,
+                unitId: params.unitId,
+                action: params.action,
+                type: params.type,
+                title: params.title,
+                metadata: params.metadata,
+            },
+        });
+    }
 
     async findAll(user: AuthUser, query: QueryUnitsDto) {
         if (!user.companyId) {
@@ -357,7 +386,7 @@ export class UnitsService {
             floor.blockId,
         );
 
-        return this.prisma.unit.create({
+        const created = await this.prisma.unit.create({
             data: {
                 number: dto.number,
                 type: dto.type,
@@ -397,6 +426,18 @@ export class UnitsService {
                 },
             },
         });
+
+        await this.logUnitActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            unitId: created.id,
+            action: ActivityAction.CREATED_UNIT,
+            type: ActivityType.UNIT_CREATED,
+            title: `Unit "${created.number}" created`,
+            metadata: {blockId: created.blockId, floorId: created.floorId},
+        });
+
+        return created;
     }
 
     async createBulk(user: AuthUser, floorId: string, dto: CreateUnitsBulkDto) {
@@ -406,7 +447,7 @@ export class UnitsService {
 
         const floor = await this.ensureFloorBelongsToCompany(floorId, user.companyId);
 
-        return await Promise.all(
+        const created = await Promise.all(
             dto.units.map((unit) =>
                 this.prisma.unit.create({
                     data: {
@@ -424,6 +465,17 @@ export class UnitsService {
                 })
             )
         );
+
+        await this.logUnitActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            action: ActivityAction.IMPORTED_UNITS,
+            type: ActivityType.UNITS_IMPORTED,
+            title: `${created.length} units created on floor`,
+            metadata: {floorId, blockId: floor.blockId, count: created.length},
+        });
+
+        return created;
     }
 
     async update(user: AuthUser, id: string, dto: UpdateUnitDto) {
@@ -452,7 +504,15 @@ export class UnitsService {
             );
         }
 
-        return this.prisma.unit.update({
+        const statusChanged = dto.status !== undefined && dto.status !== unit.status;
+        const fieldsChanged =
+            (dto.number !== undefined && dto.number !== unit.number) ||
+            (dto.type !== undefined && dto.type !== unit.type) ||
+            (dto.rooms !== undefined && dto.rooms !== unit.rooms) ||
+            (dto.area !== undefined && Number(dto.area) !== Number(unit.area)) ||
+            (dto.price !== undefined && Number(dto.price) !== Number(unit.price));
+
+        const updated = await this.prisma.unit.update({
             where: {
                 id,
             },
@@ -491,6 +551,31 @@ export class UnitsService {
                 },
             },
         });
+
+        if (statusChanged) {
+            await this.logUnitActivity({
+                companyId: user.companyId,
+                actorId: user.id,
+                unitId: id,
+                action: ActivityAction.CHANGED_UNIT_STATUS,
+                type: ActivityType.UNIT_STATUS_CHANGED,
+                title: `Unit "${updated.number}" status changed`,
+                metadata: {fromStatus: unit.status, toStatus: updated.status},
+            });
+        }
+
+        if (fieldsChanged) {
+            await this.logUnitActivity({
+                companyId: user.companyId,
+                actorId: user.id,
+                unitId: id,
+                action: ActivityAction.UPDATED_UNIT,
+                type: ActivityType.UNIT_UPDATED,
+                title: `Unit "${updated.number}" updated`,
+            });
+        }
+
+        return updated;
     }
 
     async duplicate(user: AuthUser, id: string) {
@@ -523,7 +608,7 @@ export class UnitsService {
             return !isNaN(num) && num > max ? num : max;
         }, 0);
 
-        return this.prisma.unit.create({
+        const created = await this.prisma.unit.create({
             data: {
                 number: String(maxUnitNumber + 1),
                 type: unit.type,
@@ -537,6 +622,18 @@ export class UnitsService {
                 floorId: unit.floorId,
             },
         });
+
+        await this.logUnitActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            unitId: created.id,
+            action: ActivityAction.CREATED_UNIT,
+            type: ActivityType.UNIT_CREATED,
+            title: `Unit "${created.number}" created (duplicated from "${unit.number}")`,
+            metadata: {duplicatedFromUnitId: unit.id},
+        });
+
+        return created;
     }
 
     async remove(user: AuthUser, id: string) {
@@ -576,6 +673,17 @@ export class UnitsService {
             },
         });
 
+        // No unitId — the row is already gone, and Activity.unitId is a real
+        // FK, so the identifying details go in metadata instead.
+        await this.logUnitActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            action: ActivityAction.DELETED_UNIT,
+            type: ActivityType.UNIT_DELETED,
+            title: `Unit "${unit.number}" deleted`,
+            metadata: {unitId: unit.id, blockId: unit.blockId},
+        });
+
         return {
             success: true,
         };
@@ -586,9 +694,10 @@ export class UnitsService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        await this.findOne(user, id);
+        const unit = await this.findOne(user, id);
+        const fromStatus = unit.status;
 
-        return this.prisma.unit.update({
+        const updated = await this.prisma.unit.update({
             where: {
                 id,
             },
@@ -596,6 +705,20 @@ export class UnitsService {
                 status,
             },
         });
+
+        if (fromStatus !== updated.status) {
+            await this.logUnitActivity({
+                companyId: user.companyId,
+                actorId: user.id,
+                unitId: id,
+                action: ActivityAction.CHANGED_UNIT_STATUS,
+                type: ActivityType.UNIT_STATUS_CHANGED,
+                title: `Unit "${updated.number}" status changed`,
+                metadata: {fromStatus, toStatus: updated.status},
+            });
+        }
+
+        return updated;
     }
 
     private async ensureFloorBelongsToCompany(
