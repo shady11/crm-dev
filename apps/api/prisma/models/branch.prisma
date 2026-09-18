@@ -22,11 +22,12 @@ model Branch {
   // deactivate/reactivate.
   deactivatedAt DateTime?
 
-  users   User[]
-  leads   Lead[]
-  clients Client[]
-  deals   Deal[]
-  tasks   Task[]
+  users      User[]
+  leads      Lead[]
+  clients    Client[]
+  deals      Deal[]
+  tasks      Task[]
+  activities Activity[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
