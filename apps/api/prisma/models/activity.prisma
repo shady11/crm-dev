@@ -60,6 +60,19 @@ enum ActivityAction {
   UPLOADED_DOCUMENT
   DELETED_DOCUMENT
   UPDATED_DOCUMENT_TEMPLATE
+
+  CREATED_BLOCK
+  UPDATED_BLOCK
+  DELETED_BLOCK
+
+  CREATED_ENTRANCE
+  UPDATED_ENTRANCE
+  DELETED_ENTRANCE
+
+  CREATED_FLOOR
+  UPDATED_FLOOR
+  DELETED_FLOOR
+  IMPORTED_FLOORS
 }
 
 enum ActivityType {
@@ -134,6 +147,19 @@ enum ActivityType {
   DOCUMENT_UPLOADED
   DOCUMENT_DELETED
   DOCUMENT_TEMPLATE_UPDATED
+
+  BLOCK_CREATED
+  BLOCK_UPDATED
+  BLOCK_DELETED
+
+  ENTRANCE_CREATED
+  ENTRANCE_UPDATED
+  ENTRANCE_DELETED
+
+  FLOOR_CREATED
+  FLOOR_UPDATED
+  FLOOR_DELETED
+  FLOORS_IMPORTED
 }
 
 model Activity {
@@ -171,6 +197,15 @@ model Activity {
   unitId String?
   unit   Unit?   @relation(fields: [unitId], references: [id])
 
+  blockId String?
+  block   Block?  @relation(fields: [blockId], references: [id])
+
+  entranceId String?
+  entrance   Entrance? @relation(fields: [entranceId], references: [id])
+
+  floorId String?
+  floor   Floor?  @relation(fields: [floorId], references: [id])
+
   projectId String?
   project   Project? @relation(fields: [projectId], references: [id])
 
@@ -201,4 +236,7 @@ model Activity {
   @@index([targetBranchId])
   @@index([taskId])
   @@index([documentId])
+  @@index([blockId])
+  @@index([entranceId])
+  @@index([floorId])
 }
