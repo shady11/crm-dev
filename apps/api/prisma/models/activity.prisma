@@ -21,7 +21,9 @@ enum ActivityAction {
   DISCOUNT_REJECTED
 
   CREATED_TASK
+  UPDATED_TASK
   COMPLETED_TASK
+  CHANGED_TASK_STATUS
 
   NOTE_ADDED
 
@@ -29,6 +31,48 @@ enum ActivityAction {
   REASSIGNED
 
   LOGGED_CONTACT_ATTEMPT
+
+  CREATED_USER
+  UPDATED_USER
+  ROLE_CHANGED
+  DEACTIVATED_USER
+  RESET_PASSWORD
+  REVOKED_SESSIONS
+
+  CREATED_UNIT
+  UPDATED_UNIT
+  CHANGED_UNIT_STATUS
+  DELETED_UNIT
+  IMPORTED_UNITS
+
+  CREATED_PROJECT
+  UPDATED_PROJECT
+  CHANGED_PROJECT_STATUS
+  DELETED_PROJECT
+
+  CREATED_BRANCH
+  UPDATED_BRANCH
+  DEACTIVATED_BRANCH
+  REACTIVATED_BRANCH
+
+  DELETED_TASK
+
+  UPLOADED_DOCUMENT
+  DELETED_DOCUMENT
+  UPDATED_DOCUMENT_TEMPLATE
+
+  CREATED_BLOCK
+  UPDATED_BLOCK
+  DELETED_BLOCK
+
+  CREATED_ENTRANCE
+  UPDATED_ENTRANCE
+  DELETED_ENTRANCE
+
+  CREATED_FLOOR
+  UPDATED_FLOOR
+  DELETED_FLOOR
+  IMPORTED_FLOORS
 }
 
 enum ActivityType {
@@ -59,7 +103,11 @@ enum ActivityType {
   NOTE_ADDED
 
   TASK_CREATED
+  TASK_UPDATED
   TASK_COMPLETED
+  TASK_STATUS_CHANGED
+  TASK_REASSIGNED
+  TASK_DELETED
 
   CALL
   MEETING
@@ -71,6 +119,47 @@ enum ActivityType {
 
   LEAD_REASSIGNED
   DEAL_REASSIGNED
+
+  USER_CREATED
+  USER_UPDATED
+  USER_ROLE_CHANGED
+  USER_BRANCH_TRANSFERRED
+  USER_DEACTIVATED
+  USER_PASSWORD_RESET
+  USER_SESSIONS_REVOKED
+
+  UNIT_CREATED
+  UNIT_UPDATED
+  UNIT_STATUS_CHANGED
+  UNIT_DELETED
+  UNITS_IMPORTED
+
+  PROJECT_CREATED
+  PROJECT_UPDATED
+  PROJECT_STATUS_CHANGED
+  PROJECT_DELETED
+
+  BRANCH_CREATED
+  BRANCH_UPDATED
+  BRANCH_DEACTIVATED
+  BRANCH_REACTIVATED
+
+  DOCUMENT_UPLOADED
+  DOCUMENT_DELETED
+  DOCUMENT_TEMPLATE_UPDATED
+
+  BLOCK_CREATED
+  BLOCK_UPDATED
+  BLOCK_DELETED
+
+  ENTRANCE_CREATED
+  ENTRANCE_UPDATED
+  ENTRANCE_DELETED
+
+  FLOOR_CREATED
+  FLOOR_UPDATED
+  FLOOR_DELETED
+  FLOORS_IMPORTED
 }
 
 model Activity {
@@ -99,6 +188,39 @@ model Activity {
   dealId String?
   deal   Deal?   @relation(fields: [dealId], references: [id])
 
+  taskId String?
+  task   Task?   @relation(fields: [taskId], references: [id])
+
+  documentId String?
+  document   Document? @relation(fields: [documentId], references: [id])
+
+  unitId String?
+  unit   Unit?   @relation(fields: [unitId], references: [id])
+
+  blockId String?
+  block   Block?  @relation(fields: [blockId], references: [id])
+
+  entranceId String?
+  entrance   Entrance? @relation(fields: [entranceId], references: [id])
+
+  floorId String?
+  floor   Floor?  @relation(fields: [floorId], references: [id])
+
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id])
+
+  // The Branch entity itself, for BRANCH_* activity types — unrelated to how
+  // findAll() scopes the feed by the *actor's* branchId (see
+  // ActivitiesService's doc comment).
+  targetBranchId String?
+  targetBranch   Branch? @relation(fields: [targetBranchId], references: [id])
+
+  // The user acted upon, for USER_* activity types (e.g. the user created,
+  // deactivated, or transferred) — distinct from userId, which is always the
+  // actor. Null for every other activity type.
+  targetUserId String?
+  targetUser   User?   @relation("ActivityTargetUser", fields: [targetUserId], references: [id])
+
   createdAt DateTime @default(now())
 
   @@index([companyId])
@@ -108,4 +230,13 @@ model Activity {
   @@index([dealId])
   @@index([clientId])
   @@index([leadId])
+  @@index([targetUserId])
+  @@index([unitId])
+  @@index([projectId])
+  @@index([targetBranchId])
+  @@index([taskId])
+  @@index([documentId])
+  @@index([blockId])
+  @@index([entranceId])
+  @@index([floorId])
 }

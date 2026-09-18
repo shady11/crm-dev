@@ -2,6 +2,8 @@ import {randomUUID} from "crypto";
 import {extname} from "path";
 import {BadRequestException, ForbiddenException, Inject, Injectable} from "@nestjs/common";
 import {
+    ActivityAction,
+    ActivityType,
     DocumentOwnerType,
     DocumentType,
     NotificationEntityType,
@@ -27,6 +29,45 @@ export class DocumentsService {
         private readonly notifications: NotificationsService,
         @Inject(FILE_STORAGE_PROVIDER) private readonly storage: FileStorageProvider,
     ) {}
+
+    /**
+     * Records a company-scoped document activity, linking the document's own
+     * owner (lead/client/deal/project/unit) via Activity's existing FK for
+     * that entity, in addition to documentId — so the activity shows up
+     * both on the document itself and on whatever it's attached to.
+     */
+    private logDocumentActivity(params: {
+        companyId: string;
+        actorId: string;
+        documentId: string;
+        ownerType: DocumentOwnerType;
+        ownerId: string;
+        action: ActivityAction;
+        type: ActivityType;
+        title: string;
+        metadata?: Prisma.InputJsonValue;
+    }) {
+        const ownerFk = {
+            [DocumentOwnerType.LEAD]: {leadId: params.ownerId},
+            [DocumentOwnerType.CLIENT]: {clientId: params.ownerId},
+            [DocumentOwnerType.DEAL]: {dealId: params.ownerId},
+            [DocumentOwnerType.PROJECT]: {projectId: params.ownerId},
+            [DocumentOwnerType.UNIT]: {unitId: params.ownerId},
+        }[params.ownerType];
+
+        return this.prisma.activity.create({
+            data: {
+                companyId: params.companyId,
+                userId: params.actorId,
+                documentId: params.documentId,
+                ...ownerFk,
+                action: params.action,
+                type: params.type,
+                title: params.title,
+                metadata: params.metadata,
+            },
+        });
+    }
 
     async findAll(user: AuthUser, query: QueryDocumentsDto) {
         if (!user.companyId) {
@@ -130,6 +171,17 @@ export class DocumentsService {
             }
         }
 
+        await this.logDocumentActivity({
+            companyId,
+            actorId: user.id,
+            documentId: document.id,
+            ownerType: dto.ownerType,
+            ownerId: dto.ownerId,
+            action: ActivityAction.UPLOADED_DOCUMENT,
+            type: ActivityType.DOCUMENT_UPLOADED,
+            title: `Document "${document.originalName}" uploaded`,
+        });
+
         return document;
     }
 
@@ -144,11 +196,22 @@ export class DocumentsService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        await this.findOne(user, id);
+        const document = await this.findOne(user, id);
 
         await this.prisma.document.update({
             where: { id },
             data: { deletedAt: new Date() },
+        });
+
+        await this.logDocumentActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            documentId: document.id,
+            ownerType: document.ownerType,
+            ownerId: document.ownerId,
+            action: ActivityAction.DELETED_DOCUMENT,
+            type: ActivityType.DOCUMENT_DELETED,
+            title: `Document "${document.originalName}" deleted`,
         });
 
         return { success: true };

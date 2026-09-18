@@ -1,5 +1,5 @@
 import {BadRequestException, ForbiddenException, Injectable, NotFoundException,} from "@nestjs/common";
-import {Prisma, UnitStatus} from "@/generated/prisma/client";
+import {ActivityAction, ActivityType, Prisma, UnitStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateFloorDto} from "./dto/create-floor.dto";
@@ -10,6 +10,33 @@ import {CreateFloorsBulkDto} from "@/modules/floors/dto/create-floors-bulk.dto";
 @Injectable()
 export class FloorsService {
     constructor(private readonly prisma: PrismaService) {}
+
+    /**
+     * Records a company-scoped floor activity. floorId is left out for a
+     * floor that's already been hard-deleted, since Activity.floorId is a
+     * real FK and the row it would point to no longer exists.
+     */
+    private logFloorActivity(params: {
+        companyId: string;
+        actorId: string;
+        floorId?: string;
+        action: ActivityAction;
+        type: ActivityType;
+        title: string;
+        metadata?: Prisma.InputJsonValue;
+    }) {
+        return this.prisma.activity.create({
+            data: {
+                companyId: params.companyId,
+                userId: params.actorId,
+                floorId: params.floorId,
+                action: params.action,
+                type: params.type,
+                title: params.title,
+                metadata: params.metadata,
+            },
+        });
+    }
 
     async findByEntrance(
         user: AuthUser,
@@ -174,7 +201,7 @@ export class FloorsService {
             entranceId,
         );
 
-        return this.prisma.floor.create({
+        const created = await this.prisma.floor.create({
             data: {
                 number: dto.number,
                 order: nextOrder,
@@ -183,6 +210,17 @@ export class FloorsService {
                 entranceId,
             },
         });
+
+        await this.logFloorActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            floorId: created.id,
+            action: ActivityAction.CREATED_FLOOR,
+            type: ActivityType.FLOOR_CREATED,
+            title: `Floor ${created.number} created`,
+        });
+
+        return created;
     }
 
     async createBulk(user: AuthUser, entranceId: string, dto: CreateFloorsBulkDto) {
@@ -192,7 +230,7 @@ export class FloorsService {
 
         const entrance = await this.ensureEntranceBelongsToCompany(entranceId, user.companyId);
 
-        return await Promise.all(
+        const created = await Promise.all(
             dto.floors.map((floor) =>
                 this.prisma.floor.create({
                     data: {
@@ -205,6 +243,17 @@ export class FloorsService {
                 })
             )
         );
+
+        await this.logFloorActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            action: ActivityAction.IMPORTED_FLOORS,
+            type: ActivityType.FLOORS_IMPORTED,
+            title: `${created.length} floors created on entrance`,
+            metadata: {entranceId, blockId: entrance.blockId, count: created.length},
+        });
+
+        return created;
     }
 
     async update(user: AuthUser, id: string, dto: UpdateFloorDto) {
@@ -237,7 +286,7 @@ export class FloorsService {
             );
         }
 
-        return this.prisma.floor.update({
+        const updated = await this.prisma.floor.update({
             where: {
                 id,
             },
@@ -246,6 +295,23 @@ export class FloorsService {
                 order: dto.order,
             },
         });
+
+        const fieldsChanged =
+            (dto.number !== undefined && dto.number !== floor.number) ||
+            (dto.order !== undefined && dto.order !== floor.order);
+
+        if (fieldsChanged) {
+            await this.logFloorActivity({
+                companyId: user.companyId,
+                actorId: user.id,
+                floorId: id,
+                action: ActivityAction.UPDATED_FLOOR,
+                type: ActivityType.FLOOR_UPDATED,
+                title: `Floor ${updated.number} updated`,
+            });
+        }
+
+        return updated;
     }
 
     async duplicate(user: AuthUser, id: string) {
@@ -322,6 +388,16 @@ export class FloorsService {
             },
         });
 
+        await this.logFloorActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            floorId: newFloor.id,
+            action: ActivityAction.CREATED_FLOOR,
+            type: ActivityType.FLOOR_CREATED,
+            title: `Floor ${newFloor.number} created (duplicated from floor ${floor.number})`,
+            metadata: {duplicatedFromFloorId: floor.id},
+        });
+
         // Create units using createMany
         if (floor.units.length > 0) {
             await this.prisma.unit.createMany({
@@ -388,6 +464,15 @@ export class FloorsService {
             where: {
                 id,
             },
+        });
+
+        await this.logFloorActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            action: ActivityAction.DELETED_FLOOR,
+            type: ActivityType.FLOOR_DELETED,
+            title: `Floor ${floor.number} deleted`,
+            metadata: {floorId: floor.id},
         });
 
         return {

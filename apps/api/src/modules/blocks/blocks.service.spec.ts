@@ -50,6 +50,7 @@ describe('BlocksService', () => {
             entrance: {create: jest.fn().mockImplementation(({data}) => Promise.resolve({id: 'entrance-new', ...data}))},
             floor: {create: jest.fn().mockImplementation(({data}) => Promise.resolve({id: 'floor-new', ...data}))},
             unit: {createMany: jest.fn().mockResolvedValue({count: 0})},
+            activity: {create: jest.fn().mockResolvedValue({id: 'activity-1'})},
         };
 
         const service = new BlocksService(prisma as any);

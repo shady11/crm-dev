@@ -1,5 +1,5 @@
 import {BadRequestException, ForbiddenException, Injectable, NotFoundException,} from "@nestjs/common";
-import {Prisma, UnitStatus} from "@/generated/prisma/client";
+import {ActivityAction, ActivityType, Prisma, UnitStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateEntranceDto} from "./dto/create-entrance.dto";
@@ -9,6 +9,33 @@ import {QueryEntrancesDto} from "./dto/query-entrances.dto";
 @Injectable()
 export class EntrancesService {
     constructor(private readonly prisma: PrismaService) {}
+
+    /**
+     * Records a company-scoped entrance activity. entranceId is left out for
+     * an entrance that's already been hard-deleted, since Activity.entranceId
+     * is a real FK and the row it would point to no longer exists.
+     */
+    private logEntranceActivity(params: {
+        companyId: string;
+        actorId: string;
+        entranceId?: string;
+        action: ActivityAction;
+        type: ActivityType;
+        title: string;
+        metadata?: Prisma.InputJsonValue;
+    }) {
+        return this.prisma.activity.create({
+            data: {
+                companyId: params.companyId,
+                userId: params.actorId,
+                entranceId: params.entranceId,
+                action: params.action,
+                type: params.type,
+                title: params.title,
+                metadata: params.metadata,
+            },
+        });
+    }
 
     async findByBlock(
         user: AuthUser,
@@ -168,7 +195,7 @@ export class EntrancesService {
 
         await this.ensureEntranceNameIsUniqueInsideBlock(dto.name, blockId);
 
-        return this.prisma.entrance.create({
+        const created = await this.prisma.entrance.create({
             data: {
                 name: dto.name,
                 order: nextOrder,
@@ -176,6 +203,17 @@ export class EntrancesService {
                 blockId,
             },
         });
+
+        await this.logEntranceActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            entranceId: created.id,
+            action: ActivityAction.CREATED_ENTRANCE,
+            type: ActivityType.ENTRANCE_CREATED,
+            title: `Entrance "${created.name}" created`,
+        });
+
+        return created;
     }
 
     async update(user: AuthUser, id: string, dto: UpdateEntranceDto) {
@@ -206,7 +244,7 @@ export class EntrancesService {
             );
         }
 
-        return this.prisma.entrance.update({
+        const updated = await this.prisma.entrance.update({
             where: {
                 id,
             },
@@ -215,6 +253,23 @@ export class EntrancesService {
                 order: dto.order,
             },
         });
+
+        const fieldsChanged =
+            (dto.name !== undefined && dto.name !== entrance.name) ||
+            (dto.order !== undefined && dto.order !== entrance.order);
+
+        if (fieldsChanged) {
+            await this.logEntranceActivity({
+                companyId: user.companyId,
+                actorId: user.id,
+                entranceId: id,
+                action: ActivityAction.UPDATED_ENTRANCE,
+                type: ActivityType.ENTRANCE_UPDATED,
+                title: `Entrance "${updated.name}" updated`,
+            });
+        }
+
+        return updated;
     }
 
     async duplicate(user: AuthUser, id: string) {
@@ -290,6 +345,16 @@ export class EntrancesService {
                     connect: { id: entrance.blockId },
                 },
             },
+        });
+
+        await this.logEntranceActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            entranceId: newEntrance.id,
+            action: ActivityAction.CREATED_ENTRANCE,
+            type: ActivityType.ENTRANCE_CREATED,
+            title: `Entrance "${newEntrance.name}" created (duplicated from "${entrance.name}")`,
+            metadata: {duplicatedFromEntranceId: entrance.id},
         });
 
         // Create floors and units
@@ -379,6 +444,15 @@ export class EntrancesService {
             where: {
                 id,
             },
+        });
+
+        await this.logEntranceActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            action: ActivityAction.DELETED_ENTRANCE,
+            type: ActivityType.ENTRANCE_DELETED,
+            title: `Entrance "${entrance.name}" deleted`,
+            metadata: {entranceId: entrance.id},
         });
 
         return {

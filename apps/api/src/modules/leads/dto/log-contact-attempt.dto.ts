@@ -4,6 +4,7 @@ export const ContactAttemptType = {
     CALL: "CALL",
     MESSAGE: "MESSAGE",
     MEETING: "MEETING",
+    EMAIL: "EMAIL",
 } as const;
 
 export type ContactAttemptType = (typeof ContactAttemptType)[keyof typeof ContactAttemptType];

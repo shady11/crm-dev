@@ -1,0 +1,22 @@
+-- AlterEnum
+ALTER TYPE "ActivityAction" ADD VALUE 'CREATED_UNIT';
+ALTER TYPE "ActivityAction" ADD VALUE 'UPDATED_UNIT';
+ALTER TYPE "ActivityAction" ADD VALUE 'CHANGED_UNIT_STATUS';
+ALTER TYPE "ActivityAction" ADD VALUE 'DELETED_UNIT';
+ALTER TYPE "ActivityAction" ADD VALUE 'IMPORTED_UNITS';
+
+-- AlterEnum
+ALTER TYPE "ActivityType" ADD VALUE 'UNIT_CREATED';
+ALTER TYPE "ActivityType" ADD VALUE 'UNIT_UPDATED';
+ALTER TYPE "ActivityType" ADD VALUE 'UNIT_STATUS_CHANGED';
+ALTER TYPE "ActivityType" ADD VALUE 'UNIT_DELETED';
+ALTER TYPE "ActivityType" ADD VALUE 'UNITS_IMPORTED';
+
+-- AlterTable
+ALTER TABLE "Activity" ADD COLUMN     "unitId" TEXT;
+
+-- CreateIndex
+CREATE INDEX "Activity_unitId_idx" ON "Activity"("unitId");
+
+-- AddForeignKey
+ALTER TABLE "Activity" ADD CONSTRAINT "Activity_unitId_fkey" FOREIGN KEY ("unitId") REFERENCES "Unit"("id") ON DELETE SET NULL ON UPDATE CASCADE;

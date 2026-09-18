@@ -1,5 +1,5 @@
 import {BadRequestException, ForbiddenException, Injectable} from "@nestjs/common";
-import {NotificationEntityType, NotificationType, Prisma, TaskStatus} from "@/generated/prisma/client";
+import {ActivityAction, ActivityType, NotificationEntityType, NotificationType, Prisma, TaskStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateTaskDto} from "./dto/create-task.dto";
@@ -23,6 +23,29 @@ export class TasksService {
         private readonly prisma: PrismaService,
         private readonly notifications: NotificationsService,
     ) {}
+
+    /** Records a company-scoped task activity — same pattern as the other *Activity helpers. */
+    private logTaskActivity(params: {
+        companyId: string;
+        actorId: string;
+        taskId: string;
+        action: ActivityAction;
+        type: ActivityType;
+        title: string;
+        metadata?: Prisma.InputJsonValue;
+    }) {
+        return this.prisma.activity.create({
+            data: {
+                companyId: params.companyId,
+                userId: params.actorId,
+                taskId: params.taskId,
+                action: params.action,
+                type: params.type,
+                title: params.title,
+                metadata: params.metadata,
+            },
+        });
+    }
 
     async findAll(user: AuthUser, query: QueryTasksDto) {
         if (!user.companyId) {
@@ -141,6 +164,15 @@ export class TasksService {
             });
         }
 
+        await this.logTaskActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            taskId: task.id,
+            action: ActivityAction.CREATED_TASK,
+            type: ActivityType.TASK_CREATED,
+            title: `Task "${task.title}" created`,
+        });
+
         return task;
     }
 
@@ -149,7 +181,7 @@ export class TasksService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        await this.findOne(user, id);
+        const existing = await this.findOne(user, id);
         this.ensureSingleEntityLink(dto);
 
         let branchId: string | null | undefined;
@@ -190,6 +222,48 @@ export class TasksService {
             });
         }
 
+        const reassigned = dto.assignedToId !== undefined && dto.assignedToId !== existing.assignedToId;
+        const statusChanged = dto.status !== undefined && dto.status !== existing.status;
+        const fieldsChanged =
+            (dto.title !== undefined && dto.title !== existing.title) ||
+            (dto.description !== undefined && dto.description !== existing.description) ||
+            (dto.dueDate !== undefined && task.dueDate?.toISOString() !== existing.dueDate?.toISOString());
+
+        if (reassigned) {
+            await this.logTaskActivity({
+                companyId: user.companyId,
+                actorId: user.id,
+                taskId: id,
+                action: ActivityAction.REASSIGNED,
+                type: ActivityType.TASK_REASSIGNED,
+                title: `Task "${task.title}" reassigned`,
+                metadata: {fromAssignedToId: existing.assignedToId, toAssignedToId: task.assignedToId},
+            });
+        }
+
+        if (statusChanged) {
+            await this.logTaskActivity({
+                companyId: user.companyId,
+                actorId: user.id,
+                taskId: id,
+                action: task.status === TaskStatus.DONE ? ActivityAction.COMPLETED_TASK : ActivityAction.CHANGED_TASK_STATUS,
+                type: task.status === TaskStatus.DONE ? ActivityType.TASK_COMPLETED : ActivityType.TASK_STATUS_CHANGED,
+                title: task.status === TaskStatus.DONE ? `Task "${task.title}" completed` : `Task "${task.title}" status changed`,
+                metadata: {fromStatus: existing.status, toStatus: task.status},
+            });
+        }
+
+        if (fieldsChanged) {
+            await this.logTaskActivity({
+                companyId: user.companyId,
+                actorId: user.id,
+                taskId: id,
+                action: ActivityAction.UPDATED_TASK,
+                type: ActivityType.TASK_UPDATED,
+                title: `Task "${task.title}" updated`,
+            });
+        }
+
         return task;
     }
 
@@ -198,13 +272,27 @@ export class TasksService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        await this.findOne(user, id);
+        const existing = await this.findOne(user, id);
 
-        return this.prisma.task.update({
+        const task = await this.prisma.task.update({
             where: { id },
             data: { status: dto.status },
             include: TASK_INCLUDE,
         });
+
+        if (task.status !== existing.status) {
+            await this.logTaskActivity({
+                companyId: user.companyId,
+                actorId: user.id,
+                taskId: id,
+                action: task.status === TaskStatus.DONE ? ActivityAction.COMPLETED_TASK : ActivityAction.CHANGED_TASK_STATUS,
+                type: task.status === TaskStatus.DONE ? ActivityType.TASK_COMPLETED : ActivityType.TASK_STATUS_CHANGED,
+                title: task.status === TaskStatus.DONE ? `Task "${task.title}" completed` : `Task "${task.title}" status changed`,
+                metadata: {fromStatus: existing.status, toStatus: task.status},
+            });
+        }
+
+        return task;
     }
 
     async remove(user: AuthUser, id: string) {
@@ -212,11 +300,20 @@ export class TasksService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        await this.findOne(user, id);
+        const existing = await this.findOne(user, id);
 
         await this.prisma.task.update({
             where: { id },
             data: { deletedAt: new Date() },
+        });
+
+        await this.logTaskActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            taskId: id,
+            action: ActivityAction.DELETED_TASK,
+            type: ActivityType.TASK_DELETED,
+            title: `Task "${existing.title}" deleted`,
         });
 
         return { success: true };

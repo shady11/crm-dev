@@ -1,5 +1,5 @@
 import {BadRequestException, ForbiddenException, Injectable, NotFoundException,} from "@nestjs/common";
-import {Prisma, UnitStatus} from "@/generated/prisma/client";
+import {ActivityAction, ActivityType, Prisma, UnitStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateBlockDto} from "./dto/create-block.dto";
@@ -9,6 +9,33 @@ import {QueryBlocksDto} from "./dto/query-blocks.dto";
 @Injectable()
 export class BlocksService {
     constructor(private readonly prisma: PrismaService) {}
+
+    /**
+     * Records a company-scoped block activity. blockId is left out for a
+     * block that's already been hard-deleted, since Activity.blockId is a
+     * real FK and the row it would point to no longer exists.
+     */
+    private logBlockActivity(params: {
+        companyId: string;
+        actorId: string;
+        blockId?: string;
+        action: ActivityAction;
+        type: ActivityType;
+        title: string;
+        metadata?: Prisma.InputJsonValue;
+    }) {
+        return this.prisma.activity.create({
+            data: {
+                companyId: params.companyId,
+                userId: params.actorId,
+                blockId: params.blockId,
+                action: params.action,
+                type: params.type,
+                title: params.title,
+                metadata: params.metadata,
+            },
+        });
+    }
 
     async findByProject(
         user: AuthUser,
@@ -159,13 +186,24 @@ export class BlocksService {
 
         await this.ensureBlockNameIsUniqueInsideProject(dto.name, projectId);
 
-        return this.prisma.block.create({
+        const created = await this.prisma.block.create({
             data: {
                 name: dto.name,
                 order: nextOrder,
                 projectId,
             },
         });
+
+        await this.logBlockActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            blockId: created.id,
+            action: ActivityAction.CREATED_BLOCK,
+            type: ActivityType.BLOCK_CREATED,
+            title: `Block "${created.name}" created`,
+        });
+
+        return created;
     }
 
     async update(user: AuthUser, id: string, dto: UpdateBlockDto) {
@@ -194,7 +232,7 @@ export class BlocksService {
             );
         }
 
-        return this.prisma.block.update({
+        const updated = await this.prisma.block.update({
             where: {
                 id,
             },
@@ -203,6 +241,23 @@ export class BlocksService {
                 order: dto.order,
             },
         });
+
+        const fieldsChanged =
+            (dto.name !== undefined && dto.name !== block.name) ||
+            (dto.order !== undefined && dto.order !== block.order);
+
+        if (fieldsChanged) {
+            await this.logBlockActivity({
+                companyId: user.companyId,
+                actorId: user.id,
+                blockId: id,
+                action: ActivityAction.UPDATED_BLOCK,
+                type: ActivityType.BLOCK_UPDATED,
+                title: `Block "${updated.name}" updated`,
+            });
+        }
+
+        return updated;
     }
 
     async duplicate(user: AuthUser, id: string) {
@@ -266,6 +321,16 @@ export class BlocksService {
                     connect: { id: block.projectId },
                 },
             },
+        });
+
+        await this.logBlockActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            blockId: newBlock.id,
+            action: ActivityAction.CREATED_BLOCK,
+            type: ActivityType.BLOCK_CREATED,
+            title: `Block "${newBlock.name}" created (duplicated from "${block.name}")`,
+            metadata: {duplicatedFromBlockId: block.id},
         });
 
         // Then create entrances one by one (or use transactions)
@@ -378,6 +443,15 @@ export class BlocksService {
             where: {
                 id,
             },
+        });
+
+        await this.logBlockActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            action: ActivityAction.DELETED_BLOCK,
+            type: ActivityType.BLOCK_DELETED,
+            title: `Block "${block.name}" deleted`,
+            metadata: {blockId: block.id},
         });
 
         return {

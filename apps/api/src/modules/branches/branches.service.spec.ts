@@ -34,6 +34,7 @@ describe('BranchesService', () => {
                 update: jest.fn().mockImplementation(({data}) => Promise.resolve({id: 'branch-1', ...data})),
             },
             user: {count: jest.fn().mockResolvedValue(opts.activeUserCount ?? 0)},
+            activity: {create: jest.fn().mockResolvedValue({id: 'activity-1'})},
         };
 
         const service = new BranchesService(prisma as any);

@@ -49,6 +49,7 @@ describe('FloorsService', () => {
                 findMany: jest.fn().mockResolvedValue(opts.allUnits ?? []),
                 createMany: jest.fn().mockResolvedValue({count: 0}),
             },
+            activity: {create: jest.fn().mockResolvedValue({id: 'activity-1'})},
         };
 
         const service = new FloorsService(prisma as any);

@@ -137,7 +137,7 @@ export class ClientsService {
         // BR-B2: stamped from the actor, never trusted from the request body.
         const branchId = user.isBranchScoped ? user.branchId : null;
 
-        return this.prisma.client.create({
+        const created = await this.prisma.client.create({
             data: {
                 fullName: dto.fullName,
                 phone: dto.phone,
@@ -149,6 +149,19 @@ export class ClientsService {
                 branchId,
             },
         });
+
+        await this.prisma.activity.create({
+            data: {
+                companyId: user.companyId,
+                userId: user.id,
+                clientId: created.id,
+                action: ActivityAction.CREATED,
+                type: ActivityType.CLIENT_CREATED,
+                title: `Client "${created.fullName}" created`,
+            },
+        });
+
+        return created;
     }
 
     async update(user: AuthUser, id: string, dto: UpdateClientDto) {
@@ -156,13 +169,13 @@ export class ClientsService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        await this.findOne(user, id);
+        const existing = await this.findOne(user, id);
 
         if (dto.phone) {
             await this.ensurePhoneIsUniqueInsideCompany(dto.phone, user.companyId, id);
         }
 
-        return this.prisma.client.update({
+        const updated = await this.prisma.client.update({
             where: { id },
             data: {
                 fullName: dto.fullName,
@@ -173,6 +186,29 @@ export class ClientsService {
                 pin: dto.pin,
             },
         });
+
+        const fieldsChanged =
+            (dto.fullName !== undefined && dto.fullName !== existing.fullName) ||
+            (dto.phone !== undefined && dto.phone !== existing.phone) ||
+            (dto.whatsapp !== undefined && dto.whatsapp !== existing.whatsapp) ||
+            (dto.email !== undefined && dto.email !== existing.email) ||
+            (dto.passport !== undefined && dto.passport !== existing.passport) ||
+            (dto.pin !== undefined && dto.pin !== existing.pin);
+
+        if (fieldsChanged) {
+            await this.prisma.activity.create({
+                data: {
+                    companyId: user.companyId,
+                    userId: user.id,
+                    clientId: id,
+                    action: ActivityAction.UPDATED,
+                    type: ActivityType.CLIENT_UPDATED,
+                    title: `Client "${updated.fullName}" updated`,
+                },
+            });
+        }
+
+        return updated;
     }
 
     async remove(user: AuthUser, id: string) {

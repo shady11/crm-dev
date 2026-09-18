@@ -1,5 +1,5 @@
 import {BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
-import {Prisma} from "@/generated/prisma/client";
+import {ActivityAction, ActivityType, Prisma} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateBranchDto} from "./dto/create-branch.dto";
@@ -21,6 +21,29 @@ const BRANCH_SELECT = {
 @Injectable()
 export class BranchesService {
     constructor(private readonly prisma: PrismaService) {}
+
+    /** Records a company-scoped branch activity — same pattern as the other *Activity helpers. */
+    private logBranchActivity(params: {
+        companyId: string;
+        actorId: string;
+        branchId: string;
+        action: ActivityAction;
+        type: ActivityType;
+        title: string;
+        metadata?: Prisma.InputJsonValue;
+    }) {
+        return this.prisma.activity.create({
+            data: {
+                companyId: params.companyId,
+                userId: params.actorId,
+                targetBranchId: params.branchId,
+                action: params.action,
+                type: params.type,
+                title: params.title,
+                metadata: params.metadata,
+            },
+        });
+    }
 
     async findAll(user: AuthUser, query: QueryBranchesDto) {
         if (!user.companyId) {
@@ -128,7 +151,7 @@ export class BranchesService {
 
         await this.ensureNameIsUnique(user.companyId, dto.name);
 
-        return this.prisma.branch.create({
+        const created = await this.prisma.branch.create({
             data: {
                 companyId: user.companyId,
                 name: dto.name,
@@ -138,16 +161,27 @@ export class BranchesService {
             },
             select: BRANCH_SELECT,
         });
+
+        await this.logBranchActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            branchId: created.id,
+            action: ActivityAction.CREATED_BRANCH,
+            type: ActivityType.BRANCH_CREATED,
+            title: `Branch "${created.name}" created`,
+        });
+
+        return created;
     }
 
     async update(user: AuthUser, id: string, dto: UpdateBranchDto) {
-        await this.findOne(user, id);
+        const existing = await this.findOne(user, id);
 
         if (dto.name) {
             await this.ensureNameIsUnique(user.companyId as string, dto.name, id);
         }
 
-        return this.prisma.branch.update({
+        const updated = await this.prisma.branch.update({
             where: {id},
             data: {
                 name: dto.name,
@@ -157,6 +191,25 @@ export class BranchesService {
             },
             select: BRANCH_SELECT,
         });
+
+        const fieldsChanged =
+            (dto.name !== undefined && dto.name !== existing.name) ||
+            (dto.city !== undefined && dto.city !== existing.city) ||
+            (dto.address !== undefined && dto.address !== existing.address) ||
+            (dto.phone !== undefined && dto.phone !== existing.phone);
+
+        if (fieldsChanged) {
+            await this.logBranchActivity({
+                companyId: user.companyId as string,
+                actorId: user.id,
+                branchId: id,
+                action: ActivityAction.UPDATED_BRANCH,
+                type: ActivityType.BRANCH_UPDATED,
+                title: `Branch "${updated.name}" updated`,
+            });
+        }
+
+        return updated;
     }
 
     /**
@@ -181,11 +234,22 @@ export class BranchesService {
             );
         }
 
-        return this.prisma.branch.update({
+        const updated = await this.prisma.branch.update({
             where: {id},
             data: {deactivatedAt: new Date()},
             select: BRANCH_SELECT,
         });
+
+        await this.logBranchActivity({
+            companyId: user.companyId as string,
+            actorId: user.id,
+            branchId: id,
+            action: ActivityAction.DEACTIVATED_BRANCH,
+            type: ActivityType.BRANCH_DEACTIVATED,
+            title: `Branch "${updated.name}" deactivated`,
+        });
+
+        return updated;
     }
 
     async reactivate(user: AuthUser, id: string) {
@@ -195,11 +259,22 @@ export class BranchesService {
             throw new ConflictException("This branch is not deactivated");
         }
 
-        return this.prisma.branch.update({
+        const updated = await this.prisma.branch.update({
             where: {id},
             data: {deactivatedAt: null},
             select: BRANCH_SELECT,
         });
+
+        await this.logBranchActivity({
+            companyId: user.companyId as string,
+            actorId: user.id,
+            branchId: id,
+            action: ActivityAction.REACTIVATED_BRANCH,
+            type: ActivityType.BRANCH_REACTIVATED,
+            title: `Branch "${updated.name}" reactivated`,
+        });
+
+        return updated;
     }
 
     private async ensureNameIsUnique(companyId: string, name: string, exceptBranchId?: string) {

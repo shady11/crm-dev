@@ -46,6 +46,9 @@ describe('UnitsService', () => {
             floor: {
                 findFirst: jest.fn().mockResolvedValue(opts.floor ?? null),
             },
+            activity: {
+                create: jest.fn().mockResolvedValue({id: 'activity-1'}),
+            },
         };
 
         const service = new UnitsService(prisma as any);

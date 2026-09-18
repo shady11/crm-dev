@@ -19,6 +19,7 @@ const CONTACT_ATTEMPT_TYPE_MAP: Record<ContactAttemptType, ActivityType> = {
     CALL: ActivityType.CALL,
     MESSAGE: ActivityType.MESSAGE_SENT,
     MEETING: ActivityType.MEETING,
+    EMAIL: ActivityType.EMAIL,
 };
 
 @Injectable()
@@ -195,7 +196,7 @@ export class LeadsService {
         // the lead to a branch (BR-D1).
         const branchId = user.isBranchScoped ? user.branchId : null;
 
-        return this.prisma.lead.create({
+        const created = await this.prisma.lead.create({
             data: {
                 fullName: dto.fullName,
                 phone: dto.phone,
@@ -225,6 +226,19 @@ export class LeadsService {
                 },
             },
         });
+
+        await this.prisma.activity.create({
+            data: {
+                companyId: user.companyId,
+                userId: user.id,
+                leadId: created.id,
+                action: ActivityAction.CREATED,
+                type: ActivityType.LEAD_CREATED,
+                title: `Lead "${created.fullName}" created`,
+            },
+        });
+
+        return created;
     }
 
     async update(user: AuthUser, id: string, dto: UpdateLeadDto) {
@@ -232,7 +246,7 @@ export class LeadsService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        await this.findOne(user, id);
+        const existing = await this.findOne(user, id);
 
         if (dto.managerId) {
             await this.ensureManagerAssignable(dto.managerId, user);
@@ -242,7 +256,7 @@ export class LeadsService {
             await this.ensureClientAssignable(dto.clientId, user);
         }
 
-        return this.prisma.lead.update({
+        const updated = await this.prisma.lead.update({
             where: {
                 id,
             },
@@ -273,6 +287,31 @@ export class LeadsService {
                 },
             },
         });
+
+        const fieldsChanged =
+            (dto.fullName !== undefined && dto.fullName !== existing.fullName) ||
+            (dto.phone !== undefined && dto.phone !== existing.phone) ||
+            (dto.email !== undefined && dto.email !== existing.email) ||
+            (dto.source !== undefined && dto.source !== existing.source) ||
+            (dto.status !== undefined && dto.status !== existing.status) ||
+            (dto.comment !== undefined && dto.comment !== existing.comment) ||
+            (dto.managerId !== undefined && dto.managerId !== existing.managerId) ||
+            (dto.clientId !== undefined && dto.clientId !== existing.clientId);
+
+        if (fieldsChanged) {
+            await this.prisma.activity.create({
+                data: {
+                    companyId: user.companyId,
+                    userId: user.id,
+                    leadId: id,
+                    action: ActivityAction.UPDATED,
+                    type: ActivityType.LEAD_UPDATED,
+                    title: `Lead "${updated.fullName}" updated`,
+                },
+            });
+        }
+
+        return updated;
     }
 
     /**
