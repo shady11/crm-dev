@@ -7,6 +7,7 @@ import {TransferBranchDto} from "@/common/dto/transfer-branch.dto";
 import {CreateClientDto} from "@/modules/clients/dto/create-client.dto";
 import {UpdateClientDto} from "@/modules/clients/dto/update-client.dto";
 import {resolveOrderBy} from "@/common/utils/sort.util";
+import {diffChangedFields} from "@/common/utils/activity-diff.util";
 
 @Injectable()
 export class ClientsService {
@@ -187,15 +188,11 @@ export class ClientsService {
             },
         });
 
-        const fieldsChanged =
-            (dto.fullName !== undefined && dto.fullName !== existing.fullName) ||
-            (dto.phone !== undefined && dto.phone !== existing.phone) ||
-            (dto.whatsapp !== undefined && dto.whatsapp !== existing.whatsapp) ||
-            (dto.email !== undefined && dto.email !== existing.email) ||
-            (dto.passport !== undefined && dto.passport !== existing.passport) ||
-            (dto.pin !== undefined && dto.pin !== existing.pin);
+        const changes = diffChangedFields(dto, existing, [
+            "fullName", "phone", "whatsapp", "email", "passport", "pin",
+        ]);
 
-        if (fieldsChanged) {
+        if (changes) {
             await this.prisma.activity.create({
                 data: {
                     companyId: user.companyId,
@@ -204,6 +201,7 @@ export class ClientsService {
                     action: ActivityAction.UPDATED,
                     type: ActivityType.CLIENT_UPDATED,
                     title: `Client "${updated.fullName}" updated`,
+                    metadata: changes,
                 },
             });
         }

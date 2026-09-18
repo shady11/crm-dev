@@ -89,6 +89,7 @@ describe('DealsService', () => {
             company: {findUniqueOrThrow: jest.fn().mockResolvedValue(company())},
             payment: {create: jest.fn().mockResolvedValue({}), aggregate: jest.fn().mockResolvedValue({_sum: {amount: null}})},
             paymentSchedule: {findMany: jest.fn().mockResolvedValue([]), updateMany: jest.fn().mockResolvedValue({count: 0})},
+            activity: {create: jest.fn().mockResolvedValue({id: 'activity-1'})},
             $transaction: jest.fn(async (fn: any) => fn(prisma)),
         };
 

@@ -14,6 +14,7 @@ import {CreateLeadDto} from "@/modules/leads/dto/create-lead.dto";
 import {UpdateLeadDto} from "@/modules/leads/dto/update-lead.dto";
 import {ConvertLeadDto} from "@/modules/leads/dto/convert-lead.dto";
 import {ContactAttemptType, LogContactAttemptDto} from "@/modules/leads/dto/log-contact-attempt.dto";
+import {diffChangedFields} from "@/common/utils/activity-diff.util";
 
 const CONTACT_ATTEMPT_TYPE_MAP: Record<ContactAttemptType, ActivityType> = {
     CALL: ActivityType.CALL,
@@ -288,17 +289,11 @@ export class LeadsService {
             },
         });
 
-        const fieldsChanged =
-            (dto.fullName !== undefined && dto.fullName !== existing.fullName) ||
-            (dto.phone !== undefined && dto.phone !== existing.phone) ||
-            (dto.email !== undefined && dto.email !== existing.email) ||
-            (dto.source !== undefined && dto.source !== existing.source) ||
-            (dto.status !== undefined && dto.status !== existing.status) ||
-            (dto.comment !== undefined && dto.comment !== existing.comment) ||
-            (dto.managerId !== undefined && dto.managerId !== existing.managerId) ||
-            (dto.clientId !== undefined && dto.clientId !== existing.clientId);
+        const changes = diffChangedFields(dto, existing, [
+            "fullName", "phone", "email", "source", "status", "comment", "managerId", "clientId",
+        ]);
 
-        if (fieldsChanged) {
+        if (changes) {
             await this.prisma.activity.create({
                 data: {
                     companyId: user.companyId,
@@ -307,6 +302,7 @@ export class LeadsService {
                     action: ActivityAction.UPDATED,
                     type: ActivityType.LEAD_UPDATED,
                     title: `Lead "${updated.fullName}" updated`,
+                    metadata: changes,
                 },
             });
         }
@@ -344,7 +340,7 @@ export class LeadsService {
             clientId = client.id;
         }
 
-        return this.prisma.lead.update({
+        const converted = await this.prisma.lead.update({
             where: {
                 id,
             },
@@ -369,6 +365,20 @@ export class LeadsService {
                 },
             },
         });
+
+        await this.prisma.activity.create({
+            data: {
+                companyId: user.companyId,
+                userId: user.id,
+                leadId: id,
+                clientId,
+                action: ActivityAction.CONVERTED_LEAD,
+                type: ActivityType.LEAD_CONVERTED,
+                title: `Lead "${converted.fullName}" converted to client`,
+            },
+        });
+
+        return converted;
     }
 
     async checkDuplicates(user: AuthUser, phone: string, excludeLeadId?: string) {

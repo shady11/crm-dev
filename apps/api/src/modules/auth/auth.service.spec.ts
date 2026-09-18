@@ -42,7 +42,10 @@ describe("AuthService.changeOwnPassword", () => {
         };
 
         const update = jest.fn().mockResolvedValue(record);
-        const prisma = {user: {update}} as unknown as PrismaService;
+        const prisma = {
+            user: {update},
+            activity: {create: jest.fn().mockResolvedValue({id: "activity-1"})},
+        } as unknown as PrismaService;
         const users = {findByEmail: jest.fn().mockResolvedValue(record)} as unknown as UsersService;
         const jwt = {signAsync: jest.fn().mockResolvedValue("new.jwt.token")} as unknown as JwtService;
 

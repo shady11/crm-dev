@@ -5,6 +5,7 @@ import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateBlockDto} from "./dto/create-block.dto";
 import {UpdateBlockDto} from "./dto/update-block.dto";
 import {QueryBlocksDto} from "./dto/query-blocks.dto";
+import {diffChangedFields} from "@/common/utils/activity-diff.util";
 
 @Injectable()
 export class BlocksService {
@@ -242,11 +243,9 @@ export class BlocksService {
             },
         });
 
-        const fieldsChanged =
-            (dto.name !== undefined && dto.name !== block.name) ||
-            (dto.order !== undefined && dto.order !== block.order);
+        const changes = diffChangedFields(dto, block, ["name", "order"]);
 
-        if (fieldsChanged) {
+        if (changes) {
             await this.logBlockActivity({
                 companyId: user.companyId,
                 actorId: user.id,
@@ -254,6 +253,7 @@ export class BlocksService {
                 action: ActivityAction.UPDATED_BLOCK,
                 type: ActivityType.BLOCK_UPDATED,
                 title: `Block "${updated.name}" updated`,
+                metadata: changes,
             });
         }
 

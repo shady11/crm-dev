@@ -9,6 +9,7 @@ import {QueryTasksDto, TASK_SORTABLE_FIELDS} from "./dto/query-tasks.dto";
 import {resolveOrderBy} from "@/common/utils/sort.util";
 import {TaskNotFoundException} from "./exceptions/task-not-found.exception";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
+import {diffChangedFields} from "@/common/utils/activity-diff.util";
 
 const TASK_INCLUDE = {
     assignedTo: { select: { id: true, fullName: true } },
@@ -224,10 +225,10 @@ export class TasksService {
 
         const reassigned = dto.assignedToId !== undefined && dto.assignedToId !== existing.assignedToId;
         const statusChanged = dto.status !== undefined && dto.status !== existing.status;
-        const fieldsChanged =
-            (dto.title !== undefined && dto.title !== existing.title) ||
-            (dto.description !== undefined && dto.description !== existing.description) ||
-            (dto.dueDate !== undefined && task.dueDate?.toISOString() !== existing.dueDate?.toISOString());
+        const changes = diffChangedFields(dto, existing, [
+            "title", "description",
+            {field: "dueDate", normalize: (v) => (v ? new Date(v as string | Date).toISOString() : null)},
+        ]);
 
         if (reassigned) {
             await this.logTaskActivity({
@@ -253,7 +254,7 @@ export class TasksService {
             });
         }
 
-        if (fieldsChanged) {
+        if (changes) {
             await this.logTaskActivity({
                 companyId: user.companyId,
                 actorId: user.id,
@@ -261,6 +262,7 @@ export class TasksService {
                 action: ActivityAction.UPDATED_TASK,
                 type: ActivityType.TASK_UPDATED,
                 title: `Task "${task.title}" updated`,
+                metadata: changes,
             });
         }
 

@@ -1,6 +1,6 @@
 import {Injectable, Logger} from "@nestjs/common";
 import {Cron, CronExpression} from "@nestjs/schedule";
-import {DealStatus, NotificationEntityType, NotificationType, UnitStatus} from "@/generated/prisma/client";
+import {ActivityAction, ActivityType, DealStatus, NotificationEntityType, NotificationType, UnitStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 import {DealActivityService} from "./deal-activity.service";
@@ -49,7 +49,7 @@ export class DealExpiryService {
                     return false;
                 }
 
-                await db.unit.updateMany({
+                const unitReleased = await db.unit.updateMany({
                     where: { id: deal.unitId, status: UnitStatus.RESERVED },
                     data: { status: UnitStatus.AVAILABLE },
                 });
@@ -63,6 +63,23 @@ export class DealExpiryService {
                         clientId: deal.clientId,
                         metadata: { reason: 'reservation_expiry_cron' },
                     });
+
+                    // The unit's own activity trail, distinct from the deal's
+                    // expireReservation() call above — without this, the
+                    // unit's history shows no record of being released.
+                    if (unitReleased.count > 0) {
+                        await db.activity.create({
+                            data: {
+                                companyId: deal.companyId,
+                                userId: deal.managerId,
+                                unitId: deal.unitId,
+                                action: ActivityAction.CHANGED_UNIT_STATUS,
+                                type: ActivityType.UNIT_STATUS_CHANGED,
+                                title: 'Unit relisted after reservation expired',
+                                metadata: { toStatus: UnitStatus.AVAILABLE, dealId: deal.id, reason: 'reservation_expiry_cron' },
+                            },
+                        });
+                    }
                 }
 
                 return true;

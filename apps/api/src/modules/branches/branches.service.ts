@@ -5,6 +5,7 @@ import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateBranchDto} from "./dto/create-branch.dto";
 import {UpdateBranchDto} from "./dto/update-branch.dto";
 import {QueryBranchesDto} from "./dto/query-branches.dto";
+import {diffChangedFields} from "@/common/utils/activity-diff.util";
 
 const BRANCH_SELECT = {
     id: true,
@@ -192,13 +193,9 @@ export class BranchesService {
             select: BRANCH_SELECT,
         });
 
-        const fieldsChanged =
-            (dto.name !== undefined && dto.name !== existing.name) ||
-            (dto.city !== undefined && dto.city !== existing.city) ||
-            (dto.address !== undefined && dto.address !== existing.address) ||
-            (dto.phone !== undefined && dto.phone !== existing.phone);
+        const changes = diffChangedFields(dto, existing, ["name", "city", "address", "phone"]);
 
-        if (fieldsChanged) {
+        if (changes) {
             await this.logBranchActivity({
                 companyId: user.companyId as string,
                 actorId: user.id,
@@ -206,6 +203,7 @@ export class BranchesService {
                 action: ActivityAction.UPDATED_BRANCH,
                 type: ActivityType.BRANCH_UPDATED,
                 title: `Branch "${updated.name}" updated`,
+                metadata: changes,
             });
         }
 

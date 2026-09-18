@@ -31,6 +31,9 @@ describe('DealExpiryService.expireOverdueReservations', () => {
             unit: {
                 updateMany: jest.fn().mockResolvedValue({count: 1}),
             },
+            activity: {
+                create: jest.fn().mockResolvedValue({id: 'activity-1'}),
+            },
             $transaction: jest.fn(async (fn: any) => fn(prisma)),
         };
         const notifications = {create: jest.fn().mockResolvedValue({})};
