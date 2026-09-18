@@ -1,6 +1,7 @@
 import {BadRequestException, Injectable, UnauthorizedException} from "@nestjs/common";
 import { UsersService } from "@/modules/users/users.service";
 import {JwtService} from "@nestjs/jwt";
+import {ActivityAction, ActivityType} from "@/generated/prisma/client";
 import * as bcrypt from "bcrypt";
 import {AuthBranchSummary, AuthCompanySummary, AuthUser} from "@/common/types/auth-user.type";
 import {PrismaService} from "@/database/prisma.service";
@@ -167,6 +168,23 @@ export class AuthService {
             where: { id: record.id },
             data: { passwordHash, sessionsValidFrom: new Date() },
         });
+
+        // Distinct from UsersService.updatePassword's admin-reset logging —
+        // this one records the user changing their own password, not an
+        // admin resetting it for them. SUPER_ADMIN has no companyId, so
+        // there's nothing to scope this activity to for that account.
+        if (record.companyId) {
+            await this.prisma.activity.create({
+                data: {
+                    companyId: record.companyId,
+                    userId: record.id,
+                    targetUserId: record.id,
+                    action: ActivityAction.CHANGED_PASSWORD,
+                    type: ActivityType.USER_PASSWORD_CHANGED,
+                    title: `"${record.fullName}" changed their password`,
+                },
+            });
+        }
 
         const payload: Omit<AuthUser, "company" | "branch"> = {
             id: record.id,

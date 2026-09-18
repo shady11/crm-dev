@@ -75,6 +75,9 @@ enum ActivityAction {
   IMPORTED_FLOORS
 
   CONVERTED_LEAD
+
+  REACTIVATED_USER
+  CHANGED_PASSWORD
 }
 
 enum ActivityType {
@@ -164,6 +167,9 @@ enum ActivityType {
   FLOORS_IMPORTED
 
   LEAD_CONVERTED
+
+  USER_REACTIVATED
+  USER_PASSWORD_CHANGED
 }
 
 model Activity {

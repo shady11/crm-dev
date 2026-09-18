@@ -274,7 +274,16 @@ export class UsersService {
             });
         }
 
-        if (changes || beingReactivated) {
+        if (beingReactivated) {
+            await this.logUserActivity({
+                ...activityParams,
+                action: ActivityAction.REACTIVATED_USER,
+                type: ActivityType.USER_REACTIVATED,
+                title: `User "${updated.fullName}" reactivated`,
+            });
+        }
+
+        if (changes) {
             await this.logUserActivity({
                 ...activityParams,
                 action: ActivityAction.UPDATED_USER,
