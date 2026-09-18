@@ -21,7 +21,9 @@ enum ActivityAction {
   DISCOUNT_REJECTED
 
   CREATED_TASK
+  UPDATED_TASK
   COMPLETED_TASK
+  CHANGED_TASK_STATUS
 
   NOTE_ADDED
 
@@ -52,6 +54,8 @@ enum ActivityAction {
   UPDATED_BRANCH
   DEACTIVATED_BRANCH
   REACTIVATED_BRANCH
+
+  DELETED_TASK
 }
 
 enum ActivityType {
@@ -82,7 +86,11 @@ enum ActivityType {
   NOTE_ADDED
 
   TASK_CREATED
+  TASK_UPDATED
   TASK_COMPLETED
+  TASK_STATUS_CHANGED
+  TASK_REASSIGNED
+  TASK_DELETED
 
   CALL
   MEETING
@@ -146,6 +154,9 @@ model Activity {
   dealId String?
   deal   Deal?   @relation(fields: [dealId], references: [id])
 
+  taskId String?
+  task   Task?   @relation(fields: [taskId], references: [id])
+
   unitId String?
   unit   Unit?   @relation(fields: [unitId], references: [id])
 
@@ -177,4 +188,5 @@ model Activity {
   @@index([unitId])
   @@index([projectId])
   @@index([targetBranchId])
+  @@index([taskId])
 }

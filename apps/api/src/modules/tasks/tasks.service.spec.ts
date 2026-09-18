@@ -47,6 +47,9 @@ describe('TasksService', () => {
             user: {
                 findFirst: jest.fn().mockResolvedValue(opts.assignee ?? null),
             },
+            activity: {
+                create: jest.fn().mockResolvedValue({id: 'activity-1'}),
+            },
         };
         const notifications = {create: jest.fn().mockResolvedValue({})};
 
