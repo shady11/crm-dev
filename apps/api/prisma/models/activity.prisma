@@ -29,6 +29,13 @@ enum ActivityAction {
   REASSIGNED
 
   LOGGED_CONTACT_ATTEMPT
+
+  CREATED_USER
+  UPDATED_USER
+  ROLE_CHANGED
+  DEACTIVATED_USER
+  RESET_PASSWORD
+  REVOKED_SESSIONS
 }
 
 enum ActivityType {
@@ -71,6 +78,14 @@ enum ActivityType {
 
   LEAD_REASSIGNED
   DEAL_REASSIGNED
+
+  USER_CREATED
+  USER_UPDATED
+  USER_ROLE_CHANGED
+  USER_BRANCH_TRANSFERRED
+  USER_DEACTIVATED
+  USER_PASSWORD_RESET
+  USER_SESSIONS_REVOKED
 }
 
 model Activity {
@@ -99,6 +114,12 @@ model Activity {
   dealId String?
   deal   Deal?   @relation(fields: [dealId], references: [id])
 
+  // The user acted upon, for USER_* activity types (e.g. the user created,
+  // deactivated, or transferred) — distinct from userId, which is always the
+  // actor. Null for every other activity type.
+  targetUserId String?
+  targetUser   User?   @relation("ActivityTargetUser", fields: [targetUserId], references: [id])
+
   createdAt DateTime @default(now())
 
   @@index([companyId])
@@ -108,4 +129,5 @@ model Activity {
   @@index([dealId])
   @@index([clientId])
   @@index([leadId])
+  @@index([targetUserId])
 }

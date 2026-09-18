@@ -6,7 +6,7 @@ import {
     NotFoundException,
 } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
-import {Prisma} from "@/generated/prisma/client";
+import {ActivityAction, ActivityType, Prisma} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
@@ -41,6 +41,34 @@ const USER_SAFE_SELECT = {
 @Injectable()
 export class UsersService {
     constructor(private readonly prisma: PrismaService) {}
+
+    /**
+     * Records a company-scoped activity for an action taken on a user
+     * account (as opposed to `activities`, which is the actor's own feed).
+     * Mirrors the pattern used for leads/clients — a fire-and-forget insert
+     * alongside the mutation, not part of its transaction.
+     */
+    private logUserActivity(params: {
+        companyId: string;
+        actorId: string;
+        targetUserId: string;
+        action: ActivityAction;
+        type: ActivityType;
+        title: string;
+        metadata?: Prisma.InputJsonValue;
+    }) {
+        return this.prisma.activity.create({
+            data: {
+                companyId: params.companyId,
+                userId: params.actorId,
+                targetUserId: params.targetUserId,
+                action: params.action,
+                type: params.type,
+                title: params.title,
+                metadata: params.metadata,
+            },
+        });
+    }
 
     async findAll(user: AuthUser, query: QueryUsersDto) {
         if (!user.companyId) {
@@ -146,7 +174,7 @@ export class UsersService {
 
         const passwordHash = await bcrypt.hash(dto.password, 10);
 
-        return this.prisma.user.create({
+        const created = await this.prisma.user.create({
             data: {
                 fullName: dto.fullName,
                 email: dto.email,
@@ -158,6 +186,18 @@ export class UsersService {
             },
             select: USER_SAFE_SELECT,
         });
+
+        await this.logUserActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            targetUserId: created.id,
+            action: ActivityAction.CREATED_USER,
+            type: ActivityType.USER_CREATED,
+            title: `User "${created.fullName}" created`,
+            metadata: { roleId: created.roleId, branchId: created.branchId },
+        });
+
+        return created;
     }
 
     async update(user: AuthUser, id: string, dto: UpdateUserDto) {
@@ -191,8 +231,13 @@ export class UsersService {
 
         const roleChanged = dto.roleId !== undefined && dto.roleId !== target.roleId;
         const beingDeactivated = dto.isActive === false && target.isActive === true;
+        const beingReactivated = dto.isActive === true && target.isActive === false;
+        const fieldsChanged =
+            (dto.fullName !== undefined && dto.fullName !== target.fullName) ||
+            (dto.email !== undefined && dto.email !== target.email) ||
+            (dto.phone !== undefined && dto.phone !== target.phone);
 
-        return this.prisma.user.update({
+        const updated = await this.prisma.user.update({
             where: { id },
             data: {
                 fullName: dto.fullName,
@@ -205,6 +250,42 @@ export class UsersService {
             },
             select: USER_SAFE_SELECT,
         });
+
+        const activityParams = {
+            companyId: user.companyId,
+            actorId: user.id,
+            targetUserId: id,
+        };
+
+        if (roleChanged) {
+            await this.logUserActivity({
+                ...activityParams,
+                action: ActivityAction.ROLE_CHANGED,
+                type: ActivityType.USER_ROLE_CHANGED,
+                title: `Role changed for "${updated.fullName}"`,
+                metadata: { fromRoleId: target.roleId, toRoleId: updated.roleId },
+            });
+        }
+
+        if (beingDeactivated) {
+            await this.logUserActivity({
+                ...activityParams,
+                action: ActivityAction.DEACTIVATED_USER,
+                type: ActivityType.USER_DEACTIVATED,
+                title: `User "${updated.fullName}" deactivated`,
+            });
+        }
+
+        if (fieldsChanged || beingReactivated) {
+            await this.logUserActivity({
+                ...activityParams,
+                action: ActivityAction.UPDATED_USER,
+                type: ActivityType.USER_UPDATED,
+                title: `User "${updated.fullName}" updated`,
+            });
+        }
+
+        return updated;
     }
 
     /**
@@ -313,6 +394,16 @@ export class UsersService {
             });
         });
 
+        await this.logUserActivity({
+            companyId,
+            actorId: user.id,
+            targetUserId: id,
+            action: ActivityAction.BRANCH_TRANSFERRED,
+            type: ActivityType.USER_BRANCH_TRANSFERRED,
+            title: `User "${target.fullName}" moved to another branch`,
+            metadata: { fromBranchId: target.branchId, toBranchId: dto.branchId, reassignToId },
+        });
+
         return { success: true };
     }
 
@@ -321,7 +412,7 @@ export class UsersService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        await this.getManageableTargetOrThrow(user, id);
+        const target = await this.getManageableTargetOrThrow(user, id);
 
         const passwordHash = await bcrypt.hash(dto.password, 10);
 
@@ -333,6 +424,15 @@ export class UsersService {
             },
         });
 
+        await this.logUserActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            targetUserId: id,
+            action: ActivityAction.RESET_PASSWORD,
+            type: ActivityType.USER_PASSWORD_RESET,
+            title: `Password reset for "${target.fullName}"`,
+        });
+
         return { success: true };
     }
 
@@ -341,11 +441,20 @@ export class UsersService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        await this.getManageableTargetOrThrow(user, id);
+        const target = await this.getManageableTargetOrThrow(user, id);
 
         await this.prisma.user.update({
             where: { id },
             data: { sessionsValidFrom: new Date() },
+        });
+
+        await this.logUserActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            targetUserId: id,
+            action: ActivityAction.REVOKED_SESSIONS,
+            type: ActivityType.USER_SESSIONS_REVOKED,
+            title: `Sessions revoked for "${target.fullName}"`,
         });
 
         return { success: true };
@@ -404,7 +513,7 @@ export class UsersService {
             throw new BadRequestException("You cannot delete your own account");
         }
 
-        await this.getManageableTargetOrThrow(user, id);
+        const target = await this.getManageableTargetOrThrow(user, id);
 
         const reassignToId = dto?.reassignToId;
 
@@ -450,6 +559,16 @@ export class UsersService {
                     deletedAt: new Date(),
                 },
             });
+        });
+
+        await this.logUserActivity({
+            companyId,
+            actorId: user.id,
+            targetUserId: id,
+            action: ActivityAction.DEACTIVATED_USER,
+            type: ActivityType.USER_DEACTIVATED,
+            title: `User "${target.fullName}" deactivated`,
+            metadata: { reassignToId },
         });
 
         return { success: true };

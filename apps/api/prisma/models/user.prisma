@@ -48,6 +48,7 @@ model User {
   discountApprovals Deal[] @relation("DiscountApprovedBy")
   payments      Payment[]
   activities    Activity[]
+  targetOfActivities Activity[] @relation("ActivityTargetUser")
   tasks         Task[]
   documents     Document[]
   documentTemplates DocumentTemplate[]

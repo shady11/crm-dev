@@ -73,6 +73,9 @@ describe("UsersService — role boundaries", () => {
             branch: {
                 findFirst: jest.fn().mockResolvedValue({id: "branch-1", companyId: "company-1", deactivatedAt: null}),
             },
+            activity: {
+                create: jest.fn().mockResolvedValue({id: "activity-1"}),
+            },
         };
         return {service: new UsersService(prisma as unknown as PrismaService), prisma};
     };
@@ -221,6 +224,7 @@ describe("UsersService — reassignment on deactivation (CA-B1)", () => {
             lead: {count: jest.fn().mockResolvedValue(2)},
             deal: {count: jest.fn().mockResolvedValue(1)},
             $transaction: jest.fn().mockImplementation((fn: (tx: unknown) => unknown) => fn(tx)),
+            activity: {create: jest.fn().mockResolvedValue({id: "activity-1"})},
         };
 
         return {service: new UsersService(prisma as unknown as PrismaService), prisma, leadUpdateMany, dealUpdateMany, userUpdate};
