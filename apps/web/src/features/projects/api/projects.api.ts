@@ -1,6 +1,7 @@
 import { api } from "@/lib/api";
 import type { PaginatedResponse } from "@/lib/api-types";
 import type { Project, ProjectStatus } from "../types/project.types";
+import type { UnitStatus, UnitType } from "@/features/units/types/unit.types";
 
 export type GetProjectsParams = {
     page?: number;
@@ -48,6 +49,30 @@ export async function deleteProject(id: string) {
 export async function getProjectTree(projectId: string) {
     const response = await api.get(
         `/projects/${projectId}/tree`,
+    );
+
+    return response.data;
+}
+
+export type GetProjectChessboardParams = {
+    blockId?: string;
+    entranceId?: string;
+    type?: UnitType;
+    status?: UnitStatus;
+    rooms?: number;
+    areaMin?: number;
+    areaMax?: number;
+    priceMin?: number;
+    priceMax?: number;
+};
+
+export async function getProjectChessboard(
+    projectId: string,
+    params?: GetProjectChessboardParams,
+) {
+    const response = await api.get(
+        `/projects/${projectId}/chessboard`,
+        { params },
     );
 
     return response.data;

@@ -2,6 +2,7 @@ import {Dot} from "lucide-react";
 import {createListCollection} from "@ark-ui/react";
 import {Badge} from "@/components/ui/badge";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
+import {ScrollArea} from "@/components/ui/scroll-area";
 import {Status} from "@/components/ui/status";
 import {ChessboardGrid} from "@/features/projects/components/chessboard/chessboard-grid.tsx";
 import type {Floor} from "@/features/floors/types/floor.types";
@@ -71,13 +72,15 @@ export function ChessboardCard({
             </CardHeader>
 
             <CardContent className="gap-0 p-6">
-                <ChessboardGrid
-                    floors={floors}
-                    selectedUnit={selectedUnit}
-                    hasActiveFilters={hasActiveFilters}
-                    unitMatchesFilters={unitMatchesFilters}
-                    onUnitClick={onUnitClick}
-                />
+                <ScrollArea className="h-auto w-full">
+                    <ChessboardGrid
+                        floors={floors}
+                        selectedUnit={selectedUnit}
+                        hasActiveFilters={hasActiveFilters}
+                        unitMatchesFilters={unitMatchesFilters}
+                        onUnitClick={onUnitClick}
+                    />
+                </ScrollArea>
             </CardContent>
         </Card>
     );

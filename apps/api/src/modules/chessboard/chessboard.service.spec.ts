@@ -149,7 +149,39 @@ describe('ChessboardService.getProjectChessboard', () => {
             entranceId: null,
             type: UnitType.APARTMENT,
             status: UnitStatus.AVAILABLE,
+            rooms: null,
+            areaMin: null,
+            areaMax: null,
+            priceMin: null,
+            priceMax: null,
         });
+    });
+
+    it('applies rooms/area/price filters to the units query', async () => {
+        const {service, prisma} = build({units: []});
+        await service.getProjectChessboard(user, 'project-1', {
+            rooms: 3, areaMin: 50, areaMax: 80, priceMin: 40000, priceMax: 90000,
+        } as any);
+
+        expect(prisma.unit.findMany).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: expect.objectContaining({
+                    rooms: 3,
+                    area: {gte: 50, lte: 80},
+                    price: {gte: 40000, lte: 90000},
+                }),
+            }),
+        );
+    });
+
+    it('includes the unit block/entrance/floor on each returned unit', async () => {
+        const {service} = build({units: [unitRow({id: 'u1'})]});
+        const result = await service.getProjectChessboard(user, 'project-1', {});
+
+        const unit = result.blocks[0].entrances[0].floors[0].units[0];
+        expect(unit.block).toEqual({id: 'block-1', name: 'A'});
+        expect(unit.entrance).toEqual({id: 'entrance-1', name: '1'});
+        expect(unit.floor).toEqual({id: 'floor-1', number: 1});
     });
 
     it('scopes the units query to the project and excludes soft-deleted units', async () => {

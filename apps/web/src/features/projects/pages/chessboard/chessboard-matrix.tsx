@@ -1,10 +1,9 @@
 import {useMemo, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
-import {getProjectTree} from "@/features/projects/api/projects.api";
+import {getProjectChessboard} from "@/features/projects/api/projects.api";
 import {DoorOpen, Loader2Icon,} from "lucide-react";
 import {type Unit, type UnitStatus, type UnitType} from "@/features/units/types/unit.types";
-import {type Project} from "@/features/projects/types/project.types";
 import type {Block} from "@/features/blocks/types/block.types";
 import type {Entrance} from "@/features/entrances/types/entrance.types";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
@@ -53,18 +52,20 @@ export function ChessboardMatrix() {
         actions,
     } = useChessboardSheet();
 
-    const treeQuery = useQuery({
-        queryKey: ["project-tree", projectId],
-        queryFn: () => getProjectTree(projectId!),
+    // Unfiltered project-wide structure. Filters only dim non-matching units
+    // in the grid below — they never change which units are fetched — so
+    // this single query covers both the breadcrumb's block/entrance
+    // switchers and the matrix grid itself.
+    const chessboardQuery = useQuery({
+        queryKey: ["project-chessboard", projectId],
+        queryFn: () => getProjectChessboard(projectId!),
         enabled: !!projectId,
     });
 
-    const tree = treeQuery.data as Project | undefined;
-    const block = tree?.blocks?.find((b: Block) => b.id === blockId);
-    const entrance = block?.entrances?.find((e: Entrance) => e.id === entranceId);
-
-    const blocks = tree?.blocks || [];
+    const blocks = (chessboardQuery.data?.blocks ?? []) as Block[];
+    const block = blocks.find((b: Block) => b.id === blockId);
     const blockEntrances = block?.entrances || [];
+    const entrance = blockEntrances.find((e: Entrance) => e.id === entranceId);
 
     const managersQuery = useManagers();
     const managers = managersQuery.data ?? [];
@@ -164,7 +165,7 @@ export function ChessboardMatrix() {
             ? sheet.unit
             : null;
 
-    if (treeQuery.isLoading) {
+    if (chessboardQuery.isLoading) {
         return (
             <div className="flex h-96 items-center justify-center">
                 <Loader2Icon className="h-8 w-8 animate-spin text-primary" />
@@ -172,7 +173,7 @@ export function ChessboardMatrix() {
         );
     }
 
-    if (!tree || !block || !entrance) {
+    if (!block || !entrance) {
         return (
             <div className="flex h-96 items-center justify-center text-muted-foreground">
                 <p>{t("common:errors.notFound")}</p>

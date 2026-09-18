@@ -3,11 +3,10 @@ import {useQuery} from "@tanstack/react-query";
 import {ArrowLeftIcon, Building2Icon, ChevronDownIcon, DoorOpenIcon, Loader2Icon} from "lucide-react";
 import {Card, CardContent} from "@/components/ui/card.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import type {Project} from "@/features/projects/types/project.types.ts";
 import type {Block} from "@/features/blocks/types/block.types.ts";
 import type {Entrance} from "@/features/entrances/types/entrance.types.ts";
 import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList} from "@/components/ui/breadcrumb.tsx";
-import {getProjectTree} from "@/features/projects/api/projects.api.ts";
+import {getProjectChessboard} from "@/features/projects/api/projects.api.ts";
 import {Menu, MenuContent, MenuGroup, MenuItem, MenuTrigger} from "@/components/ui/menu.tsx";
 import {useTranslation} from "react-i18next";
 
@@ -16,13 +15,13 @@ export function ChessboardEntrances() {
     const { projectId, blockId } = useParams<{ projectId: string; blockId: string }>();
     const navigate = useNavigate();
 
-    const treeQuery = useQuery({
-        queryKey: ["project-tree", projectId],
-        queryFn: () => getProjectTree(projectId!),
+    const chessboardQuery = useQuery({
+        queryKey: ["project-chessboard", projectId],
+        queryFn: () => getProjectChessboard(projectId!),
         enabled: !!projectId,
     });
 
-    if (treeQuery.isLoading) {
+    if (chessboardQuery.isLoading) {
         return (
             <div className="flex h-96 items-center justify-center">
                 <Loader2Icon className="h-8 w-8 animate-spin text-primary" />
@@ -30,10 +29,8 @@ export function ChessboardEntrances() {
         );
     }
 
-    const tree = treeQuery.data as Project | undefined;
-    const block = tree?.blocks?.find((b: Block) => b.id === blockId);
-
-    const blocks = tree?.blocks || [];
+    const blocks = (chessboardQuery.data?.blocks ?? []) as Block[];
+    const block = blocks.find((b: Block) => b.id === blockId);
 
     if (!block) {
         return (
