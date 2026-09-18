@@ -2,7 +2,7 @@ import {BadRequestException, ForbiddenException, Injectable, NotFoundException} 
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {QueryProjectsDto} from "@/modules/projects/dto/query-projects.dto";
-import {Prisma, ProjectStatus} from "@/generated/prisma/client";
+import {ActivityAction, ActivityType, Prisma, ProjectStatus} from "@/generated/prisma/client";
 import {CreateProjectDto} from "@/modules/projects/dto/create-project.dto";
 import {UpdateProjectDto} from "@/modules/projects/dto/update-project.dto";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
@@ -10,6 +10,34 @@ import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 @Injectable()
 export class ProjectsService {
     constructor(private readonly prisma: PrismaService) {}
+
+    /**
+     * Records a company-scoped project activity — same pattern as
+     * logUserActivity/logUnitActivity. projectId is left out for a project
+     * that's already been hard-deleted, since Activity.projectId is a real
+     * FK and the row it would point to no longer exists.
+     */
+    private logProjectActivity(params: {
+        companyId: string;
+        actorId: string;
+        projectId?: string;
+        action: ActivityAction;
+        type: ActivityType;
+        title: string;
+        metadata?: Prisma.InputJsonValue;
+    }) {
+        return this.prisma.activity.create({
+            data: {
+                companyId: params.companyId,
+                userId: params.actorId,
+                projectId: params.projectId,
+                action: params.action,
+                type: params.type,
+                title: params.title,
+                metadata: params.metadata,
+            },
+        });
+    }
 
     async findAll(user: AuthUser, query: QueryProjectsDto) {
         if (!user.companyId) {
@@ -126,7 +154,7 @@ export class ProjectsService {
 
         await this.ensureProjectNameIsUniqueInsideCompany(dto.name, user.companyId);
 
-        return this.prisma.project.create({
+        const created = await this.prisma.project.create({
             data: {
                 name: dto.name,
                 address: dto.address,
@@ -134,6 +162,17 @@ export class ProjectsService {
                 companyId: user.companyId,
             },
         });
+
+        await this.logProjectActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            projectId: created.id,
+            action: ActivityAction.CREATED_PROJECT,
+            type: ActivityType.PROJECT_CREATED,
+            title: `Project "${created.name}" created`,
+        });
+
+        return created;
     }
 
     async update(user: AuthUser, id: string, dto: UpdateProjectDto) {
@@ -141,7 +180,7 @@ export class ProjectsService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        await this.findOne(user, id);
+        const existing = await this.findOne(user, id);
 
         if (dto.name) {
             await this.ensureProjectNameIsUniqueInsideCompany(
@@ -151,7 +190,12 @@ export class ProjectsService {
             );
         }
 
-        return this.prisma.project.update({
+        const statusChanged = dto.status !== undefined && dto.status !== existing.status;
+        const fieldsChanged =
+            (dto.name !== undefined && dto.name !== existing.name) ||
+            (dto.address !== undefined && dto.address !== existing.address);
+
+        const updated = await this.prisma.project.update({
             where: {
                 id,
             },
@@ -161,6 +205,31 @@ export class ProjectsService {
                 status: dto.status,
             },
         });
+
+        if (statusChanged) {
+            await this.logProjectActivity({
+                companyId: user.companyId,
+                actorId: user.id,
+                projectId: id,
+                action: ActivityAction.CHANGED_PROJECT_STATUS,
+                type: ActivityType.PROJECT_STATUS_CHANGED,
+                title: `Project "${updated.name}" status changed`,
+                metadata: {fromStatus: existing.status, toStatus: updated.status},
+            });
+        }
+
+        if (fieldsChanged) {
+            await this.logProjectActivity({
+                companyId: user.companyId,
+                actorId: user.id,
+                projectId: id,
+                action: ActivityAction.UPDATED_PROJECT,
+                type: ActivityType.PROJECT_UPDATED,
+                title: `Project "${updated.name}" updated`,
+            });
+        }
+
+        return updated;
     }
 
     async remove(user: AuthUser, id: string) {
@@ -197,6 +266,17 @@ export class ProjectsService {
             where: {
                 id,
             },
+        });
+
+        // No projectId — the row is already gone, and Activity.projectId is a
+        // real FK, so the identifying details go in metadata instead.
+        await this.logProjectActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            action: ActivityAction.DELETED_PROJECT,
+            type: ActivityType.PROJECT_DELETED,
+            title: `Project "${project.name}" deleted`,
+            metadata: {projectId: project.id},
         });
 
         return {

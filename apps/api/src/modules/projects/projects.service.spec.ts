@@ -35,6 +35,9 @@ describe('ProjectsService', () => {
                 update: jest.fn().mockImplementation(({data}) => Promise.resolve({id: 'project-1', ...data})),
                 delete: jest.fn().mockResolvedValue({id: 'project-1'}),
             },
+            activity: {
+                create: jest.fn().mockResolvedValue({id: 'activity-1'}),
+            },
         };
 
         const service = new ProjectsService(prisma as any);

@@ -23,11 +23,12 @@ model Project {
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 
-  blocks    Block[]
-  units     Unit[]
-  entrances Entrance[]
-  floors    Floor[]
-  deals     Deal[]
+  blocks     Block[]
+  units      Unit[]
+  entrances  Entrance[]
+  floors     Floor[]
+  deals      Deal[]
+  activities Activity[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt

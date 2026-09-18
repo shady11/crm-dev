@@ -42,6 +42,11 @@ enum ActivityAction {
   CHANGED_UNIT_STATUS
   DELETED_UNIT
   IMPORTED_UNITS
+
+  CREATED_PROJECT
+  UPDATED_PROJECT
+  CHANGED_PROJECT_STATUS
+  DELETED_PROJECT
 }
 
 enum ActivityType {
@@ -98,6 +103,11 @@ enum ActivityType {
   UNIT_STATUS_CHANGED
   UNIT_DELETED
   UNITS_IMPORTED
+
+  PROJECT_CREATED
+  PROJECT_UPDATED
+  PROJECT_STATUS_CHANGED
+  PROJECT_DELETED
 }
 
 model Activity {
@@ -129,6 +139,9 @@ model Activity {
   unitId String?
   unit   Unit?   @relation(fields: [unitId], references: [id])
 
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id])
+
   // The user acted upon, for USER_* activity types (e.g. the user created,
   // deactivated, or transferred) — distinct from userId, which is always the
   // actor. Null for every other activity type.
@@ -146,4 +159,5 @@ model Activity {
   @@index([leadId])
   @@index([targetUserId])
   @@index([unitId])
+  @@index([projectId])
 }
