@@ -3,11 +3,10 @@ import {DocumentType} from '@/generated/prisma/client';
 import {JwtAuthGuard} from '@/modules/auth/guards/jwt-auth.guard';
 import {CompanyGuard} from '@/common/guards/company.guard';
 import {BranchGuard} from '@/common/guards/branch.guard';
-import {RolesGuard} from '@/common/guards/roles.guard';
-import {Roles} from '@/common/decorators/roles.decorator';
+import {PermissionsGuard} from '@/common/guards/permissions.guard';
+import {RequirePermissions} from '@/common/decorators/permissions.decorator';
 import {CurrentUser} from '@/common/decorators/current-user.decorator';
 import {AuthUser} from '@/common/types/auth-user.type';
-import {UserRole} from '@/generated/prisma/enums';
 
 import {DealsService} from '../services/deals.service';
 import {DealQueryDto} from '../dto/deal-query.dto';
@@ -22,7 +21,7 @@ import {PaymentScheduleService} from "@/modules/deals/services/payments/payment-
 import {PaymentService} from "@/modules/deals/services/payments/payment.service";
 import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
 
-@UseGuards(JwtAuthGuard, CompanyGuard, BranchGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, CompanyGuard, BranchGuard, PermissionsGuard)
 @Controller('deals')
 export class DealsController {
   constructor(
@@ -31,33 +30,19 @@ export class DealsController {
       private readonly paymentService: PaymentService,
   ) {}
 
-  @Roles(
-      UserRole.COMPANY_ADMIN,
-      UserRole.SALES_HEAD,
-      UserRole.SALES_MANAGER,
-      UserRole.FINANCE,
-  )
+  @RequirePermissions('deals.view')
   @Get()
   findAll(@CurrentUser() user: AuthUser, @Query() query: DealQueryDto) {
     return this.dealsService.findAll(user, query);
   }
 
-  @Roles(
-      UserRole.COMPANY_ADMIN,
-      UserRole.SALES_HEAD,
-      UserRole.SALES_MANAGER,
-  )
+  @RequirePermissions('deals.create')
   @Post('reserve')
   reserve(@CurrentUser() user: AuthUser, @Body() dto: ReserveUnitDto) {
     return this.dealsService.reserveUnit(user, dto);
   }
 
-  @Roles(
-      UserRole.COMPANY_ADMIN,
-      UserRole.SALES_HEAD,
-      UserRole.SALES_MANAGER,
-      UserRole.FINANCE
-  )
+  @RequirePermissions('deals.view')
   @Get('status-summary')
   getStatusSummary(
       @CurrentUser() user: AuthUser,
@@ -67,22 +52,13 @@ export class DealsController {
     return this.dealsService.getStatusSummary(user, projectId, branchId);
   }
 
-  @Roles(
-      UserRole.COMPANY_ADMIN,
-      UserRole.SALES_HEAD,
-      UserRole.SALES_MANAGER,
-      UserRole.FINANCE,
-  )
+  @RequirePermissions('deals.view')
   @Get(':id')
   findOne(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     return this.dealsService.findOne(user, id);
   }
 
-  @Roles(
-      UserRole.COMPANY_ADMIN,
-      UserRole.SALES_HEAD,
-      UserRole.SALES_MANAGER
-  )
+  @RequirePermissions('deals.manage')
   @Post(':id/extend')
   extendReservation(
       @CurrentUser() user: AuthUser,
@@ -92,11 +68,7 @@ export class DealsController {
     return this.dealsService.extendReservation(user, id, dto);
   }
 
-  @Roles(
-      UserRole.COMPANY_ADMIN,
-      UserRole.SALES_HEAD,
-      UserRole.SALES_MANAGER
-  )
+  @RequirePermissions('deals.manage')
   @Post(':id/sign-contract')
   signContract(
       @CurrentUser() user: AuthUser,
@@ -106,24 +78,18 @@ export class DealsController {
     return this.dealsService.signContract(user, id, dto);
   }
 
-  @Roles(
-      UserRole.COMPANY_ADMIN,
-      UserRole.SALES_HEAD,
-      UserRole.SALES_MANAGER
-  )
+  @RequirePermissions('deals.manage')
   @Post(':id/activate')
   activate(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     return this.dealsService.activate(user, id);
   }
 
   // SH-A1: a SALES_HEAD moving a deal between their own team's
-  // SALES_MANAGERs. COMPANY_ADMIN included for oversight parity with cancel
-  // below; SALES_MANAGER is deliberately excluded — this is a team-lead
-  // action, not something a rank-and-file manager grants themselves.
-  @Roles(
-      UserRole.COMPANY_ADMIN,
-      UserRole.SALES_HEAD
-  )
+  // SALES_MANAGERs. COMPANY_ADMIN included (via the default role bundle) for
+  // oversight parity with cancel below; SALES_MANAGER is deliberately
+  // excluded — this is a team-lead action, not something a rank-and-file
+  // manager grants themselves.
+  @RequirePermissions('deals.reassign')
   @Post(':id/reassign')
   reassignManager(
       @CurrentUser() user: AuthUser,
@@ -133,23 +99,18 @@ export class DealsController {
     return this.dealsService.reassignManager(user, id, dto);
   }
 
-  // SALES_MANAGER excluded — approving/rejecting a discount is exactly the
-  // authority this endpoint exists to check, so the requester can never be
-  // their own approver. DealsService.approveDiscount/rejectDiscount still
-  // check the requested amount against the actor's own band on top of this.
-  @Roles(
-      UserRole.COMPANY_ADMIN,
-      UserRole.SALES_HEAD
-  )
+  // SALES_MANAGER excluded from deals.approve_discount — approving/rejecting
+  // a discount is exactly the authority this permission exists to check, so
+  // the requester can never be their own approver. DealsService.approveDiscount
+  // /rejectDiscount still check the requested amount against the actor's own
+  // band on top of this.
+  @RequirePermissions('deals.approve_discount')
   @Post(':id/discount/approve')
   approveDiscount(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     return this.dealsService.approveDiscount(user, id);
   }
 
-  @Roles(
-      UserRole.COMPANY_ADMIN,
-      UserRole.SALES_HEAD
-  )
+  @RequirePermissions('deals.approve_discount')
   @Post(':id/discount/reject')
   rejectDiscount(
       @CurrentUser() user: AuthUser,
@@ -159,10 +120,7 @@ export class DealsController {
     return this.dealsService.rejectDiscount(user, id, dto);
   }
 
-  @Roles(
-      UserRole.COMPANY_ADMIN,
-      UserRole.SALES_HEAD
-  )
+  @RequirePermissions('deals.cancel')
   @Post(':id/cancel')
   cancel(
       @CurrentUser() user: AuthUser,
@@ -172,12 +130,7 @@ export class DealsController {
     return this.dealsService.cancelDeal(user, id, dto);
   }
 
-  @Roles(
-      UserRole.COMPANY_ADMIN,
-      UserRole.SALES_HEAD,
-      UserRole.SALES_MANAGER,
-      UserRole.FINANCE
-  )
+  @RequirePermissions('deals.manage_payments')
   @Post(':id/payment-schedule')
   generateSchedule(
       @CurrentUser() user: AuthUser,
@@ -187,12 +140,7 @@ export class DealsController {
     return this.paymentScheduleService.generate(user, id, dto);
   }
 
-  @Roles(
-      UserRole.COMPANY_ADMIN,
-      UserRole.SALES_HEAD,
-      UserRole.SALES_MANAGER,
-      UserRole.FINANCE
-  )
+  @RequirePermissions('deals.manage_payments')
   @Post(':id/payments')
   recordPayment(
       @CurrentUser() user: AuthUser,
@@ -202,21 +150,13 @@ export class DealsController {
     return this.paymentService.create(user, id, dto);
   }
 
-  @Roles(
-      UserRole.COMPANY_ADMIN,
-      UserRole.SALES_HEAD,
-      UserRole.SALES_MANAGER
-  )
+  @RequirePermissions('deals.manage')
   @Post(':id/complete')
   complete(@CurrentUser() user: AuthUser, @Param('id') id: string) {
     return this.dealsService.complete(user, id);
   }
 
-  @Roles(
-      UserRole.COMPANY_ADMIN,
-      UserRole.SALES_HEAD,
-      UserRole.SALES_MANAGER
-  )
+  @RequirePermissions('documents.generate')
   @Post(':id/documents/:type/generate')
   generateDocument(
       @CurrentUser() user: AuthUser,

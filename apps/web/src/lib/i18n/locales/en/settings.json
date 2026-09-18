@@ -19,8 +19,11 @@
   "profile": {
     "page": {
       "heading": "My profile",
-      "description": "Update your own name and phone number.",
-      "formTitle": "Personal details"
+      "description": "Manage your own account details and password."
+    },
+    "tabs": {
+      "general": "General",
+      "password": "Password"
     },
     "fields": {
       "fullName": "Full name",
@@ -32,6 +35,25 @@
       "updateSuccessDescription": "Your profile was updated.",
       "updateErrorTitle": "Could not save profile",
       "updateErrorDescription": "Something went wrong. Please try again."
+    },
+    "password": {
+      "description": "Changing it signs you out of every other device.",
+      "fields": {
+        "currentPassword": "Current password",
+        "newPassword": "New password",
+        "confirmNewPassword": "Confirm new password"
+      },
+      "hint": "At least 8 characters, with an uppercase letter, a lowercase letter, and a number.",
+      "mismatch": "Passwords do not match",
+      "submit": "Change password",
+      "toasts": {
+        "updateSuccessTitle": "Password changed",
+        "updateSuccessDescription": "Use your new password next time you sign in.",
+        "incorrectCurrentPassword": "Current password is incorrect",
+        "sameAsCurrentPassword": "The new password must differ from the current one",
+        "updateErrorTitle": "Could not change password",
+        "updateErrorDescription": "Something went wrong. Please try again."
+      }
     }
   }
 }

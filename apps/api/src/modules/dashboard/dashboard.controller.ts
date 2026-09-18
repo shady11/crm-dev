@@ -2,9 +2,8 @@ import {Controller, Get, Query, Res, UseGuards} from "@nestjs/common";
 import type {Response} from "express";
 import {JwtAuthGuard} from "@/modules/auth/guards/jwt-auth.guard";
 import {CompanyGuard} from "@/common/guards/company.guard";
-import {RolesGuard} from "@/common/guards/roles.guard";
-import {Roles} from "@/common/decorators/roles.decorator";
-import {UserRole} from "@/generated/prisma/enums";
+import {PermissionsGuard} from "@/common/guards/permissions.guard";
+import {RequirePermissions} from "@/common/decorators/permissions.decorator";
 import {CurrentUser} from "@/common/decorators/current-user.decorator";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {DashboardService} from "./dashboard.service";
@@ -12,7 +11,8 @@ import {DashboardService} from "./dashboard.service";
 // No BranchGuard here — branch filtering is applied conditionally inside the
 // service (BR-B1 auto-filter, BR-B3 optional branchId param), not via a
 // blanket controller guard. See tenant-boundary.spec.ts's NO_BRANCH_SCOPE.
-@UseGuards(JwtAuthGuard, CompanyGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, CompanyGuard, PermissionsGuard)
+@RequirePermissions("dashboard.view")
 @Controller("dashboard")
 export class DashboardController {
     constructor(private readonly dashboardService: DashboardService) {}
@@ -58,10 +58,10 @@ export class DashboardController {
         return this.dashboardService.getRecentActivity(user, projectId, branchId);
     }
 
-    // Lead → deal → won conversion funnel. Open to the same roles as
-    // getKpis/getRevenueTrend above (no @Roles restriction) since it's the
-    // same kind of company/branch-scoped overview, not a cross-branch or
-    // team-lead-only report.
+    // Lead → deal → won conversion funnel. Open to the same dashboard.view
+    // permission as getKpis/getRevenueTrend above (no extra requirement)
+    // since it's the same kind of company/branch-scoped overview, not a
+    // cross-branch or team-lead-only report.
     @Get("funnel")
     getFunnel(
         @CurrentUser() user: AuthUser,
@@ -88,37 +88,37 @@ export class DashboardController {
         return buffer;
     }
 
-    // BR-E1: cross-branch comparison, COMPANY_ADMIN only — branch-scoped
-    // roles have no use for it and shouldn't be able to enumerate other
-    // branches' numbers.
-    @Roles(UserRole.COMPANY_ADMIN)
+    // BR-E1: cross-branch comparison. dashboard.branch_comparison is only in
+    // COMPANY_ADMIN's default bundle — branch-scoped roles have no use for it
+    // and shouldn't be able to enumerate other branches' numbers.
+    @RequirePermissions("dashboard.branch_comparison")
     @Get("branch-comparison")
     getBranchComparison(@CurrentUser() user: AuthUser) {
         return this.dashboardService.getBranchComparison(user);
     }
 
-    // SH-A2: a SALES_HEAD's own-team snapshot. SALES_HEAD only — this is the
-    // team-lead's standup view, not a company-wide report COMPANY_ADMIN would
-    // reach for (they have branch-comparison above instead).
-    @Roles(UserRole.SALES_HEAD)
+    // SH-A2: a SALES_HEAD's own-team snapshot. dashboard.team_snapshot is
+    // only in SALES_HEAD's default bundle — this is the team-lead's standup
+    // view, not a company-wide report (COMPANY_ADMIN has branch-comparison
+    // above instead).
+    @RequirePermissions("dashboard.team_snapshot")
     @Get("team-snapshot")
     getTeamSnapshot(@CurrentUser() user: AuthUser) {
         return this.dashboardService.getTeamSnapshot(user);
     }
 
-    // SM-A2: a SALES_MANAGER's own "what needs doing today" view.
-    // SALES_MANAGER only — this is the individual contributor's standup view,
-    // not the team-lead rollup SALES_HEAD gets from team-snapshot above.
-    @Roles(UserRole.SALES_MANAGER)
+    // SM-A2/SM-D1: a SALES_MANAGER's own "what needs doing today" view and
+    // own deal count/conversion rate. dashboard.my_performance is only in
+    // SALES_MANAGER's default bundle — the individual contributor's standup
+    // view, self-scoped only with no cross-visibility into teammates (see
+    // DashboardService.getMyPerformance).
+    @RequirePermissions("dashboard.my_performance")
     @Get("my-work-today")
     getMyWorkToday(@CurrentUser() user: AuthUser) {
         return this.dashboardService.getMyWorkToday(user);
     }
 
-    // SM-D1: a SALES_MANAGER's own deal count and conversion rate over a
-    // period. Self-scoped only, deliberately with no cross-visibility into
-    // teammates — see DashboardService.getMyPerformance.
-    @Roles(UserRole.SALES_MANAGER)
+    @RequirePermissions("dashboard.my_performance")
     @Get("my-performance")
     getMyPerformance(@CurrentUser() user: AuthUser, @Query("days") days?: string) {
         const parsed = Number(days);

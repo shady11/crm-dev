@@ -10,5 +10,5 @@ import {landingPathFor} from "@/features/auth/access";
 export function RoleLanding() {
     const {user} = useAuth();
 
-    return <Navigate to={landingPathFor(user?.role)} replace />;
+    return <Navigate to={landingPathFor(user)} replace />;
 }

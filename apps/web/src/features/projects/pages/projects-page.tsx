@@ -22,15 +22,15 @@ import {ProjectCard} from "@/features/projects/components/project-card.tsx";
 import {createListCollection} from "@ark-ui/react";
 import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 
 type ProjectStatusFilter = ProjectStatus | "all";
 
 export function ProjectsPage() {
     const { t } = useTranslation("projects");
     const { user } = useAuth();
-    // Creating a project is COMPANY_ADMIN only (POST /projects).
-    const canCreate = user?.role === UserRole.COMPANY_ADMIN;
+    // Creating a project requires projects.create (POST /projects).
+    const canCreate = hasPermission(user, "projects.create");
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
     const [editingProject, setEditingProject] = useState<Project | null>(null);

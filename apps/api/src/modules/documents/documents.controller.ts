@@ -16,34 +16,33 @@ import {FileInterceptor} from "@nestjs/platform-express";
 import type {Response} from "express";
 import {JwtAuthGuard} from "@/modules/auth/guards/jwt-auth.guard";
 import {CompanyGuard} from "@/common/guards/company.guard";
-import {RolesGuard} from "@/common/guards/roles.guard";
-import {Roles} from "@/common/decorators/roles.decorator";
+import {PermissionsGuard} from "@/common/guards/permissions.guard";
+import {RequirePermissions} from "@/common/decorators/permissions.decorator";
 import {CurrentUser} from "@/common/decorators/current-user.decorator";
 import {AuthUser} from "@/common/types/auth-user.type";
-import {UserRole} from "@/generated/prisma/enums";
 import {DocumentsService} from "./documents.service";
 import {UploadDocumentDto} from "./dto/upload-document.dto";
 import {QueryDocumentsDto} from "./dto/query-documents.dto";
 import {documentMulterOptions} from "./documents.constants";
 
-@UseGuards(JwtAuthGuard, CompanyGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, CompanyGuard, PermissionsGuard)
 @Controller("documents")
 export class DocumentsController {
     constructor(private readonly documentsService: DocumentsService) {}
 
-    @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD, UserRole.SALES_MANAGER, UserRole.FINANCE)
+    @RequirePermissions("documents.view")
     @Get()
     findAll(@CurrentUser() user: AuthUser, @Query() query: QueryDocumentsDto) {
         return this.documentsService.findAll(user, query);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD, UserRole.SALES_MANAGER, UserRole.FINANCE)
+    @RequirePermissions("documents.view")
     @Get(":id")
     findOne(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.documentsService.findOne(user, id);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD, UserRole.SALES_MANAGER, UserRole.FINANCE)
+    @RequirePermissions("documents.view")
     @Get(":id/download")
     async download(
         @CurrentUser() user: AuthUser,
@@ -60,7 +59,7 @@ export class DocumentsController {
         return new StreamableFile(stream);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD, UserRole.SALES_MANAGER, UserRole.FINANCE)
+    @RequirePermissions("documents.upload")
     @Post()
     @UseInterceptors(FileInterceptor("file", documentMulterOptions))
     upload(
@@ -71,7 +70,7 @@ export class DocumentsController {
         return this.documentsService.upload(user, file, dto);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD)
+    @RequirePermissions("documents.delete")
     @Delete(":id")
     remove(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.documentsService.remove(user, id);

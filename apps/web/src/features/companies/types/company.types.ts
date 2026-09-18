@@ -1,5 +1,3 @@
-import type {UserRole} from "@/features/users/types/user.types";
-
 export type Company = {
     id: string;
     name: string;
@@ -23,7 +21,8 @@ export type CompanyUser = {
     fullName: string;
     email: string;
     phone: string | null;
-    role: UserRole;
+    roleId: string;
+    role: {id: string; name: string};
     isActive: boolean;
     createdAt: string;
 };

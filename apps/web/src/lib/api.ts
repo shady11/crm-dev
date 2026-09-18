@@ -16,10 +16,17 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+// Endpoints where a 401 means "the password you typed into this form was
+// wrong" rather than "your session has expired" — the global logout below
+// would otherwise force-log-out a fully signed-in user for a simple typo.
+const REAUTH_ENDPOINTS = ["/auth/me/password", "/auth/2fa/disable"];
+
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
+        const isReauthEndpoint = REAUTH_ENDPOINTS.some((path) => error.config?.url?.includes(path));
+
+        if (error.response?.status === 401 && !isReauthEndpoint) {
             disconnectNotificationsSocket();
             authStorage.clear();
             window.location.href = "/login";

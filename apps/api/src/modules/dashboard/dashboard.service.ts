@@ -1,15 +1,18 @@
 import {ForbiddenException, Injectable} from "@nestjs/common";
 import * as XLSX from "xlsx";
-import {DealStatus, LeadStatus, Prisma, TaskStatus, UnitStatus, UserRole} from "@/generated/prisma/client";
+import {DealStatus, LeadStatus, Prisma, TaskStatus, UnitStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 import {OPEN_LEAD_STATUSES} from "@/modules/leads/lead.constants";
-import {isBranchScopedRole} from "@/common/constants/branch-scope.constants";
+import {RbacService} from "@/modules/rbac/rbac.service";
 
 @Injectable()
 export class DashboardService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly rbacService: RbacService,
+    ) {}
 
     /**
      * Resolves the branchId to filter deal/task/payment queries by: a
@@ -19,7 +22,7 @@ export class DashboardService {
      * never be mistaken for the sales-role restriction above it.
      */
     private resolveBranchId(user: AuthUser, branchId?: string): string | undefined {
-        if (isBranchScopedRole(user.role)) {
+        if (user.isBranchScoped) {
             return user.branchId ?? undefined;
         }
 
@@ -261,8 +264,16 @@ export class DashboardService {
         const companyId = user.companyId;
         const branchId = user.branchId;
 
+        const targetRoleIds = await this.rbacService.findRoleIdsWithPermission(companyId, "deals.manage", "deals.reassign");
+
         const managers = await this.prisma.user.findMany({
-            where: { companyId, branchId, role: UserRole.SALES_MANAGER, isActive: true, deletedAt: null },
+            where: {
+                companyId,
+                branchId,
+                roleId: {in: targetRoleIds},
+                isActive: true,
+                deletedAt: null,
+            },
             select: { id: true, fullName: true, email: true },
             orderBy: { fullName: "asc" },
         });

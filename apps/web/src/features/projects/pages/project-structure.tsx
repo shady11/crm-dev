@@ -15,13 +15,13 @@ import {Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTit
 import {toast} from "@/components/ui/toast";
 import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 
 export function ProjectStructure() {
     const { t } = useTranslation("projects");
     const { user } = useAuth();
-    // Creating a block is COMPANY_ADMIN only (POST /projects/:id/blocks).
-    const canCreateBlock = user?.role === UserRole.COMPANY_ADMIN;
+    // Creating a block requires inventory.manage (POST /projects/:id/blocks).
+    const canCreateBlock = hasPermission(user, "inventory.manage");
     const { projectId } = useParams<{ projectId: string }>();
     const queryClient = useQueryClient();
 

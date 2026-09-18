@@ -26,6 +26,7 @@ import {
     MapPin,
     ScrollText,
     Settings,
+    ShieldCheck,
     SlidersHorizontal,
     SquareUser,
     Users
@@ -50,6 +51,7 @@ const NAV_ITEMS: {
     { titleKey: "nav.companies", feature: "companies", url: "/companies", icon: Landmark },
     { titleKey: "nav.settingOptions", feature: "settingOptions", url: "/setting-options", icon: SlidersHorizontal },
     { titleKey: "nav.users", feature: "users", url: "/users", icon: Users },
+    { titleKey: "nav.rolesPermissions", feature: "rolesPermissions", url: "/roles-permissions", icon: ShieldCheck },
     { titleKey: "nav.branches", feature: "branches", url: "/branches", icon: MapPin },
     { titleKey: "nav.activityLog", feature: "activities", url: "/activity-log", icon: History },
     { titleKey: "nav.auditLog", feature: "auditLog", url: "/audit-log", icon: ScrollText },
@@ -62,7 +64,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { user } = useAuth();
 
     const navMain = NAV_ITEMS
-        .filter((item) => canAccess(user?.role, item.feature))
+        .filter((item) => canAccess(user, item.feature))
         .map((item) => ({ title: t(item.titleKey), url: item.url, icon: item.icon }));
 
     return (

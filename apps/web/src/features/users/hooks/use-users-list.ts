@@ -1,7 +1,7 @@
 import {useMemo, useState} from "react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "@/components/ui/toast.tsx";
-import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {getRoles} from "@/features/rbac/api/rbac.api.ts";
 import {
     createUser,
     type CreateUserPayload,
@@ -14,20 +14,24 @@ import {
     type UpdateUserPayload,
     type UserSortField,
 } from "@/features/users/api/users.api.ts";
-import {getVisibleRoles, type User, type UserRole} from "@/features/users/types/user.types";
+import type {User} from "@/features/users/types/user.types";
 import {initials} from "@/features/users/utils/format.ts";
 import {useTranslation} from "react-i18next";
 import {useSort} from "@/hooks/use-sort.ts";
 
 export type StatusFilter = "all" | "active" | "inactive";
-export type RoleFilterValue = UserRole | "all";
+export type RoleFilterValue = string | "all";
 
 export function useUsersList() {
     const { t } = useTranslation("users");
-    const { user: currentUser } = useAuth();
-    const visibleRoles = useMemo(() => getVisibleRoles(currentUser?.role), [currentUser?.role]);
 
     const queryClient = useQueryClient();
+
+    const rolesQuery = useQuery({ queryKey: ["rbac", "roles"], queryFn: getRoles });
+    const visibleRoles = useMemo(
+        () => (rolesQuery.data ?? []).filter((role) => !role.isPlatformRole),
+        [rolesQuery.data],
+    );
 
     const [statusFilter, setStatusFilterState] = useState<StatusFilter>("all");
     const [roleFilter, setRoleFilterState] = useState<RoleFilterValue>("all");
@@ -49,7 +53,7 @@ export function useUsersList() {
             getUsers({
                 page,
                 limit,
-                role: roleFilter === "all" ? undefined : roleFilter,
+                roleId: roleFilter === "all" ? undefined : roleFilter,
                 isActive: statusFilter === "all" ? undefined : statusFilter === "active",
                 branchId: branchFilter === "all" ? undefined : branchFilter,
                 search: search || undefined,
@@ -164,12 +168,13 @@ export function useUsersList() {
     const clearSelection = () => setSelectedIds(new Set());
 
     const membersByRole = useMemo(() => {
-        const map = new Map<UserRole, { count: number; initials: string[] }>(
-            visibleRoles.map((role) => [role, { count: 0, initials: [] }]),
+        const map = new Map<string, { count: number; initials: string[] }>(
+            visibleRoles.map((role) => [role.id, { count: 0, initials: [] }]),
         );
 
         for (const item of roleSummaryQuery.data ?? []) {
-            map.set(item.role, {
+            if (!map.has(item.roleId)) continue;
+            map.set(item.roleId, {
                 count: item.count,
                 initials: item.sample.map((u) => initials(u.fullName)),
             });

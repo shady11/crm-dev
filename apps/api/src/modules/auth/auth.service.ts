@@ -104,7 +104,10 @@ export class AuthService {
             id: user.id,
             email: user.email,
             name: user.fullName,
-            role: user.role,
+            roleId: user.roleId,
+            roleName: user.role.name,
+            isSuperAdmin: user.isSuperAdmin,
+            isBranchScoped: user.role.isBranchScoped,
             companyId: user.companyId,
             branchId: user.branchId,
         };
@@ -118,7 +121,10 @@ export class AuthService {
                 fullName: user.fullName,
                 email: user.email,
                 phone: user.phone,
-                role: user.role,
+                roleId: user.roleId,
+                roleName: user.role.name,
+                isSuperAdmin: user.isSuperAdmin,
+                isBranchScoped: user.role.isBranchScoped,
                 companyId: user.companyId,
                 company: toCompanySummary(user.company),
                 branchId: user.branchId,
@@ -166,7 +172,10 @@ export class AuthService {
             id: record.id,
             email: record.email,
             name: record.fullName,
-            role: record.role,
+            roleId: record.roleId,
+            roleName: record.role.name,
+            isSuperAdmin: record.isSuperAdmin,
+            isBranchScoped: record.role.isBranchScoped,
             companyId: record.companyId,
             branchId: record.branchId,
         };
@@ -189,7 +198,7 @@ export class AuthService {
                 fullName: dto.fullName,
                 phone: dto.phone,
             },
-            select: {id: true, fullName: true, email: true, phone: true, role: true},
+            select: {id: true, fullName: true, email: true, phone: true, roleId: true, role: {select: {name: true}}},
         });
 
         return updated;

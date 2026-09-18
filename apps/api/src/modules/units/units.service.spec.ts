@@ -1,5 +1,5 @@
 import {BadRequestException, ForbiddenException, NotFoundException} from '@nestjs/common';
-import {UnitStatus, UserRole} from '@/generated/prisma/client';
+import {UnitStatus} from '@/generated/prisma/client';
 import {AuthUser} from '@/common/types/auth-user.type';
 import {UnitsService} from './units.service';
 
@@ -15,7 +15,8 @@ describe('UnitsService', () => {
         id: 'admin-1',
         email: 'admin@crm.dev',
         name: 'Admin',
-        role: UserRole.COMPANY_ADMIN,
+        roleId: 'role-company-admin',
+        roleName: 'Company Admin',
         companyId: 'company-1',
         company: null,
         branchId: null,

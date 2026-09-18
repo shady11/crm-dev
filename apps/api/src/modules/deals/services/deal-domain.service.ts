@@ -1,6 +1,5 @@
 import {Injectable} from '@nestjs/common';
 import {
-    Company,
     Deal,
     DealStatus,
     DiscountApprovalStatus,
@@ -9,7 +8,6 @@ import {
     Prisma,
     Unit,
     UnitStatus,
-    UserRole,
 } from '@/generated/prisma/client';
 
 import {
@@ -76,39 +74,41 @@ export class DealDomainService {
     }
 
     /**
-     * A request at or below the requesting role's own discretionary limit
-     * never needs a decision — this is what keeps an ordinary small discount
-     * exactly as fast as it is today. COMPANY_ADMIN has no ceiling.
+     * A request at or below the requester's own Role.discountLimit never
+     * needs a decision — this is what keeps an ordinary small discount
+     * exactly as fast as it is today. `null` (Company Admin, by default)
+     * means unlimited: no ceiling, never needs approval. `undefined` (a
+     * caller whose AuthUser never carries the field — old test fixtures)
+     * is treated as the most restrictive case, 0, rather than as unlimited.
      */
     requiresDiscountApproval(
         requestedPercent: Prisma.Decimal,
-        role: UserRole,
-        company: Pick<Company, 'salesManagerDiscountLimit' | 'salesHeadDiscountLimit'>,
+        requesterDiscountLimit: number | null | undefined,
     ): boolean {
-        if (role === UserRole.COMPANY_ADMIN) return false;
+        const limit = requesterDiscountLimit === undefined ? 0 : requesterDiscountLimit;
+        if (limit === null) return false;
 
-        const limit = role === UserRole.SALES_HEAD
-            ? new Prisma.Decimal(company.salesHeadDiscountLimit)
-            : new Prisma.Decimal(company.salesManagerDiscountLimit);
-
-        return requestedPercent.greaterThan(limit);
+        return requestedPercent.greaterThan(new Prisma.Decimal(limit));
     }
 
     /**
-     * Who may decide a pending request: SALES_HEAD only up to their own
-     * limit (their own band), COMPANY_ADMIN for anything above it. A
-     * SALES_HEAD can't approve a request that would itself have needed
-     * COMPANY_ADMIN sign-off had the sales head requested it directly.
+     * Who may decide a pending request: whoever holds the
+     * deals.approve_discount permission, up to their own Role.discountLimit
+     * (or unlimited, for `null`). A decider with a lower band can't approve
+     * a request that would itself have needed someone with a higher — or
+     * no — ceiling to sign off, had they requested it directly.
      */
     canDecideDiscount(
         requestedPercent: Prisma.Decimal,
-        role: UserRole,
-        company: Pick<Company, 'salesHeadDiscountLimit'>,
+        deciderCanApprove: boolean,
+        deciderDiscountLimit: number | null | undefined,
     ): boolean {
-        if (role === UserRole.COMPANY_ADMIN) return true;
-        if (role !== UserRole.SALES_HEAD) return false;
+        if (!deciderCanApprove) return false;
 
-        return requestedPercent.lessThanOrEqualTo(new Prisma.Decimal(company.salesHeadDiscountLimit));
+        const limit = deciderDiscountLimit === undefined ? 0 : deciderDiscountLimit;
+        if (limit === null) return true;
+
+        return requestedPercent.lessThanOrEqualTo(new Prisma.Decimal(limit));
     }
 
     ensureCanActivate(deal: Deal): void {

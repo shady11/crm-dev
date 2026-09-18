@@ -3,7 +3,6 @@ import {
     LeadStatus,
     UnitStatus,
     UnitType,
-    UserRole,
 } from "@/generated/prisma/enums";
 import { JwtAuthGuard } from "@/modules/auth/guards/jwt-auth.guard";
 
@@ -16,7 +15,8 @@ export class ReferencesController {
             leadStatuses: Object.values(LeadStatus),
             unitTypes: Object.values(UnitType),
             unitStatuses: Object.values(UnitStatus),
-            userRoles: Object.values(UserRole),
+            // Roles are dynamic now (see GET /rbac/roles) — no fixed list to
+            // hand back here.
         };
     }
 }

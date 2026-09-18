@@ -1,5 +1,4 @@
 import {ForbiddenException} from "@nestjs/common";
-import {UserRole} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ActivitiesService} from "./activities.service";
@@ -8,7 +7,8 @@ const baseUser: AuthUser = {
     id: "user-1",
     email: "user@crm.dev",
     name: "User",
-    role: UserRole.COMPANY_ADMIN,
+    roleId: "role-company-admin",
+    roleName: "Company Admin",
     companyId: "company-1",
     company: null,
     branchId: null,
@@ -57,11 +57,11 @@ describe("ActivitiesService", () => {
         );
     });
 
-    it.each([UserRole.SALES_HEAD, UserRole.SALES_MANAGER])(
+    it.each(["Sales Head", "Sales Manager"])(
         "restricts %s to their own branch's users, ignoring any branchId query param",
-        async (role) => {
+        async (roleName) => {
             const {service, findMany} = build();
-            const branchUser: AuthUser = {...baseUser, role, branchId: "branch-1"};
+            const branchUser: AuthUser = {...baseUser, roleName, isBranchScoped: true, branchId: "branch-1"};
 
             await service.findAll(branchUser, {branchId: "someone-elses-branch"} as any);
 

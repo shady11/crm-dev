@@ -7,7 +7,7 @@ import type {Floor} from "@/features/floors/types/floor.types.ts";
 import {useCreateUnit} from "@/features/units/hooks/use-create-unit.ts";
 import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 
 interface AddUnitButtonProps {
     floor: Floor;
@@ -26,7 +26,7 @@ export function AddUnitButton({
     });
 
     // Creating a unit is COMPANY_ADMIN only (POST /floors/:id/units).
-    if (user?.role !== UserRole.COMPANY_ADMIN) {
+    if (!hasPermission(user, "inventory.manage")) {
         return null;
     }
 

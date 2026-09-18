@@ -2,7 +2,6 @@ import {ForbiddenException, Injectable} from "@nestjs/common";
 import {Prisma} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
-import {isBranchScopedRole} from "@/common/constants/branch-scope.constants";
 import {QueryActivitiesDto} from "./dto/query-activities.dto";
 
 /**
@@ -34,7 +33,7 @@ export class ActivitiesService {
             companyId: user.companyId,
         };
 
-        if (isBranchScopedRole(user.role)) {
+        if (user.isBranchScoped) {
             where.user = {branchId: user.branchId};
         } else if (query.branchId) {
             where.user = {branchId: query.branchId};

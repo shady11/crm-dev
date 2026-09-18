@@ -21,7 +21,7 @@ import {auditLogRoutes} from "@/features/audit-log/audit-log.routes";
 import {activitiesRoutes} from "@/features/activities/activities.routes";
 import {RoleLanding} from "@/features/auth/pages/role-landing";
 import {RoleGuard} from "@/features/auth/pages/role-guard";
-import {FEATURE_ROLES} from "@/features/auth/access";
+import {rbacRoutes} from "@/features/rbac/rbac.routes";
 
 export const router = createBrowserRouter([
     { path: paths.login, element: <LoginPage /> },
@@ -41,7 +41,7 @@ export const router = createBrowserRouter([
                     { index: true, element: <RoleLanding /> },
                     {
                         path: "dashboard",
-                        element: <RoleGuard allow={[...FEATURE_ROLES.dashboard]} />,
+                        element: <RoleGuard feature="dashboard" />,
                         children: [{ index: true, element: <DashboardPage /> }],
                     },
                     companiesRoutes,
@@ -54,13 +54,14 @@ export const router = createBrowserRouter([
                     activitiesRoutes,
                     {
                         path: "leads",
-                        element: <RoleGuard allow={[...FEATURE_ROLES.leads]} />,
+                        element: <RoleGuard feature="leads" />,
                         children: [{ index: true, element: <LeadsPage /> }],
                     },
                     clientsRoutes,
                     projectsRoutes,
                     dealsRoutes,
                     usersRoutes,
+                    rbacRoutes,
                     branchesRoutes,
                     tasksRoutes,
                     { path: "*", element: <NotFoundPage /> },

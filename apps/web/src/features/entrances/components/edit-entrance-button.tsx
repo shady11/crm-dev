@@ -9,7 +9,7 @@ import { EntranceForm } from "./entrance-form.tsx";
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 
 interface EditEntranceButtonProps {
     entrance: Entrance;
@@ -37,7 +37,7 @@ export function EditEntranceButton({ entrance }: EditEntranceButtonProps) {
     });
 
     // Editing an entrance is COMPANY_ADMIN only (PATCH /entrances/:id).
-    if (user?.role !== UserRole.COMPANY_ADMIN) {
+    if (!hasPermission(user, "inventory.manage")) {
         return null;
     }
 

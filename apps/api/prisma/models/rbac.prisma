@@ -1,0 +1,105 @@
+// Dynamic RBAC layer. Every user has exactly one Role (User.roleId, in
+// user.prisma) — no fixed enum. A Permission is a fine-grained capability
+// ("leads.create"), a Role is a named bundle of permissions, and effective
+// permissions are simply that Role's permission set. SUPER_ADMIN is exempt
+// from this check entirely (see PermissionsGuard, and User.isSuperAdmin)
+// rather than needing a Role that lists every permission.
+//
+// A Role with companyId == null is a *global* role: shared across every
+// tenant, editable only by a platform administrator (SUPER_ADMIN) — see
+// RbacService. A Role with companyId set is a tenant's own custom role,
+// created by that tenant's COMPANY_ADMIN to slice up access more finely
+// than the built-in roles allow. Either kind is otherwise an ordinary,
+// fully editable Role: `isSystem` only marks the five built-in roles this
+// app seeds on first boot (Super Admin, Company Admin, Sales Head, Sales
+// Manager, Finance) as a UI label ("Built-in" vs "Custom"); it is not a
+// lock. A platform administrator can rename them, change their
+// permissions, or delete them exactly like any other global role.
+model Permission {
+  id String @id @default(uuid())
+
+  // Stable machine key, "<module>.<action>", e.g. "leads.create". Never
+  // renamed once shipped — RolePermission rows and seed data reference it.
+  key         String @unique
+  module      String
+  action      String
+  description String
+
+  roles RolePermission[]
+
+  createdAt DateTime @default(now())
+
+  @@index([module])
+}
+
+model Role {
+  id String @id @default(uuid())
+
+  name        String
+  description String?
+
+  // Marks one of the five built-in roles this app seeds on first boot —
+  // a UI label ("Built-in" vs "Custom") only, not a lock. See the model
+  // comment above and RbacService.
+  isSystem Boolean @default(false)
+
+  // Whether a user holding this Role is isolated to one branch (their
+  // User.branchId must then be set) rather than seeing company-wide data —
+  // replaces the old hardcoded SALES_HEAD/SALES_MANAGER check. Drives
+  // AuthUser.isBranchScoped (see SessionValidationService) and the
+  // branch-required/forbidden validation in UsersService.
+  isBranchScoped Boolean @default(false)
+
+  // A holder's own discretionary discount ceiling, in percent. Null means
+  // unlimited (never needs sign-off, e.g. Company Admin); a set value means
+  // a request above it needs sign-off from someone with the
+  // deals.approve_discount permission whose own ceiling (or lack of one)
+  // covers it. See DealDomainService.requiresDiscountApproval/
+  // canDecideDiscount. Replaces the old per-company
+  // Company.sales*DiscountLimit columns — a company wanting its own
+  // threshold clones the relevant role into a custom one with its own
+  // discountLimit, same as any other role customization.
+  discountLimit Decimal? @db.Decimal(5, 2)
+
+  // Exactly one global role may carry this — the role a brand-new tenant's
+  // first administrator is assigned (see CompaniesService.create). Set only
+  // at seed time; not exposed through the role-management API, so renaming
+  // or re-permissioning the role never affects which one this is.
+  isDefaultCompanyAdmin Boolean @default(false)
+
+  // Marks the "Super Admin" role: never assignable to a normal (company-
+  // scoped) user through UsersService — see ensureCanAssignRole. Set only
+  // at seed time, same as isDefaultCompanyAdmin above.
+  isPlatformRole Boolean @default(false)
+
+  // null = global role (shared across every tenant). Set = one tenant's
+  // own custom role.
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  permissions RolePermission[]
+  // Every user whose primary (and only) Role this is. See User.roleId.
+  users User[] @relation("UserPrimaryRole")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Role names only need to be unique within the scope they're offered in:
+  // a tenant's custom "Auditor" role can't collide with another custom role
+  // in the same tenant, but two different tenants can each have their own.
+  @@unique([companyId, name])
+  @@index([companyId])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  assignedAt DateTime @default(now())
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+}

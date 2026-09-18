@@ -30,7 +30,7 @@ import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 
 interface UnitTableProps {
     units: Unit[];
@@ -40,11 +40,11 @@ export function UnitTable({ units }: UnitTableProps) {
     const { t } = useTranslation("units");
     const { formatCurrency } = useCompanyFormatters();
     const { user } = useAuth();
-    // Matches the API's per-endpoint @Roles: edit is COMPANY_ADMIN/SALES_HEAD
-    // (PATCH /units/:id), duplicate and delete are COMPANY_ADMIN only.
-    const canEdit = user?.role === UserRole.COMPANY_ADMIN || user?.role === UserRole.SALES_HEAD;
-    const canDuplicate = user?.role === UserRole.COMPANY_ADMIN;
-    const canDelete = user?.role === UserRole.COMPANY_ADMIN;
+    // Matches the API's per-endpoint permissions: edit needs units.edit
+    // (PATCH /units/:id), duplicate and delete need inventory.manage.
+    const canEdit = hasPermission(user, "units.edit");
+    const canDuplicate = hasPermission(user, "inventory.manage");
+    const canDelete = hasPermission(user, "inventory.manage");
     const hasAnyRowAction = canEdit || canDuplicate || canDelete;
 
     const queryClient = useQueryClient();

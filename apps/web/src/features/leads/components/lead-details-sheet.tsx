@@ -7,7 +7,7 @@ import {LeadOverview} from "@/features/leads/components/lead-overview.tsx";
 import {LeadClientTab} from "@/features/leads/components/lead-client-tab.tsx";
 import {LeadActivityTab} from "@/features/leads/components/lead-activity-tab.tsx";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 import {useTranslation} from "react-i18next";
 
 interface LeadDetailsSheetProps {
@@ -33,10 +33,10 @@ export function LeadDetailsSheet({
                                   }: LeadDetailsSheetProps) {
     const { t } = useTranslation("leads");
     const { user } = useAuth();
-    const isCompanyAdmin = user?.role === UserRole.COMPANY_ADMIN;
-    // SH-A1: reassignment is a team-lead action — SALES_HEAD only, not
-    // SALES_MANAGER (who already has a general edit form for their own leads).
-    const isSalesHead = user?.role === UserRole.SALES_HEAD;
+    const canTransferBranch = hasPermission(user, "leads.transfer_branch");
+    // SH-A1: reassignment is a team-lead action, gated the same way the
+    // backend endpoint is (leads.assign) rather than by a specific role name.
+    const canReassign = hasPermission(user, "leads.assign");
 
     if (!lead) {
         return null;
@@ -77,7 +77,7 @@ export function LeadDetailsSheet({
                     <Button variant="destructive" size="icon-md" onClick={onRequestDelete} aria-label={t("common:actions.delete")}>
                         <Trash2 className="size-4" />
                     </Button>
-                    {isCompanyAdmin && (
+                    {canTransferBranch && (
                         <Button
                             variant="secondary"
                             size="icon-md"
@@ -87,7 +87,7 @@ export function LeadDetailsSheet({
                             <ArrowLeftRight className="size-4" />
                         </Button>
                     )}
-                    {isSalesHead && (
+                    {canReassign && (
                         <Button
                             variant="secondary"
                             size="icon-md"

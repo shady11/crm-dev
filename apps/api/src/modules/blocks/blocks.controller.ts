@@ -9,11 +9,10 @@ import {
     Query,
     UseGuards,
 } from "@nestjs/common";
-import { UserRole } from "@/generated/prisma/enums";
 import { JwtAuthGuard } from "@/modules/auth/guards/jwt-auth.guard";
 import { CompanyGuard } from "@/common/guards/company.guard";
-import { RolesGuard } from "@/common/guards/roles.guard";
-import { Roles } from "@/common/decorators/roles.decorator";
+import { PermissionsGuard } from "@/common/guards/permissions.guard";
+import { RequirePermissions } from "@/common/decorators/permissions.decorator";
 import { CurrentUser } from "@/common/decorators/current-user.decorator";
 import { AuthUser } from "@/common/types/auth-user.type";
 import { BlocksService } from "./blocks.service";
@@ -21,17 +20,12 @@ import { CreateBlockDto } from "./dto/create-block.dto";
 import { UpdateBlockDto } from "./dto/update-block.dto";
 import { QueryBlocksDto } from "./dto/query-blocks.dto";
 
-@UseGuards(JwtAuthGuard, CompanyGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, CompanyGuard, PermissionsGuard)
 @Controller()
 export class BlocksController {
     constructor(private readonly blocksService: BlocksService) {}
 
-    @Roles(
-        UserRole.COMPANY_ADMIN,
-        UserRole.SALES_HEAD,
-        UserRole.SALES_MANAGER,
-        UserRole.FINANCE,
-    )
+    @RequirePermissions("inventory.view")
     @Get("projects/:projectId/blocks")
     findByProject(
         @CurrentUser() user: AuthUser,
@@ -41,18 +35,13 @@ export class BlocksController {
         return this.blocksService.findByProject(user, projectId, query);
     }
 
-    @Roles(
-        UserRole.COMPANY_ADMIN,
-        UserRole.SALES_HEAD,
-        UserRole.SALES_MANAGER,
-        UserRole.FINANCE,
-    )
+    @RequirePermissions("inventory.view")
     @Get("blocks/:id")
     findOne(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.blocksService.findOne(user, id);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN)
+    @RequirePermissions("inventory.manage")
     @Post("projects/:projectId/blocks")
     create(
         @CurrentUser() user: AuthUser,
@@ -62,7 +51,7 @@ export class BlocksController {
         return this.blocksService.create(user, projectId, dto);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN)
+    @RequirePermissions("inventory.manage")
     @Patch("blocks/:id")
     update(
         @CurrentUser() user: AuthUser,
@@ -72,13 +61,13 @@ export class BlocksController {
         return this.blocksService.update(user, id, dto);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN)
+    @RequirePermissions("inventory.manage")
     @Post("blocks/:id/duplicate")
     duplicate(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.blocksService.duplicate(user, id);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN)
+    @RequirePermissions("inventory.manage")
     @Delete("blocks/:id")
     remove(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.blocksService.remove(user, id);

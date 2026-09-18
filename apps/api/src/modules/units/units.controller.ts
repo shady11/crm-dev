@@ -12,11 +12,10 @@ import {
     UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { UnitStatus, UserRole } from "@/generated/prisma/enums";
 import { JwtAuthGuard } from "@/modules/auth/guards/jwt-auth.guard";
 import { CompanyGuard } from "@/common/guards/company.guard";
-import { RolesGuard } from "@/common/guards/roles.guard";
-import { Roles } from "@/common/decorators/roles.decorator";
+import { PermissionsGuard } from "@/common/guards/permissions.guard";
+import { RequirePermissions } from "@/common/decorators/permissions.decorator";
 import { CurrentUser } from "@/common/decorators/current-user.decorator";
 import { AuthUser } from "@/common/types/auth-user.type";
 import { UnitsService } from "./units.service";
@@ -28,7 +27,7 @@ import {UpdateUnitStatusDto} from "@/modules/units/dto/update-unit-status.dto";
 import {CreateUnitsBulkDto} from "@/modules/units/dto/create-units-bulk.dto";
 import {unitsImportMulterOptions} from "@/modules/units/units-import.constants";
 
-@UseGuards(JwtAuthGuard, CompanyGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, CompanyGuard, PermissionsGuard)
 @Controller()
 export class UnitsController {
     constructor(
@@ -36,23 +35,13 @@ export class UnitsController {
         private readonly unitsImportService: UnitsImportService,
     ) {}
 
-    @Roles(
-        UserRole.COMPANY_ADMIN,
-        UserRole.SALES_HEAD,
-        UserRole.SALES_MANAGER,
-        UserRole.FINANCE,
-    )
+    @RequirePermissions("inventory.view")
     @Get("units")
     findAll(@CurrentUser() user: AuthUser, @Query() query: QueryUnitsDto) {
         return this.unitsService.findAll(user, query);
     }
 
-    @Roles(
-        UserRole.COMPANY_ADMIN,
-        UserRole.SALES_HEAD,
-        UserRole.SALES_MANAGER,
-        UserRole.FINANCE,
-    )
+    @RequirePermissions("inventory.view")
     @Get("floors/:floorId/units")
     findByFloor(
         @CurrentUser() user: AuthUser,
@@ -62,18 +51,13 @@ export class UnitsController {
         return this.unitsService.findByFloor(user, floorId, query);
     }
 
-    @Roles(
-        UserRole.COMPANY_ADMIN,
-        UserRole.SALES_HEAD,
-        UserRole.SALES_MANAGER,
-        UserRole.FINANCE,
-    )
+    @RequirePermissions("inventory.view")
     @Get("units/:id")
     findOne(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.unitsService.findOne(user, id);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN)
+    @RequirePermissions("inventory.manage")
     @Post("floors/:floorId/units")
     create(
         @CurrentUser() user: AuthUser,
@@ -83,7 +67,7 @@ export class UnitsController {
         return this.unitsService.create(user, floorId, dto);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN)
+    @RequirePermissions("inventory.manage")
     @Post("floors/:floorId/units/bulk")
     createBulk(
         @CurrentUser() user: AuthUser,
@@ -93,7 +77,11 @@ export class UnitsController {
         return this.unitsService.createBulk(user, floorId, dto);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD)
+    // The one deviation from the rest of the inventory hierarchy: a
+    // SALES_HEAD may correct a unit's own details and status via
+    // units.edit, but create/import/duplicate/delete stay inventory.manage
+    // (COMPANY_ADMIN only) — see inventory-role-matrix.spec.ts.
+    @RequirePermissions("units.edit")
     @Patch("units/:id")
     update(
         @CurrentUser() user: AuthUser,
@@ -103,7 +91,7 @@ export class UnitsController {
         return this.unitsService.update(user, id, dto);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD)
+    @RequirePermissions("units.edit")
     @Patch("units/:id/status")
     updateStatus(
         @CurrentUser() user: AuthUser,
@@ -115,7 +103,7 @@ export class UnitsController {
 
     // CA-C1: bulk-create a project's units from an uploaded CSV/XLSX, resolving
     // (and auto-creating) the block/entrance/floor hierarchy per row.
-    @Roles(UserRole.COMPANY_ADMIN)
+    @RequirePermissions("inventory.manage")
     @Post("projects/:projectId/units/import")
     @UseInterceptors(FileInterceptor("file", unitsImportMulterOptions))
     importUnits(
@@ -126,13 +114,13 @@ export class UnitsController {
         return this.unitsImportService.importFromFile(user, projectId, file);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN)
+    @RequirePermissions("inventory.manage")
     @Post("units/:id/duplicate")
     duplicate(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.unitsService.duplicate(user, id);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN)
+    @RequirePermissions("inventory.manage")
     @Delete("units/:id")
     remove(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.unitsService.remove(user, id);

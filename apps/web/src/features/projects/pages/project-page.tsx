@@ -23,13 +23,13 @@ import {Sheet, SheetContent, SheetHeader, SheetTitle} from "@/components/ui/shee
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 
 export function ProjectPage() {
     const { t } = useTranslation("projects");
     const { user } = useAuth();
-    // Editing/deleting a project is COMPANY_ADMIN only (PATCH/DELETE /projects/:id).
-    const canManage = user?.role === UserRole.COMPANY_ADMIN;
+    // Editing/deleting a project requires projects.edit/delete (PATCH/DELETE /projects/:id).
+    const canManage = hasPermission(user, "projects.edit") && hasPermission(user, "projects.delete");
 
     const {projectId} = useParams();
     const navigate = useNavigate();

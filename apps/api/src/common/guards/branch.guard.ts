@@ -5,7 +5,6 @@ import {
     Injectable,
 } from "@nestjs/common";
 import {AuthUser} from "@/common/types/auth-user.type";
-import {isBranchScopedRole} from "@/common/constants/branch-scope.constants";
 
 // Mirrors CompanyGuard exactly: a pure existence check, applied after it in
 // the guard stack. It does not filter any data itself — row-level branch
@@ -23,7 +22,7 @@ export class BranchGuard implements CanActivate {
         // Company-wide roles have no branch requirement — this guard is a
         // no-op for them, same as CompanyGuard is effectively a no-op for
         // any route SUPER_ADMIN can't reach in the first place.
-        if (!isBranchScopedRole(user.role)) {
+        if (!user.isBranchScoped) {
             return true;
         }
 

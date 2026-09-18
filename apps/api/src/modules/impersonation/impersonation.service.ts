@@ -13,7 +13,10 @@ export type ImpersonationTarget = {
     id: string;
     email: string;
     fullName: string;
-    role: AuthUser["role"];
+    roleId: string;
+    roleName: string;
+    isSuperAdmin: boolean;
+    isBranchScoped: boolean;
     companyId: string;
     branchId: string | null;
     phone: string | null;
@@ -60,7 +63,10 @@ export class ImpersonationService {
             id: target.id,
             email: target.email,
             name: target.fullName,
-            role: target.role,
+            roleId: target.roleId,
+            roleName: target.roleName,
+            isSuperAdmin: target.isSuperAdmin,
+            isBranchScoped: target.isBranchScoped,
             companyId: target.companyId,
             branchId: target.branchId,
             impersonation: {sessionId: session.id, superAdminId: actor.id},
@@ -86,7 +92,10 @@ export class ImpersonationService {
                 fullName: target.fullName,
                 email: target.email,
                 phone: target.phone,
-                role: target.role,
+                roleId: target.roleId,
+                roleName: target.roleName,
+                isSuperAdmin: target.isSuperAdmin,
+                isBranchScoped: target.isBranchScoped,
                 companyId: target.companyId,
                 branchId: target.branchId,
                 company,
@@ -121,6 +130,7 @@ export class ImpersonationService {
 
         const superAdmin = await this.prisma.user.findUnique({
             where: {id: current.impersonation.superAdminId},
+            include: {role: {select: {name: true, isBranchScoped: true}}},
         });
 
         if (!superAdmin || !superAdmin.isActive) {
@@ -131,7 +141,10 @@ export class ImpersonationService {
             id: superAdmin.id,
             email: superAdmin.email,
             name: superAdmin.fullName,
-            role: superAdmin.role,
+            roleId: superAdmin.roleId,
+            roleName: superAdmin.role.name,
+            isSuperAdmin: superAdmin.isSuperAdmin,
+            isBranchScoped: superAdmin.role.isBranchScoped,
             companyId: superAdmin.companyId,
             branchId: superAdmin.branchId,
         };

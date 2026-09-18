@@ -2,7 +2,6 @@ import { PaymentReminderCronService } from './payment-reminder-cron.service';
 import {
   NotificationEntityType,
   PaymentScheduleStatus,
-  UserRole,
 } from '@/generated/prisma/client';
 
 function daysFromToday(offset: number): Date {
@@ -58,10 +57,14 @@ function build(schedules: ReturnType<typeof scheduleRow>[]) {
     create: jest.fn().mockResolvedValue({}),
   };
 
+  const rbacService = {
+    findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-head']),
+  };
   const service = new PaymentReminderCronService(
     prisma as any,
     outboundMessages as any,
     notifications as any,
+    rbacService as any,
   );
   return { service, prisma, outboundMessages, notifications };
 }
@@ -165,7 +168,7 @@ describe('PaymentReminderCronService', () => {
     ];
     expect(findManyArgs.where).toMatchObject({
       branchId: 'branch-1',
-      role: UserRole.SALES_HEAD,
+      roleId: {in: ['role-sales-head']},
       isActive: true,
     });
     expect(notifications.create).toHaveBeenCalledWith(

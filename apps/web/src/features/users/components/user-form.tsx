@@ -2,6 +2,7 @@ import {useEffect, useMemo, useState} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Loader2, TriangleAlert} from "lucide-react";
 import {Controller, useForm} from "react-hook-form";
+import {useQuery} from "@tanstack/react-query";
 import {z} from "zod";
 
 import {Button} from "@/components/ui/button.tsx";
@@ -12,16 +13,8 @@ import {SheetBody, SheetClose, SheetFooter} from "@/components/ui/sheet.tsx";
 import {createListCollection} from "@ark-ui/react";
 import {Alert, AlertTitle} from "@/components/ui/alert.tsx";
 import type {CreateUserPayload, UpdateUserPayload} from "@/features/users/api/users.api";
-import {
-    getVisibleRoles,
-    isBranchScopedRole,
-    normalizeUserRole,
-    type User,
-    USER_ROLE_LABEL_KEYS,
-    USER_ROLE_VALUES,
-    UserRole,
-} from "@/features/users/types/user.types";
-import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import type {User} from "@/features/users/types/user.types";
+import {getRoles} from "@/features/rbac/api/rbac.api";
 import {useBranchesFilter} from "@/features/branches/hooks/use-branches-filter";
 import {useTranslation} from "react-i18next";
 
@@ -33,26 +26,29 @@ const baseSchemaShape = (t: (key: string) => string) => ({
     fullName: z.string().trim().min(2, t("form.validation.nameMin")),
     email: z.string().trim().email(t("form.validation.invalidEmail")),
     phone: z.string().trim().optional(),
-    role: z.enum(USER_ROLE_VALUES, t("form.validation.roleRequired")),
+    roleId: z.string().min(1, t("form.validation.roleRequired")),
     branchId: z.string().optional(),
 });
 
 // Branch-scoped role ⇒ branchId required; company-wide role ⇒ branchId must
 // be absent. Applied as a superRefine (not a plain per-field rule) since the
-// requirement depends on another field's value.
-function withBranchRule<Schema extends z.ZodType<{role: UserRole; branchId?: string}>>(
+// requirement depends on the selected role's isBranchScoped flag, looked up
+// from the roles list rather than encoded on the value itself.
+function withBranchRule<Schema extends z.ZodType<{roleId: string; branchId?: string}>>(
     schema: Schema,
     t: (key: string) => string,
+    branchScopedRoleIds: Set<string>,
 ) {
     return schema.superRefine((values, ctx) => {
-        if (isBranchScopedRole(values.role) && !values.branchId) {
+        const isBranchScoped = branchScopedRoleIds.has(values.roleId);
+        if (isBranchScoped && !values.branchId) {
             ctx.addIssue({
                 code: "custom",
                 path: ["branchId"],
                 message: t("form.validation.branchRequired"),
             });
         }
-        if (!isBranchScopedRole(values.role) && values.branchId) {
+        if (!isBranchScoped && values.branchId) {
             ctx.addIssue({
                 code: "custom",
                 path: ["branchId"],
@@ -66,7 +62,7 @@ type UserFormValues = {
     fullName: string;
     email: string;
     phone?: string;
-    role: UserRole;
+    roleId: string;
     branchId?: string;
     password?: string;
 };
@@ -85,7 +81,7 @@ const DEFAULT_VALUES: UserFormValues = {
     email: "",
     phone: "",
     password: "",
-    role: UserRole.SALES_MANAGER,
+    roleId: "",
     branchId: undefined,
 };
 
@@ -100,12 +96,19 @@ export function UserForm({
     const { t } = useTranslation("users");
     const { t: tCommon } = useTranslation("common");
 
-    const { user: currentUser } = useAuth();
-    const visibleRoles = getVisibleRoles(currentUser?.role);
+    const rolesQuery = useQuery({ queryKey: ["rbac", "roles"], queryFn: getRoles });
+    const roles = useMemo(
+        () => (rolesQuery.data ?? []).filter((role) => !role.isPlatformRole),
+        [rolesQuery.data],
+    );
+    const branchScopedRoleIds = useMemo(
+        () => new Set(roles.filter((role) => role.isBranchScoped).map((role) => role.id)),
+        [roles],
+    );
     const branches = useBranchesFilter();
 
-    const initialRole = normalizeUserRole(user?.role);
-    const [selectedRole, setSelectedRole] = useState<UserRole>(initialRole);
+    const initialRoleId = user?.roleId ?? "";
+    const [selectedRoleId, setSelectedRoleId] = useState<string>(initialRoleId);
 
     const createUserSchema = useMemo(() => {
         const base = baseSchemaShape(t);
@@ -115,8 +118,9 @@ export function UserForm({
                 password: z.string().min(6, t("form.validation.passwordMin")),
             }),
             t,
+            branchScopedRoleIds,
         );
-    }, [t]);
+    }, [t, branchScopedRoleIds]);
 
     const editUserSchema = useMemo(() => {
         const base = baseSchemaShape(t);
@@ -130,35 +134,39 @@ export function UserForm({
                     .or(z.literal("")),
             }),
             t,
+            branchScopedRoleIds,
         );
-    }, [t]);
+    }, [t, branchScopedRoleIds]);
 
     const form = useForm<UserFormValues>({
         resolver: zodResolver(user ? editUserSchema : createUserSchema),
-        defaultValues: { ...DEFAULT_VALUES, role: initialRole, branchId: user?.branchId ?? undefined },
+        defaultValues: { ...DEFAULT_VALUES, roleId: initialRoleId, branchId: user?.branchId ?? undefined },
     });
 
     useEffect(() => {
-        setSelectedRole(initialRole);
+        setSelectedRoleId(initialRoleId);
         form.reset({
             fullName: user?.fullName ?? "",
             email: user?.email ?? "",
             phone: user?.phone ?? "",
             password: "",
-            role: initialRole,
+            roleId: initialRoleId,
             branchId: user?.branchId ?? undefined,
         });
-    }, [form, initialRole, user]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [form, initialRoleId, user]);
+
+    const isSelectedRoleBranchScoped = branchScopedRoleIds.has(selectedRoleId);
 
     const handleSubmit = (values: UserFormValues) => {
-        const branchId = isBranchScopedRole(values.role) ? values.branchId : undefined;
+        const branchId = branchScopedRoleIds.has(values.roleId) ? values.branchId : undefined;
 
         if (user) {
             const payload: UpdateUserPayload = {
                 fullName: values.fullName.trim(),
                 email: values.email.trim(),
                 phone: values.phone?.trim() || undefined,
-                role: values.role,
+                roleId: values.roleId,
                 branchId,
             };
             onSubmit(payload);
@@ -170,15 +178,15 @@ export function UserForm({
             email: values.email.trim(),
             phone: values.phone?.trim() || undefined,
             password: values.password!,
-            role: values.role,
+            roleId: values.roleId,
             branchId,
         });
     };
 
     const roleCollection = createListCollection({
-        items: visibleRoles.map((role) => ({
-            label: t(USER_ROLE_LABEL_KEYS[role]),
-            value: role,
+        items: roles.map((role) => ({
+            label: role.name,
+            value: role.id,
         })),
     });
 
@@ -264,7 +272,7 @@ export function UserForm({
 
                     <Controller
                         control={form.control}
-                        name="role"
+                        name="roleId"
                         render={({ field, fieldState }) => (
                             <Field invalid={fieldState.invalid} orientation="responsive">
                                 <FieldLabel>{t("form.fields.role")}</FieldLabel>
@@ -272,14 +280,14 @@ export function UserForm({
                                     collection={roleCollection}
                                     name={field.name}
                                     onValueChange={(item) => {
-                                        const role = item.value[0] as UserRole;
-                                        setSelectedRole(role);
-                                        form.setValue("role", role, {
+                                        const roleId = item.value[0] ?? "";
+                                        setSelectedRoleId(roleId);
+                                        form.setValue("roleId", roleId, {
                                             shouldDirty: true,
                                             shouldValidate: true,
                                         });
                                     }}
-                                    value={[field.value]}
+                                    value={field.value ? [field.value] : []}
                                 >
                                     <SelectTrigger className="w-full min-w-32">
                                         <SelectValue placeholder={tCommon("placeholders.select")} />
@@ -297,7 +305,7 @@ export function UserForm({
                         )}
                     />
 
-                    {isBranchScopedRole(selectedRole) ? (
+                    {isSelectedRoleBranchScoped ? (
                         <Controller
                             control={form.control}
                             name="branchId"

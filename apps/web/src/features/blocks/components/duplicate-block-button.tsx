@@ -17,7 +17,7 @@ import type { Block } from "@/features/blocks/types/block.types.ts";
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 
 interface DuplicateBlockButtonProps {
     block: Block;
@@ -45,7 +45,7 @@ export function DuplicateBlockButton({ block }: DuplicateBlockButtonProps) {
     });
 
     // Duplicating a block is COMPANY_ADMIN only (POST /blocks/:id/duplicate).
-    if (user?.role !== UserRole.COMPANY_ADMIN) {
+    if (!hasPermission(user, "inventory.manage")) {
         return null;
     }
 

@@ -5,7 +5,6 @@ import {
     PaymentScheduleStatus,
     Prisma,
     UnitStatus,
-    UserRole,
 } from '@/generated/prisma/client';
 import {AuthUser} from '@/common/types/auth-user.type';
 import {DealsService} from './deals.service';
@@ -35,24 +34,35 @@ describe('DealsService', () => {
         id: 'manager-1',
         email: 'manager@crm.dev',
         name: 'Manager',
-        role: UserRole.SALES_MANAGER,
+        roleId: 'role-sales-manager',
+        roleName: 'Sales Manager',
+        isBranchScoped: true,
         companyId: 'company-1',
         company: null,
         branchId: 'branch-1',
         branch: null,
+        discountLimit: 5,
+        permissions: [],
     };
 
     const adminUser: AuthUser = {
         ...managerUser,
         id: 'admin-1',
-        role: UserRole.COMPANY_ADMIN,
+        roleId: 'role-company-admin',
+        roleName: 'Company Admin',
+        isBranchScoped: false,
         branchId: null,
+        discountLimit: null,
+        permissions: ['deals.approve_discount'],
     };
 
     const salesHeadUser: AuthUser = {
         ...managerUser,
         id: 'head-1',
-        role: UserRole.SALES_HEAD,
+        roleId: 'role-sales-head',
+        roleName: 'Sales Head',
+        discountLimit: 15,
+        permissions: ['deals.approve_discount'],
     };
 
     const company = (overrides: Record<string, unknown> = {}) => ({
@@ -99,10 +109,17 @@ describe('DealsService', () => {
         const notifications = {create: jest.fn().mockResolvedValue({})};
         const dealNumberService = {generateDealNumber: jest.fn().mockResolvedValue('2026-0001')};
         const documentGeneration = {generateForDeal: jest.fn().mockResolvedValue({id: 'doc-1'})};
+        const rbacService = {
+            findApproverRoles: jest.fn().mockResolvedValue([
+                {id: 'role-sales-head', isBranchScoped: true, discountLimit: 15},
+                {id: 'role-company-admin', isBranchScoped: false, discountLimit: null},
+            ]),
+            findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-manager']),
+        };
 
         const service = new DealsService(
             prisma, mapper, domain, activityService as any, notifications as any,
-            dealNumberService as any, documentGeneration as any,
+            dealNumberService as any, documentGeneration as any, rbacService as any,
         );
 
         return {service, prisma, activityService, notifications, dealNumberService, documentGeneration};
@@ -230,7 +247,7 @@ describe('DealsService', () => {
             await service.reserveUnit(managerUser, reserveDto({discountPercent: 10, salePrice: 90000}));
 
             expect(prisma.user.findMany).toHaveBeenCalledWith(
-                expect.objectContaining({where: expect.objectContaining({role: UserRole.SALES_HEAD, branchId: 'branch-1'})}),
+                expect.objectContaining({where: expect.objectContaining({roleId: {in: ['role-sales-head']}, branchId: 'branch-1'})}),
             );
         });
 
@@ -242,7 +259,7 @@ describe('DealsService', () => {
             await service.reserveUnit(managerUser, reserveDto({discountPercent: 20, salePrice: 80000}));
 
             expect(prisma.user.findMany).toHaveBeenCalledWith(
-                expect.objectContaining({where: expect.objectContaining({role: UserRole.COMPANY_ADMIN})}),
+                expect.objectContaining({where: expect.objectContaining({roleId: {in: ['role-company-admin']}})}),
             );
         });
 
@@ -436,7 +453,7 @@ describe('DealsService', () => {
         it('reassigns and records the from/to manager ids', async () => {
             const {service, prisma, activityService} = buildBase();
             prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', branchId: 'branch-1', managerId: 'old-manager', clientId: 'c1'});
-            prisma.user.findFirst.mockResolvedValue({id: 'new-manager', role: UserRole.SALES_MANAGER, isActive: true});
+            prisma.user.findFirst.mockResolvedValue({id: 'new-manager', roleId: 'role-sales-manager', isActive: true});
 
             await service.reassignManager(salesHeadUser, 'deal-1', {managerId: 'new-manager'} as any);
 

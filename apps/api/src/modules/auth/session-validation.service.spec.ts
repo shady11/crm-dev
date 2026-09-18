@@ -1,6 +1,5 @@
 import {UnauthorizedException} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {UserRole} from '@/generated/prisma/client';
 import {SessionValidationService, type JwtPayload} from './session-validation.service';
 
 /**
@@ -16,7 +15,8 @@ describe('SessionValidationService.validate', () => {
             id: 'u1',
             email: 'user@crm.dev',
             name: 'User',
-            role: UserRole.SALES_MANAGER,
+            roleId: 'role-sales-manager',
+            roleName: 'Sales Manager',
             companyId: 'company-1',
             branchId: 'branch-1',
             iat: Math.floor(Date.now() / 1000),
@@ -29,7 +29,9 @@ describe('SessionValidationService.validate', () => {
         email: 'user@crm.dev',
         fullName: 'User',
         phone: null,
-        role: UserRole.SALES_MANAGER,
+        roleId: 'role-sales-manager',
+        role: {name: 'Sales Manager', isBranchScoped: true, discountLimit: {toNumber: () => 5}},
+        isSuperAdmin: false,
         companyId: 'company-1',
         branchId: 'branch-1',
         isActive: true,
@@ -47,6 +49,18 @@ describe('SessionValidationService.validate', () => {
         ...overrides,
     });
 
+    const superAdminUser = (overrides: Record<string, unknown> = {}) =>
+        baseUser({
+            roleId: 'role-super-admin',
+            role: {name: 'Super Admin', isBranchScoped: false, discountLimit: null},
+            isSuperAdmin: true,
+            companyId: null,
+            company: null,
+            branchId: null,
+            branch: null,
+            ...overrides,
+        });
+
     function build(user: unknown, impersonationSession: unknown = null, configValues: Record<string, string> = {}) {
         const prisma = {
             user: {findUnique: jest.fn().mockResolvedValue(user)},
@@ -56,7 +70,11 @@ describe('SessionValidationService.validate', () => {
             get: jest.fn((key: string) => configValues[key]),
         } as unknown as ConfigService;
 
-        const service = new SessionValidationService(prisma as any, configService);
+        const rbacService = {
+            getEffectivePermissions: jest.fn().mockResolvedValue([]),
+        };
+
+        const service = new SessionValidationService(prisma as any, configService, rbacService as any);
         return {service, prisma};
     }
 
@@ -97,11 +115,9 @@ describe('SessionValidationService.validate', () => {
     });
 
     it('never applies the suspension check to a SUPER_ADMIN (no company)', async () => {
-        const {service} = build(
-            baseUser({role: UserRole.SUPER_ADMIN, companyId: null, company: null, branchId: null, branch: null}),
-        );
+        const {service} = build(superAdminUser());
         const result = await service.validate(
-            basePayload({role: UserRole.SUPER_ADMIN, companyId: null, branchId: null}),
+            basePayload({roleId: 'role-super-admin', roleName: 'Super Admin', isSuperAdmin: true, companyId: null, branchId: null}),
         );
         expect(result.company).toBeNull();
     });
@@ -127,42 +143,33 @@ describe('SessionValidationService.validate', () => {
 
     it('enforces the shorter SUPER_ADMIN session lifetime even though the JWT itself has not expired', async () => {
         const staleIat = Math.floor((Date.now() - 61 * 60 * 1000) / 1000);
-        const {service} = build(
-            baseUser({role: UserRole.SUPER_ADMIN, companyId: null, company: null, branchId: null, branch: null}),
-        );
+        const {service} = build(superAdminUser());
         await expect(
-            service.validate(basePayload({role: UserRole.SUPER_ADMIN, companyId: null, branchId: null, iat: staleIat})),
+            service.validate(basePayload({roleId: 'role-super-admin', roleName: 'Super Admin', isSuperAdmin: true, companyId: null, branchId: null, iat: staleIat})),
         ).rejects.toThrow(UnauthorizedException);
     });
 
     it('accepts a SUPER_ADMIN session still within the configured max age', async () => {
         const iat = Math.floor((Date.now() - 5 * 60 * 1000) / 1000);
         const {service} = build(
-            baseUser({
-                role: UserRole.SUPER_ADMIN,
-                companyId: null,
-                company: null,
-                branchId: null,
-                branch: null,
-                sessionsValidFrom: new Date(0),
-            }),
+            superAdminUser({sessionsValidFrom: new Date(0)}),
             null,
             {SUPER_ADMIN_SESSION_MAX_AGE_MINUTES: '10'},
         );
         await expect(
-            service.validate(basePayload({role: UserRole.SUPER_ADMIN, companyId: null, branchId: null, iat})),
+            service.validate(basePayload({roleId: 'role-super-admin', roleName: 'Super Admin', isSuperAdmin: true, companyId: null, branchId: null, iat})),
         ).resolves.toBeDefined();
     });
 
     it('rejects a SUPER_ADMIN session past a configured max age', async () => {
         const iat = Math.floor((Date.now() - 15 * 60 * 1000) / 1000);
         const {service} = build(
-            baseUser({role: UserRole.SUPER_ADMIN, companyId: null, company: null, branchId: null, branch: null}),
+            superAdminUser(),
             null,
             {SUPER_ADMIN_SESSION_MAX_AGE_MINUTES: '10'},
         );
         await expect(
-            service.validate(basePayload({role: UserRole.SUPER_ADMIN, companyId: null, branchId: null, iat})),
+            service.validate(basePayload({roleId: 'role-super-admin', roleName: 'Super Admin', isSuperAdmin: true, companyId: null, branchId: null, iat})),
         ).rejects.toThrow(UnauthorizedException);
     });
 

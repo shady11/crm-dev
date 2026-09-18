@@ -1,8 +1,7 @@
 import {Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards} from "@nestjs/common";
-import {UserRole} from "@/generated/prisma/enums";
 import {JwtAuthGuard} from "@/modules/auth/guards/jwt-auth.guard";
-import {RolesGuard} from "@/common/guards/roles.guard";
-import {Roles} from "@/common/decorators/roles.decorator";
+import {PermissionsGuard} from "@/common/guards/permissions.guard";
+import {RequirePermissions} from "@/common/decorators/permissions.decorator";
 import {CurrentUser} from "@/common/decorators/current-user.decorator";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CompaniesService} from "./companies.service";
@@ -18,9 +17,14 @@ import {QueryCompaniesDto} from "./dto/query-companies.dto";
  * guard rejects any user without a companyId — which is precisely how a
  * SUPER_ADMIN (who belongs to no company) stays locked out of tenant data while
  * still being able to manage tenants here.
+ *
+ * companies.manage is granted to no Role — a COMPANY_ADMIN reaches this
+ * controller's two "me" endpoints only, via their own company_settings.*
+ * permissions instead, re-scoped below. Everything else is reachable only
+ * through PermissionsGuard's unconditional SUPER_ADMIN bypass.
  */
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.SUPER_ADMIN)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
+@RequirePermissions("companies.manage")
 @Controller("companies")
 export class CompaniesController {
     constructor(private readonly companiesService: CompaniesService) {}
@@ -31,16 +35,16 @@ export class CompaniesController {
     }
 
     // Self-service for the tenant's own admin. Declared ahead of the ":id"
-    // routes below (and re-scoped with @Roles) so "me" is never swallowed by
-    // the :id param, and so a COMPANY_ADMIN — locked out of everything else on
-    // this controller — can reach exactly these two.
-    @Roles(UserRole.COMPANY_ADMIN)
+    // routes below (and re-scoped with @RequirePermissions) so "me" is never
+    // swallowed by the :id param, and so a COMPANY_ADMIN — locked out of
+    // everything else on this controller — can reach exactly these two.
+    @RequirePermissions("company_settings.view")
     @Get("me")
     findOwn(@CurrentUser() actor: AuthUser) {
         return this.companiesService.findOwn(actor);
     }
 
-    @Roles(UserRole.COMPANY_ADMIN)
+    @RequirePermissions("company_settings.edit")
     @Patch("me")
     updateOwn(@CurrentUser() actor: AuthUser, @Body() dto: UpdateOwnCompanyDto) {
         return this.companiesService.updateOwn(actor, dto);

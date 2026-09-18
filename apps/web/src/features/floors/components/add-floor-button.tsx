@@ -9,7 +9,7 @@ import type {Entrance} from "@/features/entrances/types/entrance.types.ts";
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 
 interface AddFloorButtonProps {
     entrance: Entrance;
@@ -48,7 +48,7 @@ export function AddFloorButton({ entrance }: AddFloorButtonProps) {
         ) + 1;
 
     // Creating a floor is COMPANY_ADMIN only (POST /entrances/:id/floors).
-    if (user?.role !== UserRole.COMPANY_ADMIN) {
+    if (!hasPermission(user, "inventory.manage")) {
         return null;
     }
 

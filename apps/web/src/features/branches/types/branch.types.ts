@@ -1,5 +1,3 @@
-import type {UserRole} from "@/features/users/types/user.types";
-
 export type Branch = {
     id: string;
     companyId: string;
@@ -27,7 +25,8 @@ export type BranchUser = {
     fullName: string;
     email: string;
     phone: string | null;
-    role: UserRole;
+    roleId: string;
+    role: {id: string; name: string};
     isActive: boolean;
     createdAt: string;
 };

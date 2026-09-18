@@ -9,6 +9,7 @@ import {AuthService} from "./auth.service";
 import {SessionValidationService, type JwtPayload} from "./session-validation.service";
 
 const configService = {get: jest.fn()} as unknown as ConfigService;
+const rbacService = {getEffectivePermissions: jest.fn().mockResolvedValue([])} as any;
 
 /**
  * Suspending a tenant changes exactly one field on the company row. What makes
@@ -27,7 +28,9 @@ describe("company suspension is enforced at auth", () => {
                     id: "u1",
                     email: "manager@crm.dev",
                     fullName: "Aigul",
-                    role: "SALES_MANAGER",
+                    roleId: "role-sales-manager",
+                    role: {name: "Sales Manager", isBranchScoped: true, discountLimit: {toNumber: () => 5}},
+                    isSuperAdmin: false,
                     companyId: "company-1",
                     isActive: true,
                     sessionsValidFrom: new Date(0),
@@ -36,7 +39,7 @@ describe("company suspension is enforced at auth", () => {
             },
         } as unknown as PrismaService;
 
-        return new SessionValidationService(prisma, configService);
+        return new SessionValidationService(prisma, configService, rbacService);
     };
 
     it.each([
@@ -59,7 +62,9 @@ describe("company suspension is enforced at auth", () => {
                     id: "s1",
                     email: "ops@crm.dev",
                     fullName: "Ops",
-                    role: "SUPER_ADMIN",
+                    roleId: "role-super-admin",
+                    role: {name: "Super Admin", isBranchScoped: false, discountLimit: null},
+                    isSuperAdmin: true,
                     companyId: null,
                     isActive: true,
                     sessionsValidFrom: new Date(0),
@@ -69,8 +74,8 @@ describe("company suspension is enforced at auth", () => {
         } as unknown as PrismaService;
 
         await expect(
-            new SessionValidationService(prisma, configService).validate({...payload, id: "s1"}),
-        ).resolves.toMatchObject({role: "SUPER_ADMIN", companyId: null});
+            new SessionValidationService(prisma, configService, rbacService).validate({...payload, id: "s1"}),
+        ).resolves.toMatchObject({isSuperAdmin: true, companyId: null});
     });
 
     describe("login", () => {
@@ -87,7 +92,9 @@ describe("company suspension is enforced at auth", () => {
                     id: "u1",
                     email: "manager@crm.dev",
                     fullName: "Aigul",
-                    role: "SALES_MANAGER",
+                    roleId: "role-sales-manager",
+                    role: {name: "Sales Manager", isBranchScoped: true, discountLimit: {toNumber: () => 5}},
+                    isSuperAdmin: false,
                     companyId: "company-1",
                     isActive: true,
                     passwordHash,

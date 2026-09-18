@@ -1,5 +1,4 @@
 import {BadRequestException, ForbiddenException, NotFoundException} from '@nestjs/common';
-import {UserRole} from '@/generated/prisma/client';
 import {AuthUser} from '@/common/types/auth-user.type';
 import {ClientsService} from './clients.service';
 
@@ -16,7 +15,9 @@ describe('ClientsService', () => {
         id: 'user-1',
         email: 'manager@crm.dev',
         name: 'Manager',
-        role: UserRole.SALES_MANAGER,
+        roleId: 'role-sales-manager',
+        roleName: 'Sales Manager',
+        isBranchScoped: true,
         companyId: 'company-1',
         company: null,
         branchId: 'branch-1',
@@ -26,7 +27,9 @@ describe('ClientsService', () => {
     const adminUser: AuthUser = {
         ...branchUser,
         id: 'admin-1',
-        role: UserRole.COMPANY_ADMIN,
+        roleId: 'role-company-admin',
+        roleName: 'Company Admin',
+        isBranchScoped: false,
         branchId: null,
     };
 

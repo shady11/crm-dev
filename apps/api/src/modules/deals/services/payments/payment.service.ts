@@ -9,7 +9,6 @@ import {
 } from '@/generated/prisma/client';
 import {PrismaService} from '@/database/prisma.service';
 import {AuthUser} from '@/common/types/auth-user.type';
-import {isBranchScopedRole} from '@/common/constants/branch-scope.constants';
 import {DealDomainService} from '../deal-domain.service';
 import {DealActivityService} from '../deal-activity.service';
 import {DealsService} from '../deals.service';
@@ -43,7 +42,7 @@ export class PaymentService {
                 where: {
                     id: dealId,
                     companyId,
-                    ...(isBranchScopedRole(user.role) ? { branchId: user.branchId } : {}),
+                    ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
                 },
             });
             if (!deal) throw new DealNotFoundException(dealId);

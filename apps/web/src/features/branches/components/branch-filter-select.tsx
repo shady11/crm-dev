@@ -2,7 +2,6 @@ import {createListCollection} from "@ark-ui/react";
 import {useTranslation} from "react-i18next";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {isBranchScopedRole} from "@/features/users/types/user.types";
 import {useBranchesFilter} from "../hooks/use-branches-filter";
 
 type Props = {
@@ -21,7 +20,7 @@ export function BranchFilterSelect({value, onChange, className}: Props) {
     const {user} = useAuth();
     const branches = useBranchesFilter();
 
-    if (!user || isBranchScopedRole(user.role)) return null;
+    if (!user || user.isBranchScoped) return null;
 
     const collection = createListCollection({
         items: [

@@ -10,6 +10,7 @@ import {ConfigModule, ConfigService} from "@nestjs/config";
 import {PrismaModule} from "@/database/prisma.module";
 import {SessionValidationService} from "@/modules/auth/session-validation.service";
 import {TotpService} from "@/modules/auth/totp.service";
+import {RbacModule} from "@/modules/rbac/rbac.module";
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import {TotpService} from "@/modules/auth/totp.service";
     PassportModule,
     ConfigModule,
     PrismaModule,
+    RbacModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

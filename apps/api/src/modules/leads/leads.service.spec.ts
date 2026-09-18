@@ -1,6 +1,5 @@
 import {BadRequestException, ConflictException, NotFoundException, ForbiddenException} from '@nestjs/common';
 import {LeadStatus} from '@/generated/prisma/enums';
-import {UserRole} from '@/generated/prisma/client';
 import {AuthUser} from '@/common/types/auth-user.type';
 import {LeadsService} from './leads.service';
 import {ClientsService} from '@/modules/clients/clients.service';
@@ -18,7 +17,9 @@ describe('LeadsService', () => {
         id: 'user-1',
         email: 'manager@crm.dev',
         name: 'Manager',
-        role: UserRole.SALES_MANAGER,
+        roleId: 'role-sales-manager',
+        roleName: 'Sales Manager',
+        isBranchScoped: true,
         companyId: 'company-1',
         company: null,
         branchId: 'branch-1',
@@ -28,14 +29,18 @@ describe('LeadsService', () => {
     const adminUser: AuthUser = {
         ...branchUser,
         id: 'admin-1',
-        role: UserRole.COMPANY_ADMIN,
+        roleId: 'role-company-admin',
+        roleName: 'Company Admin',
+        isBranchScoped: false,
         branchId: null,
+        permissions: ['clients.transfer_branch'],
     };
 
     const salesHeadUser: AuthUser = {
         ...branchUser,
         id: 'head-1',
-        role: UserRole.SALES_HEAD,
+        roleId: 'role-sales-head',
+        roleName: 'Sales Head',
     };
 
     function build(opts: {
@@ -81,7 +86,8 @@ describe('LeadsService', () => {
             create: jest.fn().mockResolvedValue({id: 'client-created'}),
         } as unknown as ClientsService;
 
-        const service = new LeadsService(prisma as any, clientsService);
+        const rbacService = {findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-manager'])};
+        const service = new LeadsService(prisma as any, clientsService, rbacService as any);
         return {service, prisma, clientsService};
     }
 
@@ -302,7 +308,7 @@ describe('LeadsService', () => {
         it('reassigns the lead and records the from/to manager ids', async () => {
             const {service, prisma} = build({
                 lead: {id: 'lead-1', branchId: 'branch-1', managerId: 'old-manager'},
-                manager: {id: 'new-manager', role: UserRole.SALES_MANAGER, isActive: true},
+                manager: {id: 'new-manager', roleId: 'role-sales-manager', isActive: true},
             });
 
             await service.reassignManager(salesHeadUser, 'lead-1', {managerId: 'new-manager'} as any);

@@ -4,7 +4,6 @@ import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {initials} from "@/features/deals/utils/format.ts";
 import type {Deal} from "@/features/deals/api/deals.api.ts";
-import {USER_ROLE_LABEL_KEYS} from "@/features/users/types/user.types.ts";
 import {useTranslation} from "react-i18next";
 
 type Props = {
@@ -42,7 +41,7 @@ export function DealManagerCard({ manager, canReassign, onReassign }: Props) {
                 <div className="flex flex-col gap-1">
                     <p className="font-medium">{manager?.fullName ?? t("managerCard.unassigned", { ns: "deals" })}</p>
                     <p className="flex items-center gap-2 text-sm  text-muted-foreground">
-                        {t(USER_ROLE_LABEL_KEYS[manager!.role])}
+                        {manager!.role.name}
                     </p>
                 </div>
             </CardContent>

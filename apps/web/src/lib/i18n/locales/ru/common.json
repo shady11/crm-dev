@@ -21,7 +21,8 @@
     "linkCopied": "Ссылка скопирована",
     "reload": "Обновить страницу",
     "moreActions": "Дополнительные действия",
-    "download": "Скачать"
+    "download": "Скачать",
+    "close": "Закрыть"
   },
   "labels": {
     "status": "Статус",
@@ -58,6 +59,7 @@
     "companies": "Компании",
     "settingOptions": "Валюта, локаль и часовой пояс",
     "users": "Пользователи",
+    "rolesPermissions": "Роли и права",
     "branches": "Филиалы",
     "activityLog": "Журнал активности",
     "auditLog": "Журнал аудита",

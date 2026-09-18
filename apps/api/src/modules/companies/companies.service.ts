@@ -1,12 +1,13 @@
 import {BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
 import {randomBytes} from "crypto";
 import * as bcrypt from "bcrypt";
-import {AuditAction, Prisma, UserRole} from "@/generated/prisma/client";
+import {AuditAction, Prisma} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 import {AuditLogService} from "@/modules/audit-log/audit-log.service";
 import {ImpersonationService} from "@/modules/impersonation/impersonation.service";
 import {SettingOptionsService} from "@/modules/setting-options/setting-options.service";
+import {RbacService} from "@/modules/rbac/rbac.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateCompanyDto} from "./dto/create-company.dto";
 import {UpdateCompanyDto} from "./dto/update-company.dto";
@@ -44,6 +45,7 @@ export class CompaniesService {
         private readonly auditLog: AuditLogService,
         private readonly impersonation: ImpersonationService,
         private readonly settingOptions: SettingOptionsService,
+        private readonly rbacService: RbacService,
     ) {}
 
     /**
@@ -66,39 +68,6 @@ export class CompaniesService {
 
         if (dto.timezone) {
             await this.settingOptions.assertActiveOption("TIMEZONE", dto.timezone.trim());
-        }
-    }
-
-    /**
-     * salesHeadDiscountLimit must be >= salesManagerDiscountLimit — checked
-     * against the *effective* values, since a partial update can send either
-     * threshold alone (see UpdateOwnCompanyDto).
-     */
-    private async assertValidDiscountThresholds(id: string, dto: unknown): Promise<void> {
-        // UpdateCompanyDto (the platform operator's DTO) never carries these
-        // — only UpdateOwnCompanyDto does. Typed `unknown` and read
-        // defensively so update() can call this unconditionally for either.
-        const {salesManagerDiscountLimit, salesHeadDiscountLimit} = dto as {
-            salesManagerDiscountLimit?: number;
-            salesHeadDiscountLimit?: number;
-        };
-
-        if (salesManagerDiscountLimit === undefined && salesHeadDiscountLimit === undefined) {
-            return;
-        }
-
-        const current = await this.prisma.company.findUniqueOrThrow({
-            where: {id},
-            select: {salesManagerDiscountLimit: true, salesHeadDiscountLimit: true},
-        });
-
-        const managerLimit = salesManagerDiscountLimit ?? current.salesManagerDiscountLimit.toNumber();
-        const headLimit = salesHeadDiscountLimit ?? current.salesHeadDiscountLimit.toNumber();
-
-        if (headLimit < managerLimit) {
-            throw new BadRequestException(
-                "salesHeadDiscountLimit must be greater than or equal to salesManagerDiscountLimit",
-            );
         }
     }
 
@@ -159,11 +128,12 @@ export class CompaniesService {
                         fullName: true,
                         email: true,
                         phone: true,
-                        role: true,
+                        roleId: true,
+                        role: {select: {id: true, name: true}},
                         isActive: true,
                         createdAt: true,
                     },
-                    orderBy: [{role: "asc"}, {fullName: "asc"}],
+                    orderBy: [{role: {name: "asc"}}, {fullName: "asc"}],
                 },
             },
         });
@@ -234,6 +204,7 @@ export class CompaniesService {
 
         const password = dto.adminPassword?.trim() || randomBytes(18).toString("base64url");
         const passwordHash = await bcrypt.hash(password, 10);
+        const companyAdminRoleId = await this.rbacService.findDefaultCompanyAdminRoleId();
 
         const company = await this.prisma.$transaction(async (db) => {
             const created = await db.company.create({
@@ -253,7 +224,7 @@ export class CompaniesService {
                     fullName: dto.adminFullName,
                     email: adminEmail,
                     passwordHash,
-                    role: UserRole.COMPANY_ADMIN,
+                    roleId: companyAdminRoleId,
                     companyId: created.id,
                 },
             });
@@ -355,7 +326,6 @@ export class CompaniesService {
         await this.findOne(id);
         await this.assertValidSettings(dto);
         await this.assertCurrencyIsUnlocked(id, dto);
-        await this.assertValidDiscountThresholds(id, dto);
 
         if (dto.name) {
             const clash = await this.prisma.company.findFirst({
@@ -472,6 +442,7 @@ export class CompaniesService {
     private async getTenantUserOrThrow(companyId: string, userId: string) {
         const target = await this.prisma.user.findFirst({
             where: {id: userId, companyId, deletedAt: null},
+            include: {role: {select: {name: true, isBranchScoped: true}}},
         });
 
         if (!target) {
@@ -593,7 +564,7 @@ export class CompaniesService {
 
         const target = await this.getTenantUserOrThrow(companyId, userId);
 
-        if (target.role === UserRole.SUPER_ADMIN) {
+        if (target.isSuperAdmin) {
             throw new ForbiddenException("SUPER_ADMIN accounts cannot be impersonated");
         }
 
@@ -607,7 +578,10 @@ export class CompaniesService {
                 id: target.id,
                 email: target.email,
                 fullName: target.fullName,
-                role: target.role,
+                roleId: target.roleId,
+                roleName: target.role.name,
+                isSuperAdmin: target.isSuperAdmin,
+                isBranchScoped: target.role.isBranchScoped,
                 companyId,
                 branchId: target.branchId,
                 phone: target.phone,

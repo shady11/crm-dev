@@ -17,7 +17,7 @@ import type { Floor } from "@/features/floors/types/floor.types.ts";
 import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 
 interface DeleteFloorButtonProps {
     floor: Floor;
@@ -43,7 +43,7 @@ export function DeleteFloorButton({ floor }: DeleteFloorButtonProps) {
     });
 
     // Deleting a floor is COMPANY_ADMIN only (DELETE /floors/:id).
-    if (user?.role !== UserRole.COMPANY_ADMIN) {
+    if (!hasPermission(user, "inventory.manage")) {
         return null;
     }
 

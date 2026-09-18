@@ -17,7 +17,7 @@ import {toast} from "@/components/ui/toast.tsx";
 import {useImportUnits} from "@/features/units/hooks/use-import-units.ts";
 import type {ImportUnitsResult} from "@/features/units/types/unit-import.types.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 
 type Props = {
     projectId: string;
@@ -55,7 +55,7 @@ export function ImportUnitsButton({projectId}: Props) {
     };
 
     // Importing units is COMPANY_ADMIN only (POST /projects/:id/units/import).
-    if (user?.role !== UserRole.COMPANY_ADMIN) {
+    if (!hasPermission(user, "inventory.manage")) {
         return null;
     }
 

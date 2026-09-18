@@ -1,20 +1,21 @@
 import {RoleCard} from "@/features/users/components/role-card.tsx";
-import type {UserRole} from "@/features/users/types/user.types";
+
+type RoleSummary = {id: string; name: string};
 
 interface RoleCardsGridProps {
-    roles: UserRole[];
-    membersByRole: Map<UserRole, { count: number; initials: string[] }>;
+    roles: RoleSummary[];
+    membersByRole: Map<string, { count: number; initials: string[] }>;
 }
 
 export function RoleCardsGrid({ roles, membersByRole }: RoleCardsGridProps) {
     return (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {roles.map((role) => {
-                const bucket = membersByRole.get(role) ?? { count: 0, initials: [] };
+                const bucket = membersByRole.get(role.id) ?? { count: 0, initials: [] };
                 return (
                     <RoleCard
-                        key={role}
-                        role={role}
+                        key={role.id}
+                        roleName={role.name}
                         memberCount={bucket.count}
                         memberInitials={bucket.initials}
                     />

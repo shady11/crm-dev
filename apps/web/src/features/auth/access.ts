@@ -1,92 +1,85 @@
-import {UserRole} from "@/features/users/types/user.types";
+import type {AuthUser} from "@/features/auth/types/auth.types";
 
 /**
- * Which roles may reach each feature, in one place.
+ * Which permission unlocks each feature's nav link and route, in one place.
  *
  * The sidebar and the route guards both read from here so a link can never
- * appear for a role the guard will bounce — previously RoleGuard covered only
- * deals and tasks while the sidebar offered every link to everyone, so a sales
- * manager saw "Users", clicked it, and got a wall of 403s.
- *
- * These mirror the *read* access the API grants (the @Roles decorators on each
- * controller's GET endpoints). Write permissions are narrower in several places
- * — creating a project is COMPANY_ADMIN only, for instance — and stay enforced
- * server-side. This is about not showing someone a door that will not open.
+ * appear for a user the guard will bounce. These mirror the *read* access
+ * the API grants (the @RequirePermissions() decorators on each controller's
+ * GET endpoints). Write permissions are narrower in several places —
+ * creating a project needs projects.create, for instance — and stay
+ * enforced server-side. This is about not showing someone a door that will
+ * not open.
  */
-export const FEATURE_ROLES = {
-    dashboard: [
-        UserRole.COMPANY_ADMIN,
-        UserRole.SALES_HEAD,
-        UserRole.SALES_MANAGER,
-        UserRole.FINANCE,
-    ],
-    // No FINANCE: the leads controller omits it on every endpoint.
-    leads: [UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD, UserRole.SALES_MANAGER],
-    tasks: [
-        UserRole.COMPANY_ADMIN,
-        UserRole.SALES_HEAD,
-        UserRole.SALES_MANAGER,
-        UserRole.FINANCE,
-    ],
-    clients: [
-        UserRole.COMPANY_ADMIN,
-        UserRole.SALES_HEAD,
-        UserRole.SALES_MANAGER,
-        UserRole.FINANCE,
-    ],
-    deals: [
-        UserRole.COMPANY_ADMIN,
-        UserRole.SALES_HEAD,
-        UserRole.SALES_MANAGER,
-        UserRole.FINANCE,
-    ],
-    // Everyone can read a project and its chessboard; only COMPANY_ADMIN can
-    // create, edit or delete one, which the API enforces per endpoint.
-    projects: [
-        UserRole.COMPANY_ADMIN,
-        UserRole.SALES_HEAD,
-        UserRole.SALES_MANAGER,
-        UserRole.FINANCE,
-    ],
-    users: [UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD],
-    // Branch management (create/edit/deactivate) — COMPANY_ADMIN only, same
-    // as who may write to /branches. FINANCE can still read the list (used
-    // to populate their own filters) without this nav entry.
-    branches: [UserRole.COMPANY_ADMIN],
-    // The platform operator, and only them. A SUPER_ADMIN belongs to no company
-    // and is refused by CompanyGuard everywhere else in the app, so this is the
-    // one feature they can reach.
-    companies: [UserRole.SUPER_ADMIN],
+export const FEATURE_PERMISSIONS = {
+    dashboard: "dashboard.view",
+    leads: "leads.view",
+    tasks: "tasks.view",
+    clients: "clients.view",
+    deals: "deals.view",
+    // Everyone with projects.view can read a project and its chessboard;
+    // only projects.create/edit/delete can write, enforced per endpoint.
+    projects: "projects.view",
+    users: "users.view",
+    // Branch management (create/edit/deactivate). branches.view alone (no
+    // nav entry) still lets FINANCE read the list to populate their filters.
+    branches: "branches.view",
+    // The platform operator's tenant-management screen.
+    companies: "companies.manage",
     // The currency/locale/timezone options tenants can be assigned — a
-    // SUPER_ADMIN-only pool the company forms' pickers are built from.
-    settingOptions: [UserRole.SUPER_ADMIN],
-    auditLog: [UserRole.SUPER_ADMIN],
-    // Company-wide activity feed: COMPANY_ADMIN sees the whole company;
-    // SALES_HEAD/SALES_MANAGER see only their own branch (enforced by the
-    // API — see ActivitiesService.findAll).
-    activities: [UserRole.COMPANY_ADMIN, UserRole.SALES_HEAD, UserRole.SALES_MANAGER],
+    // platform-wide pool the company forms' pickers are built from.
+    settingOptions: "setting_options.manage",
+    auditLog: "audit_log.view",
+    // Company-wide activity feed: branch-scoped roles see only their own
+    // branch (enforced by the API — see ActivitiesService.findAll).
+    activities: "activities.view",
     // A tenant's own admin editing their own company's name/currency/locale/
     // timezone (CA-A1) — distinct from `companies` above, which is the
-    // SUPER_ADMIN's cross-tenant management screen.
-    companySettings: [UserRole.COMPANY_ADMIN],
-} as const satisfies Record<string, readonly UserRole[]>;
+    // platform operator's cross-tenant management screen.
+    companySettings: "company_settings.view",
+    rolesPermissions: "rbac.manage",
+} as const satisfies Record<string, string>;
 
-export type Feature = keyof typeof FEATURE_ROLES;
+export type Feature = keyof typeof FEATURE_PERMISSIONS;
 
-export function canAccess(role: UserRole | undefined, feature: Feature): boolean {
-    return role !== undefined && (FEATURE_ROLES[feature] as readonly UserRole[]).includes(role);
+/**
+ * Features that work with no companyId — everything a SUPER_ADMIN's
+ * account actually has. Every other feature's API is behind CompanyGuard
+ * (or an equivalent service-level `if (!actor.companyId) throw...` check),
+ * which rejects a SUPER_ADMIN outright. hasPermission's unconditional "*"
+ * bypass would otherwise make canAccess offer a SUPER_ADMIN a nav link and
+ * a route for every one of those too — a door that opens onto a 403 or
+ * ForbiddenException, not a page. See CompaniesController's guard comment.
+ */
+const SUPER_ADMIN_FEATURES: readonly Feature[] = ["companies", "settingOptions", "auditLog", "rolesPermissions"];
+
+/**
+ * Fine-grained permission check. SUPER_ADMIN carries ["*"] from the API and
+ * always passes.
+ */
+export function hasPermission(user: Pick<AuthUser, "permissions"> | undefined, permission: string): boolean {
+    if (!user) return false;
+    return user.permissions.includes("*") || user.permissions.includes(permission);
+}
+
+export function canAccess(user: Pick<AuthUser, "permissions" | "isSuperAdmin"> | undefined, feature: Feature): boolean {
+    if (user?.isSuperAdmin) {
+        return SUPER_ADMIN_FEATURES.includes(feature);
+    }
+
+    return hasPermission(user, FEATURE_PERMISSIONS[feature]);
 }
 
 /**
- * Where a role should land, and where RoleGuard should bounce it back to.
+ * Where a user should land, and where RoleGuard should bounce them back to.
  *
- * This has to be per-role rather than a fixed "/dashboard": a SUPER_ADMIN has
- * no company, so the dashboard's API calls fail for them. Sending them there on
- * every denial would produce a redirect loop between the guard and a page that
- * cannot load.
+ * This has to depend on isSuperAdmin rather than a fixed "/dashboard": a
+ * SUPER_ADMIN has no company, so the dashboard's API calls fail for them.
+ * Sending them there on every denial would produce a redirect loop between
+ * the guard and a page that cannot load.
  */
-export function landingPathFor(role: UserRole | undefined): string {
-    if (role === UserRole.SUPER_ADMIN) {
+export function landingPathFor(user: Pick<AuthUser, "isSuperAdmin"> | undefined): string {
+    if (user?.isSuperAdmin) {
         return "/companies";
     }
 

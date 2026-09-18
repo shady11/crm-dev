@@ -1,0 +1,77 @@
+{
+  "badges": {
+    "system": "System",
+    "custom": "Custom"
+  },
+  "page": {
+    "heading": "Roles & permissions",
+    "description": "Built-in roles cover most cases. Add a custom role when you need a narrower or different slice of access — pick exactly the permissions it should have, then assign it to any user.",
+    "breadcrumb": "Dashboard • Role management & permissions",
+    "newRole": "New role",
+    "table": {
+      "headers": {
+        "name": "Role",
+        "type": "Type",
+        "permissions": "Permissions",
+        "users": "Users"
+      },
+      "permissionCount": "{{count}} permission",
+      "permissionCount_other": "{{count}} permissions",
+      "userCount": "{{count}} user",
+      "userCount_other": "{{count}} users"
+    },
+    "rowActions": {
+      "manageUsers": "Manage users for {{name}}",
+      "delete": "Delete {{name}}"
+    },
+    "card": {
+      "view": "View permissions",
+      "editRole": "Edit role"
+    }
+  },
+  "form": {
+    "newTitle": "New role",
+    "editTitle": "Edit role",
+    "description": "Pick exactly the permissions this role should grant.",
+    "readOnlyDescription": "This is a global role, shared by every company. Only a platform administrator can edit it — clone it into a new role to start from this set.",
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "permissions": "Permissions",
+      "discountLimit": "Discount limit (%)"
+    },
+    "placeholders": {
+      "discountLimitUnlimited": "Unlimited"
+    },
+    "hints": {
+      "discountLimit": "The highest discount a holder of this role can approve on their own, without sign-off. Leave blank for no limit.",
+      "discountLimitReadOnly": "Own discount limit: {{limit}}%",
+      "discountLimitReadOnlyUnlimited": "Own discount limit: unlimited"
+    },
+    "submit": {
+      "create": "Create role"
+    }
+  },
+  "usersDialog": {
+    "title": "Users with the \"{{name}}\" role",
+    "description": "To move a user to a different role, edit them from the Users page.",
+    "searchPlaceholder": "Search users...",
+    "empty": "No users have this role yet."
+  },
+  "confirmDialog": {
+    "delete": {
+      "title": "Delete this role?",
+      "body": "Removed from every user who has it. This cannot be undone.",
+      "confirm": "Delete"
+    },
+    "working": "Working..."
+  },
+  "toasts": {
+    "createSuccess": "Role created",
+    "createError": "Could not create the role",
+    "updateSuccess": "Role updated",
+    "updateError": "Could not save the role",
+    "deleteSuccess": "Role deleted",
+    "deleteError": "Could not delete the role"
+  }
+}

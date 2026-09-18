@@ -16,7 +16,7 @@ import { api } from "@/lib/api.ts";
 import type { Unit } from "@/features/units/types/unit.types.ts";
 import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {UserRole} from "@/features/users/types/user.types";
+import {hasPermission} from "@/features/auth/access";
 
 interface DuplicateUnitButtonProps {
     unit: Unit;
@@ -37,7 +37,7 @@ export function DuplicateUnitButton({ unit }: DuplicateUnitButtonProps) {
     });
 
     // Duplicating a unit is COMPANY_ADMIN only (POST /units/:id/duplicate).
-    if (user?.role !== UserRole.COMPANY_ADMIN) {
+    if (!hasPermission(user, "inventory.manage")) {
         return null;
     }
 

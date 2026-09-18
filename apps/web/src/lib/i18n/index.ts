@@ -24,6 +24,7 @@ import auditLogEn from "./locales/en/auditLog.json";
 import activitiesEn from "./locales/en/activities.json";
 import settingsEn from "./locales/en/settings.json";
 import settingOptionsEn from "./locales/en/settingOptions.json";
+import rbacEn from "./locales/en/rbac.json";
 
 import commonRu from "./locales/ru/common.json";
 import dealsRu from "./locales/ru/deals.json";
@@ -47,6 +48,7 @@ import auditLogRu from "./locales/ru/auditLog.json";
 import activitiesRu from "./locales/ru/activities.json";
 import settingsRu from "./locales/ru/settings.json";
 import settingOptionsRu from "./locales/ru/settingOptions.json";
+import rbacRu from "./locales/ru/rbac.json";
 
 import commonKy from "./locales/ky/common.json";
 import dealsKy from "./locales/ky/deals.json";
@@ -70,6 +72,7 @@ import auditLogKy from "./locales/ky/auditLog.json";
 import activitiesKy from "./locales/ky/activities.json";
 import settingsKy from "./locales/ky/settings.json";
 import settingOptionsKy from "./locales/ky/settingOptions.json";
+import rbacKy from "./locales/ky/rbac.json";
 
 export const resources = {
     en: {
@@ -95,6 +98,7 @@ export const resources = {
         activities: activitiesEn,
         settings: settingsEn,
         settingOptions: settingOptionsEn,
+        rbac: rbacEn,
     },
     ru: {
         common: commonRu,
@@ -119,6 +123,7 @@ export const resources = {
         activities: activitiesRu,
         settings: settingsRu,
         settingOptions: settingOptionsRu,
+        rbac: rbacRu,
     },
     ky: {
         common: commonKy,
@@ -143,6 +148,7 @@ export const resources = {
         activities: activitiesKy,
         settings: settingsKy,
         settingOptions: settingOptionsKy,
+        rbac: rbacKy,
     },
 } as const;
 

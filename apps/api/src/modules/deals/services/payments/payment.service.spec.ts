@@ -1,5 +1,5 @@
 import {ForbiddenException} from '@nestjs/common';
-import {DealStatus, PaymentMethod, PaymentScheduleStatus, PaymentType, Prisma, UserRole} from '@/generated/prisma/client';
+import {DealStatus, PaymentMethod, PaymentScheduleStatus, PaymentType, Prisma} from '@/generated/prisma/client';
 import {PaymentService} from './payment.service';
 import {DealDomainService} from '../deal-domain.service';
 import {DealNotFoundException, PaymentExceedsBalanceException, RefundExceedsPaidException} from '../../exceptions';
@@ -14,7 +14,8 @@ import {DealNotFoundException, PaymentExceedsBalanceException, RefundExceedsPaid
 describe('PaymentService.create', () => {
     const user = {
         id: 'user-1',
-        role: UserRole.COMPANY_ADMIN,
+        roleId: 'role-company-admin',
+        roleName: 'Company Admin',
         companyId: 'company-1',
         branchId: null,
     } as any;
@@ -222,7 +223,7 @@ describe('PaymentService.create', () => {
     });
 
     it('scopes the deal lookup to the requesting branch for branch-scoped roles', async () => {
-        const branchUser = {id: 'u2', role: UserRole.SALES_MANAGER, companyId: 'company-1', branchId: 'branch-9'} as any;
+        const branchUser = {id: 'u2', roleId: 'role-sales-manager', roleName: 'Sales Manager', isBranchScoped: true, companyId: 'company-1', branchId: 'branch-9'} as any;
         const {service, prisma} = build({totalPaid: 0});
         await service.create(branchUser, 'deal-1', paymentDto({amount: 100}));
 

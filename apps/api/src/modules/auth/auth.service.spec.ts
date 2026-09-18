@@ -1,7 +1,6 @@
 import {BadRequestException, UnauthorizedException} from "@nestjs/common";
 import {JwtService} from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
-import {UserRole} from "@/generated/prisma/client";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {PrismaService} from "@/database/prisma.service";
 import {UsersService} from "@/modules/users/users.service";
@@ -14,7 +13,8 @@ describe("AuthService.changeOwnPassword", () => {
         id: "user-1",
         email: "manager@crm.dev",
         name: "Aigul",
-        role: UserRole.SALES_MANAGER,
+        roleId: "role-sales-manager",
+        roleName: "Sales Manager",
         companyId: "company-1",
         company: null,
         branchId: null,
@@ -32,7 +32,9 @@ describe("AuthService.changeOwnPassword", () => {
             id: caller.id,
             email: caller.email,
             fullName: caller.name,
-            role: caller.role,
+            roleId: caller.roleId,
+            role: {name: caller.roleName, isBranchScoped: true},
+            isSuperAdmin: false,
             companyId: caller.companyId,
             isActive: true,
             passwordHash,
@@ -108,7 +110,7 @@ describe("AuthService.changeOwnPassword", () => {
 
         expect(result.accessToken).toBe("new.jwt.token");
         expect(jwt.signAsync).toHaveBeenCalledWith(
-            expect.objectContaining({id: caller.id, role: caller.role, companyId: caller.companyId}),
+            expect.objectContaining({id: caller.id, roleId: caller.roleId, companyId: caller.companyId}),
         );
     });
 });

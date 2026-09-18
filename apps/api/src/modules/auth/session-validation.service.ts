@@ -1,8 +1,8 @@
 import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
-import {UserRole} from '@/generated/prisma/client';
 import {PrismaService} from '@/database/prisma.service';
 import {AuthUser} from '@/common/types/auth-user.type';
+import {RbacService} from '@/modules/rbac/rbac.service';
 
 const DEFAULT_SUPER_ADMIN_SESSION_MAX_AGE_MINUTES = 60;
 
@@ -13,7 +13,11 @@ const DEFAULT_SUPER_ADMIN_SESSION_MAX_AGE_MINUTES = 60;
 // signed claim carries only the session id and the acting SUPER_ADMIN's id -
 // their current email/name is always re-read from the database below, never
 // trusted from an old token.
-export interface JwtPayload extends Omit<AuthUser, 'company' | 'branch' | 'impersonation'> {
+// `permissions` is also never signed into the token, for the same reason:
+// validate() below always recomputes it from the user's current Role, so
+// granting/revoking a permission takes effect on the very next request
+// instead of waiting for every outstanding token to expire.
+export interface JwtPayload extends Omit<AuthUser, 'company' | 'branch' | 'impersonation' | 'permissions'> {
     impersonation?: {
         sessionId: string;
         superAdminId: string;
@@ -27,6 +31,7 @@ export class SessionValidationService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly configService: ConfigService,
+        private readonly rbacService: RbacService,
     ) {}
 
     async validate(payload: JwtPayload): Promise<AuthUser> {
@@ -37,7 +42,9 @@ export class SessionValidationService {
                 email: true,
                 fullName: true,
                 phone: true,
-                role: true,
+                isSuperAdmin: true,
+                roleId: true,
+                role: { select: { name: true, isBranchScoped: true, discountLimit: true } },
                 companyId: true,
                 branchId: true,
                 isActive: true,
@@ -91,7 +98,7 @@ export class SessionValidationService {
         // every tenant. Enforced here, on top of sessionsValidFrom, rather than
         // by forking JwtModule's expiresIn — no schema change, and it composes
         // with the revocation check above instead of replacing it.
-        if (user.role === UserRole.SUPER_ADMIN) {
+        if (user.isSuperAdmin) {
             const maxAgeMinutes =
                 Number(this.configService.get<string>('SUPER_ADMIN_SESSION_MAX_AGE_MINUTES')) ||
                 DEFAULT_SUPER_ADMIN_SESSION_MAX_AGE_MINUTES;
@@ -139,12 +146,27 @@ export class SessionValidationService {
             };
         }
 
+        // SUPER_ADMIN is exempt from permission checks entirely (see
+        // PermissionsGuard) rather than needing a Role that lists every
+        // permission, which would silently go stale as new permissions are
+        // added. Every other user's permissions are their Role's permission
+        // set, recomputed on every request so a grant/revoke takes effect
+        // immediately.
+        const permissions = user.isSuperAdmin
+            ? ['*']
+            : await this.rbacService.getEffectivePermissions(user.id);
+
         return {
             id: user.id,
             email: user.email,
             name: user.fullName,
             phone: user.phone,
-            role: user.role,
+            roleId: user.roleId,
+            roleName: user.role.name,
+            isSuperAdmin: user.isSuperAdmin,
+            isBranchScoped: user.role.isBranchScoped,
+            discountLimit: user.role.discountLimit === null ? null : user.role.discountLimit.toNumber(),
+            permissions,
             companyId: user.companyId,
             company: user.company
                 ? {
