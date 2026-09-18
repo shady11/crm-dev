@@ -12,6 +12,9 @@ type ChessboardUnit = {
     rooms: number | null;
     area: Prisma.Decimal;
     price: Prisma.Decimal;
+    block: { id: string; name: string };
+    entrance: { id: string; name: string };
+    floor: { id: string; number: number };
 };
 
 type ChessboardFloor = {
@@ -103,6 +106,24 @@ export class ChessboardService {
 
         if (query.status) {
             unitsWhere.status = query.status;
+        }
+
+        if (query.rooms !== undefined) {
+            unitsWhere.rooms = query.rooms;
+        }
+
+        if (query.areaMin !== undefined || query.areaMax !== undefined) {
+            unitsWhere.area = {
+                ...(query.areaMin !== undefined && { gte: query.areaMin }),
+                ...(query.areaMax !== undefined && { lte: query.areaMax }),
+            };
+        }
+
+        if (query.priceMin !== undefined || query.priceMax !== undefined) {
+            unitsWhere.price = {
+                ...(query.priceMin !== undefined && { gte: query.priceMin }),
+                ...(query.priceMax !== undefined && { lte: query.priceMax }),
+            };
         }
 
         const units = await this.prisma.unit.findMany({
@@ -213,6 +234,9 @@ export class ChessboardService {
                 rooms: unit.rooms,
                 area: unit.area,
                 price: unit.price,
+                block: { id: unit.block.id, name: unit.block.name },
+                entrance: { id: unit.entrance.id, name: unit.entrance.name },
+                floor: { id: unit.floor.id, number: unit.floor.number },
             });
         }
 
@@ -237,6 +261,11 @@ export class ChessboardService {
                 entranceId: query.entranceId ?? null,
                 type: query.type ?? null,
                 status: query.status ?? null,
+                rooms: query.rooms ?? null,
+                areaMin: query.areaMin ?? null,
+                areaMax: query.areaMax ?? null,
+                priceMin: query.priceMin ?? null,
+                priceMax: query.priceMax ?? null,
             },
             summary,
             blocks,

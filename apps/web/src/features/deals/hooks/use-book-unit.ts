@@ -17,6 +17,7 @@ export function useBookUnit({ projectId, onSuccess }: UseBookUnitOptions) {
 
         onSuccess: async (deal) => {
             await queryClient.invalidateQueries({ queryKey: ["project-tree", projectId] });
+            await queryClient.invalidateQueries({ queryKey: ["project-chessboard", projectId] });
             await queryClient.invalidateQueries({ queryKey: ["deals"] });
 
             toast.success({

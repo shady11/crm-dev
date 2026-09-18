@@ -2,7 +2,6 @@ import {useNavigate, useParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {Card, CardContent} from "@/components/ui/card.tsx";
 import type {Block} from "@/features/blocks/types/block.types.ts";
-import type {Project} from "@/features/projects/types/project.types.ts";
 import {Separator} from "@/components/ui/separator.tsx";
 import {
     Building2Icon,
@@ -12,7 +11,7 @@ import {
     Loader2Icon,
     SquareArrowRightEnterIcon
 } from "lucide-react";
-import {getProjectTree} from "@/features/projects/api/projects.api.ts";
+import {getProjectChessboard} from "@/features/projects/api/projects.api.ts";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {useTranslation} from "react-i18next";
 
@@ -21,13 +20,13 @@ export function ChessboardBlocks() {
     const { projectId } = useParams<{ projectId: string }>();
     const navigate = useNavigate();
 
-    const treeQuery = useQuery({
-        queryKey: ["project-tree", projectId],
-        queryFn: () => getProjectTree(projectId!),
+    const chessboardQuery = useQuery({
+        queryKey: ["project-chessboard", projectId],
+        queryFn: () => getProjectChessboard(projectId!),
         enabled: !!projectId,
     });
 
-    if (treeQuery.isLoading) {
+    if (chessboardQuery.isLoading) {
         return (
             <div className="flex h-96 items-center justify-center">
                 <Loader2Icon className="h-8 w-8 animate-spin text-primary" />
@@ -35,9 +34,9 @@ export function ChessboardBlocks() {
         );
     }
 
-    const tree = treeQuery.data as Project | undefined;
+    const blocks = (chessboardQuery.data?.blocks ?? []) as Block[];
 
-    if (!tree || !tree.blocks || tree.blocks.length === 0) {
+    if (blocks.length === 0) {
         return (
             <Empty>
                 <EmptyHeader>
@@ -58,7 +57,7 @@ export function ChessboardBlocks() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {tree.blocks.map((block: Block) => {
+                {blocks.map((block: Block) => {
                     const totalEntrances = block.entrances?.length || 0;
                     const totalFloors = block.entrances?.reduce((sum, e) => sum + (e.floors?.length || 0), 0) || 0;
                     const totalUnits = block.entrances?.reduce(

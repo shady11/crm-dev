@@ -29,6 +29,9 @@ export function useUpdateUnit({
             await queryClient.invalidateQueries({
                 queryKey: ["project-tree", projectId],
             });
+            await queryClient.invalidateQueries({
+                queryKey: ["project-chessboard", projectId],
+            });
 
             onSuccess?.();
         },
