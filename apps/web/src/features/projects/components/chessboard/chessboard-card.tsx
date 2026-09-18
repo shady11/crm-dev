@@ -19,6 +19,8 @@ interface ChessboardCardProps {
     totalFloors: number;
     totalUnits: number;
     selectedUnit: Unit | null;
+    hasActiveFilters?: boolean;
+    unitMatchesFilters?(unit: Unit): boolean;
     onUnitClick(floor: Floor, unit: Unit): void;
 }
 
@@ -28,6 +30,8 @@ export function ChessboardCard({
                                    totalFloors,
                                    totalUnits,
                                    selectedUnit,
+                                   hasActiveFilters,
+                                   unitMatchesFilters,
                                    onUnitClick,
                                }: ChessboardCardProps) {
     const { t } = useTranslation("units");
@@ -70,6 +74,8 @@ export function ChessboardCard({
                 <ChessboardGrid
                     floors={floors}
                     selectedUnit={selectedUnit}
+                    hasActiveFilters={hasActiveFilters}
+                    unitMatchesFilters={unitMatchesFilters}
                     onUnitClick={onUnitClick}
                 />
             </CardContent>

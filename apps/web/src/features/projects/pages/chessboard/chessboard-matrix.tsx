@@ -1,9 +1,9 @@
 import {useMemo, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-import {keepPreviousData, useQuery} from "@tanstack/react-query";
+import {useQuery} from "@tanstack/react-query";
 import {getProjectChessboard} from "@/features/projects/api/projects.api";
 import {DoorOpen, Loader2Icon,} from "lucide-react";
-import {type UnitStatus, type UnitType} from "@/features/units/types/unit.types";
+import {type Unit, type UnitStatus, type UnitType} from "@/features/units/types/unit.types";
 import type {Block} from "@/features/blocks/types/block.types";
 import type {Entrance} from "@/features/entrances/types/entrance.types";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
@@ -52,19 +52,28 @@ export function ChessboardMatrix() {
         actions,
     } = useChessboardSheet();
 
-    // Unfiltered, project-wide structure — used only for the breadcrumb's
-    // block/entrance switchers, which must keep listing every block and
-    // entrance regardless of what the unit-level filters below exclude.
-    const navQuery = useQuery({
+    // Unfiltered project-wide structure. Filters only dim non-matching units
+    // in the grid below — they never change which units are fetched — so
+    // this single query covers both the breadcrumb's block/entrance
+    // switchers and the matrix grid itself.
+    const chessboardQuery = useQuery({
         queryKey: ["project-chessboard", projectId],
         queryFn: () => getProjectChessboard(projectId!),
         enabled: !!projectId,
     });
 
-    const blocks = (navQuery.data?.blocks ?? []) as Block[];
+    const blocks = (chessboardQuery.data?.blocks ?? []) as Block[];
     const block = blocks.find((b: Block) => b.id === blockId);
     const blockEntrances = block?.entrances || [];
-    const entranceMeta = blockEntrances.find((e: Entrance) => e.id === entranceId);
+    const entrance = blockEntrances.find((e: Entrance) => e.id === entranceId);
+
+    const managersQuery = useManagers();
+    const managers = managersQuery.data ?? [];
+
+    const updateUnitMutation = useUpdateUnit({
+        projectId: projectId!,
+        onSuccess: actions.close,
+    });
 
     const hasActiveFilters =
         filters.status !== "all" ||
@@ -75,58 +84,77 @@ export function ChessboardMatrix() {
         !!filters.priceMin ||
         !!filters.priceMax;
 
-    const apiFilters = useMemo(
-        () => ({
-            blockId,
-            entranceId,
-            type: filters.type !== "all" ? filters.type : undefined,
-            status: filters.status !== "all" ? filters.status : undefined,
-            rooms: filters.rooms ? Number(filters.rooms) : undefined,
-            areaMin: filters.areaMin ? Number(filters.areaMin) : undefined,
-            areaMax: filters.areaMax ? Number(filters.areaMax) : undefined,
-            priceMin: filters.priceMin ? Number(filters.priceMin) : undefined,
-            priceMax: filters.priceMax ? Number(filters.priceMax) : undefined,
-        }),
-        [blockId, entranceId, filters],
-    );
+    const unitMatchesFilters = (unit: Unit) => {
+        if (filters.status !== "all" && unit.status !== filters.status) {
+            return false;
+        }
 
-    // The actual matrix content — filtering happens on the backend, so the
-    // grid only ever receives units that already match the active filters.
-    const matrixQuery = useQuery({
-        queryKey: ["project-chessboard", projectId, apiFilters],
-        queryFn: () => getProjectChessboard(projectId!, apiFilters),
-        enabled: !!projectId && !!blockId && !!entranceId,
-        placeholderData: keepPreviousData,
-    });
+        if (filters.type !== "all" && unit.type !== filters.type) {
+            return false;
+        }
 
-    const filteredEntrance = matrixQuery.data?.blocks?.[0]?.entrances?.[0];
+        if (filters.rooms) {
+            const rooms = parseInt(filters.rooms);
 
-    const managersQuery = useManagers();
-    const managers = managersQuery.data ?? [];
+            if (!isNaN(rooms) && unit.rooms !== rooms) {
+                return false;
+            }
+        }
 
-    const updateUnitMutation = useUpdateUnit({
-        projectId: projectId!,
-        onSuccess: actions.close,
-    });
+        if (filters.areaMin) {
+            const min = parseFloat(filters.areaMin);
+
+            if (!isNaN(min) && parseFloat(unit.area) < min) {
+                return false;
+            }
+        }
+
+        if (filters.areaMax) {
+            const max = parseFloat(filters.areaMax);
+
+            if (!isNaN(max) && parseFloat(unit.area) > max) {
+                return false;
+            }
+        }
+
+        if (filters.priceMin) {
+            const min = parseFloat(filters.priceMin);
+
+            if (!isNaN(min) && parseFloat(unit.price) < min) {
+                return false;
+            }
+        }
+
+        if (filters.priceMax) {
+            const max = parseFloat(filters.priceMax);
+
+            if (!isNaN(max) && parseFloat(unit.price) > max) {
+                return false;
+            }
+        }
+
+        return true;
+    };
 
     const matrixData = useMemo(() => {
-        if (!filteredEntrance) {
+        if (!entrance) {
             return null;
         }
 
-        const sortedFloors = [...filteredEntrance.floors].sort(
-            (first: {number: number}, second: {number: number}) => second.number - first.number
+        const sortedFloors = [...entrance.floors].sort(
+            (first, second) => second.number - first.number
         );
 
         return {
             floors: sortedFloors,
             totalUnits: sortedFloors.reduce(
-                (sum: number, floor: {units: unknown[]}) => sum + floor.units.length,
+                (sum, floor) =>
+                    sum + floor.units.filter(unitMatchesFilters).length,
                 0
             ),
             totalFloors: sortedFloors.length,
         };
-    }, [filteredEntrance]);
+    }, [entrance, unitMatchesFilters]);
 
     const clearFilters = () => {
         setFilters(DEFAULT_FILTERS);
@@ -137,7 +165,7 @@ export function ChessboardMatrix() {
             ? sheet.unit
             : null;
 
-    if (navQuery.isLoading) {
+    if (chessboardQuery.isLoading) {
         return (
             <div className="flex h-96 items-center justify-center">
                 <Loader2Icon className="h-8 w-8 animate-spin text-primary" />
@@ -145,7 +173,7 @@ export function ChessboardMatrix() {
         );
     }
 
-    if (!block || !entranceMeta) {
+    if (!block || !entrance) {
         return (
             <div className="flex h-96 items-center justify-center text-muted-foreground">
                 <p>{t("common:errors.notFound")}</p>
@@ -157,7 +185,7 @@ export function ChessboardMatrix() {
         <div className="space-y-6">
             <ChessboardBreadcrumbs
                 block={block}
-                entrance={entranceMeta}
+                entrance={entrance}
                 blocks={blocks}
                 blockEntrances={blockEntrances}
                 onBack={() => navigate("..")}
@@ -173,17 +201,15 @@ export function ChessboardMatrix() {
                 onClearFilters={clearFilters}
             />
 
-            {matrixQuery.isLoading ? (
-                <div className="flex h-64 items-center justify-center">
-                    <Loader2Icon className="h-8 w-8 animate-spin text-primary" />
-                </div>
-            ) : matrixData && matrixData.floors.length > 0 ? (
+            {matrixData && matrixData.floors.length > 0 ? (
                 <ChessboardCard
-                    entranceName={entranceMeta.name}
+                    entranceName={entrance.name}
                     floors={matrixData.floors}
                     totalFloors={matrixData.totalFloors}
                     totalUnits={matrixData.totalUnits}
                     selectedUnit={selectedUnit}
+                    hasActiveFilters={hasActiveFilters}
+                    unitMatchesFilters={unitMatchesFilters}
                     onUnitClick={(floor, unit) => actions.openDetails(unit, floor)}
                 />
             ) : (

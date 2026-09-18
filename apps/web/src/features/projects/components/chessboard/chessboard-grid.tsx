@@ -6,6 +6,8 @@ interface Props {
     floors: Floor[];
 
     selectedUnit?: Unit | null;
+    hasActiveFilters?: boolean;
+    unitMatchesFilters?(unit: Unit): boolean;
 
     onUnitClick(
         floor: Floor,
@@ -16,6 +18,8 @@ interface Props {
 export function ChessboardGrid({
                                    floors,
                                    selectedUnit,
+                                   hasActiveFilters,
+                                   unitMatchesFilters,
                                    onUnitClick,
                                }: Props) {
     return (
@@ -25,6 +29,8 @@ export function ChessboardGrid({
                     key={floor.id}
                     floor={floor}
                     selectedUnit={selectedUnit}
+                    hasActiveFilters={hasActiveFilters}
+                    unitMatchesFilters={unitMatchesFilters}
                     onUnitClick={(unit) =>
                         onUnitClick(floor, unit)
                     }

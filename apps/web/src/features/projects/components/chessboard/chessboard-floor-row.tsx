@@ -6,6 +6,8 @@ import {ChessboardUnitCard} from "./chessboard-unit-card.tsx";
 interface Props {
     floor: Floor;
     selectedUnit?: Unit | null;
+    hasActiveFilters?: boolean;
+    unitMatchesFilters?(unit: Unit): boolean;
 
     onUnitClick(unit: Unit): void;
 }
@@ -13,6 +15,8 @@ interface Props {
 export function ChessboardFloorRow({
                                        floor,
                                        selectedUnit,
+                                       hasActiveFilters,
+                                       unitMatchesFilters,
                                        onUnitClick,
                                    }: Props) {
     return (
@@ -31,6 +35,7 @@ export function ChessboardFloorRow({
                         key={unit.id}
                         unit={unit}
                         selected={selectedUnit?.id === unit.id}
+                        dimmed={hasActiveFilters && !unitMatchesFilters?.(unit)}
                         onClick={() => onUnitClick(unit)}
                     />
                 ))}
