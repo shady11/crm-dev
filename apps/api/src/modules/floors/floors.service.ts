@@ -6,6 +6,7 @@ import {CreateFloorDto} from "./dto/create-floor.dto";
 import {UpdateFloorDto} from "./dto/update-floor.dto";
 import {QueryFloorsDto} from "./dto/query-floors.dto";
 import {CreateFloorsBulkDto} from "@/modules/floors/dto/create-floors-bulk.dto";
+import {diffChangedFields} from "@/common/utils/activity-diff.util";
 
 @Injectable()
 export class FloorsService {
@@ -296,11 +297,9 @@ export class FloorsService {
             },
         });
 
-        const fieldsChanged =
-            (dto.number !== undefined && dto.number !== floor.number) ||
-            (dto.order !== undefined && dto.order !== floor.order);
+        const changes = diffChangedFields(dto, floor, ["number", "order"]);
 
-        if (fieldsChanged) {
+        if (changes) {
             await this.logFloorActivity({
                 companyId: user.companyId,
                 actorId: user.id,
@@ -308,6 +307,7 @@ export class FloorsService {
                 action: ActivityAction.UPDATED_FLOOR,
                 type: ActivityType.FLOOR_UPDATED,
                 title: `Floor ${updated.number} updated`,
+                metadata: changes,
             });
         }
 

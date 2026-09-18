@@ -6,6 +6,7 @@ import {UpdateUnitDto} from "./dto/update-unit.dto";
 import {QueryUnitsDto} from "./dto/query-units.dto";
 import {CreateUnitsBulkDto} from "@/modules/units/dto/create-units-bulk.dto";
 import {PrismaService} from "@/database/prisma.service";
+import {diffChangedFields} from "@/common/utils/activity-diff.util";
 
 @Injectable()
 export class UnitsService {
@@ -505,12 +506,11 @@ export class UnitsService {
         }
 
         const statusChanged = dto.status !== undefined && dto.status !== unit.status;
-        const fieldsChanged =
-            (dto.number !== undefined && dto.number !== unit.number) ||
-            (dto.type !== undefined && dto.type !== unit.type) ||
-            (dto.rooms !== undefined && dto.rooms !== unit.rooms) ||
-            (dto.area !== undefined && Number(dto.area) !== Number(unit.area)) ||
-            (dto.price !== undefined && Number(dto.price) !== Number(unit.price));
+        const changes = diffChangedFields(dto, unit, [
+            "number", "type", "rooms",
+            {field: "area", normalize: (v) => Number(v)},
+            {field: "price", normalize: (v) => Number(v)},
+        ]);
 
         const updated = await this.prisma.unit.update({
             where: {
@@ -564,7 +564,7 @@ export class UnitsService {
             });
         }
 
-        if (fieldsChanged) {
+        if (changes) {
             await this.logUnitActivity({
                 companyId: user.companyId,
                 actorId: user.id,
@@ -572,6 +572,7 @@ export class UnitsService {
                 action: ActivityAction.UPDATED_UNIT,
                 type: ActivityType.UNIT_UPDATED,
                 title: `Unit "${updated.number}" updated`,
+                metadata: changes,
             });
         }
 

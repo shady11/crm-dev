@@ -5,6 +5,7 @@ import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateEntranceDto} from "./dto/create-entrance.dto";
 import {UpdateEntranceDto} from "./dto/update-entrance.dto";
 import {QueryEntrancesDto} from "./dto/query-entrances.dto";
+import {diffChangedFields} from "@/common/utils/activity-diff.util";
 
 @Injectable()
 export class EntrancesService {
@@ -254,11 +255,9 @@ export class EntrancesService {
             },
         });
 
-        const fieldsChanged =
-            (dto.name !== undefined && dto.name !== entrance.name) ||
-            (dto.order !== undefined && dto.order !== entrance.order);
+        const changes = diffChangedFields(dto, entrance, ["name", "order"]);
 
-        if (fieldsChanged) {
+        if (changes) {
             await this.logEntranceActivity({
                 companyId: user.companyId,
                 actorId: user.id,
@@ -266,6 +265,7 @@ export class EntrancesService {
                 action: ActivityAction.UPDATED_ENTRANCE,
                 type: ActivityType.ENTRANCE_UPDATED,
                 title: `Entrance "${updated.name}" updated`,
+                metadata: changes,
             });
         }
 

@@ -11,6 +11,7 @@ import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 import {OPEN_LEAD_STATUSES} from "@/modules/leads/lead.constants";
+import {diffChangedFields} from "@/common/utils/activity-diff.util";
 import {CreateUserDto} from "./dto/create-user.dto";
 import {UpdateUserDto} from "./dto/update-user.dto";
 import {UpdateUserPasswordDto} from "./dto/update-user-password.dto";
@@ -232,10 +233,7 @@ export class UsersService {
         const roleChanged = dto.roleId !== undefined && dto.roleId !== target.roleId;
         const beingDeactivated = dto.isActive === false && target.isActive === true;
         const beingReactivated = dto.isActive === true && target.isActive === false;
-        const fieldsChanged =
-            (dto.fullName !== undefined && dto.fullName !== target.fullName) ||
-            (dto.email !== undefined && dto.email !== target.email) ||
-            (dto.phone !== undefined && dto.phone !== target.phone);
+        const changes = diffChangedFields(dto, target, ["fullName", "email", "phone"]);
 
         const updated = await this.prisma.user.update({
             where: { id },
@@ -276,12 +274,13 @@ export class UsersService {
             });
         }
 
-        if (fieldsChanged || beingReactivated) {
+        if (changes || beingReactivated) {
             await this.logUserActivity({
                 ...activityParams,
                 action: ActivityAction.UPDATED_USER,
                 type: ActivityType.USER_UPDATED,
                 title: `User "${updated.fullName}" updated`,
+                metadata: changes,
             });
         }
 

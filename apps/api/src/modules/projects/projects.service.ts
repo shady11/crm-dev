@@ -6,6 +6,7 @@ import {ActivityAction, ActivityType, Prisma, ProjectStatus} from "@/generated/p
 import {CreateProjectDto} from "@/modules/projects/dto/create-project.dto";
 import {UpdateProjectDto} from "@/modules/projects/dto/update-project.dto";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
+import {diffChangedFields} from "@/common/utils/activity-diff.util";
 
 @Injectable()
 export class ProjectsService {
@@ -191,9 +192,7 @@ export class ProjectsService {
         }
 
         const statusChanged = dto.status !== undefined && dto.status !== existing.status;
-        const fieldsChanged =
-            (dto.name !== undefined && dto.name !== existing.name) ||
-            (dto.address !== undefined && dto.address !== existing.address);
+        const changes = diffChangedFields(dto, existing, ["name", "address"]);
 
         const updated = await this.prisma.project.update({
             where: {
@@ -218,7 +217,7 @@ export class ProjectsService {
             });
         }
 
-        if (fieldsChanged) {
+        if (changes) {
             await this.logProjectActivity({
                 companyId: user.companyId,
                 actorId: user.id,
@@ -226,6 +225,7 @@ export class ProjectsService {
                 action: ActivityAction.UPDATED_PROJECT,
                 type: ActivityType.PROJECT_UPDATED,
                 title: `Project "${updated.name}" updated`,
+                metadata: changes,
             });
         }
 
