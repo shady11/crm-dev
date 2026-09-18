@@ -73,6 +73,8 @@ enum ActivityAction {
   UPDATED_FLOOR
   DELETED_FLOOR
   IMPORTED_FLOORS
+
+  CONVERTED_LEAD
 }
 
 enum ActivityType {
@@ -160,6 +162,8 @@ enum ActivityType {
   FLOOR_UPDATED
   FLOOR_DELETED
   FLOORS_IMPORTED
+
+  LEAD_CONVERTED
 }
 
 model Activity {

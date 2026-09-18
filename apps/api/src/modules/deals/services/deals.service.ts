@@ -1,6 +1,8 @@
 import {BadRequestException, ForbiddenException, Injectable, Logger,} from '@nestjs/common';
 
 import {
+  ActivityAction,
+  ActivityType,
   DealStatus,
   DiscountApprovalStatus,
   DocumentType,
@@ -775,6 +777,21 @@ export class DealsService {
         data: { status: UnitStatus.AVAILABLE },
       });
 
+      // The unit's own activity trail, distinct from the deal's — see the
+      // cancelReservation() call below for the deal side of this event.
+      // Without this, the unit's history shows no record of being relisted.
+      await db.activity.create({
+        data: {
+          companyId,
+          userId: user.id,
+          unitId: deal.unitId,
+          action: ActivityAction.CHANGED_UNIT_STATUS,
+          type: ActivityType.UNIT_STATUS_CHANGED,
+          title: 'Unit relisted after deal cancellation',
+          metadata: { toStatus: UnitStatus.AVAILABLE, dealId: deal.id, reason: dto.reason ?? null },
+        },
+      });
+
       await db.paymentSchedule.updateMany({
         where: {
           dealId: deal.id,
@@ -866,6 +883,21 @@ export class DealsService {
     await db.unit.update({
       where: { id: deal.unitId },
       data: { status: UnitStatus.SOLD },
+    });
+
+    // The unit's own activity trail, distinct from the deal's dealUpdated()
+    // call below — without this, the unit's history shows no record of
+    // being marked sold.
+    await db.activity.create({
+      data: {
+        companyId: deal.companyId,
+        userId: user.id,
+        unitId: deal.unitId,
+        action: ActivityAction.CHANGED_UNIT_STATUS,
+        type: ActivityType.UNIT_STATUS_CHANGED,
+        title: 'Unit marked sold',
+        metadata: { toStatus: UnitStatus.SOLD, dealId },
+      },
     });
 
     await this.activityService.dealUpdated({

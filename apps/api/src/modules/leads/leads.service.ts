@@ -344,7 +344,7 @@ export class LeadsService {
             clientId = client.id;
         }
 
-        return this.prisma.lead.update({
+        const converted = await this.prisma.lead.update({
             where: {
                 id,
             },
@@ -369,6 +369,20 @@ export class LeadsService {
                 },
             },
         });
+
+        await this.prisma.activity.create({
+            data: {
+                companyId: user.companyId,
+                userId: user.id,
+                leadId: id,
+                clientId,
+                action: ActivityAction.CONVERTED_LEAD,
+                type: ActivityType.LEAD_CONVERTED,
+                title: `Lead "${converted.fullName}" converted to client`,
+            },
+        });
+
+        return converted;
     }
 
     async checkDuplicates(user: AuthUser, phone: string, excludeLeadId?: string) {
