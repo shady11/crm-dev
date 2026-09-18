@@ -70,7 +70,7 @@ export function ChessboardCard({
                 </div>
             </CardHeader>
 
-            <CardContent className="gap-0 p-6">
+            <CardContent className="gap-0 p-6 overflow-x-auto">
                 <ChessboardGrid
                     floors={floors}
                     selectedUnit={selectedUnit}
