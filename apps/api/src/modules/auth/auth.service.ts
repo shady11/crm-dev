@@ -1,10 +1,11 @@
 import {BadRequestException, Injectable, UnauthorizedException} from "@nestjs/common";
 import { UsersService } from "@/modules/users/users.service";
 import {JwtService} from "@nestjs/jwt";
-import {ActivityAction, ActivityType} from "@/generated/prisma/client";
+import {ActivityAction, ActivityType, AuditAction} from "@/generated/prisma/client";
 import * as bcrypt from "bcrypt";
 import {AuthBranchSummary, AuthCompanySummary, AuthUser} from "@/common/types/auth-user.type";
 import {PrismaService} from "@/database/prisma.service";
+import {AuditLogService} from "@/modules/audit-log/audit-log.service";
 import {ChangePasswordDto} from "@/modules/auth/dto/change-password.dto";
 import {UpdateOwnProfileDto} from "@/modules/auth/dto/update-own-profile.dto";
 import {TotpService} from "@/modules/auth/totp.service";
@@ -45,20 +46,26 @@ export class AuthService {
         private readonly jwtService: JwtService,
         private readonly prisma: PrismaService,
         private readonly totpService: TotpService,
+        private readonly auditLog: AuditLogService,
     ) {}
 
     async login(email: string, password: string, totpCode?: string) {
         const user = await this.usersService.findByEmail(email);
 
+        // No audit entry for an unknown email: AuditLog.actorId is a real FK
+        // to User, and logging "someone tried a nonexistent address" would
+        // need a target that doesn't exist to record it against.
         if (!user) {
             throw new UnauthorizedException("Invalid email or password");
         }
 
         if (!user.isActive) {
+            await this.recordLoginFailure(user, "inactive_account");
             throw new UnauthorizedException("User is inactive");
         }
 
         if (user.lockedUntil && user.lockedUntil > new Date()) {
+            await this.recordLoginFailure(user, "locked_out");
             throw new UnauthorizedException(
                 `Too many failed attempts. Try again after ${user.lockedUntil.toISOString()}.`,
             );
@@ -71,6 +78,7 @@ export class AuthService {
 
         if (!isPasswordValid) {
             await this.registerFailedLogin(user.id, user.failedLoginAttempts);
+            await this.recordLoginFailure(user, "invalid_password");
             throw new UnauthorizedException("Invalid email or password");
         }
 
@@ -80,6 +88,7 @@ export class AuthService {
                 // password attempt (the password was already right) and is
                 // not lockout-eligible on its own — it's a distinct failure
                 // the client should prompt for, not a security incident.
+                await this.recordLoginFailure(user, "invalid_totp");
                 throw new UnauthorizedException("Invalid or missing two-factor code");
             }
         }
@@ -91,6 +100,7 @@ export class AuthService {
         //
         // SUPER_ADMIN has no company, so this never applies to them.
         if (user.company && (user.company.suspendedAt || user.company.deletedAt)) {
+            await this.recordLoginFailure(user, "company_inactive");
             throw new UnauthorizedException("This company is not active. Contact your administrator.");
         }
 
@@ -100,6 +110,15 @@ export class AuthService {
                 data: { failedLoginAttempts: 0, lockedUntil: null },
             });
         }
+
+        await this.auditLog.record({
+            actorId: user.id,
+            actorEmail: user.email,
+            action: AuditAction.LOGIN_SUCCEEDED,
+            targetType: "User",
+            targetId: user.id,
+            companyId: user.companyId ?? undefined,
+        });
 
         const payload: Omit<AuthUser, "company" | "branch"> = {
             id: user.id,
@@ -229,6 +248,21 @@ export class AuthService {
      * single write instead of a read-then-write race under concurrent
      * attempts — an approximate count is all a lockout needs.
      */
+    private async recordLoginFailure(
+        user: {id: string; email: string; companyId: string | null},
+        reason: string,
+    ) {
+        await this.auditLog.record({
+            actorId: user.id,
+            actorEmail: user.email,
+            action: AuditAction.LOGIN_FAILED,
+            targetType: "User",
+            targetId: user.id,
+            companyId: user.companyId ?? undefined,
+            metadata: {reason},
+        });
+    }
+
     private async registerFailedLogin(userId: string, currentAttempts: number) {
         const attempts = currentAttempts + 1;
         const lockedUntil =

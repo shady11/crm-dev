@@ -33,7 +33,16 @@
       "TENANT_USER_PASSWORD_RESET": "Password reset",
       "IMPERSONATION_STARTED": "Impersonation started",
       "IMPERSONATION_ENDED": "Impersonation ended",
-      "IMPERSONATED_ACTION": "Action while impersonating"
+      "IMPERSONATED_ACTION": "Action while impersonating",
+      "ROLE_CREATED": "Role created",
+      "ROLE_UPDATED": "Role updated",
+      "ROLE_PERMISSIONS_UPDATED": "Role permissions changed",
+      "ROLE_DELETED": "Role deleted",
+      "SETTING_OPTION_CREATED": "Currency/locale/timezone option added",
+      "SETTING_OPTION_UPDATED": "Currency/locale/timezone option changed",
+      "SETTING_OPTION_DELETED": "Currency/locale/timezone option removed",
+      "LOGIN_SUCCEEDED": "Signed in",
+      "LOGIN_FAILED": "Sign-in attempt failed"
     }
   }
 }
