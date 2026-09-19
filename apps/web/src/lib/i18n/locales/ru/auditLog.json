@@ -33,7 +33,37 @@
       "TENANT_USER_PASSWORD_RESET": "Пароль сброшен",
       "IMPERSONATION_STARTED": "Начат вход от имени пользователя",
       "IMPERSONATION_ENDED": "Завершён вход от имени пользователя",
-      "IMPERSONATED_ACTION": "Действие от имени пользователя"
+      "IMPERSONATED_ACTION": "Действие от имени пользователя",
+      "ROLE_CREATED": "Роль создана",
+      "ROLE_UPDATED": "Роль изменена",
+      "ROLE_PERMISSIONS_UPDATED": "Права роли изменены",
+      "ROLE_DELETED": "Роль удалена",
+      "SETTING_OPTION_CREATED": "Добавлена опция валюты/локали/часового пояса",
+      "SETTING_OPTION_UPDATED": "Изменена опция валюты/локали/часового пояса",
+      "SETTING_OPTION_DELETED": "Удалена опция валюты/локали/часового пояса",
+      "LOGIN_SUCCEEDED": "Вход выполнен",
+      "LOGIN_FAILED": "Неудачная попытка входа",
+      "COMPANY_SETTINGS_UPDATED": "Изменены настройки компании"
+    }
+  },
+  "loginActivity": {
+    "heading": "Активность входов",
+    "description": "Попытки входа пользователей вашей компании.",
+    "table": {
+      "timestamp": "Когда",
+      "user": "Пользователь",
+      "result": "Результат"
+    },
+    "empty": {
+      "title": "Пока нет активности входов",
+      "description": "Входы ваших пользователей будут отображаться здесь."
+    },
+    "reasons": {
+      "invalid_password": "Неверный пароль",
+      "invalid_totp": "Неверный код двухфакторной аутентификации",
+      "locked_out": "Аккаунт заблокирован",
+      "inactive_account": "Аккаунт деактивирован",
+      "company_inactive": "Компания неактивна"
     }
   }
 }

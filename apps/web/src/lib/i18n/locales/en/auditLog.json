@@ -33,7 +33,37 @@
       "TENANT_USER_PASSWORD_RESET": "Password reset",
       "IMPERSONATION_STARTED": "Impersonation started",
       "IMPERSONATION_ENDED": "Impersonation ended",
-      "IMPERSONATED_ACTION": "Action while impersonating"
+      "IMPERSONATED_ACTION": "Action while impersonating",
+      "ROLE_CREATED": "Role created",
+      "ROLE_UPDATED": "Role updated",
+      "ROLE_PERMISSIONS_UPDATED": "Role permissions changed",
+      "ROLE_DELETED": "Role deleted",
+      "SETTING_OPTION_CREATED": "Currency/locale/timezone option added",
+      "SETTING_OPTION_UPDATED": "Currency/locale/timezone option changed",
+      "SETTING_OPTION_DELETED": "Currency/locale/timezone option removed",
+      "LOGIN_SUCCEEDED": "Signed in",
+      "LOGIN_FAILED": "Sign-in attempt failed",
+      "COMPANY_SETTINGS_UPDATED": "Company settings changed"
+    }
+  },
+  "loginActivity": {
+    "heading": "Login activity",
+    "description": "Sign-in attempts by your company's own users.",
+    "table": {
+      "timestamp": "When",
+      "user": "User",
+      "result": "Result"
+    },
+    "empty": {
+      "title": "No login activity yet",
+      "description": "Sign-ins by your users will show up here."
+    },
+    "reasons": {
+      "invalid_password": "Wrong password",
+      "invalid_totp": "Wrong two-factor code",
+      "locked_out": "Account locked",
+      "inactive_account": "Account inactive",
+      "company_inactive": "Company inactive"
     }
   }
 }

@@ -36,19 +36,19 @@ export class SettingOptionsController {
 
     @RequirePermissions("setting_options.manage")
     @Post()
-    create(@Body() dto: CreateSettingOptionDto) {
-        return this.settingOptionsService.create(dto);
+    create(@CurrentUser() actor: AuthUser, @Body() dto: CreateSettingOptionDto) {
+        return this.settingOptionsService.create(actor, dto);
     }
 
     @RequirePermissions("setting_options.manage")
     @Patch(":id")
-    update(@Param("id") id: string, @Body() dto: UpdateSettingOptionDto) {
-        return this.settingOptionsService.update(id, dto);
+    update(@CurrentUser() actor: AuthUser, @Param("id") id: string, @Body() dto: UpdateSettingOptionDto) {
+        return this.settingOptionsService.update(actor, id, dto);
     }
 
     @RequirePermissions("setting_options.manage")
     @Delete(":id")
-    remove(@Param("id") id: string) {
-        return this.settingOptionsService.remove(id);
+    remove(@CurrentUser() actor: AuthUser, @Param("id") id: string) {
+        return this.settingOptionsService.remove(actor, id);
     }
 }

@@ -6,7 +6,9 @@ import {
     NotFoundException,
     OnModuleInit,
 } from "@nestjs/common";
+import { AuditAction } from "@/generated/prisma/client";
 import { PrismaService } from "@/database/prisma.service";
+import { AuditLogService } from "@/modules/audit-log/audit-log.service";
 import { AuthUser } from "@/common/types/auth-user.type";
 import { PERMISSIONS_CATALOG, PERMISSION_KEYS } from "./permissions.catalog";
 import { DEFAULT_ROLES } from "./default-role-permissions";
@@ -15,7 +17,10 @@ import { UpdateRoleDto } from "./dto/update-role.dto";
 
 @Injectable()
 export class RbacService implements OnModuleInit {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly auditLog: AuditLogService,
+    ) {}
 
     /**
      * Idempotently brings the database in line with the code-defined
@@ -300,7 +305,7 @@ export class RbacService implements OnModuleInit {
             select: { id: true },
         });
 
-        return this.prisma.role.create({
+        const role = await this.prisma.role.create({
             data: {
                 name: dto.name.trim(),
                 description: dto.description?.trim() || null,
@@ -313,13 +318,25 @@ export class RbacService implements OnModuleInit {
             },
             include: { permissions: { select: { permission: { select: { key: true } } } } },
         });
+
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.ROLE_CREATED,
+            targetType: "Role",
+            targetId: role.id,
+            companyId: role.companyId ?? undefined,
+            metadata: { name: role.name, permissionKeys: dto.permissionKeys },
+        });
+
+        return role;
     }
 
     async updateRole(actor: AuthUser, roleId: string, dto: UpdateRoleDto) {
         const role = await this.getVisibleRole(actor, roleId);
         this.assertCanManageRole(actor, role);
 
-        return this.prisma.role.update({
+        const updated = await this.prisma.role.update({
             where: { id: roleId },
             data: {
                 ...(dto.name !== undefined ? { name: dto.name.trim() } : {}),
@@ -327,6 +344,18 @@ export class RbacService implements OnModuleInit {
                 ...(dto.discountLimit !== undefined ? { discountLimit: dto.discountLimit } : {}),
             },
         });
+
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.ROLE_UPDATED,
+            targetType: "Role",
+            targetId: role.id,
+            companyId: role.companyId ?? undefined,
+            metadata: { name: updated.name, changes: {...dto} },
+        });
+
+        return updated;
     }
 
     async setRolePermissions(actor: AuthUser, roleId: string, permissionKeys: string[]) {
@@ -345,6 +374,16 @@ export class RbacService implements OnModuleInit {
                 data: permissions.map((p) => ({ roleId, permissionId: p.id })),
             }),
         ]);
+
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.ROLE_PERMISSIONS_UPDATED,
+            targetType: "Role",
+            targetId: role.id,
+            companyId: role.companyId ?? undefined,
+            metadata: { name: role.name, permissionKeys },
+        });
 
         return this.getVisibleRole(actor, roleId);
     }
@@ -365,6 +404,16 @@ export class RbacService implements OnModuleInit {
         }
 
         await this.prisma.role.delete({ where: { id: roleId } });
+
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.ROLE_DELETED,
+            targetType: "Role",
+            targetId: role.id,
+            companyId: role.companyId ?? undefined,
+            metadata: { name: role.name },
+        });
     }
 
     /** Every user in scope for `actor` who currently holds `roleId` — backs the "who has this role" panel. */

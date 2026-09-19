@@ -144,7 +144,7 @@ async function seedDemo() {
     // catalog, default roles) — run it here too, before creating the demo
     // admin below, so there's a real "Company Admin" Role row to point
     // roleId at even on a database that has never booted the app.
-    const rbacService = new RbacService(prisma as never);
+    const rbacService = new RbacService(prisma as never, undefined as never);
     await rbacService.syncCatalog();
     await rbacService.seedDefaultRolesIfMissing();
     await ensureDefaultRolePermissions(prisma);
@@ -318,7 +318,7 @@ async function provisionTenant(flags: Map<string, string>) {
     // the same seeding RbacService runs on every boot, then look the role
     // up by its isDefaultCompanyAdmin marker rather than by name, since a
     // platform administrator may have renamed it.
-    const rbacService = new RbacService(prisma as never);
+    const rbacService = new RbacService(prisma as never, undefined as never);
     await rbacService.syncCatalog();
     await rbacService.seedDefaultRolesIfMissing();
     await ensureDefaultRolePermissions(prisma);
@@ -378,7 +378,7 @@ async function provisionSuperAdmin(flags: Map<string, string>) {
     // the same seeding RbacService runs on every boot, then look the role
     // up by its isPlatformRole marker rather than by name, since a
     // platform administrator may have renamed it.
-    const rbacService = new RbacService(prisma as never);
+    const rbacService = new RbacService(prisma as never, undefined as never);
     await rbacService.syncCatalog();
     await rbacService.seedDefaultRolesIfMissing();
     await ensureDefaultRolePermissions(prisma);

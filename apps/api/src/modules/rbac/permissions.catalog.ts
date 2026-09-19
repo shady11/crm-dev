@@ -118,6 +118,7 @@ export const PERMISSIONS_CATALOG: PermissionDefinition[] = [
     }),
     ...group("audit_log", {
         view: "View the platform audit log",
+        view_own: "View this company's own login activity",
     }),
     ...group("rbac", {
         manage: "Manage roles and permissions",

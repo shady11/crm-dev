@@ -1,5 +1,7 @@
+import {ForbiddenException} from '@nestjs/common';
 import {AuditLogService} from './audit-log.service';
 import {AuditAction} from '@/generated/prisma/client';
+import {AuthUser} from '@/common/types/auth-user.type';
 
 /**
  * The audit trail's one hard requirement: a write failure here must never
@@ -99,6 +101,48 @@ describe('AuditLogService', () => {
             const result = await service.findAll({page: 1, limit: 50} as any);
 
             expect(result.meta).toEqual({page: 1, limit: 50, total: 101, pages: 3});
+        });
+    });
+
+    /**
+     * findOwnLogins is the tenant-scoped counterpart to findAll: a
+     * COMPANY_ADMIN can reach this (via audit_log.view_own) but never
+     * findAll (audit_log.view, SUPER_ADMIN only) — so this must never let
+     * the caller see another tenant's logins or any non-login action type,
+     * regardless of what's asked for.
+     */
+    describe('findOwnLogins', () => {
+        const companyAdmin: AuthUser = {
+            id: 'admin-1',
+            email: 'admin@bishkekdev.kg',
+            name: 'Aibek',
+            roleId: 'role-company-admin',
+            roleName: 'Company Admin',
+            companyId: 'company-1',
+            company: null,
+            branchId: null,
+            branch: null,
+        };
+
+        it('scopes to the caller\'s own company and only login actions', async () => {
+            const {service, prisma} = build();
+            await service.findOwnLogins(companyAdmin, {});
+
+            expect(prisma.auditLog.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    where: {
+                        companyId: 'company-1',
+                        action: {in: [AuditAction.LOGIN_SUCCEEDED, AuditAction.LOGIN_FAILED]},
+                    },
+                }),
+            );
+        });
+
+        it('refuses an actor with no company — nothing to scope to', async () => {
+            const {service} = build();
+            const noCompany: AuthUser = {...companyAdmin, companyId: null, company: null};
+
+            await expect(service.findOwnLogins(noCompany, {})).rejects.toThrow(ForbiddenException);
         });
     });
 });

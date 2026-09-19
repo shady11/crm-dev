@@ -278,6 +278,22 @@ describe("CompaniesService self-service (CA-A1)", () => {
 
         expect(update).toHaveBeenCalled();
     });
+
+    it("audits its own settings change, company-scoped, distinct from the platform-wide TENANT_* actions", async () => {
+        const {service} = build({id: "company-1", name: "Bishkek Dev", currency: "KGS", users: []});
+
+        await service.updateOwn(companyAdmin, {currency: "USD"});
+
+        expect(auditLog.record).toHaveBeenCalledWith(
+            expect.objectContaining({
+                actorId: companyAdmin.id,
+                action: "COMPANY_SETTINGS_UPDATED",
+                targetType: "Company",
+                targetId: "company-1",
+                companyId: "company-1",
+            }),
+        );
+    });
 });
 
 describe("CompaniesService.getDashboardStats", () => {

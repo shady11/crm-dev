@@ -64,6 +64,7 @@
     "branches": "Branches",
     "activityLog": "Activity log",
     "auditLog": "Audit log",
+    "loginActivity": "Login activity",
     "settings": "Settings",
     "brandName": "CRM Dev",
     "brandTagline": "Real Estate CRM",

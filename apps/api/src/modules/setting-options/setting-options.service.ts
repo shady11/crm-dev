@@ -1,13 +1,18 @@
 import {BadRequestException, ConflictException, Injectable, NotFoundException} from "@nestjs/common";
-import {Prisma, SettingOptionType} from "@/generated/prisma/client";
+import {AuditAction, Prisma, SettingOptionType} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
+import {AuditLogService} from "@/modules/audit-log/audit-log.service";
+import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateSettingOptionDto} from "./dto/create-setting-option.dto";
 import {UpdateSettingOptionDto} from "./dto/update-setting-option.dto";
 import {QuerySettingOptionsDto} from "./dto/query-setting-options.dto";
 
 @Injectable()
 export class SettingOptionsService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly auditLog: AuditLogService,
+    ) {}
 
     async findAll(query: QuerySettingOptionsDto) {
         const where: Prisma.SettingOptionWhereInput = {};
@@ -26,7 +31,7 @@ export class SettingOptionsService {
         });
     }
 
-    async create(dto: CreateSettingOptionDto) {
+    async create(actor: AuthUser, dto: CreateSettingOptionDto) {
         const code = dto.code.trim();
         assertValidCode(dto.type, code);
 
@@ -38,24 +43,46 @@ export class SettingOptionsService {
             throw new ConflictException("This option already exists");
         }
 
-        return this.prisma.settingOption.create({
+        const option = await this.prisma.settingOption.create({
             data: {type: dto.type, code, label: dto.label.trim()},
         });
+
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.SETTING_OPTION_CREATED,
+            targetType: "SettingOption",
+            targetId: option.id,
+            metadata: {type: option.type, code: option.code, label: option.label},
+        });
+
+        return option;
     }
 
-    async update(id: string, dto: UpdateSettingOptionDto) {
+    async update(actor: AuthUser, id: string, dto: UpdateSettingOptionDto) {
         await this.findOne(id);
 
-        return this.prisma.settingOption.update({
+        const option = await this.prisma.settingOption.update({
             where: {id},
             data: {
                 label: dto.label?.trim(),
                 isActive: dto.isActive,
             },
         });
+
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.SETTING_OPTION_UPDATED,
+            targetType: "SettingOption",
+            targetId: option.id,
+            metadata: {type: option.type, code: option.code, changes: {...dto}},
+        });
+
+        return option;
     }
 
-    async remove(id: string) {
+    async remove(actor: AuthUser, id: string) {
         const option = await this.findOne(id);
 
         const inUse = await this.isReferencedByCompany(option.type, option.code);
@@ -67,6 +94,15 @@ export class SettingOptionsService {
         }
 
         await this.prisma.settingOption.delete({where: {id}});
+
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.SETTING_OPTION_DELETED,
+            targetType: "SettingOption",
+            targetId: option.id,
+            metadata: {type: option.type, code: option.code, label: option.label},
+        });
 
         return {success: true};
     }

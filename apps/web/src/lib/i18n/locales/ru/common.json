@@ -64,6 +64,7 @@
     "branches": "Филиалы",
     "activityLog": "Журнал активности",
     "auditLog": "Журнал аудита",
+    "loginActivity": "Активность входов",
     "settings": "Настройки",
     "brandName": "CRM Dev",
     "brandTagline": "CRM для недвижимости",

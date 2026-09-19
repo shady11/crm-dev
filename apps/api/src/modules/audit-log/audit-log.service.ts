@@ -1,7 +1,9 @@
-import {Injectable, Logger} from "@nestjs/common";
+import {ForbiddenException, Injectable, Logger} from "@nestjs/common";
 import {Prisma, AuditAction} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
+import {AuthUser} from "@/common/types/auth-user.type";
 import {QueryAuditLogsDto} from "./dto/query-audit-logs.dto";
+import {QueryOwnLoginsDto} from "./dto/query-own-logins.dto";
 
 export type RecordAuditLogInput = {
     actorId: string;
@@ -72,6 +74,43 @@ export class AuditLogService {
                 include: {
                     company: {select: {id: true, name: true}},
                 },
+            }),
+            this.prisma.auditLog.count({where}),
+        ]);
+
+        return {
+            items,
+            meta: {page, limit, total, pages: Math.ceil(total / limit)},
+        };
+    }
+
+    /**
+     * The scoped counterpart to findAll(): a tenant's own login activity
+     * only (LOGIN_SUCCEEDED/LOGIN_FAILED for their own companyId), never
+     * another tenant's and never the wider platform-operator action types
+     * findAll() exposes. Reached through audit_log.view_own, a different
+     * permission from audit_log.view — granted to COMPANY_ADMIN by default,
+     * not just the SUPER_ADMIN bypass. See AuditLogController.
+     */
+    async findOwnLogins(actor: AuthUser, query: QueryOwnLoginsDto) {
+        if (!actor.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const page = query.page ?? 1;
+        const limit = query.limit ?? 20;
+
+        const where: Prisma.AuditLogWhereInput = {
+            companyId: actor.companyId,
+            action: {in: [AuditAction.LOGIN_SUCCEEDED, AuditAction.LOGIN_FAILED]},
+        };
+
+        const [items, total] = await Promise.all([
+            this.prisma.auditLog.findMany({
+                where,
+                skip: (page - 1) * limit,
+                take: limit,
+                orderBy: {createdAt: "desc"},
             }),
             this.prisma.auditLog.count({where}),
         ]);

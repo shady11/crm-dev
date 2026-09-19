@@ -33,6 +33,11 @@ export const FEATURE_PERMISSIONS = {
     // platform-wide pool the company forms' pickers are built from.
     settingOptions: "setting_options.manage",
     auditLog: "audit_log.view",
+    // A tenant's own login activity — distinct from `auditLog` above (the
+    // platform-wide trail, SUPER_ADMIN only). Granted to COMPANY_ADMIN by
+    // default; deliberately absent from SUPER_ADMIN_FEATURES below, since
+    // the platform-wide audit log already covers every tenant's logins.
+    loginActivity: "audit_log.view_own",
     // Company-wide activity feed: branch-scoped roles see only their own
     // branch (enforced by the API — see ActivitiesService.findAll).
     activities: "activities.view",

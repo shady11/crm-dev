@@ -5,6 +5,7 @@ import * as bcrypt from "bcrypt";
 import {PrismaService} from "@/database/prisma.service";
 import {UsersService} from "@/modules/users/users.service";
 import {TotpService} from "@/modules/auth/totp.service";
+import {AuditLogService} from "@/modules/audit-log/audit-log.service";
 import {AuthService} from "./auth.service";
 import {SessionValidationService, type JwtPayload} from "./session-validation.service";
 
@@ -108,8 +109,9 @@ describe("company suspension is enforced at auth", () => {
             const jwt = {signAsync: jest.fn().mockResolvedValue("token")} as unknown as JwtService;
             const prisma = {user: {update: jest.fn()}} as unknown as PrismaService;
             const totp = new TotpService();
+            const auditLog = {record: jest.fn().mockResolvedValue(undefined)} as unknown as AuditLogService;
 
-            return new AuthService(users, jwt, prisma, totp);
+            return new AuthService(users, jwt, prisma, totp, auditLog);
         };
 
         it("refuses a suspended tenant and says why", async () => {

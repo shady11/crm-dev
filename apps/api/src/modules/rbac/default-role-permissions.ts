@@ -51,6 +51,7 @@ export const DEFAULT_ROLES: DefaultRoleSeed[] = [
             "dashboard.view", "dashboard.branch_comparison",
             "company_settings.view", "company_settings.edit",
             "rbac.manage",
+            "audit_log.view_own",
         ],
     },
     {

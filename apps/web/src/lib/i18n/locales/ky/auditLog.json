@@ -33,7 +33,37 @@
       "TENANT_USER_PASSWORD_RESET": "Сырсөз кайра орнотулду",
       "IMPERSONATION_STARTED": "Колдонуучунун атынан кирүү башталды",
       "IMPERSONATION_ENDED": "Колдонуучунун атынан кирүү аяктады",
-      "IMPERSONATED_ACTION": "Колдонуучунун атынан жасалган аракет"
+      "IMPERSONATED_ACTION": "Колдонуучунун атынан жасалган аракет",
+      "ROLE_CREATED": "Роль түзүлдү",
+      "ROLE_UPDATED": "Роль өзгөртүлдү",
+      "ROLE_PERMISSIONS_UPDATED": "Ролдун укуктары өзгөртүлдү",
+      "ROLE_DELETED": "Роль өчүрүлдү",
+      "SETTING_OPTION_CREATED": "Валюта/локаль/убакыт алкагы опциясы кошулду",
+      "SETTING_OPTION_UPDATED": "Валюта/локаль/убакыт алкагы опциясы өзгөртүлдү",
+      "SETTING_OPTION_DELETED": "Валюта/локаль/убакыт алкагы опциясы өчүрүлдү",
+      "LOGIN_SUCCEEDED": "Кирүү ийгиликтүү болду",
+      "LOGIN_FAILED": "Кирүү аракети ишке ашкан жок",
+      "COMPANY_SETTINGS_UPDATED": "Компаниянын тууралоолору өзгөртүлдү"
+    }
+  },
+  "loginActivity": {
+    "heading": "Кирүү активдүүлүгү",
+    "description": "Сиздин компаниянын колдонуучуларынын кирүү аракеттери.",
+    "table": {
+      "timestamp": "Качан",
+      "user": "Колдонуучу",
+      "result": "Натыйжа"
+    },
+    "empty": {
+      "title": "Азырынча кирүү активдүүлүгү жок",
+      "description": "Колдонуучуларыңыздын кирүүлөрү бул жерде көрсөтүлөт."
+    },
+    "reasons": {
+      "invalid_password": "Туура эмес сырсөз",
+      "invalid_totp": "Туура эмес эки факторлуу код",
+      "locked_out": "Аккаунт бөгөттөлдү",
+      "inactive_account": "Аккаунт активдүү эмес",
+      "company_inactive": "Компания активдүү эмес"
     }
   }
 }

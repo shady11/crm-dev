@@ -61,8 +61,9 @@ describe("RbacService", () => {
             $transaction: jest.fn().mockImplementation((ops: unknown[]) => Promise.all(ops)),
         };
 
-        const service = new RbacService(prisma as any);
-        return {service, prisma};
+        const auditLog = {record: jest.fn().mockResolvedValue(undefined)};
+        const service = new RbacService(prisma as any, auditLog as any);
+        return {service, prisma, auditLog};
     }
 
     describe("getEffectivePermissions", () => {
@@ -286,6 +287,51 @@ describe("RbacService", () => {
 
             expect(prisma.role.findMany).toHaveBeenCalledWith(
                 expect.objectContaining({where: {companyId: null}}),
+            );
+        });
+    });
+
+    describe("audit logging", () => {
+        it("records ROLE_CREATED with the actor and the new role", async () => {
+            const {service, auditLog} = build();
+
+            await service.createRole(companyAdmin, {name: "Auditor", permissionKeys: []});
+
+            expect(auditLog.record).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    actorId: "admin-1",
+                    action: "ROLE_CREATED",
+                    targetType: "Role",
+                    companyId: "company-1",
+                }),
+            );
+        });
+
+        it("records ROLE_PERMISSIONS_UPDATED when permissions change", async () => {
+            const {service, prisma, auditLog} = build();
+            prisma.role.findUnique.mockResolvedValue({id: "role-1", name: "Auditor", companyId: "company-1"});
+
+            await service.setRolePermissions(companyAdmin, "role-1", ["leads.view"]);
+
+            expect(auditLog.record).toHaveBeenCalledWith(
+                expect.objectContaining({action: "ROLE_PERMISSIONS_UPDATED", targetId: "role-1"}),
+            );
+        });
+
+        it("records ROLE_DELETED after the role is gone", async () => {
+            const {service, prisma, auditLog} = build();
+            prisma.role.findUnique.mockResolvedValue({
+                id: "role-custom",
+                name: "Auditor",
+                isSystem: false,
+                companyId: "company-1",
+            });
+            prisma.user.count.mockResolvedValue(0);
+
+            await service.deleteRole(companyAdmin, "role-custom");
+
+            expect(auditLog.record).toHaveBeenCalledWith(
+                expect.objectContaining({action: "ROLE_DELETED", targetId: "role-custom"}),
             );
         });
     });
