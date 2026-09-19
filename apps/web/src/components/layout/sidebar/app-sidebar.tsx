@@ -43,6 +43,7 @@ const NAV_ITEMS: {
     icon: typeof LayoutDashboard;
 }[] = [
     { titleKey: "nav.dashboard", feature: "dashboard", url: "/dashboard", icon: LayoutDashboard },
+    { titleKey: "nav.superAdminDashboard", feature: "superAdminDashboard", url: "/super-admin-dashboard", icon: LayoutDashboard },
     { titleKey: "nav.leads", feature: "leads", url: "/leads", icon: GalleryVerticalEnd },
     { titleKey: "nav.tasks", feature: "tasks", url: "/tasks", icon: ListTodo },
     { titleKey: "nav.clients", feature: "clients", url: "/clients", icon: SquareUser },

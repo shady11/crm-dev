@@ -51,6 +51,7 @@
   },
   "nav": {
     "dashboard": "Дашборд",
+    "superAdminDashboard": "Дашборд",
     "leads": "Лиды",
     "tasks": "Задачи",
     "clients": "Клиенты",

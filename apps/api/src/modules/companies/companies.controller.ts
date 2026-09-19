@@ -34,6 +34,14 @@ export class CompaniesController {
         return this.companiesService.findAll(query);
     }
 
+    // Declared ahead of the ":id" route below, same reasoning as "me": a
+    // literal segment registered after ":id" would never be reached because
+    // ":id" would swallow it first.
+    @Get("dashboard-stats")
+    getDashboardStats() {
+        return this.companiesService.getDashboardStats();
+    }
+
     // Self-service for the tenant's own admin. Declared ahead of the ":id"
     // routes below (and re-scoped with @RequirePermissions) so "me" is never
     // swallowed by the :id param, and so a COMPANY_ADMIN — locked out of

@@ -45,6 +45,7 @@ describe('ImpersonationService', () => {
             impersonationSession: {
                 create: jest.fn().mockResolvedValue({id: 'session-1', expiresAt: new Date(Date.now() + 30 * 60 * 1000)}),
                 updateMany: jest.fn().mockResolvedValue({count: 1}),
+                findMany: jest.fn().mockResolvedValue([]),
             },
             user: {
                 findUnique: jest.fn(),
@@ -215,6 +216,16 @@ describe('ImpersonationService', () => {
             expect(payload.id).toBe('admin-1');
             expect(payload.impersonation).toBeUndefined();
             expect(result.accessToken).toBe('signed-token');
+        });
+    });
+
+    describe('findActive', () => {
+        it('only looks up sessions not yet ended and not yet expired', async () => {
+            const {service, prisma} = build();
+            await service.findActive();
+
+            const args = (prisma.impersonationSession.findMany as jest.Mock).mock.calls[0][0];
+            expect(args.where).toEqual({endedAt: null, expiresAt: {gt: expect.any(Date)}});
         });
     });
 });

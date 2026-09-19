@@ -25,6 +25,7 @@ import activitiesEn from "./locales/en/activities.json";
 import settingsEn from "./locales/en/settings.json";
 import settingOptionsEn from "./locales/en/settingOptions.json";
 import rbacEn from "./locales/en/rbac.json";
+import superAdminDashboardEn from "./locales/en/superAdminDashboard.json";
 
 import commonRu from "./locales/ru/common.json";
 import dealsRu from "./locales/ru/deals.json";
@@ -49,6 +50,7 @@ import activitiesRu from "./locales/ru/activities.json";
 import settingsRu from "./locales/ru/settings.json";
 import settingOptionsRu from "./locales/ru/settingOptions.json";
 import rbacRu from "./locales/ru/rbac.json";
+import superAdminDashboardRu from "./locales/ru/superAdminDashboard.json";
 
 import commonKy from "./locales/ky/common.json";
 import dealsKy from "./locales/ky/deals.json";
@@ -73,6 +75,7 @@ import activitiesKy from "./locales/ky/activities.json";
 import settingsKy from "./locales/ky/settings.json";
 import settingOptionsKy from "./locales/ky/settingOptions.json";
 import rbacKy from "./locales/ky/rbac.json";
+import superAdminDashboardKy from "./locales/ky/superAdminDashboard.json";
 
 export const resources = {
     en: {
@@ -99,6 +102,7 @@ export const resources = {
         settings: settingsEn,
         settingOptions: settingOptionsEn,
         rbac: rbacEn,
+        superAdminDashboard: superAdminDashboardEn,
     },
     ru: {
         common: commonRu,
@@ -124,6 +128,7 @@ export const resources = {
         settings: settingsRu,
         settingOptions: settingOptionsRu,
         rbac: rbacRu,
+        superAdminDashboard: superAdminDashboardRu,
     },
     ky: {
         common: commonKy,
@@ -149,6 +154,7 @@ export const resources = {
         settings: settingsKy,
         settingOptions: settingOptionsKy,
         rbac: rbacKy,
+        superAdminDashboard: superAdminDashboardKy,
     },
 } as const;
 

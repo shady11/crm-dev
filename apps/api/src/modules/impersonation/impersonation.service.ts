@@ -108,6 +108,19 @@ export class ImpersonationService {
      * token for the original SUPER_ADMIN, so the frontend can swap the active
      * session in one round trip instead of forcing a full re-login.
      */
+    /** Every impersonation session still within its window and not yet ended. */
+    async findActive() {
+        return this.prisma.impersonationSession.findMany({
+            where: {endedAt: null, expiresAt: {gt: new Date()}},
+            include: {
+                superAdmin: {select: {id: true, email: true, fullName: true}},
+                targetUser: {select: {id: true, email: true, fullName: true}},
+                company: {select: {id: true, name: true}},
+            },
+            orderBy: {startedAt: "desc"},
+        });
+    }
+
     async end(current: AuthUser) {
         if (!current.impersonation) {
             throw new BadRequestException("This session is not impersonating anyone");
