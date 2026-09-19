@@ -307,7 +307,24 @@ export class CompaniesService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        return this.update(actor.companyId, dto);
+        const updated = await this.update(actor.companyId, dto);
+
+        // Company-scoped rather than platform-wide the way TENANT_* actions
+        // are: this is a tenant admin editing their own tenant, not a
+        // platform operator acting on one — but still worth surfacing to the
+        // super admin's audit view for support/oversight (e.g. "why did this
+        // tenant's currency change").
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.COMPANY_SETTINGS_UPDATED,
+            targetType: "Company",
+            targetId: actor.companyId,
+            companyId: actor.companyId,
+            metadata: {changes: {...dto}},
+        });
+
+        return updated;
     }
 
     /**

@@ -23,6 +23,8 @@ enum AuditAction {
 
   LOGIN_SUCCEEDED
   LOGIN_FAILED
+
+  COMPANY_SETTINGS_UPDATED
 }
 
 // A platform-operator audit trail, separate from Activity (which is a

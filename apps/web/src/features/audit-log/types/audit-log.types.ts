@@ -17,7 +17,8 @@ export type AuditAction =
     | "SETTING_OPTION_UPDATED"
     | "SETTING_OPTION_DELETED"
     | "LOGIN_SUCCEEDED"
-    | "LOGIN_FAILED";
+    | "LOGIN_FAILED"
+    | "COMPANY_SETTINGS_UPDATED";
 
 export const AUDIT_ACTIONS: AuditAction[] = [
     "TENANT_CREATED",
@@ -39,6 +40,7 @@ export const AUDIT_ACTIONS: AuditAction[] = [
     "SETTING_OPTION_DELETED",
     "LOGIN_SUCCEEDED",
     "LOGIN_FAILED",
+    "COMPANY_SETTINGS_UPDATED",
 ];
 
 export type AuditLogEntry = {

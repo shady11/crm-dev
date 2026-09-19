@@ -56,6 +56,7 @@ const NAV_ITEMS: {
     { titleKey: "nav.branches", feature: "branches", url: "/branches", icon: MapPin },
     { titleKey: "nav.activityLog", feature: "activities", url: "/activity-log", icon: History },
     { titleKey: "nav.auditLog", feature: "auditLog", url: "/audit-log", icon: ScrollText },
+    { titleKey: "nav.loginActivity", feature: "loginActivity", url: "/login-activity", icon: ShieldCheck },
     { titleKey: "nav.settings", feature: "companySettings", url: "/settings", icon: Settings },
 ];
 
