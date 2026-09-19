@@ -1,0 +1,28 @@
+{
+  "page": {
+    "heading": "Platform overview",
+    "description": "Tenants, users and impersonation activity across this installation.",
+    "manageCompanies": "Manage companies"
+  },
+  "kpi": {
+    "totalCompanies": "Total companies",
+    "activeCompanies": "Active companies",
+    "suspendedCompanies": "Suspended companies",
+    "totalUsers": "Total users"
+  },
+  "activeImpersonations": {
+    "title": "Active impersonation sessions",
+    "empty": "No one is currently impersonating a user.",
+    "table": {
+      "superAdmin": "Super admin",
+      "target": "Impersonating",
+      "company": "Tenant",
+      "expiresAt": "Expires"
+    }
+  },
+  "recentActivity": {
+    "title": "Recent platform activity",
+    "empty": "No activity yet.",
+    "viewAll": "View all"
+  }
+}

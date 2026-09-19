@@ -279,3 +279,39 @@ describe("CompaniesService self-service (CA-A1)", () => {
         expect(update).toHaveBeenCalled();
     });
 });
+
+describe("CompaniesService.getDashboardStats", () => {
+    it("derives active count from total minus suspended, and excludes SUPER_ADMIN from the user total", async () => {
+        const prisma = {
+            company: {
+                count: jest
+                    .fn()
+                    .mockResolvedValueOnce(10) // total, deletedAt: null
+                    .mockResolvedValueOnce(3), // suspended
+            },
+            user: {count: jest.fn().mockResolvedValue(42)},
+        } as unknown as PrismaService;
+        const impersonationWithActive = {
+            findActive: jest.fn().mockResolvedValue([{id: "session-1"}]),
+        } as unknown as ImpersonationService;
+
+        const service = new CompaniesService(
+            prisma,
+            auditLog,
+            impersonationWithActive,
+            settingOptions,
+            rbacService,
+        );
+
+        const stats = await service.getDashboardStats();
+
+        expect(stats).toEqual({
+            companies: {total: 10, active: 7, suspended: 3},
+            totalUsers: 42,
+            activeImpersonations: [{id: "session-1"}],
+        });
+        expect((prisma.user.count as jest.Mock).mock.calls[0][0]).toEqual({
+            where: {deletedAt: null, companyId: {not: null}},
+        });
+    });
+});

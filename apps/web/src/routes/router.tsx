@@ -22,6 +22,7 @@ import {activitiesRoutes} from "@/features/activities/activities.routes";
 import {RoleLanding} from "@/features/auth/pages/role-landing";
 import {RoleGuard} from "@/features/auth/pages/role-guard";
 import {rbacRoutes} from "@/features/rbac/rbac.routes";
+import {superAdminDashboardRoutes} from "@/features/super-admin-dashboard/super-admin-dashboard.routes";
 
 export const router = createBrowserRouter([
     { path: paths.login, element: <LoginPage /> },
@@ -44,6 +45,7 @@ export const router = createBrowserRouter([
                         element: <RoleGuard feature="dashboard" />,
                         children: [{ index: true, element: <DashboardPage /> }],
                     },
+                    superAdminDashboardRoutes,
                     companiesRoutes,
                     settingOptionsRoutes,
                     companySettingsRoutes,

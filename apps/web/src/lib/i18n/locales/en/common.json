@@ -51,6 +51,7 @@
   },
   "nav": {
     "dashboard": "Dashboard",
+    "superAdminDashboard": "Dashboard",
     "leads": "Leads",
     "tasks": "Tasks",
     "clients": "Clients",

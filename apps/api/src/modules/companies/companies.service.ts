@@ -71,6 +71,27 @@ export class CompaniesService {
         }
     }
 
+    /** Platform-wide counts and active impersonations, for the SUPER_ADMIN landing page. */
+    async getDashboardStats() {
+        const [totalCompanies, suspendedCompanies, totalUsers, activeImpersonations] = await Promise.all([
+            this.prisma.company.count({where: {deletedAt: null}}),
+            this.prisma.company.count({where: {deletedAt: null, suspendedAt: {not: null}}}),
+            // SUPER_ADMIN accounts have no companyId and aren't tenant users.
+            this.prisma.user.count({where: {deletedAt: null, companyId: {not: null}}}),
+            this.impersonation.findActive(),
+        ]);
+
+        return {
+            companies: {
+                total: totalCompanies,
+                active: totalCompanies - suspendedCompanies,
+                suspended: suspendedCompanies,
+            },
+            totalUsers,
+            activeImpersonations,
+        };
+    }
+
     async findAll(query: QueryCompaniesDto) {
         const page = query.page ?? 1;
         const limit = query.limit ?? 20;

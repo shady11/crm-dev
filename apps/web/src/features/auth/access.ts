@@ -24,6 +24,9 @@ export const FEATURE_PERMISSIONS = {
     // Branch management (create/edit/deactivate). branches.view alone (no
     // nav entry) still lets FINANCE read the list to populate their filters.
     branches: "branches.view",
+    // The platform operator's landing page — same backend permission as
+    // `companies` below, since both live behind CompaniesController.
+    superAdminDashboard: "companies.manage",
     // The platform operator's tenant-management screen.
     companies: "companies.manage",
     // The currency/locale/timezone options tenants can be assigned — a
@@ -51,7 +54,13 @@ export type Feature = keyof typeof FEATURE_PERMISSIONS;
  * a route for every one of those too — a door that opens onto a 403 or
  * ForbiddenException, not a page. See CompaniesController's guard comment.
  */
-const SUPER_ADMIN_FEATURES: readonly Feature[] = ["companies", "settingOptions", "auditLog", "rolesPermissions"];
+const SUPER_ADMIN_FEATURES: readonly Feature[] = [
+    "superAdminDashboard",
+    "companies",
+    "settingOptions",
+    "auditLog",
+    "rolesPermissions",
+];
 
 /**
  * Fine-grained permission check. SUPER_ADMIN carries ["*"] from the API and
@@ -80,7 +89,7 @@ export function canAccess(user: Pick<AuthUser, "permissions" | "isSuperAdmin"> |
  */
 export function landingPathFor(user: Pick<AuthUser, "isSuperAdmin"> | undefined): string {
     if (user?.isSuperAdmin) {
-        return "/companies";
+        return "/super-admin-dashboard";
     }
 
     return "/dashboard";
