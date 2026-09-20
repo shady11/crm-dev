@@ -10,8 +10,8 @@ export function BranchComparisonChart({data}: {data: BranchComparisonItem[]}) {
     const {t} = useTranslation("dashboard");
 
     const chartConfig = {
-        dealCount: {label: t("branchComparison.dealCountLabel"), color: "#3b82f6"},
-        revenue: {label: t("branchComparison.revenueLabel"), color: "#34d399"},
+        dealCount: {label: t("branchComparison.dealCountLabel"), color: "var(--chart-1)"},
+        revenue: {label: t("branchComparison.revenueLabel"), color: "var(--chart-2)"},
     } satisfies ChartConfig;
 
     const chartData = data.map((d) => ({name: d.branchName, dealCount: d.dealCount, revenue: d.revenue}));

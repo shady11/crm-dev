@@ -25,7 +25,7 @@ export function FunnelCard({
     const [isExporting, setIsExporting] = useState(false);
 
     const chartConfig = {
-        count: { label: t("funnel.leadsSeriesLabel"), color: "#3b82f6" },
+        count: { label: t("funnel.leadsSeriesLabel"), color: "var(--chart-1)" },
     } satisfies ChartConfig;
 
     const chartData = data.leadsByStatus.map((row) => ({ status: row.status, count: row.count }));

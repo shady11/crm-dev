@@ -13,7 +13,7 @@ export function RevenueTrendChart({ data }: { data: RevenueTrendPoint[] }) {
     const { t, i18n } = useTranslation("dashboard");
 
     const chartConfig = {
-        revenue: { label: t("revenueTrend.seriesLabel"), color: "#3b82f6" },
+        revenue: { label: t("revenueTrend.seriesLabel"), color: "var(--chart-1)" },
     } satisfies ChartConfig;
 
     const chartData = data.map((d) => ({ month: formatMonth(d.month, i18n.language), revenue: d.revenue }));
