@@ -6,7 +6,10 @@ import {
   S3Client,
 } from '@aws-sdk/client-s3';
 
+import type { DocumentOwnerType } from '@/generated/prisma/client';
+
 import { FileStorageProvider } from './file-storage.interface';
+import { buildOwnerScopedKey } from './owner-scoped-key';
 
 export interface S3ProviderConfig {
   bucket: string;
@@ -17,8 +20,9 @@ export interface S3ProviderConfig {
 /**
  * Production storage backend: an S3-compatible bucket (AWS S3, or a
  * compatible provider like MinIO/DigitalOcean Spaces via AWS_S3_ENDPOINT).
- * Keys are companyId/storedName, same layout LocalDiskStorageProvider uses
- * on disk, so Document.path means the same thing under either backend.
+ * Keys are companyId/ownerType/ownerId/storedName, same layout
+ * LocalDiskStorageProvider uses on disk, so Document.path means the same
+ * thing under either backend.
  */
 @Injectable()
 export class S3StorageProvider implements FileStorageProvider {
@@ -38,10 +42,12 @@ export class S3StorageProvider implements FileStorageProvider {
 
   async save(
     companyId: string,
+    ownerType: DocumentOwnerType,
+    ownerId: string,
     storedName: string,
     buffer: Buffer,
   ): Promise<string> {
-    const key = `${companyId}/${storedName}`;
+    const key = buildOwnerScopedKey(companyId, ownerType, ownerId, storedName);
 
     await this.client.send(
       new PutObjectCommand({

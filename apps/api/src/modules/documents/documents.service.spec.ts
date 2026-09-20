@@ -181,11 +181,17 @@ describe('DocumentsService', () => {
             );
         });
 
-        it('saves the file buffer under the caller company before creating the DB row', async () => {
+        it('saves the file buffer under the caller company and owner before creating the DB row', async () => {
             const {service, storage} = build({owner: {id: 'lead-1'}});
             await service.upload(user, file(), uploadDto());
 
-            expect(storage.save).toHaveBeenCalledWith('company-1', expect.any(String), expect.any(Buffer));
+            expect(storage.save).toHaveBeenCalledWith(
+                'company-1',
+                DocumentOwnerType.LEAD,
+                'lead-1',
+                expect.any(String),
+                expect.any(Buffer),
+            );
         });
 
         it('notifies the deal manager on a DEAL-owned upload when someone else uploaded it', async () => {

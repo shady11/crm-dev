@@ -1,5 +1,7 @@
 import type { Readable } from 'stream';
 
+import type { DocumentOwnerType } from '@/generated/prisma/client';
+
 /**
  * Injection token for FileStorageProvider — same pattern as
  * payment-reminders' MESSAGE_PROVIDER, so DocumentsService and
@@ -10,11 +12,20 @@ export const FILE_STORAGE_PROVIDER = Symbol('FILE_STORAGE_PROVIDER');
 
 export interface FileStorageProvider {
   /**
-   * Persists the buffer under a company-scoped key and returns that key
-   * (stored in Document.path) — never an absolute path, so it stays
-   * meaningful regardless of which backend wrote it.
+   * Persists the buffer under a key scoped by company and owner
+   * (companyId/ownerType/ownerId/storedName) and returns that key (stored
+   * in Document.path) — never an absolute path, so it stays meaningful
+   * regardless of which backend wrote it. Owner-scoping keeps a company's
+   * files organized per lead/client/deal/project/unit instead of dumped
+   * into one flat directory.
    */
-  save(companyId: string, storedName: string, buffer: Buffer): Promise<string>;
+  save(
+    companyId: string,
+    ownerType: DocumentOwnerType,
+    ownerId: string,
+    storedName: string,
+    buffer: Buffer,
+  ): Promise<string>;
 
   /** Opens a readable stream for a previously saved key. */
   getStream(relativePath: string): Promise<Readable>;

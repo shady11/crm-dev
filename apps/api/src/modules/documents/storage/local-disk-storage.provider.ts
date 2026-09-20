@@ -1,10 +1,13 @@
 import { createReadStream } from 'fs';
 import { mkdir, writeFile } from 'fs/promises';
-import { join } from 'path';
+import { dirname, join } from 'path';
 import type { Readable } from 'stream';
 import { Injectable } from '@nestjs/common';
 
+import type { DocumentOwnerType } from '@/generated/prisma/client';
+
 import { FileStorageProvider } from './file-storage.interface';
+import { buildOwnerScopedKey } from './owner-scoped-key';
 
 export const UPLOADS_ROOT =
   process.env.UPLOADS_DIR ?? join(process.cwd(), 'uploads', 'documents');
@@ -19,13 +22,16 @@ export const UPLOADS_ROOT =
 export class LocalDiskStorageProvider implements FileStorageProvider {
   async save(
     companyId: string,
+    ownerType: DocumentOwnerType,
+    ownerId: string,
     storedName: string,
     buffer: Buffer,
   ): Promise<string> {
-    const dir = join(UPLOADS_ROOT, companyId);
-    await mkdir(dir, { recursive: true });
-    await writeFile(join(dir, storedName), buffer);
-    return join(companyId, storedName);
+    const key = buildOwnerScopedKey(companyId, ownerType, ownerId, storedName);
+    const absolutePath = join(UPLOADS_ROOT, key);
+    await mkdir(dirname(absolutePath), { recursive: true });
+    await writeFile(absolutePath, buffer);
+    return key;
   }
 
   getStream(relativePath: string): Promise<Readable> {

@@ -29,7 +29,8 @@ interface GenerateForDealParams {
 export class DocumentGenerationService {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(FILE_STORAGE_PROVIDER) private readonly storage: FileStorageProvider,
+    @Inject(FILE_STORAGE_PROVIDER)
+    private readonly storage: FileStorageProvider,
   ) {}
 
   /**
@@ -84,7 +85,13 @@ export class DocumentGenerationService {
     const pdfBuffer = await renderHtmlToPdf(html);
 
     const storedName = `${randomUUID()}.pdf`;
-    const relativePath = await this.storage.save(companyId, storedName, pdfBuffer);
+    const relativePath = await this.storage.save(
+      companyId,
+      DocumentOwnerType.DEAL,
+      dealId,
+      storedName,
+      pdfBuffer,
+    );
     const originalName = `${type.toLowerCase()}-${deal.dealNumber}.pdf`;
 
     return this.prisma.document.create({
