@@ -25,7 +25,7 @@ interface ClientsTableProps {
     onToggleAll(checked: boolean): void;
     onToggleOne(id: string, checked: boolean): void;
     onEdit(client: Client): void;
-    onDelete(id: string): void;
+    onDelete(client: Client): void;
     isDeleting(id: string): boolean;
 }
 
@@ -86,7 +86,7 @@ export function ClientsTable({
                                     variant="destructive"
                                     size="icon-sm"
                                     disabled={isDeleting(client.id)}
-                                    onClick={() => onDelete(client.id)}
+                                    onClick={() => onDelete(client)}
                                     aria-label={t("common:actions.delete")}
                                 >
                                     <Trash2 className="size-3.5" />
@@ -180,7 +180,7 @@ export function ClientsTable({
                                         variant="destructive"
                                         size="icon-sm"
                                         disabled={isDeleting(client.id)}
-                                        onClick={() => onDelete(client.id)}
+                                        onClick={() => onDelete(client)}
                                         aria-label={t("common:actions.delete")}
                                     >
                                         <Trash2 className="size-3.5" />

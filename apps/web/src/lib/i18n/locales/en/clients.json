@@ -87,5 +87,26 @@
     "bulkDeleteSuccessTitle": "Clients deleted",
     "bulkDeleteSuccessDescription": "Selected clients have been removed.",
     "bulkDeleteIssuesTitle": "Bulk delete had issues"
+  },
+  "deleteDialog": {
+    "title": "Delete client?",
+    "description": "This will permanently delete {{name}}. This action cannot be undone.",
+    "descriptionFallback": "this client",
+    "cancel": "Cancel",
+    "deleting": "Deleting...",
+    "delete": "Delete"
+  },
+  "deleteClients": {
+    "title_one": "Delete {{count}} client?",
+    "title_few": "Delete {{count}} clients?",
+    "title_many": "Delete {{count}} clients?",
+    "title_other": "Delete {{count}} clients?",
+    "description_one": "This will permanently delete the selected client. This action cannot be undone.",
+    "description_few": "This will permanently delete the selected clients. This action cannot be undone.",
+    "description_many": "This will permanently delete the selected clients. This action cannot be undone.",
+    "description_other": "This will permanently delete the selected clients. This action cannot be undone.",
+    "cancel": "Cancel",
+    "deleting": "Deleting...",
+    "delete": "Delete"
   }
 }
