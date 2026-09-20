@@ -1,5 +1,5 @@
 import { DocumentGenerationService } from './document-generation.service';
-import { DocumentType } from '@/generated/prisma/client';
+import { DocumentOwnerType, DocumentType } from '@/generated/prisma/client';
 import { TemplateRenderFailedException, UnsupportedDocumentTypeException } from './exceptions';
 import { renderHtmlToPdf } from './pdf-renderer';
 
@@ -77,6 +77,7 @@ function build() {
   const storage = {
     save: jest.fn().mockResolvedValue('company-1/generated.pdf'),
     getStream: jest.fn(),
+    delete: jest.fn().mockResolvedValue(undefined),
   };
 
   const service = new DocumentGenerationService(prisma as any, storage);
@@ -218,6 +219,8 @@ describe('DocumentGenerationService', () => {
 
     expect(storage.save).toHaveBeenCalledWith(
       'company-1',
+      DocumentOwnerType.DEAL,
+      'deal-1',
       expect.stringMatching(/^[0-9a-f-]+\.pdf$/i),
       expect.any(Buffer),
     );

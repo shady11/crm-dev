@@ -1,12 +1,16 @@
 import type { Readable } from 'stream';
 import { Injectable } from '@nestjs/common';
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
 
+import type { DocumentOwnerType } from '@/generated/prisma/client';
+
 import { FileStorageProvider } from './file-storage.interface';
+import { buildOwnerScopedKey } from './owner-scoped-key';
 
 export interface S3ProviderConfig {
   bucket: string;
@@ -17,8 +21,9 @@ export interface S3ProviderConfig {
 /**
  * Production storage backend: an S3-compatible bucket (AWS S3, or a
  * compatible provider like MinIO/DigitalOcean Spaces via AWS_S3_ENDPOINT).
- * Keys are companyId/storedName, same layout LocalDiskStorageProvider uses
- * on disk, so Document.path means the same thing under either backend.
+ * Keys are companyId/ownerType/ownerId/storedName, same layout
+ * LocalDiskStorageProvider uses on disk, so Document.path means the same
+ * thing under either backend.
  */
 @Injectable()
 export class S3StorageProvider implements FileStorageProvider {
@@ -38,10 +43,12 @@ export class S3StorageProvider implements FileStorageProvider {
 
   async save(
     companyId: string,
+    ownerType: DocumentOwnerType,
+    ownerId: string,
     storedName: string,
     buffer: Buffer,
   ): Promise<string> {
-    const key = `${companyId}/${storedName}`;
+    const key = buildOwnerScopedKey(companyId, ownerType, ownerId, storedName);
 
     await this.client.send(
       new PutObjectCommand({
@@ -63,5 +70,13 @@ export class S3StorageProvider implements FileStorageProvider {
     // always a Node Readable — the SDK's other possible Body types
     // (ReadableStream, Blob) only occur in those other runtimes.
     return result.Body as Readable;
+  }
+
+  async delete(relativePath: string): Promise<void> {
+    // DeleteObjectCommand is idempotent on S3 itself (deleting a missing
+    // key returns success, not NoSuchKey), so no existence check is needed.
+    await this.client.send(
+      new DeleteObjectCommand({ Bucket: this.bucket, Key: relativePath }),
+    );
   }
 }

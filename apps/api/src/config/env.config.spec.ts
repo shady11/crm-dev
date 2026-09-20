@@ -1,4 +1,4 @@
-import {corsOptions, getAllowedOrigins, validateEnv} from './env.config';
+import {corsOptions, getAllowedOrigins, getDocumentRetentionDays, validateEnv} from './env.config';
 
 describe('validateEnv', () => {
     const complete = {
@@ -81,4 +81,30 @@ describe('CORS configuration', () => {
         delete process.env.FRONTEND_URL;
         expect(() => getAllowedOrigins()).toThrow(/FRONTEND_URL/);
     });
+});
+
+describe('getDocumentRetentionDays', () => {
+    const original = process.env.DOCUMENT_RETENTION_DAYS;
+
+    afterEach(() => {
+        process.env.DOCUMENT_RETENTION_DAYS = original;
+    });
+
+    it('defaults to 30 when unset', () => {
+        delete process.env.DOCUMENT_RETENTION_DAYS;
+        expect(getDocumentRetentionDays()).toBe(30);
+    });
+
+    it('uses the configured value', () => {
+        process.env.DOCUMENT_RETENTION_DAYS = '90';
+        expect(getDocumentRetentionDays()).toBe(90);
+    });
+
+    it.each(['0', '-5', 'not-a-number', ''])(
+        'falls back to 30 for an invalid value: %s',
+        (value) => {
+            process.env.DOCUMENT_RETENTION_DAYS = value;
+            expect(getDocumentRetentionDays()).toBe(30);
+        },
+    );
 });
