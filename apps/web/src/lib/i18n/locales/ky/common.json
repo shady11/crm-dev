@@ -72,7 +72,10 @@
     "chessboard": "Шахматка",
     "overview": "Жалпы көрүнүш",
     "builder": "Конструктор",
-    "sales": "Сатуулар"
+    "sales": "Сатуулар",
+    "skipToContent": "Мазмунга өтүү",
+    "mainNavigation": "Негизги навигация",
+    "toggleSidebar": "Каптал панелин которуу"
   },
   "language": {
     "switchLabel": "Тил",

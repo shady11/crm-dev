@@ -72,7 +72,10 @@
     "chessboard": "Шахматка",
     "overview": "Обзор",
     "builder": "Конструктор",
-    "sales": "Продажи"
+    "sales": "Продажи",
+    "skipToContent": "Перейти к содержимому",
+    "mainNavigation": "Основная навигация",
+    "toggleSidebar": "Переключить боковую панель"
   },
   "language": {
     "switchLabel": "Язык",
