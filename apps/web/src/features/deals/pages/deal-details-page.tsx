@@ -207,7 +207,7 @@ export function DealDetailsPage() {
             {/* Cancel dialog */}
             <Dialog open={cancelOpen} onOpenChange={({ open }) => setCancelOpen(open)}>
                 <DialogContent size="sm">
-                    <DialogHeader title={t("detailsPage.cancelDialogTitle")}/>
+                    <DialogHeader title={t("detailsPage.cancelDialogTitle")} description={t("detailsPage.cancelDialogDescription")} />
                     <DialogBody>
                         <FieldSet className="pt-4">
                             <FieldGroup>
@@ -226,7 +226,7 @@ export function DealDetailsPage() {
                             {t("detailsPage.back")}
                         </Button>
                         <Button
-                            variant="default"
+                            variant="destructive"
                             disabled={actions.cancel.isPending}
                             onClick={() =>
                                 actions.cancel.mutate(cancelReason || undefined, {
