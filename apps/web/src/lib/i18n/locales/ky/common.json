@@ -10,6 +10,7 @@
     "goBack": "Кайтуу",
     "createAnyway": "Баары бир түзүү",
     "saveChanges": "Өзгөртүүлөрдү сактоо",
+    "retry": "Кайра аракет кылуу",
     "deleting": "Өчүрүлүп жатат...",
     "creating": "Түзүлүп жатат...",
     "saving": "Сакталып жатат...",
@@ -71,7 +72,10 @@
     "chessboard": "Шахматка",
     "overview": "Жалпы көрүнүш",
     "builder": "Конструктор",
-    "sales": "Сатуулар"
+    "sales": "Сатуулар",
+    "skipToContent": "Мазмунга өтүү",
+    "mainNavigation": "Негизги навигация",
+    "toggleSidebar": "Каптал панелин которуу"
   },
   "language": {
     "switchLabel": "Тил",

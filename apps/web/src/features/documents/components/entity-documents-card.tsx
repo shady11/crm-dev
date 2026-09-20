@@ -2,6 +2,7 @@ import {useRef, useState} from "react";
 import {createListCollection} from "@ark-ui/react";
 import {DownloadIcon, FileIcon, Trash2Icon} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
+import {IconTooltipButton} from "@/components/shared/icon-tooltip-button.tsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {useEntityDocuments} from "@/features/documents/hooks/use-entity-documents.ts";
@@ -84,15 +85,15 @@ export function EntityDocumentsCard({ ownerType, ownerId }: EntityDocumentsCardP
                                 <Button variant="ghost" size="icon-sm" onClick={() => actions.download.mutate(doc)} aria-label={t("common:actions.download")}>
                                     <DownloadIcon className="size-3.5" />
                                 </Button>
-                                <Button
+                                <IconTooltipButton
                                     variant="ghost"
                                     size="icon-sm"
                                     onClick={() => actions.remove.mutate(doc.id)}
                                     disabled={actions.remove.isPending}
-                                    aria-label={t("common:actions.delete")}
+                                    label={t("common:actions.delete")}
                                 >
                                     <Trash2Icon className="size-3.5 text-destructive" />
-                                </Button>
+                                </IconTooltipButton>
                             </div>
                         ))}
                     </div>

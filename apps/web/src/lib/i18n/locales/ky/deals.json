@@ -129,6 +129,7 @@
     "markCompleted": "Аяктады деп белгилөө",
     "cancelDeal": "Бүтүмдү жокко чыгаруу",
     "cancelDialogTitle": "Бүтүмдү жокко чыгаруу",
+    "cancelDialogDescription": "Бүтүм жокко чыгарылат жана юнит бошотулат. Бул аракетти жокко чыгарууга болбойт.",
     "reasonOptional": "Себеби (милдеттүү эмес)",
     "confirmCancellation": "Жокко чыгарууну ырастоо",
     "extendDialogTitle": "Бронду узартуу",

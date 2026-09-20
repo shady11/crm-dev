@@ -129,6 +129,7 @@
     "markCompleted": "Mark as completed",
     "cancelDeal": "Cancel deal",
     "cancelDialogTitle": "Cancel deal",
+    "cancelDialogDescription": "This will cancel the deal and free up the unit. This action cannot be undone.",
     "reasonOptional": "Reason (optional)",
     "confirmCancellation": "Confirm cancellation",
     "extendDialogTitle": "Extend reservation",

@@ -20,6 +20,7 @@ import {
 } from "@/features/leads/api/leads.api.ts";
 import type {LeadStatus} from "@/features/leads/types/lead.types.ts";
 import {useSort} from "@/hooks/use-sort.ts";
+import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
 
 export type LeadStatusFilterValue = LeadStatus | "all";
 
@@ -34,6 +35,7 @@ export function useLeadsList() {
     const [limit, setLimitState] = useState(10);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const {sortBy, sortOrder, toggleSort} = useSort<LeadSortField>();
+    const debouncedSearch = useDebouncedValue(search);
 
     const [formOpen, setFormOpen] = useState(false);
     const [editingLead, setEditingLead] = useState<Lead | null>(null);
@@ -50,12 +52,12 @@ export function useLeadsList() {
     const [reassignTarget, setReassignTarget] = useState<Lead | null>(null);
 
     const tableQuery = useQuery({
-        queryKey: ["leads", { search, statusFilter, branchFilter, page, limit, sortBy, sortOrder }],
+        queryKey: ["leads", { search: debouncedSearch, statusFilter, branchFilter, page, limit, sortBy, sortOrder }],
         queryFn: () =>
             getLeads({
                 page,
                 limit,
-                search: search || undefined,
+                search: debouncedSearch || undefined,
                 status: statusFilter === "all" ? undefined : statusFilter,
                 branchId: branchFilter === "all" ? undefined : branchFilter,
                 sortBy,

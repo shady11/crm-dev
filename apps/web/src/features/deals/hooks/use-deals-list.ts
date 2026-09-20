@@ -3,6 +3,7 @@ import {useQuery} from "@tanstack/react-query";
 import {type DealSortField, getDeals, getDealStatusSummary} from "@/features/deals/api/deals.api";
 import {DealStatus} from "@/features/deals/types/deal.types";
 import {useSort} from "@/hooks/use-sort.ts";
+import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
 
 export type DealStatusFilter = DealStatus | "all";
 
@@ -16,14 +17,15 @@ export function useDealsList() {
     const [managerId, setManagerIdState] = useState<string | undefined>();
     const [branchId, setBranchIdState] = useState<string | undefined>();
     const {sortBy, sortOrder, toggleSort} = useSort<DealSortField>();
+    const debouncedSearch = useDebouncedValue(search);
 
     const tableQuery = useQuery({
-        queryKey: ["deals", { statusFilter, search, projectId, managerId, branchId, page, limit, sortBy, sortOrder }],
+        queryKey: ["deals", { statusFilter, search: debouncedSearch, projectId, managerId, branchId, page, limit, sortBy, sortOrder }],
         queryFn: () =>
             getDeals({
                 page, limit,
                 status: statusFilter === "all" ? undefined : statusFilter,
-                search: search || undefined,
+                search: debouncedSearch || undefined,
                 projectId,
                 managerId,
                 branchId,

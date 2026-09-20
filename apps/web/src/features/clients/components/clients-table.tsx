@@ -1,10 +1,10 @@
 import {Pen, Trash2, UsersRoundIcon} from "lucide-react";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
-import {Button} from "@/components/ui/button.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {DataTable} from "@/components/shared/data-table.tsx";
+import {IconTooltipButton} from "@/components/shared/icon-tooltip-button.tsx";
 import {SortableTableHead} from "@/components/shared/sortable-table-head.tsx";
 import type {ClientSortField} from "@/features/clients/api/clients.api.ts";
 import type {Client} from "@/features/clients/types/client.types";
@@ -25,7 +25,7 @@ interface ClientsTableProps {
     onToggleAll(checked: boolean): void;
     onToggleOne(id: string, checked: boolean): void;
     onEdit(client: Client): void;
-    onDelete(id: string): void;
+    onDelete(client: Client): void;
     isDeleting(id: string): boolean;
 }
 
@@ -79,18 +79,18 @@ export function ClientsTable({
                                 </div>
                             </div>
                             <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                                <Button variant="ghost" size="icon-sm" onClick={() => onEdit(client)} aria-label={t("common:actions.edit")}>
+                                <IconTooltipButton variant="ghost" size="icon-sm" onClick={() => onEdit(client)} label={t("common:actions.edit")}>
                                     <Pen className="size-3.5" />
-                                </Button>
-                                <Button
+                                </IconTooltipButton>
+                                <IconTooltipButton
                                     variant="destructive"
                                     size="icon-sm"
                                     disabled={isDeleting(client.id)}
-                                    onClick={() => onDelete(client.id)}
-                                    aria-label={t("common:actions.delete")}
+                                    onClick={() => onDelete(client)}
+                                    label={t("common:actions.delete")}
                                 >
                                     <Trash2 className="size-3.5" />
-                                </Button>
+                                </IconTooltipButton>
                             </div>
                         </div>
                         <div className="mt-3 space-y-1 text-sm text-muted-foreground">
@@ -173,18 +173,18 @@ export function ClientsTable({
                             </TableCell>
                             <TableCell onClick={(e) => e.stopPropagation()}>
                                 <div className="flex items-center justify-end gap-1">
-                                    <Button variant="ghost" size="icon-sm" onClick={() => onEdit(client)} aria-label={t("common:actions.edit")}>
+                                    <IconTooltipButton variant="ghost" size="icon-sm" onClick={() => onEdit(client)} label={t("common:actions.edit")}>
                                         <Pen className="size-3.5" />
-                                    </Button>
-                                    <Button
+                                    </IconTooltipButton>
+                                    <IconTooltipButton
                                         variant="destructive"
                                         size="icon-sm"
                                         disabled={isDeleting(client.id)}
-                                        onClick={() => onDelete(client.id)}
-                                        aria-label={t("common:actions.delete")}
+                                        onClick={() => onDelete(client)}
+                                        label={t("common:actions.delete")}
                                     >
                                         <Trash2 className="size-3.5" />
-                                    </Button>
+                                    </IconTooltipButton>
                                 </div>
                             </TableCell>
                         </TableRow>

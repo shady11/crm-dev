@@ -13,7 +13,7 @@ import {DealUnitCard} from "@/features/deals/components/deal-unit-card.tsx";
 import {DealClientCard} from "@/features/deals/components/deal-details/deal-client-card.tsx";
 import {DealManagerCard} from "@/features/deals/components/deal-details/deal-manager-card.tsx";
 import {DealFinancialsCard} from "@/features/deals/components/deal-details/deal-financials-card.tsx";
-import {Menu, MenuContent, MenuItem, MenuTrigger} from "@/components/ui/menu.tsx";
+import {Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger} from "@/components/ui/menu.tsx";
 import {daysUntil} from "@/features/deals/utils/days-until.ts";
 import {DealHistoryCard} from "@/features/deals/components/deal-details/deal-history-card.tsx";
 import {formatDate} from "@/utils/date-formatter.ts";
@@ -44,6 +44,7 @@ import {PAYMENT_METHOD_LABEL_KEYS, PAYMENT_TYPE_LABEL_KEYS} from "@/features/dea
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {hasPermission} from "@/features/auth/access";
 import {ReassignManagerDialog} from "@/features/users/components/reassign-manager-dialog.tsx";
+import {PageError, PageSkeleton} from "@/components/shared/page-query-state.tsx";
 
 export function DealDetailsPage() {
     const { t, i18n } = useTranslation(["deals", "payments"]);
@@ -81,7 +82,8 @@ export function DealDetailsPage() {
     const [reassignOpen, setReassignOpen] = useState(false);
 
     const deal = dealQuery.data;
-    if (!deal) return null;
+    if (dealQuery.isLoading) return <PageSkeleton />;
+    if (dealQuery.isError || !deal) return <PageError onRetry={() => dealQuery.refetch()} />;
 
     // Payments are stored signed — refunds are negative amounts — so the plain
     // sum is always the correct net figure, with no refund special-casing here
@@ -139,7 +141,7 @@ export function DealDetailsPage() {
                             </>
                         )}
                         {deal.status === "CONTRACT_SIGNED" && (
-                            <Button onClick={() => actions.activate.mutate()} disabled={actions.activate.isPending}>
+                            <Button onClick={() => actions.activate.mutate()} disabled={actions.activate.isPending} isLoading={actions.activate.isPending}>
                                 {t("detailsPage.activateDeal")}
                             </Button>
                         )}
@@ -152,9 +154,12 @@ export function DealDetailsPage() {
                                 </MenuTrigger>
                                 <MenuContent>
                                     {deal.status === "ACTIVE" && (
-                                        <MenuItem value="complete" onSelect={() => actions.complete.mutate()}>
-                                            {t("detailsPage.markCompleted")}
-                                        </MenuItem>
+                                        <>
+                                            <MenuItem value="complete" onSelect={() => actions.complete.mutate()}>
+                                                {t("detailsPage.markCompleted")}
+                                            </MenuItem>
+                                            <MenuSeparator />
+                                        </>
                                     )}
                                     <MenuItem value="cancel" variant="destructive" onSelect={() => setCancelOpen(true)}>
                                         {t("detailsPage.cancelDeal")}
@@ -205,7 +210,7 @@ export function DealDetailsPage() {
             {/* Cancel dialog */}
             <Dialog open={cancelOpen} onOpenChange={({ open }) => setCancelOpen(open)}>
                 <DialogContent size="sm">
-                    <DialogHeader title={t("detailsPage.cancelDialogTitle")}/>
+                    <DialogHeader title={t("detailsPage.cancelDialogTitle")} description={t("detailsPage.cancelDialogDescription")} />
                     <DialogBody>
                         <FieldSet className="pt-4">
                             <FieldGroup>
@@ -224,8 +229,9 @@ export function DealDetailsPage() {
                             {t("detailsPage.back")}
                         </Button>
                         <Button
-                            variant="default"
+                            variant="destructive"
                             disabled={actions.cancel.isPending}
+                            isLoading={actions.cancel.isPending}
                             onClick={() =>
                                 actions.cancel.mutate(cancelReason || undefined, {
                                     onSuccess: () => {
@@ -287,6 +293,7 @@ export function DealDetailsPage() {
                         </Button>
                         <Button
                             disabled={!newExpiry || actions.extend.isPending}
+                            isLoading={actions.extend.isPending}
                             onClick={() =>
                                 actions.extend.mutate(new Date(newExpiry[0].toString()).toISOString(), {
                                     onSuccess: () => {
@@ -349,6 +356,7 @@ export function DealDetailsPage() {
                         </Button>
                         <Button
                             disabled={!contractNumber || !contractDate || actions.sign.isPending}
+                            isLoading={actions.sign.isPending}
                             onClick={() =>
 
                                 actions.sign.mutate(
@@ -422,6 +430,7 @@ export function DealDetailsPage() {
                         <Button variant="secondary" onClick={() => setScheduleOpen(false)}>{t("detailsPage.back")}</Button>
                         <Button
                             disabled={!installments || !firstPaymentDate || actions.generateSchedule.isPending}
+                            isLoading={actions.generateSchedule.isPending}
                             onClick={() =>
                                 actions.generateSchedule.mutate(
                                     { installments, firstPaymentDate: new Date(firstPaymentDate[0].toString()).toISOString(), intervalMonths },
@@ -512,6 +521,7 @@ export function DealDetailsPage() {
                         <Button variant="secondary" onClick={() => setPaymentOpen(false)}>{t("detailsPage.back")}</Button>
                         <Button
                             disabled={!paymentAmount || !paymentMethod || !paymentType || !paidAt || actions.recordPayment.isPending}
+                            isLoading={actions.recordPayment.isPending}
                             onClick={() =>
                                 actions.recordPayment.mutate(
                                     {

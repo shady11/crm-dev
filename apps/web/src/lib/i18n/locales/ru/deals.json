@@ -129,6 +129,7 @@
     "markCompleted": "Отметить завершённой",
     "cancelDeal": "Отменить сделку",
     "cancelDialogTitle": "Отменить сделку",
+    "cancelDialogDescription": "Сделка будет отменена, а юнит освобождён. Это действие нельзя отменить.",
     "reasonOptional": "Причина (необязательно)",
     "confirmCancellation": "Подтвердить отмену",
     "extendDialogTitle": "Продлить бронь",

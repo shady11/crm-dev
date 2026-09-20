@@ -3,12 +3,14 @@ import {ClientsTable} from "@/features/clients/components/clients-table.tsx";
 import {ClientsPagination} from "@/features/clients/components/clients-pagination.tsx";
 import {ClientsActionBar} from "@/features/clients/components/clients-action-bar.tsx";
 import {ClientFormSheet} from "@/features/clients/components/client-form-sheet.tsx";
+import {DeleteClientDialog} from "@/features/clients/components/delete-client-dialog.tsx";
+import {DeleteClientsDialog} from "@/features/clients/components/delete-clients-dialog.tsx";
 import {useClientsList} from "@/features/clients/hooks/use-clients-list.ts";
 import {useTranslation} from "react-i18next";
 
 export function ClientsPage() {
     const { t } = useTranslation("clients");
-    const { filters, pagination, table, selection, form, actions } = useClientsList();
+    const { filters, pagination, table, selection, form, actions, deleteDialog, bulkDeleteDialog } = useClientsList();
 
     return (
         <div className="space-y-6">
@@ -38,7 +40,7 @@ export function ClientsPage() {
                     onToggleAll={selection.toggleSelectAll}
                     onToggleOne={selection.toggleSelectOne}
                     onEdit={form.openEditForm}
-                    onDelete={actions.deleteClient}
+                    onDelete={actions.requestDelete}
                     isDeleting={actions.isDeleting}
                 />
 
@@ -53,9 +55,9 @@ export function ClientsPage() {
 
             <ClientsActionBar
                 selectedCount={selection.selectedIds.size}
-                isProcessing={selection.isBulkDeleting}
+                isProcessing={bulkDeleteDialog.isDeleting}
                 onClear={selection.clear}
-                onDelete={selection.bulkDelete}
+                onDelete={bulkDeleteDialog.onOpen}
             />
 
             <ClientFormSheet
@@ -65,6 +67,21 @@ export function ClientsPage() {
                 hasError={form.hasError}
                 onClose={form.closeForm}
                 onSubmit={form.handleSubmit}
+            />
+
+            <DeleteClientDialog
+                client={deleteDialog.client}
+                isDeleting={deleteDialog.isDeleting}
+                onCancel={deleteDialog.onCancel}
+                onConfirm={deleteDialog.onConfirm}
+            />
+
+            <DeleteClientsDialog
+                open={bulkDeleteDialog.open}
+                count={bulkDeleteDialog.count}
+                isDeleting={bulkDeleteDialog.isDeleting}
+                onCancel={bulkDeleteDialog.onCancel}
+                onConfirm={bulkDeleteDialog.onConfirm}
             />
         </div>
     );

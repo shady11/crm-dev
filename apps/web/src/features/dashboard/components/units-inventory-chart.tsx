@@ -6,7 +6,7 @@ import {UNIT_STATUS_LABEL_KEYS} from "@/features/units/types/unit.types.ts";
 import {useTranslation} from "react-i18next";
 
 const STATUS_COLORS: Record<string, string> = {
-    AVAILABLE: "#34d399", RESERVED: "#fbbf24", SOLD: "#fb7185", UNAVAILABLE: "#9ca3af",
+    AVAILABLE: "var(--success)", RESERVED: "var(--warning)", SOLD: "var(--destructive)", UNAVAILABLE: "var(--muted-foreground)",
 };
 
 export function UnitsInventoryChart({ data }: { data: UnitsSummaryItem[] }) {
@@ -33,7 +33,7 @@ export function UnitsInventoryChart({ data }: { data: UnitsSummaryItem[] }) {
                         <ChartTooltip content={<ChartTooltipContent />} />
                         <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} strokeWidth={2}>
                             {chartData.map((entry) => (
-                                <Cell key={entry.status} fill={STATUS_COLORS[entry.status] ?? "#9ca3af"} />
+                                <Cell key={entry.status} fill={STATUS_COLORS[entry.status] ?? "var(--muted-foreground)"} />
                             ))}
                         </Pie>
                     </PieChart>

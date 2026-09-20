@@ -18,6 +18,7 @@ import type {User} from "@/features/users/types/user.types";
 import {initials} from "@/features/users/utils/format.ts";
 import {useTranslation} from "react-i18next";
 import {useSort} from "@/hooks/use-sort.ts";
+import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
 
 export type StatusFilter = "all" | "active" | "inactive";
 export type RoleFilterValue = string | "all";
@@ -41,6 +42,7 @@ export function useUsersList() {
     const [limit, setLimitState] = useState(10);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const {sortBy, sortOrder, toggleSort} = useSort<UserSortField>();
+    const debouncedSearch = useDebouncedValue(search);
 
     const [formOpen, setFormOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -48,7 +50,7 @@ export function useUsersList() {
     const [pendingTransfer, setPendingTransfer] = useState<User | null>(null);
 
     const tableQuery = useQuery({
-        queryKey: ["users", { statusFilter, roleFilter, branchFilter, search, page, limit, sortBy, sortOrder }],
+        queryKey: ["users", { statusFilter, roleFilter, branchFilter, search: debouncedSearch, page, limit, sortBy, sortOrder }],
         queryFn: () =>
             getUsers({
                 page,
@@ -56,7 +58,7 @@ export function useUsersList() {
                 roleId: roleFilter === "all" ? undefined : roleFilter,
                 isActive: statusFilter === "all" ? undefined : statusFilter === "active",
                 branchId: branchFilter === "all" ? undefined : branchFilter,
-                search: search || undefined,
+                search: debouncedSearch || undefined,
                 sortBy,
                 sortOrder,
             }),

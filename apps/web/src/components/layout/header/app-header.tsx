@@ -21,7 +21,7 @@ export function AppHeader() {
         <header className="h-16 px-6 flex items-center justify-between sticky top-0 bg-background border-b-2 z-50">
             <div className="flex items-center gap-2">
 
-                <SidebarTrigger/>
+                <SidebarTrigger aria-label={t("nav.toggleSidebar")} />
                 <Separator orientation='vertical' className='hidden h-4! data-vertical:self-center sm:block' />
 
                 {breadcrumbs.map((crumb, index) => {

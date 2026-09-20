@@ -13,6 +13,7 @@ import {
 import type {Client} from "@/features/clients/types/client.types";
 import {useTranslation} from "react-i18next";
 import {useSort} from "@/hooks/use-sort.ts";
+import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
 
 export type ProjectFilterValue = string | "all";
 
@@ -27,17 +28,20 @@ export function useClientsList() {
     const [limit, setLimitState] = useState(10);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const {sortBy, sortOrder, toggleSort} = useSort<ClientSortField>();
+    const debouncedSearch = useDebouncedValue(search);
 
     const [formOpen, setFormOpen] = useState(false);
     const [editingClient, setEditingClient] = useState<Client | null>(null);
+    const [deleteTarget, setDeleteTarget] = useState<Client | null>(null);
+    const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
     const tableQuery = useQuery({
-        queryKey: ["clients", { search, projectFilter, branchFilter, page, limit, sortBy, sortOrder }],
+        queryKey: ["clients", { search: debouncedSearch, projectFilter, branchFilter, page, limit, sortBy, sortOrder }],
         queryFn: () =>
             getClients({
                 page,
                 limit,
-                search: search || undefined,
+                search: debouncedSearch || undefined,
                 projectId: projectFilter === "all" ? undefined : projectFilter,
                 branchId: branchFilter === "all" ? undefined : branchFilter,
                 sortBy,
@@ -74,6 +78,7 @@ export function useClientsList() {
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["clients"] });
             toast.success({ title: t("toasts.deleteSuccessTitle"), description: t("toasts.deleteSuccessDescription") });
+            setDeleteTarget(null);
         },
         onError: () => {
             toast.error({ title: t("toasts.deleteErrorTitle"), description: t("toasts.deleteErrorDescription") });
@@ -97,11 +102,13 @@ export function useClientsList() {
             await queryClient.invalidateQueries({ queryKey: ["clients"] });
             toast.success({ title: t("toasts.bulkDeleteSuccessTitle"), description: t("toasts.bulkDeleteSuccessDescription") });
             setSelectedIds(new Set());
+            setBulkDeleteDialogOpen(false);
         },
         onError: async (error: Error) => {
             await queryClient.invalidateQueries({ queryKey: ["clients"] });
             toast.error({ title: t("toasts.bulkDeleteIssuesTitle"), description: error.message });
             setSelectedIds(new Set());
+            setBulkDeleteDialogOpen(false);
         },
     });
 
@@ -151,6 +158,18 @@ export function useClientsList() {
             return next;
         });
     };
+
+    const requestDelete = (client: Client) => setDeleteTarget(client);
+    const cancelDelete = () => setDeleteTarget(null);
+    const confirmDelete = () => {
+        if (deleteTarget) {
+            deleteMutation.mutate(deleteTarget.id);
+        }
+    };
+
+    const openBulkDeleteDialog = () => setBulkDeleteDialogOpen(true);
+    const closeBulkDeleteDialog = () => setBulkDeleteDialogOpen(false);
+    const confirmBulkDelete = () => bulkDeleteMutation.mutate(Array.from(selectedIds));
 
     const clients = tableQuery.data?.items ?? [];
     const meta = tableQuery.data?.meta;
@@ -203,8 +222,6 @@ export function useClientsList() {
             toggleSelectAll,
             toggleSelectOne,
             clear: clearSelection,
-            bulkDelete: () => bulkDeleteMutation.mutate(Array.from(selectedIds)),
-            isBulkDeleting: bulkDeleteMutation.isPending,
         },
 
         form: {
@@ -219,8 +236,24 @@ export function useClientsList() {
         },
 
         actions: {
-            deleteClient: (id: string) => deleteMutation.mutate(id),
+            requestDelete,
             isDeleting: (id: string) => deleteMutation.isPending && deleteMutation.variables === id,
+        },
+
+        deleteDialog: {
+            client: deleteTarget,
+            isDeleting: deleteMutation.isPending,
+            onCancel: cancelDelete,
+            onConfirm: confirmDelete,
+        },
+
+        bulkDeleteDialog: {
+            open: bulkDeleteDialogOpen,
+            count: selectedIds.size,
+            isDeleting: bulkDeleteMutation.isPending,
+            onOpen: openBulkDeleteDialog,
+            onCancel: closeBulkDeleteDialog,
+            onConfirm: confirmBulkDelete,
         },
     };
 }

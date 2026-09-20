@@ -1,7 +1,10 @@
 import type {ReactNode} from "react";
+import {useTranslation} from "react-i18next";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
-import {Spinner} from "@/components/ui/spinner.tsx";
+import {Skeleton} from "@/components/ui/skeleton.tsx";
 import {Table} from "@/components/ui/table.tsx";
+
+const SKELETON_ROWS = 6;
 
 interface DataTableProps {
     isLoading: boolean;
@@ -20,10 +23,16 @@ interface DataTableProps {
 // (clients, leads, deals, users, tasks, ...) so they only need to define
 // their own columns and rows via <TableHeader>/<TableBody> children.
 export function DataTable({isLoading, isEmpty, emptyIcon, emptyTitle, emptyDescription, children, cards}: DataTableProps) {
+    const { t } = useTranslation("common");
+
     if (isLoading) {
         return (
-            <div className="flex h-64 items-center justify-center rounded-lg border border-secondary">
-                <Spinner className="size-6" />
+            <div className="rounded-lg border border-secondary p-4">
+                <div className="flex flex-col gap-3" role="status" aria-label={t("labels.loading")}>
+                    {Array.from({ length: SKELETON_ROWS }).map((_, index) => (
+                        <Skeleton key={index} className="h-10 w-full" />
+                    ))}
+                </div>
             </div>
         );
     }

@@ -10,6 +10,7 @@
     "goBack": "Go back",
     "createAnyway": "Create anyway",
     "saveChanges": "Save changes",
+    "retry": "Try again",
     "deleting": "Deleting...",
     "creating": "Creating...",
     "saving": "Saving...",
@@ -71,7 +72,10 @@
     "chessboard": "Chessboard",
     "overview": "Overview",
     "builder": "Builder",
-    "sales": "Sales"
+    "sales": "Sales",
+    "skipToContent": "Skip to content",
+    "mainNavigation": "Main navigation",
+    "toggleSidebar": "Toggle sidebar"
   },
   "language": {
     "switchLabel": "Language",
