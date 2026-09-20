@@ -27,6 +27,7 @@ import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {hasPermission} from "@/features/auth/access";
 import {MoveToBranchDialog} from "@/features/branches/components/move-to-branch-dialog.tsx";
+import {PageError, PageSpinner} from "@/components/shared/page-query-state.tsx";
 
 export function ClientDetailsPage() {
     const { t, i18n } = useTranslation(["clients", "deals", "leads", "common", "branches"]);
@@ -67,7 +68,8 @@ export function ClientDetailsPage() {
     });
 
     const client = clientQuery.data;
-    if (!client) return null;
+    if (clientQuery.isLoading) return <PageSpinner />;
+    if (clientQuery.isError || !client) return <PageError onRetry={() => clientQuery.refetch()} />;
 
     return (
         <div className="space-y-6">

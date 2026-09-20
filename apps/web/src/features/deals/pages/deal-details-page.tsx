@@ -44,6 +44,7 @@ import {PAYMENT_METHOD_LABEL_KEYS, PAYMENT_TYPE_LABEL_KEYS} from "@/features/dea
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {hasPermission} from "@/features/auth/access";
 import {ReassignManagerDialog} from "@/features/users/components/reassign-manager-dialog.tsx";
+import {PageError, PageSpinner} from "@/components/shared/page-query-state.tsx";
 
 export function DealDetailsPage() {
     const { t, i18n } = useTranslation(["deals", "payments"]);
@@ -81,7 +82,8 @@ export function DealDetailsPage() {
     const [reassignOpen, setReassignOpen] = useState(false);
 
     const deal = dealQuery.data;
-    if (!deal) return null;
+    if (dealQuery.isLoading) return <PageSpinner />;
+    if (dealQuery.isError || !deal) return <PageError onRetry={() => dealQuery.refetch()} />;
 
     // Payments are stored signed — refunds are negative amounts — so the plain
     // sum is always the correct net figure, with no refund special-casing here
