@@ -13,7 +13,7 @@ import {DealUnitCard} from "@/features/deals/components/deal-unit-card.tsx";
 import {DealClientCard} from "@/features/deals/components/deal-details/deal-client-card.tsx";
 import {DealManagerCard} from "@/features/deals/components/deal-details/deal-manager-card.tsx";
 import {DealFinancialsCard} from "@/features/deals/components/deal-details/deal-financials-card.tsx";
-import {Menu, MenuContent, MenuItem, MenuTrigger} from "@/components/ui/menu.tsx";
+import {Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger} from "@/components/ui/menu.tsx";
 import {daysUntil} from "@/features/deals/utils/days-until.ts";
 import {DealHistoryCard} from "@/features/deals/components/deal-details/deal-history-card.tsx";
 import {formatDate} from "@/utils/date-formatter.ts";
@@ -154,9 +154,12 @@ export function DealDetailsPage() {
                                 </MenuTrigger>
                                 <MenuContent>
                                     {deal.status === "ACTIVE" && (
-                                        <MenuItem value="complete" onSelect={() => actions.complete.mutate()}>
-                                            {t("detailsPage.markCompleted")}
-                                        </MenuItem>
+                                        <>
+                                            <MenuItem value="complete" onSelect={() => actions.complete.mutate()}>
+                                                {t("detailsPage.markCompleted")}
+                                            </MenuItem>
+                                            <MenuSeparator />
+                                        </>
                                     )}
                                     <MenuItem value="cancel" variant="destructive" onSelect={() => setCancelOpen(true)}>
                                         {t("detailsPage.cancelDeal")}
