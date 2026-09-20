@@ -1,6 +1,7 @@
 import type { Readable } from 'stream';
 import { Injectable } from '@nestjs/common';
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -69,5 +70,13 @@ export class S3StorageProvider implements FileStorageProvider {
     // always a Node Readable — the SDK's other possible Body types
     // (ReadableStream, Blob) only occur in those other runtimes.
     return result.Body as Readable;
+  }
+
+  async delete(relativePath: string): Promise<void> {
+    // DeleteObjectCommand is idempotent on S3 itself (deleting a missing
+    // key returns success, not NoSuchKey), so no existence check is needed.
+    await this.client.send(
+      new DeleteObjectCommand({ Bucket: this.bucket, Key: relativePath }),
+    );
   }
 }

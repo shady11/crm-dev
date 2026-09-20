@@ -49,6 +49,7 @@ describe('DocumentsService', () => {
         const storage = {
             save: jest.fn().mockResolvedValue('company-1/stored.pdf'),
             getStream: jest.fn().mockResolvedValue('stream'),
+            delete: jest.fn().mockResolvedValue(undefined),
         };
 
         const service = new DocumentsService(prisma as any, notifications as any, storage as any);

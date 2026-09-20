@@ -77,6 +77,7 @@ function build() {
   const storage = {
     save: jest.fn().mockResolvedValue('company-1/generated.pdf'),
     getStream: jest.fn(),
+    delete: jest.fn().mockResolvedValue(undefined),
   };
 
   const service = new DocumentGenerationService(prisma as any, storage);

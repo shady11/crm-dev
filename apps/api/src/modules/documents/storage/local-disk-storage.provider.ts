@@ -1,5 +1,5 @@
 import { createReadStream } from 'fs';
-import { mkdir, writeFile } from 'fs/promises';
+import { mkdir, rm, writeFile } from 'fs/promises';
 import { dirname, join } from 'path';
 import type { Readable } from 'stream';
 import { Injectable } from '@nestjs/common';
@@ -36,5 +36,9 @@ export class LocalDiskStorageProvider implements FileStorageProvider {
 
   getStream(relativePath: string): Promise<Readable> {
     return Promise.resolve(createReadStream(join(UPLOADS_ROOT, relativePath)));
+  }
+
+  async delete(relativePath: string): Promise<void> {
+    await rm(join(UPLOADS_ROOT, relativePath), { force: true });
   }
 }

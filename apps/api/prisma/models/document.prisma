@@ -59,10 +59,18 @@ model Document {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
+  // Set once DocumentsCleanupService has removed the underlying file from
+  // storage (local disk or S3) after deletedAt has aged past the retention
+  // window — see DOCUMENT_RETENTION_DAYS. The row itself is kept for audit
+  // history; only the bytes are gone. Null means the file (if any —
+  // deletedAt null too) is still present in storage.
+  purgedAt DateTime?
+
   @@index([companyId])
   @@index([ownerType, ownerId])
   @@index([type])
   @@index([uploadedById])
   @@index([createdAt])
   @@index([generatedFromTemplateId])
+  @@index([deletedAt, purgedAt])
 }

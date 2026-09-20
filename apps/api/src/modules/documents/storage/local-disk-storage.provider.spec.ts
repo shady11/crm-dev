@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm } from 'fs/promises';
+import { access, mkdtemp, readFile, rm } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
 
@@ -86,5 +86,33 @@ describe('LocalDiskStorageProvider', () => {
     for await (const chunk of stream) chunks.push(chunk as Buffer);
 
     expect(Buffer.concat(chunks).toString()).toBe('plan-contents');
+  });
+
+  it('removes a saved file from disk', async () => {
+    const { LocalDiskStorageProvider } =
+      await import('./local-disk-storage.provider');
+    const provider = new LocalDiskStorageProvider();
+
+    const key = await provider.save(
+      'company-1',
+      DocumentOwnerType.CLIENT,
+      'client-1',
+      'a.pdf',
+      Buffer.from('to-be-deleted'),
+    );
+
+    await provider.delete(key);
+
+    await expect(access(join(root, key))).rejects.toThrow();
+  });
+
+  it('does not throw when deleting a key that was never saved', async () => {
+    const { LocalDiskStorageProvider } =
+      await import('./local-disk-storage.provider');
+    const provider = new LocalDiskStorageProvider();
+
+    await expect(
+      provider.delete('company-1/lead/lead-1/missing.pdf'),
+    ).resolves.toBeUndefined();
   });
 });

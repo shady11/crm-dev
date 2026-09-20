@@ -91,6 +91,18 @@ export function getAllowedOrigins(): string[] {
         .filter((origin) => origin.length > 0);
 }
 
+/**
+ * Days a soft-deleted document's file is kept before DocumentsCleanupService
+ * physically removes it from storage. Not in REQUIRED_* above — a missing or
+ * malformed value falls back to 30 rather than blocking startup, since
+ * getting this wrong only affects when a purge cron runs, not correctness.
+ */
+export function getDocumentRetentionDays(): number {
+    const raw = process.env.DOCUMENT_RETENTION_DAYS;
+    const parsed = raw ? Number(raw) : NaN;
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 30;
+}
+
 type CorsCallback = (err: Error | null, allow?: boolean) => void;
 
 /**

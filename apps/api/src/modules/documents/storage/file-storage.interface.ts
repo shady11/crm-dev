@@ -29,4 +29,12 @@ export interface FileStorageProvider {
 
   /** Opens a readable stream for a previously saved key. */
   getStream(relativePath: string): Promise<Readable>;
+
+  /**
+   * Removes a previously saved key. Must not throw when the key is already
+   * gone — DocumentsCleanupService retries a purge that partially failed
+   * (e.g. the DB update after a successful delete), so a second delete of
+   * the same key is expected and should be a no-op, not an error.
+   */
+  delete(relativePath: string): Promise<void>;
 }
