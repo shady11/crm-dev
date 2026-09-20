@@ -141,7 +141,7 @@ export function DealDetailsPage() {
                             </>
                         )}
                         {deal.status === "CONTRACT_SIGNED" && (
-                            <Button onClick={() => actions.activate.mutate()} disabled={actions.activate.isPending}>
+                            <Button onClick={() => actions.activate.mutate()} disabled={actions.activate.isPending} isLoading={actions.activate.isPending}>
                                 {t("detailsPage.activateDeal")}
                             </Button>
                         )}
@@ -231,6 +231,7 @@ export function DealDetailsPage() {
                         <Button
                             variant="destructive"
                             disabled={actions.cancel.isPending}
+                            isLoading={actions.cancel.isPending}
                             onClick={() =>
                                 actions.cancel.mutate(cancelReason || undefined, {
                                     onSuccess: () => {
@@ -292,6 +293,7 @@ export function DealDetailsPage() {
                         </Button>
                         <Button
                             disabled={!newExpiry || actions.extend.isPending}
+                            isLoading={actions.extend.isPending}
                             onClick={() =>
                                 actions.extend.mutate(new Date(newExpiry[0].toString()).toISOString(), {
                                     onSuccess: () => {
@@ -354,6 +356,7 @@ export function DealDetailsPage() {
                         </Button>
                         <Button
                             disabled={!contractNumber || !contractDate || actions.sign.isPending}
+                            isLoading={actions.sign.isPending}
                             onClick={() =>
 
                                 actions.sign.mutate(
@@ -427,6 +430,7 @@ export function DealDetailsPage() {
                         <Button variant="secondary" onClick={() => setScheduleOpen(false)}>{t("detailsPage.back")}</Button>
                         <Button
                             disabled={!installments || !firstPaymentDate || actions.generateSchedule.isPending}
+                            isLoading={actions.generateSchedule.isPending}
                             onClick={() =>
                                 actions.generateSchedule.mutate(
                                     { installments, firstPaymentDate: new Date(firstPaymentDate[0].toString()).toISOString(), intervalMonths },
@@ -517,6 +521,7 @@ export function DealDetailsPage() {
                         <Button variant="secondary" onClick={() => setPaymentOpen(false)}>{t("detailsPage.back")}</Button>
                         <Button
                             disabled={!paymentAmount || !paymentMethod || !paymentType || !paidAt || actions.recordPayment.isPending}
+                            isLoading={actions.recordPayment.isPending}
                             onClick={() =>
                                 actions.recordPayment.mutate(
                                     {
