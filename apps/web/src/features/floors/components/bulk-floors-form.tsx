@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {Loader2, Plus, Trash2, TriangleAlert} from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
+import { IconTooltipButton } from "@/components/shared/icon-tooltip-button.tsx";
 import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field.tsx";
 import * as React from "react";
 import type {Floor} from "@/features/floors/types/floor.types.ts";
@@ -170,16 +171,16 @@ export function BulkFloorsForm({
                                                 <NumberInputIncrement />
                                             </NumberInputGroup>
                                         </NumberInput>
-                                        <Button
+                                        <IconTooltipButton
                                             type="button"
                                             size="icon-sm"
                                             variant="destructive"
                                             onClick={() => removeFloor(index)}
                                             disabled={isSubmitting || floors.length === 1}
-                                            aria-label={t("common:actions.delete")}
+                                            label={t("common:actions.delete")}
                                         >
                                             <Trash2 className="size-3" />
-                                        </Button>
+                                        </IconTooltipButton>
                                     </div>
                                     <FieldError>
                                         {duplicateNumbers.includes(floor.number)

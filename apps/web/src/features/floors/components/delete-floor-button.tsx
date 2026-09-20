@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button.tsx";
+import { IconTooltipButton } from "@/components/shared/icon-tooltip-button.tsx";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -49,14 +49,14 @@ export function DeleteFloorButton({ floor }: DeleteFloorButtonProps) {
 
     return (
         <>
-            <Button
+            <IconTooltipButton
                 size="icon-sm"
                 variant="destructive"
                 onClick={() => setOpen(true)}
-                aria-label={t("common:actions.delete")}
+                label={t("common:actions.delete")}
             >
                 <Trash2 className="size-3" />
-            </Button>
+            </IconTooltipButton>
 
             <AlertDialog
                 open={open}

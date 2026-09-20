@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {Loader2, Plus, Trash2, TriangleAlert, Wand2} from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
+import { IconTooltipButton } from "@/components/shared/icon-tooltip-button.tsx";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field.tsx";
 import { Input } from "@/components/ui/input.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
@@ -298,16 +299,16 @@ export function BulkUnitsForm({
                                 <div key={index} className="rounded-lg border p-3 space-y-2">
                                     <div className="flex items-center justify-between">
                                         <span className="text-sm font-medium">{t("bulk.rowNumberLabel", { number: unit.number })}</span>
-                                        <Button
+                                        <IconTooltipButton
                                             type="button"
                                             size="icon-sm"
                                             variant="destructive"
                                             onClick={() => removeUnit(index)}
                                             disabled={isSubmitting || units.length === 1}
-                                            aria-label={t("common:actions.delete")}
+                                            label={t("common:actions.delete")}
                                         >
                                             <Trash2 className="size-3" />
-                                        </Button>
+                                        </IconTooltipButton>
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
                                         <Field invalid={duplicateNumbers.includes(unit.number)}>

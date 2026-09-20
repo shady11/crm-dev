@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Pen } from "lucide-react";
-import { Button } from "@/components/ui/button.tsx";
+import { IconTooltipButton } from "@/components/shared/icon-tooltip-button.tsx";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet.tsx";
 import { updateBlock } from "@/features/blocks/api/blocks.api.ts";
 import type { Block } from "@/features/blocks/types/block.types.ts";
@@ -44,14 +44,14 @@ export function EditBlockButton({ block }: EditBlockButtonProps) {
 
     return (
         <>
-            <Button
+            <IconTooltipButton
                 size="icon-sm"
                 variant="secondary"
                 onClick={() => setOpen(true)}
-                aria-label={t("common:actions.edit")}
+                label={t("common:actions.edit")}
             >
                 <Pen className="size-3" />
-            </Button>
+            </IconTooltipButton>
 
             <Sheet
                 onOpenChange={({ open: isOpen }) => setOpen(isOpen)}

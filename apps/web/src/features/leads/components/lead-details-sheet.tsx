@@ -1,5 +1,6 @@
 import {ArrowLeftRight, Pen, Repeat, Trash2, UserPlusIcon} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
+import {IconTooltipButton} from "@/components/shared/icon-tooltip-button.tsx";
 import {Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
 import type {Lead} from "@/features/leads/api/leads.api.ts";
@@ -74,9 +75,9 @@ export function LeadDetailsSheet({
                 </SheetBody>
 
                 <SheetFooter>
-                    <Button variant="destructive" size="icon-md" onClick={onRequestDelete} aria-label={t("common:actions.delete")}>
+                    <IconTooltipButton variant="destructive" size="icon-md" onClick={onRequestDelete} label={t("common:actions.delete")}>
                         <Trash2 className="size-4" />
-                    </Button>
+                    </IconTooltipButton>
                     {canTransferBranch && (
                         <Button
                             variant="secondary"
