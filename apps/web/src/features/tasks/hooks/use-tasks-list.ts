@@ -3,6 +3,7 @@ import {useQuery} from "@tanstack/react-query";
 import {getTasks, getTaskStatusSummary, type TaskSortField} from "@/features/tasks/api/tasks.api.ts";
 import {TaskStatus} from "@/features/tasks/types/task.types.ts";
 import {useSort} from "@/hooks/use-sort.ts";
+import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
 
 export type TaskStatusFilter = TaskStatus | "all";
 
@@ -14,14 +15,15 @@ export function useTasksList() {
     const [page, setPage] = useState(1);
     const [limit, setLimitState] = useState(10);
     const {sortBy, sortOrder, toggleSort} = useSort<TaskSortField>();
+    const debouncedSearch = useDebouncedValue(search);
 
     const tableQuery = useQuery({
-        queryKey: ["tasks", { statusFilter, search, assignedToId, branchId, page, limit, sortBy, sortOrder }],
+        queryKey: ["tasks", { statusFilter, search: debouncedSearch, assignedToId, branchId, page, limit, sortBy, sortOrder }],
         queryFn: () =>
             getTasks({
                 page, limit,
                 status: statusFilter === "all" ? undefined : statusFilter,
-                search: search || undefined,
+                search: debouncedSearch || undefined,
                 assignedToId,
                 branchId,
                 sortBy,

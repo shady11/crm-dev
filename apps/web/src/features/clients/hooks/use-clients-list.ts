@@ -13,6 +13,7 @@ import {
 import type {Client} from "@/features/clients/types/client.types";
 import {useTranslation} from "react-i18next";
 import {useSort} from "@/hooks/use-sort.ts";
+import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
 
 export type ProjectFilterValue = string | "all";
 
@@ -27,6 +28,7 @@ export function useClientsList() {
     const [limit, setLimitState] = useState(10);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const {sortBy, sortOrder, toggleSort} = useSort<ClientSortField>();
+    const debouncedSearch = useDebouncedValue(search);
 
     const [formOpen, setFormOpen] = useState(false);
     const [editingClient, setEditingClient] = useState<Client | null>(null);
@@ -34,12 +36,12 @@ export function useClientsList() {
     const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
 
     const tableQuery = useQuery({
-        queryKey: ["clients", { search, projectFilter, branchFilter, page, limit, sortBy, sortOrder }],
+        queryKey: ["clients", { search: debouncedSearch, projectFilter, branchFilter, page, limit, sortBy, sortOrder }],
         queryFn: () =>
             getClients({
                 page,
                 limit,
-                search: search || undefined,
+                search: debouncedSearch || undefined,
                 projectId: projectFilter === "all" ? undefined : projectFilter,
                 branchId: branchFilter === "all" ? undefined : branchFilter,
                 sortBy,
