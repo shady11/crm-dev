@@ -265,7 +265,7 @@ export const Sidebar = (props: SidebarProps) => {
           className
         )}
         data-slot="sidebar-container"
-        {...props}
+        {...rest}
       >
         <ark.div
           className={cn(
