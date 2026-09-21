@@ -4,6 +4,7 @@ import type {Task} from "@/features/tasks/api/tasks.api.ts";
 import {Separator} from "@/components/ui/separator.tsx";
 import {formatDate} from "@/utils/date-formatter.ts";
 import {Badge} from "@/components/ui/badge.tsx";
+import {TASK_PRIORITY_CLASSES, TASK_PRIORITY_LABEL_KEYS} from "@/features/tasks/types/task.types.ts";
 import {useTranslation} from "react-i18next";
 
 function isOverdue(task: Task) {
@@ -17,13 +18,16 @@ export function TaskKanbanCardContent({ task }: { task: Task }) {
     return (
         <>
             <CardHeader className="px-4">
-                {related &&
-                    <div className="flex items-center gap-1 mb-1">
+                <div className="flex items-center gap-1 mb-1">
+                    {related &&
                         <Badge variant="secondary" size="xs">
                             {related}
                         </Badge>
-                    </div>
-                }
+                    }
+                    <Badge size="xs" className={`${TASK_PRIORITY_CLASSES[task.priority]} text-white`}>
+                        {t(TASK_PRIORITY_LABEL_KEYS[task.priority])}
+                    </Badge>
+                </div>
                 <CardTitle>{task.title}</CardTitle>
                 <CardDescription className="row-start-auto text-xs">
                     {task.description}
