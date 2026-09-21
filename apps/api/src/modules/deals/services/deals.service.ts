@@ -12,6 +12,7 @@ import {
   PaymentScheduleStatus,
   PaymentType,
   Prisma,
+  TaskType,
   UnitStatus,
 } from '@/generated/prisma/client';
 import {PrismaService} from '@/database/prisma.service';
@@ -45,6 +46,7 @@ import {NotificationsService} from "@/modules/notifications/notifications.servic
 import {DealNumberService} from "@/modules/deals/services/deal-number.service";
 import {DocumentGenerationService} from "@/modules/document-generation/document-generation.service";
 import {GENERATABLE_DOCUMENT_TYPES} from "@/modules/document-generation/document-generation.constants";
+import {TasksService} from "@/modules/tasks/tasks.service";
 
 @Injectable()
 export class DealsService {
@@ -59,6 +61,7 @@ export class DealsService {
       private readonly dealNumberService: DealNumberService,
       private readonly documentGeneration: DocumentGenerationService,
       private readonly rbacService: RbacService,
+      private readonly tasksService: TasksService,
   ) {}
 
   /**
@@ -404,6 +407,26 @@ export class DealsService {
       userId: user.id,
       activityTitle: 'Reservation agreement generated',
     });
+
+    // Best-effort, non-fatal — same reasoning as generateAndLogDocument
+    // above: never blocks the reservation itself. Gives the manager a
+    // concrete next step instead of relying on them to remember one.
+    try {
+      await this.tasksService.createAutomated({
+        companyId,
+        assignedToId: result.managerId,
+        actorId: user.id,
+        title: `Confirm documents for deal ${result.dealNumber}`,
+        type: TaskType.FOLLOW_UP,
+        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+        dealId: result.id,
+      });
+    } catch (error) {
+      this.logger.error(
+          `Failed to auto-create document-confirmation task for deal ${result.id}`,
+          error instanceof Error ? error.stack : String(error),
+      );
+    }
 
     return this.mapper.toDetails(result);
   }

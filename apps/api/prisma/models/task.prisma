@@ -5,13 +5,34 @@ enum TaskStatus {
   CANCELLED
 }
 
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum TaskType {
+  CALL
+  MEETING
+  SITE_VISIT
+  FOLLOW_UP
+  OTHER
+}
+
 model Task {
   id String @id @default(uuid())
 
   title       String
   description String?
   dueDate     DateTime?
-  status      TaskStatus @default(TODO)
+  status      TaskStatus   @default(TODO)
+  priority    TaskPriority @default(MEDIUM)
+  type        TaskType     @default(OTHER)
+
+  // Free text for now — required by TasksService.updateStatus whenever a task
+  // is closed as DONE or CANCELLED, but not modeled as an enum yet: we don't
+  // know the real outcome taxonomy until reps have used it for a while.
+  outcome String?
 
   assignedToId String
   assignedTo   User   @relation(fields: [assignedToId], references: [id])

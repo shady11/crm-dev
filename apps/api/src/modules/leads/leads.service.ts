@@ -1,9 +1,10 @@
-import {BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
-import {ActivityAction, ActivityType, Prisma} from "@/generated/prisma/client";
+import {BadRequestException, ConflictException, ForbiddenException, Injectable, Logger, NotFoundException} from "@nestjs/common";
+import {ActivityAction, ActivityType, Prisma, TaskPriority, TaskType} from "@/generated/prisma/client";
 import {LeadStatus} from "@/generated/prisma/enums";
 import {PrismaService} from "@/database/prisma.service";
 import {ClientsService} from "@/modules/clients/clients.service";
 import {RbacService} from "@/modules/rbac/rbac.service";
+import {TasksService} from "@/modules/tasks/tasks.service";
 import {hasPermission} from "@/common/utils/permissions.util";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {TransferBranchDto} from "@/common/dto/transfer-branch.dto";
@@ -25,10 +26,13 @@ const CONTACT_ATTEMPT_TYPE_MAP: Record<ContactAttemptType, ActivityType> = {
 
 @Injectable()
 export class LeadsService {
+    private readonly logger = new Logger(LeadsService.name);
+
     constructor(
         private readonly prisma: PrismaService,
         private readonly clientsService: ClientsService,
         private readonly rbacService: RbacService,
+        private readonly tasksService: TasksService,
     ) {}
 
     async findAll(user: AuthUser, query: QueryLeadsDto) {
@@ -238,6 +242,30 @@ export class LeadsService {
                 title: `Lead "${created.fullName}" created`,
             },
         });
+
+        // Best-effort, non-fatal — a new lead is worth nothing if nobody
+        // calls it, so the assigned manager gets a first-contact task
+        // automatically. Never blocks lead creation itself; see
+        // TasksService.createAutomated.
+        if (created.managerId) {
+            try {
+                await this.tasksService.createAutomated({
+                    companyId: user.companyId,
+                    assignedToId: created.managerId,
+                    actorId: user.id,
+                    title: `Call ${created.fullName}`,
+                    type: TaskType.CALL,
+                    priority: TaskPriority.HIGH,
+                    dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
+                    leadId: created.id,
+                });
+            } catch (error) {
+                this.logger.error(
+                    `Failed to auto-create first-contact task for lead ${created.id}`,
+                    error instanceof Error ? error.stack : String(error),
+                );
+            }
+        }
 
         return created;
     }

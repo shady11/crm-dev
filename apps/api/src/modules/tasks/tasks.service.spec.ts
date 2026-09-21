@@ -1,5 +1,5 @@
 import {BadRequestException, ForbiddenException} from '@nestjs/common';
-import {TaskStatus} from '@/generated/prisma/client';
+import {TaskPriority, TaskStatus, TaskType} from '@/generated/prisma/client';
 import {AuthUser} from '@/common/types/auth-user.type';
 import {TasksService} from './tasks.service';
 import {TaskNotFoundException} from './exceptions/task-not-found.exception';
@@ -190,13 +190,31 @@ describe('TasksService', () => {
             );
         });
 
-        it('updates only the status field', async () => {
+        it('updates the status and outcome fields', async () => {
             const {service, prisma} = build({task: {id: 'task-1'}});
-            await service.updateStatus(adminUser, 'task-1', {status: TaskStatus.DONE} as any);
+            await service.updateStatus(adminUser, 'task-1', {status: TaskStatus.DONE, outcome: 'Called — qualified'} as any);
 
             expect(prisma.task.update).toHaveBeenCalledWith({
                 where: {id: 'task-1'},
-                data: {status: TaskStatus.DONE},
+                data: {status: TaskStatus.DONE, outcome: 'Called — qualified'},
+                include: expect.anything(),
+            });
+        });
+
+        it('requires an outcome when closing a task as DONE or CANCELLED', async () => {
+            const {service} = build({task: {id: 'task-1', status: TaskStatus.TODO}});
+            await expect(
+                service.updateStatus(adminUser, 'task-1', {status: TaskStatus.DONE} as any),
+            ).rejects.toThrow(BadRequestException);
+        });
+
+        it('does not require an outcome for a non-closing transition', async () => {
+            const {service, prisma} = build({task: {id: 'task-1', status: TaskStatus.TODO}});
+            await service.updateStatus(adminUser, 'task-1', {status: TaskStatus.IN_PROGRESS} as any);
+
+            expect(prisma.task.update).toHaveBeenCalledWith({
+                where: {id: 'task-1'},
+                data: {status: TaskStatus.IN_PROGRESS, outcome: undefined},
                 include: expect.anything(),
             });
         });
@@ -246,6 +264,79 @@ describe('TasksService', () => {
 
             expect(prisma.task.groupBy).toHaveBeenCalledWith(
                 expect.objectContaining({where: expect.objectContaining({branchId: 'branch-1'})}),
+            );
+        });
+    });
+
+    describe('createAutomated', () => {
+        it('returns null without creating a task when the assignee no longer exists', async () => {
+            const {service, prisma} = build({assignee: null});
+
+            const result = await service.createAutomated({
+                companyId: 'company-1',
+                assignedToId: 'gone',
+                actorId: 'system',
+                title: 'Call John',
+                type: TaskType.CALL,
+                dueDate: new Date(),
+            });
+
+            expect(result).toBeNull();
+            expect(prisma.task.create).not.toHaveBeenCalled();
+        });
+
+        it('derives branchId from the assignee and defaults priority to MEDIUM', async () => {
+            const {service, prisma} = build({assignee: {id: 'assignee-1', branchId: 'branch-9'}});
+
+            await service.createAutomated({
+                companyId: 'company-1',
+                assignedToId: 'assignee-1',
+                actorId: 'system',
+                title: 'Call John',
+                type: TaskType.CALL,
+                dueDate: new Date(),
+            });
+
+            expect(prisma.task.create).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    data: expect.objectContaining({
+                        branchId: 'branch-9',
+                        priority: TaskPriority.MEDIUM,
+                        type: TaskType.CALL,
+                    }),
+                }),
+            );
+        });
+
+        it('notifies the assignee unless they are also the triggering actor', async () => {
+            const {service, notifications} = build({assignee: {id: 'assignee-1', branchId: 'branch-9'}});
+
+            await service.createAutomated({
+                companyId: 'company-1',
+                assignedToId: 'assignee-1',
+                actorId: 'assignee-1',
+                title: 'Call John',
+                type: TaskType.CALL,
+                dueDate: new Date(),
+            });
+
+            expect(notifications.create).not.toHaveBeenCalled();
+        });
+
+        it('logs a CREATED_TASK activity attributed to the triggering actor, not the system', async () => {
+            const {service, prisma} = build({assignee: {id: 'assignee-1', branchId: 'branch-9'}});
+
+            await service.createAutomated({
+                companyId: 'company-1',
+                assignedToId: 'assignee-1',
+                actorId: 'lead-creator-1',
+                title: 'Call John',
+                type: TaskType.CALL,
+                dueDate: new Date(),
+            });
+
+            expect(prisma.activity.create).toHaveBeenCalledWith(
+                expect.objectContaining({data: expect.objectContaining({userId: 'lead-creator-1'})}),
             );
         });
     });

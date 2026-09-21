@@ -14,9 +14,10 @@ import {DealExpiryService} from "@/modules/deals/services/deal-expiry.service";
 import { DealNumberService } from '@/modules/deals/services/deal-number.service';
 import {DocumentGenerationModule} from "@/modules/document-generation/document-generation.module";
 import {RbacModule} from "@/modules/rbac/rbac.module";
+import {TasksModule} from "@/modules/tasks/tasks.module";
 
 @Module({
-  imports: [PrismaModule, NotificationsModule, DocumentGenerationModule, RbacModule],
+  imports: [PrismaModule, NotificationsModule, DocumentGenerationModule, RbacModule, TasksModule],
   controllers: [DealsController],
   providers: [
     DealsService,
