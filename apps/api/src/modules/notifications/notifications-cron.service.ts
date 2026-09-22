@@ -3,6 +3,11 @@ import {Cron, CronExpression} from "@nestjs/schedule";
 import {NotificationEntityType, NotificationType, TaskStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {NotificationsService} from "./notifications.service";
+import {RbacService} from "@/modules/rbac/rbac.service";
+
+// Days overdue before a task escalates to the assignee's branch team
+// lead(s) — same tiering idea as payment-reminders' REMINDER_STAGES.
+const TASK_ESCALATION_DAYS = 3;
 
 @Injectable()
 export class NotificationsCronService {
@@ -11,6 +16,7 @@ export class NotificationsCronService {
     constructor(
         private readonly prisma: PrismaService,
         private readonly notifications: NotificationsService,
+        private readonly rbacService: RbacService,
     ) {}
 
     @Cron(CronExpression.EVERY_HOUR)
@@ -81,7 +87,45 @@ export class NotificationsCronService {
             });
         }
 
-        this.logger.log(`Checked task deadlines: ${dueSoon.length} due soon, ${overdue.length} overdue`);
+        const escalationCutoff = new Date(now.getTime() - TASK_ESCALATION_DAYS * 24 * 60 * 60 * 1000);
+        const severelyOverdue = await this.prisma.task.findMany({
+            where: {
+                status: { in: activeStatuses },
+                dueDate: { lte: escalationCutoff },
+                deletedAt: null,
+                branchId: { not: null },
+            },
+            select: { id: true, title: true, companyId: true, branchId: true },
+        });
+
+        let escalations = 0;
+        for (const task of severelyOverdue) {
+            // "Team lead" = whoever holds deals.reassign, same convention
+            // payment-reminders uses to find a branch's escalation target.
+            const teamLeadRoleIds = await this.rbacService.findRoleIdsWithPermission(task.companyId, "deals.reassign");
+
+            const teamLeads = await this.prisma.user.findMany({
+                where: { companyId: task.companyId, branchId: task.branchId!, roleId: { in: teamLeadRoleIds }, isActive: true },
+                select: { id: true },
+            });
+
+            for (const lead of teamLeads) {
+                await this.notifyOnce({
+                    userId: lead.id,
+                    companyId: task.companyId,
+                    type: NotificationType.TASK_ESCALATED,
+                    entityType: NotificationEntityType.TASK,
+                    entityId: task.id,
+                    title: `Task overdue ${TASK_ESCALATION_DAYS}+ days`,
+                    message: task.title,
+                });
+                escalations++;
+            }
+        }
+
+        this.logger.log(
+            `Checked task deadlines: ${dueSoon.length} due soon, ${overdue.length} overdue, ${escalations} escalated`,
+        );
     }
 
     // не даёт слать одно и то же уведомление на каждый прогон крона —

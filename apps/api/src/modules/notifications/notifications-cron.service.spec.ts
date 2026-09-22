@@ -8,20 +8,30 @@ import {NotificationsCronService} from './notifications-cron.service';
  * the underlying condition resolves.
  */
 describe('NotificationsCronService', () => {
-    function build(opts: {deals?: unknown[]; dueSoonTasks?: unknown[]; overdueTasks?: unknown[]; existingNotification?: unknown} = {}) {
+    function build(opts: {
+        deals?: unknown[];
+        dueSoonTasks?: unknown[];
+        overdueTasks?: unknown[];
+        severelyOverdueTasks?: unknown[];
+        teamLeads?: unknown[];
+        existingNotification?: unknown;
+    } = {}) {
         const prisma = {
             deal: {findMany: jest.fn().mockResolvedValue(opts.deals ?? [])},
             task: {
                 findMany: jest.fn()
                     .mockResolvedValueOnce(opts.dueSoonTasks ?? [])
-                    .mockResolvedValueOnce(opts.overdueTasks ?? []),
+                    .mockResolvedValueOnce(opts.overdueTasks ?? [])
+                    .mockResolvedValueOnce(opts.severelyOverdueTasks ?? []),
             },
+            user: {findMany: jest.fn().mockResolvedValue(opts.teamLeads ?? [])},
             notification: {findFirst: jest.fn().mockResolvedValue(opts.existingNotification ?? null)},
         };
         const notifications = {create: jest.fn().mockResolvedValue({})};
+        const rbacService = {findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-head'])};
 
-        const service = new NotificationsCronService(prisma as any, notifications as any);
-        return {service, prisma, notifications};
+        const service = new NotificationsCronService(prisma as any, notifications as any, rbacService as any);
+        return {service, prisma, notifications, rbacService};
     }
 
     describe('checkExpiringReservations', () => {
@@ -131,6 +141,50 @@ describe('NotificationsCronService', () => {
                 existingNotification: {id: 'notif-existing'},
             });
 
+            await service.checkTaskDeadlines();
+
+            expect(notifications.create).not.toHaveBeenCalled();
+        });
+
+        it('queries tasks overdue 3+ days, excluding branchless tasks, for escalation', async () => {
+            const {service, prisma} = build();
+            await service.checkTaskDeadlines();
+
+            expect(prisma.task.findMany).toHaveBeenNthCalledWith(
+                3,
+                expect.objectContaining({
+                    where: {
+                        status: {in: [TaskStatus.TODO, TaskStatus.IN_PROGRESS]},
+                        dueDate: {lte: expect.any(Date)},
+                        deletedAt: null,
+                        branchId: {not: null},
+                    },
+                }),
+            );
+        });
+
+        it('escalates a severely overdue task to its branch team lead(s), not the assignee', async () => {
+            const {service, prisma, notifications, rbacService} = build({
+                severelyOverdueTasks: [{id: 'task-3', title: 'Stale task', companyId: 'company-1', branchId: 'branch-1'}],
+                teamLeads: [{id: 'head-1'}, {id: 'head-2'}],
+            });
+
+            await service.checkTaskDeadlines();
+
+            expect(rbacService.findRoleIdsWithPermission).toHaveBeenCalledWith('company-1', 'deals.reassign');
+            expect(prisma.user.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({branchId: 'branch-1', roleId: {in: ['role-sales-head']}})}),
+            );
+            expect(notifications.create).toHaveBeenCalledWith(
+                expect.objectContaining({userId: 'head-1', type: NotificationType.TASK_ESCALATED, entityId: 'task-3'}),
+            );
+            expect(notifications.create).toHaveBeenCalledWith(
+                expect.objectContaining({userId: 'head-2', type: NotificationType.TASK_ESCALATED, entityId: 'task-3'}),
+            );
+        });
+
+        it('does not escalate when no severely overdue tasks exist', async () => {
+            const {service, notifications} = build();
             await service.checkTaskDeadlines();
 
             expect(notifications.create).not.toHaveBeenCalled();

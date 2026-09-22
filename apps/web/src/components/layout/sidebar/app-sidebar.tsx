@@ -70,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         .map((item) => ({ title: t(item.titleKey), url: item.url, icon: item.icon }));
 
     return (
-        <Sidebar className="h-full border-r-2" collapsible="icon" {...props}>
+        <Sidebar className="border-r-2" collapsible="icon" {...props}>
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>

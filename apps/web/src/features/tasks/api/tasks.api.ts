@@ -1,6 +1,6 @@
 import {api} from "@/lib/api";
 import type {PaginatedResponse} from "@/lib/api-types.ts";
-import type {TaskStatus} from "@/features/tasks/types/task.types.ts";
+import type {TaskPriority, TaskStatus, TaskType} from "@/features/tasks/types/task.types.ts";
 
 export type Task = {
     id: string;
@@ -8,6 +8,9 @@ export type Task = {
     description: string | null;
     dueDate: string | null;
     status: TaskStatus;
+    priority: TaskPriority;
+    type: TaskType;
+    outcome: string | null;
     createdAt: string;
     updatedAt: string;
     assignedTo: { id: string; fullName: string };
@@ -19,7 +22,7 @@ export type Task = {
 export type TaskStatusSummaryItem = { status: TaskStatus; count: number };
 
 // Kept in sync with TASK_SORTABLE_FIELDS in the API's query-tasks.dto.ts.
-export type TaskSortField = "title" | "dueDate" | "status";
+export type TaskSortField = "title" | "dueDate" | "status" | "priority";
 
 export type GetTasksParams = {
     status?: TaskStatus;
@@ -43,6 +46,9 @@ export type TaskPayload = {
     description?: string;
     dueDate?: string;
     status?: TaskStatus;
+    priority?: TaskPriority;
+    type?: TaskType;
+    outcome?: string;
     assignedToId: string;
     leadId?: string;
     clientId?: string;
@@ -69,8 +75,8 @@ export async function updateTask(id: string, payload: Partial<TaskPayload>) {
     return response.data;
 }
 
-export async function updateTaskStatus(id: string, status: TaskStatus) {
-    const response = await api.patch<Task>(`/tasks/${id}/status`, { status });
+export async function updateTaskStatus(id: string, status: TaskStatus, outcome?: string) {
+    const response = await api.patch<Task>(`/tasks/${id}/status`, { status, outcome });
     return response.data;
 }
 

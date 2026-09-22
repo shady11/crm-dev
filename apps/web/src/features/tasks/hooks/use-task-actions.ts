@@ -30,7 +30,8 @@ export function useTaskActions() {
     });
 
     const changeStatus = useMutation({
-        mutationFn: ({ id, status }: { id: string; status: TaskStatus }) => updateTaskStatus(id, status),
+        mutationFn: ({ id, status, outcome }: { id: string; status: TaskStatus; outcome?: string }) =>
+            updateTaskStatus(id, status, outcome),
 
         onMutate: async ({ id, status }) => {
             await queryClient.cancelQueries({ queryKey: ["tasks"] });

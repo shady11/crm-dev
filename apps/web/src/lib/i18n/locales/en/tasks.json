@@ -5,6 +5,18 @@
     "done": "Done",
     "cancelled": "Cancelled"
   },
+  "priority": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
+  },
+  "type": {
+    "call": "Call",
+    "meeting": "Meeting",
+    "site_visit": "Site visit",
+    "follow_up": "Follow-up",
+    "other": "Other"
+  },
   "page": {
     "title": "Tasks"
   },
@@ -22,6 +34,7 @@
     "relatedTo": "Related to",
     "assignee": "Assignee",
     "dueDate": "Due date",
+    "priority": "Priority",
     "status": "Status",
     "emptyTitle": "No tasks found",
     "emptyDescription": "Try adjusting your filters or search."
@@ -58,13 +71,25 @@
     "assignee": "Assignee",
     "selectAssignee": "Select assignee",
     "status": "Status",
+    "priority": "Priority",
+    "type": "Type",
+    "outcome": "Outcome",
+    "outcomePlaceholder": "e.g. Called — client qualified, or no answer",
     "dueDate": "Due date (optional)",
     "selectDueDate": "Select due date",
     "cancel": "Cancel",
     "validation": {
       "titleMin": "Title must be at least 2 characters",
-      "selectAssignee": "Select an assignee"
+      "selectAssignee": "Select an assignee",
+      "outcomeRequired": "An outcome is required to close a task"
     }
+  },
+  "outcomeDialog": {
+    "title": "Add an outcome",
+    "description": "Moving this task to \"{{status}}\" requires a short outcome note.",
+    "label": "Outcome",
+    "placeholder": "e.g. Called — client qualified, or no answer",
+    "confirm": "Confirm"
   },
   "clientCard": {
     "title": "Tasks",

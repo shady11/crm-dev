@@ -7,9 +7,11 @@ import {TasksTable} from "@/features/tasks/components/tasks-table.tsx";
 import {TasksPagination} from "@/features/tasks/components/tasks-pagination.tsx";
 import {TaskKanbanBoard} from "@/features/tasks/components/task-kanban-board.tsx";
 import {TaskFormSheet} from "@/features/tasks/components/task-form-sheet.tsx";
+import {TaskOutcomeDialog} from "@/features/tasks/components/task-outcome-dialog.tsx";
 import {useTasksList} from "@/features/tasks/hooks/use-tasks-list.ts";
 import {useTaskActions} from "@/features/tasks/hooks/use-task-actions.ts";
 import type {Task, TaskPayload} from "@/features/tasks/api/tasks.api.ts";
+import {TASK_TERMINAL_STATUSES, type TaskStatus} from "@/features/tasks/types/task.types.ts";
 import {useTranslation} from "react-i18next";
 
 type TasksView = "table" | "board";
@@ -22,10 +24,30 @@ export function TasksPage() {
     const [view, setView] = useState<TasksView>("board");
     const [formOpen, setFormOpen] = useState(false);
     const [editingTask, setEditingTask] = useState<Task | null>(null);
+    const [pendingClose, setPendingClose] = useState<{ taskId: string; status: TaskStatus } | null>(null);
 
     const openCreate = () => { setEditingTask(null); setFormOpen(true); };
     const openEdit = (task: Task) => { setEditingTask(task); setFormOpen(true); };
     const closeForm = () => { setFormOpen(false); setEditingTask(null); actions.create.reset(); actions.update.reset(); };
+
+    // A drag onto Done/Cancelled needs an outcome (the API rejects the
+    // transition without one) — every other status change goes straight
+    // through, same as before.
+    const handleStatusChange = (taskId: string, status: TaskStatus) => {
+        if (TASK_TERMINAL_STATUSES.includes(status)) {
+            setPendingClose({ taskId, status });
+            return;
+        }
+        actions.changeStatus.mutate({ id: taskId, status });
+    };
+
+    const confirmClose = (outcome: string) => {
+        if (!pendingClose) return;
+        actions.changeStatus.mutate(
+            { id: pendingClose.taskId, status: pendingClose.status, outcome },
+            { onSuccess: () => setPendingClose(null) },
+        );
+    };
 
     const handleSubmit = (payload: TaskPayload) => {
         if (editingTask) {
@@ -90,7 +112,7 @@ export function TasksPage() {
                         search={filters.search}
                         assignedToId={filters.assignedToId}
                         branchId={filters.branchId}
-                        onStatusChange={(taskId, status) => actions.changeStatus.mutate({ id: taskId, status })}
+                        onStatusChange={handleStatusChange}
                         onCardClick={openEdit}
                     />
                 )}
@@ -103,6 +125,14 @@ export function TasksPage() {
                 hasError={actions.create.isError || actions.update.isError}
                 onClose={closeForm}
                 onSubmit={handleSubmit}
+            />
+
+            <TaskOutcomeDialog
+                open={!!pendingClose}
+                status={pendingClose?.status ?? null}
+                isSubmitting={actions.changeStatus.isPending}
+                onCancel={() => setPendingClose(null)}
+                onConfirm={confirmClose}
             />
         </div>
     );

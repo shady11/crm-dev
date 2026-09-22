@@ -1,5 +1,14 @@
 import {BadRequestException, ForbiddenException, Injectable} from "@nestjs/common";
-import {ActivityAction, ActivityType, NotificationEntityType, NotificationType, Prisma, TaskStatus} from "@/generated/prisma/client";
+import {
+    ActivityAction,
+    ActivityType,
+    NotificationEntityType,
+    NotificationType,
+    Prisma,
+    TaskPriority,
+    TaskStatus,
+    TaskType,
+} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateTaskDto} from "./dto/create-task.dto";
@@ -10,6 +19,8 @@ import {resolveOrderBy} from "@/common/utils/sort.util";
 import {TaskNotFoundException} from "./exceptions/task-not-found.exception";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
+
+const TERMINAL_STATUSES: TaskStatus[] = [TaskStatus.DONE, TaskStatus.CANCELLED];
 
 const TASK_INCLUDE = {
     assignedTo: { select: { id: true, fullName: true } },
@@ -61,6 +72,8 @@ export class TasksService {
             companyId: user.companyId,
             deletedAt: null,
             status: query.status,
+            priority: query.priority,
+            type: query.type,
             assignedToId: query.assignedToId,
             dealId: query.dealId,
             clientId: query.clientId,
@@ -139,6 +152,8 @@ export class TasksService {
                 description: dto.description,
                 dueDate: dto.dueDate ? new Date(dto.dueDate) : null,
                 status: dto.status ?? TaskStatus.TODO,
+                priority: dto.priority ?? TaskPriority.MEDIUM,
+                type: dto.type ?? TaskType.OTHER,
                 assignedToId: dto.assignedToId,
                 // Derived from the assignee's branch, not stamped from the
                 // creating user — a COMPANY_ADMIN assigning a task to a
@@ -184,6 +199,9 @@ export class TasksService {
 
         const existing = await this.findOne(user, id);
         this.ensureSingleEntityLink(dto);
+        if (dto.status !== undefined) {
+            this.ensureOutcomeOnClose(dto.status, existing.status, dto.outcome ?? existing.outcome);
+        }
 
         let branchId: string | null | undefined;
 
@@ -202,6 +220,9 @@ export class TasksService {
                 description: dto.description,
                 dueDate: dto.dueDate !== undefined ? (dto.dueDate ? new Date(dto.dueDate) : null) : undefined,
                 status: dto.status,
+                priority: dto.priority,
+                type: dto.type,
+                outcome: dto.outcome,
                 assignedToId: dto.assignedToId,
                 branchId,
                 leadId: dto.leadId,
@@ -275,10 +296,11 @@ export class TasksService {
         }
 
         const existing = await this.findOne(user, id);
+        this.ensureOutcomeOnClose(dto.status, existing.status, dto.outcome ?? existing.outcome);
 
         const task = await this.prisma.task.update({
             where: { id },
-            data: { status: dto.status },
+            data: { status: dto.status, outcome: dto.outcome ?? existing.outcome },
             include: TASK_INCLUDE,
         });
 
@@ -351,6 +373,98 @@ export class TasksService {
         if (linked.length > 1) {
             throw new BadRequestException("A task can only be linked to one of lead, client, or deal.");
         }
+    }
+
+    /**
+     * A task closed as DONE or CANCELLED must carry an outcome — the whole
+     * point of closing it is to leave a signal ("no answer" vs "qualified")
+     * for reporting and follow-up automation. Only enforced on the
+     * transition *into* a closed state, so re-saving an already-closed task
+     * without touching status never re-demands it.
+     */
+    private ensureOutcomeOnClose(newStatus: TaskStatus, previousStatus: TaskStatus, outcome?: string | null) {
+        const closing = TERMINAL_STATUSES.includes(newStatus);
+        const wasAlreadyClosed = TERMINAL_STATUSES.includes(previousStatus);
+
+        if (closing && !wasAlreadyClosed && !outcome?.trim()) {
+            throw new BadRequestException("An outcome is required to close a task.");
+        }
+    }
+
+    /**
+     * System-triggered task creation — called by other modules (Leads,
+     * Deals) as a best-effort side effect of their own events, the same way
+     * DealsService.generateAndLogDocument runs document generation outside
+     * the triggering transaction. Bypasses the branch-assignment permission
+     * check in ensureAssigneeAssignable: the caller already resolved and
+     * authorized assignedToId (e.g. a lead's own manager), so re-checking it
+     * against the *triggering* user's branch would wrongly reject a
+     * company-wide admin's lead being auto-assigned a task in its own
+     * branch. Returns null (never throws) when the assignee no longer
+     * exists, so a caller's try/catch isn't required for that case — but
+     * callers should still wrap this in try/catch, since it can still throw
+     * on an unexpected DB error and must never block the event that
+     * triggered it.
+     */
+    async createAutomated(params: {
+        companyId: string;
+        assignedToId: string;
+        actorId: string;
+        title: string;
+        description?: string;
+        type: TaskType;
+        priority?: TaskPriority;
+        dueDate: Date;
+        leadId?: string;
+        clientId?: string;
+        dealId?: string;
+    }) {
+        const assignee = await this.prisma.user.findFirst({
+            where: { id: params.assignedToId, companyId: params.companyId, isActive: true },
+            select: { branchId: true },
+        });
+
+        if (!assignee) return null;
+
+        const task = await this.prisma.task.create({
+            data: {
+                title: params.title,
+                description: params.description,
+                dueDate: params.dueDate,
+                priority: params.priority ?? TaskPriority.MEDIUM,
+                type: params.type,
+                assignedToId: params.assignedToId,
+                branchId: assignee.branchId,
+                leadId: params.leadId,
+                clientId: params.clientId,
+                dealId: params.dealId,
+                companyId: params.companyId,
+            },
+            include: TASK_INCLUDE,
+        });
+
+        if (task.assignedToId !== params.actorId) {
+            await this.notifications.create({
+                companyId: params.companyId,
+                userId: task.assignedToId,
+                type: NotificationType.TASK_ASSIGNED,
+                title: "New task assigned to you",
+                message: task.title,
+                entityType: NotificationEntityType.TASK,
+                entityId: task.id,
+            });
+        }
+
+        await this.logTaskActivity({
+            companyId: params.companyId,
+            actorId: params.actorId,
+            taskId: task.id,
+            action: ActivityAction.CREATED_TASK,
+            type: ActivityType.TASK_CREATED,
+            title: `Task "${task.title}" auto-created`,
+        });
+
+        return task;
     }
 
     /**

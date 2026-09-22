@@ -117,13 +117,14 @@ describe('DealsService', () => {
             ]),
             findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-manager']),
         };
+        const tasksService = {createAutomated: jest.fn().mockResolvedValue(null)};
 
         const service = new DealsService(
             prisma, mapper, domain, activityService as any, notifications as any,
-            dealNumberService as any, documentGeneration as any, rbacService as any,
+            dealNumberService as any, documentGeneration as any, rbacService as any, tasksService as any,
         );
 
-        return {service, prisma, activityService, notifications, dealNumberService, documentGeneration};
+        return {service, prisma, activityService, notifications, dealNumberService, documentGeneration, tasksService};
     }
 
     describe('reserveUnit', () => {
@@ -269,6 +270,34 @@ describe('DealsService', () => {
             await service.reserveUnit(managerUser, reserveDto({salePrice: 100000}));
 
             expect(prisma.user.findMany).not.toHaveBeenCalled();
+        });
+
+        it('auto-creates a document-confirmation task assigned to the deal manager', async () => {
+            const {service, prisma, tasksService} = build();
+            prisma.deal.findUniqueOrThrow.mockResolvedValue({
+                id: 'deal-1', clientId: 'client-1', managerId: 'manager-1', dealNumber: 'D-2026-0001',
+            });
+
+            await service.reserveUnit(managerUser, reserveDto({salePrice: 100000}));
+
+            expect(tasksService.createAutomated).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    companyId: 'company-1',
+                    assignedToId: 'manager-1',
+                    actorId: managerUser.id,
+                    dealId: 'deal-1',
+                }),
+            );
+        });
+
+        it('does not fail the reservation when task auto-creation throws', async () => {
+            const {service, prisma, tasksService} = build();
+            prisma.deal.findUniqueOrThrow.mockResolvedValue({
+                id: 'deal-1', clientId: 'client-1', managerId: 'manager-1', dealNumber: 'D-2026-0001',
+            });
+            (tasksService.createAutomated as jest.Mock).mockRejectedValue(new Error('boom'));
+
+            await expect(service.reserveUnit(managerUser, reserveDto({salePrice: 100000}))).resolves.toBeDefined();
         });
     });
 

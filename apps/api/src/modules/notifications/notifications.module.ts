@@ -6,9 +6,10 @@ import {NotificationsCronService} from "./notifications-cron.service";
 import {AuthModule} from "@/modules/auth/auth.module";
 import {NotificationsGateway} from "@/modules/notifications/notifications.gateway";
 import {WebsocketModule} from "@/common/websocket/websocket.module";
+import {RbacModule} from "@/modules/rbac/rbac.module";
 
 @Module({
-    imports: [PrismaModule, AuthModule, WebsocketModule],
+    imports: [PrismaModule, AuthModule, WebsocketModule, RbacModule],
     controllers: [NotificationsController],
     providers: [NotificationsService, NotificationsCronService, NotificationsGateway],
     exports: [NotificationsService],

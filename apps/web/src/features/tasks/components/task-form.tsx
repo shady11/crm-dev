@@ -15,7 +15,15 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {SheetBody, SheetClose, SheetFooter} from "@/components/ui/sheet.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {useAssignableUsers} from "@/features/users/hooks/use-assignable-users.ts";
-import {TASK_STATUS_LABEL_KEYS, TaskStatus} from "@/features/tasks/types/task.types.ts";
+import {
+    TASK_PRIORITY_LABEL_KEYS,
+    TASK_STATUS_LABEL_KEYS,
+    TASK_TERMINAL_STATUSES,
+    TASK_TYPE_LABEL_KEYS,
+    TaskPriority,
+    TaskStatus,
+    TaskType,
+} from "@/features/tasks/types/task.types.ts";
 import type {Task, TaskPayload} from "@/features/tasks/api/tasks.api.ts";
 import {formatDate} from "@/utils/date-formatter.ts";
 import {
@@ -35,6 +43,9 @@ type TaskFormValues = {
     description?: string;
     dueDate?: string;
     status: TaskStatus;
+    priority: TaskPriority;
+    type: TaskType;
+    outcome?: string;
     assignedToId: string;
 };
 
@@ -48,7 +59,8 @@ interface TaskFormProps {
 }
 
 const DEFAULT_VALUES: TaskFormValues = {
-    title: "", description: "", dueDate: "", status: TaskStatus.TODO, assignedToId: "",
+    title: "", description: "", dueDate: "", status: TaskStatus.TODO,
+    priority: TaskPriority.MEDIUM, type: TaskType.OTHER, outcome: "", assignedToId: "",
 };
 
 function toFormValues(task?: Task | null): TaskFormValues {
@@ -58,8 +70,18 @@ function toFormValues(task?: Task | null): TaskFormValues {
         description: task.description ?? "",
         dueDate: task.dueDate ? task.dueDate.slice(0, 10) : "",
         status: task.status,
+        priority: task.priority,
+        type: task.type,
+        outcome: task.outcome ?? "",
         assignedToId: task.assignedTo.id,
     };
+}
+
+// The API only demands an outcome on the transition *into* a closed status
+// (TasksService.ensureOutcomeOnClose) — re-saving an already-closed task
+// without touching status should never re-demand it.
+function outcomeRequired(status: TaskStatus, previousStatus?: TaskStatus) {
+    return TASK_TERMINAL_STATUSES.includes(status) && !TASK_TERMINAL_STATUSES.includes(previousStatus ?? TaskStatus.TODO);
 }
 
 export function TaskForm({ task, errorMessage, isSubmitting, submitLabel, onCancel, onSubmit }: TaskFormProps) {
@@ -74,8 +96,15 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel, onCanc
         description: z.string().trim().optional(),
         dueDate: z.string().trim().optional(),
         status: z.enum(TaskStatus),
+        priority: z.enum(TaskPriority),
+        type: z.enum(TaskType),
+        outcome: z.string().trim().optional(),
         assignedToId: z.string().min(1, t("form.validation.selectAssignee")),
-    }), [t]);
+    }).superRefine((values, ctx) => {
+        if (task && outcomeRequired(values.status, task.status) && !values.outcome) {
+            ctx.addIssue({ code: "custom", path: ["outcome"], message: t("form.validation.outcomeRequired") });
+        }
+    }), [t, task]);
 
     const form = useForm<TaskFormValues>({
         resolver: zodResolver(taskSchema),
@@ -84,6 +113,9 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel, onCanc
 
     useEffect(() => { form.reset(toFormValues(task)); }, [task]);
 
+    const watchedStatus = form.watch("status");
+    const showOutcome = !!task && outcomeRequired(watchedStatus, task.status);
+
     const statusCollection = createListCollection({
         items: Object.values(TaskStatus).map(
             (s) => ({
@@ -91,6 +123,12 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel, onCanc
                 value: s
             })
         ),
+    });
+    const priorityCollection = createListCollection({
+        items: Object.values(TaskPriority).map((p) => ({ label: t(TASK_PRIORITY_LABEL_KEYS[p]), value: p })),
+    });
+    const typeCollection = createListCollection({
+        items: Object.values(TaskType).map((tt) => ({ label: t(TASK_TYPE_LABEL_KEYS[tt]), value: tt })),
     });
     const assigneeCollection = createListCollection({
         items: assignableUsers.data.map((u) => ({ label: u.fullName, value: u.id })),
@@ -102,6 +140,11 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel, onCanc
             description: values.description || undefined,
             dueDate: values.dueDate ? new Date(values.dueDate).toISOString() : undefined,
             status: values.status,
+            priority: values.priority,
+            type: values.type,
+            // Only meaningful (and only accepted by the API) once there's an
+            // existing task to close — see the comment on outcomeRequired.
+            ...(task ? { outcome: values.outcome || undefined } : {}),
             assignedToId: values.assignedToId,
         });
     });
@@ -153,6 +196,42 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel, onCanc
                                 <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                                 <SelectContent>
                                     {statusCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                            <FieldError>{fieldState.error?.message}</FieldError>
+                        </Field>
+                    )} />
+
+                    {showOutcome && (
+                        <Controller control={form.control} name="outcome" render={({ field, fieldState }) => (
+                            <Field invalid={fieldState.invalid}>
+                                <FieldLabel>{t("form.outcome")}</FieldLabel>
+                                <Textarea {...field} rows={2} placeholder={t("form.outcomePlaceholder")} />
+                                <FieldError>{fieldState.error?.message}</FieldError>
+                            </Field>
+                        )} />
+                    )}
+
+                    <Controller control={form.control} name="priority" render={({ field, fieldState }) => (
+                        <Field invalid={fieldState.invalid}>
+                            <FieldLabel>{t("form.priority")}</FieldLabel>
+                            <Select collection={priorityCollection} value={[field.value]} onValueChange={(item) => field.onChange(item.value[0])}>
+                                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    {priorityCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                            <FieldError>{fieldState.error?.message}</FieldError>
+                        </Field>
+                    )} />
+
+                    <Controller control={form.control} name="type" render={({ field, fieldState }) => (
+                        <Field invalid={fieldState.invalid}>
+                            <FieldLabel>{t("form.type")}</FieldLabel>
+                            <Select collection={typeCollection} value={[field.value]} onValueChange={(item) => field.onChange(item.value[0])}>
+                                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    {typeCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
                                 </SelectContent>
                             </Select>
                             <FieldError>{fieldState.error?.message}</FieldError>

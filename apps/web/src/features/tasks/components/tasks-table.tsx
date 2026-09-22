@@ -3,7 +3,12 @@ import {Badge} from "@/components/ui/badge.tsx";
 import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {DataTable} from "@/components/shared/data-table.tsx";
 import {SortableTableHead} from "@/components/shared/sortable-table-head.tsx";
-import {TASK_STATUS_CLASSES, TASK_STATUS_LABEL_KEYS} from "@/features/tasks/types/task.types.ts";
+import {
+    TASK_PRIORITY_CLASSES,
+    TASK_PRIORITY_LABEL_KEYS,
+    TASK_STATUS_CLASSES,
+    TASK_STATUS_LABEL_KEYS,
+} from "@/features/tasks/types/task.types.ts";
 import type {Task, TaskSortField} from "@/features/tasks/api/tasks.api.ts";
 import {useTranslation} from "react-i18next";
 import type {SortOrder} from "@/hooks/use-sort.ts";
@@ -39,9 +44,14 @@ export function TasksTable({ tasks, isLoading, sortBy, sortOrder, onSort, onRowC
                 >
                     <div className="flex items-start justify-between gap-3">
                         <p className="min-w-0 truncate font-medium">{task.title}</p>
-                        <Badge className={`shrink-0 ${TASK_STATUS_CLASSES[task.status]} text-white`}>
-                            {t(TASK_STATUS_LABEL_KEYS[task.status])}
-                        </Badge>
+                        <div className="flex shrink-0 items-center gap-1.5">
+                            <Badge variant="secondary" className={`${TASK_PRIORITY_CLASSES[task.priority]} text-white`}>
+                                {t(TASK_PRIORITY_LABEL_KEYS[task.priority])}
+                            </Badge>
+                            <Badge className={`${TASK_STATUS_CLASSES[task.status]} text-white`}>
+                                {t(TASK_STATUS_LABEL_KEYS[task.status])}
+                            </Badge>
+                        </div>
                     </div>
                     <p className="mt-1 truncate text-sm text-muted-foreground">
                         {task.deal ? t("related.deal", { number: task.deal.dealNumber }) : task.client ? task.client.fullName : task.lead ? task.lead.fullName : "—"}
@@ -68,6 +78,9 @@ export function TasksTable({ tasks, isLoading, sortBy, sortOrder, onSort, onRowC
                     <SortableTableHead field="dueDate" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
                         {t("table.dueDate")}
                     </SortableTableHead>
+                    <SortableTableHead field="priority" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.priority")}
+                    </SortableTableHead>
                     <SortableTableHead field="status" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
                         {t("table.status")}
                     </SortableTableHead>
@@ -88,6 +101,11 @@ export function TasksTable({ tasks, isLoading, sortBy, sortOrder, onSort, onRowC
                                     {new Date(task.dueDate).toLocaleDateString(i18n.language)}
                                 </span>
                             ) : "—"}
+                        </TableCell>
+                        <TableCell>
+                            <Badge variant="secondary" className={`${TASK_PRIORITY_CLASSES[task.priority]} text-white`}>
+                                {t(TASK_PRIORITY_LABEL_KEYS[task.priority])}
+                            </Badge>
                         </TableCell>
                         <TableCell>
                             <Badge className={`${TASK_STATUS_CLASSES[task.status]} text-white`}>

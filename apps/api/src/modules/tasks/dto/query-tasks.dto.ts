@@ -1,15 +1,23 @@
 import {IsBoolean, IsEnum, IsIn, IsInt, IsOptional, IsString, IsUUID, Max, Min} from "class-validator";
 import {Transform} from "class-transformer";
-import {TaskStatus} from "@/generated/prisma/client";
+import {TaskPriority, TaskStatus, TaskType} from "@/generated/prisma/client";
 
 // Columns the tasks table lets a user sort by — kept in sync with the
 // column keys TasksTable passes to SortableTableHead on the frontend.
-export const TASK_SORTABLE_FIELDS = ["title", "dueDate", "status"] as const;
+export const TASK_SORTABLE_FIELDS = ["title", "dueDate", "status", "priority"] as const;
 
 export class QueryTasksDto {
     @IsOptional()
     @IsEnum(TaskStatus)
     status?: TaskStatus;
+
+    @IsOptional()
+    @IsEnum(TaskPriority)
+    priority?: TaskPriority;
+
+    @IsOptional()
+    @IsEnum(TaskType)
+    type?: TaskType;
 
     @IsOptional()
     @IsUUID()

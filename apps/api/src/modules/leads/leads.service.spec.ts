@@ -87,8 +87,9 @@ describe('LeadsService', () => {
         } as unknown as ClientsService;
 
         const rbacService = {findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-manager'])};
-        const service = new LeadsService(prisma as any, clientsService, rbacService as any);
-        return {service, prisma, clientsService};
+        const tasksService = {createAutomated: jest.fn().mockResolvedValue(null)};
+        const service = new LeadsService(prisma as any, clientsService, rbacService as any, tasksService as any);
+        return {service, prisma, clientsService, tasksService};
     }
 
     const createDto = (overrides: Record<string, unknown> = {}) => ({
@@ -178,6 +179,34 @@ describe('LeadsService', () => {
             await expect(service.create(adminUser, createDto({clientId: 'client-x'}))).rejects.toThrow(
                 BadRequestException,
             );
+        });
+
+        it('auto-creates a first-contact task for the assigned manager', async () => {
+            const {service, tasksService} = build({manager: {id: 'manager-1', branchId: 'branch-1'}});
+            await service.create(adminUser, createDto({managerId: 'manager-1'}));
+
+            expect(tasksService.createAutomated).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    companyId: 'company-1',
+                    assignedToId: 'manager-1',
+                    actorId: adminUser.id,
+                    leadId: 'lead-new',
+                }),
+            );
+        });
+
+        it('creates no task when no manager is assigned', async () => {
+            const {service, tasksService} = build();
+            await service.create(adminUser, createDto());
+
+            expect(tasksService.createAutomated).not.toHaveBeenCalled();
+        });
+
+        it('does not fail lead creation when task auto-creation throws', async () => {
+            const {service, tasksService} = build({manager: {id: 'manager-1', branchId: 'branch-1'}});
+            (tasksService.createAutomated as jest.Mock).mockRejectedValue(new Error('boom'));
+
+            await expect(service.create(adminUser, createDto({managerId: 'manager-1'}))).resolves.toBeDefined();
         });
     });
 
