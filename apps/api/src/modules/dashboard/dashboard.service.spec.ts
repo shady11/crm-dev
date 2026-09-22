@@ -42,6 +42,7 @@ describe('DashboardService', () => {
             payment: {
                 aggregate: jest.fn().mockResolvedValue({_sum: {amount: null}}),
                 findMany: jest.fn().mockResolvedValue([]),
+                groupBy: jest.fn().mockResolvedValue([]),
             },
             deal: {
                 count: jest.fn().mockResolvedValue(0),
@@ -49,6 +50,9 @@ describe('DashboardService', () => {
                 groupBy: jest.fn().mockResolvedValue([]),
             },
             unit: {groupBy: jest.fn().mockResolvedValue([])},
+            paymentSchedule: {
+                aggregate: jest.fn().mockResolvedValue({_sum: {amount: null, paidAmount: null}, _count: {_all: 0}}),
+            },
             task: {count: jest.fn().mockResolvedValue(0), findMany: jest.fn().mockResolvedValue([])},
             activity: {findMany: jest.fn().mockResolvedValue([]), findFirst: jest.fn().mockResolvedValue(null)},
             branch: {findMany: jest.fn().mockResolvedValue([])},
@@ -262,6 +266,50 @@ describe('DashboardService', () => {
             expect(result.leadsByStatus).toHaveLength(Object.values(LeadStatus).length);
             expect(result.dealsByStatus).toHaveLength(Object.values(DealStatus).length);
             expect(result.leadsByStatus.every((r) => r.count === 0)).toBe(true);
+        });
+    });
+
+    describe('getFinanceOverview', () => {
+        it('rejects when the user has no company', async () => {
+            const {service} = build();
+            await expect(service.getFinanceOverview({...adminUser, companyId: null})).rejects.toThrow(
+                ForbiddenException,
+            );
+        });
+
+        it('reports each schedule bucket as amount minus paidAmount', async () => {
+            const {service, prisma} = build();
+            (prisma.paymentSchedule.aggregate as jest.Mock)
+                .mockResolvedValueOnce({_sum: {amount: 5000, paidAmount: 2000}, _count: {_all: 3}}) // overdue
+                .mockResolvedValueOnce({_sum: {amount: 1200, paidAmount: 0}, _count: {_all: 1}}) // upcoming
+                .mockResolvedValueOnce({_sum: {amount: 9000, paidAmount: 3000}, _count: {_all: 0}}); // outstanding
+
+            const result = await service.getFinanceOverview(adminUser);
+
+            expect(result.overdue).toEqual({amount: 3000, count: 3});
+            expect(result.upcoming).toEqual({amount: 1200, count: 1});
+            expect(result.outstandingBalance).toBe(6000);
+        });
+
+        it('fills every PaymentMethod with a zero amount when absent from the groupBy', async () => {
+            const {service, prisma} = build();
+            prisma.payment.groupBy.mockResolvedValue([{paymentMethod: 'CASH', _sum: {amount: 500}}]);
+
+            const result = await service.getFinanceOverview(adminUser);
+
+            const cash = result.cashFlowByMethod.find((c) => c.method === 'CASH');
+            const other = result.cashFlowByMethod.find((c) => c.method === 'OTHER');
+            expect(cash?.amount).toBe(500);
+            expect(other?.amount).toBe(0);
+        });
+
+        it('pins a branch-scoped role to their own branch, ignoring any passed branchId', async () => {
+            const {service, prisma} = build();
+            await service.getFinanceOverview(branchUser, 'other-branch');
+
+            expect(prisma.payment.aggregate).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({deal: expect.objectContaining({branchId: 'branch-1'})})}),
+            );
         });
     });
 

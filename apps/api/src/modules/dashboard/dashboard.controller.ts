@@ -124,4 +124,12 @@ export class DashboardController {
         const parsed = Number(days);
         return this.dashboardService.getMyPerformance(user, Number.isFinite(parsed) && parsed > 0 ? parsed : 30);
     }
+
+    // FIN-A1: a FINANCE user's collections/cash-flow overview.
+    // dashboard.finance_overview is only in FINANCE's default bundle.
+    @RequirePermissions("dashboard.finance_overview")
+    @Get("finance-overview")
+    getFinanceOverview(@CurrentUser() user: AuthUser, @Query("branchId") branchId?: string) {
+        return this.dashboardService.getFinanceOverview(user, branchId);
+    }
 }

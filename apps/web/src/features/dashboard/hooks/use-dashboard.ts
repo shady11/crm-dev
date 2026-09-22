@@ -3,6 +3,7 @@ import {
     getAttentionItems,
     getBranchComparison,
     getDashboardKpis,
+    getFinanceOverview,
     getFunnel,
     getMyPerformance,
     getMyWorkToday,
@@ -59,6 +60,15 @@ export function useMyPerformance(enabled: boolean, days = 30) {
     return useQuery({
         queryKey: ["dashboard", "my-performance", days],
         queryFn: () => getMyPerformance(days),
+        enabled,
+    });
+}
+
+// FIN-A1, FINANCE only — same reasoning as useBranchComparison above.
+export function useFinanceOverview(enabled: boolean, branchId?: string) {
+    return useQuery({
+        queryKey: ["dashboard", "finance-overview", { branchId }],
+        queryFn: () => getFinanceOverview(branchId),
         enabled,
     });
 }

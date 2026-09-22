@@ -104,7 +104,7 @@ export const DEFAULT_ROLES: DefaultRoleSeed[] = [
             "tasks.view", "tasks.create", "tasks.edit",
             "documents.view", "documents.upload",
             "branches.view",
-            "dashboard.view",
+            "dashboard.view", "dashboard.finance_overview",
         ],
     },
 ];

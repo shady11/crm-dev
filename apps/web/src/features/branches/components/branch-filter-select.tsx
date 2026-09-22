@@ -2,6 +2,7 @@ import {createListCollection} from "@ark-ui/react";
 import {useTranslation} from "react-i18next";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {hasPermission} from "@/features/auth/access";
 import {useBranchesFilter} from "../hooks/use-branches-filter";
 
 type Props = {
@@ -18,9 +19,15 @@ type Props = {
 export function BranchFilterSelect({value, onChange, className}: Props) {
     const {t} = useTranslation("branches");
     const {user} = useAuth();
-    const branches = useBranchesFilter();
+    // Company-wide but permission-less viewers exist too (e.g. a custom
+    // role without branches.view) — GET /branches 403s for them same as it
+    // would for a branch-scoped one, so gate on both. Passed into the hook
+    // itself (not just this early return) so the query never fires only to
+    // have its result discarded — see useBranchesFilter's doc comment.
+    const canViewBranches = !!user && !user.isBranchScoped && hasPermission(user, "branches.view");
+    const branches = useBranchesFilter(canViewBranches);
 
-    if (!user || user.isBranchScoped) return null;
+    if (!canViewBranches) return null;
 
     const collection = createListCollection({
         items: [

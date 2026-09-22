@@ -83,5 +83,31 @@
     "leadsAssigned": "Назначено лидов",
     "dealsWon": "Сделок закрыто",
     "conversionRate": "Конверсия"
+  },
+  "financeOverview": {
+    "title": "Финансовый обзор",
+    "collectedThisMonth": "Собрано за месяц",
+    "outstandingBalance": "Остаток задолженности",
+    "overdue": "Просрочено",
+    "overdueCount_one": "{{count}} просроченный платёж",
+    "overdueCount_few": "{{count}} просроченных платежа",
+    "overdueCount_many": "{{count}} просроченных платежей",
+    "overdueCount_other": "{{count}} просроченных платежа",
+    "upcoming": "К оплате в течение 30 дней",
+    "upcomingCount_one": "{{count}} платёж",
+    "upcomingCount_few": "{{count}} платежа",
+    "upcomingCount_many": "{{count}} платежей",
+    "upcomingCount_other": "{{count}} платежа",
+    "cashFlowTitle": "Денежный поток по способу оплаты",
+    "cashFlowLabel": "Собрано",
+    "empty": "Платежи пока не зафиксированы.",
+    "method": {
+      "CASH": "Наличные",
+      "BANK_TRANSFER": "Банковский перевод",
+      "MBANK": "MBank",
+      "OPTIMA": "Optima",
+      "ELKART": "Элкарт",
+      "OTHER": "Другое"
+    }
   }
 }

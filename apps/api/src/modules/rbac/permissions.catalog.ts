@@ -105,6 +105,7 @@ export const PERMISSIONS_CATALOG: PermissionDefinition[] = [
         branch_comparison: "View the cross-branch comparison report",
         team_snapshot: "View a sales head's team snapshot",
         my_performance: "View a sales manager's own performance report",
+        finance_overview: "View the finance collections and cash flow overview",
     }),
     ...group("company_settings", {
         view: "View own company settings",

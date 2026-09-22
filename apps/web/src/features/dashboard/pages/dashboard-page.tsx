@@ -13,9 +13,11 @@ import {MyWorkTodayCard} from "@/features/dashboard/components/my-work-today-car
 import {MyPerformanceCard} from "@/features/dashboard/components/my-performance-card.tsx";
 import {DealStatusCardsGrid} from "@/features/deals/components/deal-status-cards-grid.tsx";
 import {FunnelCard} from "@/features/dashboard/components/funnel-card.tsx";
+import {FinanceOverviewCard} from "@/features/dashboard/components/finance-overview-card.tsx";
 import {
     useBranchComparison,
     useDashboard,
+    useFinanceOverview,
     useMyPerformance,
     useMyWorkToday,
     useTeamSnapshot,
@@ -45,6 +47,8 @@ export function DashboardPage() {
     const canViewMyPerformance = hasPermission(user, "dashboard.my_performance");
     const myWorkToday = useMyWorkToday(canViewMyPerformance);
     const myPerformance = useMyPerformance(canViewMyPerformance);
+    const canViewFinanceOverview = hasPermission(user, "dashboard.finance_overview");
+    const financeOverview = useFinanceOverview(canViewFinanceOverview, branchId === "all" ? undefined : branchId);
 
     const projectCollection = createListCollection({
         items: [{ label: t("allProjects"), value: "all" }, ...projects.data.map((p) => ({ label: p.name, value: p.id }))],
@@ -126,6 +130,7 @@ export function DashboardPage() {
             {canViewTeamSnapshot ? <TeamSnapshotCard data={teamSnapshot.data ?? []} /> : null}
             {canViewMyPerformance && myWorkToday.data ? <MyWorkTodayCard data={myWorkToday.data} /> : null}
             {canViewMyPerformance && myPerformance.data ? <MyPerformanceCard data={myPerformance.data} /> : null}
+            {canViewFinanceOverview && financeOverview.data ? <FinanceOverviewCard data={financeOverview.data} /> : null}
         </div>
     );
 }

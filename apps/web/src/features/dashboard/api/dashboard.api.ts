@@ -127,6 +127,22 @@ export async function getFunnel(projectId?: string, branchId?: string) {
     return response.data;
 }
 
+// FIN-A1: a FINANCE user's collections/cash-flow overview, FINANCE only.
+export type FinanceBucket = { amount: number; count: number };
+export type CashFlowByMethod = { method: string; amount: number };
+export type FinanceOverview = {
+    collectedThisMonth: number;
+    outstandingBalance: number;
+    overdue: FinanceBucket;
+    upcoming: FinanceBucket;
+    cashFlowByMethod: CashFlowByMethod[];
+};
+
+export async function getFinanceOverview(branchId?: string) {
+    const response = await api.get<FinanceOverview>("/dashboard/finance-overview", { params: { branchId } });
+    return response.data;
+}
+
 export async function downloadFunnelExport(projectId?: string, branchId?: string) {
     const response = await api.get<Blob>("/dashboard/funnel/export", {
         params: { projectId, branchId },
