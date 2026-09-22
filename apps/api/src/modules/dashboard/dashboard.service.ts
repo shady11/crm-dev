@@ -3,6 +3,7 @@ import * as XLSX from "xlsx";
 import {DealStatus, LeadStatus, PaymentMethod, PaymentScheduleStatus, Prisma, TaskStatus, UnitStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
+import {hasPermission} from "@/common/utils/permissions.util";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 import {OPEN_LEAD_STATUSES} from "@/modules/leads/lead.constants";
 import {RbacService} from "@/modules/rbac/rbac.service";
@@ -29,10 +30,31 @@ export class DashboardService {
         return branchId;
     }
 
+    /**
+     * SM-A1: whether the shared/generic dashboard widgets (KPIs, revenue
+     * trend, funnel, attention, recent activity) should show this viewer's
+     * own pipeline instead of the whole branch's. dashboard.my_performance
+     * is only in SALES_MANAGER's default bundle — the individual-
+     * contributor role, as opposed to SALES_HEAD (branch-wide view +
+     * team_snapshot) or a company-wide role. Keyed off the permission, not
+     * roleName, same as every other role-shaped decision in this service —
+     * see DEFAULT_ROLES' doc comment on why nothing compares against role
+     * names at runtime.
+     */
+    private isSelfScoped(user: AuthUser): boolean {
+        return hasPermission(user, "dashboard.my_performance");
+    }
+
     async getKpis(user: AuthUser, projectId?: string, branchId?: string) {
         if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
         const companyId = user.companyId;
         const effectiveBranchId = this.resolveBranchId(user, branchId);
+        // SM-A1: a self-scoped viewer's revenue/deals/tasks KPIs count only
+        // their own pipeline, not the whole branch's. availableUnits/
+        // totalUnits stay company-wide below regardless — units have no
+        // individual owner to scope them to.
+        const selfScoped = this.isSelfScoped(user) ? { managerId: user.id } : {};
+        const selfScopedTasks = this.isSelfScoped(user) ? { assignedToId: user.id } : {};
 
         const startOfMonth = new Date();
         startOfMonth.setDate(1);
@@ -41,14 +63,14 @@ export class DashboardService {
         const [revenueAgg, activeDealsCount, unitsAgg, overdueTasksCount] = await Promise.all([
             this.prisma.payment.aggregate({
                 where: {
-                    deal: { companyId, projectId, branchId: effectiveBranchId },
+                    deal: { companyId, projectId, branchId: effectiveBranchId, ...selfScoped },
                     paidAt: { gte: startOfMonth },
                     deletedAt: null,
                 },
                 _sum: { amount: true },
             }),
             this.prisma.deal.count({
-                where: { companyId, projectId, branchId: effectiveBranchId, status: { in: ACTIVE_DEAL_STATUSES } },
+                where: { companyId, projectId, branchId: effectiveBranchId, ...selfScoped, status: { in: ACTIVE_DEAL_STATUSES } },
             }),
             // Units are deliberately company-wide, not branch-scoped (BR-C1) —
             // no branch filter here even for a branch-scoped viewer.
@@ -61,6 +83,7 @@ export class DashboardService {
                 where: {
                     companyId,
                     branchId: effectiveBranchId,
+                    ...selfScopedTasks,
                     deletedAt: null,
                     status: { in: [TaskStatus.TODO, TaskStatus.IN_PROGRESS] },
                     dueDate: { lt: new Date() },
@@ -84,6 +107,7 @@ export class DashboardService {
     async getRevenueTrend(user: AuthUser, projectId?: string, branchId?: string) {
         if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
         const effectiveBranchId = this.resolveBranchId(user, branchId);
+        const selfScoped = this.isSelfScoped(user) ? { managerId: user.id } : {};
 
         const sixMonthsAgo = new Date();
         sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
@@ -92,7 +116,7 @@ export class DashboardService {
 
         const payments = await this.prisma.payment.findMany({
             where: {
-                deal: { companyId: user.companyId, projectId, branchId: effectiveBranchId },
+                deal: { companyId: user.companyId, projectId, branchId: effectiveBranchId, ...selfScoped },
                 paidAt: { gte: sixMonthsAgo },
                 deletedAt: null,
             },
@@ -135,6 +159,7 @@ export class DashboardService {
         if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
         const companyId = user.companyId;
         const effectiveBranchId = this.resolveBranchId(user, branchId);
+        const selfScoped = this.isSelfScoped(user);
         const in3Days = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
 
         const [expiringDeals, urgentTasks] = await Promise.all([
@@ -143,6 +168,7 @@ export class DashboardService {
                     companyId,
                     projectId,
                     branchId: effectiveBranchId,
+                    ...(selfScoped ? { managerId: user.id } : {}),
                     status: DealStatus.RESERVED,
                     reservationExpiresAt: { lte: in3Days },
                 },
@@ -157,6 +183,7 @@ export class DashboardService {
                 where: {
                     companyId,
                     branchId: effectiveBranchId,
+                    ...(selfScoped ? { assignedToId: user.id } : {}),
                     deletedAt: null,
                     status: { in: [TaskStatus.TODO, TaskStatus.IN_PROGRESS] },
                     dueDate: { lte: in3Days },
@@ -183,10 +210,17 @@ export class DashboardService {
             ...(projectId ? { deal: { projectId } } : {}),
         };
 
-        // Activity has no branchId of its own — filtered through whichever
-        // entity it's attached to. An activity with none of the three set
-        // never matches a branch filter, same as an unassigned record would.
-        if (effectiveBranchId) {
+        // SM-A1: a self-scoped viewer's feed is just their own actions, not
+        // the whole branch's — takes over from the branch OR clause below
+        // rather than narrowing it further (their own activity already
+        // implies their own branch).
+        if (this.isSelfScoped(user)) {
+            where.userId = user.id;
+        } else if (effectiveBranchId) {
+            // Activity has no branchId of its own — filtered through
+            // whichever entity it's attached to. An activity with none of
+            // the three set never matches a branch filter, same as an
+            // unassigned record would.
             where.OR = [
                 { lead: { branchId: effectiveBranchId } },
                 { client: { branchId: effectiveBranchId } },
@@ -514,23 +548,26 @@ export class DashboardService {
         if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
         const companyId = user.companyId;
         const effectiveBranchId = this.resolveBranchId(user, branchId);
+        // SM-A1: a self-scoped viewer's funnel counts only leads/deals they
+        // manage, not the whole branch's.
+        const selfScoped = this.isSelfScoped(user) ? { managerId: user.id } : {};
 
         const [leadCounts, dealCounts, wonDeals, totalLeads] = await Promise.all([
             this.prisma.lead.groupBy({
                 by: ["status"],
-                where: { companyId, branchId: effectiveBranchId, deletedAt: null },
+                where: { companyId, branchId: effectiveBranchId, ...selfScoped, deletedAt: null },
                 _count: { _all: true },
             }),
             this.prisma.deal.groupBy({
                 by: ["status"],
-                where: { companyId, projectId, branchId: effectiveBranchId },
+                where: { companyId, projectId, branchId: effectiveBranchId, ...selfScoped },
                 _count: { _all: true },
             }),
             this.prisma.deal.count({
-                where: { companyId, projectId, branchId: effectiveBranchId, status: DealStatus.COMPLETED },
+                where: { companyId, projectId, branchId: effectiveBranchId, ...selfScoped, status: DealStatus.COMPLETED },
             }),
             this.prisma.lead.count({
-                where: { companyId, branchId: effectiveBranchId, deletedAt: null },
+                where: { companyId, branchId: effectiveBranchId, ...selfScoped, deletedAt: null },
             }),
         ]);
 

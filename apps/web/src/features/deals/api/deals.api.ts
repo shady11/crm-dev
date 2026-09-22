@@ -145,8 +145,13 @@ export async function getDeals(params?: GetDealsParams) {
     return response.data;
 }
 
-export async function getDealStatusSummary(projectId?: string, branchId?: string) {
-    const response = await api.get<DealStatusSummaryItem[]>("/deals/status-summary", { params: { projectId, branchId } });
+// `mine`: opt-in, silently ignored server-side unless the caller actually
+// holds dashboard.my_performance — safe for the dashboard to always pass
+// true regardless of viewer role. The standalone Deals list page never
+// passes it, so its own summary cards stay whole-branch (it has its own
+// explicit manager filter instead).
+export async function getDealStatusSummary(projectId?: string, branchId?: string, mine?: boolean) {
+    const response = await api.get<DealStatusSummaryItem[]>("/deals/status-summary", { params: { projectId, branchId, mine } });
     return response.data;
 }
 

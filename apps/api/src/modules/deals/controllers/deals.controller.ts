@@ -48,8 +48,9 @@ export class DealsController {
       @CurrentUser() user: AuthUser,
       @Query('projectId') projectId?: string,
       @Query('branchId') branchId?: string,
+      @Query('mine') mine?: string,
   ) {
-    return this.dealsService.getStatusSummary(user, projectId, branchId);
+    return this.dealsService.getStatusSummary(user, projectId, branchId, mine === 'true');
   }
 
   @RequirePermissions('deals.view')

@@ -598,5 +598,38 @@ describe('DealsService', () => {
                 expect.objectContaining({where: expect.objectContaining({branchId: 'branch-1'})}),
             );
         });
+
+        // SM-A1: `mine` backs the dashboard's self-scoped "deals by stage"
+        // cards. It must stay opt-in and permission-gated, since this same
+        // endpoint also backs the standalone Deals list page, which never
+        // passes it and must stay whole-branch regardless of caller.
+        it('does not scope by manager when mine is omitted, even for a caller with dashboard.my_performance', async () => {
+            const {service, prisma} = buildBase();
+            const selfScopedManager = {...managerUser, permissions: ['dashboard.my_performance']};
+            await service.getStatusSummary(selfScopedManager);
+
+            expect(prisma.deal.groupBy).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.not.objectContaining({managerId: expect.anything()})}),
+            );
+        });
+
+        it('scopes by manager when mine is true and the caller holds dashboard.my_performance', async () => {
+            const {service, prisma} = buildBase();
+            const selfScopedManager = {...managerUser, permissions: ['dashboard.my_performance']};
+            await service.getStatusSummary(selfScopedManager, undefined, undefined, true);
+
+            expect(prisma.deal.groupBy).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({managerId: 'manager-1'})}),
+            );
+        });
+
+        it('ignores mine: true for a caller without dashboard.my_performance', async () => {
+            const {service, prisma} = buildBase();
+            await service.getStatusSummary(adminUser, undefined, undefined, true);
+
+            expect(prisma.deal.groupBy).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.not.objectContaining({managerId: expect.anything()})}),
+            );
+        });
     });
 });
