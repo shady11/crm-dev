@@ -21,7 +21,9 @@ export function useDashboard(projectId?: string, branchId?: string) {
         unitsSummary: useQuery({ queryKey: ["dashboard", "units-summary", { projectId }], queryFn: () => getUnitsSummary(projectId) }),
         attention: useQuery({ queryKey: ["dashboard", "attention", { projectId, branchId }], queryFn: () => getAttentionItems(projectId, branchId) }),
         recentActivity: useQuery({ queryKey: ["dashboard", "recent-activity", { projectId, branchId }], queryFn: () => getRecentActivity(projectId, branchId) }),
-        dealsStatus: useQuery({ queryKey: ["deals", "status-summary", { projectId, branchId }], queryFn: () => getDealStatusSummary(projectId, branchId) }),
+        // mine: true — a self-scoped viewer (SALES_MANAGER) sees only their
+        // own deals here; ignored server-side for every other role.
+        dealsStatus: useQuery({ queryKey: ["deals", "status-summary", { projectId, branchId }], queryFn: () => getDealStatusSummary(projectId, branchId, true) }),
         funnel: useQuery({ queryKey: ["dashboard", "funnel", { projectId, branchId }], queryFn: () => getFunnel(projectId, branchId) }),
     };
 }

@@ -37,6 +37,12 @@ describe('DashboardService', () => {
 
     const salesHeadUser: AuthUser = {...branchUser, id: 'head-1', roleId: 'role-sales-head', roleName: 'Sales Head'};
 
+    // Self-scoping (SM-A1) is keyed off the dashboard.my_performance
+    // permission, not roleName — branchUser above is named "Sales Manager"
+    // but carries no permissions array, so it does NOT trigger self-scoping
+    // on its own. This fixture is the one that actually does.
+    const selfScopedUser: AuthUser = {...branchUser, id: 'self-1', permissions: ['dashboard.my_performance']};
+
     function build() {
         const prisma = {
             payment: {
@@ -90,6 +96,84 @@ describe('DashboardService', () => {
 
             const where = (prisma.unit.groupBy as jest.Mock).mock.calls[0][0].where;
             expect(where.branchId).toBeUndefined();
+        });
+    });
+
+    describe('self-scoping (SM-A1: dashboard.my_performance)', () => {
+        it('getKpis: filters deals/payments/tasks by the caller, not the branch, for a self-scoped viewer', async () => {
+            const {service, prisma} = build();
+            await service.getKpis(selfScopedUser);
+
+            expect(prisma.deal.count).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({managerId: 'self-1'})}),
+            );
+            expect(prisma.payment.aggregate).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({deal: expect.objectContaining({managerId: 'self-1'})})}),
+            );
+            expect(prisma.task.count).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({assignedToId: 'self-1'})}),
+            );
+        });
+
+        it('getKpis: never filters the units query by the caller, even self-scoped', async () => {
+            const {service, prisma} = build();
+            await service.getKpis(selfScopedUser);
+
+            const where = (prisma.unit.groupBy as jest.Mock).mock.calls[0][0].where;
+            expect(where.managerId).toBeUndefined();
+        });
+
+        it('getKpis: does not scope by caller for a plain branch-scoped viewer without the permission', async () => {
+            const {service, prisma} = build();
+            await service.getKpis(branchUser);
+
+            expect(prisma.deal.count).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.not.objectContaining({managerId: expect.anything()})}),
+            );
+        });
+
+        it('getRevenueTrend: filters payments by the caller for a self-scoped viewer', async () => {
+            const {service, prisma} = build();
+            await service.getRevenueTrend(selfScopedUser);
+
+            expect(prisma.payment.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({deal: expect.objectContaining({managerId: 'self-1'})})}),
+            );
+        });
+
+        it('getAttentionItems: filters expiring deals by manager and urgent tasks by assignee for a self-scoped viewer', async () => {
+            const {service, prisma} = build();
+            await service.getAttentionItems(selfScopedUser);
+
+            expect(prisma.deal.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({managerId: 'self-1'})}),
+            );
+            expect(prisma.task.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({assignedToId: 'self-1'})}),
+            );
+        });
+
+        it('getRecentActivity: filters by the caller\'s own userId instead of branch, for a self-scoped viewer', async () => {
+            const {service, prisma} = build();
+            await service.getRecentActivity(selfScopedUser);
+
+            expect(prisma.activity.findMany).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({userId: 'self-1'})}),
+            );
+            const where = (prisma.activity.findMany as jest.Mock).mock.calls[0][0].where;
+            expect(where.OR).toBeUndefined();
+        });
+
+        it('getFunnel: filters leads and deals by manager for a self-scoped viewer', async () => {
+            const {service, prisma} = build();
+            await service.getFunnel(selfScopedUser);
+
+            expect(prisma.lead.groupBy).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({managerId: 'self-1'})}),
+            );
+            expect(prisma.deal.groupBy).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({managerId: 'self-1'})}),
+            );
         });
     });
 

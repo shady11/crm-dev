@@ -1045,7 +1045,16 @@ export class DealsService {
     return document;
   }
 
-  async getStatusSummary(user: AuthUser, projectId?: string, branchId?: string) {
+  // `mine`: opt-in, and only honored when the caller actually holds
+  // dashboard.my_performance (SALES_MANAGER's default bundle) — this same
+  // endpoint backs both the dashboard's "deals by stage" cards (which pass
+  // `mine: true` so a self-scoped viewer sees their own pipeline, matching
+  // DashboardService.isSelfScoped) and the standalone Deals list page's
+  // summary cards (which never pass it, so that page stays whole-branch
+  // with its own explicit manager filter regardless of caller). A
+  // permission-only check here would've silently scoped the Deals page
+  // too, which nothing asked for.
+  async getStatusSummary(user: AuthUser, projectId?: string, branchId?: string, mine?: boolean) {
     if (!user.companyId) {
       throw new ForbiddenException("User does not belong to a company");
     }
@@ -1056,6 +1065,10 @@ export class DealsService {
       where.branchId = user.branchId;
     } else if (branchId) {
       where.branchId = branchId;
+    }
+
+    if (mine && hasPermission(user, "dashboard.my_performance")) {
+      where.managerId = user.id;
     }
 
     const counts = await this.prisma.deal.groupBy({
