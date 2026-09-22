@@ -1,6 +1,6 @@
 import {ForbiddenException, Injectable} from "@nestjs/common";
 import * as XLSX from "xlsx";
-import {DealStatus, LeadStatus, Prisma, TaskStatus, UnitStatus} from "@/generated/prisma/client";
+import {DealStatus, LeadStatus, PaymentMethod, PaymentScheduleStatus, Prisma, TaskStatus, UnitStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
@@ -424,6 +424,80 @@ export class DashboardService {
             dealsCreated,
             dealsWon,
             conversionRate: leadsAssigned > 0 ? dealsWon / leadsAssigned : 0,
+        };
+    }
+
+    /**
+     * FIN-A1: a FINANCE user's collections overview — cash collected this
+     * month, what's overdue and what's coming due in the next 30 days
+     * (both from PaymentSchedule, the installment/invoice-like record —
+     * see payment.prisma), the outstanding balance across every deal still
+     * being paid off, and a cash-flow breakdown by payment method. Kept
+     * separate from getKpis/getRevenueTrend above since those are the
+     * generic per-viewer overview every role sees; this is the dedicated
+     * reconciliation view gated by dashboard.finance_overview (FINANCE's
+     * default bundle only).
+     */
+    async getFinanceOverview(user: AuthUser, branchId?: string) {
+        if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
+        const companyId = user.companyId;
+        const effectiveBranchId = this.resolveBranchId(user, branchId);
+
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        const in30Days = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+        const dealScope: Prisma.DealWhereInput = { companyId, branchId: effectiveBranchId };
+
+        const [collectedThisMonth, overdue, upcoming, outstanding, cashFlowByMethod] = await Promise.all([
+            this.prisma.payment.aggregate({
+                where: { deal: dealScope, paidAt: { gte: startOfMonth }, deletedAt: null },
+                _sum: { amount: true },
+            }),
+            this.prisma.paymentSchedule.aggregate({
+                where: { deal: dealScope, status: PaymentScheduleStatus.OVERDUE, deletedAt: null },
+                _sum: { amount: true, paidAmount: true },
+                _count: { _all: true },
+            }),
+            this.prisma.paymentSchedule.aggregate({
+                where: {
+                    deal: dealScope,
+                    status: PaymentScheduleStatus.PENDING,
+                    dueDate: { lte: in30Days },
+                    deletedAt: null,
+                },
+                _sum: { amount: true, paidAmount: true },
+                _count: { _all: true },
+            }),
+            this.prisma.paymentSchedule.aggregate({
+                where: {
+                    deal: dealScope,
+                    status: { in: [PaymentScheduleStatus.PENDING, PaymentScheduleStatus.PARTIAL, PaymentScheduleStatus.OVERDUE] },
+                    deletedAt: null,
+                },
+                _sum: { amount: true, paidAmount: true },
+            }),
+            this.prisma.payment.groupBy({
+                by: ["paymentMethod"],
+                where: { deal: dealScope, deletedAt: null },
+                _sum: { amount: true },
+            }),
+        ]);
+
+        const remaining = (agg: { _sum: { amount: unknown; paidAmount: unknown } }) =>
+            Number(agg._sum.amount ?? 0) - Number(agg._sum.paidAmount ?? 0);
+
+        return {
+            collectedThisMonth: collectedThisMonth._sum.amount ?? 0,
+            outstandingBalance: remaining(outstanding),
+            overdue: { amount: remaining(overdue), count: overdue._count._all },
+            upcoming: { amount: remaining(upcoming), count: upcoming._count._all },
+            cashFlowByMethod: Object.values(PaymentMethod).map((method) => ({
+                method,
+                amount: cashFlowByMethod.find((c) => c.paymentMethod === method)?._sum.amount ?? 0,
+            })),
         };
     }
 

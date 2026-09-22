@@ -83,5 +83,27 @@
     "leadsAssigned": "Leads assigned",
     "dealsWon": "Deals won",
     "conversionRate": "Conversion rate"
+  },
+  "financeOverview": {
+    "title": "Finance overview",
+    "collectedThisMonth": "Collected this month",
+    "outstandingBalance": "Outstanding balance",
+    "overdue": "Overdue",
+    "overdueCount_one": "{{count}} overdue installment",
+    "overdueCount_other": "{{count}} overdue installments",
+    "upcoming": "Due in 30 days",
+    "upcomingCount_one": "{{count}} installment",
+    "upcomingCount_other": "{{count}} installments",
+    "cashFlowTitle": "Cash flow by payment method",
+    "cashFlowLabel": "Collected",
+    "empty": "No payments recorded yet.",
+    "method": {
+      "CASH": "Cash",
+      "BANK_TRANSFER": "Bank transfer",
+      "MBANK": "MBank",
+      "OPTIMA": "Optima",
+      "ELKART": "Elkart",
+      "OTHER": "Other"
+    }
   }
 }

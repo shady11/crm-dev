@@ -83,5 +83,31 @@
     "leadsAssigned": "Дайындалган лиддер",
     "dealsWon": "Жабылган бүтүмдөр",
     "conversionRate": "Конверсия"
+  },
+  "financeOverview": {
+    "title": "Финансылык обзор",
+    "collectedThisMonth": "Ушул айда чогултулду",
+    "outstandingBalance": "Калган карыз",
+    "overdue": "Мөөнөтү өткөн",
+    "overdueCount_one": "{{count}} мөөнөтү өткөн төлөм",
+    "overdueCount_few": "{{count}} мөөнөтү өткөн төлөм",
+    "overdueCount_many": "{{count}} мөөнөтү өткөн төлөм",
+    "overdueCount_other": "{{count}} мөөнөтү өткөн төлөм",
+    "upcoming": "30 күн ичинде төлөнүүчү",
+    "upcomingCount_one": "{{count}} төлөм",
+    "upcomingCount_few": "{{count}} төлөм",
+    "upcomingCount_many": "{{count}} төлөм",
+    "upcomingCount_other": "{{count}} төлөм",
+    "cashFlowTitle": "Төлөм ыкмасы боюнча акча агымы",
+    "cashFlowLabel": "Чогултулду",
+    "empty": "Азырынча төлөм катталган жок.",
+    "method": {
+      "CASH": "Накталай",
+      "BANK_TRANSFER": "Банк которуусу",
+      "MBANK": "MBank",
+      "OPTIMA": "Optima",
+      "ELKART": "Элкарт",
+      "OTHER": "Башка"
+    }
   }
 }
