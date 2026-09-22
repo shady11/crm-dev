@@ -11,7 +11,14 @@ import {
     SidebarMenuSubItem,
 } from "@/components/ui/sidebar.tsx"
 import {ChevronRight, type LucideIcon} from "lucide-react";
-import {Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
+
+// A nav item is active on its own route and on any nested route below it
+// (e.g. "/projects" stays highlighted for "/projects/<id>/overview"), but
+// "/" must only match the root itself or every item would light up.
+function isNavItemActive(pathname: string, url: string) {
+    return url === "/" ? pathname === "/" : pathname === url || pathname.startsWith(`${url}/`);
+}
 
 export function NavMain({
                             items,
@@ -28,6 +35,8 @@ export function NavMain({
         }[]
     }[]
 }) {
+    const { pathname } = useLocation();
+
     return (
         <SidebarGroup>
             <SidebarMenu>
@@ -51,7 +60,7 @@ export function NavMain({
                                     <SidebarMenuSub>
                                         {item.items?.map((subItem) => (
                                             <SidebarMenuSubItem key={subItem.title}>
-                                                <SidebarMenuSubButton asChild>
+                                                <SidebarMenuSubButton asChild isActive={isNavItemActive(pathname, subItem.url)}>
                                                     <Link to={subItem.url}>
                                                         <span className="font-medium">{subItem.title}</span>
                                                     </Link>
@@ -64,7 +73,7 @@ export function NavMain({
                         </Collapsible>
                     ): (
                         <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton asChild tooltip={item.title}>
+                            <SidebarMenuButton asChild tooltip={item.title} isActive={isNavItemActive(pathname, item.url)}>
                                 <Link to={item.url}>
                                     {item.icon && <item.icon />}
                                     <span className="font-medium group-data-[collapsible=icon]:hidden">{item.title}</span>
