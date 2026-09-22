@@ -22,7 +22,13 @@ const ROUTE_LABEL_KEYS: Record<string, string> = {
     sales: "nav.sales",
 };
 
-export function getBreadcrumbs(pathname: string, t: (key: string) => string): Breadcrumb[] {
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+export function getBreadcrumbs(
+    pathname: string,
+    t: (key: string) => string,
+    entityNames: Record<string, string> = {},
+): Breadcrumb[] {
     const segments = pathname.split("/").filter(Boolean);
 
     const breadcrumbs: Breadcrumb[] = [];
@@ -33,7 +39,11 @@ export function getBreadcrumbs(pathname: string, t: (key: string) => string): Br
         path += `/${segment}`;
 
         const key = ROUTE_LABEL_KEYS[segment];
-        const label = key ? t(key) : segment;
+        const label = key
+            ? t(key)
+            : UUID_PATTERN.test(segment)
+                ? (entityNames[segment] ?? segment)
+                : segment;
 
         breadcrumbs.push({
             label,
