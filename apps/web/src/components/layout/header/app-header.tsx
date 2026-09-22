@@ -1,4 +1,5 @@
 import {Link, useLocation} from "react-router-dom";
+import {useQuery} from "@tanstack/react-query";
 import {getBreadcrumbs} from "@/lib/breadcrumbs.ts";
 import {Separator} from "@/components/ui/separator.tsx";
 import {SidebarTrigger} from "@/components/ui/sidebar.tsx";
@@ -8,6 +9,23 @@ import {useTheme} from "@/hooks/use-theme.ts";
 import {Languages, MoonStar, Sun} from "lucide-react";
 import {NotificationBell} from "@/features/notifications/components/notification-bell.tsx";
 import {useTranslation} from "react-i18next";
+import {getProject} from "@/features/projects/api/projects.api.ts";
+import {getClient} from "@/features/clients/api/clients.api.ts";
+import {getDeal} from "@/features/deals/api/deals.api.ts";
+import {getCompany} from "@/features/companies/api/companies.api.ts";
+import {getBranch} from "@/features/branches/api/branches.api.ts";
+
+// Finds the UUID that follows `segmentKey` in the path (e.g. the project id
+// after "projects" in /projects/<id>/overview), so breadcrumbs can resolve it
+// to a human-readable name instead of showing the raw id.
+function useIdAfterSegment(segments: string[], segmentKey: string) {
+    const index = segments.indexOf(segmentKey);
+    const candidate = index !== -1 ? segments[index + 1] : undefined;
+
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(candidate ?? "")
+        ? candidate
+        : undefined;
+}
 
 export function AppHeader() {
 
@@ -15,7 +33,48 @@ export function AppHeader() {
     const location = useLocation();
     const { theme, toggleTheme } = useTheme();
 
-    const breadcrumbs = getBreadcrumbs(location.pathname, t);
+    const segments = location.pathname.split("/").filter(Boolean);
+
+    const projectId = useIdAfterSegment(segments, "projects");
+    const clientId = useIdAfterSegment(segments, "clients");
+    const dealId = useIdAfterSegment(segments, "deals");
+    const companyId = useIdAfterSegment(segments, "companies");
+    const branchId = useIdAfterSegment(segments, "branches");
+
+    const projectQuery = useQuery({
+        queryKey: ["project", projectId],
+        queryFn: () => getProject(projectId!),
+        enabled: !!projectId,
+    });
+    const clientQuery = useQuery({
+        queryKey: ["client", clientId],
+        queryFn: () => getClient(clientId!),
+        enabled: !!clientId,
+    });
+    const dealQuery = useQuery({
+        queryKey: ["deal", dealId],
+        queryFn: () => getDeal(dealId!),
+        enabled: !!dealId,
+    });
+    const companyQuery = useQuery({
+        queryKey: ["companies", companyId],
+        queryFn: () => getCompany(companyId!),
+        enabled: !!companyId,
+    });
+    const branchQuery = useQuery({
+        queryKey: ["branches", branchId],
+        queryFn: () => getBranch(branchId!),
+        enabled: !!branchId,
+    });
+
+    const entityNames: Record<string, string> = {};
+    if (projectId && projectQuery.data) entityNames[projectId] = projectQuery.data.name;
+    if (clientId && clientQuery.data) entityNames[clientId] = clientQuery.data.fullName;
+    if (dealId && dealQuery.data) entityNames[dealId] = dealQuery.data.dealNumber;
+    if (companyId && companyQuery.data) entityNames[companyId] = companyQuery.data.name;
+    if (branchId && branchQuery.data) entityNames[branchId] = branchQuery.data.name;
+
+    const breadcrumbs = getBreadcrumbs(location.pathname, t, entityNames);
 
     return (
         <header className="h-16 px-6 flex items-center justify-between sticky top-0 bg-background border-b-2 z-50">
