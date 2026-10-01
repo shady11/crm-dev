@@ -53,7 +53,7 @@ export function ChessboardBlocks() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-medium">{t("chessboard.selectBlockHeading")}</h2>
+                <h2 className="text-lg font-bold">{t("chessboard.selectBlockHeading")}</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -78,7 +78,7 @@ export function ChessboardBlocks() {
                                             <BuildingIcon size={32} strokeWidth={1.25} className="text-white" />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-medium">{t("chessboard.blockLabel", { name: block.name })}</h3>
+                                            <h3 className="text-lg font-bold">{t("chessboard.blockLabel", { name: block.name })}</h3>
                                             {(block as any).code && (
                                                 <p className="text-xs text-muted-foreground">{(block as any).code}</p>
                                             )}

@@ -28,7 +28,7 @@ export function DealUnitCard({
                         <div className="flex items-center">
                             <div className="flex flex-col">
                                 <div className="flex items-center gap-2">
-                                    <h3 className="text-lg font-medium">
+                                    <h3 className="text-lg font-bold">
                                         {t("unitCard.unitNumber", { ns: "deals", number: unit.number })}
                                     </h3>
                                 </div>

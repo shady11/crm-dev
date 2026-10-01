@@ -27,7 +27,7 @@ export function UsersPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-start justify-between gap-4">
-                <h2 className="text-2xl font-medium tracking-tight">{t("page.rolesHeading")}</h2>
+                <h2 className="text-2xl font-bold tracking-tight">{t("page.rolesHeading")}</h2>
             </div>
 
             <RoleCardsGrid roles={visibleRoles} membersByRole={roleCards.membersByRole} />

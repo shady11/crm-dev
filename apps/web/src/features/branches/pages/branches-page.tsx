@@ -97,7 +97,7 @@ export function BranchesPage() {
         <div className="space-y-6">
             <div className="flex items-start justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-medium tracking-tight">{t("page.heading")}</h2>
+                    <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
                 </div>
 
                 <div className="flex items-center gap-2">

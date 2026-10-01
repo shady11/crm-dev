@@ -44,7 +44,7 @@ export function TasksToolbar({ statusFilter, onStatusFilterChange, assignedToId,
 
     return (
         <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-medium">{t("toolbar.heading")}</h2>
+            <h2 className="text-lg font-bold">{t("toolbar.heading")}</h2>
 
             <div className="flex flex-wrap items-center gap-2">
                 <BranchFilterSelect

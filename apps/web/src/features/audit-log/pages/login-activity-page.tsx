@@ -26,7 +26,7 @@ export function LoginActivityPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-2xl font-medium tracking-tight">{t("loginActivity.heading")}</h2>
+                <h2 className="text-2xl font-bold tracking-tight">{t("loginActivity.heading")}</h2>
                 <p className="text-muted-foreground text-sm">{t("loginActivity.description")}</p>
             </div>
 

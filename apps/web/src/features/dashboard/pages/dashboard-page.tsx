@@ -59,7 +59,7 @@ export function DashboardPage() {
     return (
         <div className="space-y-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
-                <h2 className="text-2xl font-medium tracking-tight">{t("title")}</h2>
+                <h2 className="text-2xl font-bold tracking-tight">{t("title")}</h2>
 
                 <div className="flex flex-wrap items-center gap-2">
                     <BranchFilterSelect value={branchId} onChange={setBranchId} />
