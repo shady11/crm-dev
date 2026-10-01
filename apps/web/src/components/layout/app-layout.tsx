@@ -17,8 +17,14 @@ export function AppLayout() {
         <SidebarProvider
             className="bg-shell"
             // Wider than the 16rem default so the floating card's padding
-            // doesn't truncate the longer Kyrgyz/Russian nav labels.
-            style={{"--sidebar-width": "17.5rem"} as React.CSSProperties}
+            // doesn't truncate the longer Kyrgyz/Russian nav labels. The
+            // collapsed width is an icon button (size-8) plus p-2 on each
+            // side; the stock "3rem" assumes a 0.25rem spacing unit, but ours
+            // is 0.3rem, so items overflowed the card's right edge.
+            style={{
+                "--sidebar-width": "17.5rem",
+                "--sidebar-width-icon": "calc(var(--spacing) * 12)",
+            } as React.CSSProperties}
         >
             <SkipNavLink>{t("nav.skipToContent")}</SkipNavLink>
 
