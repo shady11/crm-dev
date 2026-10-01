@@ -26,17 +26,22 @@ export function AppLayout() {
                 <AppSidebar />
             </nav>
 
-            {/* A card floating on the shell, matching the floating sidebar: same
-                gap on every side, and it scrolls inside itself. */}
-            <SidebarInset className="h-svh overflow-hidden md:m-2 md:ms-0 md:h-[calc(100svh-(--spacing(4)))] md:rounded-2xl md:border md:border-sidebar-border">
-                <ImpersonationBanner />
-                <AppHeader />
+            {/* Header and page content are two cards floating on the shell,
+                matching the floating sidebar: same gap on every side and
+                between them. Only the content card scrolls. */}
+            <SidebarInset className="h-svh overflow-hidden md:m-2 md:ms-0 md:h-[calc(100svh-(--spacing(4)))] md:gap-2 md:bg-transparent">
+                <div className="shrink-0 overflow-hidden bg-background md:rounded-2xl md:border md:border-sidebar-border">
+                    <ImpersonationBanner />
+                    <AppHeader />
+                </div>
 
-                <ScrollArea className="flex-1">
-                    <SkipNavContent className="flex-1 p-6">
-                        <Outlet />
-                    </SkipNavContent>
-                </ScrollArea>
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background md:rounded-2xl md:border md:border-sidebar-border">
+                    <ScrollArea className="flex-1">
+                        <SkipNavContent className="flex-1 p-6">
+                            <Outlet />
+                        </SkipNavContent>
+                    </ScrollArea>
+                </div>
             </SidebarInset>
         </SidebarProvider>
     );
