@@ -592,7 +592,6 @@ export const SidebarMenuButton = ({
       className={cn(
         "peer/menu-button group/menu-button",
         "w-full",
-        "font-sans",
         "justify-start gap-2",
         "p-2",
         "overflow-hidden",
@@ -790,7 +789,6 @@ export const SidebarMenuSubButton = (props: SidebarMenuSubButtonProps) => {
       className={cn(
         buttonVariants({ size, variant: "ghost", clickEffect: false }),
         "w-full min-w-0",
-        "font-sans",
         "justify-start",
         "px-2",
         "text-sidebar-foreground",
