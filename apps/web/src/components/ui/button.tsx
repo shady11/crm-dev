@@ -8,7 +8,7 @@ export const buttonVariants = tv({
   base: [
     "relative",
     "inline-flex shrink-0 items-center justify-center gap-2",
-    "whitespace-nowrap font-normal text-sm",
+    "whitespace-nowrap font-heading font-normal text-sm",
     "rounded-lg",
     "transition-all",
     "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/32",
