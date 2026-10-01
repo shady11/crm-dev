@@ -33,7 +33,7 @@ export function SuperAdminDashboardPage() {
         <div className="space-y-6">
             <div className="flex items-start justify-between gap-4">
                 <div>
-                    <h2 className="text-2xl font-medium tracking-tight">{t("page.heading")}</h2>
+                    <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
                     <p className="text-muted-foreground text-sm">{t("page.description")}</p>
                 </div>
                 <Button variant="secondary" asChild>

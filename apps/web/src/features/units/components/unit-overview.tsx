@@ -65,7 +65,7 @@ export const UnitOverview = ({
                 <DataListItem>
                     <DataListItemLabel>{t("overview.listPriceLabel")}</DataListItemLabel>
                     <DataListItemValue>
-                        <h4 className="text-lg font-medium">
+                        <h4 className="text-lg font-bold">
                             {formatCurrency(parseFloat(unit.price))}
                         </h4>
                     </DataListItemValue>

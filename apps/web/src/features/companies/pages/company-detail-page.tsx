@@ -118,7 +118,7 @@ export function CompanyDetailPage() {
                         </Link>
                     </Button>
                     <div className="flex items-center gap-3">
-                        <h2 className="text-2xl font-medium tracking-tight">{data.name}</h2>
+                        <h2 className="text-2xl font-bold tracking-tight">{data.name}</h2>
                         <Badge variant={suspended ? "destructive" : "secondary"}>
                             {suspended
                                 ? t("status.suspended", {ns: "companies"})

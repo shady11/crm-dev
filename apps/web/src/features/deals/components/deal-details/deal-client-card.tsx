@@ -16,7 +16,7 @@ export function DealClientCard({ client }: { client: Deal["client"] }) {
                     <AvatarFallback>{initials(client.fullName)}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col gap-1">
-                    <h3 className="text-lg font-medium">{client.fullName}</h3>
+                    <h3 className="text-lg font-bold">{client.fullName}</h3>
 
                     <div className="flex flex-col gap-1 text-muted-foreground">
                         <a

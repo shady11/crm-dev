@@ -70,7 +70,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         .map((item) => ({ title: t(item.titleKey), url: item.url, icon: item.icon }));
 
     return (
-        <Sidebar className="border-r-2" collapsible="icon" {...props}>
+        <Sidebar
+            variant="floating"
+            collapsible="icon"
+            className="[&>[data-slot=sidebar-inner]]:rounded-2xl [&>[data-slot=sidebar-inner]]:shadow-none"
+            {...props}
+        >
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>

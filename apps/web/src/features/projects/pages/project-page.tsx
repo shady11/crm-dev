@@ -92,7 +92,7 @@ export function ProjectPage() {
         <div className="space-y-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
-                    <h1 className="text-3xl font-medium">{project.name}</h1>
+                    <h1 className="text-3xl font-bold">{project.name}</h1>
                     <Badge variant="default" className={PROJECT_STATUS_BADGE_CLASSES[project.status]}>
                         {t(PROJECT_STATUS_LABEL_KEYS[project.status])}
                     </Badge>

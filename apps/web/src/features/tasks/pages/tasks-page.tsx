@@ -60,7 +60,7 @@ export function TasksPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-start justify-between gap-4">
-                <h2 className="text-2xl font-medium tracking-tight">{t("page.title")}</h2>
+                <h2 className="text-2xl font-bold tracking-tight">{t("page.title")}</h2>
 
                 <ToggleGroup
                     size="sm"

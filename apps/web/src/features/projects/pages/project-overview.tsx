@@ -33,7 +33,7 @@ export function ProjectOverview() {
     return (
         <div className="space-y-2">
             <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-medium">{t("overview.heading")}</h2>
+                <h2 className="text-lg font-bold">{t("overview.heading")}</h2>
             </div>
 
             <OverviewCards project={project}/>

@@ -71,7 +71,7 @@ export function CompanySettingsPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-2xl font-medium tracking-tight">{t("page.heading")}</h2>
+                <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
                 <p className="text-sm text-muted-foreground">{t("page.description")}</p>
             </div>
 

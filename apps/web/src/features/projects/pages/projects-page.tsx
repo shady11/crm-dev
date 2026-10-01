@@ -111,7 +111,7 @@ export function ProjectsPage() {
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between gap-4">
-                <h2 className="text-2xl font-medium tracking-tight">{t("tabs.heading")}</h2>
+                <h2 className="text-2xl font-bold tracking-tight">{t("tabs.heading")}</h2>
                 <div className="flex items-center gap-2">
                     <Select
                         collection={statusCollection}

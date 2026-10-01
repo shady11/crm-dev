@@ -98,7 +98,7 @@ export function BranchDetailPage() {
             <div className="flex items-start justify-between gap-4">
                 <div className="space-y-1">
                     <div className="flex items-center gap-3">
-                        <h2 className="text-2xl font-medium tracking-tight">{data.name}</h2>
+                        <h2 className="text-2xl font-bold tracking-tight">{data.name}</h2>
                         <Badge variant="default" className={BRANCH_STATUS_BADGE_CLASSES[deactivated ? 1 : 0]}>
                             {deactivated ? t("status.deactivated") : t("status.active")}
                         </Badge>

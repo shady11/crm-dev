@@ -39,7 +39,7 @@ export function ClientsToolbar({
 
     return (
         <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-medium">{t("page.title")}</h2>
+            <h2 className="text-lg font-bold">{t("page.title")}</h2>
 
             <div className="flex flex-wrap items-center gap-2">
                 <BranchFilterSelect value={branchFilter} onChange={onBranchFilterChange} />
