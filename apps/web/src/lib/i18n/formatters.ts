@@ -29,11 +29,11 @@ export function useFormatters(company?: CompanySettings) {
 
     return useMemo(() => {
         const number = new Intl.NumberFormat(locale);
-        // Money reads as "12345 KGS": plain digits, then the ISO code. Built
-        // by hand because Intl's currency style puts the code before the
-        // amount in some locales and adds group separators.
-        const amount = new Intl.NumberFormat(locale, {
-            useGrouping: false,
+        // Money reads as "12,345 KGS": comma-grouped digits, then the ISO
+        // code. Built by hand because Intl's currency style puts the code
+        // before the amount in some locales, and pinned to en-US because
+        // ru-RU groups with spaces rather than commas.
+        const amount = new Intl.NumberFormat("en-US", {
             maximumFractionDigits: 0,
         });
         const money = (value: number) => `${amount.format(value)} ${currency}`;
