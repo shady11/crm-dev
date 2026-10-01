@@ -29,18 +29,21 @@ export function useFormatters(company?: CompanySettings) {
 
     return useMemo(() => {
         const number = new Intl.NumberFormat(locale);
-        const currencyFmt = new Intl.NumberFormat(locale, {
-            style: "currency",
-            currency,
+        // Money reads as "12345 KGS": plain digits, then the ISO code. Built
+        // by hand because Intl's currency style puts the code before the
+        // amount in some locales and adds group separators.
+        const amount = new Intl.NumberFormat(locale, {
+            useGrouping: false,
             maximumFractionDigits: 0,
         });
+        const money = (value: number) => `${amount.format(value)} ${currency}`;
         const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
         const dateTime = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
 
         return {
             formatNumber: (value: number) => number.format(value),
-            formatCurrency: (value: number) => currencyFmt.format(value),
-            formatPricePerSqm: (value: number) => `${number.format(value)} ${currency}/m²`,
+            formatCurrency: money,
+            formatPricePerSqm: (value: number) => `${money(value)}/m²`,
             formatDate: (value: string | Date) => date.format(new Date(value)),
             formatDateTime: (value: string | Date) => dateTime.format(new Date(value)),
             // The bare ISO currency code (e.g. "KGS") - for labels like
