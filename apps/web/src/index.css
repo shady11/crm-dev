@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Onest:wght@100..900&family=Unbounded:wght@200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap');
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -7,7 +7,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-    --font-heading: 'Unbounded', sans-serif;
+    --font-heading: var(--font-sans);
     --font-sans: 'Onest', sans-serif;
     --color-background: var(--background);
     --color-foreground: var(--foreground);
@@ -261,9 +261,6 @@
     }
   html {
     @apply font-sans;
-    }
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-heading;
     }
 }
 
