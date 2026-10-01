@@ -1,3 +1,4 @@
+import type React from "react";
 import {Outlet} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import {AppHeader} from "./header/app-header.tsx";
@@ -13,18 +14,25 @@ export function AppLayout() {
     const { t } = useTranslation("common");
 
     return (
-        <SidebarProvider>
+        <SidebarProvider
+            className="bg-shell"
+            // Wider than the 16rem default so the floating card's padding
+            // doesn't truncate the longer Kyrgyz/Russian nav labels.
+            style={{"--sidebar-width": "17.5rem"} as React.CSSProperties}
+        >
             <SkipNavLink>{t("nav.skipToContent")}</SkipNavLink>
 
             <nav aria-label={t("nav.mainNavigation")}>
                 <AppSidebar />
             </nav>
 
-            <SidebarInset className="rounded-lg overflow-hidden">
+            {/* A card floating on the shell, matching the floating sidebar: same
+                gap on every side, and it scrolls inside itself. */}
+            <SidebarInset className="h-svh overflow-hidden md:m-2 md:ms-0 md:h-[calc(100svh-(--spacing(4)))] md:rounded-2xl md:border md:border-sidebar-border">
                 <ImpersonationBanner />
                 <AppHeader />
 
-                <ScrollArea className="h-[calc(100vh-var(--spacing)*16)]">
+                <ScrollArea className="flex-1">
                     <SkipNavContent className="flex-1 p-6">
                         <Outlet />
                     </SkipNavContent>

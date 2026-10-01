@@ -91,7 +91,7 @@ export function AppHeader() {
     const breadcrumbs = getBreadcrumbs(location.pathname, t, entityNames);
 
     return (
-        <header className="h-16 px-6 flex items-center justify-between sticky top-0 bg-background border-b-2 z-50">
+        <header className="h-16 px-6 shrink-0 flex items-center justify-between bg-background">
             <div className="flex items-center gap-2">
 
                 <SidebarTrigger aria-label={t("nav.toggleSidebar")} />
