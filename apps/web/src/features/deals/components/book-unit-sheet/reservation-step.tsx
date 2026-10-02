@@ -1,5 +1,6 @@
 import {Controller, type UseFormReturn} from "react-hook-form";
 import {createListCollection} from "@ark-ui/react";
+import {DateField} from "@/components/shared/date-field";
 import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field";
 import {SheetBody} from "@/components/ui/sheet";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
@@ -70,11 +71,9 @@ export function ReservationStep({ form, apartment, managers }: ReservationStepPr
                     render={({ field, fieldState }) => (
                         <Field invalid={fieldState.invalid}>
                             <FieldLabel>{t("booking.reservationExpires")}</FieldLabel>
-                            <input
-                                type="date"
-                                className="h-9 rounded-md border px-3 text-sm"
+                            <DateField
                                 value={field.value ? field.value.toISOString().slice(0, 10) : ""}
-                                onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : undefined)}
+                                onChange={(value) => field.onChange(value ? new Date(value) : undefined)}
                             />
                             <FieldError>{fieldState.error?.message}</FieldError>
                         </Field>

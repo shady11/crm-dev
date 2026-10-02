@@ -23,7 +23,8 @@
     "reload": "Reload page",
     "moreActions": "More actions",
     "download": "Download",
-    "close": "Close"
+    "close": "Close",
+    "clear": "Clear"
   },
   "labels": {
     "status": "Status",
@@ -39,7 +40,8 @@
     "block": "Block",
     "entrance": "Entrance",
     "floor": "Floor",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "selectDate": "Select date"
   },
   "units": {
     "sqm": "m²",
