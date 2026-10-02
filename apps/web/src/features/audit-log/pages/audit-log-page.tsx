@@ -4,6 +4,7 @@ import {useTranslation} from "react-i18next";
 import {createListCollection} from "@ark-ui/react";
 import {ScrollText} from "lucide-react";
 import {Input} from "@/components/ui/input.tsx";
+import {DateField} from "@/components/shared/date-field.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
@@ -89,29 +90,33 @@ export function AuditLogPage() {
                     </Select>
                 </label>
 
-                <label className="block space-y-1.5">
+                <div className="space-y-1.5">
                     <span className="text-sm font-medium">{t("page.filters.dateFrom")}</span>
-                    <Input
-                        type="date"
+                    <DateField
+                        className="w-44"
+                        clearable
                         value={dateFrom}
-                        onChange={(event) => {
-                            setDateFrom(event.target.value);
+                        max={dateTo}
+                        onChange={(value) => {
+                            setDateFrom(value);
                             setPage(1);
                         }}
                     />
-                </label>
+                </div>
 
-                <label className="block space-y-1.5">
+                <div className="space-y-1.5">
                     <span className="text-sm font-medium">{t("page.filters.dateTo")}</span>
-                    <Input
-                        type="date"
+                    <DateField
+                        className="w-44"
+                        clearable
                         value={dateTo}
-                        onChange={(event) => {
-                            setDateTo(event.target.value);
+                        min={dateFrom}
+                        onChange={(value) => {
+                            setDateTo(value);
                             setPage(1);
                         }}
                     />
-                </label>
+                </div>
             </div>
 
             {logs.isLoading ? (
