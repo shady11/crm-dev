@@ -32,6 +32,7 @@ describe('TasksService', () => {
         roleName: 'Company Admin',
         isBranchScoped: false,
         branchId: null,
+        permissions: ['tasks.view', 'tasks.edit'],
     };
 
     function build(opts: {task?: unknown; assignee?: unknown} = {}) {
@@ -216,6 +217,25 @@ describe('TasksService', () => {
                 where: {id: 'task-1'},
                 data: {status: TaskStatus.IN_PROGRESS, outcome: undefined},
                 include: expect.anything(),
+            });
+        });
+
+        describe('with tasks.change_status only', () => {
+            const manager: AuthUser = {...branchUser, permissions: ['tasks.view', 'tasks.change_status']};
+
+            it('moves a task assigned to the caller', async () => {
+                const {service, prisma} = build({task: {id: 'task-1', status: TaskStatus.TODO, assignedToId: manager.id}});
+                await service.updateStatus(manager, 'task-1', {status: TaskStatus.IN_PROGRESS} as any);
+
+                expect(prisma.task.update).toHaveBeenCalled();
+            });
+
+            it("rejects moving someone else's task", async () => {
+                const {service, prisma} = build({task: {id: 'task-1', status: TaskStatus.TODO, assignedToId: 'someone-else'}});
+                await expect(
+                    service.updateStatus(manager, 'task-1', {status: TaskStatus.IN_PROGRESS} as any),
+                ).rejects.toThrow(ForbiddenException);
+                expect(prisma.task.update).not.toHaveBeenCalled();
             });
         });
     });

@@ -4,6 +4,9 @@ import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {TaskFormSheet} from "@/features/tasks/components/task-form-sheet.tsx";
+import {TaskDetailsSheet} from "@/features/tasks/components/task-details-sheet.tsx";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {hasPermission} from "@/features/auth/access";
 import {useTaskActions} from "@/features/tasks/hooks/use-task-actions.ts";
 import {TASK_STATUS_CLASSES, TASK_STATUS_LABEL_KEYS} from "@/features/tasks/types/task.types.ts";
 import type {Task, TaskPayload} from "@/features/tasks/api/tasks.api.ts";
@@ -27,9 +30,13 @@ export function ClientTasksCard({ clientId }: { clientId: string }) {
     const actions = useTaskActions();
     const [formOpen, setFormOpen] = useState(false);
     const [editingTask, setEditingTask] = useState<Task | null>(null);
+    const [viewingTask, setViewingTask] = useState<Task | null>(null);
+    const [detailsOpen, setDetailsOpen] = useState(false);
+    const { user } = useAuth();
 
+    const openDetails = (task: Task) => { setViewingTask(task); setDetailsOpen(true); };
     const openCreate = () => { setEditingTask(null); setFormOpen(true); };
-    const openEdit = (task: Task) => { setEditingTask(task); setFormOpen(true); };
+    const openEdit = (task: Task) => { setDetailsOpen(false); setEditingTask(task); setFormOpen(true); };
     const closeForm = () => { setFormOpen(false); setEditingTask(null); actions.create.reset(); actions.update.reset(); };
 
     const handleSubmit = (payload: TaskPayload) => {
@@ -46,9 +53,11 @@ export function ClientTasksCard({ clientId }: { clientId: string }) {
                 <CardTitle className="text-sm text-muted-foreground">
                     {tasks.length > 0 ? t("clientCard.titleWithCount", { count: tasks.length }) : t("clientCard.title")}
                 </CardTitle>
-                <Button variant="secondary" size="sm" onClick={openCreate}>
-                    {t("clientCard.addTask")}
-                </Button>
+                {hasPermission(user, "tasks.create") && (
+                    <Button variant="secondary" size="sm" onClick={openCreate}>
+                        {t("clientCard.addTask")}
+                    </Button>
+                )}
             </CardHeader>
             <CardContent>
                 {tasksQuery.isLoading ? null : tasks.length === 0 ? (
@@ -58,7 +67,7 @@ export function ClientTasksCard({ clientId }: { clientId: string }) {
                         {tasks.map((task) => {
                             const Icon = ICONS[task.status] ?? CircleIcon;
                             return (
-                                <div key={task.id} className="flex cursor-pointer items-center gap-3 py-2.5 text-sm" onClick={() => openEdit(task)}>
+                                <div key={task.id} className="flex cursor-pointer items-center gap-3 py-2.5 text-sm" onClick={() => openDetails(task)}>
                                     <Icon size={16} className="shrink-0 text-muted-foreground" />
                                     <div className="min-w-0 flex-1">
                                         <p className="truncate font-medium">{task.title}</p>
@@ -76,6 +85,13 @@ export function ClientTasksCard({ clientId }: { clientId: string }) {
                     </div>
                 )}
             </CardContent>
+
+            <TaskDetailsSheet
+                open={detailsOpen}
+                task={viewingTask}
+                onOpenChange={setDetailsOpen}
+                onEdit={openEdit}
+            />
 
             <TaskFormSheet
                 open={formOpen}

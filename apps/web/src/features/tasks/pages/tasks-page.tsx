@@ -8,6 +8,7 @@ import {TasksPagination} from "@/features/tasks/components/tasks-pagination.tsx"
 import {TaskKanbanBoard} from "@/features/tasks/components/task-kanban-board.tsx";
 import {TaskFormSheet} from "@/features/tasks/components/task-form-sheet.tsx";
 import {TaskOutcomeDialog} from "@/features/tasks/components/task-outcome-dialog.tsx";
+import {TaskDetailsSheet} from "@/features/tasks/components/task-details-sheet.tsx";
 import {useTasksList} from "@/features/tasks/hooks/use-tasks-list.ts";
 import {useTaskActions} from "@/features/tasks/hooks/use-task-actions.ts";
 import type {Task, TaskPayload} from "@/features/tasks/api/tasks.api.ts";
@@ -24,10 +25,13 @@ export function TasksPage() {
     const [view, setView] = useState<TasksView>("board");
     const [formOpen, setFormOpen] = useState(false);
     const [editingTask, setEditingTask] = useState<Task | null>(null);
+    const [viewingTask, setViewingTask] = useState<Task | null>(null);
+    const [detailsOpen, setDetailsOpen] = useState(false);
     const [pendingClose, setPendingClose] = useState<{ taskId: string; status: TaskStatus } | null>(null);
 
+    const openDetails = (task: Task) => { setViewingTask(task); setDetailsOpen(true); };
     const openCreate = () => { setEditingTask(null); setFormOpen(true); };
-    const openEdit = (task: Task) => { setEditingTask(task); setFormOpen(true); };
+    const openEdit = (task: Task) => { setDetailsOpen(false); setEditingTask(task); setFormOpen(true); };
     const closeForm = () => { setFormOpen(false); setEditingTask(null); actions.create.reset(); actions.update.reset(); };
 
     // A drag onto Done/Cancelled needs an outcome (the API rejects the
@@ -97,7 +101,7 @@ export function TasksPage() {
                             sortBy={table.sortBy}
                             sortOrder={table.sortOrder}
                             onSort={table.toggleSort}
-                            onRowClick={openEdit}
+                            onRowClick={openDetails}
                         />
                         <TasksPagination
                             page={pagination.page}
@@ -113,10 +117,17 @@ export function TasksPage() {
                         assignedToId={filters.assignedToId}
                         branchId={filters.branchId}
                         onStatusChange={handleStatusChange}
-                        onCardClick={openEdit}
+                        onCardClick={openDetails}
                     />
                 )}
             </div>
+
+            <TaskDetailsSheet
+                open={detailsOpen}
+                task={viewingTask}
+                onOpenChange={setDetailsOpen}
+                onEdit={openEdit}
+            />
 
             <TaskFormSheet
                 open={formOpen}

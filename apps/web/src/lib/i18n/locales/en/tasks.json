@@ -84,6 +84,18 @@
       "outcomeRequired": "An outcome is required to close a task"
     }
   },
+  "details": {
+    "status": "Status",
+    "priority": "Priority",
+    "type": "Type",
+    "assignee": "Assignee",
+    "relatedTo": "Related to",
+    "dueDate": "Due date",
+    "created": "Created",
+    "description": "Description",
+    "outcome": "Outcome",
+    "edit": "Edit"
+  },
   "outcomeDialog": {
     "title": "Add an outcome",
     "description": "Moving this task to \"{{status}}\" requires a short outcome note.",

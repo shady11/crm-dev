@@ -18,6 +18,8 @@ import {useTasksBoard} from "@/features/tasks/hooks/use-tasks-board.ts";
 import type {Task} from "@/features/tasks/api/tasks.api.ts";
 import {useQueryClient} from "@tanstack/react-query";
 import {applyTaskStatusOptimistically} from "@/features/tasks/utils/optimistic-status.ts";
+import {canMoveTask} from "@/features/tasks/utils/task-access.ts";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 
 interface TaskKanbanBoardProps {
     search?: string;
@@ -31,6 +33,8 @@ export function TaskKanbanBoard({ search, assignedToId, branchId, onStatusChange
     const { tasksByStatus, isLoading } = useTasksBoard({ search, assignedToId, branchId });
     const [activeTask, setActiveTask] = useState<Task | null>(null);
     const queryClient = useQueryClient();
+    const { user } = useAuth();
+    const isMovable = (task: Task) => canMoveTask(user, task);
 
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -47,7 +51,7 @@ export function TaskKanbanBoard({ search, assignedToId, branchId, onStatusChange
         const { active, over } = event;
         const task = allTasks.find((t) => t.id === active.id);
 
-        if (over && task) {
+        if (over && task && isMovable(task)) {
             const newStatus = over.id as TaskStatus;
             if (task.status !== newStatus) {
                 applyTaskStatusOptimistically(queryClient, task.id, newStatus);
@@ -66,7 +70,7 @@ export function TaskKanbanBoard({ search, assignedToId, branchId, onStatusChange
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <div className="flex gap-4 overflow-x-auto pb-2">
                 {Object.values(TaskStatus).map((status) => (
-                    <TaskKanbanColumn key={status} status={status} tasks={tasksByStatus.get(status) ?? []} onCardClick={onCardClick} />
+                    <TaskKanbanColumn key={status} status={status} tasks={tasksByStatus.get(status) ?? []} canMoveTask={isMovable} onCardClick={onCardClick} />
                 ))}
             </div>
 

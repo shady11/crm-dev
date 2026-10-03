@@ -9,10 +9,11 @@ import {ScrollArea} from "@/components/ui/scroll-area";
 interface TaskKanbanColumnProps {
     status: TaskStatus;
     tasks: Task[];
+    canMoveTask(task: Task): boolean;
     onCardClick(task: Task): void;
 }
 
-export function TaskKanbanColumn({ status, tasks, onCardClick }: TaskKanbanColumnProps) {
+export function TaskKanbanColumn({ status, tasks, canMoveTask, onCardClick }: TaskKanbanColumnProps) {
     const { t } = useTranslation("tasks");
     const { setNodeRef, isOver } = useDroppable({ id: status });
 
@@ -38,7 +39,7 @@ export function TaskKanbanColumn({ status, tasks, onCardClick }: TaskKanbanColum
                     {tasks.length === 0 ? (
                         <p className="py-6 text-center text-xs text-muted-foreground">{t("kanban.noTasks")}</p>
                     ) : (
-                        tasks.map((task) => <TaskKanbanCard key={task.id} task={task} onClick={onCardClick} />)
+                        tasks.map((task) => <TaskKanbanCard key={task.id} task={task} canMove={canMoveTask(task)} onClick={onCardClick} />)
                     )}
                 </div>
             </ScrollArea>
