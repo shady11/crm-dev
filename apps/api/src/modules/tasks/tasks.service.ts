@@ -296,6 +296,7 @@ export class TasksService {
         }
 
         const existing = await this.findOne(user, id);
+        this.ensureCanChangeStatus(user, existing.assignedToId);
         this.ensureOutcomeOnClose(dto.status, existing.status, dto.outcome ?? existing.outcome);
 
         const task = await this.prisma.task.update({
@@ -372,6 +373,18 @@ export class TasksService {
         const linked = [dto.leadId, dto.clientId, dto.dealId].filter(Boolean);
         if (linked.length > 1) {
             throw new BadRequestException("A task can only be linked to one of lead, client, or deal.");
+        }
+    }
+
+    /**
+     * tasks.edit moves any task the caller can see; tasks.change_status alone
+     * (an individual contributor) only moves tasks assigned to them.
+     */
+    private ensureCanChangeStatus(user: AuthUser, assignedToId: string) {
+        if (user.isSuperAdmin || user.permissions?.includes("tasks.edit")) return;
+
+        if (assignedToId !== user.id) {
+            throw new ForbiddenException("You can only change the status of tasks assigned to you.");
         }
     }
 

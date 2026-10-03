@@ -47,7 +47,9 @@ export class TasksController {
         return this.tasksService.update(user, id, dto);
     }
 
-    @RequirePermissions("tasks.edit")
+    // tasks.change_status alone only covers tasks assigned to the caller —
+    // enforced in TasksService.updateStatus, since it depends on the row.
+    @RequirePermissions("tasks.edit", "tasks.change_status")
     @Patch(":id/status")
     updateStatus(@CurrentUser() user: AuthUser, @Param("id") id: string, @Body() dto: UpdateTaskStatusDto) {
         return this.tasksService.updateStatus(user, id, dto);

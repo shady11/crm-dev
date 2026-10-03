@@ -4,14 +4,16 @@ import {TASK_STATUS_CLASSES, TASK_STATUS_LABEL_KEYS, type TaskStatus} from "@/fe
 import {TaskKanbanCard} from "./task-kanban-card.tsx";
 import type {Task} from "@/features/tasks/api/tasks.api.ts";
 import {useTranslation} from "react-i18next";
+import {ScrollArea} from "@/components/ui/scroll-area";
 
 interface TaskKanbanColumnProps {
     status: TaskStatus;
     tasks: Task[];
+    canMoveTask(task: Task): boolean;
     onCardClick(task: Task): void;
 }
 
-export function TaskKanbanColumn({ status, tasks, onCardClick }: TaskKanbanColumnProps) {
+export function TaskKanbanColumn({ status, tasks, canMoveTask, onCardClick }: TaskKanbanColumnProps) {
     const { t } = useTranslation("tasks");
     const { setNodeRef, isOver } = useDroppable({ id: status });
 
@@ -29,13 +31,18 @@ export function TaskKanbanColumn({ status, tasks, onCardClick }: TaskKanbanColum
                 <span className="ml-auto text-xs text-muted-foreground">{tasks.length}</span>
             </div>
 
-            <div className="flex flex-col gap-2 overflow-y-auto" style={{ maxHeight: "calc(100vh - 320px)" }}>
-                {tasks.length === 0 ? (
-                    <p className="py-6 text-center text-xs text-muted-foreground">{t("kanban.noTasks")}</p>
-                ) : (
-                    tasks.map((task) => <TaskKanbanCard key={task.id} task={task} onClick={onCardClick} />)
-                )}
-            </div>
+            <ScrollArea
+                scrollFade
+                className="max-h-[calc(100vh-320px)] [&>[data-slot=scroll-area-viewport]]:max-h-[inherit]"
+            >
+                <div className="flex flex-col gap-2 pr-2">
+                    {tasks.length === 0 ? (
+                        <p className="py-6 text-center text-xs text-muted-foreground">{t("kanban.noTasks")}</p>
+                    ) : (
+                        tasks.map((task) => <TaskKanbanCard key={task.id} task={task} canMove={canMoveTask(task)} onClick={onCardClick} />)
+                    )}
+                </div>
+            </ScrollArea>
         </div>
     );
 }

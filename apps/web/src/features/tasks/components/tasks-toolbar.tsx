@@ -7,6 +7,8 @@ import {TASK_STATUS_LABEL_KEYS, TaskStatus} from "@/features/tasks/types/task.ty
 import type {TaskStatusFilter} from "@/features/tasks/hooks/use-tasks-list.ts";
 import {useAssignableUsers} from "@/features/users/hooks/use-assignable-users.ts";
 import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {hasPermission} from "@/features/auth/access";
 import {useTranslation} from "react-i18next";
 
 interface TasksToolbarProps {
@@ -24,6 +26,7 @@ interface TasksToolbarProps {
 
 export function TasksToolbar({ statusFilter, onStatusFilterChange, assignedToId, onAssignedToIdChange, branchId, onBranchIdChange, search, onSearchChange, onAddTask, hideStatusFilter }: TasksToolbarProps) {
     const { t } = useTranslation("tasks");
+    const { user } = useAuth();
 
     const assignableUsers = useAssignableUsers();
     const assigneeCollection = createListCollection({
@@ -73,10 +76,12 @@ export function TasksToolbar({ statusFilter, onStatusFilterChange, assignedToId,
                     <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
                 </InputGroup>
 
-                <Button onClick={onAddTask}>
-                    <PlusIcon className="size-4" />
-                    {t("toolbar.addTask")}
-                </Button>
+                {hasPermission(user, "tasks.create") && (
+                    <Button onClick={onAddTask}>
+                        <PlusIcon className="size-4" />
+                        {t("toolbar.addTask")}
+                    </Button>
+                )}
             </div>
         </div>
     );

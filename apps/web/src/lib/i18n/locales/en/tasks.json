@@ -84,6 +84,25 @@
       "outcomeRequired": "An outcome is required to close a task"
     }
   },
+  "details": {
+    "status": "Status",
+    "priority": "Priority",
+    "type": "Type",
+    "assignee": "Assignee",
+    "relatedTo": "Related to",
+    "dueDate": "Due date",
+    "created": "Created",
+    "description": "Description",
+    "outcome": "Outcome",
+    "edit": "Edit"
+  },
+  "deleteDialog": {
+    "title": "Delete task?",
+    "description": "\"{{title}}\" will be deleted. This action cannot be undone.",
+    "cancel": "Cancel",
+    "deleting": "Deleting...",
+    "delete": "Delete"
+  },
   "outcomeDialog": {
     "title": "Add an outcome",
     "description": "Moving this task to \"{{status}}\" requires a short outcome note.",
