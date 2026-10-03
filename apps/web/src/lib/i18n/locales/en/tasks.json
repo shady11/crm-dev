@@ -96,6 +96,13 @@
     "outcome": "Outcome",
     "edit": "Edit"
   },
+  "deleteDialog": {
+    "title": "Delete task?",
+    "description": "\"{{title}}\" will be deleted. This action cannot be undone.",
+    "cancel": "Cancel",
+    "deleting": "Deleting...",
+    "delete": "Delete"
+  },
   "outcomeDialog": {
     "title": "Add an outcome",
     "description": "Moving this task to \"{{status}}\" requires a short outcome note.",

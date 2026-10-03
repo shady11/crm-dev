@@ -9,6 +9,11 @@ export function canEditTask(user: Viewer) {
     return hasPermission(user, "tasks.edit");
 }
 
+/** Mirrors DELETE /tasks/:id (tasks.delete). */
+export function canDeleteTask(user: Viewer) {
+    return hasPermission(user, "tasks.delete");
+}
+
 /**
  * Mirrors PATCH /tasks/:id/status: tasks.edit moves any task, while
  * tasks.change_status alone only moves tasks assigned to the user (see
