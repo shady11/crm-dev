@@ -25,6 +25,7 @@ import {
   DiscountApprovalNotAllowedException,
   DiscountNotPendingException,
   SalePriceMismatchException,
+  UnitNotAvailableException,
   UnitNotFoundException,
 } from '../exceptions';
 
@@ -229,6 +230,25 @@ export class DealsService {
 
       this.domain.ensureNoActiveDeal(activeDeal, unit);
 
+      // Claim the unit before anything else is written. The status check
+      // above is only a read; this conditional write is what makes the
+      // booking exclusive — of two concurrent reservations, the second blocks
+      // on the row lock, re-reads the status once the first commits, matches
+      // nothing and fails here. Deal_unitId_open_key backs this up in the DB.
+      const claimed = await db.unit.updateMany({
+        where: {
+          id: unit.id,
+          status: UnitStatus.AVAILABLE,
+        },
+        data: {
+          status: UnitStatus.RESERVED,
+        },
+      });
+
+      if (claimed.count === 0) {
+        throw new UnitNotAvailableException(unit.number);
+      }
+
       const listPrice = new Prisma.Decimal(unit.price);
       const discountPercent = new Prisma.Decimal(dto.discountPercent ?? 0);
       const explicitDiscountAmount = dto.discountAmount != null
@@ -323,15 +343,6 @@ export class DealsService {
           },
         });
       }
-
-      await db.unit.update({
-        where: {
-          id: unit.id,
-        },
-        data: {
-          status: UnitStatus.RESERVED,
-        },
-      });
 
       await this.activityService.reserve({
         db,

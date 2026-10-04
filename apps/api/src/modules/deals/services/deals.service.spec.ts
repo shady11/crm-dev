@@ -74,7 +74,7 @@ describe('DealsService', () => {
 
     function buildBase() {
         const prisma: any = {
-            unit: {findFirst: jest.fn(), update: jest.fn().mockResolvedValue({})},
+            unit: {findFirst: jest.fn(), update: jest.fn().mockResolvedValue({}), updateMany: jest.fn().mockResolvedValue({count: 1})},
             deal: {
                 findFirst: jest.fn(),
                 findMany: jest.fn().mockResolvedValue([]),
@@ -238,7 +238,21 @@ describe('DealsService', () => {
             const {service, prisma} = build();
             await service.reserveUnit(managerUser, reserveDto({salePrice: 100000}));
 
-            expect(prisma.unit.update).toHaveBeenCalledWith({where: {id: 'unit-1'}, data: {status: UnitStatus.RESERVED}});
+            expect(prisma.unit.updateMany).toHaveBeenCalledWith({
+                where: {id: 'unit-1', status: UnitStatus.AVAILABLE},
+                data: {status: UnitStatus.RESERVED},
+            });
+            expect(prisma.unit.update).not.toHaveBeenCalled();
+        });
+
+        it('fails without creating a deal when a concurrent booking claimed the unit first', async () => {
+            const {service, prisma} = build();
+            prisma.unit.updateMany.mockResolvedValue({count: 0});
+
+            await expect(service.reserveUnit(managerUser, reserveDto({salePrice: 100000, deposit: 5000})))
+                .rejects.toThrow(UnitNotAvailableException);
+            expect(prisma.deal.create).not.toHaveBeenCalled();
+            expect(prisma.payment.create).not.toHaveBeenCalled();
         });
 
         it('routes discount-approval notifications to SALES_HEADs on the branch when within their band', async () => {

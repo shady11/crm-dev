@@ -546,7 +546,7 @@ export class UnitsService {
         // unchanged status is a no-op rather than a manual status change.
         const statusChanged = dto.status !== undefined && dto.status !== unit.status;
         if (statusChanged) {
-            await this.ensureManualStatusChangeAllowed(unit, dto.status!);
+            await this.ensureManualStatusChangeAllowed(unit, dto.status);
         }
 
         const changes = diffChangedFields(dto, unit, [
