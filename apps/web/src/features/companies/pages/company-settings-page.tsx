@@ -1,8 +1,10 @@
 import {useEffect, useState, type ReactNode} from "react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
+import {useSearchParams} from "react-router-dom";
+import {Building2, CalendarClock, type LucideIcon} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
+import {Card} from "@/components/ui/card.tsx";
 import {Input, type InputProps} from "@/components/ui/input.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {toast} from "@/components/ui/toast.tsx";
@@ -12,6 +14,7 @@ import {
     type UpdateOwnCompanyPayload,
 } from "@/features/companies/api/companies.api.ts";
 import {SettingOptionSelect} from "@/features/setting-options/components/setting-option-select.tsx";
+import {cn} from "@/lib/utils";
 
 const EMPTY: UpdateOwnCompanyPayload = {name: "", currency: "", locale: "", timezone: ""};
 
@@ -45,6 +48,13 @@ function reservationPolicyError(policy: ReservationPolicyForm): "invalid" | "def
     return defaultDays > maxDays ? "defaultExceedsMax" : null;
 }
 
+type SettingsSection = "general" | "reservations";
+
+const SECTIONS: {id: SettingsSection; labelKey: string; icon: LucideIcon}[] = [
+    {id: "general", labelKey: "page.formTitle", icon: Building2},
+    {id: "reservations", labelKey: "reservations.title", icon: CalendarClock},
+];
+
 export function CompanySettingsPage() {
     const {t} = useTranslation("settings");
     const {t: tCommon} = useTranslation("common");
@@ -54,6 +64,13 @@ export function CompanySettingsPage() {
     const [form, setForm] = useState<UpdateOwnCompanyPayload>(EMPTY);
     const [policy, setPolicy] = useState<ReservationPolicyForm>(EMPTY_POLICY);
     const policyError = reservationPolicyError(policy);
+
+    // Kept in the URL so a section can be linked to and survives a reload.
+    const [searchParams, setSearchParams] = useSearchParams();
+    const activeSection: SettingsSection =
+        SECTIONS.find((section) => section.id === searchParams.get("section"))?.id ?? "general";
+    const selectSection = (section: SettingsSection) =>
+        setSearchParams(section === "general" ? {} : {section}, {replace: true});
 
     useEffect(() => {
         if (!companyQuery.data) return;
@@ -72,7 +89,7 @@ export function CompanySettingsPage() {
     }, [companyQuery.data]);
 
     const updateMutation = useMutation({
-        mutationFn: (payload: UpdateOwnCompanyPayload) => updateOwnCompany(payload),
+        mutationFn: (payload: Partial<UpdateOwnCompanyPayload>) => updateOwnCompany(payload),
         onSuccess: async () => {
             await queryClient.invalidateQueries({queryKey: ["companies", "me"]});
             // Refreshes useAuth()'s cached AuthUser — useCompanyFormatters() reads
@@ -115,60 +132,95 @@ export function CompanySettingsPage() {
                 <p className="text-sm text-muted-foreground">{t("page.description")}</p>
             </div>
 
-            <Card className="max-w-xl border border-secondary shadow-none">
-                <CardHeader>
-                    <CardTitle className="text-base">{t("page.formTitle")}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <form
-                        className="space-y-5"
-                        onSubmit={(event) => {
-                            event.preventDefault();
-                            if (policyError) return;
-                            updateMutation.mutate({
-                                ...form,
-                                reservationDefaultDays: Number(policy.reservationDefaultDays),
-                                reservationMaxDays: Number(policy.reservationMaxDays),
-                                reservationMaxExtensions: Number(policy.reservationMaxExtensions),
-                            });
-                        }}
-                    >
-                        <Field
-                            label={t("fields.name")}
-                            required
-                            value={form.name}
-                            onChange={set("name")}
-                        />
+            <div className="grid max-w-5xl items-start gap-6 md:grid-cols-[220px_1fr]">
+                <Card className="p-2 py-2">
+                    <nav className="flex gap-1 overflow-x-auto md:flex-col">
+                        {SECTIONS.map(({id, labelKey, icon: Icon}) => (
+                            <button
+                                key={id}
+                                type="button"
+                                onClick={() => selectSection(id)}
+                                aria-current={activeSection === id ? "page" : undefined}
+                                className={cn(
+                                    "flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors",
+                                    activeSection === id
+                                        ? "bg-muted text-foreground"
+                                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+                                )}
+                            >
+                                <Icon className="size-4" />
+                                {t(labelKey)}
+                            </button>
+                        ))}
+                    </nav>
+                </Card>
 
-                        <div className="grid grid-cols-3 gap-3">
-                            <SelectField label={t("fields.currency")}>
-                                <SettingOptionSelect
-                                    type="CURRENCY"
-                                    value={form.currency ?? ""}
-                                    onChange={(value) => setForm((previous) => ({...previous, currency: value}))}
-                                />
-                            </SelectField>
-                            <SelectField label={t("fields.locale")}>
-                                <SettingOptionSelect
-                                    type="LOCALE"
-                                    value={form.locale ?? ""}
-                                    onChange={(value) => setForm((previous) => ({...previous, locale: value}))}
-                                />
-                            </SelectField>
-                            <SelectField label={t("fields.timezone")}>
-                                <SettingOptionSelect
-                                    type="TIMEZONE"
-                                    value={form.timezone ?? ""}
-                                    onChange={(value) => setForm((previous) => ({...previous, timezone: value}))}
-                                />
-                            </SelectField>
-                        </div>
+                <Card className="px-6">
+                    {/* Each section saves only its own fields — PATCH /companies/me
+                        accepts a partial payload, so a half-edited reservation
+                        policy never blocks saving the company name. */}
+                    {activeSection === "general" && (
+                        <form
+                            className="space-y-5"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                updateMutation.mutate(form);
+                            }}
+                        >
+                            <SectionHeader title={t("page.formTitle")} />
 
-                        <div className="space-y-3 border-t pt-5">
-                            <div>
-                                <h3 className="text-sm font-semibold">{t("reservations.title")}</h3>
-                                <p className="text-sm text-muted-foreground">{t("reservations.description")}</p>
+                            <Field
+                                label={t("fields.name")}
+                                required
+                                value={form.name}
+                                onChange={set("name")}
+                            />
+
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                                <SelectField label={t("fields.currency")}>
+                                    <SettingOptionSelect
+                                        type="CURRENCY"
+                                        value={form.currency ?? ""}
+                                        onChange={(value) => setForm((previous) => ({...previous, currency: value}))}
+                                    />
+                                </SelectField>
+                                <SelectField label={t("fields.locale")}>
+                                    <SettingOptionSelect
+                                        type="LOCALE"
+                                        value={form.locale ?? ""}
+                                        onChange={(value) => setForm((previous) => ({...previous, locale: value}))}
+                                    />
+                                </SelectField>
+                                <SelectField label={t("fields.timezone")}>
+                                    <SettingOptionSelect
+                                        type="TIMEZONE"
+                                        value={form.timezone ?? ""}
+                                        onChange={(value) => setForm((previous) => ({...previous, timezone: value}))}
+                                    />
+                                </SelectField>
                             </div>
+
+                            <Button type="submit" disabled={updateMutation.isPending}>
+                                {updateMutation.isPending ? tCommon("actions.saving") : tCommon("actions.saveChanges")}
+                            </Button>
+                        </form>
+                    )}
+
+                    {activeSection === "reservations" && (
+                        <form
+                            className="space-y-5"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                if (policyError) return;
+                                updateMutation.mutate({
+                                    reservationDefaultDays: Number(policy.reservationDefaultDays),
+                                    reservationMaxDays: Number(policy.reservationMaxDays),
+                                    reservationMaxExtensions: Number(policy.reservationMaxExtensions),
+                                });
+                            }}
+                        >
+                            <SectionHeader title={t("reservations.title")} description={t("reservations.description")} />
+
                             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                                 <Field
                                     label={t("reservations.defaultDays")}
@@ -198,14 +250,23 @@ export function CompanySettingsPage() {
                             {policyError && (
                                 <p className="text-sm text-destructive">{t(`reservations.errors.${policyError}`)}</p>
                             )}
-                        </div>
 
-                        <Button type="submit" disabled={updateMutation.isPending || !!policyError}>
-                            {updateMutation.isPending ? tCommon("actions.saving") : tCommon("actions.saveChanges")}
-                        </Button>
-                    </form>
-                </CardContent>
-            </Card>
+                            <Button type="submit" disabled={updateMutation.isPending || !!policyError}>
+                                {updateMutation.isPending ? tCommon("actions.saving") : tCommon("actions.saveChanges")}
+                            </Button>
+                        </form>
+                    )}
+                </Card>
+            </div>
+        </div>
+    );
+}
+
+function SectionHeader({title, description}: {title: string; description?: string}) {
+    return (
+        <div className="border-b pb-4">
+            <h3 className="text-base font-semibold">{title}</h3>
+            {description && <p className="text-sm text-muted-foreground">{description}</p>}
         </div>
     );
 }
