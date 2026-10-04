@@ -279,6 +279,40 @@ describe("CompaniesService self-service (CA-A1)", () => {
         expect(update).toHaveBeenCalled();
     });
 
+    describe("reservation policy", () => {
+        const withPolicy = {id: "company-1", name: "Bishkek Dev", users: [], reservationDefaultDays: 7, reservationMaxDays: 14};
+
+        it("saves a default term within the maximum", async () => {
+            const {service, update} = build(withPolicy);
+
+            await service.updateOwn(companyAdmin, {reservationDefaultDays: 10, reservationMaxExtensions: 3});
+
+            expect(update.mock.calls[0][0].data).toMatchObject({reservationDefaultDays: 10, reservationMaxExtensions: 3});
+        });
+
+        it("refuses a default term longer than the stored maximum", async () => {
+            const {service, update} = build(withPolicy);
+
+            await expect(service.updateOwn(companyAdmin, {reservationDefaultDays: 20})).rejects.toThrow(BadRequestException);
+            expect(update).not.toHaveBeenCalled();
+        });
+
+        it("refuses lowering the maximum below the stored default", async () => {
+            const {service, update} = build(withPolicy);
+
+            await expect(service.updateOwn(companyAdmin, {reservationMaxDays: 5})).rejects.toThrow(BadRequestException);
+            expect(update).not.toHaveBeenCalled();
+        });
+
+        it("checks both values together when both change", async () => {
+            const {service, update} = build(withPolicy);
+
+            await service.updateOwn(companyAdmin, {reservationDefaultDays: 20, reservationMaxDays: 30});
+
+            expect(update).toHaveBeenCalled();
+        });
+    });
+
     it("audits its own settings change, company-scoped, distinct from the platform-wide TENANT_* actions", async () => {
         const {service} = build({id: "company-1", name: "Bishkek Dev", currency: "KGS", users: []});
 

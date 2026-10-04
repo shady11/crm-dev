@@ -154,7 +154,9 @@
     "paymentDate": "Төлөм датасы",
     "reference": "Шилтеме (милдеттүү эмес)",
     "referencePlaceholder": "мисалы, транзакция ID",
-    "record": "Жаздыруу"
+    "record": "Жаздыруу",
+    "extensionsLeft": "Калган узартуулар: {{max}} ичинен {{left}}. Жаңы күн бүгүндөн тартып {{maxDays}} күндөн ашпайт.",
+    "extendUnavailable": "Узартуулар түгөндү — келишимге кол коюңуз же брондун мөөнөтү бүтүшүн күтүңүз."
   },
   "toasts": {
     "unitReserved": "Юнит бронделди",
@@ -217,6 +219,7 @@
       "phoneRequired": "Телефон номери милдеттүү.",
       "invalidEmail": "Email туура эмес"
     },
-    "depositPlain": "Депозит"
+    "depositPlain": "Депозит",
+    "reservationExpiresHint": "Демейки {{defaultDays}} күн; бүгүндөн тартып {{maxDays}} күндөн ашпайт."
   }
 }

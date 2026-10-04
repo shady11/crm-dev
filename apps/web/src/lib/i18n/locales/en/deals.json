@@ -154,7 +154,9 @@
     "paymentDate": "Payment date",
     "reference": "Reference (optional)",
     "referencePlaceholder": "e.g. transaction ID",
-    "record": "Record"
+    "record": "Record",
+    "extensionsLeft": "Extensions left: {{left}} of {{max}}. The new date can be at most {{maxDays}} days from today.",
+    "extendUnavailable": "No extensions left — sign the contract or let the reservation expire."
   },
   "toasts": {
     "unitReserved": "Unit reserved",
@@ -217,6 +219,7 @@
       "phoneRequired": "Phone number is required.",
       "invalidEmail": "Invalid email"
     },
-    "depositPlain": "Deposit"
+    "depositPlain": "Deposit",
+    "reservationExpiresHint": "Defaults to {{defaultDays}} days; at most {{maxDays}} days from today."
   }
 }

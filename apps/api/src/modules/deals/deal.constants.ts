@@ -15,6 +15,12 @@ export const ACTIVE_DEAL_STATUSES: DealStatus[]  = [
     'ACTIVE',
 ];
 
+export const RESERVATION_POLICY_SELECT = {
+    reservationDefaultDays: true,
+    reservationMaxDays: true,
+    reservationMaxExtensions: true,
+} satisfies Prisma.CompanySelect;
+
 export const DEAL_MANAGER_SELECT = {
     id: true,
     fullName: true,

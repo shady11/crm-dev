@@ -53,6 +53,13 @@ export class DealsController {
     return this.dealsService.getStatusSummary(user, projectId, branchId, mine === 'true');
   }
 
+  // Declared before ':id' so it isn't captured as a deal id.
+  @RequirePermissions('deals.view')
+  @Get('reservation-policy')
+  getReservationPolicy(@CurrentUser() user: AuthUser) {
+    return this.dealsService.getReservationPolicy(user);
+  }
+
   @RequirePermissions('deals.view')
   @Get(':id')
   findOne(@CurrentUser() user: AuthUser, @Param('id') id: string) {

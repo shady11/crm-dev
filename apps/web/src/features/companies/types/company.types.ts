@@ -6,6 +6,10 @@ export type Company = {
     currency: string | null;
     locale: string | null;
     timezone: string | null;
+    /** Reservation policy — returned by the API, editable via /companies/me. */
+    reservationDefaultDays?: number;
+    reservationMaxDays?: number;
+    reservationMaxExtensions?: number;
     /** Non-null means suspended. Reversible, unlike deletion. */
     suspendedAt: string | null;
     createdAt: string;

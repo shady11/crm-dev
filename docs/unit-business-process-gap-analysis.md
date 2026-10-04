@@ -95,6 +95,7 @@ Severity: **High** means a risk of double sale, money or data integrity. **Mediu
    - Add a partial unique index on `Deal(unitId) WHERE status IN ('RESERVED','CONTRACT_SIGNED','ACTIVE') AND "deletedAt" IS NULL`.
 2. **G3 + G4. Close the open doors on reservation.**
    - *G3 fixed:* `reserveUnit` ignores soft-deleted units and projects, and refuses units in projects that are not open for sales. Bookable statuses are `PLANNING` (off-plan pre-sales), `ACTIVE` and `COMPLETED`; `DRAFT`, `PAUSED`, `SOLDOUT` and `ARCHIVED` are closed. The unit sheet disables Book and states why.
+   - *G4 fixed:* every reservation now has an expiry. Each company sets a default term (7 days), a maximum term per booking or extension (14 days) and a number of extensions (2) in company settings; bookings without a date get the default. The migration gives open reservations that had no expiry the default term counted from the day it runs.
    - Reject deleted units and non-`ACTIVE` projects.
    - Add a company default reservation term, a maximum term and a maximum number of extensions.
 3. **G5 + G6. Align the unit status model with the deal stages.**

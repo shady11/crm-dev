@@ -75,6 +75,9 @@ model Deal {
   reservedAt           DateTime?
   reservationExpiresAt DateTime?
   reservedById         String?
+  // How many times reservationExpiresAt was pushed out — capped by
+  // Company.reservationMaxExtensions.
+  reservationExtensionCount Int @default(0)
   reservedBy           User?     @relation("ReservedBy", fields: [reservedById], references: [id])
 
   contractNumber String?

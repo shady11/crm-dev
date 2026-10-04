@@ -1,4 +1,4 @@
-import {IsOptional, IsString, MaxLength, MinLength} from "class-validator";
+import {IsInt, IsOptional, IsString, Max, MaxLength, Min, MinLength} from "class-validator";
 
 /**
  * Fields a COMPANY_ADMIN may change on their own tenant. Deliberately
@@ -56,4 +56,25 @@ export class UpdateOwnCompanyDto {
     @IsString()
     @MaxLength(2000)
     letterheadUrl?: string;
+
+    // Reservation policy — see DealDomainService.resolveReservationExpiry.
+    // reservationDefaultDays may not exceed reservationMaxDays; that
+    // cross-field rule is checked in CompaniesService against stored values.
+    @IsOptional()
+    @IsInt()
+    @Min(1)
+    @Max(365)
+    reservationDefaultDays?: number;
+
+    @IsOptional()
+    @IsInt()
+    @Min(1)
+    @Max(365)
+    reservationMaxDays?: number;
+
+    @IsOptional()
+    @IsInt()
+    @Min(0)
+    @Max(20)
+    reservationMaxExtensions?: number;
 }
