@@ -1,8 +1,10 @@
 import {useEffect, useState, type ReactNode} from "react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
+import {Building2, CalendarClock} from "lucide-react";
+import {SettingsLayout, SettingsSectionHeader} from "@/components/shared/settings-layout.tsx";
+import {useSettingsSection} from "@/components/shared/use-settings-section.ts";
 import {Button} from "@/components/ui/button.tsx";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Input, type InputProps} from "@/components/ui/input.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {toast} from "@/components/ui/toast.tsx";
@@ -45,6 +47,8 @@ function reservationPolicyError(policy: ReservationPolicyForm): "invalid" | "def
     return defaultDays > maxDays ? "defaultExceedsMax" : null;
 }
 
+const SECTION_IDS = ["general", "reservations"] as const;
+
 export function CompanySettingsPage() {
     const {t} = useTranslation("settings");
     const {t: tCommon} = useTranslation("common");
@@ -54,6 +58,7 @@ export function CompanySettingsPage() {
     const [form, setForm] = useState<UpdateOwnCompanyPayload>(EMPTY);
     const [policy, setPolicy] = useState<ReservationPolicyForm>(EMPTY_POLICY);
     const policyError = reservationPolicyError(policy);
+    const [activeSection, selectSection] = useSettingsSection(SECTION_IDS);
 
     useEffect(() => {
         if (!companyQuery.data) return;
@@ -72,7 +77,7 @@ export function CompanySettingsPage() {
     }, [companyQuery.data]);
 
     const updateMutation = useMutation({
-        mutationFn: (payload: UpdateOwnCompanyPayload) => updateOwnCompany(payload),
+        mutationFn: (payload: Partial<UpdateOwnCompanyPayload>) => updateOwnCompany(payload),
         onSuccess: async () => {
             await queryClient.invalidateQueries({queryKey: ["companies", "me"]});
             // Refreshes useAuth()'s cached AuthUser — useCompanyFormatters() reads
@@ -115,24 +120,27 @@ export function CompanySettingsPage() {
                 <p className="text-sm text-muted-foreground">{t("page.description")}</p>
             </div>
 
-            <Card className="max-w-xl border border-secondary shadow-none">
-                <CardHeader>
-                    <CardTitle className="text-base">{t("page.formTitle")}</CardTitle>
-                </CardHeader>
-                <CardContent>
+            <SettingsLayout
+                sections={[
+                    {id: "general", label: t("page.formTitle"), icon: Building2},
+                    {id: "reservations", label: t("reservations.title"), icon: CalendarClock},
+                ]}
+                activeSection={activeSection}
+                onSelect={selectSection}
+            >
+                {/* Each section saves only its own fields — PATCH /companies/me
+                    accepts a partial payload, so a half-edited reservation
+                    policy never blocks saving the company name. */}
+                {activeSection === "general" && (
                     <form
                         className="space-y-5"
                         onSubmit={(event) => {
                             event.preventDefault();
-                            if (policyError) return;
-                            updateMutation.mutate({
-                                ...form,
-                                reservationDefaultDays: Number(policy.reservationDefaultDays),
-                                reservationMaxDays: Number(policy.reservationMaxDays),
-                                reservationMaxExtensions: Number(policy.reservationMaxExtensions),
-                            });
+                            updateMutation.mutate(form);
                         }}
                     >
+                        <SettingsSectionHeader title={t("page.formTitle")} />
+
                         <Field
                             label={t("fields.name")}
                             required
@@ -140,7 +148,7 @@ export function CompanySettingsPage() {
                             onChange={set("name")}
                         />
 
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                             <SelectField label={t("fields.currency")}>
                                 <SettingOptionSelect
                                     type="CURRENCY"
@@ -164,48 +172,63 @@ export function CompanySettingsPage() {
                             </SelectField>
                         </div>
 
-                        <div className="space-y-3 border-t pt-5">
-                            <div>
-                                <h3 className="text-sm font-semibold">{t("reservations.title")}</h3>
-                                <p className="text-sm text-muted-foreground">{t("reservations.description")}</p>
-                            </div>
-                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                                <Field
-                                    label={t("reservations.defaultDays")}
-                                    type="number"
-                                    min={1}
-                                    max={365}
-                                    value={policy.reservationDefaultDays}
-                                    onChange={setPolicyField("reservationDefaultDays")}
-                                />
-                                <Field
-                                    label={t("reservations.maxDays")}
-                                    type="number"
-                                    min={1}
-                                    max={365}
-                                    value={policy.reservationMaxDays}
-                                    onChange={setPolicyField("reservationMaxDays")}
-                                />
-                                <Field
-                                    label={t("reservations.maxExtensions")}
-                                    type="number"
-                                    min={0}
-                                    max={20}
-                                    value={policy.reservationMaxExtensions}
-                                    onChange={setPolicyField("reservationMaxExtensions")}
-                                />
-                            </div>
-                            {policyError && (
-                                <p className="text-sm text-destructive">{t(`reservations.errors.${policyError}`)}</p>
-                            )}
+                        <Button type="submit" disabled={updateMutation.isPending}>
+                            {updateMutation.isPending ? tCommon("actions.saving") : tCommon("actions.saveChanges")}
+                        </Button>
+                    </form>
+                )}
+
+                {activeSection === "reservations" && (
+                    <form
+                        className="space-y-5"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            if (policyError) return;
+                            updateMutation.mutate({
+                                reservationDefaultDays: Number(policy.reservationDefaultDays),
+                                reservationMaxDays: Number(policy.reservationMaxDays),
+                                reservationMaxExtensions: Number(policy.reservationMaxExtensions),
+                            });
+                        }}
+                    >
+                        <SettingsSectionHeader title={t("reservations.title")} description={t("reservations.description")} />
+
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                            <Field
+                                label={t("reservations.defaultDays")}
+                                type="number"
+                                min={1}
+                                max={365}
+                                value={policy.reservationDefaultDays}
+                                onChange={setPolicyField("reservationDefaultDays")}
+                            />
+                            <Field
+                                label={t("reservations.maxDays")}
+                                type="number"
+                                min={1}
+                                max={365}
+                                value={policy.reservationMaxDays}
+                                onChange={setPolicyField("reservationMaxDays")}
+                            />
+                            <Field
+                                label={t("reservations.maxExtensions")}
+                                type="number"
+                                min={0}
+                                max={20}
+                                value={policy.reservationMaxExtensions}
+                                onChange={setPolicyField("reservationMaxExtensions")}
+                            />
                         </div>
+                        {policyError && (
+                            <p className="text-sm text-destructive">{t(`reservations.errors.${policyError}`)}</p>
+                        )}
 
                         <Button type="submit" disabled={updateMutation.isPending || !!policyError}>
                             {updateMutation.isPending ? tCommon("actions.saving") : tCommon("actions.saveChanges")}
                         </Button>
                     </form>
-                </CardContent>
-            </Card>
+                )}
+            </SettingsLayout>
         </div>
     );
 }
