@@ -5,25 +5,25 @@ import {isAxiosError} from "axios";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {z} from "zod";
-import {Loader2} from "lucide-react";
+import {KeyRound, Loader2, UserRound} from "lucide-react";
+import {SettingsLayout, SettingsSectionHeader} from "@/components/shared/settings-layout.tsx";
+import {useSettingsSection} from "@/components/shared/use-settings-section.ts";
 import {Button} from "@/components/ui/button.tsx";
-import {Card, CardContent, CardHeader, CardDescription} from "@/components/ui/card.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field.tsx";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
 import {toast} from "@/components/ui/toast.tsx";
 import {changeOwnPassword, updateOwnProfile, type UpdateOwnProfilePayload} from "@/features/auth/api/auth.api.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {authStorage} from "@/features/auth/utils/auth-storage.ts";
 
-type ProfileTab = "general" | "password";
+const SECTION_IDS = ["general", "password"] as const;
 
 // SM-A1: lets any signed-in user fix their own name/phone — previously the
 // only self-service action was changing a password, so a typo at onboarding
 // meant filing a request with an admin.
 export function ProfilePage() {
     const {t} = useTranslation("settings");
-    const [activeTab, setActiveTab] = useState<ProfileTab>("general");
+    const [activeSection, selectSection] = useSettingsSection(SECTION_IDS);
 
     return (
         <div className="space-y-6">
@@ -32,20 +32,17 @@ export function ProfilePage() {
                 <p className="text-sm text-muted-foreground">{t("profile.page.description")}</p>
             </div>
 
-            <Tabs value={activeTab} onValueChange={({value}) => setActiveTab(value as ProfileTab)}>
-                <TabsList>
-                    <TabsTrigger value="general">{t("profile.tabs.general")}</TabsTrigger>
-                    <TabsTrigger value="password">{t("profile.tabs.password")}</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="general">
-                    <GeneralPanel />
-                </TabsContent>
-
-                <TabsContent value="password">
-                    <ChangePasswordCard />
-                </TabsContent>
-            </Tabs>
+            <SettingsLayout
+                sections={[
+                    {id: "general", label: t("profile.tabs.general"), icon: UserRound},
+                    {id: "password", label: t("profile.tabs.password"), icon: KeyRound},
+                ]}
+                activeSection={activeSection}
+                onSelect={selectSection}
+            >
+                {activeSection === "general" && <GeneralPanel />}
+                {activeSection === "password" && <ChangePasswordPanel />}
+            </SettingsLayout>
         </div>
     );
 }
@@ -81,44 +78,42 @@ function GeneralPanel() {
     });
 
     return (
-        <Card className="max-w-xl border border-secondary shadow-none">
-            <CardContent>
-                <form
-                    className="space-y-5"
-                    onSubmit={(event) => {
-                        event.preventDefault();
-                        updateMutation.mutate(form);
-                    }}
-                >
-                    <label className="block space-y-1.5">
-                        <span className="text-sm font-medium">{t("profile.fields.fullName")}</span>
-                        <Input
-                            aria-label={t("profile.fields.fullName")}
-                            value={form.fullName}
-                            onChange={(event) => setForm((prev) => ({...prev, fullName: event.target.value}))}
-                        />
-                    </label>
+        <form
+            className="space-y-5"
+            onSubmit={(event) => {
+                event.preventDefault();
+                updateMutation.mutate(form);
+            }}
+        >
+            <SettingsSectionHeader title={t("profile.tabs.general")} />
 
-                    <label className="block space-y-1.5">
-                        <span className="text-sm font-medium">{t("profile.fields.email")}</span>
-                        <Input aria-label={t("profile.fields.email")} value={user?.email ?? ""} disabled />
-                    </label>
+            <label className="block space-y-1.5">
+                <span className="text-sm font-medium">{t("profile.fields.fullName")}</span>
+                <Input
+                    aria-label={t("profile.fields.fullName")}
+                    value={form.fullName}
+                    onChange={(event) => setForm((prev) => ({...prev, fullName: event.target.value}))}
+                />
+            </label>
 
-                    <label className="block space-y-1.5">
-                        <span className="text-sm font-medium">{t("profile.fields.phone")}</span>
-                        <Input
-                            aria-label={t("profile.fields.phone")}
-                            value={form.phone}
-                            onChange={(event) => setForm((prev) => ({...prev, phone: event.target.value}))}
-                        />
-                    </label>
+            <label className="block space-y-1.5">
+                <span className="text-sm font-medium">{t("profile.fields.email")}</span>
+                <Input aria-label={t("profile.fields.email")} value={user?.email ?? ""} disabled />
+            </label>
 
-                    <Button type="submit" disabled={updateMutation.isPending}>
-                        {updateMutation.isPending ? tCommon("actions.saving") : tCommon("actions.saveChanges")}
-                    </Button>
-                </form>
-            </CardContent>
-        </Card>
+            <label className="block space-y-1.5">
+                <span className="text-sm font-medium">{t("profile.fields.phone")}</span>
+                <Input
+                    aria-label={t("profile.fields.phone")}
+                    value={form.phone}
+                    onChange={(event) => setForm((prev) => ({...prev, phone: event.target.value}))}
+                />
+            </label>
+
+            <Button type="submit" disabled={updateMutation.isPending}>
+                {updateMutation.isPending ? tCommon("actions.saving") : tCommon("actions.saveChanges")}
+            </Button>
+        </form>
     );
 }
 
@@ -128,7 +123,7 @@ type PasswordFormValues = {
     confirmNewPassword: string;
 };
 
-function ChangePasswordCard() {
+function ChangePasswordPanel() {
     const {t} = useTranslation("settings");
     const queryClient = useQueryClient();
 
@@ -196,63 +191,58 @@ function ChangePasswordCard() {
     const errors = form.formState.errors;
 
     return (
-        <Card className="max-w-xl border border-secondary shadow-none">
-            <CardHeader>
-                <CardDescription>{t("profile.password.description")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <form className="space-y-5" onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
-                    <FieldGroup className="gap-5">
-                        <Field invalid={!!errors.currentPassword}>
-                            <FieldLabel htmlFor="currentPassword">
-                                {t("profile.password.fields.currentPassword")}
-                            </FieldLabel>
-                            <Input
-                                id="currentPassword"
-                                type="password"
-                                autoComplete="current-password"
-                                disabled={mutation.isPending}
-                                aria-invalid={!!errors.currentPassword}
-                                {...form.register("currentPassword")}
-                            />
-                            <FieldError>{errors.currentPassword?.message}</FieldError>
-                        </Field>
+        <form className="space-y-5" onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
+            <SettingsSectionHeader title={t("profile.tabs.password")} description={t("profile.password.description")} />
 
-                        <Field invalid={!!errors.newPassword}>
-                            <FieldLabel htmlFor="newPassword">{t("profile.password.fields.newPassword")}</FieldLabel>
-                            <Input
-                                id="newPassword"
-                                type="password"
-                                autoComplete="new-password"
-                                disabled={mutation.isPending}
-                                aria-invalid={!!errors.newPassword}
-                                {...form.register("newPassword")}
-                            />
-                            <FieldError>{errors.newPassword?.message ?? t("profile.password.hint")}</FieldError>
-                        </Field>
+            <FieldGroup className="gap-5">
+                <Field invalid={!!errors.currentPassword}>
+                    <FieldLabel htmlFor="currentPassword">
+                        {t("profile.password.fields.currentPassword")}
+                    </FieldLabel>
+                    <Input
+                        id="currentPassword"
+                        type="password"
+                        autoComplete="current-password"
+                        disabled={mutation.isPending}
+                        aria-invalid={!!errors.currentPassword}
+                        {...form.register("currentPassword")}
+                    />
+                    <FieldError>{errors.currentPassword?.message}</FieldError>
+                </Field>
 
-                        <Field invalid={!!errors.confirmNewPassword}>
-                            <FieldLabel htmlFor="confirmNewPassword">
-                                {t("profile.password.fields.confirmNewPassword")}
-                            </FieldLabel>
-                            <Input
-                                id="confirmNewPassword"
-                                type="password"
-                                autoComplete="new-password"
-                                disabled={mutation.isPending}
-                                aria-invalid={!!errors.confirmNewPassword}
-                                {...form.register("confirmNewPassword")}
-                            />
-                            <FieldError>{errors.confirmNewPassword?.message}</FieldError>
-                        </Field>
-                    </FieldGroup>
+                <Field invalid={!!errors.newPassword}>
+                    <FieldLabel htmlFor="newPassword">{t("profile.password.fields.newPassword")}</FieldLabel>
+                    <Input
+                        id="newPassword"
+                        type="password"
+                        autoComplete="new-password"
+                        disabled={mutation.isPending}
+                        aria-invalid={!!errors.newPassword}
+                        {...form.register("newPassword")}
+                    />
+                    <FieldError>{errors.newPassword?.message ?? t("profile.password.hint")}</FieldError>
+                </Field>
 
-                    <Button type="submit" disabled={mutation.isPending}>
-                        {mutation.isPending && <Loader2 className="animate-spin" />}
-                        {t("profile.password.submit")}
-                    </Button>
-                </form>
-            </CardContent>
-        </Card>
+                <Field invalid={!!errors.confirmNewPassword}>
+                    <FieldLabel htmlFor="confirmNewPassword">
+                        {t("profile.password.fields.confirmNewPassword")}
+                    </FieldLabel>
+                    <Input
+                        id="confirmNewPassword"
+                        type="password"
+                        autoComplete="new-password"
+                        disabled={mutation.isPending}
+                        aria-invalid={!!errors.confirmNewPassword}
+                        {...form.register("confirmNewPassword")}
+                    />
+                    <FieldError>{errors.confirmNewPassword?.message}</FieldError>
+                </Field>
+            </FieldGroup>
+
+            <Button type="submit" disabled={mutation.isPending}>
+                {mutation.isPending && <Loader2 className="animate-spin" />}
+                {t("profile.password.submit")}
+            </Button>
+        </form>
     );
 }
