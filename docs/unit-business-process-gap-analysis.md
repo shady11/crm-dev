@@ -94,6 +94,7 @@ Severity: **High** means a risk of double sale, money or data integrity. **Mediu
    - Make the reservation write conditional: `updateMany({ where: { id, status: AVAILABLE } })` and fail if `count = 0`.
    - Add a partial unique index on `Deal(unitId) WHERE status IN ('RESERVED','CONTRACT_SIGNED','ACTIVE') AND "deletedAt" IS NULL`.
 2. **G3 + G4. Close the open doors on reservation.**
+   - *G3 fixed:* `reserveUnit` ignores soft-deleted units and projects, and refuses units in projects that are not open for sales. Bookable statuses are `PLANNING` (off-plan pre-sales), `ACTIVE` and `COMPLETED`; `DRAFT`, `PAUSED`, `SOLDOUT` and `ARCHIVED` are closed. The unit sheet disables Book and states why.
    - Reject deleted units and non-`ACTIVE` projects.
    - Add a company default reservation term, a maximum term and a maximum number of extensions.
 3. **G5 + G6. Align the unit status model with the deal stages.**

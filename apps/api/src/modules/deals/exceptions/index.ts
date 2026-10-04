@@ -7,6 +7,7 @@ export * from './reservation-date-invalid.exception';
 export * from './reservation-expired.exception';
 export * from './unit-not-available.exception';
 export * from './unit-not-found.exception';
+export * from './project-not-open-for-sales.exception';
 export * from './sale-price-mismatch.exception';
 export * from './discount-pending-approval.exception';
 export * from './discount-not-pending.exception';

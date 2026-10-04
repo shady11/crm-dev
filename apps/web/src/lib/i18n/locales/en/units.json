@@ -96,6 +96,7 @@
     "dealsTab": "Deals",
     "noDeals": "No deals recorded for this unit yet.",
     "bookButton": "Book",
+    "bookingClosed": "Booking is closed: the project status is {{status}}.",
     "infoSheetButton": "Info sheet"
   },
   "infoSheet": {

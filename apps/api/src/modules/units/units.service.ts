@@ -339,6 +339,7 @@ export class UnitsService {
                         id: true,
                         name: true,
                         address: true,
+                        status: true,
                     },
                 },
                 block: {

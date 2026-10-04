@@ -116,6 +116,7 @@ export type Unit = {
         id: string;
         name: string;
         address?: string | null;
+        status?: string;
     };
 
     deals?: UnitDealHistoryEntry[];

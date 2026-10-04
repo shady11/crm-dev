@@ -22,6 +22,14 @@ export const PROJECT_STATUS_VALUES = [
     ProjectStatus.ARCHIVED,
 ] as const;
 
+// Mirrors BOOKABLE_PROJECT_STATUSES in the API (deal.constants.ts): units can
+// be booked during off-plan pre-sales, normal sales, and once built.
+export const BOOKABLE_PROJECT_STATUSES: ProjectStatus[] = [
+    ProjectStatus.PLANNING,
+    ProjectStatus.ACTIVE,
+    ProjectStatus.COMPLETED,
+];
+
 export const PROJECT_STATUS_LABEL_KEYS: Record<ProjectStatus, string> = {
     [ProjectStatus.DRAFT]: "projects:status.draft",
     [ProjectStatus.PLANNING]: "projects:status.planning",

@@ -15,6 +15,7 @@ import {
     DealNotFoundException,
     DiscountApprovalNotAllowedException,
     DiscountNotPendingException,
+    ProjectNotOpenForSalesException,
     SalePriceMismatchException,
     UnitNotAvailableException,
     UnitNotFoundException,
@@ -135,11 +136,13 @@ describe('DealsService', () => {
             ...overrides,
         }) as any;
 
+        const openProject = {name: 'Sunrise', status: 'ACTIVE'};
+
         function build(opts: {unit?: unknown; client?: unknown; activeDeal?: unknown; company?: unknown} = {}) {
             const b = buildBase();
             b.prisma.unit.findFirst.mockResolvedValue(
                 opts.unit === undefined
-                    ? {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.AVAILABLE, projectId: 'p1', number: '101'}
+                    ? {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.AVAILABLE, projectId: 'p1', number: '101', project: openProject}
                     : opts.unit,
             );
             b.prisma.client.findFirst.mockResolvedValue(
@@ -157,13 +160,44 @@ describe('DealsService', () => {
             await expect(service.reserveUnit(managerUser, reserveDto())).rejects.toThrow(UnitNotFoundException);
         });
 
+        it('looks the unit up excluding soft-deleted units and projects', async () => {
+            const {service, prisma} = build();
+            await service.reserveUnit(managerUser, reserveDto());
+
+            expect(prisma.unit.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+                where: {id: 'unit-1', deletedAt: null, project: {companyId: 'company-1', deletedAt: null}},
+            }));
+        });
+
+        it.each(['DRAFT', 'PAUSED', 'SOLDOUT', 'ARCHIVED'])(
+            'throws ProjectNotOpenForSalesException when the project is %s, before claiming the unit',
+            async (status) => {
+                const {service, prisma} = build({
+                    unit: {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.AVAILABLE, projectId: 'p1', number: '101', project: {name: 'Sunrise', status}},
+                });
+
+                await expect(service.reserveUnit(managerUser, reserveDto())).rejects.toThrow(ProjectNotOpenForSalesException);
+                expect(prisma.unit.updateMany).not.toHaveBeenCalled();
+                expect(prisma.deal.create).not.toHaveBeenCalled();
+            },
+        );
+
+        it.each(['PLANNING', 'ACTIVE', 'COMPLETED'])('allows booking when the project is %s', async (status) => {
+            const {service, prisma} = build({
+                unit: {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.AVAILABLE, projectId: 'p1', number: '101', project: {name: 'Sunrise', status}},
+            });
+
+            await service.reserveUnit(managerUser, reserveDto());
+            expect(prisma.deal.create).toHaveBeenCalled();
+        });
+
         it('throws ClientNotFoundException when the client is outside caller scope', async () => {
             const {service} = build({client: null});
             await expect(service.reserveUnit(managerUser, reserveDto())).rejects.toThrow(ClientNotFoundException);
         });
 
         it('throws UnitNotAvailableException when the unit is not AVAILABLE', async () => {
-            const {service} = build({unit: {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.RESERVED, projectId: 'p1', number: '101'}});
+            const {service} = build({unit: {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.RESERVED, projectId: 'p1', number: '101', project: openProject}});
             await expect(service.reserveUnit(managerUser, reserveDto())).rejects.toThrow(UnitNotAvailableException);
         });
 

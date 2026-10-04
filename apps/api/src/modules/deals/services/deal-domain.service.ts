@@ -6,6 +6,7 @@ import {
     PaymentSchedule,
     PaymentScheduleStatus,
     Prisma,
+    Project,
     Unit,
     UnitStatus,
 } from '@/generated/prisma/client';
@@ -14,12 +15,14 @@ import {
     ActiveDealExistsException,
     DiscountPendingApprovalException,
     InvalidDealStateException,
+    ProjectNotOpenForSalesException,
     PaymentExceedsBalanceException,
     RefundExceedsPaidException,
     ReservationDateInvalidException,
     ReservationExpiredException,
     UnitNotAvailableException,
 } from '../exceptions';
+import {BOOKABLE_PROJECT_STATUSES} from '../deal.constants';
 
 @Injectable()
 export class DealDomainService {
@@ -38,6 +41,12 @@ export class DealDomainService {
     ensureUnitCanBeReserved(unit: Unit): void {
         if (unit.status !== UnitStatus.AVAILABLE) {
             throw new UnitNotAvailableException(unit.number);
+        }
+    }
+
+    ensureProjectOpenForSales(project: Pick<Project, 'name' | 'status'>): void {
+        if (!BOOKABLE_PROJECT_STATUSES.includes(project.status)) {
+            throw new ProjectNotOpenForSalesException(project.name, project.status);
         }
     }
 

@@ -96,6 +96,7 @@
     "dealsTab": "Бүтүмдөр",
     "noDeals": "Бул юнит үчүн азырынча бүтүм жок.",
     "bookButton": "Брондоо",
+    "bookingClosed": "Брондоо жабык: долбоордун статусу — {{status}}.",
     "infoSheetButton": "Маалымат баракчасы"
   },
   "infoSheet": {

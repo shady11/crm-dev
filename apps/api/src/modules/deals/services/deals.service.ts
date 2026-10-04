@@ -207,8 +207,15 @@ export class DealsService {
       const unit = await db.unit.findFirst({
         where: {
           id: dto.unitId,
+          deletedAt: null,
           project: {
             companyId,
+            deletedAt: null,
+          },
+        },
+        include: {
+          project: {
+            select: {name: true, status: true},
           },
         },
       });
@@ -217,6 +224,7 @@ export class DealsService {
         throw new UnitNotFoundException(dto.unitId);
       }
 
+      this.domain.ensureProjectOpenForSales(unit.project);
       this.domain.ensureUnitCanBeReserved(unit);
 
       const activeDeal = await db.deal.findFirst({

@@ -96,6 +96,7 @@
     "dealsTab": "Сделки",
     "noDeals": "Для этого юнита пока нет сделок.",
     "bookButton": "Забронировать",
+    "bookingClosed": "Бронирование закрыто: статус проекта — {{status}}.",
     "infoSheetButton": "Инфолист"
   },
   "infoSheet": {
