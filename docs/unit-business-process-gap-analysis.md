@@ -88,6 +88,7 @@ Severity: **High** means a risk of double sale, money or data integrity. **Mediu
 ## 5. Recommended priority
 
 1. **G1 + G2 + G17. Make the deal the only way to change a unit's sale status.**
+   - *G1 fixed:* manual changes now only toggle `AVAILABLE ↔ UNAVAILABLE`, are refused while an in-progress or completed deal holds the unit, and are written conditionally on the status read (`UnitsService.ensureManualStatusChangeAllowed` / `applyStatusChangeIfUnchanged`). The unit form offers only those two statuses and locks the field for deal-held units.
    - Restrict manual status changes to `AVAILABLE ↔ UNAVAILABLE`, and only when there is no active deal.
    - Make the reservation write conditional: `updateMany({ where: { id, status: AVAILABLE } })` and fail if `count = 0`.
    - Add a partial unique index on `Deal(unitId) WHERE status IN ('RESERVED','CONTRACT_SIGNED','ACTIVE') AND "deletedAt" IS NULL`.

@@ -4,7 +4,7 @@ import {Loader2, TriangleAlert} from "lucide-react";
 import {Controller, useForm} from "react-hook-form";
 import {z} from "zod";
 import {Button} from "@/components/ui/button.tsx";
-import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field.tsx";
+import {Field, FieldDescription, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {
@@ -39,6 +39,10 @@ const unitSchema = z.object({
     area: z.number().positive(),
     price: z.number().nonnegative(),
 });
+
+// RESERVED and SOLD are set only by the deal lifecycle — the API rejects them
+// as a manual status, so the form only offers these two.
+const MANUAL_STATUS_VALUES: UnitStatus[] = [UnitStatus.AVAILABLE, UnitStatus.UNAVAILABLE];
 
 type UnitFormInput = z.input<typeof unitSchema>;
 type UnitFormValues = z.infer<typeof unitSchema>;
@@ -78,6 +82,7 @@ export function UnitForm({
     const initialStatus = normalizeUnitStatus(unit?.status);
     const [, setSelectedStatus] =
         useState<UnitStatus>(initialStatus);
+    const isStatusManagedByDeal = !MANUAL_STATUS_VALUES.includes(initialStatus);
 
     const form = useForm<UnitFormInput>({
         resolver: zodResolver(unitSchema),
@@ -117,7 +122,7 @@ export function UnitForm({
 
     const statusCollection = createListCollection({
         items: [
-            ...UNIT_STATUS_VALUES.map((status) => ({
+            ...(isStatusManagedByDeal ? [initialStatus] : MANUAL_STATUS_VALUES).map((status) => ({
                 label: t(UNIT_STATUS_LABEL_KEYS[status]),
                 value: status,
             })),
@@ -246,6 +251,7 @@ export function UnitForm({
                                 <FieldLabel>{t("common:labels.status")}</FieldLabel>
                                 <Select
                                     collection={statusCollection}
+                                    disabled={isStatusManagedByDeal}
                                     name={field.name}
                                     onValueChange={(item) => {
                                         const status = item.value[0] as UnitStatus;
@@ -268,6 +274,9 @@ export function UnitForm({
                                         ))}
                                     </SelectContent>
                                 </Select>
+                                {isStatusManagedByDeal && (
+                                    <FieldDescription>{t("form.statusManagedByDeal")}</FieldDescription>
+                                )}
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}

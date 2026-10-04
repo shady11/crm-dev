@@ -1,4 +1,4 @@
-import {BadRequestException, ForbiddenException, NotFoundException} from '@nestjs/common';
+import {BadRequestException, ConflictException, ForbiddenException, NotFoundException} from '@nestjs/common';
 import {UnitStatus} from '@/generated/prisma/client';
 import {AuthUser} from '@/common/types/auth-user.type';
 import {UnitsService} from './units.service';
@@ -28,6 +28,8 @@ describe('UnitsService', () => {
         floor?: unknown;
         existingUnit?: unknown;
         allUnits?: {number: string}[];
+        holdingDeal?: unknown;
+        updateManyCount?: number;
     } = {}) {
         const prisma = {
             unit: {
@@ -41,10 +43,15 @@ describe('UnitsService', () => {
                 }),
                 create: jest.fn().mockImplementation(({data}) => Promise.resolve({id: 'unit-new', ...data})),
                 update: jest.fn().mockImplementation(({data}) => Promise.resolve({id: 'unit-1', ...data})),
+                updateMany: jest.fn().mockResolvedValue({count: opts.updateManyCount ?? 1}),
+                findUniqueOrThrow: jest.fn().mockImplementation(() => Promise.resolve(opts.unit)),
                 delete: jest.fn().mockResolvedValue({id: 'unit-1'}),
             },
             floor: {
                 findFirst: jest.fn().mockResolvedValue(opts.floor ?? null),
+            },
+            deal: {
+                findFirst: jest.fn().mockResolvedValue(opts.holdingDeal ?? null),
             },
             activity: {
                 create: jest.fn().mockResolvedValue({id: 'activity-1'}),
@@ -166,16 +173,25 @@ describe('UnitsService', () => {
             );
         });
 
-        it('honors an explicit status when provided', async () => {
+        it('accepts UNAVAILABLE as an initial status', async () => {
             const {service, prisma} = build({
                 floor: {id: 'floor-1', projectId: 'p1', blockId: 'block-1', entranceId: 'e1'},
             });
 
-            await service.create(adminUser, 'floor-1', createDto({status: UnitStatus.RESERVED}));
+            await service.create(adminUser, 'floor-1', createDto({status: UnitStatus.UNAVAILABLE}));
 
             expect(prisma.unit.create).toHaveBeenCalledWith(
-                expect.objectContaining({data: expect.objectContaining({status: UnitStatus.RESERVED})}),
+                expect.objectContaining({data: expect.objectContaining({status: UnitStatus.UNAVAILABLE})}),
             );
+        });
+
+        it.each([UnitStatus.RESERVED, UnitStatus.SOLD])('rejects %s as an initial status — only deals set it', async (status) => {
+            const {service, prisma} = build({
+                floor: {id: 'floor-1', projectId: 'p1', blockId: 'block-1', entranceId: 'e1'},
+            });
+
+            await expect(service.create(adminUser, 'floor-1', createDto({status}))).rejects.toThrow(BadRequestException);
+            expect(prisma.unit.create).not.toHaveBeenCalled();
         });
     });
 
@@ -226,6 +242,42 @@ describe('UnitsService', () => {
             await service.update(adminUser, 'unit-1', {price: 999} as any);
 
             expect(prisma.unit.findFirst).toHaveBeenCalledTimes(1); // the initial ownership lookup only
+        });
+
+        it('lets a price edit on a deal-held unit through when the status is resent unchanged', async () => {
+            const unit = {id: 'unit-1', number: '101', blockId: 'block-1', status: UnitStatus.RESERVED};
+            const {service, prisma} = build({unit, holdingDeal: {dealNumber: 'D-1', status: 'RESERVED'}});
+
+            await service.update(adminUser, 'unit-1', {price: 999, status: UnitStatus.RESERVED} as any);
+
+            expect(prisma.deal.findFirst).not.toHaveBeenCalled();
+            expect(prisma.unit.update).toHaveBeenCalledWith({
+                where: {id: 'unit-1'},
+                data: expect.objectContaining({price: 999, status: undefined}),
+            });
+        });
+
+        it('refuses a status change on a unit held by a deal', async () => {
+            const unit = {id: 'unit-1', number: '101', blockId: 'block-1', status: UnitStatus.RESERVED};
+            const {service, prisma} = build({unit, holdingDeal: {dealNumber: 'D-1', status: 'CONTRACT_SIGNED'}});
+
+            await expect(
+                service.update(adminUser, 'unit-1', {status: UnitStatus.AVAILABLE} as any),
+            ).rejects.toThrow(ConflictException);
+            expect(prisma.unit.update).not.toHaveBeenCalled();
+            expect(prisma.unit.updateMany).not.toHaveBeenCalled();
+        });
+
+        it('writes a status change conditionally on the status it read', async () => {
+            const unit = {id: 'unit-1', number: '101', blockId: 'block-1', status: UnitStatus.AVAILABLE};
+            const {service, prisma} = build({unit});
+
+            await service.update(adminUser, 'unit-1', {status: UnitStatus.UNAVAILABLE, price: 5} as any);
+
+            expect(prisma.unit.updateMany).toHaveBeenCalledWith({
+                where: {id: 'unit-1', status: UnitStatus.AVAILABLE},
+                data: expect.objectContaining({status: UnitStatus.UNAVAILABLE, price: 5}),
+            });
         });
     });
 
@@ -283,19 +335,71 @@ describe('UnitsService', () => {
     });
 
     describe('updateStatus', () => {
+        const availableUnit = {id: 'unit-1', number: '101', status: UnitStatus.AVAILABLE};
+
         it('404s for a unit outside the company', async () => {
             const {service} = build({unit: null});
-            await expect(service.updateStatus(adminUser, 'missing', UnitStatus.SOLD)).rejects.toThrow(NotFoundException);
+            await expect(service.updateStatus(adminUser, 'missing', UnitStatus.UNAVAILABLE)).rejects.toThrow(NotFoundException);
         });
 
-        it('updates only the status field', async () => {
-            const {service, prisma} = build({unit: {id: 'unit-1'}});
-            await service.updateStatus(adminUser, 'unit-1', UnitStatus.SOLD);
+        it.each([UnitStatus.RESERVED, UnitStatus.SOLD])('rejects %s as a manual target — only deals set it', async (status) => {
+            const {service, prisma} = build({unit: availableUnit});
 
-            expect(prisma.unit.update).toHaveBeenCalledWith({
-                where: {id: 'unit-1'},
-                data: {status: UnitStatus.SOLD},
+            await expect(service.updateStatus(adminUser, 'unit-1', status)).rejects.toThrow(BadRequestException);
+            expect(prisma.unit.updateMany).not.toHaveBeenCalled();
+        });
+
+        it('refuses to release a unit held by an in-progress or completed deal', async () => {
+            const {service, prisma} = build({
+                unit: {id: 'unit-1', number: '101', status: UnitStatus.SOLD},
+                holdingDeal: {dealNumber: 'D-1', status: 'COMPLETED'},
             });
+
+            await expect(service.updateStatus(adminUser, 'unit-1', UnitStatus.AVAILABLE)).rejects.toThrow(ConflictException);
+            expect(prisma.deal.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+                where: expect.objectContaining({
+                    unitId: 'unit-1',
+                    deletedAt: null,
+                    status: {in: ['RESERVED', 'CONTRACT_SIGNED', 'ACTIVE', 'COMPLETED']},
+                }),
+            }));
+            expect(prisma.unit.updateMany).not.toHaveBeenCalled();
+        });
+
+        it('lets an orphaned RESERVED unit with no deal be corrected back to AVAILABLE', async () => {
+            const {service, prisma} = build({unit: {id: 'unit-1', number: '101', status: UnitStatus.RESERVED}});
+
+            await service.updateStatus(adminUser, 'unit-1', UnitStatus.AVAILABLE);
+
+            expect(prisma.unit.updateMany).toHaveBeenCalledWith({
+                where: {id: 'unit-1', status: UnitStatus.RESERVED},
+                data: {status: UnitStatus.AVAILABLE},
+            });
+        });
+
+        it('writes only the status, conditionally on the status it read', async () => {
+            const {service, prisma} = build({unit: availableUnit});
+            await service.updateStatus(adminUser, 'unit-1', UnitStatus.UNAVAILABLE);
+
+            expect(prisma.unit.updateMany).toHaveBeenCalledWith({
+                where: {id: 'unit-1', status: UnitStatus.AVAILABLE},
+                data: {status: UnitStatus.UNAVAILABLE},
+            });
+        });
+
+        it('409s when the unit changed status between the read and the write', async () => {
+            const {service} = build({unit: availableUnit, updateManyCount: 0});
+
+            await expect(service.updateStatus(adminUser, 'unit-1', UnitStatus.UNAVAILABLE)).rejects.toThrow(ConflictException);
+        });
+
+        it('is a no-op when the status is unchanged', async () => {
+            const {service, prisma} = build({unit: availableUnit});
+            await service.updateStatus(adminUser, 'unit-1', UnitStatus.AVAILABLE);
+
+            expect(prisma.deal.findFirst).not.toHaveBeenCalled();
+            expect(prisma.unit.updateMany).not.toHaveBeenCalled();
+            expect(prisma.activity.create).not.toHaveBeenCalled();
         });
     });
 });

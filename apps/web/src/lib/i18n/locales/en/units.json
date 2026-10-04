@@ -42,7 +42,8 @@
     "areaLabel": "Area (m²)",
     "submitCreate": "Create Unit",
     "errorCreate": "Unit could not be created. Check the details and try again.",
-    "errorSave": "Unit could not be saved. Check the details and try again."
+    "errorSave": "Unit could not be saved. Check the details and try again.",
+    "statusManagedByDeal": "Set by the deal. Cancel or complete the deal to change it."
   },
   "bulk": {
     "unitsHeading": "Units",

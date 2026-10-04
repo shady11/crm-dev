@@ -1,5 +1,11 @@
-import {BadRequestException, ForbiddenException, Injectable, NotFoundException,} from "@nestjs/common";
-import {ActivityAction, ActivityType, Prisma, UnitStatus} from "@/generated/prisma/client";
+import {
+    BadRequestException,
+    ConflictException,
+    ForbiddenException,
+    Injectable,
+    NotFoundException,
+} from "@nestjs/common";
+import {ActivityAction, ActivityType, DealStatus, Prisma, UnitStatus} from "@/generated/prisma/client";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateUnitDto} from "./dto/create-unit.dto";
 import {UpdateUnitDto} from "./dto/update-unit.dto";
@@ -7,6 +13,33 @@ import {QueryUnitsDto} from "./dto/query-units.dto";
 import {CreateUnitsBulkDto} from "@/modules/units/dto/create-units-bulk.dto";
 import {PrismaService} from "@/database/prisma.service";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
+import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
+
+/**
+ * The only statuses a person may set by hand. RESERVED and SOLD belong to
+ * the deal lifecycle (DealsService.reserveUnit / cancelDeal / complete and
+ * DealExpiryService) — setting them manually would show a unit as booked or
+ * sold with no deal, client or payment behind it, and clearing them manually
+ * would put a unit under contract back on sale.
+ */
+const MANUAL_UNIT_STATUSES: UnitStatus[] = [
+    UnitStatus.AVAILABLE,
+    UnitStatus.UNAVAILABLE,
+];
+
+// A unit is held by a deal while one is in progress, and permanently once one
+// has completed.
+const UNIT_HOLDING_DEAL_STATUSES: DealStatus[] = [
+    ...ACTIVE_DEAL_STATUSES,
+    DealStatus.COMPLETED,
+];
+
+const UNIT_LOCATION_INCLUDE = {
+    project: {select: {id: true, name: true}},
+    block: {select: {id: true, name: true}},
+    entrance: {select: {id: true, name: true}},
+    floor: {select: {id: true, number: true}},
+} satisfies Prisma.UnitInclude;
 
 @Injectable()
 export class UnitsService {
@@ -377,6 +410,10 @@ export class UnitsService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
+        if (dto.status !== undefined) {
+            this.ensureManualStatus(dto.status);
+        }
+
         const floor = await this.ensureFloorBelongsToCompany(
             floorId,
             user.companyId,
@@ -505,51 +542,37 @@ export class UnitsService {
             );
         }
 
+        // The edit form always sends the current status back, so an
+        // unchanged status is a no-op rather than a manual status change.
         const statusChanged = dto.status !== undefined && dto.status !== unit.status;
+        if (statusChanged) {
+            await this.ensureManualStatusChangeAllowed(unit, dto.status!);
+        }
+
         const changes = diffChangedFields(dto, unit, [
             "number", "type", "rooms",
             {field: "area", normalize: (v) => Number(v)},
             {field: "price", normalize: (v) => Number(v)},
         ]);
 
-        const updated = await this.prisma.unit.update({
-            where: {
-                id,
-            },
-            data: {
-                number: dto.number,
-                type: dto.type,
-                status: dto.status,
-                rooms: dto.rooms,
-                area: dto.area,
-                price: dto.price,
-            },
-            include: {
-                project: {
-                    select: {
-                        id: true,
-                        name: true,
-                    },
-                },
-                block: {
-                    select: {
-                        id: true,
-                        name: true,
-                    },
-                },
-                entrance: {
-                    select: {
-                        id: true,
-                        name: true,
-                    },
-                },
-                floor: {
-                    select: {
-                        id: true,
-                        number: true,
-                    },
-                },
-            },
+        const data: Prisma.UnitUpdateManyMutationInput = {
+            number: dto.number,
+            type: dto.type,
+            status: statusChanged ? dto.status : undefined,
+            rooms: dto.rooms,
+            area: dto.area,
+            price: dto.price,
+        };
+
+        if (statusChanged) {
+            await this.applyStatusChangeIfUnchanged(unit, data);
+        } else {
+            await this.prisma.unit.update({where: {id}, data});
+        }
+
+        const updated = await this.prisma.unit.findUniqueOrThrow({
+            where: {id},
+            include: UNIT_LOCATION_INCLUDE,
         });
 
         if (statusChanged) {
@@ -698,14 +721,14 @@ export class UnitsService {
         const unit = await this.findOne(user, id);
         const fromStatus = unit.status;
 
-        const updated = await this.prisma.unit.update({
-            where: {
-                id,
-            },
-            data: {
-                status,
-            },
-        });
+        if (status === fromStatus) {
+            return this.prisma.unit.findUniqueOrThrow({where: {id}});
+        }
+
+        await this.ensureManualStatusChangeAllowed(unit, status);
+        await this.applyStatusChangeIfUnchanged(unit, {status});
+
+        const updated = await this.prisma.unit.findUniqueOrThrow({where: {id}});
 
         if (fromStatus !== updated.status) {
             await this.logUnitActivity({
@@ -720,6 +743,65 @@ export class UnitsService {
         }
 
         return updated;
+    }
+
+    private ensureManualStatus(status: UnitStatus) {
+        if (!MANUAL_UNIT_STATUSES.includes(status)) {
+            throw new BadRequestException(
+                `Unit status ${status} is set by deals and cannot be set manually`,
+            );
+        }
+    }
+
+    /**
+     * A manual status change must target AVAILABLE/UNAVAILABLE and must not
+     * touch a unit that a deal is holding — that unit is released by
+     * cancelling the deal (or by reservation expiry), never by hand. A
+     * RESERVED/SOLD unit with no such deal (left over from before this rule)
+     * may still be corrected back to AVAILABLE/UNAVAILABLE.
+     */
+    private async ensureManualStatusChangeAllowed(
+        unit: {id: string; number: string},
+        status: UnitStatus,
+    ) {
+        this.ensureManualStatus(status);
+
+        const holdingDeal = await this.prisma.deal.findFirst({
+            where: {
+                unitId: unit.id,
+                deletedAt: null,
+                status: {in: UNIT_HOLDING_DEAL_STATUSES},
+            },
+            select: {dealNumber: true, status: true},
+        });
+
+        if (holdingDeal) {
+            throw new ConflictException(
+                `Unit "${unit.number}" is held by deal ${holdingDeal.dealNumber} (${holdingDeal.status}); ` +
+                "its status changes through the deal",
+            );
+        }
+    }
+
+    /**
+     * Writes a status change only if the unit still has the status it was
+     * read with, so a reservation that lands between the check above and
+     * this write is not silently overwritten.
+     */
+    private async applyStatusChangeIfUnchanged(
+        unit: {id: string; number: string; status: UnitStatus},
+        data: Prisma.UnitUpdateManyMutationInput,
+    ) {
+        const {count} = await this.prisma.unit.updateMany({
+            where: {id: unit.id, status: unit.status},
+            data,
+        });
+
+        if (count === 0) {
+            throw new ConflictException(
+                `Unit "${unit.number}" status changed while you were editing it; reload and try again`,
+            );
+        }
     }
 
     private async ensureFloorBelongsToCompany(
