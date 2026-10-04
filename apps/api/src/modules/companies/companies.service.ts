@@ -33,6 +33,9 @@ const COMPANY_SELECT = {
     currency: true,
     locale: true,
     timezone: true,
+    reservationDefaultDays: true,
+    reservationMaxDays: true,
+    reservationMaxExtensions: true,
     suspendedAt: true,
     createdAt: true,
     updatedAt: true,
@@ -307,6 +310,8 @@ export class CompaniesService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
+        await this.assertValidReservationPolicy(actor.companyId, dto);
+
         const updated = await this.update(actor.companyId, dto);
 
         // Company-scoped rather than platform-wide the way TENANT_* actions
@@ -325,6 +330,34 @@ export class CompaniesService {
         });
 
         return updated;
+    }
+
+    /**
+     * The default reservation term can't exceed the maximum one — otherwise a
+     * booking made without a date would get an expiry no manager could have
+     * picked. Either side may be omitted from the update, so the stored value
+     * stands in for it.
+     */
+    private async assertValidReservationPolicy(
+        id: string,
+        dto: {reservationDefaultDays?: number; reservationMaxDays?: number},
+    ): Promise<void> {
+        if (dto.reservationDefaultDays === undefined && dto.reservationMaxDays === undefined) {
+            return;
+        }
+
+        const current = await this.prisma.company.findUniqueOrThrow({
+            where: {id},
+            select: {reservationDefaultDays: true, reservationMaxDays: true},
+        });
+        const defaultDays = dto.reservationDefaultDays ?? current.reservationDefaultDays;
+        const maxDays = dto.reservationMaxDays ?? current.reservationMaxDays;
+
+        if (defaultDays > maxDays) {
+            throw new BadRequestException(
+                `Default reservation term (${defaultDays} days) can't exceed the maximum (${maxDays} days)`,
+            );
+        }
     }
 
     /**

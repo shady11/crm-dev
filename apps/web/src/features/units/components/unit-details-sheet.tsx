@@ -11,6 +11,11 @@ import {paths} from "@/routes/paths.ts";
 import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {hasPermission} from "@/features/auth/access";
+import {
+    BOOKABLE_PROJECT_STATUSES,
+    isProjectStatus,
+    PROJECT_STATUS_LABEL_KEYS,
+} from "@/features/projects/types/project.types.ts";
 
 interface UnitDetailsSheetProps {
     unit: Unit | null;
@@ -41,6 +46,17 @@ export function UnitDetailsSheet({
     // deal (POST /deals/reserve) needs deals.create.
     const canEdit = hasPermission(user, "units.edit");
     const canBook = hasPermission(user, "deals.create");
+
+    // The API refuses bookings in projects that are not open for sales. The
+    // status arrives with the full unit; until then the button stays enabled
+    // and the API remains the gate.
+    const projectStatus = fullUnit?.project?.status;
+    const closedProjectStatus = isProjectStatus(projectStatus) && !BOOKABLE_PROJECT_STATUSES.includes(projectStatus)
+        ? projectStatus
+        : null;
+    const bookingClosedReason = closedProjectStatus
+        ? t("details.bookingClosed", { status: t(PROJECT_STATUS_LABEL_KEYS[closedProjectStatus]) })
+        : null;
 
     if (!unit || !floor) {
         return null;
@@ -82,6 +98,9 @@ export function UnitDetailsSheet({
                             </TabsContent>
                         </Tabs>
                     </div>
+                    {unit.status === "AVAILABLE" && canBook && bookingClosedReason && (
+                        <p className="pb-4 text-sm text-muted-foreground">{bookingClosedReason}</p>
+                    )}
                 </SheetBody>
 
                 <SheetFooter>
@@ -97,7 +116,14 @@ export function UnitDetailsSheet({
                         <Button variant="secondary" className="flex-1" onClick={onEdit}>{t("common:actions.edit")}</Button>
                     )}
                     {unit.status === "AVAILABLE" && canBook && (
-                        <Button className="flex-1" onClick={onBook}>{t("details.bookButton")}</Button>
+                        <Button
+                            className="flex-1"
+                            disabled={!!bookingClosedReason}
+                            title={bookingClosedReason ?? undefined}
+                            onClick={onBook}
+                        >
+                            {t("details.bookButton")}
+                        </Button>
                     )}
                 </SheetFooter>
             </SheetContent>

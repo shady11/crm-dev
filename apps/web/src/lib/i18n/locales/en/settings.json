@@ -55,5 +55,16 @@
         "updateErrorDescription": "Something went wrong. Please try again."
       }
     }
+  },
+  "reservations": {
+    "title": "Reservations",
+    "description": "How long a booking holds a unit before it returns to sale.",
+    "defaultDays": "Default term, days",
+    "maxDays": "Maximum term, days",
+    "maxExtensions": "Extensions allowed",
+    "errors": {
+      "invalid": "Enter whole numbers: terms 1–365 days, extensions 0–20.",
+      "defaultExceedsMax": "The default term can't be longer than the maximum term."
+    }
   }
 }

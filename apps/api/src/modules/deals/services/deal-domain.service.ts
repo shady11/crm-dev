@@ -1,11 +1,13 @@
 import {Injectable} from '@nestjs/common';
 import {
+    Company,
     Deal,
     DealStatus,
     DiscountApprovalStatus,
     PaymentSchedule,
     PaymentScheduleStatus,
     Prisma,
+    Project,
     Unit,
     UnitStatus,
 } from '@/generated/prisma/client';
@@ -14,12 +16,22 @@ import {
     ActiveDealExistsException,
     DiscountPendingApprovalException,
     InvalidDealStateException,
+    ProjectNotOpenForSalesException,
     PaymentExceedsBalanceException,
     RefundExceedsPaidException,
     ReservationDateInvalidException,
     ReservationExpiredException,
+    ReservationExtensionLimitException,
     UnitNotAvailableException,
 } from '../exceptions';
+import {BOOKABLE_PROJECT_STATUSES} from '../deal.constants';
+
+export type ReservationPolicy = Pick<
+    Company,
+    'reservationDefaultDays' | 'reservationMaxDays' | 'reservationMaxExtensions'
+>;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class DealDomainService {
@@ -41,27 +53,77 @@ export class DealDomainService {
         }
     }
 
+    ensureProjectOpenForSales(project: Pick<Project, 'name' | 'status'>): void {
+        if (!BOOKABLE_PROJECT_STATUSES.includes(project.status)) {
+            throw new ProjectNotOpenForSalesException(project.name, project.status);
+        }
+    }
+
     ensureNoActiveDeal(activeDeal: Deal | null, unit: Unit): void {
         if (activeDeal) {
             throw new ActiveDealExistsException(unit.number);
         }
     }
 
+    /**
+     * The expiry a new reservation gets: the requested date if it is within
+     * the company's maximum term, or the company's default term when none was
+     * requested — so no reservation is ever open-ended.
+     */
+    resolveReservationExpiry(
+        requested: Date | undefined,
+        policy: ReservationPolicy,
+        now: Date = new Date(),
+    ): Date {
+        if (!requested) {
+            return new Date(now.getTime() + policy.reservationDefaultDays * DAY_MS);
+        }
+
+        this.ensureWithinReservationTerm(requested, policy, now);
+        return requested;
+    }
+
     ensureCanExtendReservation(
         deal: Deal,
         reservationExpiresAt: Date,
+        policy: ReservationPolicy,
+        now: Date = new Date(),
     ): void {
         this.ensureStatus(deal, DealStatus.RESERVED);
 
         if (
             deal.reservationExpiresAt &&
-            deal.reservationExpiresAt < new Date()
+            deal.reservationExpiresAt < now
         ) {
             throw new ReservationExpiredException();
         }
 
-        if (reservationExpiresAt <= new Date()) {
+        if (deal.reservationExtensionCount >= policy.reservationMaxExtensions) {
+            throw new ReservationExtensionLimitException(policy.reservationMaxExtensions);
+        }
+
+        if (deal.reservationExpiresAt && reservationExpiresAt <= deal.reservationExpiresAt) {
+            throw new ReservationDateInvalidException(
+                'The new expiration date must be later than the current one.',
+            );
+        }
+
+        this.ensureWithinReservationTerm(reservationExpiresAt, policy, now);
+    }
+
+    private ensureWithinReservationTerm(
+        reservationExpiresAt: Date,
+        policy: ReservationPolicy,
+        now: Date,
+    ): void {
+        if (reservationExpiresAt <= now) {
             throw new ReservationDateInvalidException();
+        }
+
+        if (reservationExpiresAt.getTime() > now.getTime() + policy.reservationMaxDays * DAY_MS) {
+            throw new ReservationDateInvalidException(
+                `Reservation expiration date can be at most ${policy.reservationMaxDays} days from now.`,
+            );
         }
     }
 

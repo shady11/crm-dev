@@ -15,6 +15,36 @@ import {SettingOptionSelect} from "@/features/setting-options/components/setting
 
 const EMPTY: UpdateOwnCompanyPayload = {name: "", currency: "", locale: "", timezone: ""};
 
+// Kept as strings while editing so a cleared input doesn't snap back to 0.
+type ReservationPolicyForm = {
+    reservationDefaultDays: string;
+    reservationMaxDays: string;
+    reservationMaxExtensions: string;
+};
+
+const EMPTY_POLICY: ReservationPolicyForm = {
+    reservationDefaultDays: "",
+    reservationMaxDays: "",
+    reservationMaxExtensions: "",
+};
+
+/** Same bounds as UpdateOwnCompanyDto in the API. */
+function reservationPolicyError(policy: ReservationPolicyForm): "invalid" | "defaultExceedsMax" | null {
+    const defaultDays = Number(policy.reservationDefaultDays);
+    const maxDays = Number(policy.reservationMaxDays);
+    const maxExtensions = Number(policy.reservationMaxExtensions);
+    const inRange = (value: number, min: number, max: number) => Number.isInteger(value) && value >= min && value <= max;
+
+    if (
+        [policy.reservationDefaultDays, policy.reservationMaxDays, policy.reservationMaxExtensions].some((v) => v.trim() === "") ||
+        !inRange(defaultDays, 1, 365) || !inRange(maxDays, 1, 365) || !inRange(maxExtensions, 0, 20)
+    ) {
+        return "invalid";
+    }
+
+    return defaultDays > maxDays ? "defaultExceedsMax" : null;
+}
+
 export function CompanySettingsPage() {
     const {t} = useTranslation("settings");
     const {t: tCommon} = useTranslation("common");
@@ -22,6 +52,8 @@ export function CompanySettingsPage() {
 
     const companyQuery = useQuery({queryKey: ["companies", "me"], queryFn: getOwnCompany});
     const [form, setForm] = useState<UpdateOwnCompanyPayload>(EMPTY);
+    const [policy, setPolicy] = useState<ReservationPolicyForm>(EMPTY_POLICY);
+    const policyError = reservationPolicyError(policy);
 
     useEffect(() => {
         if (!companyQuery.data) return;
@@ -31,6 +63,11 @@ export function CompanySettingsPage() {
             currency: companyQuery.data.currency ?? "",
             locale: companyQuery.data.locale ?? "",
             timezone: companyQuery.data.timezone ?? "",
+        });
+        setPolicy({
+            reservationDefaultDays: String(companyQuery.data.reservationDefaultDays ?? ""),
+            reservationMaxDays: String(companyQuery.data.reservationMaxDays ?? ""),
+            reservationMaxExtensions: String(companyQuery.data.reservationMaxExtensions ?? ""),
         });
     }, [companyQuery.data]);
 
@@ -56,6 +93,9 @@ export function CompanySettingsPage() {
             });
         },
     });
+
+    const setPolicyField = (key: keyof ReservationPolicyForm) => (event: React.ChangeEvent<HTMLInputElement>) =>
+        setPolicy((previous) => ({...previous, [key]: event.target.value}));
 
     const set = (key: keyof UpdateOwnCompanyPayload) => (event: React.ChangeEvent<HTMLInputElement>) =>
         setForm((previous) => ({...previous, [key]: event.target.value}));
@@ -84,7 +124,13 @@ export function CompanySettingsPage() {
                         className="space-y-5"
                         onSubmit={(event) => {
                             event.preventDefault();
-                            updateMutation.mutate(form);
+                            if (policyError) return;
+                            updateMutation.mutate({
+                                ...form,
+                                reservationDefaultDays: Number(policy.reservationDefaultDays),
+                                reservationMaxDays: Number(policy.reservationMaxDays),
+                                reservationMaxExtensions: Number(policy.reservationMaxExtensions),
+                            });
                         }}
                     >
                         <Field
@@ -118,7 +164,43 @@ export function CompanySettingsPage() {
                             </SelectField>
                         </div>
 
-                        <Button type="submit" disabled={updateMutation.isPending}>
+                        <div className="space-y-3 border-t pt-5">
+                            <div>
+                                <h3 className="text-sm font-semibold">{t("reservations.title")}</h3>
+                                <p className="text-sm text-muted-foreground">{t("reservations.description")}</p>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                                <Field
+                                    label={t("reservations.defaultDays")}
+                                    type="number"
+                                    min={1}
+                                    max={365}
+                                    value={policy.reservationDefaultDays}
+                                    onChange={setPolicyField("reservationDefaultDays")}
+                                />
+                                <Field
+                                    label={t("reservations.maxDays")}
+                                    type="number"
+                                    min={1}
+                                    max={365}
+                                    value={policy.reservationMaxDays}
+                                    onChange={setPolicyField("reservationMaxDays")}
+                                />
+                                <Field
+                                    label={t("reservations.maxExtensions")}
+                                    type="number"
+                                    min={0}
+                                    max={20}
+                                    value={policy.reservationMaxExtensions}
+                                    onChange={setPolicyField("reservationMaxExtensions")}
+                                />
+                            </div>
+                            {policyError && (
+                                <p className="text-sm text-destructive">{t(`reservations.errors.${policyError}`)}</p>
+                            )}
+                        </div>
+
+                        <Button type="submit" disabled={updateMutation.isPending || !!policyError}>
                             {updateMutation.isPending ? tCommon("actions.saving") : tCommon("actions.saveChanges")}
                         </Button>
                     </form>

@@ -75,6 +75,9 @@ model Deal {
   reservedAt           DateTime?
   reservationExpiresAt DateTime?
   reservedById         String?
+  // How many times reservationExpiresAt was pushed out — capped by
+  // Company.reservationMaxExtensions.
+  reservationExtensionCount Int @default(0)
   reservedBy           User?     @relation("ReservedBy", fields: [reservedById], references: [id])
 
   contractNumber String?
@@ -96,6 +99,12 @@ model Deal {
   deletedAt DateTime?
 
   @@unique([companyId, dealNumber])
+  // At most one open deal per unit — the database backstop behind the
+  // conditional AVAILABLE -> RESERVED claim in DealsService.reserveUnit, so
+  // two concurrent bookings can never both hold the same unit.
+  // The predicate is written the way Postgres stores it (see the migration
+  // for the readable form) so `prisma migrate diff` sees no drift.
+  @@unique([unitId], map: "Deal_unitId_open_key", where: raw("((status = ANY (ARRAY['RESERVED'::\"DealStatus\", 'CONTRACT_SIGNED'::\"DealStatus\", 'ACTIVE'::\"DealStatus\"])) AND (\"deletedAt\" IS NULL))"))
   @@index([companyId, discountApprovalStatus])
   @@index([projectId])
   @@index([unitId])

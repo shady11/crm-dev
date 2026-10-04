@@ -20,6 +20,15 @@ model Company {
   signatoryTitle String?
   letterheadUrl  String?
 
+  // Reservation policy — see DealDomainService.resolveReservationExpiry /
+  // ensureCanExtendReservation. A booking made without an expiry date holds
+  // the unit for reservationDefaultDays; any expiry set at booking or on
+  // extension may be at most reservationMaxDays from that moment; a
+  // reservation may be extended at most reservationMaxExtensions times.
+  reservationDefaultDays   Int @default(7)
+  reservationMaxDays       Int @default(14)
+  reservationMaxExtensions Int @default(2)
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 

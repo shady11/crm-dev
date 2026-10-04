@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/calendar.tsx";
 import {createListCollection, parseDate} from "@ark-ui/react";
 import {format} from "date-fns";
-import {Field, FieldGroup, FieldLabel, FieldSet} from "@/components/ui/field.tsx";
+import {Field, FieldDescription, FieldGroup, FieldLabel, FieldSet} from "@/components/ui/field.tsx";
 import {DealPaymentScheduleCard} from "@/features/deals/components/deal-details/deal-payment-schedule-card.tsx";
 import {DealPaymentsHistoryCard} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
 import {NumberInput, NumberInputGroup, NumberInputInput} from "@/components/ui/number-input";
@@ -42,6 +42,8 @@ import {EntityDocumentsCard} from "@/features/documents/components/entity-docume
 import {useTranslation} from "react-i18next";
 import {PAYMENT_METHOD_LABEL_KEYS, PAYMENT_TYPE_LABEL_KEYS} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {useReservationPolicy} from "@/features/deals/hooks/use-reservation-policy.ts";
+import {reservationDateBounds} from "@/features/deals/utils/reservation-dates.ts";
 import {hasPermission} from "@/features/auth/access";
 import {ReassignManagerDialog} from "@/features/users/components/reassign-manager-dialog.tsx";
 import {PageError, PageSkeleton} from "@/components/shared/page-query-state.tsx";
@@ -62,6 +64,7 @@ export function DealDetailsPage() {
 
     const [extendOpen, setExtendOpen] = useState(false);
     const [newExpiry, setNewExpiry] = useState([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+    const reservationPolicy = useReservationPolicy(hasPermission(user, "deals.manage")).data;
 
     const [signOpen, setSignOpen] = useState(false);
     const [contractNumber, setContractNumber] = useState("");
@@ -94,6 +97,28 @@ export function DealDetailsPage() {
     const visual = DEAL_STATUS_VISUALS[deal.status];
 
     const daysLeft = deal.status === "RESERVED" ? daysUntil(deal.reservationExpiresAt) : null;
+
+    // Mirrors DealDomainService.ensureCanExtendReservation: a limited number
+    // of extensions, each to a later date within the company's maximum term.
+    const extensionsLeft = reservationPolicy
+        ? Math.max(reservationPolicy.reservationMaxExtensions - deal.reservationExtensionCount, 0)
+        : null;
+    const extendBounds = reservationPolicy ? reservationDateBounds(reservationPolicy) : null;
+    const dayAfterCurrentExpiry = deal.reservationExpiresAt
+        // UTC day, like reservationDateBounds — the picked day is sent as midnight UTC.
+        ? new Date(new Date(deal.reservationExpiresAt).getTime() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+        : null;
+    const extendMin = [extendBounds?.min, dayAfterCurrentExpiry]
+        .filter((value): value is string => !!value)
+        .sort()
+        .at(-1);
+    const extendMax = extendBounds?.max;
+    const canExtend = extensionsLeft !== 0 && !(extendMin && extendMax && extendMin > extendMax);
+
+    const openExtendDialog = () => {
+        if (extendMin) setNewExpiry([parseDate(extendMin)]);
+        setExtendOpen(true);
+    };
 
     const paymentMethodCollection = createListCollection({
         items: Object.entries(PAYMENT_METHOD_LABEL_KEYS).map(([value, key]) => ({ label: t(key), value })),
@@ -134,7 +159,12 @@ export function DealDetailsPage() {
                         </Button>
                         {deal.status === "RESERVED" && (
                             <>
-                                <Button variant="secondary" onClick={() => setExtendOpen(true)}>
+                                <Button
+                                    variant="secondary"
+                                    disabled={!canExtend}
+                                    title={!canExtend ? t("detailsPage.extendUnavailable") : undefined}
+                                    onClick={openExtendDialog}
+                                >
                                     {t("detailsPage.extendReservation")}
                                 </Button>
                                 <Button onClick={() => setSignOpen(true)}>{t("detailsPage.signContract")}</Button>
@@ -262,7 +292,8 @@ export function DealDetailsPage() {
                                     <DatePicker
                                         onValueChange={({ value }) => setNewExpiry(value)}
                                         value={newExpiry}
-                                        min={deal.reservationExpiresAt ? parseDate(deal.reservationExpiresAt.slice(0, 10)) : undefined}
+                                        min={extendMin ? parseDate(extendMin) : undefined}
+                                        max={extendMax ? parseDate(extendMax) : undefined}
                                     >
                                         <DatePickerTrigger asChild>
                                             <Button className="w-full flex justify-between" variant="outline">
@@ -283,6 +314,15 @@ export function DealDetailsPage() {
                                             </CalendarTable>
                                         </DatePickerContent>
                                     </DatePicker>
+                                    {reservationPolicy && extensionsLeft !== null && (
+                                        <FieldDescription>
+                                            {t("detailsPage.extensionsLeft", {
+                                                left: extensionsLeft,
+                                                max: reservationPolicy.reservationMaxExtensions,
+                                                maxDays: reservationPolicy.reservationMaxDays,
+                                            })}
+                                        </FieldDescription>
+                                    )}
                                 </Field>
                             </FieldGroup>
                         </FieldSet>

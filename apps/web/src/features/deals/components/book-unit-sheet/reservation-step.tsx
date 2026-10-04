@@ -1,7 +1,8 @@
+import {useEffect} from "react";
 import {Controller, type UseFormReturn} from "react-hook-form";
 import {createListCollection} from "@ark-ui/react";
 import {DateField} from "@/components/shared/date-field";
-import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field";
+import {Field, FieldDescription, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field";
 import {SheetBody} from "@/components/ui/sheet";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {NumberInput, NumberInputGroup, NumberInputInput} from "@/components/ui/number-input";
@@ -11,6 +12,8 @@ import type {ApartmentSummary} from "@/features/deals/types/booking.types.ts";
 import {calculateBooking} from "@/features/deals/utils/booking-calculator.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useTranslation} from "react-i18next";
+import {useReservationPolicy} from "@/features/deals/hooks/use-reservation-policy.ts";
+import {defaultReservationExpiry, reservationDateBounds} from "@/features/deals/utils/reservation-dates.ts";
 
 interface Manager {
     id: string;
@@ -26,6 +29,15 @@ interface ReservationStepProps {
 export function ReservationStep({ form, apartment, managers }: ReservationStepProps) {
     const { t } = useTranslation("deals");
     const { formatCurrency, currencyCode } = useCompanyFormatters();
+    const policy = useReservationPolicy().data;
+    const expiryBounds = policy ? reservationDateBounds(policy) : undefined;
+
+    // Pre-fill the company's default term so the common case needs no input.
+    useEffect(() => {
+        if (policy && !form.getValues("reservation.expiresAt")) {
+            form.setValue("reservation.expiresAt", defaultReservationExpiry(policy));
+        }
+    }, [policy, form]);
     const discountPercent = form.watch("reservation.discountPercent") || 0;
     const deposit = form.watch("reservation.deposit") || 0;
 
@@ -74,7 +86,17 @@ export function ReservationStep({ form, apartment, managers }: ReservationStepPr
                             <DateField
                                 value={field.value ? field.value.toISOString().slice(0, 10) : ""}
                                 onChange={(value) => field.onChange(value ? new Date(value) : undefined)}
+                                min={expiryBounds?.min}
+                                max={expiryBounds?.max}
                             />
+                            {policy && (
+                                <FieldDescription>
+                                    {t("booking.reservationExpiresHint", {
+                                        defaultDays: policy.reservationDefaultDays,
+                                        maxDays: policy.reservationMaxDays,
+                                    })}
+                                </FieldDescription>
+                            )}
                             <FieldError>{fieldState.error?.message}</FieldError>
                         </Field>
                     )}

@@ -38,6 +38,7 @@ export type Deal = {
     deposit: number | null;
     reservedAt: string | null;
     reservationExpiresAt: string | null;
+    reservationExtensionCount: number;
     contractNumber: string | null;
     contractDate: string | null;
     cancelledAt: string | null;
@@ -157,6 +158,19 @@ export async function getDealStatusSummary(projectId?: string, branchId?: string
 
 export async function getDeal(id: string) {
     const response = await api.get<DealDetails>(`/deals/${id}`);
+    return response.data;
+}
+
+// The caller's company limits on reservation terms — see
+// DealDomainService.resolveReservationExpiry in the API.
+export type ReservationPolicy = {
+    reservationDefaultDays: number;
+    reservationMaxDays: number;
+    reservationMaxExtensions: number;
+};
+
+export async function getReservationPolicy() {
+    const response = await api.get<ReservationPolicy>("/deals/reservation-policy");
     return response.data;
 }
 

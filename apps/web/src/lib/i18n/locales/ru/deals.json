@@ -154,7 +154,9 @@
     "paymentDate": "Дата платежа",
     "reference": "Референс (необязательно)",
     "referencePlaceholder": "например, ID транзакции",
-    "record": "Записать"
+    "record": "Записать",
+    "extensionsLeft": "Осталось продлений: {{left}} из {{max}}. Новая дата — не более {{maxDays}} дн. от сегодня.",
+    "extendUnavailable": "Продления исчерпаны — подпишите договор или дождитесь окончания брони."
   },
   "toasts": {
     "unitReserved": "Юнит забронирован",
@@ -217,6 +219,7 @@
       "phoneRequired": "Номер телефона обязателен.",
       "invalidEmail": "Некорректный email"
     },
-    "depositPlain": "Депозит"
+    "depositPlain": "Депозит",
+    "reservationExpiresHint": "По умолчанию {{defaultDays}} дн.; не более {{maxDays}} дн. от сегодня."
   }
 }

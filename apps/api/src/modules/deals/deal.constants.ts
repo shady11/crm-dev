@@ -1,10 +1,25 @@
-import {DealStatus, Prisma} from "@/generated/prisma/client";
+import {DealStatus, Prisma, ProjectStatus} from "@/generated/prisma/client";
+
+// Project statuses in which units may be booked: off-plan pre-sales while
+// PLANNING, normal sales while ACTIVE, and remaining stock once COMPLETED.
+// DRAFT, PAUSED, SOLDOUT and ARCHIVED projects are closed for sales.
+export const BOOKABLE_PROJECT_STATUSES: ProjectStatus[] = [
+    ProjectStatus.PLANNING,
+    ProjectStatus.ACTIVE,
+    ProjectStatus.COMPLETED,
+];
 
 export const ACTIVE_DEAL_STATUSES: DealStatus[]  = [
     'RESERVED',
     'CONTRACT_SIGNED',
     'ACTIVE',
 ];
+
+export const RESERVATION_POLICY_SELECT = {
+    reservationDefaultDays: true,
+    reservationMaxDays: true,
+    reservationMaxExtensions: true,
+} satisfies Prisma.CompanySelect;
 
 export const DEAL_MANAGER_SELECT = {
     id: true,

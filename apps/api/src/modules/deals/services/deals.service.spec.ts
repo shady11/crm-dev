@@ -1,4 +1,4 @@
-import {BadRequestException} from '@nestjs/common';
+import {BadRequestException, ConflictException} from '@nestjs/common';
 import {
     DealStatus,
     DiscountApprovalStatus,
@@ -15,6 +15,9 @@ import {
     DealNotFoundException,
     DiscountApprovalNotAllowedException,
     DiscountNotPendingException,
+    ProjectNotOpenForSalesException,
+    ReservationDateInvalidException,
+    ReservationExtensionLimitException,
     SalePriceMismatchException,
     UnitNotAvailableException,
     UnitNotFoundException,
@@ -69,14 +72,18 @@ describe('DealsService', () => {
         id: 'company-1',
         salesManagerDiscountLimit: new Prisma.Decimal(5),
         salesHeadDiscountLimit: new Prisma.Decimal(15),
+        reservationDefaultDays: 7,
+        reservationMaxDays: 14,
+        reservationMaxExtensions: 2,
         ...overrides,
     });
 
     function buildBase() {
         const prisma: any = {
-            unit: {findFirst: jest.fn(), update: jest.fn().mockResolvedValue({})},
+            unit: {findFirst: jest.fn(), update: jest.fn().mockResolvedValue({}), updateMany: jest.fn().mockResolvedValue({count: 1})},
             deal: {
                 findFirst: jest.fn(),
+                updateMany: jest.fn().mockResolvedValue({count: 1}),
                 findMany: jest.fn().mockResolvedValue([]),
                 count: jest.fn().mockResolvedValue(0),
                 create: jest.fn(),
@@ -135,11 +142,13 @@ describe('DealsService', () => {
             ...overrides,
         }) as any;
 
+        const openProject = {name: 'Sunrise', status: 'ACTIVE'};
+
         function build(opts: {unit?: unknown; client?: unknown; activeDeal?: unknown; company?: unknown} = {}) {
             const b = buildBase();
             b.prisma.unit.findFirst.mockResolvedValue(
                 opts.unit === undefined
-                    ? {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.AVAILABLE, projectId: 'p1', number: '101'}
+                    ? {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.AVAILABLE, projectId: 'p1', number: '101', project: openProject}
                     : opts.unit,
             );
             b.prisma.client.findFirst.mockResolvedValue(
@@ -157,13 +166,74 @@ describe('DealsService', () => {
             await expect(service.reserveUnit(managerUser, reserveDto())).rejects.toThrow(UnitNotFoundException);
         });
 
+        it('looks the unit up excluding soft-deleted units and projects', async () => {
+            const {service, prisma} = build();
+            await service.reserveUnit(managerUser, reserveDto());
+
+            expect(prisma.unit.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+                where: {id: 'unit-1', deletedAt: null, project: {companyId: 'company-1', deletedAt: null}},
+            }));
+        });
+
+        it.each(['DRAFT', 'PAUSED', 'SOLDOUT', 'ARCHIVED'])(
+            'throws ProjectNotOpenForSalesException when the project is %s, before claiming the unit',
+            async (status) => {
+                const {service, prisma} = build({
+                    unit: {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.AVAILABLE, projectId: 'p1', number: '101', project: {name: 'Sunrise', status}},
+                });
+
+                await expect(service.reserveUnit(managerUser, reserveDto())).rejects.toThrow(ProjectNotOpenForSalesException);
+                expect(prisma.unit.updateMany).not.toHaveBeenCalled();
+                expect(prisma.deal.create).not.toHaveBeenCalled();
+            },
+        );
+
+        it.each(['PLANNING', 'ACTIVE', 'COMPLETED'])('allows booking when the project is %s', async (status) => {
+            const {service, prisma} = build({
+                unit: {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.AVAILABLE, projectId: 'p1', number: '101', project: {name: 'Sunrise', status}},
+            });
+
+            await service.reserveUnit(managerUser, reserveDto());
+            expect(prisma.deal.create).toHaveBeenCalled();
+        });
+
+        it('defaults the expiry to the company default term when none is given', async () => {
+            const {service, prisma} = build({company: company({reservationDefaultDays: 3})});
+            const before = Date.now();
+
+            await service.reserveUnit(managerUser, reserveDto());
+
+            const {reservationExpiresAt} = prisma.deal.create.mock.calls[0][0].data;
+            const days = (reservationExpiresAt.getTime() - before) / (24 * 60 * 60 * 1000);
+            expect(days).toBeGreaterThanOrEqual(3);
+            expect(days).toBeLessThan(3.01);
+        });
+
+        it('keeps a requested expiry within the company maximum term', async () => {
+            const {service, prisma} = build();
+            const requested = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString();
+
+            await service.reserveUnit(managerUser, reserveDto({reservationExpiresAt: requested}));
+
+            expect(prisma.deal.create.mock.calls[0][0].data.reservationExpiresAt).toEqual(new Date(requested));
+        });
+
+        it('rejects a requested expiry beyond the company maximum term, before claiming the unit', async () => {
+            const {service, prisma} = build();
+            const requested = new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString();
+
+            await expect(service.reserveUnit(managerUser, reserveDto({reservationExpiresAt: requested})))
+                .rejects.toThrow(ReservationDateInvalidException);
+            expect(prisma.unit.updateMany).not.toHaveBeenCalled();
+        });
+
         it('throws ClientNotFoundException when the client is outside caller scope', async () => {
             const {service} = build({client: null});
             await expect(service.reserveUnit(managerUser, reserveDto())).rejects.toThrow(ClientNotFoundException);
         });
 
         it('throws UnitNotAvailableException when the unit is not AVAILABLE', async () => {
-            const {service} = build({unit: {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.RESERVED, projectId: 'p1', number: '101'}});
+            const {service} = build({unit: {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.RESERVED, projectId: 'p1', number: '101', project: openProject}});
             await expect(service.reserveUnit(managerUser, reserveDto())).rejects.toThrow(UnitNotAvailableException);
         });
 
@@ -238,7 +308,21 @@ describe('DealsService', () => {
             const {service, prisma} = build();
             await service.reserveUnit(managerUser, reserveDto({salePrice: 100000}));
 
-            expect(prisma.unit.update).toHaveBeenCalledWith({where: {id: 'unit-1'}, data: {status: UnitStatus.RESERVED}});
+            expect(prisma.unit.updateMany).toHaveBeenCalledWith({
+                where: {id: 'unit-1', status: UnitStatus.AVAILABLE},
+                data: {status: UnitStatus.RESERVED},
+            });
+            expect(prisma.unit.update).not.toHaveBeenCalled();
+        });
+
+        it('fails without creating a deal when a concurrent booking claimed the unit first', async () => {
+            const {service, prisma} = build();
+            prisma.unit.updateMany.mockResolvedValue({count: 0});
+
+            await expect(service.reserveUnit(managerUser, reserveDto({salePrice: 100000, deposit: 5000})))
+                .rejects.toThrow(UnitNotAvailableException);
+            expect(prisma.deal.create).not.toHaveBeenCalled();
+            expect(prisma.payment.create).not.toHaveBeenCalled();
         });
 
         it('routes discount-approval notifications to SALES_HEADs on the branch when within their band', async () => {
@@ -316,17 +400,62 @@ describe('DealsService', () => {
             ).rejects.toThrow();
         });
 
-        it('updates reservationExpiresAt on success', async () => {
+        const DAY = 24 * 60 * 60 * 1000;
+        const reservedDeal = (overrides: Record<string, unknown> = {}) => ({
+            id: 'deal-1',
+            status: DealStatus.RESERVED,
+            reservationExpiresAt: new Date(Date.now() + 2 * DAY),
+            reservationExtensionCount: 0,
+            clientId: 'c1',
+            ...overrides,
+        });
+        const extendTo = (ms: number) => ({reservationExpiresAt: new Date(Date.now() + ms).toISOString()}) as any;
+
+        it('pushes the expiry out and counts the extension, conditional on the count it read', async () => {
             const {service, prisma} = buildBase();
-            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', status: DealStatus.RESERVED, reservationExpiresAt: null, clientId: 'c1'});
-            const newExpiry = new Date(Date.now() + 60000).toISOString();
+            prisma.deal.findFirst.mockResolvedValue(reservedDeal({reservationExtensionCount: 1}));
+            const dto = extendTo(5 * DAY);
 
-            await service.extendReservation(managerUser, 'deal-1', {reservationExpiresAt: newExpiry} as any);
+            await service.extendReservation(managerUser, 'deal-1', dto);
 
-            expect(prisma.deal.update).toHaveBeenCalledWith({
-                where: {id: 'deal-1'},
-                data: {reservationExpiresAt: new Date(newExpiry)},
+            expect(prisma.deal.updateMany).toHaveBeenCalledWith({
+                where: {id: 'deal-1', status: DealStatus.RESERVED, reservationExtensionCount: 1},
+                data: {reservationExpiresAt: new Date(dto.reservationExpiresAt), reservationExtensionCount: {increment: 1}},
             });
+        });
+
+        it('refuses once the company extension limit is used up', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(reservedDeal({reservationExtensionCount: 2}));
+
+            await expect(service.extendReservation(managerUser, 'deal-1', extendTo(5 * DAY)))
+                .rejects.toThrow(ReservationExtensionLimitException);
+            expect(prisma.deal.updateMany).not.toHaveBeenCalled();
+        });
+
+        it('refuses a new expiry beyond the company maximum term', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(reservedDeal());
+
+            await expect(service.extendReservation(managerUser, 'deal-1', extendTo(15 * DAY)))
+                .rejects.toThrow(ReservationDateInvalidException);
+        });
+
+        it('refuses a new expiry that is not later than the current one', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(reservedDeal({reservationExpiresAt: new Date(Date.now() + 5 * DAY)}));
+
+            await expect(service.extendReservation(managerUser, 'deal-1', extendTo(4 * DAY)))
+                .rejects.toThrow(ReservationDateInvalidException);
+        });
+
+        it('409s when a concurrent extension changed the deal first', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(reservedDeal());
+            prisma.deal.updateMany.mockResolvedValue({count: 0});
+
+            await expect(service.extendReservation(managerUser, 'deal-1', extendTo(5 * DAY)))
+                .rejects.toThrow(ConflictException);
         });
     });
 

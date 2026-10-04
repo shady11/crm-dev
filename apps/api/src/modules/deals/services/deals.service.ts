@@ -1,4 +1,4 @@
-import {BadRequestException, ForbiddenException, Injectable, Logger,} from '@nestjs/common';
+import {BadRequestException, ConflictException, ForbiddenException, Injectable, Logger,} from '@nestjs/common';
 
 import {
   ActivityAction,
@@ -25,6 +25,7 @@ import {
   DiscountApprovalNotAllowedException,
   DiscountNotPendingException,
   SalePriceMismatchException,
+  UnitNotAvailableException,
   UnitNotFoundException,
 } from '../exceptions';
 
@@ -33,7 +34,7 @@ import {DEAL_SORTABLE_FIELDS, DealQueryDto} from '../dto/deal-query.dto';
 import {resolveOrderBy} from '@/common/utils/sort.util';
 import {DealDomainService} from './deal-domain.service';
 import {DealActivityService} from './deal-activity.service';
-import {ACTIVE_DEAL_STATUSES, DEAL_DETAILS_INCLUDE} from "../deal.constants";
+import {ACTIVE_DEAL_STATUSES, DEAL_DETAILS_INCLUDE, RESERVATION_POLICY_SELECT} from "../deal.constants";
 import {ReserveUnitDto} from "../dto/reserve-unit.dto";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ExtendReservationDto} from "@/modules/deals/dto/extend-reservation.dto";
@@ -206,8 +207,15 @@ export class DealsService {
       const unit = await db.unit.findFirst({
         where: {
           id: dto.unitId,
+          deletedAt: null,
           project: {
             companyId,
+            deletedAt: null,
+          },
+        },
+        include: {
+          project: {
+            select: {name: true, status: true},
           },
         },
       });
@@ -216,6 +224,7 @@ export class DealsService {
         throw new UnitNotFoundException(dto.unitId);
       }
 
+      this.domain.ensureProjectOpenForSales(unit.project);
       this.domain.ensureUnitCanBeReserved(unit);
 
       const activeDeal = await db.deal.findFirst({
@@ -228,6 +237,34 @@ export class DealsService {
       });
 
       this.domain.ensureNoActiveDeal(activeDeal, unit);
+
+      const reservationPolicy = await db.company.findUniqueOrThrow({
+        where: {id: companyId},
+        select: RESERVATION_POLICY_SELECT,
+      });
+      const reservationExpiresAt = this.domain.resolveReservationExpiry(
+          dto.reservationExpiresAt ? new Date(dto.reservationExpiresAt) : undefined,
+          reservationPolicy,
+      );
+
+      // Claim the unit before anything else is written. The status check
+      // above is only a read; this conditional write is what makes the
+      // booking exclusive — of two concurrent reservations, the second blocks
+      // on the row lock, re-reads the status once the first commits, matches
+      // nothing and fails here. Deal_unitId_open_key backs this up in the DB.
+      const claimed = await db.unit.updateMany({
+        where: {
+          id: unit.id,
+          status: UnitStatus.AVAILABLE,
+        },
+        data: {
+          status: UnitStatus.RESERVED,
+        },
+      });
+
+      if (claimed.count === 0) {
+        throw new UnitNotAvailableException(unit.number);
+      }
 
       const listPrice = new Prisma.Decimal(unit.price);
       const discountPercent = new Prisma.Decimal(dto.discountPercent ?? 0);
@@ -301,9 +338,7 @@ export class DealsService {
           deposit: dto.deposit ?? 0,
 
           reservedAt: new Date(),
-          reservationExpiresAt: dto.reservationExpiresAt
-              ? new Date(dto.reservationExpiresAt)
-              : null,
+          reservationExpiresAt,
 
           reservedById: managerId,
 
@@ -323,15 +358,6 @@ export class DealsService {
           },
         });
       }
-
-      await db.unit.update({
-        where: {
-          id: unit.id,
-        },
-        data: {
-          status: UnitStatus.RESERVED,
-        },
-      });
 
       await this.activityService.reserve({
         db,
@@ -431,6 +457,18 @@ export class DealsService {
     return this.mapper.toDetails(result);
   }
 
+  /** The caller's company reservation limits, for the booking and extension forms. */
+  async getReservationPolicy(user: AuthUser) {
+    if (!user.companyId) {
+      throw new ForbiddenException("User does not belong to a company");
+    }
+
+    return this.prisma.company.findUniqueOrThrow({
+      where: { id: user.companyId },
+      select: RESERVATION_POLICY_SELECT,
+    });
+  }
+
   async extendReservation(user: AuthUser, id: string, dto: ExtendReservationDto) {
     if (!user.companyId) {
       throw new ForbiddenException("User does not belong to a company");
@@ -448,18 +486,35 @@ export class DealsService {
       });
       if (!deal) throw new DealNotFoundException(id);
 
-      const newExpiresAt = new Date(dto.reservationExpiresAt);
-      this.domain.ensureCanExtendReservation(deal, newExpiresAt);
-
-      await db.deal.update({
-        where: { id },
-        data: { reservationExpiresAt: newExpiresAt },
+      const reservationPolicy = await db.company.findUniqueOrThrow({
+        where: { id: companyId },
+        select: RESERVATION_POLICY_SELECT,
       });
+
+      const newExpiresAt = new Date(dto.reservationExpiresAt);
+      this.domain.ensureCanExtendReservation(deal, newExpiresAt, reservationPolicy);
+
+      // Conditional on the count read above, so two concurrent extensions
+      // can't both pass the limit check.
+      const extended = await db.deal.updateMany({
+        where: { id, status: DealStatus.RESERVED, reservationExtensionCount: deal.reservationExtensionCount },
+        data: {
+          reservationExpiresAt: newExpiresAt,
+          reservationExtensionCount: { increment: 1 },
+        },
+      });
+      if (extended.count === 0) {
+        throw new ConflictException('Reservation changed while you were extending it; reload and try again.');
+      }
 
       await this.activityService.extendReservation({
         db, companyId, userId: user.id,
         dealId: deal.id, clientId: deal.clientId,
-        metadata: { reservationExpiresAt: newExpiresAt.toISOString() },
+        metadata: {
+          reservationExpiresAt: newExpiresAt.toISOString(),
+          extension: deal.reservationExtensionCount + 1,
+          maxExtensions: reservationPolicy.reservationMaxExtensions,
+        },
       });
 
       return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
