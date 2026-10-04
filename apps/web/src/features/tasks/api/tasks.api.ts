@@ -83,3 +83,8 @@ export async function updateTaskStatus(id: string, status: TaskStatus, outcome?:
 export async function deleteTask(id: string) {
     await api.delete(`/tasks/${id}`);
 }
+
+// Undoes deleteTask() — the row is only soft-deleted server-side.
+export async function restoreTask(id: string) {
+    await api.post(`/tasks/${id}/restore`);
+}

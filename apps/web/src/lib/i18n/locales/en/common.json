@@ -107,5 +107,11 @@
     "exit": "Exit",
     "exiting": "Exiting...",
     "exitError": "Could not exit. Try again."
+  },
+  "undo": {
+    "action": "Undo",
+    "success": "Action undone",
+    "errorTitle": "Couldn't undo",
+    "errorDescription": "The record may have changed in the meantime. Refresh and try again."
   }
 }

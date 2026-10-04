@@ -4,13 +4,15 @@ import {useTranslation} from "react-i18next";
 import {
     createTask,
     deleteTask,
+    restoreTask,
     type Task,
     type TaskPayload,
     updateTask,
     updateTaskStatus
 } from "@/features/tasks/api/tasks.api.ts";
-import type {TaskStatus} from "@/features/tasks/types/task.types.ts";
+import {TASK_STATUS_LABEL_KEYS, type TaskStatus} from "@/features/tasks/types/task.types.ts";
 import {applyTaskStatusOptimistically} from "@/features/tasks/utils/optimistic-status.ts";
+import {toastWithUndo} from "@/lib/undo-toast.ts";
 
 export function useTaskActions() {
     const { t } = useTranslation("tasks");
@@ -36,8 +38,22 @@ export function useTaskActions() {
         onMutate: async ({ id, status }) => {
             await queryClient.cancelQueries({ queryKey: ["tasks"] });
             const previousQueries = queryClient.getQueriesData<{ items: Task[] }>({ queryKey: ["tasks"] });
+            const previousStatus = previousQueries
+                .flatMap(([, data]) => data?.items ?? [])
+                .find((task) => task.id === id)?.status;
             applyTaskStatusOptimistically(queryClient, id, status);
-            return { previousQueries };
+            return { previousQueries, previousStatus };
+        },
+
+        onSuccess: (_task, { id, status }, context) => {
+            const previousStatus = context?.previousStatus;
+            if (!previousStatus || previousStatus === status) return;
+
+            toastWithUndo({
+                title: t("toasts.statusSuccess", { status: t(TASK_STATUS_LABEL_KEYS[status]) }),
+                undo: () => updateTaskStatus(id, previousStatus),
+                onUndone: invalidate,
+            });
         },
 
         onError: (_err, _vars, context) => {
@@ -50,7 +66,10 @@ export function useTaskActions() {
 
     const remove = useMutation({
         mutationFn: (id: string) => deleteTask(id),
-        onSuccess: async () => { await invalidate(); toast.success({ title: t("toasts.deleteSuccess") }); },
+        onSuccess: async (_data, id) => {
+            await invalidate();
+            toastWithUndo({ title: t("toasts.deleteSuccess"), undo: () => restoreTask(id), onUndone: invalidate });
+        },
         onError: () => toast.error({ title: t("toasts.deleteError") }),
     });
 

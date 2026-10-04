@@ -7,6 +7,7 @@ import {
     type CreateClientPayload,
     deleteClient,
     getClients,
+    restoreClient,
     updateClient,
     type UpdateClientPayload,
 } from "@/features/clients/api/clients.api.ts";
@@ -14,6 +15,7 @@ import type {Client} from "@/features/clients/types/client.types";
 import {useTranslation} from "react-i18next";
 import {useSort} from "@/hooks/use-sort.ts";
 import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
+import {toastWithUndo} from "@/lib/undo-toast.ts";
 
 export type ProjectFilterValue = string | "all";
 
@@ -73,11 +75,18 @@ export function useClientsList() {
         },
     });
 
+    const invalidateClients = () => queryClient.invalidateQueries({ queryKey: ["clients"] });
+
     const deleteMutation = useMutation({
         mutationFn: deleteClient,
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["clients"] });
-            toast.success({ title: t("toasts.deleteSuccessTitle"), description: t("toasts.deleteSuccessDescription") });
+        onSuccess: async (_data, id) => {
+            await invalidateClients();
+            toastWithUndo({
+                title: t("toasts.deleteSuccessTitle"),
+                description: t("toasts.deleteSuccessDescription"),
+                undo: () => restoreClient(id),
+                onUndone: invalidateClients,
+            });
             setDeleteTarget(null);
         },
         onError: () => {
@@ -98,9 +107,14 @@ export function useClientsList() {
                 );
             }
         },
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["clients"] });
-            toast.success({ title: t("toasts.bulkDeleteSuccessTitle"), description: t("toasts.bulkDeleteSuccessDescription") });
+        onSuccess: async (_data, ids) => {
+            await invalidateClients();
+            toastWithUndo({
+                title: t("toasts.bulkDeleteSuccessTitle"),
+                description: t("toasts.bulkDeleteSuccessDescription"),
+                undo: () => Promise.all(ids.map((id) => restoreClient(id))),
+                onUndone: invalidateClients,
+            });
             setSelectedIds(new Set());
             setBulkDeleteDialogOpen(false);
         },

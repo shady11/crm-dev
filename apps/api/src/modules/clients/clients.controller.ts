@@ -51,6 +51,12 @@ export class ClientsController {
         return this.clientsService.remove(user, id);
     }
 
+    @RequirePermissions("clients.delete")
+    @Post(":id/restore")
+    restore(@CurrentUser() user: AuthUser, @Param("id") id: string) {
+        return this.clientsService.restore(user, id);
+    }
+
     // BR-D1: branch staff can't see across the boundary, so this can only
     // ever be reached by a company-wide role.
     @RequirePermissions("clients.transfer_branch")

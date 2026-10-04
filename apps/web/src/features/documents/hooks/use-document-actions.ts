@@ -5,9 +5,11 @@ import {
     deleteDocument,
     type Document,
     downloadDocument,
+    restoreDocument,
     uploadDocument
 } from "@/features/documents/api/documents.api.ts";
 import type {DocumentOwnerType, DocumentType} from "@/features/documents/types/document.types.ts";
+import {toastWithUndo} from "@/lib/undo-toast.ts";
 
 export function useDocumentActions() {
     const { t } = useTranslation("documents");
@@ -23,7 +25,10 @@ export function useDocumentActions() {
 
     const remove = useMutation({
         mutationFn: (id: string) => deleteDocument(id),
-        onSuccess: async () => { await invalidate(); toast.success({ title: t("toast.deleted") }); },
+        onSuccess: async (_data, id) => {
+            await invalidate();
+            toastWithUndo({ title: t("toast.deleted"), undo: () => restoreDocument(id), onUndone: invalidate });
+        },
         onError: () => toast.error({ title: t("toast.deleteError") }),
     });
 

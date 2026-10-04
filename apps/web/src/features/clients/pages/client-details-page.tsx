@@ -28,6 +28,7 @@ import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {hasPermission} from "@/features/auth/access";
 import {MoveToBranchDialog} from "@/features/branches/components/move-to-branch-dialog.tsx";
 import {PageError, PageSkeleton} from "@/components/shared/page-query-state.tsx";
+import {toastWithUndo} from "@/lib/undo-toast.ts";
 
 export function ClientDetailsPage() {
     const { t, i18n } = useTranslation(["clients", "deals", "leads", "common", "branches"]);
@@ -42,11 +43,26 @@ export function ClientDetailsPage() {
     const [transferOpen, setTransferOpen] = useState(false);
 
     const transferBranchMutation = useMutation({
-        mutationFn: (branchId: string) => transferClientBranch(clientId!, branchId),
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["client", clientId] });
-            await queryClient.invalidateQueries({ queryKey: ["clients"] });
-            toast.success({ title: t("moveDialog.success", { ns: "branches", name: clientQuery.data?.fullName }) });
+        mutationFn: ({ branchId }: { branchId: string; previousBranchId: string | null }) =>
+            transferClientBranch(clientId!, branchId),
+        onSuccess: async (_data, { previousBranchId }) => {
+            const invalidate = async () => {
+                await queryClient.invalidateQueries({ queryKey: ["client", clientId] });
+                await queryClient.invalidateQueries({ queryKey: ["clients"] });
+            };
+            await invalidate();
+            const title = t("moveDialog.success", { ns: "branches", name: clientQuery.data?.fullName });
+            // A client that had no branch can't be moved back to "none" — the
+            // transfer endpoint only accepts a real branch.
+            if (previousBranchId) {
+                toastWithUndo({
+                    title,
+                    undo: () => transferClientBranch(clientId!, previousBranchId),
+                    onUndone: invalidate,
+                });
+            } else {
+                toast.success({ title });
+            }
             setTransferOpen(false);
         },
         onError: () => {
@@ -233,7 +249,9 @@ export function ClientDetailsPage() {
                 currentBranchId={client.branchId}
                 isSubmitting={transferBranchMutation.isPending}
                 onOpenChange={setTransferOpen}
-                onConfirm={(branchId) => transferBranchMutation.mutate(branchId)}
+                onConfirm={(branchId) =>
+                    transferBranchMutation.mutate({ branchId, previousBranchId: clientQuery.data?.branchId ?? null })
+                }
             />
         </div>
     );

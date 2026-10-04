@@ -79,6 +79,11 @@ export async function deleteLead(id: string) {
     await api.delete(`/leads/${id}`);
 }
 
+// Undoes deleteLead() — the row is only soft-deleted server-side.
+export async function restoreLead(id: string) {
+    await api.post(`/leads/${id}/restore`);
+}
+
 export type ConvertLeadPayload = {
     clientId?: string;
 };

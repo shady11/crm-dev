@@ -258,6 +258,25 @@ describe('TasksService', () => {
         });
     });
 
+    describe('restore', () => {
+        it('404s when there is no deleted task in scope', async () => {
+            const {service} = build({task: null});
+            await expect(service.restore(adminUser, 'missing')).rejects.toThrow(TaskNotFoundException);
+        });
+
+        it('only looks at soft-deleted tasks and clears deletedAt', async () => {
+            const {service, prisma} = build({task: {id: 'task-1'}});
+            await service.restore(adminUser, 'task-1');
+
+            expect(prisma.task.findFirst).toHaveBeenCalledWith({
+                where: expect.objectContaining({id: 'task-1', deletedAt: {not: null}}),
+            });
+            expect(prisma.task.update).toHaveBeenCalledWith(
+                expect.objectContaining({where: {id: 'task-1'}, data: {deletedAt: null}}),
+            );
+        });
+    });
+
     describe('getStatusSummary', () => {
         it('rejects when the user has no company', async () => {
             const {service} = build();

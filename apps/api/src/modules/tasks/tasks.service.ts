@@ -344,6 +344,44 @@ export class TasksService {
         return { success: true };
     }
 
+    /**
+     * Reverses remove() — backs the "Undo" on the delete toast. Same scoping
+     * as findOne(), except it looks only at soft-deleted rows.
+     */
+    async restore(user: AuthUser, id: string) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const existing = await this.prisma.task.findFirst({
+            where: {
+                id,
+                companyId: user.companyId,
+                deletedAt: { not: null },
+                ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
+            },
+        });
+
+        if (!existing) throw new TaskNotFoundException(id);
+
+        const task = await this.prisma.task.update({
+            where: { id },
+            data: { deletedAt: null },
+            include: TASK_INCLUDE,
+        });
+
+        await this.logTaskActivity({
+            companyId: user.companyId,
+            actorId: user.id,
+            taskId: id,
+            action: ActivityAction.RESTORED_TASK,
+            type: ActivityType.TASK_RESTORED,
+            title: `Task "${task.title}" restored`,
+        });
+
+        return task;
+    }
+
     async getStatusSummary(user: AuthUser, branchId?: string) {
         if (!user.companyId) {
             throw new ForbiddenException("User does not belong to a company");

@@ -60,4 +60,10 @@ export class TasksController {
     remove(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.tasksService.remove(user, id);
     }
+
+    @RequirePermissions("tasks.delete")
+    @Post(":id/restore")
+    restore(@CurrentUser() user: AuthUser, @Param("id") id: string) {
+        return this.tasksService.restore(user, id);
+    }
 }

@@ -73,6 +73,12 @@ export class LeadsController {
         return this.leadsService.remove(user, id);
     }
 
+    @RequirePermissions("leads.delete")
+    @Post(":id/restore")
+    restore(@CurrentUser() user: AuthUser, @Param("id") id: string) {
+        return this.leadsService.restore(user, id);
+    }
+
     // SH-A1: a SALES_HEAD moving a lead between their own team's
     // SALES_MANAGERs. COMPANY_ADMIN included (via the default role bundle)
     // for oversight parity with remove() above; SALES_MANAGER is
