@@ -12,13 +12,13 @@
     "storage": "Кладовка"
   },
   "actions": {
-    "addUnit": "Добавить юнит",
+    "addUnit": "Добавить помещение",
     "bulkUnits": "Массовое добавление"
   },
   "import": {
-    "trigger": "Импорт юнитов",
-    "toastSuccessTitle": "Юниты импортированы",
-    "toastSuccessDescription": "Создано юнитов: {{count}}.",
+    "trigger": "Импорт помещений",
+    "toastSuccessTitle": "Помещения импортированы",
+    "toastSuccessDescription": "Создано помещений: {{count}}.",
     "toastErrorTitle": "Ошибка импорта",
     "toastErrorDescription": "Не удалось обработать файл. Проверьте его и попробуйте снова.",
     "resultTitle": "Результат импорта",
@@ -30,77 +30,77 @@
     "close": "Закрыть"
   },
   "sheets": {
-    "addTitle": "Добавить юнит на этаж {{number}}",
-    "bulkAddTitle": "Добавить несколько юнитов на этаж {{number}}",
-    "editTitle": "Редактировать юнит №{{number}}",
-    "detailsTitle": "Юнит №{{number}}"
+    "addTitle": "Добавить помещение на этаж {{number}}",
+    "bulkAddTitle": "Добавить несколько помещений на этаж {{number}}",
+    "editTitle": "Редактировать помещение №{{number}}",
+    "detailsTitle": "Помещение №{{number}}"
   },
   "form": {
-    "numberLabel": "Номер юнита",
+    "numberLabel": "Номер помещения",
     "numberPlaceholder": "например, 1, 101, A-1",
     "roomsLabel": "Комнаты (необязательно)",
     "areaLabel": "Площадь (м²)",
-    "submitCreate": "Создать юнит",
-    "errorCreate": "Не удалось создать юнит. Проверьте данные и попробуйте снова.",
-    "errorSave": "Не удалось сохранить юнит. Проверьте данные и попробуйте снова.",
+    "submitCreate": "Создать помещение",
+    "errorCreate": "Не удалось создать помещение. Проверьте данные и попробуйте снова.",
+    "errorSave": "Не удалось сохранить помещение. Проверьте данные и попробуйте снова.",
     "statusManagedByDeal": "Устанавливается сделкой. Чтобы изменить статус, отмените или завершите сделку."
   },
   "bulk": {
-    "unitsHeading": "Юниты",
+    "unitsHeading": "Помещения",
     "autoGenerate": "Автогенерация",
-    "autoGeneratePopoverTitle": "Автогенерация юнитов",
-    "numberOfUnitsLabel": "Количество юнитов",
+    "autoGeneratePopoverTitle": "Автогенерация помещений",
+    "numberOfUnitsLabel": "Количество помещений",
     "startingNumberLabel": "Начальный номер",
     "roomsLabel": "Комнаты",
     "areaLabel": "Площадь (м²)",
     "priceLabel": "Цена",
     "generate": "Сгенерировать",
-    "addUnit": "Добавить юнит",
+    "addUnit": "Добавить помещение",
     "numberLabel": "Номер",
     "duplicateNumberError": "Этот номер уже существует",
-    "duplicateNumbersAlert": "Обнаружены повторяющиеся номера юнитов. Исправьте их перед созданием.",
+    "duplicateNumbersAlert": "Обнаружены повторяющиеся номера помещений. Исправьте их перед созданием.",
     "priceLabelDollar": "Цена, $",
     "rowNumberLabel": "№{{number}}",
-    "errorGeneric": "Не удалось создать юниты. Проверьте данные и попробуйте снова.",
-    "submitCreate_one": "Создать {{count}} юнит",
-    "submitCreate_few": "Создать {{count}} юнита",
-    "submitCreate_many": "Создать {{count}} юнитов",
-    "submitCreate_other": "Создать {{count}} юнита"
+    "errorGeneric": "Не удалось создать помещения. Проверьте данные и попробуйте снова.",
+    "submitCreate_one": "Создать {{count}} помещение",
+    "submitCreate_few": "Создать {{count}} помещения",
+    "submitCreate_many": "Создать {{count}} помещений",
+    "submitCreate_other": "Создать {{count}} помещения"
   },
   "table": {
     "numberHeader": "Номер",
     "actionsHeader": "Действия"
   },
   "delete": {
-    "title": "Удалить юнит?",
-    "description": "Юнит №{{number}} будет удалён безвозвратно. Это действие нельзя отменить."
+    "title": "Удалить помещение?",
+    "description": "Помещение №{{number}} будет удалено безвозвратно. Это действие нельзя отменить."
   },
   "duplicate": {
-    "title": "Дублировать юнит?",
-    "description": "Будет создана копия юнита №{{number}}."
+    "title": "Дублировать помещение?",
+    "description": "Будет создана копия помещения №{{number}}."
   },
   "toasts": {
     "createdTitle": "Успешно создано",
-    "createdDescription": "Юнит {{number}} создан.",
+    "createdDescription": "Помещение {{number}} создано.",
     "updatedTitle": "Успешно обновлено",
     "duplicatedTitle": "Успешно продублировано",
     "deletedTitle": "Успешно удалено"
   },
   "overview": {
-    "numberLabel": "Номер юнита",
+    "numberLabel": "Номер помещения",
     "pricePerSqmLabel": "Цена за м²",
     "listPriceLabel": "Цена продажи"
   },
   "details": {
     "overviewTab": "Обзор",
     "dealsTab": "Сделки",
-    "noDeals": "Для этого юнита пока нет сделок.",
+    "noDeals": "Для этого помещения пока нет сделок.",
     "bookButton": "Забронировать",
     "bookingClosed": "Бронирование закрыто: статус проекта — {{status}}.",
     "infoSheetButton": "Инфолист"
   },
   "infoSheet": {
-    "title": "Юнит №{{number}}",
+    "title": "Помещение №{{number}}",
     "generatedAt": "Сформировано {{date}}",
     "project": "Проект",
     "address": "Адрес",
@@ -113,7 +113,7 @@
     "pricePerSqm": "Цена за м²",
     "status": "Статус",
     "printButton": "Печать / Сохранить как PDF",
-    "notFound": "Юнит не найден."
+    "notFound": "Помещение не найдено."
   },
   "chessboard": {
     "entranceLabel": "Подъезд {{name}}",
@@ -125,10 +125,10 @@
     "floors_few": "{{count}} этажа",
     "floors_many": "{{count}} этажей",
     "floors_other": "{{count}} этажа",
-    "units_one": "{{count}} юнит",
-    "units_few": "{{count}} юнита",
-    "units_many": "{{count}} юнитов",
-    "units_other": "{{count}} юнита"
+    "units_one": "{{count}} помещение",
+    "units_few": "{{count}} помещения",
+    "units_many": "{{count}} помещений",
+    "units_other": "{{count}} помещения"
   },
   "filters": {
     "roomsSummary_one": "{{count}} комната",
@@ -146,10 +146,10 @@
     "presetsLabel": "Пресеты",
     "fromPlaceholder": "От",
     "toPlaceholder": "До",
-    "unitsFound_one": "найден {{count}} юнит",
-    "unitsFound_few": "найдено {{count}} юнита",
-    "unitsFound_many": "найдено {{count}} юнитов",
-    "unitsFound_other": "найдено {{count}} юнита",
+    "unitsFound_one": "найдено {{count}} помещение",
+    "unitsFound_few": "найдено {{count}} помещения",
+    "unitsFound_many": "найдено {{count}} помещений",
+    "unitsFound_other": "найдено {{count}} помещения",
     "clearAll": "Сбросить всё",
     "pricePresetUnder": "До {{value}}",
     "pricePresetOver": "От {{value}}",

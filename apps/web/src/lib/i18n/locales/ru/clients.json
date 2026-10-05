@@ -65,7 +65,7 @@
     "deals": "Сделки",
     "dealsWithCount": "Сделки ({{count}})",
     "noDeals": "Пока нет сделок.",
-    "unitFallback": "Юнит №{{number}}",
+    "unitFallback": "Помещение №{{number}}",
     "leadsWithCount": "Лиды ({{count}})",
     "noLeadsYet": "Пока нет лидов.",
     "updateSuccessTitle": "Успешно обновлено",

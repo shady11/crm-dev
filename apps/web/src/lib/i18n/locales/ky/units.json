@@ -12,13 +12,13 @@
     "storage": "Кампа"
   },
   "actions": {
-    "addUnit": "Юнит кошуу",
+    "addUnit": "Жай кошуу",
     "bulkUnits": "Массалык кошуу"
   },
   "import": {
-    "trigger": "Юниттерди импорттоо",
-    "toastSuccessTitle": "Юниттер импортолду",
-    "toastSuccessDescription": "Түзүлгөн юниттер: {{count}}.",
+    "trigger": "Жайларды импорттоо",
+    "toastSuccessTitle": "Жайлар импортолду",
+    "toastSuccessDescription": "Түзүлгөн жайлар: {{count}}.",
     "toastErrorTitle": "Импорт катасы",
     "toastErrorDescription": "Файлды иштетүү мүмкүн болбоду. Аны текшерип, кайра аракет кылыңыз.",
     "resultTitle": "Импорттун натыйжасы",
@@ -30,77 +30,77 @@
     "close": "Жабуу"
   },
   "sheets": {
-    "addTitle": "{{number}}-кабатка юнит кошуу",
-    "bulkAddTitle": "{{number}}-кабатка бир нече юнит кошуу",
-    "editTitle": "№{{number}} юнитти оңдоо",
-    "detailsTitle": "№{{number}} юнит"
+    "addTitle": "{{number}}-кабатка жай кошуу",
+    "bulkAddTitle": "{{number}}-кабатка бир нече жай кошуу",
+    "editTitle": "№{{number}} жайды оңдоо",
+    "detailsTitle": "№{{number}} жай"
   },
   "form": {
-    "numberLabel": "Юнит номери",
+    "numberLabel": "Жай номери",
     "numberPlaceholder": "мисалы, 1, 101, A-1",
     "roomsLabel": "Бөлмөлөр (милдеттүү эмес)",
     "areaLabel": "Аянты (м²)",
-    "submitCreate": "Юнит түзүү",
-    "errorCreate": "Юнитти түзүү мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз.",
-    "errorSave": "Юнитти сактоо мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз.",
+    "submitCreate": "Жай түзүү",
+    "errorCreate": "Жайды түзүү мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз.",
+    "errorSave": "Жайды сактоо мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз.",
     "statusManagedByDeal": "Бүтүм аркылуу коюлат. Статусту өзгөртүү үчүн бүтүмдү жокко чыгарыңыз же аяктаңыз."
   },
   "bulk": {
-    "unitsHeading": "Юниттер",
+    "unitsHeading": "Жайлар",
     "autoGenerate": "Автоматтык түзүү",
-    "autoGeneratePopoverTitle": "Юниттерди автоматтык түзүү",
-    "numberOfUnitsLabel": "Юниттердин саны",
+    "autoGeneratePopoverTitle": "Жайларды автоматтык түзүү",
+    "numberOfUnitsLabel": "Жайлардын саны",
     "startingNumberLabel": "Баштапкы номер",
     "roomsLabel": "Бөлмөлөр",
     "areaLabel": "Аянты (м²)",
     "priceLabel": "Баасы",
     "generate": "Түзүү",
-    "addUnit": "Юнит кошуу",
+    "addUnit": "Жай кошуу",
     "numberLabel": "Номер",
     "duplicateNumberError": "Бул номер мурунтан бар",
-    "duplicateNumbersAlert": "Кайталанган юнит номерлери табылды. Түзүүдөн мурун аларды оңдоңуз.",
+    "duplicateNumbersAlert": "Кайталанган жай номерлери табылды. Түзүүдөн мурун аларды оңдоңуз.",
     "priceLabelDollar": "Баасы, $",
     "rowNumberLabel": "№{{number}}",
-    "errorGeneric": "Юниттерди түзүү мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз.",
-    "submitCreate_one": "{{count}} юнит түзүү",
-    "submitCreate_few": "{{count}} юнит түзүү",
-    "submitCreate_many": "{{count}} юнит түзүү",
-    "submitCreate_other": "{{count}} юнит түзүү"
+    "errorGeneric": "Жайларды түзүү мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз.",
+    "submitCreate_one": "{{count}} жай түзүү",
+    "submitCreate_few": "{{count}} жай түзүү",
+    "submitCreate_many": "{{count}} жай түзүү",
+    "submitCreate_other": "{{count}} жай түзүү"
   },
   "table": {
     "numberHeader": "Номер",
     "actionsHeader": "Аракеттер"
   },
   "delete": {
-    "title": "Юнитти өчүрөсүзбү?",
-    "description": "№{{number}} юнит биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт."
+    "title": "Жайды өчүрөсүзбү?",
+    "description": "№{{number}} жай биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт."
   },
   "duplicate": {
-    "title": "Юнитти кайталайсызбы?",
-    "description": "№{{number}} юниттин көчүрмөсү түзүлөт."
+    "title": "Жайды кайталайсызбы?",
+    "description": "№{{number}} жайдын көчүрмөсү түзүлөт."
   },
   "toasts": {
     "createdTitle": "Ийгиликтүү түзүлдү",
-    "createdDescription": "{{number}} юнити түзүлдү.",
+    "createdDescription": "№{{number}} жай түзүлдү.",
     "updatedTitle": "Ийгиликтүү жаңырды",
     "duplicatedTitle": "Ийгиликтүү кайталанды",
     "deletedTitle": "Ийгиликтүү өчүрүлдү"
   },
   "overview": {
-    "numberLabel": "Юнит номери",
+    "numberLabel": "Жай номери",
     "pricePerSqmLabel": "м² үчүн баасы",
     "listPriceLabel": "Сатуу баасы"
   },
   "details": {
     "overviewTab": "Жалпы көрүнүш",
     "dealsTab": "Бүтүмдөр",
-    "noDeals": "Бул юнит үчүн азырынча бүтүм жок.",
+    "noDeals": "Бул жай үчүн азырынча бүтүм жок.",
     "bookButton": "Брондоо",
     "bookingClosed": "Брондоо жабык: долбоордун статусу — {{status}}.",
     "infoSheetButton": "Маалымат баракчасы"
   },
   "infoSheet": {
-    "title": "№{{number}} юнит",
+    "title": "№{{number}} жай",
     "generatedAt": "{{date}} күнү түзүлдү",
     "project": "Долбоор",
     "address": "Дареги",
@@ -113,7 +113,7 @@
     "pricePerSqm": "м² үчүн баасы",
     "status": "Статус",
     "printButton": "Басып чыгаруу / PDF катары сактоо",
-    "notFound": "Юнит табылган жок."
+    "notFound": "Жай табылган жок."
   },
   "chessboard": {
     "entranceLabel": "{{name}} кире бериши",
@@ -125,10 +125,10 @@
     "floors_few": "{{count}} кабат",
     "floors_many": "{{count}} кабат",
     "floors_other": "{{count}} кабат",
-    "units_one": "{{count}} юнит",
-    "units_few": "{{count}} юнит",
-    "units_many": "{{count}} юнит",
-    "units_other": "{{count}} юнит"
+    "units_one": "{{count}} жай",
+    "units_few": "{{count}} жай",
+    "units_many": "{{count}} жай",
+    "units_other": "{{count}} жай"
   },
   "filters": {
     "roomsSummary_one": "{{count}} бөлмө",
@@ -146,10 +146,10 @@
     "presetsLabel": "Даяр варианттар",
     "fromPlaceholder": "Баштап",
     "toPlaceholder": "Чейин",
-    "unitsFound_one": "{{count}} юнит табылды",
-    "unitsFound_few": "{{count}} юнит табылды",
-    "unitsFound_many": "{{count}} юнит табылды",
-    "unitsFound_other": "{{count}} юнит табылды",
+    "unitsFound_one": "{{count}} жай табылды",
+    "unitsFound_few": "{{count}} жай табылды",
+    "unitsFound_many": "{{count}} жай табылды",
+    "unitsFound_other": "{{count}} жай табылды",
     "clearAll": "Баарын тазалоо",
     "pricePresetUnder": "{{value}}-ге чейин",
     "pricePresetOver": "{{value}}-ден баштап",

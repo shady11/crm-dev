@@ -35,7 +35,7 @@
   },
   "counts": {
     "blocksLabel": "Блоктор",
-    "unitsLabel": "Юниттер"
+    "unitsLabel": "Жайлар"
   },
   "card": {
     "deleteTitle": "Долбоорду өчүрөсүзбү?",
@@ -53,7 +53,7 @@
     "notFound": "Долбоордун структурасы табылган жок",
     "emptyTitle": "Азырынча блок жок",
     "emptyDescriptionPrefix": "Биринчи блокту түзүүдөн баштаңыз.",
-    "emptyDescriptionSuffix": "Блоктор долбооруңуздагы кире беришибиш, кабаттарды жана юниттерди уюштурууга жардам берет.",
+    "emptyDescriptionSuffix": "Блоктор долбооруңуздагы кире беришибиш, кабаттарды жана жайларды уюштурууга жардам берет.",
     "toastCreateErrorTitle": "Блокту түзүү мүмкүн болбоду"
   },
   "overview": {
@@ -67,19 +67,19 @@
     "selectBlockHeading": "Блокту тандаңыз",
     "statEntrances": "Кире беришибиш",
     "statFloors": "Кабаттар",
-    "statUnits": "Юниттер",
+    "statUnits": "Жайлар",
     "noBlocksTitle": "Азырынча блок жок",
     "noBlocksDescription": "Адегенде «Конструктор» бетинде блоктор түзүңүз",
-    "noUnitsTitle": "Юниттер табылган жок",
+    "noUnitsTitle": "Жайлар табылган жок",
     "noUnitsDescription": "Чыпкаларды өзгөртүп көрүңүз",
-    "updateUnitError": "Юнитти жаңыртуу мүмкүн болбоду.",
+    "updateUnitError": "Жайды жаңыртуу мүмкүн болбоду.",
     "floors_one": "{{count}} кабат",
     "floors_few": "{{count}} кабат",
     "floors_many": "{{count}} кабат",
     "floors_other": "{{count}} кабат",
-    "units_one": "{{count}} юнит",
-    "units_few": "{{count}} юнит",
-    "units_many": "{{count}} юнит",
-    "units_other": "{{count}} юнит"
+    "units_one": "{{count}} жай",
+    "units_few": "{{count}} жай",
+    "units_many": "{{count}} жай",
+    "units_other": "{{count}} жай"
   }
 }

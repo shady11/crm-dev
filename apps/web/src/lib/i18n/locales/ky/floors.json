@@ -17,10 +17,10 @@
   },
   "item": {
     "titleWithNumber": "{{number}}-кабат",
-    "units_one": "{{count}} юнит",
-    "units_few": "{{count}} юнит",
-    "units_many": "{{count}} юнит",
-    "units_other": "{{count}} юнит"
+    "units_one": "{{count}} жай",
+    "units_few": "{{count}} жай",
+    "units_many": "{{count}} жай",
+    "units_other": "{{count}} жай"
   },
   "bulk": {
     "title": "{{name}} кире беришине бир нече кабат кошуу",
@@ -38,11 +38,11 @@
   },
   "delete": {
     "title": "Кабатты өчүрөсүзбү?",
-    "description": "{{number}}-кабат жана анын бардык юниттери биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт."
+    "description": "{{number}}-кабат жана анын бардык жайлары биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт."
   },
   "duplicate": {
     "title": "Кабатты кайталайсызбы?",
-    "description": "{{number}}-кабаттын көчүрмөсү бардык юниттери менен түзүлөт."
+    "description": "{{number}}-кабаттын көчүрмөсү бардык жайлары менен түзүлөт."
   },
   "toasts": {
     "createdTitle": "Ийгиликтүү түзүлдү",

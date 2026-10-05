@@ -15,12 +15,12 @@
     "paid": "Төлөндү",
     "remaining": "Калдык",
     "financing": "Каржылоо",
-    "unitSection": "Юнит",
+    "unitSection": "Жай",
     "dealSection": "Бүтүм",
     "discount": "Арзандатуу"
   },
   "unitCard": {
-    "unitNumber": "№{{number}} юнит",
+    "unitNumber": "№{{number}} жай",
     "floor": "{{floor}}-кабат"
   },
   "page": {
@@ -35,11 +35,11 @@
     "managerPlaceholder": "Менеджер",
     "filterByStatus": "Статус боюнча чыпка",
     "statusPlaceholder": "Статус",
-    "searchPlaceholder": "Клиент, телефон, юнит боюнча издөө..."
+    "searchPlaceholder": "Клиент, телефон, жай боюнча издөө..."
   },
   "table": {
     "dealNumber": "Бүтүм №",
-    "unit": "Юнит",
+    "unit": "Жай",
     "client": "Клиент",
     "manager": "Менеджер",
     "status": "Статус",
@@ -129,7 +129,7 @@
     "markCompleted": "Аяктады деп белгилөө",
     "cancelDeal": "Бүтүмдү жокко чыгаруу",
     "cancelDialogTitle": "Бүтүмдү жокко чыгаруу",
-    "cancelDialogDescription": "Бүтүм жокко чыгарылат жана юнит бошотулат. Бул аракетти жокко чыгарууга болбойт.",
+    "cancelDialogDescription": "Бүтүм жокко чыгарылат жана жай бошотулат. Бул аракетти жокко чыгарууга болбойт.",
     "reasonOptional": "Себеби (милдеттүү эмес)",
     "confirmCancellation": "Жокко чыгарууну ырастоо",
     "extendDialogTitle": "Бронду узартуу",
@@ -159,9 +159,9 @@
     "extendUnavailable": "Узартуулар түгөндү — келишимге кол коюңуз же брондун мөөнөтү бүтүшүн күтүңүз."
   },
   "toasts": {
-    "unitReserved": "Юнит бронделди",
-    "unitReservedDescription": "№{{number}} юнит бронделди.",
-    "reserveError": "Юнитти брондоо мүмкүн болбоду",
+    "unitReserved": "Жай бронделди",
+    "unitReservedDescription": "№{{number}} жай бронделди.",
+    "reserveError": "Жайды брондоо мүмкүн болбоду",
     "tryAgain": "Кайра аракет кылыңыз.",
     "reservationExtended": "Брон узартылды",
     "extendError": "Бронду узартуу мүмкүн болбоду",
@@ -180,7 +180,7 @@
   },
   "booking": {
     "rooms": "{{count}} бөлм.",
-    "sheetTitle": "№{{number}} юнитти брондоо",
+    "sheetTitle": "№{{number}} жайды брондоо",
     "existingClient": "Учурдагы клиент",
     "newClient": "Жаңы клиент",
     "fullName": "Аты-жөнү",
@@ -210,7 +210,7 @@
     "next": "Кийинки",
     "confirmReservation": "Брондоону ырастоо",
     "selectClientError": "Клиентти тандаңыз же түзүңүз.",
-    "reserveError": "Юнитти брондоо мүмкүн болбоду. Кайра аракет кылыңыз.",
+    "reserveError": "Жайды брондоо мүмкүн болбоду. Кайра аракет кылыңыз.",
     "validation": {
       "managerRequired": "Менеджерди көрсөтүңүз",
       "expiresRequired": "Брондун мөөнөтүн көрсөтүңүз",
