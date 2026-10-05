@@ -100,7 +100,12 @@
     "infoSheetButton": "Маалымат баракчасы"
   },
   "infoSheet": {
-    "title": "№{{number}} жай",
+    "title": {
+      "apartment": "№{{number}}\u00a0квартира",
+      "commercial": "№{{number}}\u00a0коммерциялык жай",
+      "parking": "№{{number}}\u00a0унаа орду",
+      "storage": "№{{number}}\u00a0кампа"
+    },
     "generatedAt": "{{date}} күнү түзүлдү",
     "project": "Долбоор",
     "address": "Дареги",

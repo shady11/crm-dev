@@ -100,7 +100,12 @@
     "infoSheetButton": "Инфолист"
   },
   "infoSheet": {
-    "title": "Помещение №{{number}}",
+    "title": {
+      "apartment": "Квартира\u00a0№{{number}}",
+      "commercial": "Коммерческое помещение\u00a0№{{number}}",
+      "parking": "Машиноместо\u00a0№{{number}}",
+      "storage": "Склад\u00a0№{{number}}"
+    },
     "generatedAt": "Сформировано {{date}}",
     "project": "Проект",
     "address": "Адрес",

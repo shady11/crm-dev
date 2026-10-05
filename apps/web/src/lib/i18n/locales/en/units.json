@@ -100,7 +100,12 @@
     "infoSheetButton": "Info sheet"
   },
   "infoSheet": {
-    "title": "Unit №{{number}}",
+    "title": {
+      "apartment": "Apartment\u00a0№{{number}}",
+      "commercial": "Commercial unit\u00a0№{{number}}",
+      "parking": "Parking space\u00a0№{{number}}",
+      "storage": "Storage unit\u00a0№{{number}}"
+    },
     "generatedAt": "Generated {{date}}",
     "project": "Project",
     "address": "Address",

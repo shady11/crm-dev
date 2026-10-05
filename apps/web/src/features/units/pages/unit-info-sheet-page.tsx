@@ -5,7 +5,7 @@ import {Button} from "@/components/ui/button.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {toast} from "@/components/ui/toast.tsx";
 import {useUnit} from "@/features/units/hooks/use-unit.ts";
-import {UNIT_STATUS_LABEL_KEYS, UNIT_TYPE_LABEL_KEYS} from "@/features/units/types/unit.types.ts";
+import {UNIT_STATUS_LABEL_KEYS, UNIT_TYPE_LABEL_KEYS, UnitType} from "@/features/units/types/unit.types.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {KeregeLogo} from "@/components/shared/kerege-logo.tsx";
 
@@ -15,6 +15,15 @@ import {KeregeLogo} from "@/components/shared/kerege-logo.tsx";
 // codebase yet, so "output as a PDF" is served by the browser's own
 // print-to-PDF on this page, rather than adding a new dependency for one
 // story. The link itself is shareable with anyone signed in to the tenant.
+// The sheet goes to clients, so it names the unit by what it is rather than
+// the generic «помещение» used across the rest of the app.
+const TITLE_KEYS: Record<UnitType, string> = {
+    [UnitType.APARTMENT]: "infoSheet.title.apartment",
+    [UnitType.COMMERCIAL]: "infoSheet.title.commercial",
+    [UnitType.PARKING]: "infoSheet.title.parking",
+    [UnitType.STORAGE]: "infoSheet.title.storage",
+};
+
 export function UnitInfoSheetPage() {
     const {unitId} = useParams<{unitId: string}>();
     const {t, i18n} = useTranslation(["units", "common"]);
@@ -68,12 +77,12 @@ export function UnitInfoSheetPage() {
                 <div className="mb-8 border-b pb-6">
                     <KeregeLogo className="h-7" />
                 </div>
-                <div className="mb-6 flex items-start justify-between">
+                <div className="mb-6 flex items-start justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-semibold">{t("infoSheet.title", {number: unit.number})}</h1>
+                        <h1 className="text-2xl font-semibold">{t(TITLE_KEYS[unit.type], {number: unit.number})}</h1>
                         {unit.project && <p className="text-muted-foreground">{unit.project.name}</p>}
                     </div>
-                    <p className="text-xs text-muted-foreground">{t("infoSheet.generatedAt", {date: generatedAt})}</p>
+                    <p className="shrink-0 whitespace-nowrap text-xs text-muted-foreground">{t("infoSheet.generatedAt", {date: generatedAt})}</p>
                 </div>
 
                 <dl className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
