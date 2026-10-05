@@ -7,6 +7,7 @@ import {toast} from "@/components/ui/toast.tsx";
 import {useUnit} from "@/features/units/hooks/use-unit.ts";
 import {UNIT_STATUS_LABEL_KEYS, UNIT_TYPE_LABEL_KEYS} from "@/features/units/types/unit.types.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
+import {KeregeLogo} from "@/components/shared/kerege-logo.tsx";
 
 // SM-C1: a one-page, print-ready summary of a unit (price, floor plan
 // location, key specs) so a manager can hand it to a client without
@@ -64,6 +65,9 @@ export function UnitInfoSheetPage() {
             </div>
 
             <div className="rounded-lg border border-secondary p-8">
+                <div className="mb-8 border-b pb-6">
+                    <KeregeLogo className="h-7" />
+                </div>
                 <div className="mb-6 flex items-start justify-between">
                     <div>
                         <h1 className="text-2xl font-semibold">{t("infoSheet.title", {number: unit.number})}</h1>
@@ -82,7 +86,7 @@ export function UnitInfoSheetPage() {
                     <div>
                         <dt className="text-muted-foreground">{t("infoSheet.location")}</dt>
                         <dd className="font-medium">
-                            {[unit.block?.name, unit.entrance?.name, unit.floor && `${unit.floor.number}`]
+                            {[unit.block?.name, unit.entrance?.name, unit.floor && t("infoSheet.floor", {number: unit.floor.number})]
                                 .filter(Boolean)
                                 .join(" / ") || "—"}
                         </dd>

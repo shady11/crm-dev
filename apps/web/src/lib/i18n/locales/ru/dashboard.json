@@ -4,7 +4,7 @@
   "kpi": {
     "revenueThisMonth": "Выручка за месяц",
     "activeDeals": "Активные сделки",
-    "availableUnits": "Свободные юниты",
+    "availableUnits": "Свободные помещения",
     "unitsOfTotal": "из {{total}} всего",
     "overdueTasks": "Просроченные задачи"
   },
@@ -13,8 +13,8 @@
     "seriesLabel": "Выручка"
   },
   "unitsInventory": {
-    "title": "Остатки юнитов",
-    "totalUnits": "Всего юнитов: {{count}}"
+    "title": "Остатки помещений",
+    "totalUnits": "Всего помещений: {{count}}"
   },
   "branchComparison": {
     "title": "Сравнение филиалов",

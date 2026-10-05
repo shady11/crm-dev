@@ -4,7 +4,7 @@
   "kpi": {
     "revenueThisMonth": "Айлык кирешe",
     "activeDeals": "Активдүү бүтүмдөр",
-    "availableUnits": "Бош юниттер",
+    "availableUnits": "Бош жайлар",
     "unitsOfTotal": "жалпы {{total}} ичинен",
     "overdueTasks": "Мөөнөтү өткөн тапшырмалар"
   },
@@ -13,8 +13,8 @@
     "seriesLabel": "Киреше"
   },
   "unitsInventory": {
-    "title": "Юниттердин калдыгы",
-    "totalUnits": "Бардыгы юниттер: {{count}}"
+    "title": "Жайлардын калдыгы",
+    "totalUnits": "Бардык жайлар: {{count}}"
   },
   "branchComparison": {
     "title": "Филиалдарды салыштыруу",

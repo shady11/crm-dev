@@ -15,7 +15,6 @@ import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {canAccess, type Feature} from "@/features/auth/access";
 import {
-    Box,
     Building2,
     GalleryVerticalEnd,
     Landmark,
@@ -32,6 +31,7 @@ import {
     Users
 } from "lucide-react";
 import {Link} from "react-router-dom";
+import {KeregeLogo, KeregeMark} from "@/components/shared/kerege-logo.tsx";
 
 // titleKey resolves against the "common" namespace via t() below - kept as a
 // key rather than the label itself so NavMain never renders an un-translated
@@ -79,18 +79,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
+                        {/* Collapsed, the button shrinks to a padding-less 32px box
+                            but keeps justify-start, which would leave the mark
+                            sitting left of the nav icons below it. */}
+                        <SidebarMenuButton size="lg" asChild className="group-data-[collapsible=icon]:justify-center">
                             <Link to="/dashboard">
-                                <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                                    <Box />
-                                </div>
+                                <span className="hidden size-5 shrink-0 group-data-[collapsible=icon]:block">
+                                    <KeregeMark className="size-5" />
+                                </span>
 
-                                <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                                    <span className="font-semibold">{t("nav.brandName")}</span>
-                                    <span className="text-xs text-muted-foreground">
-                                        {t("nav.brandTagline")}
-                                      </span>
-                                </div>
+                                <span className="flex-1 group-data-[collapsible=icon]:hidden">
+                                    <KeregeLogo className="h-5" />
+                                </span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

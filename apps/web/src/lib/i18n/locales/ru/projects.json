@@ -35,7 +35,7 @@
   },
   "counts": {
     "blocksLabel": "Блоки",
-    "unitsLabel": "Юниты"
+    "unitsLabel": "Помещения"
   },
   "card": {
     "deleteTitle": "Удалить проект?",
@@ -53,7 +53,7 @@
     "notFound": "Структура проекта не найдена",
     "emptyTitle": "Пока нет блоков",
     "emptyDescriptionPrefix": "Начните с создания первого блока.",
-    "emptyDescriptionSuffix": "Блоки помогают организовать подъезды, этажи и юниты в вашем проекте.",
+    "emptyDescriptionSuffix": "Блоки помогают организовать подъезды, этажи и помещения в вашем проекте.",
     "toastCreateErrorTitle": "Не удалось создать блок"
   },
   "overview": {
@@ -67,19 +67,19 @@
     "selectBlockHeading": "Выберите блок",
     "statEntrances": "Подъезды",
     "statFloors": "Этажи",
-    "statUnits": "Юниты",
+    "statUnits": "Помещения",
     "noBlocksTitle": "Пока нет блоков",
     "noBlocksDescription": "Сначала создайте блоки во вкладке «Конструктор»",
-    "noUnitsTitle": "Юниты не найдены",
+    "noUnitsTitle": "Помещения не найдены",
     "noUnitsDescription": "Попробуйте изменить фильтры",
-    "updateUnitError": "Не удалось обновить юнит.",
+    "updateUnitError": "Не удалось обновить помещение.",
     "floors_one": "{{count}} этаж",
     "floors_few": "{{count}} этажа",
     "floors_many": "{{count}} этажей",
     "floors_other": "{{count}} этажа",
-    "units_one": "{{count}} юнит",
-    "units_few": "{{count}} юнита",
-    "units_many": "{{count}} юнитов",
-    "units_other": "{{count}} юнита"
+    "units_one": "{{count}} помещение",
+    "units_few": "{{count}} помещения",
+    "units_many": "{{count}} помещений",
+    "units_other": "{{count}} помещения"
   }
 }

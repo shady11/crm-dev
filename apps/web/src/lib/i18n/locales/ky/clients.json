@@ -65,7 +65,7 @@
     "deals": "Бүтүмдөр",
     "dealsWithCount": "Бүтүмдөр ({{count}})",
     "noDeals": "Азырынча бүтүм жок.",
-    "unitFallback": "№{{number}} юнит",
+    "unitFallback": "№{{number}} жай",
     "leadsWithCount": "Лиддер ({{count}})",
     "noLeadsYet": "Азырынча лид жок.",
     "updateSuccessTitle": "Ийгиликтүү жаңырды",

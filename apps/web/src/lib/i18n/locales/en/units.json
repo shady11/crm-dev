@@ -105,6 +105,7 @@
     "project": "Project",
     "address": "Address",
     "location": "Location",
+    "floor": "Floor {{number}}",
     "type": "Type",
     "rooms": "Rooms",
     "area": "Area",

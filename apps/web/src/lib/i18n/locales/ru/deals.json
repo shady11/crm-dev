@@ -15,12 +15,12 @@
     "paid": "Оплачено",
     "remaining": "Остаток",
     "financing": "Финансирование",
-    "unitSection": "Юнит",
+    "unitSection": "Помещение",
     "dealSection": "Сделка",
     "discount": "Скидка"
   },
   "unitCard": {
-    "unitNumber": "Юнит №{{number}}",
+    "unitNumber": "Помещение №{{number}}",
     "floor": "{{floor}} этаж"
   },
   "page": {
@@ -35,11 +35,11 @@
     "managerPlaceholder": "Менеджер",
     "filterByStatus": "Фильтр по статусу",
     "statusPlaceholder": "Статус",
-    "searchPlaceholder": "Поиск по клиенту, телефону, юниту..."
+    "searchPlaceholder": "Поиск по клиенту, телефону, помещению..."
   },
   "table": {
     "dealNumber": "№ сделки",
-    "unit": "Юнит",
+    "unit": "Помещение",
     "client": "Клиент",
     "manager": "Менеджер",
     "status": "Статус",
@@ -129,7 +129,7 @@
     "markCompleted": "Отметить завершённой",
     "cancelDeal": "Отменить сделку",
     "cancelDialogTitle": "Отменить сделку",
-    "cancelDialogDescription": "Сделка будет отменена, а юнит освобождён. Это действие нельзя отменить.",
+    "cancelDialogDescription": "Сделка будет отменена, а помещение освобождено. Это действие нельзя отменить.",
     "reasonOptional": "Причина (необязательно)",
     "confirmCancellation": "Подтвердить отмену",
     "extendDialogTitle": "Продлить бронь",
@@ -159,9 +159,9 @@
     "extendUnavailable": "Продления исчерпаны — подпишите договор или дождитесь окончания брони."
   },
   "toasts": {
-    "unitReserved": "Юнит забронирован",
-    "unitReservedDescription": "Юнит №{{number}} забронирован.",
-    "reserveError": "Не удалось забронировать юнит",
+    "unitReserved": "Помещение забронировано",
+    "unitReservedDescription": "Помещение №{{number}} забронировано.",
+    "reserveError": "Не удалось забронировать помещение",
     "tryAgain": "Попробуйте снова.",
     "reservationExtended": "Бронь продлена",
     "extendError": "Не удалось продлить бронь",
@@ -180,7 +180,7 @@
   },
   "booking": {
     "rooms": "{{count}} комн.",
-    "sheetTitle": "Бронирование юнита №{{number}}",
+    "sheetTitle": "Бронирование помещения №{{number}}",
     "existingClient": "Существующий клиент",
     "newClient": "Новый клиент",
     "fullName": "ФИО",
@@ -210,7 +210,7 @@
     "next": "Далее",
     "confirmReservation": "Подтвердить бронирование",
     "selectClientError": "Выберите или создайте клиента.",
-    "reserveError": "Не удалось забронировать юнит. Попробуйте снова.",
+    "reserveError": "Не удалось забронировать помещение. Попробуйте снова.",
     "validation": {
       "managerRequired": "Укажите менеджера",
       "expiresRequired": "Укажите дату истечения брони",
