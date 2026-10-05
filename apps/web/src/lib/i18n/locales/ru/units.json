@@ -105,6 +105,7 @@
     "project": "Проект",
     "address": "Адрес",
     "location": "Расположение",
+    "floor": "{{number}} этаж",
     "type": "Тип",
     "rooms": "Комнат",
     "area": "Площадь",

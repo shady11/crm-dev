@@ -89,7 +89,7 @@ export function UnitInfoSheetPage() {
                     <div>
                         <dt className="text-muted-foreground">{t("infoSheet.location")}</dt>
                         <dd className="font-medium">
-                            {[unit.block?.name, unit.entrance?.name, unit.floor && `${unit.floor.number}`]
+                            {[unit.block?.name, unit.entrance?.name, unit.floor && t("infoSheet.floor", {number: unit.floor.number})]
                                 .filter(Boolean)
                                 .join(" / ") || "—"}
                         </dd>
