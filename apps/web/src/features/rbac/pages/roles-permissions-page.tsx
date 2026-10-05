@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {toast} from "sonner";
+import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
 import {Plus} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
@@ -73,9 +73,9 @@ export function RolesPermissionsPage() {
             void refresh();
             setFormOpen(false);
             setEditing(null);
-            toast.success(editing ? t("toasts.updateSuccess") : t("toasts.createSuccess"));
+            toast.success({title: editing ? t("toasts.updateSuccess") : t("toasts.createSuccess")});
         },
-        onError: () => toast.error(editing ? t("toasts.updateError") : t("toasts.createError")),
+        onError: () => toast.error({title: editing ? t("toasts.updateError") : t("toasts.createError")}),
     });
 
     const remove = useMutation({
@@ -83,11 +83,11 @@ export function RolesPermissionsPage() {
         onSuccess: () => {
             void refresh();
             setPending(null);
-            toast.success(t("toasts.deleteSuccess"));
+            toast.success({title: t("toasts.deleteSuccess")});
         },
         onError: () => {
             setPending(null);
-            toast.error(t("toasts.deleteError"));
+            toast.error({title: t("toasts.deleteError")});
         },
     });
 
