@@ -15,7 +15,6 @@ import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {canAccess, type Feature} from "@/features/auth/access";
 import {
-    Box,
     Building2,
     GalleryVerticalEnd,
     Landmark,
@@ -32,6 +31,7 @@ import {
     Users
 } from "lucide-react";
 import {Link} from "react-router-dom";
+import {KeregeLogo, KeregeMark} from "@/components/shared/kerege-logo.tsx";
 
 // titleKey resolves against the "common" namespace via t() below - kept as a
 // key rather than the label itself so NavMain never renders an un-translated
@@ -81,15 +81,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link to="/dashboard">
-                                <div className="flex size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                                    <Box />
-                                </div>
+                                <KeregeMark className="hidden size-5 shrink-0 group-data-[collapsible=icon]:block" />
 
-                                <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                                    <span className="font-semibold">{t("nav.brandName")}</span>
+                                <div className="grid flex-1 gap-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
+                                    <KeregeLogo className="h-5" />
                                     <span className="text-xs text-muted-foreground">
                                         {t("nav.brandTagline")}
-                                      </span>
+                                    </span>
                                 </div>
                             </Link>
                         </SidebarMenuButton>
