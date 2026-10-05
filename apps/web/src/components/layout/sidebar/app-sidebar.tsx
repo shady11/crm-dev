@@ -79,18 +79,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
+                        {/* Collapsed, the button shrinks to a padding-less 32px box
+                            but keeps justify-start, which would leave the mark
+                            sitting left of the nav icons below it. */}
+                        <SidebarMenuButton size="lg" asChild className="group-data-[collapsible=icon]:justify-center">
                             <Link to="/dashboard">
                                 <span className="hidden size-5 shrink-0 group-data-[collapsible=icon]:block">
                                     <KeregeMark className="size-5" />
                                 </span>
 
-                                <div className="grid flex-1 gap-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
+                                <span className="flex-1 group-data-[collapsible=icon]:hidden">
                                     <KeregeLogo className="h-5" />
-                                    <span className="text-xs text-muted-foreground">
-                                        {t("nav.brandTagline")}
-                                    </span>
-                                </div>
+                                </span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
