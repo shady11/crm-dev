@@ -7,6 +7,8 @@ import {toast} from "@/components/ui/toast.tsx";
 import {useUnit} from "@/features/units/hooks/use-unit.ts";
 import {UNIT_STATUS_LABEL_KEYS, UNIT_TYPE_LABEL_KEYS} from "@/features/units/types/unit.types.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
+import keregeLogoLight from "@/assets/logo/kerege-logo-light.png";
+import keregeLogoDark from "@/assets/logo/kerege-logo-dark.png";
 
 // SM-C1: a one-page, print-ready summary of a unit (price, floor plan
 // location, key specs) so a manager can hand it to a client without
@@ -64,6 +66,11 @@ export function UnitInfoSheetPage() {
             </div>
 
             <div className="rounded-lg border border-secondary p-8">
+                {/* Paper is always white, so print uses the light logo even in dark mode. */}
+                <div className="mb-8 border-b pb-6">
+                    <img src={keregeLogoLight} alt="Kerege" className="h-7 w-auto dark:hidden print:block" />
+                    <img src={keregeLogoDark} alt="Kerege" className="hidden h-7 w-auto dark:block print:hidden" />
+                </div>
                 <div className="mb-6 flex items-start justify-between">
                     <div>
                         <h1 className="text-2xl font-semibold">{t("infoSheet.title", {number: unit.number})}</h1>
