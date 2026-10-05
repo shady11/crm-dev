@@ -13,6 +13,7 @@ import {
     signContract
 } from "@/features/deals/api/deals.api";
 import {useTranslation} from "react-i18next";
+import {toastWithUndo} from "@/lib/undo-toast.ts";
 
 export function useDealActions(dealId: string) {
     const { t } = useTranslation("deals");
@@ -91,10 +92,20 @@ export function useDealActions(dealId: string) {
 
     // SH-A1: SALES_HEAD moving a deal between their own team's SALES_MANAGERs.
     const reassign = useMutation({
-        mutationFn: (managerId: string) => reassignDealManager(dealId, managerId),
-        onSuccess: async () => {
+        mutationFn: ({ managerId }: { managerId: string; previousManagerId: string | null }) =>
+            reassignDealManager(dealId, managerId),
+        onSuccess: async (_data, { previousManagerId }) => {
             await invalidate();
-            toast.success({ title: t("reassignDialog.successTitle", { ns: "users" }) });
+            const title = t("reassignDialog.successTitle", { ns: "users" });
+            if (previousManagerId) {
+                toastWithUndo({
+                    title,
+                    undo: () => reassignDealManager(dealId, previousManagerId),
+                    onUndone: invalidate,
+                });
+            } else {
+                toast.success({ title });
+            }
         },
         onError: () => toast.error({ title: t("reassignDialog.errorTitle", { ns: "users" }) }),
     });

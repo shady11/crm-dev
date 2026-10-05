@@ -47,6 +47,11 @@ export async function deleteDocument(id: string) {
     await api.delete(`/documents/${id}`);
 }
 
+// Undoes deleteDocument() — the row is only soft-deleted server-side.
+export async function restoreDocument(id: string) {
+    await api.post(`/documents/${id}/restore`);
+}
+
 export async function downloadDocument(doc: Document) {
     const response = await api.get(`/documents/${doc.id}/download`, { responseType: "blob" });
     const url = window.URL.createObjectURL(new Blob([response.data]));

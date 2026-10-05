@@ -359,12 +359,42 @@ describe('LeadsService', () => {
             await expect(service.remove(adminUser, 'missing')).rejects.toThrow(NotFoundException);
         });
 
-        it('hard-deletes the lead once found in scope', async () => {
+        it('soft-deletes the lead once found in scope', async () => {
             const {service, prisma} = build({lead: {id: 'lead-1'}});
             const result = await service.remove(adminUser, 'lead-1');
 
-            expect(prisma.lead.delete).toHaveBeenCalledWith({where: {id: 'lead-1'}});
+            expect(prisma.lead.delete).not.toHaveBeenCalled();
+            expect(prisma.lead.update).toHaveBeenCalledWith({
+                where: {id: 'lead-1'},
+                data: {deletedAt: expect.any(Date)},
+            });
             expect(result).toEqual({success: true});
+        });
+    });
+
+    describe('restore', () => {
+        it('404s when there is no deleted lead in scope', async () => {
+            const {service} = build({lead: null});
+            await expect(service.restore(adminUser, 'missing')).rejects.toThrow(NotFoundException);
+        });
+
+        it('only looks at soft-deleted leads', async () => {
+            const {service, prisma} = build({lead: {id: 'lead-1'}});
+            await service.restore(adminUser, 'lead-1');
+
+            expect(prisma.lead.findFirst).toHaveBeenNthCalledWith(1, {
+                where: expect.objectContaining({id: 'lead-1', deletedAt: {not: null}}),
+            });
+        });
+
+        it('clears deletedAt', async () => {
+            const {service, prisma} = build({lead: {id: 'lead-1'}});
+            await service.restore(adminUser, 'lead-1');
+
+            expect(prisma.lead.update).toHaveBeenCalledWith({
+                where: {id: 'lead-1'},
+                data: {deletedAt: null},
+            });
         });
     });
 

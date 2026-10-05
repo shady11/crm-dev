@@ -1,6 +1,6 @@
 import {useNavigate} from "react-router-dom";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {toast} from "sonner";
+import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
 import {Eye} from "lucide-react";
 import {Alert, AlertAction, AlertTitle} from "@/components/ui/alert.tsx";
@@ -28,7 +28,7 @@ export function ImpersonationBanner() {
             void queryClient.invalidateQueries({queryKey: ["auth", "me"]});
             navigate(`/companies/${user?.companyId}`);
         },
-        onError: () => toast.error(t("impersonation.exitError")),
+        onError: () => toast.error({title: t("impersonation.exitError")}),
     });
 
     if (!user?.impersonation) {

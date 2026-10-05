@@ -122,6 +122,7 @@
     "updateSuccess": "Задача обновлена",
     "updateError": "Не удалось обновить задачу",
     "statusError": "Не удалось обновить статус",
+    "statusSuccess": "Перемещено в «{{status}}»",
     "deleteSuccess": "Задача удалена",
     "deleteError": "Не удалось удалить задачу"
   },

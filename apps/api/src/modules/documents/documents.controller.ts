@@ -75,4 +75,10 @@ export class DocumentsController {
     remove(@CurrentUser() user: AuthUser, @Param("id") id: string) {
         return this.documentsService.remove(user, id);
     }
+
+    @RequirePermissions("documents.delete")
+    @Post(":id/restore")
+    restore(@CurrentUser() user: AuthUser, @Param("id") id: string) {
+        return this.documentsService.restore(user, id);
+    }
 }

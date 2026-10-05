@@ -238,6 +238,46 @@ export class DocumentsService {
     return { success: true };
   }
 
+  /**
+   * Reverses remove() — backs the "Undo" on the delete toast. A document the
+   * cleanup job has already purged from storage is gone for good.
+   */
+  async restore(user: AuthUser, id: string) {
+    if (!user.companyId) {
+      throw new ForbiddenException('User does not belong to a company');
+    }
+
+    const existing = await this.prisma.document.findFirst({
+      where: {
+        id,
+        companyId: user.companyId,
+        deletedAt: { not: null },
+        purgedAt: null,
+      },
+    });
+
+    if (!existing) throw new DocumentNotFoundException(id);
+
+    const document = await this.prisma.document.update({
+      where: { id },
+      data: { deletedAt: null },
+      include: DOCUMENT_INCLUDE,
+    });
+
+    await this.logDocumentActivity({
+      companyId: user.companyId,
+      actorId: user.id,
+      documentId: document.id,
+      ownerType: document.ownerType,
+      ownerId: document.ownerId,
+      action: ActivityAction.RESTORED_DOCUMENT,
+      type: ActivityType.DOCUMENT_RESTORED,
+      title: `Document "${document.originalName}" restored`,
+    });
+
+    return document;
+  }
+
   private async ensureOwnerExists(
     ownerType: DocumentOwnerType,
     ownerId: string,

@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {toast} from "sonner";
+import {toast} from "@/components/ui/toast.tsx";
 import {ArrowLeft, Eye, KeyRound, PauseCircle, PlayCircle} from "lucide-react";
 import {useTranslation} from "react-i18next";
 import {Badge} from "@/components/ui/badge.tsx";
@@ -68,14 +68,14 @@ export function CompanyDetailPage() {
                 // auto-dismisses would lose it.
                 setResetResult(result as ResetCompanyUserPasswordResult);
             } else {
-                toast.success(
-                    action === "deactivate"
+                toast.success({
+                    title: action === "deactivate"
                         ? t("detail.usersCard.toasts.deactivated", {ns: "companies", name: user.fullName})
                         : t("detail.usersCard.toasts.reactivated", {ns: "companies", name: user.fullName}),
-                );
+                });
             }
         },
-        onError: () => toast.error(t("detail.usersCard.toasts.actionError", {ns: "companies"})),
+        onError: () => toast.error({title: t("detail.usersCard.toasts.actionError", {ns: "companies"})}),
     });
 
     const impersonate = useMutation({
@@ -89,7 +89,7 @@ export function CompanyDetailPage() {
             setPendingImpersonate(null);
             navigate(landingPathFor(result.user));
         },
-        onError: () => toast.error(t("detail.usersCard.toasts.actionError", {ns: "companies"})),
+        onError: () => toast.error({title: t("detail.usersCard.toasts.actionError", {ns: "companies"})}),
     });
 
     if (company.isLoading) {

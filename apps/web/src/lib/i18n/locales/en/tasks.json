@@ -122,6 +122,7 @@
     "updateSuccess": "Task updated",
     "updateError": "Failed to update task",
     "statusError": "Failed to update status",
+    "statusSuccess": "Moved to “{{status}}”",
     "deleteSuccess": "Task deleted",
     "deleteError": "Failed to delete task"
   },

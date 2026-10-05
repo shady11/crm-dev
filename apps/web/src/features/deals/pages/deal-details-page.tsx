@@ -599,7 +599,7 @@ export function DealDetailsPage() {
                 isSubmitting={actions.reassign.isPending}
                 onOpenChange={setReassignOpen}
                 onConfirm={(managerId) =>
-                    actions.reassign.mutate(managerId, {
+                    actions.reassign.mutate({ managerId, previousManagerId: deal.manager?.id ?? null }, {
                         onSuccess: () => setReassignOpen(false),
                     })
                 }

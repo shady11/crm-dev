@@ -210,6 +210,35 @@ describe('ClientsService', () => {
         });
     });
 
+    describe('restore', () => {
+        it('404s when there is no deleted client in scope', async () => {
+            const {service} = build({client: null});
+            await expect(service.restore(adminUser, 'missing')).rejects.toThrow(NotFoundException);
+        });
+
+        it('refuses when another client has taken the phone meanwhile', async () => {
+            const {service, prisma} = build({
+                client: {id: 'client-1', phone: '+996700000000'},
+                existingPhoneClient: {id: 'client-2'},
+            });
+            await expect(service.restore(adminUser, 'client-1')).rejects.toThrow(BadRequestException);
+            expect(prisma.client.update).not.toHaveBeenCalled();
+        });
+
+        it('only looks at soft-deleted clients and clears deletedAt', async () => {
+            const {service, prisma} = build({client: {id: 'client-1', phone: '+996700000000'}});
+            await service.restore(adminUser, 'client-1');
+
+            expect(prisma.client.findFirst).toHaveBeenCalledWith({
+                where: expect.objectContaining({id: 'client-1', deletedAt: {not: null}}),
+            });
+            expect(prisma.client.update).toHaveBeenCalledWith({
+                where: {id: 'client-1'},
+                data: {deletedAt: null},
+            });
+        });
+    });
+
     describe('transferBranch', () => {
         it('throws NotFoundException when the client is missing from the company', async () => {
             const {service} = build({client: null});

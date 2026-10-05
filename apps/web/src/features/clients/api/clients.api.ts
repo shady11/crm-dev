@@ -93,6 +93,11 @@ export async function deleteClient(id: string) {
     await api.delete(`/clients/${id}`);
 }
 
+// Undoes deleteClient() — the row is only soft-deleted server-side.
+export async function restoreClient(id: string) {
+    await api.post(`/clients/${id}/restore`);
+}
+
 export async function searchClients(search: string) {
     const response = await api.get<PaginatedResponse<Client>>("/clients", {
         params: { search, limit: 10 },

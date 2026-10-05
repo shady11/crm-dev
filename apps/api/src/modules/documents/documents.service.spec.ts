@@ -273,4 +273,24 @@ describe('DocumentsService', () => {
             expect(result).toEqual({success: true});
         });
     });
+
+    describe('restore', () => {
+        it('404s when there is no restorable document in scope', async () => {
+            const {service} = build({document: null});
+            await expect(service.restore(user, 'missing')).rejects.toThrow(DocumentNotFoundException);
+        });
+
+        it('skips documents already purged from storage', async () => {
+            const {service, prisma} = build({document: {id: 'doc-1'}});
+            prisma.document.update.mockResolvedValue({id: 'doc-1', ownerType: 'LEAD', ownerId: 'lead-1', originalName: 'a.pdf'});
+            await service.restore(user, 'doc-1');
+
+            expect(prisma.document.findFirst).toHaveBeenCalledWith({
+                where: expect.objectContaining({id: 'doc-1', deletedAt: {not: null}, purgedAt: null}),
+            });
+            expect(prisma.document.update).toHaveBeenCalledWith(
+                expect.objectContaining({where: {id: 'doc-1'}, data: {deletedAt: null}}),
+            );
+        });
+    });
 });

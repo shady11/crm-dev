@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {Link, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {toast} from "sonner";
+import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
 import {ArrowLeft, PauseCircle, Pencil, PlayCircle, Users} from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
@@ -56,10 +56,10 @@ export function BranchDetailPage() {
         onSuccess: () => {
             void refresh();
             setFormOpen(false);
-            toast.success(t("page.toasts.updateSuccess"));
+            toast.success({title: t("page.toasts.updateSuccess")});
         },
         onError: (error: Error & {response?: {data?: {message?: string}}}) =>
-            toast.error(error.response?.data?.message ?? t("page.toasts.updateError")),
+            toast.error({title: error.response?.data?.message ?? t("page.toasts.updateError")}),
     });
 
     const act = useMutation<unknown, Error & {response?: {data?: {message?: string}}}, NonNullable<PendingAction>>({
@@ -68,12 +68,14 @@ export function BranchDetailPage() {
         onSuccess: () => {
             void refresh();
             setPending(null);
-            toast.success(
-                pending === "deactivate" ? t("page.toasts.deactivated", {name: branch.data?.name}) : t("page.toasts.reactivated", {name: branch.data?.name}),
-            );
+            toast.success({
+                title: pending === "deactivate"
+                    ? t("page.toasts.deactivated", {name: branch.data?.name})
+                    : t("page.toasts.reactivated", {name: branch.data?.name}),
+            });
         },
         onError: (error) => {
-            toast.error(error.response?.data?.message ?? t("page.toasts.actionError"));
+            toast.error({title: error.response?.data?.message ?? t("page.toasts.actionError")});
             setPending(null);
         },
     });

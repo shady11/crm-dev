@@ -14,6 +14,7 @@ import {
     type Lead,
     type LeadSortField,
     reassignLeadManager,
+    restoreLead,
     transferLeadBranch,
     updateLead,
     type UpdateLeadPayload,
@@ -21,6 +22,7 @@ import {
 import type {LeadStatus} from "@/features/leads/types/lead.types.ts";
 import {useSort} from "@/hooks/use-sort.ts";
 import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
+import {toastWithUndo} from "@/lib/undo-toast.ts";
 
 export type LeadStatusFilterValue = LeadStatus | "all";
 
@@ -107,11 +109,18 @@ export function useLeadsList() {
         },
     });
 
+    const invalidateLeads = () => queryClient.invalidateQueries({ queryKey: ["leads"] });
+
     const deleteMutation = useMutation({
         mutationFn: deleteLead,
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["leads"] });
-            toast.success({ title: t("toasts.deleteSuccessTitle"), description: t("toasts.deleteSuccessDescription") });
+        onSuccess: async (_data, id) => {
+            await invalidateLeads();
+            toastWithUndo({
+                title: t("toasts.deleteSuccessTitle"),
+                description: t("toasts.deleteSuccessDescription"),
+                undo: () => restoreLead(id),
+                onUndone: invalidateLeads,
+            });
             setDeleteTarget(null);
             setDetailsTarget(null);
         },
@@ -121,10 +130,22 @@ export function useLeadsList() {
     });
 
     const transferBranchMutation = useMutation({
-        mutationFn: ({ id, branchId }: { id: string; branchId: string }) => transferLeadBranch(id, branchId),
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["leads"] });
-            toast.success({ title: t("detailsSheet.transferBranch.successTitle") });
+        mutationFn: ({ id, branchId }: { id: string; branchId: string; previousBranchId: string | null }) =>
+            transferLeadBranch(id, branchId),
+        onSuccess: async (_data, { id, previousBranchId }) => {
+            await invalidateLeads();
+            const title = t("detailsSheet.transferBranch.successTitle");
+            // A lead that had no branch can't be moved back to "none" — the
+            // transfer endpoint only accepts a real branch.
+            if (previousBranchId) {
+                toastWithUndo({
+                    title,
+                    undo: () => transferLeadBranch(id, previousBranchId),
+                    onUndone: invalidateLeads,
+                });
+            } else {
+                toast.success({ title });
+            }
             setTransferTarget(null);
         },
         onError: () => {
@@ -134,10 +155,20 @@ export function useLeadsList() {
 
     // SH-A1: SALES_HEAD moving a lead between their own team's SALES_MANAGERs.
     const reassignMutation = useMutation({
-        mutationFn: ({ id, managerId }: { id: string; managerId: string }) => reassignLeadManager(id, managerId),
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["leads"] });
-            toast.success({ title: t("reassignDialog.successTitle", { ns: "users" }) });
+        mutationFn: ({ id, managerId }: { id: string; managerId: string; previousManagerId: string | null }) =>
+            reassignLeadManager(id, managerId),
+        onSuccess: async (_data, { id, previousManagerId }) => {
+            await invalidateLeads();
+            const title = t("reassignDialog.successTitle", { ns: "users" });
+            if (previousManagerId) {
+                toastWithUndo({
+                    title,
+                    undo: () => reassignLeadManager(id, previousManagerId),
+                    onUndone: invalidateLeads,
+                });
+            } else {
+                toast.success({ title });
+            }
             setReassignTarget(null);
         },
         onError: () => {
@@ -158,9 +189,14 @@ export function useLeadsList() {
                 );
             }
         },
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["leads"] });
-            toast.success({ title: t("toasts.bulkDeleteSuccessTitle"), description: t("toasts.bulkDeleteSuccessDescription") });
+        onSuccess: async (_data, ids) => {
+            await invalidateLeads();
+            toastWithUndo({
+                title: t("toasts.bulkDeleteSuccessTitle"),
+                description: t("toasts.bulkDeleteSuccessDescription"),
+                undo: () => Promise.all(ids.map((id) => restoreLead(id))),
+                onUndone: invalidateLeads,
+            });
             setSelectedIds(new Set());
             setBulkDeleteDialogOpen(false);
         },
@@ -387,7 +423,7 @@ export function useLeadsList() {
             },
             onConfirm: (branchId: string) => {
                 if (!transferTarget) return;
-                transferBranchMutation.mutate({ id: transferTarget.id, branchId });
+                transferBranchMutation.mutate({ id: transferTarget.id, branchId, previousBranchId: transferTarget.branchId });
             },
         },
 
@@ -400,7 +436,11 @@ export function useLeadsList() {
             },
             onConfirm: (managerId: string) => {
                 if (!reassignTarget) return;
-                reassignMutation.mutate({ id: reassignTarget.id, managerId });
+                reassignMutation.mutate({
+                    id: reassignTarget.id,
+                    managerId,
+                    previousManagerId: reassignTarget.manager?.id ?? null,
+                });
             },
         },
     };

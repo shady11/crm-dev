@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {Link} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {toast} from "sonner";
+import {toast} from "@/components/ui/toast.tsx";
 import {useTranslation} from "react-i18next";
 import {Building2, PauseCircle, Pencil, PlayCircle, Plus, SlidersHorizontal, Trash2} from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
@@ -61,7 +61,7 @@ export function CompaniesPage() {
             setFormOpen(false);
 
             if (editing) {
-                toast.success(t("page.toasts.updateSuccess"));
+                toast.success({title: t("page.toasts.updateSuccess")});
                 setEditing(null);
             } else {
                 // Held in state, not a toast: the generated password is shown
@@ -70,7 +70,7 @@ export function CompaniesPage() {
             }
         },
         onError: () =>
-            toast.error(editing ? t("page.toasts.updateError") : t("page.toasts.createError")),
+            toast.error({title: editing ? t("page.toasts.updateError") : t("page.toasts.createError")}),
     });
 
     const act = useMutation<unknown, Error, NonNullable<Pending>>({
@@ -83,15 +83,15 @@ export function CompaniesPage() {
         onSuccess: (_result, {action, company}) => {
             void refresh();
             setPending(null);
-            toast.success(
-                action === "suspend"
+            toast.success({
+                title: action === "suspend"
                     ? t("page.toasts.suspended", {name: company.name})
                     : action === "resume"
                       ? t("page.toasts.resumed", {name: company.name})
                       : t("page.toasts.deleted", {name: company.name}),
-            );
+            });
         },
-        onError: () => toast.error(t("page.toasts.actionError")),
+        onError: () => toast.error({title: t("page.toasts.actionError")}),
     });
 
     const items = companies.data?.items ?? [];

@@ -46,6 +46,7 @@ export class LeadsService {
 
         const where: Prisma.LeadWhereInput = {
             companyId: user.companyId,
+            deletedAt: null,
         };
 
         // BR-B1: branch-scoped roles see only their own branch's leads.
@@ -147,6 +148,7 @@ export class LeadsService {
             where: {
                 id,
                 companyId: user.companyId,
+                deletedAt: null,
                 // BR-B1: merged into the same lookup as the company check, so
                 // a lead in another branch 404s exactly like a lead in
                 // another company — never a separate 403 that would confirm
@@ -485,7 +487,7 @@ export class LeadsService {
 
         const companyId = user.companyId;
 
-        const lead = await this.prisma.lead.findFirst({ where: { id, companyId } });
+        const lead = await this.prisma.lead.findFirst({ where: { id, companyId, deletedAt: null } });
 
         if (!lead) {
             throw new NotFoundException("Lead not found");
@@ -626,15 +628,46 @@ export class LeadsService {
 
         await this.findOne(user, id);
 
-        await this.prisma.lead.delete({
-            where: {
-                id,
-            },
+        // Soft delete, like clients: the lead's activities and tasks keep
+        // their FK, and restore() can bring it back.
+        await this.prisma.lead.update({
+            where: { id },
+            data: { deletedAt: new Date() },
         });
 
         return {
             success: true,
         };
+    }
+
+    /**
+     * Reverses remove() — backs the "Undo" on the delete toast. Same scoping
+     * as findOne(), except it looks only at soft-deleted rows.
+     */
+    async restore(user: AuthUser, id: string) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const lead = await this.prisma.lead.findFirst({
+            where: {
+                id,
+                companyId: user.companyId,
+                deletedAt: { not: null },
+                ...(user.isBranchScoped ? {branchId: user.branchId} : {}),
+            },
+        });
+
+        if (!lead) {
+            throw new NotFoundException("Lead not found");
+        }
+
+        await this.prisma.lead.update({
+            where: { id },
+            data: { deletedAt: null },
+        });
+
+        return this.findOne(user, id);
     }
 
     /**

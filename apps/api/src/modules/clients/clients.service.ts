@@ -60,7 +60,7 @@ export class ClientsService {
                     { createdAt: "desc" },
                 ),
                 include: {
-                    _count: { select: { leads: true, deals: true } },
+                    _count: { select: { leads: { where: { deletedAt: null } }, deals: true } },
                 },
             }),
             this.prisma.client.count({ where }),
@@ -86,6 +86,7 @@ export class ClientsService {
             },
             include: {
                 leads: {
+                    where: { deletedAt: null },
                     orderBy: { createdAt: "desc" },
                     select: { id: true, fullName: true, phone: true, source: true, status: true, createdAt: true },
                 },
@@ -233,6 +234,36 @@ export class ClientsService {
         });
 
         return { success: true };
+    }
+
+    /**
+     * Reverses remove() — backs the "Undo" on the delete toast. Re-checks the
+     * phone rule, since a new client may have taken the number meanwhile.
+     */
+    async restore(user: AuthUser, id: string) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        const client = await this.prisma.client.findFirst({
+            where: {
+                id,
+                companyId: user.companyId,
+                deletedAt: { not: null },
+                ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
+            },
+        });
+
+        if (!client) {
+            throw new NotFoundException("Client not found");
+        }
+
+        await this.ensurePhoneIsUniqueInsideCompany(client.phone, user.companyId, id);
+
+        return this.prisma.client.update({
+            where: { id },
+            data: { deletedAt: null },
+        });
     }
 
     /**
