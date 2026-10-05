@@ -81,7 +81,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link to="/dashboard">
-                                <KeregeMark className="hidden size-5 shrink-0 group-data-[collapsible=icon]:block" />
+                                <span className="hidden size-5 shrink-0 group-data-[collapsible=icon]:block">
+                                    <KeregeMark className="size-5" />
+                                </span>
 
                                 <div className="grid flex-1 gap-1 text-left leading-tight group-data-[collapsible=icon]:hidden">
                                     <KeregeLogo className="h-5" />

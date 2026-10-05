@@ -1,5 +1,7 @@
 import keregeLogoLight from "@/assets/logo/kerege-logo-light.png";
 import keregeLogoDark from "@/assets/logo/kerege-logo-dark.png";
+import keregeMarkLight from "@/assets/logo/kerege-mark-light.png";
+import keregeMarkDark from "@/assets/logo/kerege-mark-dark.png";
 import {cn} from "@/lib/utils";
 
 // Full wordmark. Paper is always white, so print uses the light-theme logo
@@ -14,21 +16,12 @@ export function KeregeLogo({className}: {className?: string}) {
 }
 
 // The lattice symbol alone, for spots too small for the wordmark (e.g. the
-// collapsed sidebar). Drawn as SVG so it stays crisp at any size.
+// collapsed sidebar). Blue on light backgrounds, white on dark.
 export function KeregeMark({className}: {className?: string}) {
     return (
-        <svg
-            viewBox="-150 -150 300 300"
-            aria-label="Kerege"
-            role="img"
-            className={cn("text-[#4b5fd8] dark:text-[#7f8ceb]", className)}
-        >
-            <g stroke="currentColor" strokeWidth="24" strokeLinecap="round" fill="none">
-                <line x1="-77" y1="-137" x2="137" y2="77" />
-                <line x1="-137" y1="-77" x2="77" y2="137" />
-                <line x1="77" y1="-137" x2="-137" y2="77" />
-                <line x1="137" y1="-77" x2="-77" y2="137" />
-            </g>
-        </svg>
+        <>
+            <img src={keregeMarkLight} alt="Kerege" className={cn("dark:hidden print:block", className)} />
+            <img src={keregeMarkDark} alt="Kerege" className={cn("hidden dark:block print:hidden", className)} />
+        </>
     );
 }
