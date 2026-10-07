@@ -41,7 +41,7 @@ export const UnitOverview = ({
                 <DataListItem>
                     <DataListItemLabel>{t("common:labels.status")}</DataListItemLabel>
                     <DataListItemValue>
-                        <Badge className={UNIT_STATUS_CLASSES[unit.status]}>
+                        <Badge className={`${UNIT_STATUS_CLASSES[unit.status]} text-white`}>
                             {t(UNIT_STATUS_LABEL_KEYS[unit.status])}
                         </Badge>
                     </DataListItemValue>

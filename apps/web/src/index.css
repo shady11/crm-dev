@@ -18,18 +18,6 @@
     --color-popover-foreground: var(--popover-foreground);
     --color-primary: var(--primary);
     --color-primary-foreground: var(--primary-foreground);
-    --color-primary-hover: var(--primary-hover);
-    --color-unit-free: var(--unit-free);
-    --color-unit-free-foreground: var(--unit-free-foreground);
-    --color-unit-free-border: var(--unit-free-border);
-    --color-unit-booked: var(--unit-booked);
-    --color-unit-booked-foreground: var(--unit-booked-foreground);
-    --color-unit-sold: var(--unit-sold);
-    --color-unit-sold-foreground: var(--unit-sold-foreground);
-    --color-unit-overdue: var(--unit-overdue);
-    --color-unit-overdue-foreground: var(--unit-overdue-foreground);
-    --color-unit-unavailable: var(--unit-unavailable);
-    --color-unit-unavailable-foreground: var(--unit-unavailable-foreground);
     --color-secondary: var(--secondary);
     --color-secondary-foreground: var(--secondary-foreground);
     --color-muted: var(--muted);
@@ -161,65 +149,44 @@
     }
 }
 
-/*
- * Kerege brandbook 1.0, section 05 «Цвет» / 07 «Токены».
- * Indigo answers «whose product» and «where to click», never «what status»:
- * keep it on the primary action / active nav item only. Light base is warm
- * felt, not grey.
- */
 :root {
     --spacing: 0.3rem;
     --radius: 0.625rem;
 
-    /* App backdrop behind the floating sidebar and main content cards (brand «Светлая база»). */
-    --shell: #F5F2EC;
+    /* App backdrop behind the floating sidebar and main content cards. */
+    --shell: oklch(0.955 0.008 274);
 
-    --background: #FFFFFF;
-    --foreground: #1F1D1A;
-    --card: #FFFFFF;
-    --card-foreground: #1F1D1A;
-    --popover: #FFFFFF;
-    --popover-foreground: #1F1D1A;
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.21 0.03 264.67);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.21 0.03 264.67);
+    --popover: oklch(1.00 0 0);
+    --popover-foreground: oklch(0.21 0.03 264.67);
     --primary: #4A5FD4;
-    --primary-hover: #3A4CB0;
-    --primary-foreground: #FFFFFF;
-    --secondary: #EDE8DF;
-    --secondary-foreground: #56514A;
-    --muted: #EDE8DF;
-    --muted-foreground: #56514A;
-    --accent: #EDE8DF;
-    --accent-foreground: #1F1D1A;
+    --primary-foreground: oklch(1.00 0 0);
+    --secondary: oklch(0.9142 0.0208 274.02);
+    --secondary-foreground: oklch(0.37 0.03 259.73);
+    --muted: oklch(0.9443 0.0165 274.82);
+    --muted-foreground: oklch(0.55 0.02 264.37);
+    --accent: oklch(0.95 0.02 261.78);
+    --accent-foreground: #4A5FD4;
     --destructive: oklch(0.58 0.22 27.33);
-    --border: #DFD9CE;
-    --input: #C4BDB0;
+    --border: oklch(0.9142 0.0208 274.02);
+    --input: oklch(0.9002 0.013 266.69);
     --ring: #4A5FD4;
-    --chart-1: #4A5FD4;
-    --chart-2: #7C8CE8;
-    --chart-3: #3A4CB0;
-    --chart-4: #B8C0EF;
-    --chart-5: #232A4D;
-    --sidebar: #FFFFFF;
-    --sidebar-foreground: #1F1D1A;
+    --chart-1: oklch(0.48 0.20 260.48);
+    --chart-2: oklch(0.56 0.24 260.95);
+    --chart-3: oklch(0.40 0.16 259.09);
+    --chart-4: oklch(0.43 0.16 259.85);
+    --chart-5: oklch(0.29 0.07 260.37);
+    --sidebar: oklch(1 0 0);
+    --sidebar-foreground: oklch(0.21 0.03 264.67);
     --sidebar-primary: #4A5FD4;
-    --sidebar-primary-foreground: #FFFFFF;
-    --sidebar-accent: #EEF0FA;
+    --sidebar-primary-foreground: oklch(1.00 0 0);
+    --sidebar-accent: oklch(0.95 0.02 261.78);
     --sidebar-accent-foreground: #4A5FD4;
-    --sidebar-border: #DFD9CE;
+    --sidebar-border: oklch(0.93 0.01 264.60);
     --sidebar-ring: #4A5FD4;
-
-    /* Unit statuses belong to the product, not the brand. «Free» is the
-       default state, not a status, so it has no fill. */
-    --unit-free: #FFFFFF;
-    --unit-free-foreground: #1F1D1A;
-    --unit-free-border: #C4BDB0;
-    --unit-booked: #FAE3B8;
-    --unit-booked-foreground: #633806;
-    --unit-sold: #D6E8C0;
-    --unit-sold-foreground: #27500A;
-    --unit-overdue: #F7D5D5;
-    --unit-overdue-foreground: #791F1F;
-    --unit-unavailable: #EDE8DF;
-    --unit-unavailable-foreground: #56514A;
 
     --shadow-2xs: 0 1px 3px 0px oklch(0.00 0 0 / 0.05);
     --shadow-xs: 0 1px 3px 0px oklch(0.00 0 0 / 0.05);
@@ -239,53 +206,39 @@
     --warning-foreground: var(--color-amber-700);
 }
 
-
 .dark {
-    --shell: #161A2B;
-    --background: #2A2724;
-    --foreground: #F2EFE9;
-    --card: #2A2724;
-    --card-foreground: #F2EFE9;
-    --popover: #2A2724;
-    --popover-foreground: #F2EFE9;
+    --shell: oklch(0.21 0.025 262.71);
+    --background: oklch(0.26 0.03 262.71);
+    --foreground: oklch(0.93 0.01 264.60);
+    --card: oklch(0.3452 0.0243 255.69);
+    --card-foreground: oklch(0.93 0.01 264.60);
+    --popover: oklch(0.3452 0.0243 255.69);
+    --popover-foreground: oklch(0.93 0.01 264.60);
     --primary: #7C8CE8;
-    --primary-hover: #B8C0EF;
     --primary-foreground: #161A2B;
-    --secondary: #3A3733;
-    --secondary-foreground: #F2EFE9;
-    --muted: #3A3733;
-    --muted-foreground: #B5AFA4;
-    --accent: #3A3733;
-    --accent-foreground: #F2EFE9;
+    --secondary: oklch(0.35 0.04 262.16);
+    --secondary-foreground: oklch(0.93 0.01 264.60);
+    --muted: oklch(0.30 0.03 261.75);
+    --muted-foreground: oklch(0.71 0.02 261.33);
+    --accent: oklch(0.33 0.04 264.82);
+    --accent-foreground: oklch(0.93 0.01 264.60);
     --destructive: oklch(0.64 0.21 25.33);
-    --border: #3A3733;
-    --input: #4E4A44;
+    --border: oklch(0.422 0.035 261.299);
+    --input: oklch(0.422 0.035 261.299);
     --ring: #7C8CE8;
-    --chart-1: #7C8CE8;
-    --chart-2: #4A5FD4;
-    --chart-3: #B8C0EF;
-    --chart-4: #3A4CB0;
-    --chart-5: #232A4D;
-    --sidebar: #2A2724;
-    --sidebar-foreground: #F2EFE9;
+    --chart-1: oklch(0.56 0.24 260.95);
+    --chart-2: oklch(0.48 0.20 260.48);
+    --chart-3: oklch(0.69 0.17 256.00);
+    --chart-4: oklch(0.43 0.16 259.85);
+    --chart-5: oklch(0.29 0.07 260.37);
+    --sidebar: oklch(0.26 0.03 262.71);
+    --sidebar-foreground: oklch(0.93 0.01 264.60);
     --sidebar-primary: #7C8CE8;
     --sidebar-primary-foreground: #161A2B;
-    --sidebar-accent: #232A4D;
-    --sidebar-accent-foreground: #7C8CE8;
-    --sidebar-border: #3A3733;
+    --sidebar-accent: oklch(0.33 0.04 264.82);
+    --sidebar-accent-foreground: oklch(0.93 0.01 264.60);
+    --sidebar-border: oklch(0.35 0.04 262.16);
     --sidebar-ring: #7C8CE8;
-
-    --unit-free: transparent;
-    --unit-free-foreground: #F2EFE9;
-    --unit-free-border: #4E4A44;
-    --unit-booked: #4A3410;
-    --unit-booked-foreground: #FAE3B8;
-    --unit-sold: #2A3D14;
-    --unit-sold-foreground: #D6E8C0;
-    --unit-overdue: #4A1F1F;
-    --unit-overdue-foreground: #F7D5D5;
-    --unit-unavailable: #141723;
-    --unit-unavailable-foreground: #B5AFA4;
 
     --shadow-2xs: 0 1px 3px 0px oklch(0.00 0 0 / 0.05);
     --shadow-xs: 0 1px 3px 0px oklch(0.00 0 0 / 0.05);
