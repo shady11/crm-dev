@@ -5,10 +5,9 @@ import type {UnitsSummaryItem} from "@/features/dashboard/api/dashboard.api.ts";
 import {UNIT_STATUS_LABEL_KEYS} from "@/features/units/types/unit.types.ts";
 import {useTranslation} from "react-i18next";
 
-// Same brand status palette as UNIT_STATUS_CLASSES. AVAILABLE has no fill on
-// the chessboard, so the chart draws it with the strong border colour.
+// Same strong status colours as UNIT_STATUS_DOT_CLASSES.
 const STATUS_COLORS: Record<string, string> = {
-    AVAILABLE: "var(--unit-free-border)", RESERVED: "var(--unit-booked-foreground)", SOLD: "var(--unit-sold-foreground)", UNAVAILABLE: "var(--unit-unavailable)",
+    AVAILABLE: "var(--unit-free-border)", RESERVED: "var(--unit-booked-foreground)", SOLD: "var(--unit-sold-foreground)", UNAVAILABLE: "var(--unit-unavailable-foreground)",
 };
 
 export function UnitsInventoryChart({ data }: { data: UnitsSummaryItem[] }) {

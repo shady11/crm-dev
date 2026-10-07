@@ -52,9 +52,18 @@ export const UNIT_STATUS_LABEL_KEYS: Record<UnitStatus, string> = {
 // its own — always render it next to the status label.
 export const UNIT_STATUS_CLASSES: Record<UnitStatus, string> = {
     [UnitStatus.AVAILABLE]: "bg-unit-free text-unit-free-foreground border border-unit-free-border",
-    [UnitStatus.RESERVED]: "bg-unit-booked text-unit-booked-foreground",
-    [UnitStatus.SOLD]: "bg-unit-sold text-unit-sold-foreground",
-    [UnitStatus.UNAVAILABLE]: "bg-unit-unavailable text-unit-unavailable-foreground",
+    [UnitStatus.RESERVED]: "bg-unit-booked text-unit-booked-foreground border border-transparent",
+    [UnitStatus.SOLD]: "bg-unit-sold text-unit-sold-foreground border border-transparent",
+    [UnitStatus.UNAVAILABLE]: "bg-unit-unavailable text-unit-unavailable-foreground border border-transparent",
+};
+
+// Small legend/filter dots: the fills above are too pale (light) or too dark
+// (dark theme) to read at dot size, so dots use each status's strong colour.
+export const UNIT_STATUS_DOT_CLASSES: Record<UnitStatus, string> = {
+    [UnitStatus.AVAILABLE]: "bg-unit-free-border",
+    [UnitStatus.RESERVED]: "bg-unit-booked-foreground",
+    [UnitStatus.SOLD]: "bg-unit-sold-foreground",
+    [UnitStatus.UNAVAILABLE]: "bg-unit-unavailable-foreground",
 };
 
 export function isUnitType(type?: string | null): type is UnitType {

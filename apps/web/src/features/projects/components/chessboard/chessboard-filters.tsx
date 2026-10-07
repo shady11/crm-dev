@@ -5,7 +5,7 @@ import {Field, FieldGroup} from "@/components/ui/field";
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
 import {
-    UNIT_STATUS_CLASSES,
+    UNIT_STATUS_DOT_CLASSES,
     UNIT_STATUS_LABEL_KEYS,
     UNIT_STATUS_VALUES,
     UNIT_TYPE_LABEL_KEYS,
@@ -134,7 +134,7 @@ export function ChessboardFilters({
                                         <Status
                                             size="sm"
                                             variant="default"
-                                            className={UNIT_STATUS_CLASSES[status.value]}
+                                            className={UNIT_STATUS_DOT_CLASSES[status.value]}
                                         />
                                         {status.label}
                                     </SelectItem>

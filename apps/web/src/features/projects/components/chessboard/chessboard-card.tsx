@@ -8,7 +8,7 @@ import {ChessboardGrid} from "@/features/projects/components/chessboard/chessboa
 import type {Floor} from "@/features/floors/types/floor.types";
 import {
     type Unit,
-    UNIT_STATUS_CLASSES,
+    UNIT_STATUS_DOT_CLASSES,
     UNIT_STATUS_LABEL_KEYS,
     UNIT_STATUS_VALUES,
 } from "@/features/units/types/unit.types";
@@ -56,7 +56,7 @@ export function ChessboardCard({
                                 <Status
                                     size="sm"
                                     variant="default"
-                                    className={UNIT_STATUS_CLASSES[status.value]}
+                                    className={UNIT_STATUS_DOT_CLASSES[status.value]}
                                 />
                                 {status.label}
                             </div>
