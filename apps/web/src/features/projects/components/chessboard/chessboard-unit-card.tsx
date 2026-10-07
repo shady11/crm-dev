@@ -30,7 +30,7 @@ export function ChessboardUnitCard({
         <button
             onClick={onClick}
             className={cn(
-                "flex flex-col items-start justify-center p-2 gap-1 rounded-md cursor-pointer text-white",
+                "flex flex-col items-start justify-center p-2 gap-1 rounded-md cursor-pointer",
                 "hover:ring-2 hover:ring-primary ring-offset-1 transition-all duration-500",
                 UNIT_STATUS_CLASSES[unit.status],
                 dimmed && "opacity-20",

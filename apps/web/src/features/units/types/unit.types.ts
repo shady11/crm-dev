@@ -46,16 +46,15 @@ export const UNIT_STATUS_LABEL_KEYS: Record<UnitStatus, string> = {
     [UnitStatus.UNAVAILABLE]: "units:status.unavailable",
 };
 
-// SOLD is deliberately blue, not red/rose: red is reserved elsewhere in the
-// app for "needs attention" (overdue tasks, expired reservations), and a
-// sold unit is a good outcome, not a warning. Blue also keeps AVAILABLE vs.
-// SOLD distinguishable for red-green color-blind users, unlike a green/red
-// pairing.
+// Kerege brandbook «Статусные» colours. Each class carries its own text
+// colour, so callers must not add text-white. AVAILABLE has no fill: «free»
+// is the default state, not a status. Status colour never carries meaning on
+// its own — always render it next to the status label.
 export const UNIT_STATUS_CLASSES: Record<UnitStatus, string> = {
-    [UnitStatus.AVAILABLE]: "bg-emerald-400",
-    [UnitStatus.RESERVED]: "bg-amber-400",
-    [UnitStatus.SOLD]: "bg-blue-400",
-    [UnitStatus.UNAVAILABLE]: "bg-gray-400",
+    [UnitStatus.AVAILABLE]: "bg-unit-free text-unit-free-foreground border border-unit-free-border",
+    [UnitStatus.RESERVED]: "bg-unit-booked text-unit-booked-foreground",
+    [UnitStatus.SOLD]: "bg-unit-sold text-unit-sold-foreground",
+    [UnitStatus.UNAVAILABLE]: "bg-unit-unavailable text-unit-unavailable-foreground",
 };
 
 export function isUnitType(type?: string | null): type is UnitType {

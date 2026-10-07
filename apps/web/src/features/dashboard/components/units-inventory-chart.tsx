@@ -5,11 +5,10 @@ import type {UnitsSummaryItem} from "@/features/dashboard/api/dashboard.api.ts";
 import {UNIT_STATUS_LABEL_KEYS} from "@/features/units/types/unit.types.ts";
 import {useTranslation} from "react-i18next";
 
-// SOLD uses --info (blue), not --destructive (red) — see the doc comment on
-// UNIT_STATUS_CLASSES for why: red means "needs attention" elsewhere in this
-// app, and green/red isn't reliably distinguishable for color-blind users.
+// Same brand status palette as UNIT_STATUS_CLASSES. AVAILABLE has no fill on
+// the chessboard, so the chart draws it with the strong border colour.
 const STATUS_COLORS: Record<string, string> = {
-    AVAILABLE: "var(--success)", RESERVED: "var(--warning)", SOLD: "var(--info)", UNAVAILABLE: "var(--muted-foreground)",
+    AVAILABLE: "var(--unit-free-border)", RESERVED: "var(--unit-booked-foreground)", SOLD: "var(--unit-sold-foreground)", UNAVAILABLE: "var(--unit-unavailable)",
 };
 
 export function UnitsInventoryChart({ data }: { data: UnitsSummaryItem[] }) {

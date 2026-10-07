@@ -114,7 +114,7 @@ export function UnitTable({ units }: UnitTableProps) {
                                 <TableRow key={unit.id}>
                                     <TableCell className="font-medium">№{unit.number}</TableCell>
                                     <TableCell>
-                                        <Badge className={`${UNIT_STATUS_CLASSES[unit.status]} text-white`}>
+                                        <Badge className={UNIT_STATUS_CLASSES[unit.status]}>
                                             {t(UNIT_STATUS_LABEL_KEYS[unit.status])}
                                         </Badge>
                                     </TableCell>
