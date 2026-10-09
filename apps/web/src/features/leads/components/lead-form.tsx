@@ -12,7 +12,11 @@ import {Input} from "@/components/ui/input.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {SheetBody, SheetClose, SheetFooter} from "@/components/ui/sheet.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
+import {DateField} from "@/components/shared/date-field.tsx";
 import {useManagers} from "@/features/users/hooks/use-managers.ts";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {hasPermission} from "@/features/auth/access.ts";
+import {isoToDay, nextContactToIso} from "@/features/leads/utils/format.ts";
 import type {CreateLeadPayload, Lead, UpdateLeadPayload} from "@/features/leads/api/leads.api.ts";
 import {LEAD_STATUS_LABEL_KEYS, LeadStatus} from "@/features/leads/types/lead.types.ts";
 import {useTranslation} from "react-i18next";
@@ -26,6 +30,7 @@ type LeadFormValues = {
     source?: string;
     status: LeadStatus;
     managerId: string;
+    nextContactDay: string;
     comment?: string;
 };
 
@@ -45,6 +50,7 @@ const DEFAULT_VALUES: LeadFormValues = {
     source: "",
     status: LeadStatus.NEW,
     managerId: UNASSIGNED,
+    nextContactDay: "",
     comment: "",
 };
 
@@ -57,6 +63,7 @@ function toFormValues(lead?: Lead | null): LeadFormValues {
         source: lead.source ?? "",
         status: lead.status,
         managerId: lead.manager?.id ?? UNASSIGNED,
+        nextContactDay: isoToDay(lead.nextContactAt),
         comment: lead.comment ?? "",
     };
 }
@@ -72,6 +79,10 @@ export function LeadForm({
     const { t } = useTranslation("leads");
 
     const managers = useManagers();
+    const { user } = useAuth();
+    // Without leads.assign the API puts a new lead in the creator's own name
+    // and refuses anyone else's, so there is nothing to pick.
+    const canAssign = hasPermission(user, "leads.assign");
 
     // Rebuilt whenever the language changes, so a validation message that
     // fired before a language switch doesn't stay frozen in the old language.
@@ -82,6 +93,7 @@ export function LeadForm({
         source: z.string().trim().optional(),
         status: z.enum(LeadStatus),
         managerId: z.string(),
+        nextContactDay: z.string(),
         comment: z.string().trim().optional(),
     }), [t]);
 
@@ -117,7 +129,11 @@ export function LeadForm({
             email: values.email?.trim() || undefined,
             source: values.source?.trim() || undefined,
             status: values.status,
-            managerId: values.managerId === UNASSIGNED ? undefined : values.managerId,
+            managerId: !canAssign || values.managerId === UNASSIGNED ? undefined : values.managerId,
+            // On edit an emptied field clears the date; on create it is just left out.
+            nextContactAt: values.nextContactDay
+                ? nextContactToIso(values.nextContactDay)
+                : lead ? null : undefined,
             comment: values.comment?.trim() || undefined,
         });
     };
@@ -203,30 +219,43 @@ export function LeadForm({
 
                     <Controller
                         control={form.control}
-                        name="managerId"
-                        render={({ field, fieldState }) => (
-                            <Field invalid={fieldState.invalid}>
-                                <FieldLabel>{t("form.manager")}</FieldLabel>
-                                <Select
-                                    collection={managerCollection}
-                                    value={[field.value]}
-                                    onValueChange={(item) => field.onChange(item.value[0] ?? UNASSIGNED)}
-                                >
-                                    <SelectTrigger className="w-full">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {managerCollection.items.map((item) => (
-                                            <SelectItem key={item.value} item={item}>
-                                                {item.label}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                                <FieldError>{fieldState.error?.message}</FieldError>
+                        name="nextContactDay"
+                        render={({ field }) => (
+                            <Field>
+                                <FieldLabel>{t("form.nextContact")}</FieldLabel>
+                                <DateField value={field.value} onChange={field.onChange} clearable />
                             </Field>
                         )}
                     />
+
+                    {canAssign && (
+                        <Controller
+                            control={form.control}
+                            name="managerId"
+                            render={({ field, fieldState }) => (
+                                <Field invalid={fieldState.invalid}>
+                                    <FieldLabel>{t("form.manager")}</FieldLabel>
+                                    <Select
+                                        collection={managerCollection}
+                                        value={[field.value]}
+                                        onValueChange={(item) => field.onChange(item.value[0] ?? UNASSIGNED)}
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {managerCollection.items.map((item) => (
+                                                <SelectItem key={item.value} item={item}>
+                                                    {item.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                    <FieldError>{fieldState.error?.message}</FieldError>
+                                </Field>
+                            )}
+                        />
+                    )}
 
                     <Controller
                         control={form.control}

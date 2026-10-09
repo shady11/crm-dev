@@ -7,6 +7,7 @@ import {Button} from "@/components/ui/button.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
+import {DateField} from "@/components/shared/date-field.tsx";
 import {toast} from "@/components/ui/toast.tsx";
 import {
     ContactAttemptType,
@@ -14,7 +15,7 @@ import {
     logLeadContactAttempt,
     type Lead,
 } from "@/features/leads/api/leads.api.ts";
-import {formatCreatedAt} from "@/features/leads/utils/format.ts";
+import {formatCreatedAt, nextContactToIso} from "@/features/leads/utils/format.ts";
 
 const CONTACT_TYPE_ICON: Record<ContactAttemptType, typeof PhoneCall> = {
     [ContactAttemptType.CALL]: PhoneCall,
@@ -35,6 +36,7 @@ export function LeadActivityTab({lead}: LeadActivityTabProps) {
     const queryClient = useQueryClient();
     const [type, setType] = useState<ContactAttemptType>(ContactAttemptType.CALL);
     const [note, setNote] = useState("");
+    const [nextContactDay, setNextContactDay] = useState("");
 
     const activitiesQuery = useQuery({
         queryKey: ["leads", lead.id, "activities"],
@@ -42,10 +44,19 @@ export function LeadActivityTab({lead}: LeadActivityTabProps) {
     });
 
     const logMutation = useMutation({
-        mutationFn: () => logLeadContactAttempt(lead.id, {type, note: note.trim() || undefined}),
+        mutationFn: () =>
+            logLeadContactAttempt(lead.id, {
+                type,
+                note: note.trim() || undefined,
+                nextContactAt: nextContactDay ? nextContactToIso(nextContactDay) : undefined,
+            }),
         onSuccess: async () => {
             setNote("");
+            setNextContactDay("");
             await queryClient.invalidateQueries({queryKey: ["leads", lead.id, "activities"]});
+            // Last/next contact dates on the lead itself, and the dashboard's follow-up list.
+            await queryClient.invalidateQueries({queryKey: ["leads"]});
+            await queryClient.invalidateQueries({queryKey: ["dashboard"]});
             toast.success({title: t("activityTab.logSuccess")});
         },
         onError: () => {
@@ -87,6 +98,11 @@ export function LeadActivityTab({lead}: LeadActivityTabProps) {
                     value={note}
                     onChange={(event) => setNote(event.target.value)}
                 />
+
+                <div className="space-y-1">
+                    <p className="text-xs text-muted-foreground">{t("activityTab.nextContact")}</p>
+                    <DateField value={nextContactDay} onChange={setNextContactDay} clearable />
+                </div>
 
                 <Button
                     size="sm"

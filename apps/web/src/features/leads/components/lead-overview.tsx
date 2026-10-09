@@ -50,6 +50,18 @@ export function LeadOverview({ lead }: LeadOverviewProps) {
                     <DataListItemValue>{lead.manager?.fullName ?? t("overview.unassigned")}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
+                    <DataListItemLabel>{t("overview.nextContact")}</DataListItemLabel>
+                    <DataListItemValue>
+                        {lead.nextContactAt ? formatCreatedAt(lead.nextContactAt, i18n.language).date : "—"}
+                    </DataListItemValue>
+                </DataListItem>
+                <DataListItem>
+                    <DataListItemLabel>{t("overview.lastContact")}</DataListItemLabel>
+                    <DataListItemValue>
+                        {lead.lastContactAt ? formatCreatedAt(lead.lastContactAt, i18n.language).date : "—"}
+                    </DataListItemValue>
+                </DataListItem>
+                <DataListItem>
                     <DataListItemLabel>{t("overview.comment")}</DataListItemLabel>
                     <DataListItemValue>{lead.comment ?? "—"}</DataListItemValue>
                 </DataListItem>

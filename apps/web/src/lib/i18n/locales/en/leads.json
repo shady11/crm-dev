@@ -43,7 +43,9 @@
     "unassigned": "Unassigned",
     "comment": "Comment",
     "created": "Created",
-    "createdAt": "{{date}} at {{time}}"
+    "createdAt": "{{date}} at {{time}}",
+    "nextContact": "Next contact",
+    "lastContact": "Last contact"
   },
   "clientTab": {
     "notConverted": "This lead hasn't been converted to a client yet.",
@@ -84,7 +86,8 @@
     "logSuccess": "Contact attempt logged",
     "logError": "Could not log contact attempt. Please try again.",
     "empty": "No contact attempts logged yet.",
-    "system": "System"
+    "system": "System",
+    "nextContact": "Next contact (optional)"
   },
   "form": {
     "editTitle": "Edit lead",
@@ -113,7 +116,8 @@
       "nameMin": "Name must be at least 2 characters",
       "phoneMin": "Phone must be at least 5 characters",
       "invalidEmail": "Invalid email"
-    }
+    },
+    "nextContact": "Next contact"
   },
   "convertDialog": {
     "title": "Convert to client",

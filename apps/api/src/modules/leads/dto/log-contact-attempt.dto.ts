@@ -1,4 +1,4 @@
-import {IsEnum, IsOptional, IsString, MaxLength} from "class-validator";
+import {IsDateString, IsEnum, IsOptional, IsString, MaxLength} from "class-validator";
 
 export const ContactAttemptType = {
     CALL: "CALL",
@@ -17,4 +17,10 @@ export class LogContactAttemptDto {
     @IsString()
     @MaxLength(500)
     note?: string;
+
+    // The next step agreed on this contact, so logging a call and booking
+    // the callback is one action.
+    @IsOptional()
+    @IsDateString()
+    nextContactAt?: string;
 }
