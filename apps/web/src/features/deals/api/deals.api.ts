@@ -17,7 +17,14 @@ type DealClient = {
     passport: string | null;
     pin: string | null;
 };
-type DealManager = { id: string; fullName: string; role: {id: string; name: string} } | null;
+type DealManager = {
+    id: string;
+    fullName: string;
+    phone: string | null;
+    email: string;
+    isActive: boolean;
+    role: {id: string; name: string};
+} | null;
 type DealUnit = {
     id: string;
     number: string;

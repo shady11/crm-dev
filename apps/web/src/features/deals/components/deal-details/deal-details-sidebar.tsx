@@ -1,7 +1,9 @@
 import type {ReactNode} from "react";
 import {Link} from "react-router-dom";
-import {CircleAlertIcon, CircleCheckIcon, ExternalLinkIcon, PhoneIcon, RepeatIcon} from "lucide-react";
+import {CircleAlertIcon, CircleCheckIcon, ExternalLinkIcon, MailIcon, PhoneIcon, RepeatIcon, UserRoundXIcon} from "lucide-react";
 import {useTranslation} from "react-i18next";
+import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
+import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {WhatsAppLink} from "@/components/shared/whatsapp-link.tsx";
@@ -11,6 +13,8 @@ import {UNIT_TYPE_LABEL_KEYS} from "@/features/units/types/unit.types.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {formatDate} from "@/utils/date-formatter.ts";
 import {paths} from "@/routes/paths.ts";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {initials} from "@/features/deals/utils/format.ts";
 
 interface DealDetailsSidebarProps {
     deal: DealDetails;
@@ -41,13 +45,14 @@ function Row({label, children}: {label: string; children: ReactNode}) {
 
 /**
  * Everything about the deal that isn't money or history, in one card: who
- * the client is and how to reach them, which unit it is, and the deal's own
- * facts. Replaces separate client, manager, unit, financials and timeline
+ * the client is and how to reach them, who owns the deal, which unit it is,
+ * and the deal's own facts. Replaces separate client, manager, unit, financials and timeline
  * cards that repeated the price and dates several times.
  */
 export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsSidebarProps) {
     const {t, i18n} = useTranslation(["deals", "common", "units"]);
     const {formatCurrency} = useCompanyFormatters();
+    const {user} = useAuth();
     const date = (iso: string | null | undefined) => (iso ? formatDate(iso, i18n.language).date : "—");
 
     const {client, unit, project, manager} = deal;
@@ -95,6 +100,59 @@ export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsS
                 </Section>
 
                 <Section
+                    title={t("managerCard.title")}
+                    action={
+                        canReassign && (
+                            <Button variant="ghost" size="xs" onClick={onReassign}>
+                                <RepeatIcon className="size-3" />
+                                {t("sidebar.reassign")}
+                            </Button>
+                        )
+                    }
+                >
+                    {manager ? (
+                        <div className="flex items-start gap-3">
+                            <Avatar className="size-9">
+                                <AvatarFallback className="text-xs">{initials(manager.fullName)}</AvatarFallback>
+                            </Avatar>
+                            <div className="flex min-w-0 flex-col gap-1">
+                                <div className="flex flex-wrap items-center gap-1.5">
+                                    <p className="font-semibold">{manager.fullName}</p>
+                                    {manager.id === user?.id && <Badge variant="secondary">{t("sidebar.you")}</Badge>}
+                                </div>
+                                <p className="text-sm text-muted-foreground">{manager.role.name}</p>
+                                {/* Your own number isn't much use to you; colleagues and heads need it. */}
+                                {manager.id !== user?.id && (
+                                    <div className="flex flex-col gap-1 text-sm">
+                                        {manager.phone && (
+                                            <a href={`tel:${manager.phone}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
+                                                <PhoneIcon size={14} />
+                                                {manager.phone}
+                                            </a>
+                                        )}
+                                        <a href={`mailto:${manager.email}`} className="flex min-w-0 items-center gap-1.5 text-muted-foreground hover:text-foreground">
+                                            <MailIcon size={14} className="shrink-0" />
+                                            <span className="truncate">{manager.email}</span>
+                                        </a>
+                                    </div>
+                                )}
+                                {!manager.isActive && (
+                                    <p className="flex items-start gap-1.5 text-xs text-warning-foreground">
+                                        <UserRoundXIcon className="mt-px size-3.5 shrink-0 text-warning" />
+                                        {t("sidebar.managerInactive")}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <p className="flex items-start gap-1.5 text-sm text-warning-foreground">
+                            <UserRoundXIcon className="mt-0.5 size-4 shrink-0 text-warning" />
+                            {t("sidebar.noManager")}
+                        </p>
+                    )}
+                </Section>
+
+                <Section
                     title={t("sidebar.unit")}
                     action={
                         <Button variant="ghost" size="xs" asChild>
@@ -116,19 +174,8 @@ export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsS
                     </dl>
                 </Section>
 
-                <Section
-                    title={t("sidebar.deal")}
-                    action={
-                        canReassign && (
-                            <Button variant="ghost" size="xs" onClick={onReassign}>
-                                <RepeatIcon className="size-3" />
-                                {t("sidebar.reassign")}
-                            </Button>
-                        )
-                    }
-                >
+                <Section title={t("sidebar.deal")}>
                     <dl className="flex flex-col gap-1.5">
-                        <Row label={t("managerCard.title")}>{manager?.fullName ?? t("managerCard.unassigned")}</Row>
                         {deal.financingType && <Row label={t("financials.financing")}>{t(FINANCING_TYPE_LABEL_KEYS[deal.financingType])}</Row>}
                         {(deal.discountPercent ?? 0) > 0 && (
                             <Row label={t("financials.discount")}>

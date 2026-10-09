@@ -290,6 +290,9 @@
     "rooms_one": "{{count}} room",
     "rooms_few": "{{count}} rooms",
     "rooms_many": "{{count}} rooms",
-    "rooms_other": "{{count}} rooms"
+    "rooms_other": "{{count}} rooms",
+    "you": "You",
+    "managerInactive": "This manager has been deactivated. Reassign the deal so someone follows it up.",
+    "noManager": "No manager on this deal. Reassign it so someone follows it up."
   }
 }
