@@ -44,6 +44,7 @@ import {
     PaymentScheduleStatus,
     PaymentType,
     PrismaClient,
+    ProjectStatus,
     TaskStatus,
     UnitStatus,
     UnitType,
@@ -236,6 +237,9 @@ async function seedDemo() {
         data: {
             name: "ЖК Орион",
             address: "Бишкек",
+            // Open for sales: the demo deals below live on this project, and
+            // a DRAFT project refuses new bookings (ensureProjectOpenForSales).
+            status: ProjectStatus.ACTIVE,
             companyId: company.id,
         },
     });

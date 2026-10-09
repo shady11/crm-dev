@@ -199,6 +199,12 @@ export class DealsService {
     const companyId = user.companyId;
     const managerId = dto.managerId ?? user.id;
 
+    // Booking in someone else's name is a reassignment, so it needs the
+    // same right as reassigning an existing deal.
+    if (managerId !== user.id && !hasPermission(user, 'deals.reassign')) {
+      throw new ForbiddenException('You can only book a unit in your own name.');
+    }
+
     // Validate immutable entities before transaction
     const client = await this.getClientOrThrow(user, dto.clientId);
     await this.getManagerOrThrow(managerId, user);

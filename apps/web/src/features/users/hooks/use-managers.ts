@@ -1,22 +1,26 @@
 import {useQuery} from "@tanstack/react-query";
-import {getUsers} from "@/features/users/api/users.api";
-import {getRoles} from "@/features/rbac/api/rbac.api";
+import {getSalesTeam} from "@/features/users/api/users.api";
+import {useAuth} from "@/features/auth/hooks/use-auth";
+import {hasPermission} from "@/features/auth/access";
 
-const SALES_MANAGER_ROLE_NAME = "Sales Manager";
-
+/**
+ * People a deal or lead can be assigned to, scoped by the API to the
+ * caller's branch when the caller is branch-scoped. Skipped for users who
+ * can see neither deals nor leads, since the endpoint would refuse them.
+ */
 export function useManagers() {
-    const rolesQuery = useQuery({ queryKey: ["rbac", "roles"], queryFn: getRoles });
-    const salesManagerRoleId = rolesQuery.data?.find((role) => role.name === SALES_MANAGER_ROLE_NAME)?.id;
+    const {user} = useAuth();
+    const canRead = hasPermission(user, "deals.view") || hasPermission(user, "leads.view");
 
     const query = useQuery({
-        queryKey: ["users", "managers", salesManagerRoleId],
-        queryFn: () => getUsers({ roleId: salesManagerRoleId }),
-        enabled: !!salesManagerRoleId,
+        queryKey: ["users", "sales-team"],
+        queryFn: getSalesTeam,
+        enabled: canRead,
         staleTime: 5 * 60 * 1000,
     });
 
     return {
         ...query,
-        data: query.data?.items ?? [],
+        data: query.data ?? [],
     };
 }
