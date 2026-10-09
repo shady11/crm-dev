@@ -1,11 +1,13 @@
 import {IsBoolean, IsDateString, IsEmail, IsEnum, IsOptional, IsString, IsUUID, MinLength, ValidateIf} from "class-validator";
 import {LeadStatus} from "@/generated/prisma/enums";
+import {NormalizePhone} from "@/common/utils/phone.util";
 
 export class CreateLeadDto {
     @IsString()
     @MinLength(2)
     fullName!: string;
 
+    @NormalizePhone()
     @IsString()
     @MinLength(5)
     phone!: string;

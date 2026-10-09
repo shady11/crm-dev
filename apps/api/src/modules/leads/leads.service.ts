@@ -16,6 +16,7 @@ import {UpdateLeadDto} from "@/modules/leads/dto/update-lead.dto";
 import {ConvertLeadDto} from "@/modules/leads/dto/convert-lead.dto";
 import {ContactAttemptType, LogContactAttemptDto} from "@/modules/leads/dto/log-contact-attempt.dto";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
+import {normalizePhone} from "@/common/utils/phone.util";
 
 const CONTACT_ATTEMPT_TYPE_MAP: Record<ContactAttemptType, ActivityType> = {
     CALL: ActivityType.CALL,
@@ -419,10 +420,13 @@ export class LeadsService {
         return converted;
     }
 
-    async checkDuplicates(user: AuthUser, phone: string, excludeLeadId?: string) {
+    async checkDuplicates(user: AuthUser, rawPhone: string, excludeLeadId?: string) {
         if (!user.companyId) {
             throw new ForbiddenException("User does not belong to a company");
         }
+
+        // Also reached straight from GET /leads/duplicates?phone=, which no DTO normalizes.
+        const phone = normalizePhone(rawPhone);
 
         const companyId = user.companyId;
         const branchScoped = user.isBranchScoped;
