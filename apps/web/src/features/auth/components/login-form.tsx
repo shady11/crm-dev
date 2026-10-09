@@ -55,7 +55,8 @@ export function LoginForm({
                 title: t("login.success"),
             });
 
-            navigate("/projects");
+            // "/" is RoleLanding: the dashboard, or the platform dashboard for a SUPER_ADMIN.
+            navigate("/");
         },
     });
 

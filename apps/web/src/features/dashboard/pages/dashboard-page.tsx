@@ -77,6 +77,10 @@ export function DashboardPage() {
                 </div>
             </div>
 
+            {/* A manager's own day comes first: what to do today, then how they're doing. */}
+            {canViewMyPerformance && myWorkToday.data ? <MyWorkTodayCard data={myWorkToday.data} /> : null}
+            {canViewMyPerformance && myPerformance.data ? <MyPerformanceCard data={myPerformance.data} /> : null}
+
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <KpiCard
                     icon={DollarSignIcon}
@@ -128,8 +132,6 @@ export function DashboardPage() {
 
             {canViewBranchComparison ? <BranchComparisonChart data={branchComparison.data ?? []} /> : null}
             {canViewTeamSnapshot ? <TeamSnapshotCard data={teamSnapshot.data ?? []} /> : null}
-            {canViewMyPerformance && myWorkToday.data ? <MyWorkTodayCard data={myWorkToday.data} /> : null}
-            {canViewMyPerformance && myPerformance.data ? <MyPerformanceCard data={myPerformance.data} /> : null}
             {canViewFinanceOverview && financeOverview.data ? <FinanceOverviewCard data={financeOverview.data} /> : null}
         </div>
     );

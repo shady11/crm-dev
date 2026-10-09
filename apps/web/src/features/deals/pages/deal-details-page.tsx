@@ -63,6 +63,7 @@ export function DealDetailsPage() {
     const canDecideDiscount = hasPermission(user, "deals.approve_discount");
     const canCancel = hasPermission(user, "deals.cancel");
     const [rejectOpen, setRejectOpen] = useState(false);
+    const [activateOpen, setActivateOpen] = useState(false);
     const [rejectReason, setRejectReason] = useState("");
 
     const [cancelOpen, setCancelOpen] = useState(false);
@@ -158,7 +159,7 @@ export function DealDetailsPage() {
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                         <Button variant="ghost" onClick={() => navigate("/deals")}>
                             <ArrowLeft className="size-3"/>
                             {t("detailsPage.back")}
@@ -183,7 +184,7 @@ export function DealDetailsPage() {
                             </>
                         )}
                         {deal.status === "CONTRACT_SIGNED" && (
-                            <Button onClick={() => actions.activate.mutate()} disabled={actions.activate.isPending} isLoading={actions.activate.isPending}>
+                            <Button onClick={() => setActivateOpen(true)}>
                                 {t("detailsPage.activateDeal")}
                             </Button>
                         )}
@@ -221,8 +222,9 @@ export function DealDetailsPage() {
                 onReject={() => setRejectOpen(true)}
             />
 
-            <div className="flex gap-4">
-                <div className="flex-2 space-y-4">
+            {/* Two columns on a wide screen, one on a phone. */}
+            <div className="flex flex-col gap-4 lg:flex-row">
+                <div className="min-w-0 flex-2 space-y-4">
 
                     <DealUnitCard unit={deal.unit} project={deal.project} />
 
@@ -248,7 +250,7 @@ export function DealDetailsPage() {
                         />
                     </div>
                 </div>
-                <div className="flex-1 space-y-4">
+                <div className="min-w-0 flex-1 space-y-4">
                     <DealFinancialsCard deal={deal} totalPaid={totalPaid} remaining={remaining} />
                     <DealTimelineCard deal={deal} />
                     <DealTasksCard dealId={deal.id} />
@@ -287,6 +289,25 @@ export function DealDetailsPage() {
                     <DealHistoryCard activities={deal.activities} />
                 </div>
             </div>
+
+            {/* Activate dialog: there is no way back to CONTRACT_SIGNED. */}
+            <Dialog open={activateOpen} onOpenChange={({ open }) => setActivateOpen(open)}>
+                <DialogContent size="sm">
+                    <DialogHeader title={t("detailsPage.activateDialogTitle")} description={t("detailsPage.activateDialogDescription")} />
+                    <DialogFooter>
+                        <Button variant="secondary" onClick={() => setActivateOpen(false)}>
+                            {t("detailsPage.back")}
+                        </Button>
+                        <Button
+                            disabled={actions.activate.isPending}
+                            isLoading={actions.activate.isPending}
+                            onClick={() => actions.activate.mutate(undefined, { onSuccess: () => setActivateOpen(false) })}
+                        >
+                            {t("detailsPage.activateDeal")}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Reject discount dialog */}
             <Dialog open={rejectOpen} onOpenChange={({ open }) => setRejectOpen(open)}>

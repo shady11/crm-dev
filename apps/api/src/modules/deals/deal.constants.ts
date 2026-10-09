@@ -15,6 +15,28 @@ export const ACTIVE_DEAL_STATUSES: DealStatus[]  = [
     'ACTIVE',
 ];
 
+// How a deal's status reads in a notification title ("Deal D-2026-0001:
+// contract signed"), rather than the raw enum value.
+export const DEAL_STATUS_PHRASES: Record<DealStatus, string> = {
+    RESERVED: 'reserved',
+    CONTRACT_SIGNED: 'contract signed',
+    ACTIVE: 'activated, payments under way',
+    COMPLETED: 'completed, fully paid',
+    CANCELLED: 'cancelled',
+    EXPIRED: 'reservation expired',
+};
+
+/** "Deal D-2026-0001: contract signed" */
+export function dealStatusTitle(dealNumber: string, status: DealStatus): string {
+    return `Deal ${dealNumber}: ${DEAL_STATUS_PHRASES[status]}`;
+}
+
+/** "3,693.33 KGS": the amount in the company's own currency. */
+export function formatMoney(amount: Prisma.Decimal | number, currency: string | null | undefined): string {
+    const value = Number(amount).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    return currency ? `${value} ${currency}` : value;
+}
+
 // A deal is won once the contract is signed. COMPLETED only means the last
 // installment came in, which on an installment plan can be years later, so
 // counting only COMPLETED would show a manager almost no wins.

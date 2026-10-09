@@ -20,6 +20,7 @@
     "discount": "Discount"
   },
   "unitCard": {
+    "title": "Unit",
     "unitNumber": "Unit №{{number}}",
     "floor": "{{floor}}-floor"
   },
@@ -159,7 +160,9 @@
     "extendUnavailable": "No extensions left — sign the contract or let the reservation expire.",
     "generateDocument": "Generate",
     "generateReservation": "Reservation agreement",
-    "generateContract": "Sale contract"
+    "generateContract": "Sale contract",
+    "activateDialogTitle": "Activate this deal?",
+    "activateDialogDescription": "Payments start from here: you can then generate the payment schedule and record installments. An active deal can't go back to \"Contract signed\"."
   },
   "toasts": {
     "unitReserved": "Unit reserved",

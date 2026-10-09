@@ -16,11 +16,12 @@ export function DealStatusCard({ status, count }: DealStatusCardProps) {
 
     return (
         <Card className="border border-secondary shadow-none">
-            <CardContent className="flex items-center gap-3">
-                <div className={`rounded-lg p-2 text-white ${visual?.bg}`}>
+            <CardContent className="flex min-w-0 items-center gap-3">
+                {/* Hidden on a phone, where two cards share a row and the label needs the room. */}
+                <div className={`hidden shrink-0 rounded-lg p-2 text-white sm:block ${visual?.bg}`}>
                     <Icon size={20} strokeWidth={1.75} />
                 </div>
-                <div>
+                <div className="min-w-0">
                     <h3 className="font-medium">{t(DEAL_STATUS_LABEL_KEYS[status])}</h3>
                     <p className="text-sm text-muted-foreground">
                         {t("statusCard.count", { count })}

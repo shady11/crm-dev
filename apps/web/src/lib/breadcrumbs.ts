@@ -20,6 +20,14 @@ const ROUTE_LABEL_KEYS: Record<string, string> = {
     overview: "nav.overview",
     builder: "nav.builder",
     sales: "nav.sales",
+    branches: "nav.branches",
+    settings: "nav.settings",
+    "activity-log": "nav.activityLog",
+    "audit-log": "nav.auditLog",
+    "login-activity": "nav.loginActivity",
+    "roles-permissions": "nav.rolesPermissions",
+    "setting-options": "nav.settingOptions",
+    "super-admin-dashboard": "nav.superAdminDashboard",
 };
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

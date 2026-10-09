@@ -495,7 +495,7 @@ async function seedDemoTenantData(args: {
                     clientId: client.id,
                     managerId: manager.id,
                     branchId: team.branchId,
-                    dealNumber: `DL-${new Date().getFullYear()}-${String(dealSeq).padStart(4, "0")}`,
+                    dealNumber: `D-${new Date().getFullYear()}-${String(dealSeq).padStart(4, "0")}`,
                     status,
                     financingType: pick(financingTypes, dealSeed),
                     listPrice,

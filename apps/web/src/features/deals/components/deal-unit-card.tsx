@@ -18,7 +18,7 @@ export function DealUnitCard({
 
     return (
         <Card className="border border-secondary shadow-none flex-1 pt-0">
-            <CardHeader title={t("financials.title", { ns: "deals" })} className="py-4 border-b gap-0"></CardHeader>
+            <CardHeader title={t("unitCard.title", { ns: "deals" })} className="py-4 border-b gap-0"></CardHeader>
             <CardContent className="flex flex-col gap-6">
                 <div className="flex items-center gap-4">
                     <div className="rounded-lg bg-muted p-2.5">
@@ -32,7 +32,7 @@ export function DealUnitCard({
                                         {t("unitCard.unitNumber", { ns: "deals", number: unit.number })}
                                     </h3>
                                 </div>
-                                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                                     {project.name}
                                     <Separator className="h-2.5 bg-muted-foreground/50" orientation="vertical" />
                                     {unit.block && `${t("labels.block", { ns: "common" })} ${unit.block.name}`}
@@ -45,7 +45,7 @@ export function DealUnitCard({
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center text-center gap-4">
+                <div className="flex flex-wrap items-center text-center gap-4">
                     <div className="border border-dashed p-2 rounded-lg">
                         <p className="text-sm text-muted-foreground">
                             {t("labels.type", { ns: "common" })}
