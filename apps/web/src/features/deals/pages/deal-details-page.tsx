@@ -38,6 +38,7 @@ import type {PaymentMethod, PaymentType} from "../api/deals.api";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {DealTimelineCard} from "@/features/deals/components/deal-details/deal-timeline-card.tsx";
 import {DealTasksCard} from "@/features/deals/components/deal-tasks-card.tsx";
+import {DealDiscountBanner} from "@/features/deals/components/deal-details/deal-discount-banner.tsx";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
 import {useTranslation} from "react-i18next";
 import {PAYMENT_METHOD_LABEL_KEYS, PAYMENT_TYPE_LABEL_KEYS} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
@@ -59,6 +60,9 @@ export function DealDetailsPage() {
     // backend endpoint is (deals.reassign) rather than by a specific role name.
     const canReassign = hasPermission(user, "deals.reassign");
     const canGenerateDocuments = hasPermission(user, "documents.generate");
+    const canDecideDiscount = hasPermission(user, "deals.approve_discount");
+    const [rejectOpen, setRejectOpen] = useState(false);
+    const [rejectReason, setRejectReason] = useState("");
 
     const [cancelOpen, setCancelOpen] = useState(false);
     const [cancelReason, setCancelReason] = useState("");
@@ -168,7 +172,13 @@ export function DealDetailsPage() {
                                 >
                                     {t("detailsPage.extendReservation")}
                                 </Button>
-                                <Button onClick={() => setSignOpen(true)}>{t("detailsPage.signContract")}</Button>
+                                <Button
+                                    onClick={() => setSignOpen(true)}
+                                    disabled={deal.discountApprovalStatus === "PENDING"}
+                                    title={deal.discountApprovalStatus === "PENDING" ? t("discountBanner.signBlocked") : undefined}
+                                >
+                                    {t("detailsPage.signContract")}
+                                </Button>
                             </>
                         )}
                         {deal.status === "CONTRACT_SIGNED" && (
@@ -201,6 +211,14 @@ export function DealDetailsPage() {
                     </div>
                 </div>
             </div>
+
+            <DealDiscountBanner
+                deal={deal}
+                canDecide={canDecideDiscount}
+                isDeciding={actions.approveDiscount.isPending || actions.rejectDiscount.isPending}
+                onApprove={() => actions.approveDiscount.mutate()}
+                onReject={() => setRejectOpen(true)}
+            />
 
             <div className="flex gap-4">
                 <div className="flex-2 space-y-4">
@@ -268,6 +286,43 @@ export function DealDetailsPage() {
                     <DealHistoryCard activities={deal.activities} />
                 </div>
             </div>
+
+            {/* Reject discount dialog */}
+            <Dialog open={rejectOpen} onOpenChange={({ open }) => setRejectOpen(open)}>
+                <DialogContent size="sm">
+                    <DialogHeader title={t("discountBanner.rejectDialogTitle")} description={t("discountBanner.rejectDialogDescription")} />
+                    <DialogBody>
+                        <FieldSet className="pt-4">
+                            <FieldGroup>
+                                <Field>
+                                    <FieldLabel>{t("discountBanner.rejectReason")}</FieldLabel>
+                                    <Textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} />
+                                </Field>
+                            </FieldGroup>
+                        </FieldSet>
+                    </DialogBody>
+                    <DialogFooter>
+                        <Button variant="secondary" onClick={() => setRejectOpen(false)}>
+                            {t("detailsPage.back")}
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            disabled={rejectReason.trim().length < 2 || actions.rejectDiscount.isPending}
+                            isLoading={actions.rejectDiscount.isPending}
+                            onClick={() =>
+                                actions.rejectDiscount.mutate(rejectReason.trim(), {
+                                    onSuccess: () => {
+                                        setRejectOpen(false);
+                                        setRejectReason("");
+                                    },
+                                })
+                            }
+                        >
+                            {t("discountBanner.reject")}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Cancel dialog */}
             <Dialog open={cancelOpen} onOpenChange={({ open }) => setCancelOpen(open)}>

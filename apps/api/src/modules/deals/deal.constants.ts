@@ -15,6 +15,15 @@ export const ACTIVE_DEAL_STATUSES: DealStatus[]  = [
     'ACTIVE',
 ];
 
+// A deal is won once the contract is signed. COMPLETED only means the last
+// installment came in, which on an installment plan can be years later, so
+// counting only COMPLETED would show a manager almost no wins.
+export const WON_DEAL_STATUSES: DealStatus[] = [
+    'CONTRACT_SIGNED',
+    'ACTIVE',
+    'COMPLETED',
+];
+
 export const RESERVATION_POLICY_SELECT = {
     reservationDefaultDays: true,
     reservationMaxDays: true,

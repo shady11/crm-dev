@@ -3,6 +3,8 @@ import {isAxiosError} from "axios";
 import {toast} from "@/components/ui/toast";
 import {
     activateDeal,
+    approveDiscount,
+    rejectDiscount,
     cancelDeal,
     completeDeal,
     createPayment,
@@ -134,5 +136,27 @@ export function useDealActions(dealId: string) {
         onError: () => toast.error({ title: t("toasts.documentError"), description: t("toasts.tryAgain") }),
     });
 
-    return { extend, sign, activate, cancel, generateSchedule, recordPayment, complete, reassign, generateDocument };
+    const approveDiscountRequest = useMutation({
+        mutationFn: () => approveDiscount(dealId),
+        onSuccess: async () => {
+            await invalidate();
+            toast.success({ title: t("toasts.discountApproved") });
+        },
+        onError: () => toast.error({ title: t("toasts.discountDecisionError"), description: t("toasts.tryAgain") }),
+    });
+
+    const rejectDiscountRequest = useMutation({
+        mutationFn: (reason: string) => rejectDiscount(dealId, reason),
+        onSuccess: async () => {
+            await invalidate();
+            toast.success({ title: t("toasts.discountRejected") });
+        },
+        onError: () => toast.error({ title: t("toasts.discountDecisionError"), description: t("toasts.tryAgain") }),
+    });
+
+    return {
+        extend, sign, activate, cancel, generateSchedule, recordPayment, complete, reassign, generateDocument,
+        approveDiscount: approveDiscountRequest,
+        rejectDiscount: rejectDiscountRequest,
+    };
 }

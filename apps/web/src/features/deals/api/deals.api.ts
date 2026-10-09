@@ -25,6 +25,8 @@ type DealUnit = {
 };
 type DealProject = { id: string; name: string };
 
+export type DiscountApprovalStatus = "NONE" | "PENDING" | "APPROVED" | "REJECTED";
+
 export type Deal = {
     id: string;
     dealNumber: string;
@@ -36,6 +38,10 @@ export type Deal = {
     discountAmount: number | null;
     discountPercent: number | null;
     deposit: number | null;
+    discountApprovalStatus: DiscountApprovalStatus;
+    requestedDiscountPercent: number | null;
+    requestedDiscountAmount: number | null;
+    discountRejectionReason: string | null;
     reservedAt: string | null;
     reservationExpiresAt: string | null;
     reservationExtensionCount: number;
@@ -176,6 +182,16 @@ export async function getReservationPolicy() {
 
 export async function extendReservation(id: string, reservationExpiresAt: string) {
     const response = await api.post<DealDetails>(`/deals/${id}/extend`, { reservationExpiresAt });
+    return response.data;
+}
+
+export async function approveDiscount(dealId: string) {
+    const response = await api.post<DealDetails>(`/deals/${dealId}/discount/approve`);
+    return response.data;
+}
+
+export async function rejectDiscount(dealId: string, reason: string) {
+    const response = await api.post<DealDetails>(`/deals/${dealId}/discount/reject`, { reason });
     return response.data;
 }
 

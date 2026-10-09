@@ -26,6 +26,16 @@ export class DealMapper {
                     ? null
                     : Number(deal.deposit),
 
+            requestedDiscountPercent:
+                deal.requestedDiscountPercent == null
+                    ? null
+                    : Number(deal.requestedDiscountPercent),
+
+            requestedDiscountAmount:
+                deal.requestedDiscountAmount == null
+                    ? null
+                    : Number(deal.requestedDiscountAmount),
+
             unit: {
                 ...deal.unit,
 

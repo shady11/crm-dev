@@ -81,7 +81,7 @@
   "myPerformance": {
     "title": "Моя эффективность за последние {{days}} дн.",
     "leadsAssigned": "Назначено лидов",
-    "dealsWon": "Сделок закрыто",
+    "dealsWon": "Подписано договоров",
     "conversionRate": "Конверсия"
   },
   "financeOverview": {

@@ -186,7 +186,10 @@
     "clientField": {
       "passport": "passport number",
       "pin": "personal number (PIN)"
-    }
+    },
+    "discountApproved": "Discount approved",
+    "discountRejected": "Discount rejected",
+    "discountDecisionError": "Could not save the decision"
   },
   "booking": {
     "rooms": "{{count}} rooms",
@@ -231,5 +234,18 @@
     },
     "depositPlain": "Deposit",
     "reservationExpiresHint": "Defaults to {{defaultDays}} days; at most {{maxDays}} days from today."
+  },
+  "discountBanner": {
+    "pendingTitle": "Discount of {{percent}}% ({{amount}}) is awaiting approval",
+    "pendingRequester": "The contract can be signed once your Sales Head decides. The sale price stays at the list price until then.",
+    "pendingApprover": "This is above the manager's own limit. Approve it to apply the discount, or reject it with a reason.",
+    "approve": "Approve",
+    "reject": "Reject",
+    "rejectedTitle": "Discount of {{percent}}% was rejected",
+    "reason": "Reason: {{reason}}",
+    "signBlocked": "Waiting for the discount decision",
+    "rejectDialogTitle": "Reject discount",
+    "rejectDialogDescription": "The deal stays at the list price. The manager sees your reason.",
+    "rejectReason": "Reason"
   }
 }

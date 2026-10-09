@@ -4,7 +4,7 @@ import {DealStatus, LeadStatus, PaymentMethod, PaymentScheduleStatus, Prisma, Ta
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {hasPermission} from "@/common/utils/permissions.util";
-import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
+import {ACTIVE_DEAL_STATUSES, WON_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 import {OPEN_LEAD_STATUSES} from "@/modules/leads/lead.constants";
 import {RbacService} from "@/modules/rbac/rbac.service";
 
@@ -443,11 +443,13 @@ export class DashboardService {
             this.prisma.deal.count({
                 where: { companyId, managerId, deletedAt: null, createdAt: { gte: since } },
             }),
+            // Won in the period = contract signed in the period, whenever the
+            // deal was reserved.
             this.prisma.deal.count({
                 where: {
                     companyId, managerId, deletedAt: null,
-                    status: DealStatus.COMPLETED,
-                    createdAt: { gte: since },
+                    status: { in: WON_DEAL_STATUSES },
+                    contractDate: { gte: since },
                 },
             }),
         ]);
@@ -564,7 +566,7 @@ export class DashboardService {
                 _count: { _all: true },
             }),
             this.prisma.deal.count({
-                where: { companyId, projectId, branchId: effectiveBranchId, ...selfScoped, status: DealStatus.COMPLETED },
+                where: { companyId, projectId, branchId: effectiveBranchId, ...selfScoped, status: { in: WON_DEAL_STATUSES } },
             }),
             this.prisma.lead.count({
                 where: { companyId, branchId: effectiveBranchId, ...selfScoped, deletedAt: null },
