@@ -44,6 +44,7 @@ import {
     PaymentScheduleStatus,
     PaymentType,
     PrismaClient,
+    ProjectStatus,
     TaskStatus,
     UnitStatus,
     UnitType,
@@ -236,6 +237,9 @@ async function seedDemo() {
         data: {
             name: "ЖК Орион",
             address: "Бишкек",
+            // Open for sales: the demo deals below live on this project, and
+            // a DRAFT project refuses new bookings (ensureProjectOpenForSales).
+            status: ProjectStatus.ACTIVE,
             companyId: company.id,
         },
     });
@@ -393,6 +397,12 @@ async function seedDemoTenantData(args: {
                     fullName: personName(seed),
                     phone: `+9967001${String(seed).padStart(5, "0")}`,
                     email: `client${seed}@example.com`,
+                    // Signing a contract needs both. Every fifth client is
+                    // left without them to show the "add the client's
+                    // details first" path.
+                    ...(seed % 5 === 0
+                        ? {}
+                        : {passport: `AN${String(1000000 + seed)}`, pin: `2${String(seed).padStart(13, "0")}`}),
                     companyId: company.id,
                     branchId: team.branchId,
                 },
@@ -485,7 +495,7 @@ async function seedDemoTenantData(args: {
                     clientId: client.id,
                     managerId: manager.id,
                     branchId: team.branchId,
-                    dealNumber: `DL-${new Date().getFullYear()}-${String(dealSeq).padStart(4, "0")}`,
+                    dealNumber: `D-${new Date().getFullYear()}-${String(dealSeq).padStart(4, "0")}`,
                     status,
                     financingType: pick(financingTypes, dealSeed),
                     listPrice,

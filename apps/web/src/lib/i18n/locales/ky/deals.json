@@ -20,6 +20,7 @@
     "discount": "Арзандатуу"
   },
   "unitCard": {
+    "title": "Жай",
     "unitNumber": "№{{number}} жай",
     "floor": "{{floor}}-кабат"
   },
@@ -156,7 +157,12 @@
     "referencePlaceholder": "мисалы, транзакция ID",
     "record": "Жаздыруу",
     "extensionsLeft": "Калган узартуулар: {{max}} ичинен {{left}}. Жаңы күн бүгүндөн тартып {{maxDays}} күндөн ашпайт.",
-    "extendUnavailable": "Узартуулар түгөндү — келишимге кол коюңуз же брондун мөөнөтү бүтүшүн күтүңүз."
+    "extendUnavailable": "Узартуулар түгөндү — келишимге кол коюңуз же брондун мөөнөтү бүтүшүн күтүңүз.",
+    "generateDocument": "Түзүү",
+    "generateReservation": "Брондоо келишими",
+    "generateContract": "Сатып алуу-сатуу келишими",
+    "activateDialogTitle": "Бүтүмдү активдештирүү керекпи?",
+    "activateDialogDescription": "Мындан ары төлөмдөр башталат: төлөм графигин түзүп, төлөмдөрдү киргизүүгө болот. Активдүү бүтүмдү «Келишимге кол коюлду» статусуна кайтаруу мүмкүн эмес."
   },
   "toasts": {
     "unitReserved": "Жай бронделди",
@@ -176,7 +182,17 @@
     "paymentRecorded": "Төлөм жаздырылды",
     "paymentError": "Төлөмдү жаздыруу мүмкүн болбоду",
     "dealCompleted": "Бүтүм аякталды",
-    "completeError": "Бүтүмдү аяктоо мүмкүн болбоду"
+    "completeError": "Бүтүмдү аяктоо мүмкүн болбоду",
+    "documentGenerated": "Документ түзүлдү",
+    "documentError": "Документти түзүү мүмкүн болбоду",
+    "signMissingDetails": "Адегенде кардардын карточкасына кошуңуз: {{fields}}.",
+    "clientField": {
+      "passport": "паспорттун номери",
+      "pin": "ПИН"
+    },
+    "discountApproved": "Арзандатуу макулдашылды",
+    "discountRejected": "Арзандатуу четке кагылды",
+    "discountDecisionError": "Чечимди сактоо мүмкүн болбоду"
   },
   "booking": {
     "rooms": "{{count}} бөлм.",
@@ -221,5 +237,62 @@
     },
     "depositPlain": "Депозит",
     "reservationExpiresHint": "Демейки {{defaultDays}} күн; бүгүндөн тартып {{maxDays}} күндөн ашпайт."
+  },
+  "discountBanner": {
+    "pendingTitle": "{{percent}}% ({{amount}}) арзандатуу макулдашууну күтүүдө",
+    "pendingRequester": "Келишимге сатуу бөлүмүнүн башчысы чечим кабыл алгандан кийин кол коюуга болот. Ага чейин баа прайс боюнча калат.",
+    "pendingApprover": "Арзандатуу менеджердин лимитинен жогору. Макулдаңыз же себебин көрсөтүп четке кагыңыз.",
+    "approve": "Макулдоо",
+    "reject": "Четке кагуу",
+    "rejectedTitle": "{{percent}}% арзандатуу четке кагылды",
+    "reason": "Себеби: {{reason}}",
+    "signBlocked": "Арзандатуу боюнча чечим күтүлүүдө",
+    "rejectDialogTitle": "Арзандатууну четке кагуу",
+    "rejectDialogDescription": "Бүтүм прайс баасында калат. Менеджер себебин көрөт.",
+    "rejectReason": "Себеби"
+  },
+  "stage": {
+    "label": "Бүтүмдүн этабы",
+    "installments_one": "{{count}} төлөм",
+    "installments_few": "{{count}} төлөм",
+    "installments_many": "{{count}} төлөм",
+    "installments_other": "{{count}} төлөм"
+  },
+  "keyFigures": {
+    "discounted": "Прайс боюнча {{list}} · −{{percent}}%",
+    "atListPrice": "Прайс баасында",
+    "paidShare": "{{percent}}% төлөндү",
+    "ofSalePrice": "{{total}} ичинен",
+    "reservationExpires": "Брондун мөөнөтү",
+    "contract": "Келишим",
+    "activateHint": "Төлөмдөрдү баштоо үчүн активдештириңиз",
+    "nextPayment": "Кийинки төлөм",
+    "dueOn": "{{date}} чейин",
+    "overdueSince": "{{date}} бери мөөнөтү өттү",
+    "noSchedule": "Төлөм графиги азырынча жок",
+    "status": "Статус",
+    "fullyPaid": "Толук төлөндү"
+  },
+  "tabs": {
+    "payments": "Төлөмдөр",
+    "documents": "Документтер",
+    "activity": "Тарых"
+  },
+  "sidebar": {
+    "title": "Маалымат",
+    "client": "Кардар",
+    "idOnFile": "Паспорт жана ПИН бар",
+    "idMissing": "Паспорт же ПИН жок: аларсыз келишимге кол коюлбайт",
+    "unit": "Жай",
+    "unitSheet": "Жайдын карточкасы",
+    "deal": "Бүтүм",
+    "reassign": "Өткөрүү",
+    "rooms_one": "{{count}} бөлмө",
+    "rooms_few": "{{count}} бөлмө",
+    "rooms_many": "{{count}} бөлмө",
+    "rooms_other": "{{count}} бөлмө",
+    "you": "Сиз",
+    "managerInactive": "Менеджер өчүрүлгөн. Бүтүмдү бирөө жүргүзүшү үчүн аны өткөрүп бериңиз.",
+    "noManager": "Бүтүмдүн менеджери жок. Бирөө жүргүзүшү үчүн аны өткөрүп бериңиз."
   }
 }

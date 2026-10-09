@@ -1,4 +1,4 @@
-import {BadRequestException, ConflictException} from '@nestjs/common';
+import {BadRequestException, ConflictException, ForbiddenException} from '@nestjs/common';
 import {
     DealStatus,
     DiscountApprovalStatus,
@@ -91,7 +91,10 @@ describe('DealsService', () => {
                 findUniqueOrThrow: jest.fn().mockImplementation(({where}: any) => Promise.resolve({id: where.id})),
                 groupBy: jest.fn().mockResolvedValue([]),
             },
-            client: {findFirst: jest.fn()},
+            client: {
+                findFirst: jest.fn(),
+                findUniqueOrThrow: jest.fn().mockResolvedValue({passport: 'AN1234567', pin: '21234567890123'}),
+            },
             user: {findFirstOrThrow: jest.fn(), findFirst: jest.fn(), findMany: jest.fn().mockResolvedValue([])},
             company: {findUniqueOrThrow: jest.fn().mockResolvedValue(company())},
             payment: {create: jest.fn().mockResolvedValue({}), aggregate: jest.fn().mockResolvedValue({_sum: {amount: null}})},
@@ -164,6 +167,26 @@ describe('DealsService', () => {
         it('throws UnitNotFoundException when the unit is missing or outside the company', async () => {
             const {service} = build({unit: null});
             await expect(service.reserveUnit(managerUser, reserveDto())).rejects.toThrow(UnitNotFoundException);
+        });
+
+        it('refuses to book in another manager\'s name without deals.reassign', async () => {
+            const {service, prisma} = build();
+            await expect(service.reserveUnit(managerUser, reserveDto({managerId: 'manager-2'})))
+                .rejects.toThrow(ForbiddenException);
+            expect(prisma.deal.create).not.toHaveBeenCalled();
+        });
+
+        it('books in another manager\'s name when the actor holds deals.reassign', async () => {
+            const {service, prisma} = build();
+            const head = {...salesHeadUser, permissions: ['deals.reassign']};
+            await service.reserveUnit(head, reserveDto({managerId: 'manager-1'}));
+            expect(prisma.deal.create).toHaveBeenCalled();
+        });
+
+        it('books in the actor\'s own name when no manager is given', async () => {
+            const {service, prisma} = build();
+            await service.reserveUnit(managerUser, reserveDto());
+            expect(prisma.deal.create.mock.calls[0][0].data.managerId).toBe(managerUser.id);
         });
 
         it('looks the unit up excluding soft-deleted units and projects', async () => {

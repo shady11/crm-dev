@@ -1,4 +1,4 @@
-import {useRef, useState} from "react";
+import {type ReactNode, useRef, useState} from "react";
 import {createListCollection} from "@ark-ui/react";
 import {DownloadIcon, FileIcon, Trash2Icon} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
@@ -14,14 +14,21 @@ import {
     formatFileSize
 } from "@/features/documents/types/document.types.ts";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {hasPermission} from "@/features/auth/access.ts";
 
 interface EntityDocumentsCardProps {
     ownerType: DocumentOwnerType;
     ownerId: string;
+    /** Extra controls next to Upload, e.g. a deal's "Generate" menu. */
+    headerActions?: ReactNode;
 }
 
-export function EntityDocumentsCard({ ownerType, ownerId }: EntityDocumentsCardProps) {
+export function EntityDocumentsCard({ ownerType, ownerId, headerActions }: EntityDocumentsCardProps) {
     const { t } = useTranslation("documents");
+    const { user } = useAuth();
+    const canUpload = hasPermission(user, "documents.upload");
+    const canDelete = hasPermission(user, "documents.delete");
 
     const { documents, isLoading } = useEntityDocuments(ownerType, ownerId);
     const actions = useDocumentActions();
@@ -48,24 +55,29 @@ export function EntityDocumentsCard({ ownerType, ownerId }: EntityDocumentsCardP
     return (
         <Card className="border border-secondary shadow-none pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
-                <CardTitle className="text-sm text-muted-foreground">
+                <CardTitle className="text-sm whitespace-nowrap text-muted-foreground">
                     {t("card.title")}{documents.length > 0 && ` (${documents.length})`}
                 </CardTitle>
-                <div className="flex items-center gap-2">
-                    <Select
-                        collection={typeCollection}
-                        value={[selectedType]}
-                        onValueChange={({ value }) => setSelectedType(value[0] as DocumentType)}
-                    >
-                        <SelectTrigger size="sm" className="w-40"><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                            {typeCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
-                    <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()} disabled={actions.upload.isPending}>
-                        {t("card.upload")}
-                    </Button>
-                    <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileSelected} />
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                    {headerActions}
+                    {canUpload && (
+                        <>
+                            <Select
+                                collection={typeCollection}
+                                value={[selectedType]}
+                                onValueChange={({ value }) => setSelectedType(value[0] as DocumentType)}
+                            >
+                                <SelectTrigger size="sm" className="w-40"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    {typeCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                            <Button variant="secondary" size="sm" onClick={() => fileInputRef.current?.click()} disabled={actions.upload.isPending}>
+                                {t("card.upload")}
+                            </Button>
+                            <input ref={fileInputRef} type="file" className="hidden" onChange={handleFileSelected} />
+                        </>
+                    )}
                 </div>
             </CardHeader>
             <CardContent>
@@ -85,15 +97,17 @@ export function EntityDocumentsCard({ ownerType, ownerId }: EntityDocumentsCardP
                                 <Button variant="ghost" size="icon-sm" onClick={() => actions.download.mutate(doc)} aria-label={t("common:actions.download")}>
                                     <DownloadIcon className="size-3.5" />
                                 </Button>
-                                <IconTooltipButton
-                                    variant="ghost"
-                                    size="icon-sm"
-                                    onClick={() => actions.remove.mutate(doc.id)}
-                                    disabled={actions.remove.isPending}
-                                    label={t("common:actions.delete")}
-                                >
-                                    <Trash2Icon className="size-3.5 text-destructive" />
-                                </IconTooltipButton>
+                                {canDelete && (
+                                    <IconTooltipButton
+                                        variant="ghost"
+                                        size="icon-sm"
+                                        onClick={() => actions.remove.mutate(doc.id)}
+                                        disabled={actions.remove.isPending}
+                                        label={t("common:actions.delete")}
+                                    >
+                                        <Trash2Icon className="size-3.5 text-destructive" />
+                                    </IconTooltipButton>
+                                )}
                             </div>
                         ))}
                     </div>

@@ -81,7 +81,7 @@
   "myPerformance": {
     "title": "Акыркы {{days}} күндөгү менин натыйжам",
     "leadsAssigned": "Дайындалган лиддер",
-    "dealsWon": "Жабылган бүтүмдөр",
+    "dealsWon": "Кол коюлган келишимдер",
     "conversionRate": "Конверсия"
   },
   "financeOverview": {

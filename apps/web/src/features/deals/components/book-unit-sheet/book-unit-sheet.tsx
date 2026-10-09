@@ -15,6 +15,8 @@ import type {ApartmentSummary} from "@/features/deals/types/booking.types.ts";
 import {useBookUnit} from "@/features/deals/hooks/use-book-unit.ts";
 import type {Client} from "@/features/clients/types/client.types.ts";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {hasPermission} from "@/features/auth/access.ts";
 
 interface BookUnitSheetProps {
     unit: Unit;
@@ -42,6 +44,14 @@ const DEFAULT_VALUES: BookingFormInput = {
 
 export function BookUnitSheet({ unit, floor, projectId, managers, open, onOpenChange }: BookUnitSheetProps) {
     const { t } = useTranslation("deals");
+    const { user } = useAuth();
+    // Booking in someone else's name needs deals.reassign on the API too;
+    // everyone else books in their own name without being asked.
+    const canChooseManager = hasPermission(user, "deals.reassign");
+    const defaultValues = useMemo<BookingFormInput>(
+        () => ({ ...DEFAULT_VALUES, reservation: { ...DEFAULT_VALUES.reservation, managerId: user?.id ?? "" } }),
+        [user?.id],
+    );
     const [step, setStep] = useState(0);
     const [selectedClient, setSelectedClient] = useState<Client | null>(null);
     const [submitError, setSubmitError] = useState<string | undefined>();
@@ -68,11 +78,11 @@ export function BookUnitSheet({ unit, floor, projectId, managers, open, onOpenCh
 
     const form = useForm<BookingFormInput>({
         resolver: zodResolver(bookingSchema),
-        defaultValues: DEFAULT_VALUES,
+        defaultValues,
     });
 
     const reset = () => {
-        form.reset(DEFAULT_VALUES);
+        form.reset(defaultValues);
         setStep(0);
         setSelectedClient(null);
         setSubmitError(undefined);
@@ -149,7 +159,10 @@ export function BookUnitSheet({ unit, floor, projectId, managers, open, onOpenCh
         }
     });
 
-    const managerName = managers.find((m) => m.id === form.watch("reservation.managerId"))?.fullName;
+    const selectedManagerId = form.watch("reservation.managerId");
+    const managerName =
+        managers.find((m) => m.id === selectedManagerId)?.fullName ??
+        (selectedManagerId === user?.id ? user?.name : undefined);
     return (
         <Sheet open={open} onOpenChange={({ open }) => handleOpenChange(open)}>
             <SheetContent variant="inset" className="sm:max-w-md">
@@ -169,7 +182,12 @@ export function BookUnitSheet({ unit, floor, projectId, managers, open, onOpenCh
                             <ClientStep form={form} selectedClient={selectedClient} onSelectClient={setSelectedClient} />
                         </>
                     )}
-                    {step === 1 && <ReservationStep form={form} apartment={apartment} managers={managers} />}
+                    {step === 1 && <ReservationStep
+                            form={form}
+                            apartment={apartment}
+                            managers={managers}
+                            canChooseManager={canChooseManager}
+                        />}
                     {step === 2 && (
                         <SummaryStep
                             values={form.getValues()}

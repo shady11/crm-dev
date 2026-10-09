@@ -24,9 +24,11 @@ interface ReservationStepProps {
     form: UseFormReturn<BookingFormInput>;
     apartment: ApartmentSummary;
     managers: Manager[];
+    /** False books in the signed-in user's own name, with no picker shown. */
+    canChooseManager: boolean;
 }
 
-export function ReservationStep({ form, apartment, managers }: ReservationStepProps) {
+export function ReservationStep({ form, apartment, managers, canChooseManager }: ReservationStepProps) {
     const { t } = useTranslation("deals");
     const { formatCurrency, currencyCode } = useCompanyFormatters();
     const policy = useReservationPolicy().data;
@@ -50,32 +52,34 @@ export function ReservationStep({ form, apartment, managers }: ReservationStepPr
     return (
         <SheetBody scrollFade>
             <FieldGroup className="gap-5 py-4">
-                <Controller
-                    control={form.control}
-                    name="reservation.managerId"
-                    render={({ field, fieldState }) => (
-                        <Field invalid={fieldState.invalid} orientation="responsive">
-                            <FieldLabel>{t("booking.manager")}</FieldLabel>
-                            <Select
-                                collection={managerCollection}
-                                value={field.value ? [field.value] : []}
-                                onValueChange={(item) => field.onChange(item.value[0])}
-                            >
-                                <SelectTrigger className="w-full min-w-32">
-                                    <SelectValue placeholder={t("booking.selectManager")} />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {managerCollection.items.map((item) => (
-                                        <SelectItem key={item.value} item={item}>
-                                            {item.label}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            <FieldError>{fieldState.error?.message}</FieldError>
-                        </Field>
-                    )}
-                />
+                {canChooseManager && (
+                    <Controller
+                        control={form.control}
+                        name="reservation.managerId"
+                        render={({ field, fieldState }) => (
+                            <Field invalid={fieldState.invalid} orientation="responsive">
+                                <FieldLabel>{t("booking.manager")}</FieldLabel>
+                                <Select
+                                    collection={managerCollection}
+                                    value={field.value ? [field.value] : []}
+                                    onValueChange={(item) => field.onChange(item.value[0])}
+                                >
+                                    <SelectTrigger className="w-full min-w-32">
+                                        <SelectValue placeholder={t("booking.selectManager")} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {managerCollection.items.map((item) => (
+                                            <SelectItem key={item.value} item={item}>
+                                                {item.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <FieldError>{fieldState.error?.message}</FieldError>
+                            </Field>
+                        )}
+                    />
+                )}
 
                 <Controller
                     control={form.control}

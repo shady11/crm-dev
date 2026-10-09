@@ -8,8 +8,23 @@ export type PaymentMethod = "CASH" | "BANK_TRANSFER" | "MBANK" | "OPTIMA" | "ELK
 export type PaymentType = "DEPOSIT" | "INSTALLMENT" | "FINAL" | "REFUND";
 export type PaymentScheduleStatus = "PENDING" | "PARTIAL" | "PAID" | "OVERDUE";
 
-type DealClient = { id: string; fullName: string; phone: string; email:string };
-type DealManager = { id: string; fullName: string; role: {id: string; name: string} } | null;
+type DealClient = {
+    id: string;
+    fullName: string;
+    phone: string;
+    email: string | null;
+    // Both needed before a contract can be signed (see DealDomainService.ensureCanSignContract).
+    passport: string | null;
+    pin: string | null;
+};
+type DealManager = {
+    id: string;
+    fullName: string;
+    phone: string | null;
+    email: string;
+    isActive: boolean;
+    role: {id: string; name: string};
+} | null;
 type DealUnit = {
     id: string;
     number: string;
@@ -25,6 +40,8 @@ type DealUnit = {
 };
 type DealProject = { id: string; name: string };
 
+export type DiscountApprovalStatus = "NONE" | "PENDING" | "APPROVED" | "REJECTED";
+
 export type Deal = {
     id: string;
     dealNumber: string;
@@ -36,6 +53,10 @@ export type Deal = {
     discountAmount: number | null;
     discountPercent: number | null;
     deposit: number | null;
+    discountApprovalStatus: DiscountApprovalStatus;
+    requestedDiscountPercent: number | null;
+    requestedDiscountAmount: number | null;
+    discountRejectionReason: string | null;
     reservedAt: string | null;
     reservationExpiresAt: string | null;
     reservationExtensionCount: number;
@@ -176,6 +197,24 @@ export async function getReservationPolicy() {
 
 export async function extendReservation(id: string, reservationExpiresAt: string) {
     const response = await api.post<DealDetails>(`/deals/${id}/extend`, { reservationExpiresAt });
+    return response.data;
+}
+
+export async function approveDiscount(dealId: string) {
+    const response = await api.post<DealDetails>(`/deals/${dealId}/discount/approve`);
+    return response.data;
+}
+
+export async function rejectDiscount(dealId: string, reason: string) {
+    const response = await api.post<DealDetails>(`/deals/${dealId}/discount/reject`, { reason });
+    return response.data;
+}
+
+export type GeneratableDocumentType = "RESERVATION" | "CONTRACT";
+
+/** Re-renders a deal's reservation agreement or contract PDF from its current data. */
+export async function generateDealDocument(dealId: string, type: GeneratableDocumentType) {
+    const response = await api.post(`/deals/${dealId}/documents/${type}/generate`);
     return response.data;
 }
 

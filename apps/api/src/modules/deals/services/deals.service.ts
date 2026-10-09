@@ -34,7 +34,7 @@ import {DEAL_SORTABLE_FIELDS, DealQueryDto} from '../dto/deal-query.dto';
 import {resolveOrderBy} from '@/common/utils/sort.util';
 import {DealDomainService} from './deal-domain.service';
 import {DealActivityService} from './deal-activity.service';
-import {ACTIVE_DEAL_STATUSES, DEAL_DETAILS_INCLUDE, RESERVATION_POLICY_SELECT} from "../deal.constants";
+import {ACTIVE_DEAL_STATUSES, DEAL_DETAILS_INCLUDE, dealStatusTitle, RESERVATION_POLICY_SELECT} from "../deal.constants";
 import {ReserveUnitDto} from "../dto/reserve-unit.dto";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ExtendReservationDto} from "@/modules/deals/dto/extend-reservation.dto";
@@ -198,6 +198,12 @@ export class DealsService {
 
     const companyId = user.companyId;
     const managerId = dto.managerId ?? user.id;
+
+    // Booking in someone else's name is a reassignment, so it needs the
+    // same right as reassigning an existing deal.
+    if (managerId !== user.id && !hasPermission(user, 'deals.reassign')) {
+      throw new ForbiddenException('You can only book a unit in your own name.');
+    }
 
     // Validate immutable entities before transaction
     const client = await this.getClientOrThrow(user, dto.clientId);
@@ -540,7 +546,11 @@ export class DealsService {
       });
       if (!deal) throw new DealNotFoundException(id);
 
-      this.domain.ensureCanSignContract(deal);
+      const client = await db.client.findUniqueOrThrow({
+        where: { id: deal.clientId },
+        select: { passport: true, pin: true },
+      });
+      this.domain.ensureCanSignContract(deal, client);
 
       await db.deal.update({
         where: { id },
@@ -563,7 +573,7 @@ export class DealsService {
           companyId,
           userId: deal.managerId,
           type: NotificationType.DEAL_STATUS_CHANGED,
-          title: `Deal ${deal.dealNumber} is now ${this.domain.nextStatusAfterReservation()}`,
+          title: dealStatusTitle(deal.dealNumber, this.domain.nextStatusAfterReservation()),
           entityType: NotificationEntityType.DEAL,
           entityId: deal.id,
         });
@@ -619,7 +629,7 @@ export class DealsService {
           companyId,
           userId: deal.managerId,
           type: NotificationType.DEAL_STATUS_CHANGED,
-          title: `Deal ${deal.dealNumber} is now ${this.domain.nextStatusAfterContract()}`,
+          title: dealStatusTitle(deal.dealNumber, this.domain.nextStatusAfterContract()),
           entityType: NotificationEntityType.DEAL,
           entityId: deal.id,
         });
@@ -890,7 +900,7 @@ export class DealsService {
           companyId,
           userId: deal.managerId,
           type: NotificationType.DEAL_STATUS_CHANGED,
-          title: `Deal ${deal.dealNumber} is now ${UnitStatus.AVAILABLE}`,
+          title: dealStatusTitle(deal.dealNumber, DealStatus.CANCELLED),
           entityType: NotificationEntityType.DEAL,
           entityId: deal.id,
         });
@@ -989,7 +999,7 @@ export class DealsService {
         companyId: deal.companyId,
         userId: deal.managerId,
         type: NotificationType.DEAL_STATUS_CHANGED,
-        title: `Deal ${deal.dealNumber} is now ${this.domain.nextStatusAfterCompletion()}`,
+        title: dealStatusTitle(deal.dealNumber, this.domain.nextStatusAfterCompletion()),
         entityType: NotificationEntityType.DEAL,
         entityId: deal.id,
       });

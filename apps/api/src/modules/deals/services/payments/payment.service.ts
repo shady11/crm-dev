@@ -13,7 +13,7 @@ import {DealDomainService} from '../deal-domain.service';
 import {DealActivityService} from '../deal-activity.service';
 import {DealsService} from '../deals.service';
 import {DealMapper} from '../../mappers/deal.mapper';
-import {DEAL_DETAILS_INCLUDE} from '../../deal.constants';
+import {DEAL_DETAILS_INCLUDE, formatMoney} from '../../deal.constants';
 import {DealNotFoundException} from '../../exceptions';
 import {CreatePaymentDto} from '../../dto/payments/create-payment.dto';
 import {NotificationsService} from "@/modules/notifications/notifications.service";
@@ -84,7 +84,7 @@ export class PaymentService {
                     title: isRefund
                         ? `Refund issued for deal ${deal.dealNumber}`
                         : `Payment received for deal ${deal.dealNumber}`,
-                    message: `${magnitude.toString()} $`,
+                    message: formatMoney(magnitude, user.company?.currency),
                     entityType: NotificationEntityType.DEAL,
                     entityId: dealId,
                 });

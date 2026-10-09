@@ -1,7 +1,6 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {ScrollArea} from "@/components/ui/scroll-area.tsx";
 import type {DealDetails} from "@/features/deals/api/deals.api.ts";
 import {Table, TableBody, TableCell, TableRow} from "@/components/ui/table.tsx";
 import {Progress} from "@/components/ui/progress";
@@ -74,36 +73,34 @@ export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule 
                         {canGenerate ? t("paymentSchedule.emptyActive", { ns: "deals" }) : t("paymentSchedule.emptyInactive", { ns: "deals" })}
                     </p>
                 ) : (
-                    <div className="h-80 py-2">
-                        <ScrollArea scrollFade className="pr-2">
-                            <Table className="mx-auto w-full max-w-xl">
-                                <TableBody>
-                                    {schedules.map((s, i) => (
-                                        <TableRow
-                                            key={s.id}
-                                            className={`text-sm ${
-                                                i === currentIndex ? " bg-border" : ""
-                                            }`}
-                                        >
-                                            <TableCell>
-                                                #{s.order}
-                                            </TableCell>
-                                            <TableCell>
-                                                {new Date(s.dueDate).toLocaleDateString(i18n.language)}
-                                            </TableCell>
-                                            <TableCell>
-                                                {formatCurrency(s.paidAmount)} / {formatCurrency(s.amount)}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <Badge className={`${SCHEDULE_STATUS_CLASSES[s.status]} text-white`}>
-                                                    {t(SCHEDULE_STATUS_LABEL_KEYS[s.status])}
-                                                </Badge>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        </ScrollArea>
+                    <div className="py-2">
+                        <Table className="w-full">
+                            <TableBody>
+                                {schedules.map((s, i) => (
+                                    <TableRow
+                                        key={s.id}
+                                        className={`text-sm ${
+                                            i === currentIndex ? " bg-border" : ""
+                                        }`}
+                                    >
+                                        <TableCell>
+                                            #{s.order}
+                                        </TableCell>
+                                        <TableCell>
+                                            {new Date(s.dueDate).toLocaleDateString(i18n.language)}
+                                        </TableCell>
+                                        <TableCell>
+                                            {formatCurrency(s.paidAmount)} / {formatCurrency(s.amount)}
+                                        </TableCell>
+                                        <TableCell className="text-right">
+                                            <Badge className={`${SCHEDULE_STATUS_CLASSES[s.status]} text-white`}>
+                                                {t(SCHEDULE_STATUS_LABEL_KEYS[s.status])}
+                                            </Badge>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
                     </div>
                 )}
             </CardContent>

@@ -1,4 +1,4 @@
-import {BadRequestException, HttpStatus, NotFoundException} from "@nestjs/common";
+import {BadRequestException, ConflictException, HttpStatus, NotFoundException} from "@nestjs/common";
 import {HttpAdapterHost} from "@nestjs/core";
 import {Prisma} from "@/generated/prisma/client";
 import {AllExceptionsFilter} from "./all-exceptions.filter";
@@ -42,6 +42,20 @@ describe("AllExceptionsFilter", () => {
         expect(sent.status).toBe(HttpStatus.NOT_FOUND);
         expect(sent.body.message).toBe('Deal "abc" was not found.');
         expect(sent.body.path).toBe("/api/deals");
+    });
+
+    it("keeps the extra fields an application exception carries", () => {
+        filter.catch(
+            new ConflictException({
+                message: "A lead or client with this phone number already exists",
+                duplicates: {leads: [{id: "lead-1"}], clients: []},
+            }),
+            host,
+        );
+
+        expect(sent.status).toBe(HttpStatus.CONFLICT);
+        expect(sent.body.message).toBe("A lead or client with this phone number already exists");
+        expect(sent.body.duplicates).toEqual({leads: [{id: "lead-1"}], clients: []});
     });
 
     it("joins the array of messages a ValidationPipe produces", () => {

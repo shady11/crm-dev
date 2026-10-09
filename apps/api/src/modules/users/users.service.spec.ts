@@ -158,6 +158,33 @@ describe("UsersService — role boundaries", () => {
         });
     });
 
+    describe("findSalesTeam", () => {
+        it("lists active users whose role can work deals, company-wide for an unscoped actor", async () => {
+            const {service, prisma} = build();
+
+            await service.findSalesTeam(admin);
+
+            const args = prisma.user.findMany.mock.calls[0][0];
+            expect(args.where).toMatchObject({
+                companyId: "company-1",
+                isActive: true,
+                deletedAt: null,
+                isSuperAdmin: false,
+                role: {permissions: {some: {permission: {key: "deals.manage"}}}},
+            });
+            expect(args.where.branchId).toBeUndefined();
+            expect(args.select).toEqual({id: true, fullName: true, branchId: true});
+        });
+
+        it("limits a branch-scoped actor to their own branch", async () => {
+            const {service, prisma} = build();
+
+            await service.findSalesTeam({...admin, isBranchScoped: true, branchId: "branch-1"});
+
+            expect(prisma.user.findMany.mock.calls[0][0].where.branchId).toBe("branch-1");
+        });
+    });
+
     describe("findAll", () => {
         it("scopes the query to non-SUPER_ADMIN users and excludes deleted users", async () => {
             const {service, prisma} = build();

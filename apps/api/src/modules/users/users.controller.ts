@@ -30,6 +30,13 @@ export class UsersController {
         return this.usersService.getRoleSummary(user);
     }
 
+    // Declared before ":id" so "sales-team" isn't read as a user id.
+    @RequirePermissions("deals.view", "leads.view")
+    @Get("sales-team")
+    findSalesTeam(@CurrentUser() user: AuthUser) {
+        return this.usersService.findSalesTeam(user);
+    }
+
     @RequirePermissions("users.view")
     @Get(":id")
     findOne(@CurrentUser() user: AuthUser, @Param("id") id: string) {

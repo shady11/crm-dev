@@ -81,7 +81,7 @@
   "myPerformance": {
     "title": "My performance, last {{days}} days",
     "leadsAssigned": "Leads assigned",
-    "dealsWon": "Deals won",
+    "dealsWon": "Contracts signed",
     "conversionRate": "Conversion rate"
   },
   "financeOverview": {

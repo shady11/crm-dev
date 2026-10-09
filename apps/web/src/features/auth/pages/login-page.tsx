@@ -6,7 +6,8 @@ export function LoginPage() {
     const token = authStorage.getToken();
 
     if (token) {
-        return <Navigate to="/projects" replace />;
+        // "/" is RoleLanding, which picks the right first page for each role.
+        return <Navigate to="/" replace />;
     }
 
     return (

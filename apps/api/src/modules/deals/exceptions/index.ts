@@ -1,5 +1,6 @@
 export * from './active-deal-exists.exception';
 export * from './client-not-found.exception';
+export * from './client-details-missing.exception';
 export * from './deal-not-found.exception';
 export * from './deal-number-generation-failed.exception';
 export * from './invalid-deal-state.exception';

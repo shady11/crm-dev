@@ -315,6 +315,20 @@ describe('DashboardService', () => {
         });
     });
 
+    describe('getMyPerformance: deals won', () => {
+        it('counts contracts signed in the period, not only fully paid deals', async () => {
+            const {service, prisma} = build();
+            await service.getMyPerformance(adminUser, 30);
+
+            const wonWhere = prisma.deal.count.mock.calls
+                .map((call: any[]) => call[0].where)
+                .find((where: any) => where.status);
+            expect(wonWhere.status).toEqual({in: ['CONTRACT_SIGNED', 'ACTIVE', 'COMPLETED']});
+            expect(wonWhere.contractDate.gte).toBeInstanceOf(Date);
+            expect(wonWhere.createdAt).toBeUndefined();
+        });
+    });
+
     describe('getFunnel', () => {
         it('reports zero conversion rates when there are no leads at all', async () => {
             const {service, prisma} = build();

@@ -33,7 +33,7 @@ describe('LeadsService', () => {
         roleName: 'Company Admin',
         isBranchScoped: false,
         branchId: null,
-        permissions: ['clients.transfer_branch'],
+        permissions: ['clients.transfer_branch', 'leads.assign'],
     };
 
     const salesHeadUser: AuthUser = {
@@ -41,6 +41,7 @@ describe('LeadsService', () => {
         id: 'head-1',
         roleId: 'role-sales-head',
         roleName: 'Sales Head',
+        permissions: ['leads.assign'],
     };
 
     function build(opts: {
@@ -169,9 +170,39 @@ describe('LeadsService', () => {
 
         it('rejects assigning a manager outside the branch-scoped actor own branch', async () => {
             const {service} = build({manager: null});
-            await expect(service.create(branchUser, createDto({managerId: 'other-branch-manager'}))).rejects.toThrow(
+            await expect(service.create(salesHeadUser, createDto({managerId: 'other-branch-manager'}))).rejects.toThrow(
                 BadRequestException,
             );
+        });
+
+        it('puts a lead in the creator\'s own name when they cannot assign leads', async () => {
+            const {service, prisma} = build();
+            await service.create(branchUser, createDto());
+
+            expect(prisma.lead.create.mock.calls[0][0].data.managerId).toBe(branchUser.id);
+            expect(prisma.user.findFirst).not.toHaveBeenCalled();
+        });
+
+        it('refuses to assign someone else\'s name without leads.assign', async () => {
+            const {service, prisma} = build({manager: {id: 'manager-2', branchId: 'branch-1'}});
+            await expect(service.create(branchUser, createDto({managerId: 'manager-2'}))).rejects.toThrow(
+                ForbiddenException,
+            );
+            expect(prisma.lead.create).not.toHaveBeenCalled();
+        });
+
+        it('leaves a lead unassigned when an assigner gives no manager', async () => {
+            const {service, prisma} = build();
+            await service.create(adminUser, createDto());
+
+            expect(prisma.lead.create.mock.calls[0][0].data.managerId).toBeUndefined();
+        });
+
+        it('stores the next contact date', async () => {
+            const {service, prisma} = build();
+            await service.create(branchUser, createDto({nextContactAt: '2026-10-12T09:00:00.000Z'}));
+
+            expect(prisma.lead.create.mock.calls[0][0].data.nextContactAt).toEqual(new Date('2026-10-12T09:00:00.000Z'));
         });
 
         it('rejects linking a client not assignable to the acting user', async () => {
@@ -413,6 +444,18 @@ describe('LeadsService', () => {
             expect(prisma.activity.create).toHaveBeenCalledWith(
                 expect.objectContaining({data: expect.objectContaining({description: 'left voicemail'})}),
             );
+        });
+
+        it('stamps lastContactAt and books the next contact in the same step', async () => {
+            const {service, prisma} = build({lead: {id: 'lead-1'}});
+            await service.logContactAttempt(adminUser, 'lead-1', {
+                type: 'CALL',
+                nextContactAt: '2026-10-12T09:00:00.000Z',
+            } as any);
+
+            const data = prisma.lead.update.mock.calls[0][0].data;
+            expect(data.lastContactAt).toBeInstanceOf(Date);
+            expect(data.nextContactAt).toEqual(new Date('2026-10-12T09:00:00.000Z'));
         });
 
         it('404s before listing activities on an out-of-scope lead', async () => {

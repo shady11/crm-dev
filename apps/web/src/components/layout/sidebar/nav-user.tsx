@@ -18,6 +18,7 @@ import {BadgeCheck, Bell, ChevronsUpDown, LogOut} from "lucide-react";
 import {disconnectNotificationsSocket} from "@/lib/socket.ts";
 import {useTranslation} from "react-i18next";
 import {paths} from "@/routes/paths.ts";
+import {initials} from "@/features/users/utils/format.ts";
 
 export function NavUser({
                             user,
@@ -50,7 +51,7 @@ export function NavUser({
                         >
                             <Avatar className="h-8 w-8 rounded-lg">
                                 <AvatarImage src={user.avatar} alt={user.name} />
-                                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                                <AvatarFallback className="rounded-lg">{initials(user.name)}</AvatarFallback>
                             </Avatar>
                             <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                                 <span className="truncate font-medium">{user.name}</span>
@@ -67,7 +68,7 @@ export function NavUser({
                                 <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                                     <Avatar className="h-8 w-8 rounded-lg">
                                         <AvatarImage src={user.avatar} alt={user.name} />
-                                        <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                                        <AvatarFallback className="rounded-lg">{initials(user.name)}</AvatarFallback>
                                     </Avatar>
                                     <div className="grid flex-1 text-left text-sm leading-tight">
                                         <span className="truncate font-medium">{user.name}</span>

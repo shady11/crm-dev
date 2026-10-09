@@ -61,6 +61,7 @@ export type CreateLeadPayload = {
     // Set to bypass the server's duplicate-phone check after the caller has
     // already seen the warning (409 response) and wants to create it anyway.
     confirmDuplicate?: boolean;
+    nextContactAt?: string | null;
 };
 
 export type UpdateLeadPayload = Partial<CreateLeadPayload>;
@@ -153,6 +154,7 @@ export type LeadActivity = {
 export type LogContactAttemptPayload = {
     type: ContactAttemptType;
     note?: string;
+    nextContactAt?: string;
 };
 
 export async function getLeadActivities(id: string) {

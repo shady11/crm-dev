@@ -35,6 +35,7 @@ export function LeadDetailsSheet({
     const { t } = useTranslation("leads");
     const { user } = useAuth();
     const canTransferBranch = hasPermission(user, "leads.transfer_branch");
+    const canDelete = hasPermission(user, "leads.delete");
     // SH-A1: reassignment is a team-lead action, gated the same way the
     // backend endpoint is (leads.assign) rather than by a specific role name.
     const canReassign = hasPermission(user, "leads.assign");
@@ -75,9 +76,11 @@ export function LeadDetailsSheet({
                 </SheetBody>
 
                 <SheetFooter>
-                    <IconTooltipButton variant="destructive" size="icon-md" onClick={onRequestDelete} label={t("common:actions.delete")}>
-                        <Trash2 className="size-4" />
-                    </IconTooltipButton>
+                    {canDelete && (
+                        <IconTooltipButton variant="destructive" size="icon-md" onClick={onRequestDelete} label={t("common:actions.delete")}>
+                            <Trash2 className="size-4" />
+                        </IconTooltipButton>
+                    )}
                     {canTransferBranch && (
                         <Button
                             variant="secondary"

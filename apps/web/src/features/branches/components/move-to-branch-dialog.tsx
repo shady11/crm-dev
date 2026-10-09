@@ -40,7 +40,8 @@ export function MoveToBranchDialog({
     const {t} = useTranslation("branches");
     const {t: tCommon} = useTranslation("common");
     const [branchId, setBranchId] = useState("");
-    const branches = useBranchesFilter();
+    // Mounted on every leads/clients page; only fetch once someone opens it.
+    const branches = useBranchesFilter(open);
 
     useEffect(() => {
         if (open) setBranchId("");

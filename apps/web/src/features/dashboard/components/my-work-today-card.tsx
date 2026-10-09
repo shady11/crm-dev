@@ -2,6 +2,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx
 import {Badge} from "@/components/ui/badge.tsx";
 import type {MyWorkToday} from "@/features/dashboard/api/dashboard.api.ts";
 import {useTranslation} from "react-i18next";
+import {DEAL_STATUS_LABEL_KEYS, DealStatus} from "@/features/deals/types/deal.types.ts";
 
 // SM-A2: one screen showing what a SALES_MANAGER needs to do today — leads
 // waiting on follow-up, tasks due today, and deals waiting on the client —
@@ -70,7 +71,7 @@ export function MyWorkTodayCard({data}: {data: MyWorkToday}) {
                                         <p className="truncate font-medium">{deal.client.fullName}</p>
                                         <p className="text-xs text-muted-foreground">№{deal.unit.number}</p>
                                     </div>
-                                    <Badge variant="secondary">{deal.status}</Badge>
+                                    <Badge variant="secondary">{t(DEAL_STATUS_LABEL_KEYS[deal.status as DealStatus])}</Badge>
                                 </div>
                             ))}
                         </div>

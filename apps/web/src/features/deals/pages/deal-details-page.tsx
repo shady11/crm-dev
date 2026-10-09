@@ -1,6 +1,6 @@
 import {useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import {ArrowLeft, CalendarIcon, Dot, MoreVerticalIcon} from "lucide-react";
+import {useNavigate, useParams, useSearchParams} from "react-router-dom";
+import {ArrowLeft, CalendarIcon, FileTextIcon, MoreVerticalIcon} from "lucide-react";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
 import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader} from "@/components/ui/dialog";
@@ -8,13 +8,8 @@ import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {useDeal} from "@/features/deals/hooks/use-deal";
 import {useDealActions} from "@/features/deals/hooks/use-deal-actions";
-import {DEAL_STATUS_VISUALS} from "@/features/deals/types/deal.types";
-import {DealUnitCard} from "@/features/deals/components/deal-unit-card.tsx";
-import {DealClientCard} from "@/features/deals/components/deal-details/deal-client-card.tsx";
-import {DealManagerCard} from "@/features/deals/components/deal-details/deal-manager-card.tsx";
-import {DealFinancialsCard} from "@/features/deals/components/deal-details/deal-financials-card.tsx";
+import {DEAL_STATUS_VISUALS, type DealStatus} from "@/features/deals/types/deal.types";
 import {Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger} from "@/components/ui/menu.tsx";
-import {daysUntil} from "@/features/deals/utils/days-until.ts";
 import {DealHistoryCard} from "@/features/deals/components/deal-details/deal-history-card.tsx";
 import {formatDate} from "@/utils/date-formatter.ts";
 import {DatePicker, DatePickerContent, DatePickerTrigger} from "@/components/ui/date-picker.tsx";
@@ -36,9 +31,14 @@ import {DealPaymentsHistoryCard} from "@/features/deals/components/deal-details/
 import {NumberInput, NumberInputGroup, NumberInputInput} from "@/components/ui/number-input";
 import type {PaymentMethod, PaymentType} from "../api/deals.api";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
-import {DealTimelineCard} from "@/features/deals/components/deal-details/deal-timeline-card.tsx";
 import {DealTasksCard} from "@/features/deals/components/deal-tasks-card.tsx";
+import {DealDiscountBanner} from "@/features/deals/components/deal-details/deal-discount-banner.tsx";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
+import {useEntityDocuments} from "@/features/documents/hooks/use-entity-documents.ts";
+import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
+import {DealStageTracker} from "@/features/deals/components/deal-details/deal-stage-tracker.tsx";
+import {DealKeyFigures} from "@/features/deals/components/deal-details/deal-key-figures.tsx";
+import {DealDetailsSidebar} from "@/features/deals/components/deal-details/deal-details-sidebar.tsx";
 import {useTranslation} from "react-i18next";
 import {PAYMENT_METHOD_LABEL_KEYS, PAYMENT_TYPE_LABEL_KEYS} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
@@ -47,6 +47,21 @@ import {reservationDateBounds} from "@/features/deals/utils/reservation-dates.ts
 import {hasPermission} from "@/features/auth/access";
 import {ReassignManagerDialog} from "@/features/users/components/reassign-manager-dialog.tsx";
 import {PageError, PageSkeleton} from "@/components/shared/page-query-state.tsx";
+
+const TAB_VALUES = ["payments", "documents", "activity"] as const;
+type DealTab = (typeof TAB_VALUES)[number];
+
+/** Open on what this stage is about: paperwork before payments start, then payments. */
+function defaultTabFor(status: DealStatus): DealTab {
+    if (status === "ACTIVE" || status === "COMPLETED") return "payments";
+    if (status === "RESERVED" || status === "CONTRACT_SIGNED") return "documents";
+    return "activity";
+}
+
+function TabCount({ count }: { count: number }) {
+    if (count === 0) return null;
+    return <span className="ml-1.5 rounded-full bg-muted px-1.5 text-xs tabular-nums text-muted-foreground">{count}</span>;
+}
 
 export function DealDetailsPage() {
     const { t, i18n } = useTranslation(["deals", "payments"]);
@@ -58,6 +73,12 @@ export function DealDetailsPage() {
     // SH-A1: reassignment is a team-lead action, gated the same way the
     // backend endpoint is (deals.reassign) rather than by a specific role name.
     const canReassign = hasPermission(user, "deals.reassign");
+    const canGenerateDocuments = hasPermission(user, "documents.generate");
+    const canDecideDiscount = hasPermission(user, "deals.approve_discount");
+    const canCancel = hasPermission(user, "deals.cancel");
+    const [rejectOpen, setRejectOpen] = useState(false);
+    const [activateOpen, setActivateOpen] = useState(false);
+    const [rejectReason, setRejectReason] = useState("");
 
     const [cancelOpen, setCancelOpen] = useState(false);
     const [cancelReason, setCancelReason] = useState("");
@@ -84,6 +105,10 @@ export function DealDetailsPage() {
 
     const [reassignOpen, setReassignOpen] = useState(false);
 
+    // The open tab lives in the URL, so a link can point at a deal's payments or documents.
+    const [searchParams, setSearchParams] = useSearchParams();
+    const documentsCount = useEntityDocuments("DEAL", dealId!).documents.length;
+
     const deal = dealQuery.data;
     if (dealQuery.isLoading) return <PageSkeleton />;
     if (dealQuery.isError || !deal) return <PageError onRetry={() => dealQuery.refetch()} />;
@@ -95,8 +120,6 @@ export function DealDetailsPage() {
     const remaining = Math.max(deal.salePrice - totalPaid, 0);
 
     const visual = DEAL_STATUS_VISUALS[deal.status];
-
-    const daysLeft = deal.status === "RESERVED" ? daysUntil(deal.reservationExpiresAt) : null;
 
     // Mirrors DealDomainService.ensureCanExtendReservation: a limited number
     // of extensions, each to a later date within the company's maximum term.
@@ -128,114 +151,245 @@ export function DealDetailsPage() {
         items: Object.entries(PAYMENT_TYPE_LABEL_KEYS).map(([value, key]) => ({ label: t(key), value })),
     });
 
+    const isOpen = ["RESERVED", "CONTRACT_SIGNED", "ACTIVE"].includes(deal.status);
+    const tab = TAB_VALUES.includes(searchParams.get("tab") as DealTab)
+        ? (searchParams.get("tab") as DealTab)
+        : defaultTabFor(deal.status);
+    const setTab = (value: string) =>
+        setSearchParams((params) => {
+            params.set("tab", value);
+            return params;
+        }, { replace: true });
+
+    const generateMenu = canGenerateDocuments && !["CANCELLED", "EXPIRED"].includes(deal.status) && (
+        <Menu>
+            <MenuTrigger asChild>
+                <Button
+                    variant="secondary"
+                    size="sm"
+                    disabled={actions.generateDocument.isPending}
+                    isLoading={actions.generateDocument.isPending}
+                >
+                    <FileTextIcon className="size-3.5" />
+                    {t("detailsPage.generateDocument")}
+                </Button>
+            </MenuTrigger>
+            <MenuContent>
+                <MenuItem value="reservation" onSelect={() => actions.generateDocument.mutate("RESERVATION")}>
+                    {t("detailsPage.generateReservation")}
+                </MenuItem>
+                {/* The contract template prints the contract number and date. */}
+                {["CONTRACT_SIGNED", "ACTIVE", "COMPLETED"].includes(deal.status) && (
+                    <MenuItem value="contract" onSelect={() => actions.generateDocument.mutate("CONTRACT")}>
+                        {t("detailsPage.generateContract")}
+                    </MenuItem>
+                )}
+            </MenuContent>
+        </Menu>
+    );
+
     return (
         <div className="space-y-6">
-            <div className="space-y-2">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="flex flex-col gap-1.5">
-                        <div className="flex flex-wrap items-center gap-2.5">
-                            <h1 className="text-2xl font-semibold">{t("detailsPage.dealNumber", { number: deal.dealNumber })}</h1>
-                        </div>
-                        <div className="flex items-center text-sm text-muted-foreground gap-2">
-                            <Badge className={`${visual?.bg} text-white`}>{visual && t(visual.headingKey)}</Badge>
-                            {daysLeft !== null && (
-                                <div className="flex items-center">
-                                    <Dot />
-                                    <span className={`text-sm font-medium ${daysLeft <= 1 ? "text-destructive" : "text-muted-foreground"}`}>
-                                        {daysLeft > 0 ? t("card.daysLeft", { count: daysLeft }) : daysLeft === 0 ? t("card.expiresToday") : t("card.expired")}
-                                    </span>
-                                </div>
-                            )}
-                            {deal.contractNumber && (
-                                <p className="text-sm text-muted-foreground">{t("detailsPage.contractNumber", { number: deal.contractNumber })}</p>
-                            )}
-                        </div>
+            {/* Header: who and what at a glance, and the one next step for this stage. */}
+            <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex min-w-0 flex-col gap-1.5">
+                    <div className="flex flex-wrap items-center gap-2.5">
+                        <h1 className="text-2xl font-semibold">{t("detailsPage.dealNumber", { number: deal.dealNumber })}</h1>
+                        <Badge className={`${visual?.bg} text-white`}>{visual && t(visual.headingKey)}</Badge>
                     </div>
+                    <p className="truncate text-sm text-muted-foreground">
+                        {[
+                            t("unitCard.unitNumber", { number: deal.unit.number }),
+                            deal.project.name,
+                            deal.client.fullName,
+                        ].join(" · ")}
+                    </p>
+                </div>
 
-                    <div className="flex items-center gap-2">
-                        <Button variant="ghost" onClick={() => navigate("/deals")}>
-                            <ArrowLeft className="size-3"/>
-                            {t("detailsPage.back")}
-                        </Button>
-                        {deal.status === "RESERVED" && (
-                            <>
-                                <Button
-                                    variant="secondary"
-                                    disabled={!canExtend}
-                                    title={!canExtend ? t("detailsPage.extendUnavailable") : undefined}
-                                    onClick={openExtendDialog}
-                                >
-                                    {t("detailsPage.extendReservation")}
-                                </Button>
-                                <Button onClick={() => setSignOpen(true)}>{t("detailsPage.signContract")}</Button>
-                            </>
-                        )}
-                        {deal.status === "CONTRACT_SIGNED" && (
-                            <Button onClick={() => actions.activate.mutate()} disabled={actions.activate.isPending} isLoading={actions.activate.isPending}>
-                                {t("detailsPage.activateDeal")}
+                <div className="flex flex-wrap items-center gap-2">
+                    <Button variant="ghost" onClick={() => navigate("/deals")}>
+                        <ArrowLeft className="size-3"/>
+                        {t("detailsPage.back")}
+                    </Button>
+                    {deal.status === "RESERVED" && (
+                        <>
+                            <Button
+                                variant="secondary"
+                                disabled={!canExtend}
+                                title={!canExtend ? t("detailsPage.extendUnavailable") : undefined}
+                                onClick={openExtendDialog}
+                            >
+                                {t("detailsPage.extendReservation")}
                             </Button>
-                        )}
-                        {["RESERVED", "CONTRACT_SIGNED", "ACTIVE"].includes(deal.status) && (
-                            <Menu>
-                                <MenuTrigger asChild>
-                                    <Button variant="ghost" size="icon-sm" aria-label={t("detailsPage.moreActions")}>
-                                        <MoreVerticalIcon className="size-4" />
-                                    </Button>
-                                </MenuTrigger>
-                                <MenuContent>
-                                    {deal.status === "ACTIVE" && (
-                                        <>
-                                            <MenuItem value="complete" onSelect={() => actions.complete.mutate()}>
-                                                {t("detailsPage.markCompleted")}
-                                            </MenuItem>
-                                            <MenuSeparator />
-                                        </>
-                                    )}
+                            <Button
+                                onClick={() => setSignOpen(true)}
+                                disabled={deal.discountApprovalStatus === "PENDING"}
+                                title={deal.discountApprovalStatus === "PENDING" ? t("discountBanner.signBlocked") : undefined}
+                            >
+                                {t("detailsPage.signContract")}
+                            </Button>
+                        </>
+                    )}
+                    {deal.status === "CONTRACT_SIGNED" && (
+                        <Button onClick={() => setActivateOpen(true)}>
+                            {t("detailsPage.activateDeal")}
+                        </Button>
+                    )}
+                    {deal.status === "ACTIVE" && (
+                        deal.paymentSchedules.length === 0 ? (
+                            <Button variant="secondary" onClick={() => setScheduleOpen(true)}>
+                                {t("paymentSchedule.generate")}
+                            </Button>
+                        ) : null
+                    )}
+                    {deal.status === "ACTIVE" && (
+                        <Button onClick={() => setPaymentOpen(true)}>{t("paymentsHistory.record")}</Button>
+                    )}
+                    {isOpen && (canCancel || deal.status === "ACTIVE") && (
+                        <Menu>
+                            <MenuTrigger asChild>
+                                <Button variant="ghost" size="icon-sm" aria-label={t("detailsPage.moreActions")}>
+                                    <MoreVerticalIcon className="size-4" />
+                                </Button>
+                            </MenuTrigger>
+                            <MenuContent>
+                                {deal.status === "ACTIVE" && (
+                                    <MenuItem value="complete" onSelect={() => actions.complete.mutate()}>
+                                        {t("detailsPage.markCompleted")}
+                                    </MenuItem>
+                                )}
+                                {deal.status === "ACTIVE" && canCancel && <MenuSeparator />}
+                                {canCancel && (
                                     <MenuItem value="cancel" variant="destructive" onSelect={() => setCancelOpen(true)}>
                                         {t("detailsPage.cancelDeal")}
                                     </MenuItem>
-                                </MenuContent>
-                            </Menu>
-                        )}
-                    </div>
+                                )}
+                            </MenuContent>
+                        </Menu>
+                    )}
                 </div>
-            </div>
+            </header>
 
-            <div className="flex gap-4">
-                <div className="flex-2 space-y-4">
+            <DealStageTracker deal={deal} />
 
-                    <DealUnitCard unit={deal.unit} project={deal.project} />
+            <DealDiscountBanner
+                deal={deal}
+                canDecide={canDecideDiscount}
+                isDeciding={actions.approveDiscount.isPending || actions.rejectDiscount.isPending}
+                onApprove={() => actions.approveDiscount.mutate()}
+                onReject={() => setRejectOpen(true)}
+            />
 
-                    <div className="grid gap-4 sm:grid-cols-2">
-                        <DealClientCard client={deal.client} />
-                        <DealManagerCard
-                            manager={deal.manager}
-                            canReassign={canReassign}
-                            onReassign={() => setReassignOpen(true)}
-                        />
-                    </div>
+            <DealKeyFigures deal={deal} totalPaid={totalPaid} remaining={remaining} />
 
-                    <div className="grid gap-4 lg:grid-cols-2">
-                        <DealPaymentScheduleCard
-                            status={deal.status}
-                            schedules={deal.paymentSchedules}
-                            onGenerateSchedule={() => setScheduleOpen(true)}
-                        />
-                        <DealPaymentsHistoryCard
-                            payments={deal.payments}
-                            canRecordPayment={deal.status === "ACTIVE"}
-                            onRecordPayment={() => setPaymentOpen(true)}
-                        />
-                    </div>
+            {/* Work area on the left, reference facts on the right; on a phone the
+                facts come first, since that's where the client's number is. */}
+            <div className="grid gap-6 lg:grid-cols-3">
+                <div className="min-w-0 lg:col-span-2">
+                    <Tabs value={tab} onValueChange={({ value }) => setTab(value)} className="gap-4">
+                        <TabsList variant="underline" className="w-full justify-start overflow-x-auto">
+                            <TabsTrigger value="payments" className="grow-0 px-3">
+                                {t("tabs.payments")}
+                                <TabCount count={deal.payments.length} />
+                            </TabsTrigger>
+                            <TabsTrigger value="documents" className="grow-0 px-3">
+                                {t("tabs.documents")}
+                                <TabCount count={documentsCount} />
+                            </TabsTrigger>
+                            <TabsTrigger value="activity" className="grow-0 px-3">
+                                {t("tabs.activity")}
+                                <TabCount count={deal.activities.length} />
+                            </TabsTrigger>
+                        </TabsList>
+
+                        <TabsContent value="payments" className="space-y-4">
+                            <DealPaymentScheduleCard
+                                status={deal.status}
+                                schedules={deal.paymentSchedules}
+                                onGenerateSchedule={() => setScheduleOpen(true)}
+                            />
+                            <DealPaymentsHistoryCard
+                                payments={deal.payments}
+                                canRecordPayment={deal.status === "ACTIVE"}
+                                onRecordPayment={() => setPaymentOpen(true)}
+                            />
+                        </TabsContent>
+
+                        <TabsContent value="documents">
+                            <EntityDocumentsCard ownerType="DEAL" ownerId={deal.id} headerActions={generateMenu} />
+                        </TabsContent>
+
+                        <TabsContent value="activity">
+                            <DealHistoryCard activities={deal.activities} />
+                        </TabsContent>
+                    </Tabs>
                 </div>
-                <div className="flex-1 space-y-4">
-                    <DealFinancialsCard deal={deal} totalPaid={totalPaid} remaining={remaining} />
-                    <DealTimelineCard deal={deal} />
+
+                <aside className="order-first min-w-0 space-y-4 lg:order-none">
+                    <DealDetailsSidebar
+                        deal={deal}
+                        canReassign={canReassign}
+                        onReassign={() => setReassignOpen(true)}
+                    />
                     <DealTasksCard dealId={deal.id} />
-                    <EntityDocumentsCard ownerType="DEAL" ownerId={deal.id} />
-                    <DealHistoryCard activities={deal.activities} />
-                </div>
+                </aside>
             </div>
+
+            {/* Activate dialog: there is no way back to CONTRACT_SIGNED. */}
+            <Dialog open={activateOpen} onOpenChange={({ open }) => setActivateOpen(open)}>
+                <DialogContent size="sm">
+                    <DialogHeader title={t("detailsPage.activateDialogTitle")} description={t("detailsPage.activateDialogDescription")} />
+                    <DialogFooter>
+                        <Button variant="secondary" onClick={() => setActivateOpen(false)}>
+                            {t("detailsPage.back")}
+                        </Button>
+                        <Button
+                            disabled={actions.activate.isPending}
+                            isLoading={actions.activate.isPending}
+                            onClick={() => actions.activate.mutate(undefined, { onSuccess: () => setActivateOpen(false) })}
+                        >
+                            {t("detailsPage.activateDeal")}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Reject discount dialog */}
+            <Dialog open={rejectOpen} onOpenChange={({ open }) => setRejectOpen(open)}>
+                <DialogContent size="sm">
+                    <DialogHeader title={t("discountBanner.rejectDialogTitle")} description={t("discountBanner.rejectDialogDescription")} />
+                    <DialogBody>
+                        <FieldSet className="pt-4">
+                            <FieldGroup>
+                                <Field>
+                                    <FieldLabel>{t("discountBanner.rejectReason")}</FieldLabel>
+                                    <Textarea value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} />
+                                </Field>
+                            </FieldGroup>
+                        </FieldSet>
+                    </DialogBody>
+                    <DialogFooter>
+                        <Button variant="secondary" onClick={() => setRejectOpen(false)}>
+                            {t("detailsPage.back")}
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            disabled={rejectReason.trim().length < 2 || actions.rejectDiscount.isPending}
+                            isLoading={actions.rejectDiscount.isPending}
+                            onClick={() =>
+                                actions.rejectDiscount.mutate(rejectReason.trim(), {
+                                    onSuccess: () => {
+                                        setRejectOpen(false);
+                                        setRejectReason("");
+                                    },
+                                })
+                            }
+                        >
+                            {t("discountBanner.reject")}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
 
             {/* Cancel dialog */}
             <Dialog open={cancelOpen} onOpenChange={({ open }) => setCancelOpen(open)}>

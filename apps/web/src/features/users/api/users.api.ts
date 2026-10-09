@@ -28,6 +28,17 @@ export async function getUsers(params?: GetUsersParams) {
     return response.data;
 }
 
+export type SalesTeamMember = { id: string; fullName: string; branchId: string | null };
+
+/**
+ * Who a deal or lead can be put in the name of. Readable by anyone with
+ * deals.view or leads.view, unlike getUsers (users.view).
+ */
+export async function getSalesTeam() {
+    const response = await api.get<SalesTeamMember[]>("/users/sales-team");
+    return response.data;
+}
+
 export async function getUser(id: string) {
     const response = await api.get<User>(`/users/${id}`);
     return response.data;

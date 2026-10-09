@@ -20,6 +20,7 @@
     "discount": "Discount"
   },
   "unitCard": {
+    "title": "Unit",
     "unitNumber": "Unit №{{number}}",
     "floor": "{{floor}}-floor"
   },
@@ -156,7 +157,12 @@
     "referencePlaceholder": "e.g. transaction ID",
     "record": "Record",
     "extensionsLeft": "Extensions left: {{left}} of {{max}}. The new date can be at most {{maxDays}} days from today.",
-    "extendUnavailable": "No extensions left — sign the contract or let the reservation expire."
+    "extendUnavailable": "No extensions left — sign the contract or let the reservation expire.",
+    "generateDocument": "Generate",
+    "generateReservation": "Reservation agreement",
+    "generateContract": "Sale contract",
+    "activateDialogTitle": "Activate this deal?",
+    "activateDialogDescription": "Payments start from here: you can then generate the payment schedule and record installments. An active deal can't go back to \"Contract signed\"."
   },
   "toasts": {
     "unitReserved": "Unit reserved",
@@ -176,7 +182,17 @@
     "paymentRecorded": "Payment recorded",
     "paymentError": "Failed to record payment",
     "dealCompleted": "Deal completed",
-    "completeError": "Failed to complete deal"
+    "completeError": "Failed to complete deal",
+    "documentGenerated": "Document generated",
+    "documentError": "Could not generate the document",
+    "signMissingDetails": "Add the client's {{fields}} on their card first.",
+    "clientField": {
+      "passport": "passport number",
+      "pin": "personal number (PIN)"
+    },
+    "discountApproved": "Discount approved",
+    "discountRejected": "Discount rejected",
+    "discountDecisionError": "Could not save the decision"
   },
   "booking": {
     "rooms": "{{count}} rooms",
@@ -221,5 +237,62 @@
     },
     "depositPlain": "Deposit",
     "reservationExpiresHint": "Defaults to {{defaultDays}} days; at most {{maxDays}} days from today."
+  },
+  "discountBanner": {
+    "pendingTitle": "Discount of {{percent}}% ({{amount}}) is awaiting approval",
+    "pendingRequester": "The contract can be signed once your Sales Head decides. The sale price stays at the list price until then.",
+    "pendingApprover": "This is above the manager's own limit. Approve it to apply the discount, or reject it with a reason.",
+    "approve": "Approve",
+    "reject": "Reject",
+    "rejectedTitle": "Discount of {{percent}}% was rejected",
+    "reason": "Reason: {{reason}}",
+    "signBlocked": "Waiting for the discount decision",
+    "rejectDialogTitle": "Reject discount",
+    "rejectDialogDescription": "The deal stays at the list price. The manager sees your reason.",
+    "rejectReason": "Reason"
+  },
+  "stage": {
+    "label": "Deal stage",
+    "installments_one": "{{count}} installment",
+    "installments_few": "{{count}} installments",
+    "installments_many": "{{count}} installments",
+    "installments_other": "{{count}} installments"
+  },
+  "keyFigures": {
+    "discounted": "List {{list}} · −{{percent}}%",
+    "atListPrice": "At list price",
+    "paidShare": "{{percent}}% paid",
+    "ofSalePrice": "Of {{total}}",
+    "reservationExpires": "Reservation expires",
+    "contract": "Contract",
+    "activateHint": "Activate to start payments",
+    "nextPayment": "Next payment",
+    "dueOn": "Due {{date}}",
+    "overdueSince": "Overdue since {{date}}",
+    "noSchedule": "No payment schedule yet",
+    "status": "Status",
+    "fullyPaid": "Fully paid"
+  },
+  "tabs": {
+    "payments": "Payments",
+    "documents": "Documents",
+    "activity": "Activity"
+  },
+  "sidebar": {
+    "title": "Details",
+    "client": "Client",
+    "idOnFile": "Passport and PIN on file",
+    "idMissing": "Passport or PIN missing: needed to sign the contract",
+    "unit": "Unit",
+    "unitSheet": "Unit sheet",
+    "deal": "Deal",
+    "reassign": "Reassign",
+    "rooms_one": "{{count}} room",
+    "rooms_few": "{{count}} rooms",
+    "rooms_many": "{{count}} rooms",
+    "rooms_other": "{{count}} rooms",
+    "you": "You",
+    "managerInactive": "This manager has been deactivated. Reassign the deal so someone follows it up.",
+    "noManager": "No manager on this deal. Reassign it so someone follows it up."
   }
 }

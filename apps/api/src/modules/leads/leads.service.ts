@@ -16,6 +16,7 @@ import {UpdateLeadDto} from "@/modules/leads/dto/update-lead.dto";
 import {ConvertLeadDto} from "@/modules/leads/dto/convert-lead.dto";
 import {ContactAttemptType, LogContactAttemptDto} from "@/modules/leads/dto/log-contact-attempt.dto";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
+import {normalizePhone} from "@/common/utils/phone.util";
 
 const CONTACT_ATTEMPT_TYPE_MAP: Record<ContactAttemptType, ActivityType> = {
     CALL: ActivityType.CALL,
@@ -185,8 +186,10 @@ export class LeadsService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        if (dto.managerId) {
-            await this.ensureManagerAssignable(dto.managerId, user);
+        const managerId = this.resolveManagerOnCreate(user, dto.managerId);
+
+        if (managerId && managerId !== user.id) {
+            await this.ensureManagerAssignable(managerId, user);
         }
 
         if (dto.clientId) {
@@ -213,8 +216,9 @@ export class LeadsService {
                 comment: dto.comment,
                 companyId: user.companyId,
                 branchId,
-                managerId: dto.managerId,
+                managerId,
                 clientId: dto.clientId,
+                nextContactAt: dto.nextContactAt ? new Date(dto.nextContactAt) : undefined,
             },
             include: {
                 manager: {
@@ -279,8 +283,11 @@ export class LeadsService {
 
         const existing = await this.findOne(user, id);
 
-        if (dto.managerId) {
-            await this.ensureManagerAssignable(dto.managerId, user);
+        if (dto.managerId && dto.managerId !== existing.managerId) {
+            this.ensureCanAssign(user, dto.managerId);
+            if (dto.managerId !== user.id) {
+                await this.ensureManagerAssignable(dto.managerId, user);
+            }
         }
 
         if (dto.clientId) {
@@ -300,6 +307,8 @@ export class LeadsService {
                 comment: dto.comment,
                 managerId: dto.managerId,
                 clientId: dto.clientId,
+                nextContactAt:
+                    dto.nextContactAt === undefined ? undefined : dto.nextContactAt && new Date(dto.nextContactAt),
             },
             include: {
                 manager: {
@@ -411,10 +420,13 @@ export class LeadsService {
         return converted;
     }
 
-    async checkDuplicates(user: AuthUser, phone: string, excludeLeadId?: string) {
+    async checkDuplicates(user: AuthUser, rawPhone: string, excludeLeadId?: string) {
         if (!user.companyId) {
             throw new ForbiddenException("User does not belong to a company");
         }
+
+        // Also reached straight from GET /leads/duplicates?phone=, which no DTO normalizes.
+        const phone = normalizePhone(rawPhone);
 
         const companyId = user.companyId;
         const branchScoped = user.isBranchScoped;
@@ -584,6 +596,15 @@ export class LeadsService {
 
         await this.findOne(user, id);
 
+        const now = new Date();
+        await this.prisma.lead.update({
+            where: {id},
+            data: {
+                lastContactAt: now,
+                ...(dto.nextContactAt ? {nextContactAt: new Date(dto.nextContactAt)} : {}),
+            },
+        });
+
         return this.prisma.activity.create({
             data: {
                 companyId: user.companyId,
@@ -687,6 +708,23 @@ export class LeadsService {
                 message: "A lead or client with this phone number already exists",
                 duplicates: { leads, clients },
             });
+        }
+    }
+
+    /**
+     * Without leads.assign a lead can only be the caller's own: it is put
+     * in their name when no manager is given, so a lead a Sales Manager
+     * enters themselves shows up in their follow-ups and their numbers.
+     */
+    private resolveManagerOnCreate(user: AuthUser, requested?: string) {
+        if (hasPermission(user, "leads.assign")) return requested;
+        if (requested) this.ensureCanAssign(user, requested);
+        return user.id;
+    }
+
+    private ensureCanAssign(user: AuthUser, managerId: string) {
+        if (managerId !== user.id && !hasPermission(user, "leads.assign")) {
+            throw new ForbiddenException("You can only assign a lead to yourself.");
         }
     }
 

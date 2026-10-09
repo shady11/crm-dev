@@ -15,6 +15,9 @@ type ErrorBody = {
     error?: string;
     path: string;
     timestamp: string;
+    // Extra fields an application exception was thrown with, e.g. the
+    // `duplicates` a 409 on lead create carries for the "create anyway?" prompt.
+    [detail: string]: unknown;
 };
 
 /**
@@ -66,7 +69,17 @@ export class AllExceptionsFilter implements ExceptionFilter {
                     ? response
                     : ((response as {message?: string | string[]}).message ?? exception.message);
 
+            // Our own exceptions only, never a driver's, so extra fields are
+            // safe to pass on; the standard ones below always win.
+            const details =
+                typeof response === "object" && response !== null
+                    ? Object.fromEntries(
+                          Object.entries(response).filter(([key]) => !["statusCode", "message", "error"].includes(key)),
+                      )
+                    : {};
+
             return {
+                ...details,
                 statusCode: exception.getStatus(),
                 message: Array.isArray(message) ? message.join(", ") : message,
                 error: (typeof response === "object"

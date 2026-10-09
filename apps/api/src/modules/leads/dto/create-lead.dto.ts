@@ -1,11 +1,13 @@
-import {IsBoolean, IsEmail, IsEnum, IsOptional, IsString, IsUUID, MinLength} from "class-validator";
+import {IsBoolean, IsDateString, IsEmail, IsEnum, IsOptional, IsString, IsUUID, MinLength, ValidateIf} from "class-validator";
 import {LeadStatus} from "@/generated/prisma/enums";
+import {NormalizePhone} from "@/common/utils/phone.util";
 
 export class CreateLeadDto {
     @IsString()
     @MinLength(2)
     fullName!: string;
 
+    @NormalizePhone()
     @IsString()
     @MinLength(5)
     phone!: string;
@@ -33,6 +35,11 @@ export class CreateLeadDto {
     @IsOptional()
     @IsUUID()
     clientId?: string;
+
+    // When to get back to this lead. null clears it on update.
+    @ValidateIf((_, value) => value !== null && value !== undefined)
+    @IsDateString()
+    nextContactAt?: string | null;
 
     // Set once the caller has seen the duplicate warning (from
     // GET /leads/duplicates) and wants to create the lead anyway — a repeat

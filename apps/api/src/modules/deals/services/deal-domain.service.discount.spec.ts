@@ -5,7 +5,7 @@ import {
   Prisma,
 } from '@/generated/prisma/client';
 import { DealDomainService } from './deal-domain.service';
-import { DiscountPendingApprovalException } from '@/modules/deals/exceptions';
+import { ClientDetailsMissingException, DiscountPendingApprovalException } from '@/modules/deals/exceptions';
 
 describe('DealDomainService discount approval', () => {
   const service = new DealDomainService();
@@ -77,6 +77,8 @@ describe('DealDomainService discount approval', () => {
   });
 
   describe('ensureCanSignContract with a pending discount', () => {
+    const withId = {passport: 'AN1234567', pin: '21234567890123'};
+
     const dealWith = (discountApprovalStatus: DiscountApprovalStatus): Deal =>
       ({
         status: DealStatus.RESERVED,
@@ -85,29 +87,35 @@ describe('DealDomainService discount approval', () => {
 
     it('blocks signing while a discount request is PENDING', () => {
       expect(() =>
-        service.ensureCanSignContract(dealWith(DiscountApprovalStatus.PENDING)),
+        service.ensureCanSignContract(dealWith(DiscountApprovalStatus.PENDING), withId),
       ).toThrow(DiscountPendingApprovalException);
     });
 
     it('allows signing when there is no discount request', () => {
       expect(() =>
-        service.ensureCanSignContract(dealWith(DiscountApprovalStatus.NONE)),
+        service.ensureCanSignContract(dealWith(DiscountApprovalStatus.NONE), withId),
       ).not.toThrow();
     });
 
     it('allows signing once a discount has been approved', () => {
       expect(() =>
-        service.ensureCanSignContract(
-          dealWith(DiscountApprovalStatus.APPROVED),
-        ),
+        service.ensureCanSignContract(dealWith(DiscountApprovalStatus.APPROVED), withId),
       ).not.toThrow();
+    });
+
+    it('blocks signing until the client has a passport number and PIN, naming what is missing', () => {
+      const deal = dealWith(DiscountApprovalStatus.NONE);
+      expect(() => service.ensureCanSignContract(deal, {passport: null, pin: ' '})).toThrow(
+        new ClientDetailsMissingException(['passport', 'pin']),
+      );
+      expect(() => service.ensureCanSignContract(deal, {...withId, pin: null})).toThrow(
+        "Add the client's personal number (PIN) before signing the contract.",
+      );
     });
 
     it('allows signing after a discount was rejected (deal reverts to list price)', () => {
       expect(() =>
-        service.ensureCanSignContract(
-          dealWith(DiscountApprovalStatus.REJECTED),
-        ),
+        service.ensureCanSignContract(dealWith(DiscountApprovalStatus.REJECTED), withId),
       ).not.toThrow();
     });
   });

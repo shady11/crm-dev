@@ -14,6 +14,8 @@ import {
 
 import {
     ActiveDealExistsException,
+    ClientDetailsMissingException,
+    type ContractClientField,
     DiscountPendingApprovalException,
     InvalidDealStateException,
     ProjectNotOpenForSalesException,
@@ -127,11 +129,18 @@ export class DealDomainService {
         }
     }
 
-    ensureCanSignContract(deal: Deal): void {
+    ensureCanSignContract(deal: Deal, client: {passport: string | null; pin: string | null}): void {
         this.ensureStatus(deal, DealStatus.RESERVED);
 
         if (deal.discountApprovalStatus === DiscountApprovalStatus.PENDING) {
             throw new DiscountPendingApprovalException();
+        }
+
+        const missing: ContractClientField[] = [];
+        if (!client.passport?.trim()) missing.push('passport');
+        if (!client.pin?.trim()) missing.push('pin');
+        if (missing.length > 0) {
+            throw new ClientDetailsMissingException(missing);
         }
     }
 

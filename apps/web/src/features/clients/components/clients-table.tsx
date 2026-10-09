@@ -12,6 +12,8 @@ import {formatCreatedAt, initials} from "@/features/clients/utils/format.ts";
 import {useNavigate} from "react-router-dom";
 import {paths} from "@/routes/paths.ts";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {hasPermission} from "@/features/auth/access.ts";
 import type {SortOrder} from "@/hooks/use-sort.ts";
 
 interface ClientsTableProps {
@@ -46,6 +48,8 @@ export function ClientsTable({
 
     const { t, i18n } = useTranslation("clients");
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const canDelete = hasPermission(user, "clients.delete");
 
     return (
         <DataTable
@@ -82,15 +86,17 @@ export function ClientsTable({
                                 <IconTooltipButton variant="ghost" size="icon-sm" onClick={() => onEdit(client)} label={t("common:actions.edit")}>
                                     <Pen className="size-3.5" />
                                 </IconTooltipButton>
-                                <IconTooltipButton
-                                    variant="destructive"
-                                    size="icon-sm"
-                                    disabled={isDeleting(client.id)}
-                                    onClick={() => onDelete(client)}
-                                    label={t("common:actions.delete")}
-                                >
-                                    <Trash2 className="size-3.5" />
-                                </IconTooltipButton>
+                                {canDelete && (
+                                    <IconTooltipButton
+                                        variant="destructive"
+                                        size="icon-sm"
+                                        disabled={isDeleting(client.id)}
+                                        onClick={() => onDelete(client)}
+                                        label={t("common:actions.delete")}
+                                    >
+                                        <Trash2 className="size-3.5" />
+                                    </IconTooltipButton>
+                                )}
                             </div>
                         </div>
                         <div className="mt-3 space-y-1 text-sm text-muted-foreground">
@@ -176,15 +182,17 @@ export function ClientsTable({
                                     <IconTooltipButton variant="ghost" size="icon-sm" onClick={() => onEdit(client)} label={t("common:actions.edit")}>
                                         <Pen className="size-3.5" />
                                     </IconTooltipButton>
-                                    <IconTooltipButton
-                                        variant="destructive"
-                                        size="icon-sm"
-                                        disabled={isDeleting(client.id)}
-                                        onClick={() => onDelete(client)}
-                                        label={t("common:actions.delete")}
-                                    >
-                                        <Trash2 className="size-3.5" />
-                                    </IconTooltipButton>
+                                    {canDelete && (
+                                        <IconTooltipButton
+                                            variant="destructive"
+                                            size="icon-sm"
+                                            disabled={isDeleting(client.id)}
+                                            onClick={() => onDelete(client)}
+                                            label={t("common:actions.delete")}
+                                        >
+                                            <Trash2 className="size-3.5" />
+                                        </IconTooltipButton>
+                                    )}
                                 </div>
                             </TableCell>
                         </TableRow>

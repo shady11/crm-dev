@@ -20,6 +20,7 @@
     "discount": "Скидка"
   },
   "unitCard": {
+    "title": "Помещение",
     "unitNumber": "Помещение №{{number}}",
     "floor": "{{floor}} этаж"
   },
@@ -156,7 +157,12 @@
     "referencePlaceholder": "например, ID транзакции",
     "record": "Записать",
     "extensionsLeft": "Осталось продлений: {{left}} из {{max}}. Новая дата — не более {{maxDays}} дн. от сегодня.",
-    "extendUnavailable": "Продления исчерпаны — подпишите договор или дождитесь окончания брони."
+    "extendUnavailable": "Продления исчерпаны — подпишите договор или дождитесь окончания брони.",
+    "generateDocument": "Сформировать",
+    "generateReservation": "Договор бронирования",
+    "generateContract": "Договор купли-продажи",
+    "activateDialogTitle": "Активировать сделку?",
+    "activateDialogDescription": "С этого момента начинается оплата: можно сформировать график платежей и вносить взносы. Активную сделку нельзя вернуть в статус «Договор подписан»."
   },
   "toasts": {
     "unitReserved": "Помещение забронировано",
@@ -176,7 +182,17 @@
     "paymentRecorded": "Платёж записан",
     "paymentError": "Не удалось записать платёж",
     "dealCompleted": "Сделка завершена",
-    "completeError": "Не удалось завершить сделку"
+    "completeError": "Не удалось завершить сделку",
+    "documentGenerated": "Документ сформирован",
+    "documentError": "Не удалось сформировать документ",
+    "signMissingDetails": "Сначала укажите в карточке клиента: {{fields}}.",
+    "clientField": {
+      "passport": "номер паспорта",
+      "pin": "ПИН"
+    },
+    "discountApproved": "Скидка согласована",
+    "discountRejected": "Скидка отклонена",
+    "discountDecisionError": "Не удалось сохранить решение"
   },
   "booking": {
     "rooms": "{{count}} комн.",
@@ -221,5 +237,62 @@
     },
     "depositPlain": "Депозит",
     "reservationExpiresHint": "По умолчанию {{defaultDays}} дн.; не более {{maxDays}} дн. от сегодня."
+  },
+  "discountBanner": {
+    "pendingTitle": "Скидка {{percent}}% ({{amount}}) ждёт согласования",
+    "pendingRequester": "Договор можно подписать после решения руководителя отдела продаж. До тех пор цена остаётся по прайсу.",
+    "pendingApprover": "Скидка выше лимита менеджера. Согласуйте её или отклоните с указанием причины.",
+    "approve": "Согласовать",
+    "reject": "Отклонить",
+    "rejectedTitle": "Скидка {{percent}}% отклонена",
+    "reason": "Причина: {{reason}}",
+    "signBlocked": "Ждём решения по скидке",
+    "rejectDialogTitle": "Отклонить скидку",
+    "rejectDialogDescription": "Сделка остаётся по цене прайса. Менеджер увидит причину.",
+    "rejectReason": "Причина"
+  },
+  "stage": {
+    "label": "Этап сделки",
+    "installments_one": "{{count}} взнос",
+    "installments_few": "{{count}} взноса",
+    "installments_many": "{{count}} взносов",
+    "installments_other": "{{count}} взноса"
+  },
+  "keyFigures": {
+    "discounted": "По прайсу {{list}} · −{{percent}}%",
+    "atListPrice": "По цене прайса",
+    "paidShare": "Оплачено {{percent}}%",
+    "ofSalePrice": "Из {{total}}",
+    "reservationExpires": "Бронь до",
+    "contract": "Договор",
+    "activateHint": "Активируйте сделку, чтобы начать оплату",
+    "nextPayment": "Следующий платёж",
+    "dueOn": "До {{date}}",
+    "overdueSince": "Просрочен с {{date}}",
+    "noSchedule": "Графика платежей ещё нет",
+    "status": "Статус",
+    "fullyPaid": "Оплачено полностью"
+  },
+  "tabs": {
+    "payments": "Платежи",
+    "documents": "Документы",
+    "activity": "История"
+  },
+  "sidebar": {
+    "title": "Сведения",
+    "client": "Клиент",
+    "idOnFile": "Паспорт и ПИН указаны",
+    "idMissing": "Нет паспорта или ПИН: без них договор не подписать",
+    "unit": "Помещение",
+    "unitSheet": "Карточка помещения",
+    "deal": "Сделка",
+    "reassign": "Передать",
+    "rooms_one": "{{count}} комната",
+    "rooms_few": "{{count}} комнаты",
+    "rooms_many": "{{count}} комнат",
+    "rooms_other": "{{count}} комнаты",
+    "you": "Вы",
+    "managerInactive": "Менеджер деактивирован. Передайте сделку, чтобы её кто-то вёл.",
+    "noManager": "У сделки нет менеджера. Передайте её, чтобы её кто-то вёл."
   }
 }

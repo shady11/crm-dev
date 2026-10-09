@@ -71,6 +71,32 @@ export class UsersService {
         });
     }
 
+    /**
+     * People a deal or lead can be put in the name of: active users whose
+     * role can work deals (deals.manage), in the caller's own branch when
+     * the caller is branch-scoped. Deliberately minimal (id, name, branch)
+     * so it can be readable by anyone on the sales floor, unlike
+     * GET /users, which needs users.view and returns contact details.
+     */
+    async findSalesTeam(user: AuthUser) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        return this.prisma.user.findMany({
+            where: {
+                companyId: user.companyId,
+                deletedAt: null,
+                isActive: true,
+                isSuperAdmin: false,
+                ...(user.isBranchScoped ? {branchId: user.branchId} : {}),
+                role: {permissions: {some: {permission: {key: "deals.manage"}}}},
+            },
+            orderBy: {fullName: "asc"},
+            select: {id: true, fullName: true, branchId: true},
+        });
+    }
+
     async findAll(user: AuthUser, query: QueryUsersDto) {
         if (!user.companyId) {
             throw new ForbiddenException("User does not belong to a company");
