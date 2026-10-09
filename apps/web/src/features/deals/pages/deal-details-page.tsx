@@ -61,6 +61,7 @@ export function DealDetailsPage() {
     const canReassign = hasPermission(user, "deals.reassign");
     const canGenerateDocuments = hasPermission(user, "documents.generate");
     const canDecideDiscount = hasPermission(user, "deals.approve_discount");
+    const canCancel = hasPermission(user, "deals.cancel");
     const [rejectOpen, setRejectOpen] = useState(false);
     const [rejectReason, setRejectReason] = useState("");
 
@@ -186,7 +187,7 @@ export function DealDetailsPage() {
                                 {t("detailsPage.activateDeal")}
                             </Button>
                         )}
-                        {["RESERVED", "CONTRACT_SIGNED", "ACTIVE"].includes(deal.status) && (
+                        {["RESERVED", "CONTRACT_SIGNED", "ACTIVE"].includes(deal.status) && (canCancel || deal.status === "ACTIVE") && (
                             <Menu>
                                 <MenuTrigger asChild>
                                     <Button variant="ghost" size="icon-sm" aria-label={t("detailsPage.moreActions")}>
@@ -195,16 +196,16 @@ export function DealDetailsPage() {
                                 </MenuTrigger>
                                 <MenuContent>
                                     {deal.status === "ACTIVE" && (
-                                        <>
-                                            <MenuItem value="complete" onSelect={() => actions.complete.mutate()}>
-                                                {t("detailsPage.markCompleted")}
-                                            </MenuItem>
-                                            <MenuSeparator />
-                                        </>
+                                        <MenuItem value="complete" onSelect={() => actions.complete.mutate()}>
+                                            {t("detailsPage.markCompleted")}
+                                        </MenuItem>
                                     )}
-                                    <MenuItem value="cancel" variant="destructive" onSelect={() => setCancelOpen(true)}>
-                                        {t("detailsPage.cancelDeal")}
-                                    </MenuItem>
+                                    {deal.status === "ACTIVE" && canCancel && <MenuSeparator />}
+                                    {canCancel && (
+                                        <MenuItem value="cancel" variant="destructive" onSelect={() => setCancelOpen(true)}>
+                                            {t("detailsPage.cancelDeal")}
+                                        </MenuItem>
+                                    )}
                                 </MenuContent>
                             </Menu>
                         )}

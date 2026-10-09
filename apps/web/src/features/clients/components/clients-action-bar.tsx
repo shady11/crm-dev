@@ -9,6 +9,8 @@ import {
 } from "@/components/ui/action-bar.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {hasPermission} from "@/features/auth/access.ts";
 
 interface ClientsActionBarProps {
     selectedCount: number;
@@ -19,6 +21,8 @@ interface ClientsActionBarProps {
 
 export function ClientsActionBar({ selectedCount, isProcessing, onClear, onDelete }: ClientsActionBarProps) {
     const { t } = useTranslation("clients");
+    const { user } = useAuth();
+    const canDelete = hasPermission(user, "clients.delete");
 
     return (
         <ActionBar open={selectedCount > 0} onOpenChange={(open) => !open && onClear()}>
@@ -30,17 +34,19 @@ export function ClientsActionBar({ selectedCount, isProcessing, onClear, onDelet
                 <ActionBarSeparator />
 
                 <ActionBarBody>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        disabled={isProcessing}
-                        isLoading={isProcessing}
-                        onClick={onDelete}
-                    >
-                        <Trash2 className="size-3.5" />
-                        {t("actionBar.delete")}
-                    </Button>
+                    {canDelete && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            disabled={isProcessing}
+                            isLoading={isProcessing}
+                            onClick={onDelete}
+                        >
+                            <Trash2 className="size-3.5" />
+                            {t("actionBar.delete")}
+                        </Button>
+                    )}
 
                     <ActionBarClose asChild>
                         <Button variant="ghost" size="icon-sm" aria-label={t("actionBar.clearSelection")}>
