@@ -8,7 +8,15 @@ export type PaymentMethod = "CASH" | "BANK_TRANSFER" | "MBANK" | "OPTIMA" | "ELK
 export type PaymentType = "DEPOSIT" | "INSTALLMENT" | "FINAL" | "REFUND";
 export type PaymentScheduleStatus = "PENDING" | "PARTIAL" | "PAID" | "OVERDUE";
 
-type DealClient = { id: string; fullName: string; phone: string; email:string };
+type DealClient = {
+    id: string;
+    fullName: string;
+    phone: string;
+    email: string | null;
+    // Both needed before a contract can be signed (see DealDomainService.ensureCanSignContract).
+    passport: string | null;
+    pin: string | null;
+};
 type DealManager = { id: string; fullName: string; role: {id: string; name: string} } | null;
 type DealUnit = {
     id: string;

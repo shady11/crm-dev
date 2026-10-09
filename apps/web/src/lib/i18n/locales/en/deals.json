@@ -250,5 +250,46 @@
     "rejectDialogTitle": "Reject discount",
     "rejectDialogDescription": "The deal stays at the list price. The manager sees your reason.",
     "rejectReason": "Reason"
+  },
+  "stage": {
+    "label": "Deal stage",
+    "installments_one": "{{count}} installment",
+    "installments_few": "{{count}} installments",
+    "installments_many": "{{count}} installments",
+    "installments_other": "{{count}} installments"
+  },
+  "keyFigures": {
+    "discounted": "List {{list}} · −{{percent}}%",
+    "atListPrice": "At list price",
+    "paidShare": "{{percent}}% paid",
+    "ofSalePrice": "Of {{total}}",
+    "reservationExpires": "Reservation expires",
+    "contract": "Contract",
+    "activateHint": "Activate to start payments",
+    "nextPayment": "Next payment",
+    "dueOn": "Due {{date}}",
+    "overdueSince": "Overdue since {{date}}",
+    "noSchedule": "No payment schedule yet",
+    "status": "Status",
+    "fullyPaid": "Fully paid"
+  },
+  "tabs": {
+    "payments": "Payments",
+    "documents": "Documents",
+    "activity": "Activity"
+  },
+  "sidebar": {
+    "title": "Details",
+    "client": "Client",
+    "idOnFile": "Passport and PIN on file",
+    "idMissing": "Passport or PIN missing: needed to sign the contract",
+    "unit": "Unit",
+    "unitSheet": "Unit sheet",
+    "deal": "Deal",
+    "reassign": "Reassign",
+    "rooms_one": "{{count}} room",
+    "rooms_few": "{{count}} rooms",
+    "rooms_many": "{{count}} rooms",
+    "rooms_other": "{{count}} rooms"
   }
 }

@@ -55,7 +55,7 @@ export function EntityDocumentsCard({ ownerType, ownerId, headerActions }: Entit
     return (
         <Card className="border border-secondary shadow-none pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
-                <CardTitle className="text-sm text-muted-foreground">
+                <CardTitle className="text-sm whitespace-nowrap text-muted-foreground">
                     {t("card.title")}{documents.length > 0 && ` (${documents.length})`}
                 </CardTitle>
                 <div className="flex flex-wrap items-center justify-end gap-2">

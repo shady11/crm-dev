@@ -250,5 +250,46 @@
     "rejectDialogTitle": "Арзандатууну четке кагуу",
     "rejectDialogDescription": "Бүтүм прайс баасында калат. Менеджер себебин көрөт.",
     "rejectReason": "Себеби"
+  },
+  "stage": {
+    "label": "Бүтүмдүн этабы",
+    "installments_one": "{{count}} төлөм",
+    "installments_few": "{{count}} төлөм",
+    "installments_many": "{{count}} төлөм",
+    "installments_other": "{{count}} төлөм"
+  },
+  "keyFigures": {
+    "discounted": "Прайс боюнча {{list}} · −{{percent}}%",
+    "atListPrice": "Прайс баасында",
+    "paidShare": "{{percent}}% төлөндү",
+    "ofSalePrice": "{{total}} ичинен",
+    "reservationExpires": "Брондун мөөнөтү",
+    "contract": "Келишим",
+    "activateHint": "Төлөмдөрдү баштоо үчүн активдештириңиз",
+    "nextPayment": "Кийинки төлөм",
+    "dueOn": "{{date}} чейин",
+    "overdueSince": "{{date}} бери мөөнөтү өттү",
+    "noSchedule": "Төлөм графиги азырынча жок",
+    "status": "Статус",
+    "fullyPaid": "Толук төлөндү"
+  },
+  "tabs": {
+    "payments": "Төлөмдөр",
+    "documents": "Документтер",
+    "activity": "Тарых"
+  },
+  "sidebar": {
+    "title": "Маалымат",
+    "client": "Кардар",
+    "idOnFile": "Паспорт жана ПИН бар",
+    "idMissing": "Паспорт же ПИН жок: аларсыз келишимге кол коюлбайт",
+    "unit": "Жай",
+    "unitSheet": "Жайдын карточкасы",
+    "deal": "Бүтүм",
+    "reassign": "Өткөрүү",
+    "rooms_one": "{{count}} бөлмө",
+    "rooms_few": "{{count}} бөлмө",
+    "rooms_many": "{{count}} бөлмө",
+    "rooms_other": "{{count}} бөлмө"
   }
 }

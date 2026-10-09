@@ -250,5 +250,46 @@
     "rejectDialogTitle": "Отклонить скидку",
     "rejectDialogDescription": "Сделка остаётся по цене прайса. Менеджер увидит причину.",
     "rejectReason": "Причина"
+  },
+  "stage": {
+    "label": "Этап сделки",
+    "installments_one": "{{count}} взнос",
+    "installments_few": "{{count}} взноса",
+    "installments_many": "{{count}} взносов",
+    "installments_other": "{{count}} взноса"
+  },
+  "keyFigures": {
+    "discounted": "По прайсу {{list}} · −{{percent}}%",
+    "atListPrice": "По цене прайса",
+    "paidShare": "Оплачено {{percent}}%",
+    "ofSalePrice": "Из {{total}}",
+    "reservationExpires": "Бронь до",
+    "contract": "Договор",
+    "activateHint": "Активируйте сделку, чтобы начать оплату",
+    "nextPayment": "Следующий платёж",
+    "dueOn": "До {{date}}",
+    "overdueSince": "Просрочен с {{date}}",
+    "noSchedule": "Графика платежей ещё нет",
+    "status": "Статус",
+    "fullyPaid": "Оплачено полностью"
+  },
+  "tabs": {
+    "payments": "Платежи",
+    "documents": "Документы",
+    "activity": "История"
+  },
+  "sidebar": {
+    "title": "Сведения",
+    "client": "Клиент",
+    "idOnFile": "Паспорт и ПИН указаны",
+    "idMissing": "Нет паспорта или ПИН: без них договор не подписать",
+    "unit": "Помещение",
+    "unitSheet": "Карточка помещения",
+    "deal": "Сделка",
+    "reassign": "Передать",
+    "rooms_one": "{{count}} комната",
+    "rooms_few": "{{count}} комнаты",
+    "rooms_many": "{{count}} комнат",
+    "rooms_other": "{{count}} комнаты"
   }
 }
