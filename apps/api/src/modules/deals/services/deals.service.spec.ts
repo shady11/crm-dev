@@ -91,7 +91,10 @@ describe('DealsService', () => {
                 findUniqueOrThrow: jest.fn().mockImplementation(({where}: any) => Promise.resolve({id: where.id})),
                 groupBy: jest.fn().mockResolvedValue([]),
             },
-            client: {findFirst: jest.fn()},
+            client: {
+                findFirst: jest.fn(),
+                findUniqueOrThrow: jest.fn().mockResolvedValue({passport: 'AN1234567', pin: '21234567890123'}),
+            },
             user: {findFirstOrThrow: jest.fn(), findFirst: jest.fn(), findMany: jest.fn().mockResolvedValue([])},
             company: {findUniqueOrThrow: jest.fn().mockResolvedValue(company())},
             payment: {create: jest.fn().mockResolvedValue({}), aggregate: jest.fn().mockResolvedValue({_sum: {amount: null}})},

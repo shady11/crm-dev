@@ -156,7 +156,10 @@
     "referencePlaceholder": "e.g. transaction ID",
     "record": "Record",
     "extensionsLeft": "Extensions left: {{left}} of {{max}}. The new date can be at most {{maxDays}} days from today.",
-    "extendUnavailable": "No extensions left — sign the contract or let the reservation expire."
+    "extendUnavailable": "No extensions left — sign the contract or let the reservation expire.",
+    "generateDocument": "Generate",
+    "generateReservation": "Reservation agreement",
+    "generateContract": "Sale contract"
   },
   "toasts": {
     "unitReserved": "Unit reserved",
@@ -176,7 +179,14 @@
     "paymentRecorded": "Payment recorded",
     "paymentError": "Failed to record payment",
     "dealCompleted": "Deal completed",
-    "completeError": "Failed to complete deal"
+    "completeError": "Failed to complete deal",
+    "documentGenerated": "Document generated",
+    "documentError": "Could not generate the document",
+    "signMissingDetails": "Add the client's {{fields}} on their card first.",
+    "clientField": {
+      "passport": "passport number",
+      "pin": "personal number (PIN)"
+    }
   },
   "booking": {
     "rooms": "{{count}} rooms",

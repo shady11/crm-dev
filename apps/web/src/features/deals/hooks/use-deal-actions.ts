@@ -1,4 +1,5 @@
 import {useMutation, useQueryClient} from "@tanstack/react-query";
+import {isAxiosError} from "axios";
 import {toast} from "@/components/ui/toast";
 import {
     activateDeal,
@@ -7,6 +8,8 @@ import {
     createPayment,
     type CreatePaymentPayload,
     extendReservation,
+    generateDealDocument,
+    type GeneratableDocumentType,
     generatePaymentSchedule,
     type GeneratePaymentSchedulePayload,
     reassignDealManager,
@@ -42,7 +45,18 @@ export function useDealActions(dealId: string) {
             await invalidate();
             toast.success({ title: t("toasts.contractSigned") });
         },
-        onError: () => toast.error({ title: t("toasts.signError") }),
+        onError: (error) => {
+            // 422 from the API lists the client fields a contract still needs.
+            const missing = isAxiosError<{ missing?: string[] }>(error) ? error.response?.data?.missing : undefined;
+            toast.error({
+                title: t("toasts.signError"),
+                description: missing?.length
+                    ? t("toasts.signMissingDetails", {
+                          fields: missing.map((field) => t(`toasts.clientField.${field}`)).join(", "),
+                      })
+                    : undefined,
+            });
+        },
     });
 
     const activate = useMutation({
@@ -110,5 +124,15 @@ export function useDealActions(dealId: string) {
         onError: () => toast.error({ title: t("reassignDialog.errorTitle", { ns: "users" }) }),
     });
 
-    return { extend, sign, activate, cancel, generateSchedule, recordPayment, complete, reassign };
+    const generateDocument = useMutation({
+        mutationFn: (type: GeneratableDocumentType) => generateDealDocument(dealId, type),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["documents", { ownerType: "DEAL", ownerId: dealId }] });
+            await queryClient.invalidateQueries({ queryKey: ["deal", dealId] });
+            toast.success({ title: t("toasts.documentGenerated") });
+        },
+        onError: () => toast.error({ title: t("toasts.documentError"), description: t("toasts.tryAgain") }),
+    });
+
+    return { extend, sign, activate, cancel, generateSchedule, recordPayment, complete, reassign, generateDocument };
 }

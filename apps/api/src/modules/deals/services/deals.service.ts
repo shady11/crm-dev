@@ -546,7 +546,11 @@ export class DealsService {
       });
       if (!deal) throw new DealNotFoundException(id);
 
-      this.domain.ensureCanSignContract(deal);
+      const client = await db.client.findUniqueOrThrow({
+        where: { id: deal.clientId },
+        select: { passport: true, pin: true },
+      });
+      this.domain.ensureCanSignContract(deal, client);
 
       await db.deal.update({
         where: { id },

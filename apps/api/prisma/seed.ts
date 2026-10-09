@@ -397,6 +397,12 @@ async function seedDemoTenantData(args: {
                     fullName: personName(seed),
                     phone: `+9967001${String(seed).padStart(5, "0")}`,
                     email: `client${seed}@example.com`,
+                    // Signing a contract needs both. Every fifth client is
+                    // left without them to show the "add the client's
+                    // details first" path.
+                    ...(seed % 5 === 0
+                        ? {}
+                        : {passport: `AN${String(1000000 + seed)}`, pin: `2${String(seed).padStart(13, "0")}`}),
                     companyId: company.id,
                     branchId: team.branchId,
                 },

@@ -156,7 +156,10 @@
     "referencePlaceholder": "мисалы, транзакция ID",
     "record": "Жаздыруу",
     "extensionsLeft": "Калган узартуулар: {{max}} ичинен {{left}}. Жаңы күн бүгүндөн тартып {{maxDays}} күндөн ашпайт.",
-    "extendUnavailable": "Узартуулар түгөндү — келишимге кол коюңуз же брондун мөөнөтү бүтүшүн күтүңүз."
+    "extendUnavailable": "Узартуулар түгөндү — келишимге кол коюңуз же брондун мөөнөтү бүтүшүн күтүңүз.",
+    "generateDocument": "Түзүү",
+    "generateReservation": "Брондоо келишими",
+    "generateContract": "Сатып алуу-сатуу келишими"
   },
   "toasts": {
     "unitReserved": "Жай бронделди",
@@ -176,7 +179,14 @@
     "paymentRecorded": "Төлөм жаздырылды",
     "paymentError": "Төлөмдү жаздыруу мүмкүн болбоду",
     "dealCompleted": "Бүтүм аякталды",
-    "completeError": "Бүтүмдү аяктоо мүмкүн болбоду"
+    "completeError": "Бүтүмдү аяктоо мүмкүн болбоду",
+    "documentGenerated": "Документ түзүлдү",
+    "documentError": "Документти түзүү мүмкүн болбоду",
+    "signMissingDetails": "Адегенде кардардын карточкасына кошуңуз: {{fields}}.",
+    "clientField": {
+      "passport": "паспорттун номери",
+      "pin": "ПИН"
+    }
   },
   "booking": {
     "rooms": "{{count}} бөлм.",

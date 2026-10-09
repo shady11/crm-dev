@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
-import {ArrowLeft, CalendarIcon, Dot, MoreVerticalIcon} from "lucide-react";
+import {ArrowLeft, CalendarIcon, Dot, FileTextIcon, MoreVerticalIcon} from "lucide-react";
 import {Badge} from "@/components/ui/badge";
 import {Button} from "@/components/ui/button";
 import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader} from "@/components/ui/dialog";
@@ -58,6 +58,7 @@ export function DealDetailsPage() {
     // SH-A1: reassignment is a team-lead action, gated the same way the
     // backend endpoint is (deals.reassign) rather than by a specific role name.
     const canReassign = hasPermission(user, "deals.reassign");
+    const canGenerateDocuments = hasPermission(user, "documents.generate");
 
     const [cancelOpen, setCancelOpen] = useState(false);
     const [cancelReason, setCancelReason] = useState("");
@@ -232,7 +233,38 @@ export function DealDetailsPage() {
                     <DealFinancialsCard deal={deal} totalPaid={totalPaid} remaining={remaining} />
                     <DealTimelineCard deal={deal} />
                     <DealTasksCard dealId={deal.id} />
-                    <EntityDocumentsCard ownerType="DEAL" ownerId={deal.id} />
+                    <EntityDocumentsCard
+                        ownerType="DEAL"
+                        ownerId={deal.id}
+                        headerActions={
+                            canGenerateDocuments && !["CANCELLED", "EXPIRED"].includes(deal.status) && (
+                                <Menu>
+                                    <MenuTrigger asChild>
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            disabled={actions.generateDocument.isPending}
+                                            isLoading={actions.generateDocument.isPending}
+                                        >
+                                            <FileTextIcon className="size-3.5" />
+                                            {t("detailsPage.generateDocument")}
+                                        </Button>
+                                    </MenuTrigger>
+                                    <MenuContent>
+                                        <MenuItem value="reservation" onSelect={() => actions.generateDocument.mutate("RESERVATION")}>
+                                            {t("detailsPage.generateReservation")}
+                                        </MenuItem>
+                                        {/* The contract template prints the contract number and date. */}
+                                        {["CONTRACT_SIGNED", "ACTIVE", "COMPLETED"].includes(deal.status) && (
+                                            <MenuItem value="contract" onSelect={() => actions.generateDocument.mutate("CONTRACT")}>
+                                                {t("detailsPage.generateContract")}
+                                            </MenuItem>
+                                        )}
+                                    </MenuContent>
+                                </Menu>
+                            )
+                        }
+                    />
                     <DealHistoryCard activities={deal.activities} />
                 </div>
             </div>

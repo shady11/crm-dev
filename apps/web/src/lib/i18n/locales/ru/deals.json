@@ -156,7 +156,10 @@
     "referencePlaceholder": "например, ID транзакции",
     "record": "Записать",
     "extensionsLeft": "Осталось продлений: {{left}} из {{max}}. Новая дата — не более {{maxDays}} дн. от сегодня.",
-    "extendUnavailable": "Продления исчерпаны — подпишите договор или дождитесь окончания брони."
+    "extendUnavailable": "Продления исчерпаны — подпишите договор или дождитесь окончания брони.",
+    "generateDocument": "Сформировать",
+    "generateReservation": "Договор бронирования",
+    "generateContract": "Договор купли-продажи"
   },
   "toasts": {
     "unitReserved": "Помещение забронировано",
@@ -176,7 +179,14 @@
     "paymentRecorded": "Платёж записан",
     "paymentError": "Не удалось записать платёж",
     "dealCompleted": "Сделка завершена",
-    "completeError": "Не удалось завершить сделку"
+    "completeError": "Не удалось завершить сделку",
+    "documentGenerated": "Документ сформирован",
+    "documentError": "Не удалось сформировать документ",
+    "signMissingDetails": "Сначала укажите в карточке клиента: {{fields}}.",
+    "clientField": {
+      "passport": "номер паспорта",
+      "pin": "ПИН"
+    }
   },
   "booking": {
     "rooms": "{{count}} комн.",

@@ -179,6 +179,14 @@ export async function extendReservation(id: string, reservationExpiresAt: string
     return response.data;
 }
 
+export type GeneratableDocumentType = "RESERVATION" | "CONTRACT";
+
+/** Re-renders a deal's reservation agreement or contract PDF from its current data. */
+export async function generateDealDocument(dealId: string, type: GeneratableDocumentType) {
+    const response = await api.post(`/deals/${dealId}/documents/${type}/generate`);
+    return response.data;
+}
+
 export async function signContract(id: string, payload: { contractNumber: string; contractDate: string; note?: string }) {
     const response = await api.post<DealDetails>(`/deals/${id}/sign-contract`, payload);
     return response.data;
