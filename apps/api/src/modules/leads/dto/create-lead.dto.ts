@@ -1,5 +1,6 @@
-import {IsBoolean, IsDateString, IsEmail, IsEnum, IsOptional, IsString, IsUUID, MinLength, ValidateIf} from "class-validator";
-import {LeadStatus} from "@/generated/prisma/enums";
+import {IsBoolean, IsDateString, IsEmail, IsEnum, IsInt, IsNumber, IsOptional, IsString, IsUUID, Max, Min, MinLength, ValidateIf} from "class-validator";
+import {Type} from "class-transformer";
+import {FinancingType, LeadStatus} from "@/generated/prisma/enums";
 import {NormalizePhone} from "@/common/utils/phone.util";
 
 export class CreateLeadDto {
@@ -49,4 +50,26 @@ export class CreateLeadDto {
     @IsOptional()
     @IsBoolean()
     confirmDuplicate?: boolean;
+
+    // Qualification. null clears a value on update.
+    @ValidateIf((_, value) => value !== null && value !== undefined)
+    @Type(() => Number)
+    @IsNumber({maxDecimalPlaces: 2})
+    @Min(0)
+    budget?: number | null;
+
+    @ValidateIf((_, value) => value !== null && value !== undefined)
+    @Type(() => Number)
+    @IsInt()
+    @Min(0)
+    @Max(10)
+    rooms?: number | null;
+
+    @ValidateIf((_, value) => value !== null && value !== undefined)
+    @IsUUID()
+    preferredProjectId?: string | null;
+
+    @ValidateIf((_, value) => value !== null && value !== undefined)
+    @IsEnum(FinancingType)
+    financingType?: FinancingType | null;
 }

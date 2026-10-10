@@ -28,6 +28,7 @@ model Project {
   entrances  Entrance[]
   floors     Floor[]
   deals      Deal[]
+  interestedLeads Lead[] @relation("LeadPreferredProject")
   activities Activity[]
 
   createdAt DateTime  @default(now())

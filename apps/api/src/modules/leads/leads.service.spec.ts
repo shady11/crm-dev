@@ -52,6 +52,7 @@ describe('LeadsService', () => {
         manager?: unknown;
         client?: unknown;
         branch?: unknown;
+        project?: unknown;
     } = {}) {
         const prisma = {
             lead: {
@@ -76,6 +77,9 @@ describe('LeadsService', () => {
             },
             branch: {
                 findFirst: jest.fn().mockResolvedValue(opts.branch ?? null),
+            },
+            project: {
+                findFirst: jest.fn().mockResolvedValue(opts.project === undefined ? {id: 'project-1'} : opts.project),
             },
             activity: {
                 create: jest.fn().mockResolvedValue({}),
@@ -123,6 +127,21 @@ describe('LeadsService', () => {
             const where = (prisma.lead.findMany as jest.Mock).mock.calls[0][0].where;
             expect(where.OR).toHaveLength(3);
             expect(where.OR[0]).toEqual({fullName: {contains: 'jane', mode: 'insensitive'}});
+        });
+
+        it('matches a locally typed number against stored +996 phones', async () => {
+            const {service, prisma} = build();
+            await service.findAll(adminUser, {search: '0555 32'} as any);
+
+            const where = (prisma.lead.findMany as jest.Mock).mock.calls[0][0].where;
+            expect(where.OR).toContainEqual({phone: {contains: '55532'}});
+        });
+
+        it('filters by the project a lead is interested in', async () => {
+            const {service, prisma} = build();
+            await service.findAll(adminUser, {projectId: 'project-1'} as any);
+
+            expect((prisma.lead.findMany as jest.Mock).mock.calls[0][0].where.preferredProjectId).toBe('project-1');
         });
     });
 
@@ -196,6 +215,23 @@ describe('LeadsService', () => {
             await service.create(adminUser, createDto());
 
             expect(prisma.lead.create.mock.calls[0][0].data.managerId).toBeUndefined();
+        });
+
+        it('stores what the lead is looking for', async () => {
+            const {service, prisma} = build();
+            await service.create(branchUser, createDto({budget: 6000000, rooms: 2, preferredProjectId: 'project-1', financingType: 'INSTALLMENT'}));
+
+            expect(prisma.lead.create.mock.calls[0][0].data).toMatchObject({
+                budget: 6000000, rooms: 2, preferredProjectId: 'project-1', financingType: 'INSTALLMENT',
+            });
+        });
+
+        it('rejects a preferred project outside the company', async () => {
+            const {service, prisma} = build({project: null});
+            await expect(service.create(branchUser, createDto({preferredProjectId: 'other-company-project'}))).rejects.toThrow(
+                BadRequestException,
+            );
+            expect(prisma.lead.create).not.toHaveBeenCalled();
         });
 
         it('stores the next contact date', async () => {
