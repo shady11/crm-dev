@@ -98,7 +98,9 @@
     "bookButton": "Book",
     "bookingClosed": "Booking is closed: the project status is {{status}}.",
     "infoSheetButton": "Info sheet",
-    "offerButton": "Price offer"
+    "offerButton": "Price offer",
+    "blockNotOnSale": "Not on sale yet: Block {{block}} opens for sales later{{completion}}.",
+    "blockNotOnSaleCompletion": " (completion {{quarter}})"
   },
   "infoSheet": {
     "title": "Unit №{{number}}",
@@ -114,7 +116,8 @@
     "pricePerSqm": "Price per m²",
     "status": "Status",
     "printButton": "Print / Save as PDF",
-    "notFound": "Unit not found."
+    "notFound": "Unit not found.",
+    "completion": "Completion"
   },
   "chessboard": {
     "entranceLabel": "Entrance {{name}}",

@@ -9,7 +9,9 @@
     "namePlaceholder": "Блоктун аталышы (мисалы, A, B, C)",
     "orderLabel": "Тартиби (милдеттүү эмес)",
     "submitCreate": "Блок түзүү",
-    "errorGeneric": "Блокту сактоо мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз."
+    "errorGeneric": "Блокту сактоо мүмкүн болбоду. Дайындарды текшерип, кайра аракет кылыңыз.",
+    "salesStatusLabel": "Сатуу",
+    "completionLabel": "Пландалган тапшыруу"
   },
   "validation": {
     "nameRequired": "Блоктун аталышы милдеттүү"
@@ -41,5 +43,13 @@
     "deletedDescription": "{{name}} блогу өчүрүлдү.",
     "duplicatedTitle": "Ийгиликтүү түзүлдү",
     "duplicatedDescription": "{{name}} блогу кайталанды."
-  }
+  },
+  "salesStatus": {
+    "upcoming": "Азырынча сатыкта эмес",
+    "onSale": "Сатыкта",
+    "completed": "Тапшырылган"
+  },
+  "quarter": "{{year}}-ж. {{quarter}}-чейрек",
+  "completion": "Тапшыруу {{quarter}}",
+  "notBookable": "брондоо азырынча жабык"
 }

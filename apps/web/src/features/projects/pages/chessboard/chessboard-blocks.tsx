@@ -14,6 +14,15 @@ import {
 import {getProjectChessboard} from "@/features/projects/api/projects.api.ts";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {useTranslation} from "react-i18next";
+import {Badge} from "@/components/ui/badge.tsx";
+import {cn} from "@/lib/utils";
+import {
+    BLOCK_SALES_STATUS_BADGE_CLASSES,
+    BLOCK_SALES_STATUS_LABEL_KEYS,
+    BlockSalesStatus,
+    completionQuarter,
+    isBlockBookable,
+} from "@/features/blocks/types/block-sales.ts";
 import {chessboardLanding, isBrowsing} from "@/features/projects/utils/chessboard-navigation.ts";
 
 export function ChessboardBlocks() {
@@ -75,7 +84,7 @@ export function ChessboardBlocks() {
                     return (
                         <Card
                             key={block.id}
-                            className="cursor-pointer border border-secondary shadow-none"
+                            className={cn("cursor-pointer border border-secondary shadow-none", !isBlockBookable(block.salesStatus) && "border-dashed")}
                             onClick={() => navigate(`./${block.id}`)}
                         >
                             <CardContent>
@@ -88,6 +97,18 @@ export function ChessboardBlocks() {
                                             <h3 className="text-lg font-bold">{t("chessboard.blockLabel", { name: block.name })}</h3>
                                             {(block as any).code && (
                                                 <p className="text-xs text-muted-foreground">{(block as any).code}</p>
+                                            )}
+                                            {(completionQuarter(t, block.completionDate) || (block.salesStatus && block.salesStatus !== BlockSalesStatus.ON_SALE)) && (
+                                                <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                                                    {block.salesStatus && (
+                                                        <Badge className={BLOCK_SALES_STATUS_BADGE_CLASSES[block.salesStatus]}>
+                                                            {t(BLOCK_SALES_STATUS_LABEL_KEYS[block.salesStatus])}
+                                                        </Badge>
+                                                    )}
+                                                    {completionQuarter(t, block.completionDate) && (
+                                                        <span>{t("blocks:completion", {quarter: completionQuarter(t, block.completionDate)})}</span>
+                                                    )}
+                                                </div>
                                             )}
                                         </div>
                                     </div>

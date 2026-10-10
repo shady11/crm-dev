@@ -8,6 +8,12 @@ import {AddEntranceButton} from "@/features/entrances/components/add-entrance-bu
 import {EntranceItem} from "@/features/entrances/components/entrance-item.tsx";
 import {DuplicateBlockButton} from "@/features/blocks/components/duplicate-block-button.tsx";
 import {useTranslation} from "react-i18next";
+import {Badge} from "@/components/ui/badge.tsx";
+import {
+    BLOCK_SALES_STATUS_BADGE_CLASSES,
+    BLOCK_SALES_STATUS_LABEL_KEYS,
+    completionQuarter,
+} from "@/features/blocks/types/block-sales.ts";
 
 interface BlockItemProps {
     block: Block;
@@ -32,8 +38,20 @@ export function BlockItem({ block, isExpanded, onToggle }: BlockItemProps) {
                     <Building className="size-8" strokeWidth={1.25} />
                 </ItemMedia>
                 <ItemContent>
-                    <ItemTitle>{t("item.titleWithName", { name: block.name })}</ItemTitle>
-                    <ItemDescription>{t("item.entrances", { count: block.entrances.length })}</ItemDescription>
+                    <ItemTitle className="flex flex-wrap items-center gap-2">
+                        {t("item.titleWithName", { name: block.name })}
+                        {block.salesStatus && (
+                            <Badge className={BLOCK_SALES_STATUS_BADGE_CLASSES[block.salesStatus]}>
+                                {t(BLOCK_SALES_STATUS_LABEL_KEYS[block.salesStatus])}
+                            </Badge>
+                        )}
+                    </ItemTitle>
+                    <ItemDescription>
+                        {[
+                            t("item.entrances", { count: block.entrances.length }),
+                            completionQuarter(t, block.completionDate) && t("completion", { quarter: completionQuarter(t, block.completionDate) }),
+                        ].filter(Boolean).join(" · ")}
+                    </ItemDescription>
                 </ItemContent>
                 <ItemActions onClick={(e) => e.stopPropagation()}>
                     <AddEntranceButton

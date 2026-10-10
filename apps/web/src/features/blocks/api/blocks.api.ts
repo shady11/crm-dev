@@ -1,10 +1,15 @@
 import { api } from "@/lib/api";
 import type { Block } from "../types/block.types";
+import type { BlockSalesStatus } from "../types/block-sales";
 import type {PaginatedResponse} from "@/lib/api-types.ts";
 
 export type BlockPayload = {
     name: string;
     code?: string;
+    order?: number;
+    salesStatus?: BlockSalesStatus;
+    // YYYY-MM-DD; null clears it.
+    completionDate?: string | null;
 };
 
 export async function getBlocks(projectId: string) {

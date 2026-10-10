@@ -1,3 +1,4 @@
+import type {BlockSalesStatus} from "@/features/blocks/types/block-sales";
 import type {UnitDealHistoryEntry} from "@/features/deals/types/deal.types.ts";
 
 export const UnitType = {
@@ -107,6 +108,9 @@ export type Unit = {
     block?: {
         id: string;
         name: string;
+        // On the full unit (GET /units/:id).
+        salesStatus?: BlockSalesStatus;
+        completionDate?: string | null;
     };
     entrance?: {
         id: string;

@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {Building2, Loader2, Plus} from "lucide-react";
 import { Button } from "@/components/ui/button.tsx";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet.tsx";
-import { createBlock } from "@/features/blocks/api/blocks.api";
+import { type BlockPayload, createBlock } from "@/features/blocks/api/blocks.api";
 import type {Block} from "@/features/blocks/types/block.types.ts";
 import type {ProjectTree} from "@/features/projects/types/project.types.ts";
 import {BlockItem} from "@/features/blocks/components/block-item.tsx";
@@ -35,7 +35,7 @@ export function ProjectStructure() {
     });
 
     const createBlockMutation = useMutation({
-        mutationFn: (payload: { name: string; code?: string }) =>
+        mutationFn: (payload: BlockPayload) =>
             createBlock(projectId!, payload),
 
         onSuccess: async (_, variables) => {
