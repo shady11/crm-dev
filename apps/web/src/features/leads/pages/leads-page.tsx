@@ -42,6 +42,10 @@ export function LeadsPage() {
                     onStatusFilterChange={filters.setStatusFilter}
                     branchFilter={filters.branchFilter}
                     onBranchFilterChange={filters.setBranchFilter}
+                    sourceFilter={filters.sourceFilter}
+                    onSourceFilterChange={filters.setSourceFilter}
+                    mineOnly={filters.mineOnly}
+                    onMineOnlyChange={filters.setMineOnly}
                     onAddLead={form.openCreateForm}
                 />
 

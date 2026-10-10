@@ -18,6 +18,14 @@ import {ContactAttemptType, LogContactAttemptDto} from "@/modules/leads/dto/log-
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
 import {normalizePhone} from "@/common/utils/phone.util";
 
+// What every lead response carries besides the lead's own columns.
+const LEAD_INCLUDE = {
+    manager: {select: {id: true, fullName: true, email: true}},
+    client: {select: {id: true, fullName: true, phone: true}},
+    preferredProject: {select: {id: true, name: true}},
+} satisfies Prisma.LeadInclude;
+
+
 const CONTACT_ATTEMPT_TYPE_MAP: Record<ContactAttemptType, ActivityType> = {
     CALL: ActivityType.CALL,
     MESSAGE: ActivityType.MESSAGE_SENT,
@@ -73,6 +81,10 @@ export class LeadsService {
             where.managerId = query.managerId;
         }
 
+        if (query.projectId) {
+            where.preferredProjectId = query.projectId;
+        }
+
         if (query.search) {
             where.OR = [
                 {
@@ -94,6 +106,13 @@ export class LeadsService {
                     },
                 },
             ];
+
+            // Phones are stored as +996…, so "0555 32" must match "+99655532…":
+            // compare digits, without the national leading 0.
+            const digits = query.search.replace(/\D/g, "").replace(/^0/, "");
+            if (digits.length >= 3) {
+                where.OR.push({phone: {contains: digits}});
+            }
         }
 
         const [items, total] = await Promise.all([
@@ -107,22 +126,7 @@ export class LeadsService {
                     LEAD_SORTABLE_FIELDS,
                     { createdAt: "desc" },
                 ),
-                include: {
-                    manager: {
-                        select: {
-                            id: true,
-                            fullName: true,
-                            email: true,
-                        },
-                    },
-                    client: {
-                        select: {
-                            id: true,
-                            fullName: true,
-                            phone: true,
-                        },
-                    },
-                },
+                include: LEAD_INCLUDE,
             }),
             this.prisma.lead.count({
                 where,
@@ -156,22 +160,7 @@ export class LeadsService {
                 // the record exists.
                 ...(user.isBranchScoped ? {branchId: user.branchId} : {}),
             },
-            include: {
-                manager: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        email: true,
-                    },
-                },
-                client: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        phone: true,
-                    },
-                },
-            },
+            include: LEAD_INCLUDE,
         });
 
         if (!lead) {
@@ -194,6 +183,10 @@ export class LeadsService {
 
         if (dto.clientId) {
             await this.ensureClientAssignable(dto.clientId, user);
+        }
+
+        if (dto.preferredProjectId) {
+            await this.ensureProjectInCompany(dto.preferredProjectId, user);
         }
 
         if (!dto.confirmDuplicate) {
@@ -219,23 +212,12 @@ export class LeadsService {
                 managerId,
                 clientId: dto.clientId,
                 nextContactAt: dto.nextContactAt ? new Date(dto.nextContactAt) : undefined,
+                budget: dto.budget ?? undefined,
+                rooms: dto.rooms ?? undefined,
+                preferredProjectId: dto.preferredProjectId ?? undefined,
+                financingType: dto.financingType ?? undefined,
             },
-            include: {
-                manager: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        email: true,
-                    },
-                },
-                client: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        phone: true,
-                    },
-                },
-            },
+            include: LEAD_INCLUDE,
         });
 
         await this.prisma.activity.create({
@@ -294,6 +276,10 @@ export class LeadsService {
             await this.ensureClientAssignable(dto.clientId, user);
         }
 
+        if (dto.preferredProjectId) {
+            await this.ensureProjectInCompany(dto.preferredProjectId, user);
+        }
+
         const updated = await this.prisma.lead.update({
             where: {
                 id,
@@ -309,27 +295,19 @@ export class LeadsService {
                 clientId: dto.clientId,
                 nextContactAt:
                     dto.nextContactAt === undefined ? undefined : dto.nextContactAt && new Date(dto.nextContactAt),
+                // undefined leaves a field alone, null clears it.
+                budget: dto.budget,
+                rooms: dto.rooms,
+                preferredProjectId: dto.preferredProjectId,
+                financingType: dto.financingType,
             },
-            include: {
-                manager: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        email: true,
-                    },
-                },
-                client: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        phone: true,
-                    },
-                },
-            },
+            include: LEAD_INCLUDE,
         });
 
         const changes = diffChangedFields(dto, existing, [
             "fullName", "phone", "email", "source", "status", "comment", "managerId", "clientId",
+            "rooms", "preferredProjectId", "financingType",
+            {field: "budget", normalize: (value) => (value == null ? null : Number(value))},
         ]);
 
         if (changes) {
@@ -387,22 +365,7 @@ export class LeadsService {
                 clientId,
                 status: LeadStatus.CONVERTED,
             },
-            include: {
-                manager: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        email: true,
-                    },
-                },
-                client: {
-                    select: {
-                        id: true,
-                        fullName: true,
-                        phone: true,
-                    },
-                },
-            },
+            include: LEAD_INCLUDE,
         });
 
         await this.prisma.activity.create({
@@ -725,6 +688,16 @@ export class LeadsService {
     private ensureCanAssign(user: AuthUser, managerId: string) {
         if (managerId !== user.id && !hasPermission(user, "leads.assign")) {
             throw new ForbiddenException("You can only assign a lead to yourself.");
+        }
+    }
+
+    private async ensureProjectInCompany(projectId: string, user: AuthUser) {
+        const project = await this.prisma.project.findFirst({
+            where: {id: projectId, companyId: user.companyId!, deletedAt: null},
+            select: {id: true},
+        });
+        if (!project) {
+            throw new BadRequestException("Project not found in your company");
         }
     }
 

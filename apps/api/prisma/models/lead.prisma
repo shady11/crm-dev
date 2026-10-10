@@ -18,6 +18,14 @@ model Lead {
   email    String?
   comment  String?
 
+  // Qualification: what the client is looking for, so a manager can match
+  // units and the team can see demand. All optional.
+  budget             Decimal?       @db.Decimal(14, 2)
+  rooms              Int?
+  preferredProjectId String?
+  preferredProject   Project?       @relation("LeadPreferredProject", fields: [preferredProjectId], references: [id], onDelete: SetNull)
+  financingType      FinancingType?
+
   nextContactAt DateTime?
   lastContactAt DateTime?
   assignedAt    DateTime?
@@ -52,4 +60,5 @@ model Lead {
   @@index([companyId, branchId])
   @@index([companyId, branchId, status])
   @@index([phone])
+  @@index([companyId, preferredProjectId])
 }

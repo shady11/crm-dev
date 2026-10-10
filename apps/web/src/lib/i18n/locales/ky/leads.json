@@ -15,7 +15,9 @@
     "heading": "Бардык лиддер",
     "filterByStatus": "Статус боюнча чыпка",
     "searchPlaceholder": "Лиддерди издөө...",
-    "addLead": "Лид кошуу"
+    "addLead": "Лид кошуу",
+    "mineOnly": "Менин лиддерим",
+    "allSources": "Бардык булактар"
   },
   "table": {
     "lead": "Лид",
@@ -23,7 +25,11 @@
     "manager": "Менеджер",
     "created": "Түзүлдү",
     "emptyTitle": "Лиддер табылган жок",
-    "emptyDescription": "Чыпкаларды же издөөнү өзгөртүп көрүңүз."
+    "emptyDescription": "Чыпкаларды же издөөнү өзгөртүп көрүңүз.",
+    "nextContact": "Кийинки байланыш",
+    "today": "Бүгүн",
+    "tomorrow": "Эртең",
+    "nextContactShort": "Чалуу: {{date}}"
   },
   "pagination": {
     "rowsPerPage": "Барактагы саптар"
@@ -45,7 +51,11 @@
     "created": "Түзүлдү",
     "createdAt": "{{date}} күнү, {{time}}",
     "nextContact": "Кийинки байланыш",
-    "lastContact": "Акыркы байланыш"
+    "lastContact": "Акыркы байланыш",
+    "rooms": "Бөлмө",
+    "budget": "Бюджет",
+    "preferredProject": "Долбоор",
+    "financingType": "Төлөм"
   },
   "clientTab": {
     "notConverted": "Бул лид дагы клиентке конвертелген эмес.",
@@ -105,7 +115,6 @@
     "phone": "Телефон",
     "email": "Email (милдеттүү эмес)",
     "source": "Булак (милдеттүү эмес)",
-    "sourcePlaceholder": "мисалы, Instagram, сунуш, келүү",
     "status": "Статус",
     "manager": "Менеджер (милдеттүү эмес)",
     "unassigned": "Дайындалган эмес",
@@ -115,9 +124,18 @@
     "validation": {
       "nameMin": "Аты кеминде 2 белгиден турушу керек",
       "phoneMin": "Телефон кеминде 5 белгиден турушу керек",
-      "invalidEmail": "Email туура эмес"
+      "invalidEmail": "Email туура эмес",
+      "budget": "Оң сумма киргизиңиз",
+      "rooms": "0дөн 10го чейин бүтүн сан киргизиңиз"
     },
-    "nextContact": "Кийинки байланыш"
+    "nextContact": "Кийинки байланыш",
+    "notSpecified": "Көрсөтүлгөн эмес",
+    "anyProject": "Каалаган долбоор",
+    "lookingFor": "Кардар эмне издейт",
+    "rooms": "Бөлмө",
+    "budget": "Бюджет, чейин",
+    "preferredProject": "Долбоор",
+    "financingType": "Төлөм"
   },
   "convertDialog": {
     "title": "Клиентке конверттөө",
@@ -173,5 +191,22 @@
     "bulkDeleteSuccessTitle": "Лиддер өчүрүлдү",
     "bulkDeleteSuccessDescription": "Тандалган лиддер өчүрүлдү.",
     "bulkDeleteIssuesTitle": "Массалык өчүрүү учурунда көйгөйлөр пайда болду"
+  },
+  "interest": {
+    "budget": "{{amount}} чейин",
+    "rooms_one": "{{count}} бөлмө",
+    "rooms_few": "{{count}} бөлмө",
+    "rooms_many": "{{count}} бөлмө",
+    "rooms_other": "{{count}} бөлмө"
+  },
+  "sources": {
+    "Website": "Сайт",
+    "Instagram": "Instagram",
+    "Facebook": "Facebook",
+    "WhatsApp": "WhatsApp",
+    "Referral": "Сунуш",
+    "Walk-in": "Кеңсеге келүү",
+    "Phone": "Чалуу",
+    "Other": "Башка"
   }
 }

@@ -440,6 +440,16 @@ async function seedDemoTenantData(args: {
                     nextContactAt: status === LeadStatus.LOST || isConverted ? undefined : daysFromNow((leadSeed % 10) - 3),
                     lastContactAt: monthsAgo(0),
                     assignedAt: monthsAgo(1),
+                    // Qualification on most leads; every fourth left blank, as
+                    // a freshly logged call would be.
+                    ...(leadSeed % 4 === 3
+                        ? {}
+                        : {
+                              budget: 40000 + (leadSeed % 5) * 6000,
+                              rooms: 1 + (leadSeed % 3),
+                              preferredProjectId: units[0]?.projectId,
+                              financingType: pick(Object.values(FinancingType), leadSeed),
+                          }),
                 },
             });
             leadSeed += 1;

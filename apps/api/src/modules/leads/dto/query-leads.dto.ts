@@ -4,7 +4,7 @@ import {Transform} from "class-transformer";
 
 // Columns the leads table lets a user sort by — kept in sync with the
 // column keys LeadsTable passes to SortableTableHead on the frontend.
-export const LEAD_SORTABLE_FIELDS = ["fullName", "status", "createdAt"] as const;
+export const LEAD_SORTABLE_FIELDS = ["fullName", "status", "createdAt", "nextContactAt"] as const;
 
 export class QueryLeadsDto {
     @IsOptional()
@@ -22,6 +22,11 @@ export class QueryLeadsDto {
     @IsOptional()
     @IsUUID()
     managerId?: string;
+
+    // Leads interested in this project (Lead.preferredProjectId).
+    @IsOptional()
+    @IsUUID()
+    projectId?: string;
 
     // Admin-only cross-branch filter (BR-B3) — ignored for a branch-scoped
     // caller, whose own branch filter already takes precedence. Kept as a

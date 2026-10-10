@@ -23,16 +23,20 @@ import type {LeadStatus} from "@/features/leads/types/lead.types.ts";
 import {useSort} from "@/hooks/use-sort.ts";
 import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
 import {toastWithUndo} from "@/lib/undo-toast.ts";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 
 export type LeadStatusFilterValue = LeadStatus | "all";
 
 export function useLeadsList() {
     const { t } = useTranslation("leads");
     const queryClient = useQueryClient();
+    const { user } = useAuth();
 
     const [search, setSearchState] = useState("");
     const [statusFilter, setStatusFilterState] = useState<LeadStatusFilterValue>("all");
     const [branchFilter, setBranchFilterState] = useState<string | "all">("all");
+    const [sourceFilter, setSourceFilterState] = useState<string | "all">("all");
+    const [mineOnly, setMineOnlyState] = useState(false);
     const [page, setPage] = useState(1);
     const [limit, setLimitState] = useState(10);
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -54,7 +58,7 @@ export function useLeadsList() {
     const [reassignTarget, setReassignTarget] = useState<Lead | null>(null);
 
     const tableQuery = useQuery({
-        queryKey: ["leads", { search: debouncedSearch, statusFilter, branchFilter, page, limit, sortBy, sortOrder }],
+        queryKey: ["leads", { search: debouncedSearch, statusFilter, branchFilter, sourceFilter, mineOnly, page, limit, sortBy, sortOrder }],
         queryFn: () =>
             getLeads({
                 page,
@@ -62,6 +66,8 @@ export function useLeadsList() {
                 search: debouncedSearch || undefined,
                 status: statusFilter === "all" ? undefined : statusFilter,
                 branchId: branchFilter === "all" ? undefined : branchFilter,
+                source: sourceFilter === "all" ? undefined : sourceFilter,
+                managerId: mineOnly ? user?.id : undefined,
                 sortBy,
                 sortOrder,
             }),
@@ -309,6 +315,16 @@ export function useLeadsList() {
             branchFilter,
             setBranchFilter: (value: string | "all") => {
                 setBranchFilterState(value);
+                setPage(1);
+            },
+            sourceFilter,
+            setSourceFilter: (value: string | "all") => {
+                setSourceFilterState(value);
+                setPage(1);
+            },
+            mineOnly,
+            setMineOnly: (value: boolean) => {
+                setMineOnlyState(value);
                 setPage(1);
             },
         },

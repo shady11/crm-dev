@@ -30,3 +30,11 @@ export function formatCreatedAt(iso: string, locale = "ru-RU") {
         time: date.toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" }),
     };
 }
+
+/** Whole calendar days from today to a timestamp's local day (negative = past). */
+export function calendarDaysFromToday(iso: string) {
+    const day = new Date(iso);
+    const today = new Date();
+    const start = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    return Math.round((start(day) - start(today)) / 86_400_000);
+}

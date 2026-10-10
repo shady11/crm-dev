@@ -1,10 +1,12 @@
-import {Plus, Search} from "lucide-react";
+import {Plus, Search, UserRoundIcon} from "lucide-react";
 import {createListCollection} from "@ark-ui/react";
 import {Button} from "@/components/ui/button.tsx";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
+import {Toggle} from "@/components/ui/toggle.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {LEAD_STATUS_LABEL_KEYS, LeadStatus} from "@/features/leads/types/lead.types.ts";
 import type {LeadStatusFilterValue} from "@/features/leads/hooks/use-leads-list.ts";
+import {LEAD_SOURCES} from "@/features/leads/utils/sources.ts";
 import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
 import {useTranslation} from "react-i18next";
 
@@ -15,6 +17,10 @@ interface LeadsToolbarProps {
     onStatusFilterChange(value: LeadStatusFilterValue): void;
     branchFilter: string | "all";
     onBranchFilterChange(value: string | "all"): void;
+    sourceFilter: string | "all";
+    onSourceFilterChange(value: string | "all"): void;
+    mineOnly: boolean;
+    onMineOnlyChange(value: boolean): void;
     onAddLead(): void;
 }
 
@@ -25,6 +31,10 @@ export function LeadsToolbar({
                                   onStatusFilterChange,
                                   branchFilter,
                                   onBranchFilterChange,
+                                  sourceFilter,
+                                  onSourceFilterChange,
+                                  mineOnly,
+                                  onMineOnlyChange,
                                   onAddLead,
                               }: LeadsToolbarProps) {
     const { t } = useTranslation("leads");
@@ -41,12 +51,46 @@ export function LeadsToolbar({
         ],
     });
 
+    const sourceCollection = createListCollection({
+        items: [
+            { label: t("toolbar.allSources"), value: "all" },
+            ...LEAD_SOURCES.map((source) => ({ label: t(`sources.${source}`), value: source })),
+        ],
+    });
+
     return (
         <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-bold">{t("toolbar.heading")}</h2>
 
             <div className="flex flex-wrap items-center gap-2">
+                <Toggle
+                    variant="outline"
+                    size="lg"
+                    pressed={mineOnly}
+                    onPressedChange={onMineOnlyChange}
+                >
+                    <UserRoundIcon className="size-4" />
+                    {t("toolbar.mineOnly")}
+                </Toggle>
+
                 <BranchFilterSelect value={branchFilter} onChange={onBranchFilterChange} />
+
+                <Select
+                    collection={sourceCollection}
+                    value={[sourceFilter]}
+                    onValueChange={({ value }) => onSourceFilterChange(value[0] ?? "all")}
+                >
+                    <SelectTrigger className="w-40">
+                        <SelectValue placeholder={t("toolbar.allSources")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {sourceCollection.items.map((item) => (
+                            <SelectItem key={item.value} item={item}>
+                                {item.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
 
                 <Select
                     collection={statusCollection}

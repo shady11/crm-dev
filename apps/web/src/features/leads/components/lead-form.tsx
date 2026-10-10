@@ -19,18 +19,29 @@ import {hasPermission} from "@/features/auth/access.ts";
 import {isoToDay, nextContactToIso} from "@/features/leads/utils/format.ts";
 import type {CreateLeadPayload, Lead, UpdateLeadPayload} from "@/features/leads/api/leads.api.ts";
 import {LEAD_STATUS_LABEL_KEYS, LeadStatus} from "@/features/leads/types/lead.types.ts";
+import {LEAD_SOURCES} from "@/features/leads/utils/sources.ts";
+import {useProjectsFilter} from "@/features/projects/hooks/use-projects-filter.ts";
+import {FINANCING_TYPE_LABEL_KEYS} from "@/features/deals/types/deal.types.ts";
+import type {FinancingType} from "@/features/deals/api/deals.api.ts";
 import {useTranslation} from "react-i18next";
 
 const UNASSIGNED = "unassigned";
+// Select can't hold an empty value, so "nothing picked" gets its own token.
+const NONE = "none";
+const FINANCING_TYPES: FinancingType[] = ["CASH", "INSTALLMENT", "MORTGAGE"];
 
 type LeadFormValues = {
     fullName: string;
     phone: string;
     email?: string;
-    source?: string;
+    source: string;
     status: LeadStatus;
     managerId: string;
     nextContactDay: string;
+    budget: string;
+    rooms: string;
+    preferredProjectId: string;
+    financingType: string;
     comment?: string;
 };
 
@@ -47,10 +58,14 @@ const DEFAULT_VALUES: LeadFormValues = {
     fullName: "",
     phone: "",
     email: "",
-    source: "",
+    source: NONE,
     status: LeadStatus.NEW,
     managerId: UNASSIGNED,
     nextContactDay: "",
+    budget: "",
+    rooms: "",
+    preferredProjectId: NONE,
+    financingType: NONE,
     comment: "",
 };
 
@@ -60,10 +75,14 @@ function toFormValues(lead?: Lead | null): LeadFormValues {
         fullName: lead.fullName,
         phone: lead.phone,
         email: lead.email ?? "",
-        source: lead.source ?? "",
+        source: lead.source || NONE,
         status: lead.status,
         managerId: lead.manager?.id ?? UNASSIGNED,
         nextContactDay: isoToDay(lead.nextContactAt),
+        budget: lead.budget != null ? String(Number(lead.budget)) : "",
+        rooms: lead.rooms != null ? String(lead.rooms) : "",
+        preferredProjectId: lead.preferredProject?.id ?? NONE,
+        financingType: lead.financingType ?? NONE,
         comment: lead.comment ?? "",
     };
 }
@@ -79,6 +98,7 @@ export function LeadForm({
     const { t } = useTranslation("leads");
 
     const managers = useManagers();
+    const projects = useProjectsFilter();
     const { user } = useAuth();
     // Without leads.assign the API puts a new lead in the creator's own name
     // and refuses anyone else's, so there is nothing to pick.
@@ -90,10 +110,14 @@ export function LeadForm({
         fullName: z.string().trim().min(2, t("form.validation.nameMin")),
         phone: z.string().trim().min(5, t("form.validation.phoneMin")),
         email: z.string().trim().email(t("form.validation.invalidEmail")).optional().or(z.literal("")),
-        source: z.string().trim().optional(),
+        source: z.string(),
         status: z.enum(LeadStatus),
         managerId: z.string(),
         nextContactDay: z.string(),
+        budget: z.string().trim().refine((v) => v === "" || (Number(v) >= 0 && Number.isFinite(Number(v))), t("form.validation.budget")),
+        rooms: z.string().trim().refine((v) => v === "" || (Number.isInteger(Number(v)) && Number(v) >= 0 && Number(v) <= 10), t("form.validation.rooms")),
+        preferredProjectId: z.string(),
+        financingType: z.string(),
         comment: z.string().trim().optional(),
     }), [t]);
 
@@ -115,6 +139,36 @@ export function LeadForm({
         ),
     });
 
+    // A source typed before the fixed list existed stays selectable as is.
+    const currentSource = lead?.source;
+    const sourceCollection = createListCollection({
+        items: [
+            { label: t("form.notSpecified"), value: NONE },
+            ...LEAD_SOURCES.map((source) => ({ label: t(`sources.${source}`), value: source as string })),
+            ...(currentSource && !(LEAD_SOURCES as readonly string[]).includes(currentSource)
+                ? [{ label: currentSource, value: currentSource }]
+                : []),
+        ],
+    });
+
+    const projectCollection = createListCollection({
+        items: [
+            { label: t("form.anyProject"), value: NONE },
+            ...projects.data.map((project) => ({ label: project.name, value: project.id })),
+            // Keeps a project the list doesn't return (archived, past the first page) visible.
+            ...(lead?.preferredProject && !projects.data.some((p) => p.id === lead.preferredProject?.id)
+                ? [{ label: lead.preferredProject.name, value: lead.preferredProject.id }]
+                : []),
+        ],
+    });
+
+    const financingCollection = createListCollection({
+        items: [
+            { label: t("form.notSpecified"), value: NONE },
+            ...FINANCING_TYPES.map((type) => ({ label: t(FINANCING_TYPE_LABEL_KEYS[type]), value: type as string })),
+        ],
+    });
+
     const managerCollection = createListCollection({
         items: [
             { label: t("form.unassigned"), value: UNASSIGNED },
@@ -127,7 +181,7 @@ export function LeadForm({
             fullName: values.fullName.trim(),
             phone: values.phone.trim(),
             email: values.email?.trim() || undefined,
-            source: values.source?.trim() || undefined,
+            source: values.source !== NONE ? values.source : undefined,
             status: values.status,
             managerId: !canAssign || values.managerId === UNASSIGNED ? undefined : values.managerId,
             // On edit an emptied field clears the date; on create it is just left out.
@@ -135,6 +189,11 @@ export function LeadForm({
                 ? nextContactToIso(values.nextContactDay)
                 : lead ? null : undefined,
             comment: values.comment?.trim() || undefined,
+            // On edit an emptied field is sent as null to clear it.
+            budget: values.budget.trim() ? Number(values.budget) : lead ? null : undefined,
+            rooms: values.rooms.trim() ? Number(values.rooms) : lead ? null : undefined,
+            preferredProjectId: values.preferredProjectId !== NONE ? values.preferredProjectId : lead ? null : undefined,
+            financingType: values.financingType !== NONE ? (values.financingType as FinancingType) : lead ? null : undefined,
         });
     };
 
@@ -181,11 +240,25 @@ export function LeadForm({
                     <Controller
                         control={form.control}
                         name="source"
-                        render={({ field, fieldState }) => (
-                            <Field invalid={fieldState.invalid}>
+                        render={({ field }) => (
+                            <Field>
                                 <FieldLabel>{t("form.source")}</FieldLabel>
-                                <Input {...field} placeholder={t("form.sourcePlaceholder")} aria-label={t("form.source")} />
-                                <FieldError>{fieldState.error?.message}</FieldError>
+                                <Select
+                                    collection={sourceCollection}
+                                    value={[field.value]}
+                                    onValueChange={(item) => field.onChange(item.value[0] ?? NONE)}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {sourceCollection.items.map((item) => (
+                                            <SelectItem key={item.value} item={item}>
+                                                {item.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </Field>
                         )}
                     />
@@ -216,6 +289,84 @@ export function LeadForm({
                             </Field>
                         )}
                     />
+
+                    <fieldset className="flex flex-col gap-4 rounded-lg border border-secondary p-4">
+                        <legend className="px-1 text-sm font-medium">{t("form.lookingFor")}</legend>
+                        <div className="grid grid-cols-2 gap-3">
+                            <Controller
+                                control={form.control}
+                                name="rooms"
+                                render={({ field, fieldState }) => (
+                                    <Field invalid={fieldState.invalid}>
+                                        <FieldLabel>{t("form.rooms")}</FieldLabel>
+                                        <Input {...field} type="number" inputMode="numeric" min={0} max={10} step={1} placeholder="2" />
+                                        <FieldError>{fieldState.error?.message}</FieldError>
+                                    </Field>
+                                )}
+                            />
+                            <Controller
+                                control={form.control}
+                                name="budget"
+                                render={({ field, fieldState }) => (
+                                    <Field invalid={fieldState.invalid}>
+                                        <FieldLabel>{t("form.budget")}</FieldLabel>
+                                        <Input {...field} type="number" inputMode="decimal" min={0} step="any" placeholder="50000" />
+                                        <FieldError>{fieldState.error?.message}</FieldError>
+                                    </Field>
+                                )}
+                            />
+                        </div>
+                        <Controller
+                            control={form.control}
+                            name="preferredProjectId"
+                            render={({ field }) => (
+                                <Field>
+                                    <FieldLabel>{t("form.preferredProject")}</FieldLabel>
+                                    <Select
+                                        collection={projectCollection}
+                                        value={[field.value]}
+                                        onValueChange={(item) => field.onChange(item.value[0] ?? NONE)}
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {projectCollection.items.map((item) => (
+                                                <SelectItem key={item.value} item={item}>
+                                                    {item.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </Field>
+                            )}
+                        />
+                        <Controller
+                            control={form.control}
+                            name="financingType"
+                            render={({ field }) => (
+                                <Field>
+                                    <FieldLabel>{t("form.financingType")}</FieldLabel>
+                                    <Select
+                                        collection={financingCollection}
+                                        value={[field.value]}
+                                        onValueChange={(item) => field.onChange(item.value[0] ?? NONE)}
+                                    >
+                                        <SelectTrigger className="w-full">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {financingCollection.items.map((item) => (
+                                                <SelectItem key={item.value} item={item}>
+                                                    {item.label}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </Field>
+                            )}
+                        />
+                    </fieldset>
 
                     <Controller
                         control={form.control}

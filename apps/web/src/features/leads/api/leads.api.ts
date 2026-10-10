@@ -1,6 +1,7 @@
 import {api} from "@/lib/api";
 import type {PaginatedResponse} from "@/lib/api-types";
 import type {LeadStatus} from "../types/lead.types";
+import type {FinancingType} from "@/features/deals/api/deals.api";
 
 export type LeadManager = { id: string; fullName: string; email: string } | null;
 export type LeadClient = { id: string; fullName: string; phone: string } | null;
@@ -13,6 +14,12 @@ export interface Lead {
     source: string | null;
     status: LeadStatus;
     comment: string | null;
+    // What the client is looking for, captured while qualifying the lead.
+    // Decimal columns arrive as strings.
+    budget: string | number | null;
+    rooms: number | null;
+    financingType: FinancingType | null;
+    preferredProject: { id: string; name: string } | null;
     nextContactAt: string | null;
     lastContactAt: string | null;
     assignedAt: string | null;
@@ -25,14 +32,16 @@ export interface Lead {
 }
 
 // Kept in sync with LEAD_SORTABLE_FIELDS in the API's query-leads.dto.ts.
-export type LeadSortField = "fullName" | "status" | "createdAt";
+export type LeadSortField = "fullName" | "status" | "createdAt" | "nextContactAt";
 
 export type GetLeadsParams = {
     page?: number;
     limit?: number;
     search?: string;
     status?: LeadStatus;
+    source?: string;
     managerId?: string;
+    projectId?: string;
     // Admin-only cross-branch filter (BR-B3); ignored server-side for a
     // branch-scoped caller, whose own branch filter already takes precedence.
     branchId?: string;
@@ -62,6 +71,11 @@ export type CreateLeadPayload = {
     // already seen the warning (409 response) and wants to create it anyway.
     confirmDuplicate?: boolean;
     nextContactAt?: string | null;
+    // null clears the field on update.
+    budget?: number | null;
+    rooms?: number | null;
+    preferredProjectId?: string | null;
+    financingType?: FinancingType | null;
 };
 
 export type UpdateLeadPayload = Partial<CreateLeadPayload>;
