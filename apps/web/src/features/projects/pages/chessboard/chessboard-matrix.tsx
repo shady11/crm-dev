@@ -1,4 +1,4 @@
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {getProjectChessboard} from "@/features/projects/api/projects.api";
@@ -15,6 +15,8 @@ import {useChessboardSheet} from "@/features/projects/hooks/use-chessboard-sheet
 import {useUpdateUnit} from "@/features/units/hooks/use-update-unit.ts";
 import {useManagers} from "@/features/users/hooks/use-managers.ts";
 import {useTranslation} from "react-i18next";
+import {paths} from "@/routes/paths.ts";
+import {BROWSE_STATE, saveLastView} from "@/features/projects/utils/chessboard-navigation.ts";
 
 interface Filters {
     status: UnitStatus | "all";
@@ -66,6 +68,12 @@ export function ChessboardMatrix() {
     const block = blocks.find((b: Block) => b.id === blockId);
     const blockEntrances = block?.entrances || [];
     const entrance = blockEntrances.find((e: Entrance) => e.id === entranceId);
+
+    // Reopening the chessboard comes back here.
+    const found = !!block && !!entrance;
+    useEffect(() => {
+        if (found && projectId && blockId && entranceId) saveLastView(projectId, {blockId, entranceId});
+    }, [found, projectId, blockId, entranceId]);
 
     const managersQuery = useManagers();
     const managers = managersQuery.data ?? [];
@@ -188,9 +196,21 @@ export function ChessboardMatrix() {
                 entrance={entrance}
                 blocks={blocks}
                 blockEntrances={blockEntrances}
-                onBack={() => navigate("..")}
-                onBlockSelect={(id) => navigate(`../../${id}`)}
-                onEntranceSelect={(id) => navigate(`../${id}`)}
+                // Back to the entrance list, or to the block list when this
+                // block has only the one entrance.
+                onBack={() => navigate(
+                    blockEntrances.length > 1
+                        ? paths.projects.chessboard.block(projectId!, block.id)
+                        : paths.projects.chessboard.root(projectId!),
+                    {state: BROWSE_STATE},
+                )}
+                onBlockSelect={(id) => {
+                    const first = blocks.find((b) => b.id === id)?.entrances?.[0];
+                    navigate(first
+                        ? paths.projects.chessboard.entrance(projectId!, id, first.id)
+                        : paths.projects.chessboard.block(projectId!, id));
+                }}
+                onEntranceSelect={(id) => navigate(paths.projects.chessboard.entrance(projectId!, block.id, id))}
             />
 
             <ChessboardFilters

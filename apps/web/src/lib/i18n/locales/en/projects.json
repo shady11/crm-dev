@@ -39,7 +39,8 @@
   },
   "card": {
     "deleteTitle": "Delete project?",
-    "deleteDescription": "This will permanently delete \"{{name}}\". This action cannot be undone."
+    "deleteDescription": "This will permanently delete \"{{name}}\". This action cannot be undone.",
+    "openChessboard": "Chessboard"
   },
   "page": {
     "notFound": "Project not found",
@@ -80,6 +81,8 @@
     "units_one": "{{count}} unit",
     "units_few": "{{count}} units",
     "units_many": "{{count}} units",
-    "units_other": "{{count}} units"
+    "units_other": "{{count}} units",
+    "blocksNav": "Blocks",
+    "entrancesNav": "Entrances"
   }
 }

@@ -39,7 +39,8 @@
   },
   "card": {
     "deleteTitle": "Долбоорду өчүрөсүзбү?",
-    "deleteDescription": "«{{name}}» долбоору биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт."
+    "deleteDescription": "«{{name}}» долбоору биротоло өчүрүлөт. Бул аракетти жокко чыгарууга болбойт.",
+    "openChessboard": "Шахматка"
   },
   "page": {
     "notFound": "Долбоор табылган жок",
@@ -80,6 +81,8 @@
     "units_one": "{{count}} жай",
     "units_few": "{{count}} жай",
     "units_many": "{{count}} жай",
-    "units_other": "{{count}} жай"
+    "units_other": "{{count}} жай",
+    "blocksNav": "Блоктор",
+    "entrancesNav": "Кире бериштер"
   }
 }

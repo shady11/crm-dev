@@ -23,7 +23,8 @@ export function ProjectTabs() {
                     <NavLink
                         key={tab.to}
                         to={tab.to}
-                        end
+                        // The chessboard tab stays lit inside its block and entrance pages.
+                        end={tab.to !== "chessboard"}
                         className={({ isActive }) =>
                             cn(
                                 "relative inline-flex items-center px-2.5 py-4 text-md font-medium text-muted-foreground transition-colors",
