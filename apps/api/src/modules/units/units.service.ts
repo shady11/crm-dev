@@ -346,6 +346,8 @@ export class UnitsService {
                     select: {
                         id: true,
                         name: true,
+                        salesStatus: true,
+                        completionDate: true,
                     },
                 },
                 entrance: {

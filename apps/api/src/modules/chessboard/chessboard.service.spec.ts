@@ -110,6 +110,23 @@ describe('ChessboardService.getProjectChessboard', () => {
         expect(floorsOfBlock1.map((f: any) => f.order)).toEqual([2, 1]);
     });
 
+    it("returns each block's sales status and completion date", async () => {
+        const due = new Date('2027-11-30');
+        const {service} = build({
+            units: [
+                unitRow({id: 'u1', block: {id: 'block-a', name: 'A', order: 1, salesStatus: 'ON_SALE', completionDate: null}}),
+                unitRow({id: 'u2', block: {id: 'block-b', name: 'B', order: 2, salesStatus: 'UPCOMING', completionDate: due}}),
+            ],
+        });
+
+        const result = await service.getProjectChessboard(user, 'project-1', {});
+
+        expect(result.blocks.map((b: any) => [b.id, b.salesStatus, b.completionDate])).toEqual([
+            ['block-a', 'ON_SALE', null],
+            ['block-b', 'UPCOMING', due],
+        ]);
+    });
+
     it('builds a summary with counts by status/type and total price', async () => {
         const {service} = build({
             units: [

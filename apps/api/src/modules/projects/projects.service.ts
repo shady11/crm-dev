@@ -304,6 +304,8 @@ export class ProjectsService {
                         id: true,
                         name: true,
                         order: true,
+                        salesStatus: true,
+                        completionDate: true,
                         entrances: {
                             orderBy: [
                                 { order: "asc" },

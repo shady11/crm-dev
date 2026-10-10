@@ -1,8 +1,21 @@
+// Whether a block's units can be sold yet. Booking is refused only while
+// UPCOMING; a COMPLETED (handed-over) block still sells what's left.
+enum BlockSalesStatus {
+  UPCOMING
+  ON_SALE
+  COMPLETED
+}
+
 model Block {
   id String @id @default(uuid())
 
   name  String
   order Int    @default(0)
+
+  // Blocks of one project are often built and sold at different times.
+  salesStatus    BlockSalesStatus @default(ON_SALE)
+  // Expected handover; shown to clients by quarter.
+  completionDate DateTime?        @db.Date
 
   projectId String
   project   Project @relation(fields: [projectId], references: [id])

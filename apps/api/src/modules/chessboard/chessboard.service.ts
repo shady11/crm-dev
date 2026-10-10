@@ -1,5 +1,5 @@
 import {BadRequestException, ForbiddenException, Injectable, NotFoundException,} from "@nestjs/common";
-import {Prisma, UnitStatus, UnitType} from "@/generated/prisma/client";
+import {BlockSalesStatus, Prisma, UnitStatus, UnitType} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {QueryChessboardDto} from "./dto/query-chessboard.dto";
@@ -35,6 +35,10 @@ type ChessboardBlock = {
     id: string;
     name: string;
     order: number;
+    // Whether the block is on sale yet, and when it's due, so the grid can
+    // say so before anyone tries to book.
+    salesStatus: BlockSalesStatus;
+    completionDate: Date | null;
     entrances: ChessboardEntrance[];
 };
 
@@ -161,6 +165,8 @@ export class ChessboardService {
                         id: true,
                         name: true,
                         order: true,
+                        salesStatus: true,
+                        completionDate: true,
                     },
                 },
                 entrance: {
@@ -190,6 +196,8 @@ export class ChessboardService {
                     id: unit.block.id,
                     name: unit.block.name,
                     order: unit.block.order,
+                    salesStatus: unit.block.salesStatus,
+                    completionDate: unit.block.completionDate ?? null,
                     entrances: [],
                 };
 

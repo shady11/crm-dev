@@ -192,6 +192,8 @@ export class BlocksService {
                 name: dto.name,
                 order: nextOrder,
                 projectId,
+                salesStatus: dto.salesStatus,
+                completionDate: dto.completionDate ? new Date(dto.completionDate) : null,
             },
         });
 
@@ -240,10 +242,23 @@ export class BlocksService {
             data: {
                 name: dto.name,
                 order: dto.order,
+                salesStatus: dto.salesStatus,
+                // undefined leaves it alone, null clears it.
+                completionDate: dto.completionDate === undefined
+                    ? undefined
+                    : dto.completionDate ? new Date(dto.completionDate) : null,
             },
         });
 
-        const changes = diffChangedFields(dto, block, ["name", "order"]);
+        const changes = diffChangedFields(dto, block, [
+            "name",
+            "order",
+            "salesStatus",
+            {
+                field: "completionDate",
+                normalize: (value) => (value ? new Date(value as string | Date).toISOString().slice(0, 10) : null),
+            },
+        ]);
 
         if (changes) {
             await this.logBlockActivity({
