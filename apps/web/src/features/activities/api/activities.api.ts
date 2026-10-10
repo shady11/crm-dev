@@ -1,6 +1,6 @@
 import {api} from "@/lib/api";
 import type {PaginatedResponse} from "@/lib/api-types";
-import type {Activity} from "../types/activity.types";
+import type {Activity, ActivitySubject} from "../types/activity.types";
 
 export type GetActivitiesParams = {
     page?: number;
@@ -10,6 +10,8 @@ export type GetActivitiesParams = {
     branchId?: string;
     dateFrom?: string;
     dateTo?: string;
+    userId?: string;
+    subject?: ActivitySubject;
 };
 
 export async function getActivities(params?: GetActivitiesParams) {

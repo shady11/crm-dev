@@ -7,7 +7,17 @@
       "branch": "Branch",
       "allBranches": "All branches",
       "dateFrom": "From",
-      "dateTo": "To"
+      "dateTo": "To",
+      "subject": "Related to",
+      "anything": "Anything",
+      "mineOnly": "My actions",
+      "subjects": {
+        "lead": "Leads",
+        "client": "Clients",
+        "deal": "Deals",
+        "task": "Tasks",
+        "inventory": "Units & projects"
+      }
     },
     "table": {
       "headers": {
@@ -21,5 +31,10 @@
       "description": "Nothing matches these filters."
     },
     "system": "System"
+  },
+  "subjects": {
+    "deal": "Deal {{number}}",
+    "lead": "Lead: {{name}}",
+    "unit": "Unit {{number}}"
   }
 }
