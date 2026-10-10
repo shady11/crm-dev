@@ -7,7 +7,9 @@ import {DataTable} from "@/components/shared/data-table.tsx";
 import {SortableTableHead} from "@/components/shared/sortable-table-head.tsx";
 import type {Lead, LeadSortField} from "@/features/leads/api/leads.api.ts";
 import {LEAD_STATUS_CLASSES, LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
-import {formatCreatedAt, initials} from "@/features/leads/utils/format.ts";
+import {calendarDaysFromToday, formatCreatedAt, initials} from "@/features/leads/utils/format.ts";
+import {useLeadInterest} from "@/features/leads/components/lead-interest.tsx";
+import {cn} from "@/lib/utils";
 import {useTranslation} from "react-i18next";
 import type {SortOrder} from "@/hooks/use-sort.ts";
 
@@ -37,6 +39,20 @@ export function LeadsTable({
                                 onRowClick,
                             }: LeadsTableProps) {
     const { t, i18n } = useTranslation("leads");
+    const interest = useLeadInterest();
+
+    // The day a lead is due a call, flagged once it has slipped; closed
+    // leads have nothing to follow up.
+    const nextContact = (lead: Lead) => {
+        if (!lead.nextContactAt) return null;
+        const days = calendarDaysFromToday(lead.nextContactAt);
+        const closed = lead.status === "CONVERTED" || lead.status === "LOST";
+        return {
+            label: days === 0 ? t("table.today") : days === 1 ? t("table.tomorrow") : formatCreatedAt(lead.nextContactAt, i18n.language).date,
+            overdue: !closed && days < 0,
+            today: !closed && days === 0,
+        };
+    };
 
     return (
         <DataTable
@@ -47,6 +63,8 @@ export function LeadsTable({
             emptyDescription={t("table.emptyDescription")}
             cards={leads.map((lead) => {
                 const created = formatCreatedAt(lead.createdAt, i18n.language);
+                const summary = interest(lead);
+                const next = nextContact(lead);
 
                 return (
                     <div
@@ -67,6 +85,7 @@ export function LeadsTable({
                                 <div className="min-w-0">
                                     <p className="truncate font-medium">{lead.fullName}</p>
                                     <p className="truncate text-xs text-muted-foreground">{lead.phone}</p>
+                                    {summary && <p className="truncate text-xs text-muted-foreground">{summary}</p>}
                                 </div>
                             </div>
                             <Badge className={`shrink-0 ${LEAD_STATUS_CLASSES[lead.status]} text-white`}>
@@ -75,7 +94,13 @@ export function LeadsTable({
                         </div>
                         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
                             <span className="truncate">{lead.manager?.fullName ?? "—"}</span>
-                            <span className="ml-auto">{created.date}</span>
+                            {next ? (
+                                <span className={cn("ml-auto", next.overdue && "font-medium text-destructive", next.today && "font-medium text-foreground")}>
+                                    {t("table.nextContactShort", { date: next.label })}
+                                </span>
+                            ) : (
+                                <span className="ml-auto">{created.date}</span>
+                            )}
                         </div>
                     </div>
                 );
@@ -96,6 +121,9 @@ export function LeadsTable({
                         {t("table.status")}
                     </SortableTableHead>
                     <TableHead>{t("table.manager")}</TableHead>
+                    <SortableTableHead field="nextContactAt" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
+                        {t("table.nextContact")}
+                    </SortableTableHead>
                     <SortableTableHead field="createdAt" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
                         {t("table.created")}
                     </SortableTableHead>
@@ -104,6 +132,8 @@ export function LeadsTable({
             <TableBody>
                 {leads.map((lead) => {
                     const created = formatCreatedAt(lead.createdAt, i18n.language);
+                    const summary = interest(lead);
+                    const next = nextContact(lead);
 
                     return (
                         <TableRow
@@ -125,6 +155,7 @@ export function LeadsTable({
                                     <div>
                                         <p className="font-medium">{lead.fullName}</p>
                                         <p className="text-xs text-muted-foreground">{lead.phone}</p>
+                                        {summary && <p className="text-xs text-muted-foreground">{summary}</p>}
                                     </div>
                                 </div>
                             </TableCell>
@@ -134,6 +165,9 @@ export function LeadsTable({
                                 </Badge>
                             </TableCell>
                             <TableCell>{lead.manager?.fullName ?? "—"}</TableCell>
+                            <TableCell className={cn(next?.overdue && "font-medium text-destructive", next?.today && "font-medium")}>
+                                {next?.label ?? "—"}
+                            </TableCell>
                             <TableCell>
                                 <p>{created.date}</p>
                                 <p className="text-sm text-muted-foreground">{created.time}</p>

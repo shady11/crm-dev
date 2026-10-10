@@ -15,7 +15,9 @@
     "heading": "Все лиды",
     "filterByStatus": "Фильтр по статусу",
     "searchPlaceholder": "Поиск лидов...",
-    "addLead": "Добавить лида"
+    "addLead": "Добавить лида",
+    "mineOnly": "Мои лиды",
+    "allSources": "Все источники"
   },
   "table": {
     "lead": "Лид",
@@ -23,7 +25,11 @@
     "manager": "Менеджер",
     "created": "Создан",
     "emptyTitle": "Лиды не найдены",
-    "emptyDescription": "Попробуйте изменить фильтры или поиск."
+    "emptyDescription": "Попробуйте изменить фильтры или поиск.",
+    "nextContact": "Следующий контакт",
+    "today": "Сегодня",
+    "tomorrow": "Завтра",
+    "nextContactShort": "Звонок: {{date}}"
   },
   "pagination": {
     "rowsPerPage": "Строк на странице"
@@ -45,7 +51,11 @@
     "created": "Создан",
     "createdAt": "{{date}} в {{time}}",
     "nextContact": "Следующий контакт",
-    "lastContact": "Последний контакт"
+    "lastContact": "Последний контакт",
+    "rooms": "Комнат",
+    "budget": "Бюджет",
+    "preferredProject": "Проект",
+    "financingType": "Оплата"
   },
   "clientTab": {
     "notConverted": "Этот лид ещё не конвертирован в клиента.",
@@ -105,7 +115,6 @@
     "phone": "Телефон",
     "email": "Email (необязательно)",
     "source": "Источник (необязательно)",
-    "sourcePlaceholder": "например, Instagram, рекомендация, визит",
     "status": "Статус",
     "manager": "Менеджер (необязательно)",
     "unassigned": "Не назначен",
@@ -115,9 +124,18 @@
     "validation": {
       "nameMin": "Имя должно содержать не менее 2 символов",
       "phoneMin": "Телефон должен содержать не менее 5 символов",
-      "invalidEmail": "Некорректный email"
+      "invalidEmail": "Некорректный email",
+      "budget": "Введите положительную сумму",
+      "rooms": "Введите целое число от 0 до 10"
     },
-    "nextContact": "Следующий контакт"
+    "nextContact": "Следующий контакт",
+    "notSpecified": "Не указано",
+    "anyProject": "Любой проект",
+    "lookingFor": "Что ищет клиент",
+    "rooms": "Комнат",
+    "budget": "Бюджет, до",
+    "preferredProject": "Проект",
+    "financingType": "Оплата"
   },
   "convertDialog": {
     "title": "Конвертировать в клиента",
@@ -173,5 +191,22 @@
     "bulkDeleteSuccessTitle": "Лиды удалены",
     "bulkDeleteSuccessDescription": "Выбранные лиды удалены.",
     "bulkDeleteIssuesTitle": "Возникли проблемы при массовом удалении"
+  },
+  "interest": {
+    "budget": "до {{amount}}",
+    "rooms_one": "{{count}}-комн.",
+    "rooms_few": "{{count}}-комн.",
+    "rooms_many": "{{count}}-комн.",
+    "rooms_other": "{{count}}-комн."
+  },
+  "sources": {
+    "Website": "Сайт",
+    "Instagram": "Instagram",
+    "Facebook": "Facebook",
+    "WhatsApp": "WhatsApp",
+    "Referral": "Рекомендация",
+    "Walk-in": "Визит в офис",
+    "Phone": "Звонок",
+    "Other": "Другое"
   }
 }

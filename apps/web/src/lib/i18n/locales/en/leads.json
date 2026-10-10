@@ -15,7 +15,9 @@
     "heading": "All Leads",
     "filterByStatus": "Filter by status",
     "searchPlaceholder": "Search for leads...",
-    "addLead": "Add New Lead"
+    "addLead": "Add New Lead",
+    "mineOnly": "My leads",
+    "allSources": "All sources"
   },
   "table": {
     "lead": "Lead",
@@ -23,7 +25,11 @@
     "manager": "Manager",
     "created": "Created",
     "emptyTitle": "No leads found",
-    "emptyDescription": "Try adjusting your filters or search."
+    "emptyDescription": "Try adjusting your filters or search.",
+    "nextContact": "Next contact",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "nextContactShort": "Call: {{date}}"
   },
   "pagination": {
     "rowsPerPage": "Rows per page"
@@ -45,7 +51,11 @@
     "created": "Created",
     "createdAt": "{{date}} at {{time}}",
     "nextContact": "Next contact",
-    "lastContact": "Last contact"
+    "lastContact": "Last contact",
+    "rooms": "Rooms",
+    "budget": "Budget",
+    "preferredProject": "Project",
+    "financingType": "Payment"
   },
   "clientTab": {
     "notConverted": "This lead hasn't been converted to a client yet.",
@@ -105,7 +115,6 @@
     "phone": "Phone",
     "email": "Email (optional)",
     "source": "Source (optional)",
-    "sourcePlaceholder": "e.g. Instagram, referral, walk-in",
     "status": "Status",
     "manager": "Manager (optional)",
     "unassigned": "Unassigned",
@@ -115,9 +124,18 @@
     "validation": {
       "nameMin": "Name must be at least 2 characters",
       "phoneMin": "Phone must be at least 5 characters",
-      "invalidEmail": "Invalid email"
+      "invalidEmail": "Invalid email",
+      "budget": "Enter a positive amount",
+      "rooms": "Enter a whole number from 0 to 10"
     },
-    "nextContact": "Next contact"
+    "nextContact": "Next contact",
+    "notSpecified": "Not specified",
+    "anyProject": "Any project",
+    "lookingFor": "What they're looking for",
+    "rooms": "Rooms",
+    "budget": "Budget, up to",
+    "preferredProject": "Project",
+    "financingType": "Payment"
   },
   "convertDialog": {
     "title": "Convert to client",
@@ -173,5 +191,22 @@
     "bulkDeleteSuccessTitle": "Leads deleted",
     "bulkDeleteSuccessDescription": "Selected leads have been removed.",
     "bulkDeleteIssuesTitle": "Bulk delete had issues"
+  },
+  "interest": {
+    "budget": "up to {{amount}}",
+    "rooms_one": "{{count}} room",
+    "rooms_few": "{{count}} rooms",
+    "rooms_many": "{{count}} rooms",
+    "rooms_other": "{{count}} rooms"
+  },
+  "sources": {
+    "Website": "Website",
+    "Instagram": "Instagram",
+    "Facebook": "Facebook",
+    "WhatsApp": "WhatsApp",
+    "Referral": "Referral",
+    "Walk-in": "Walk-in",
+    "Phone": "Phone call",
+    "Other": "Other"
   }
 }

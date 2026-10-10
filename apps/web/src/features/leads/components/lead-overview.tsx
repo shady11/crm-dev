@@ -4,6 +4,9 @@ import {WhatsAppLink} from "@/components/shared/whatsapp-link.tsx";
 import type {Lead} from "@/features/leads/api/leads.api.ts";
 import {LEAD_STATUS_CLASSES, LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
 import {formatCreatedAt} from "@/features/leads/utils/format.ts";
+import {leadSourceLabel} from "@/features/leads/utils/sources.ts";
+import {FINANCING_TYPE_LABEL_KEYS} from "@/features/deals/types/deal.types.ts";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useTranslation} from "react-i18next";
 
 interface LeadOverviewProps {
@@ -12,6 +15,7 @@ interface LeadOverviewProps {
 
 export function LeadOverview({ lead }: LeadOverviewProps) {
     const { t, i18n } = useTranslation("leads");
+    const { formatCurrency } = useCompanyFormatters();
 
     const created = formatCreatedAt(lead.createdAt, i18n.language);
 
@@ -43,7 +47,25 @@ export function LeadOverview({ lead }: LeadOverviewProps) {
                 </DataListItem>
                 <DataListItem>
                     <DataListItemLabel>{t("overview.source")}</DataListItemLabel>
-                    <DataListItemValue>{lead.source ?? "—"}</DataListItemValue>
+                    <DataListItemValue>{leadSourceLabel(t, lead.source)}</DataListItemValue>
+                </DataListItem>
+                <DataListItem>
+                    <DataListItemLabel>{t("overview.rooms")}</DataListItemLabel>
+                    <DataListItemValue>{lead.rooms ?? "—"}</DataListItemValue>
+                </DataListItem>
+                <DataListItem>
+                    <DataListItemLabel>{t("overview.budget")}</DataListItemLabel>
+                    <DataListItemValue>
+                        {lead.budget != null ? t("interest.budget", { amount: formatCurrency(Number(lead.budget)) }) : "—"}
+                    </DataListItemValue>
+                </DataListItem>
+                <DataListItem>
+                    <DataListItemLabel>{t("overview.preferredProject")}</DataListItemLabel>
+                    <DataListItemValue>{lead.preferredProject?.name ?? "—"}</DataListItemValue>
+                </DataListItem>
+                <DataListItem>
+                    <DataListItemLabel>{t("overview.financingType")}</DataListItemLabel>
+                    <DataListItemValue>{lead.financingType ? t(FINANCING_TYPE_LABEL_KEYS[lead.financingType]) : "—"}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
                     <DataListItemLabel>{t("overview.manager")}</DataListItemLabel>
