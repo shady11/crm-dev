@@ -97,7 +97,8 @@
     "noDeals": "No deals recorded for this unit yet.",
     "bookButton": "Book",
     "bookingClosed": "Booking is closed: the project status is {{status}}.",
-    "infoSheetButton": "Info sheet"
+    "infoSheetButton": "Info sheet",
+    "offerButton": "Price offer"
   },
   "infoSheet": {
     "title": "Unit №{{number}}",
@@ -154,5 +155,37 @@
     "pricePresetUnder": "Under {{value}}",
     "pricePresetOver": "Over {{value}}",
     "pricePresetRange": "{{min}} – {{max}}"
+  },
+  "offer": {
+    "settings": "Price offer",
+    "client": "Prepared for",
+    "clientPlaceholder": "Client name (optional)",
+    "validUntil": "Price valid until",
+    "includePlan": "Include an installment plan",
+    "downPayment": "Down payment, %",
+    "installments": "Installments",
+    "interval": "Paid",
+    "firstPayment": "First installment",
+    "every_one": "Monthly",
+    "every_few": "Every {{count}} months",
+    "every_many": "Every {{count}} months",
+    "every_other": "Every {{count}} months",
+    "notAvailable": "This unit is currently {{status}}. You can still print the offer, but it can't be booked right now.",
+    "preparedFor": "Prepared for {{name}}",
+    "paymentOptions": "Payment options",
+    "fullPayment": "Full payment",
+    "installmentPlan": "Installment plan",
+    "perInstallment": "per installment",
+    "planSummary_one": "{{down}} down ({{percent}}%), then {{count}} payment, {{every}}",
+    "planSummary_few": "{{down}} down ({{percent}}%), then {{count}} payments, {{every}}",
+    "planSummary_many": "{{down}} down ({{percent}}%), then {{count}} payments, {{every}}",
+    "planSummary_other": "{{down}} down ({{percent}}%), then {{count}} payments, {{every}}",
+    "dueDate": "Due",
+    "amount": "Amount",
+    "downPaymentRow": "Down payment",
+    "total": "Total",
+    "lastDiffers": "The last installment is adjusted by the rounding.",
+    "yourManager": "Your manager",
+    "validNote": "Price valid until {{date}}. The schedule is indicative and is fixed in the contract."
   }
 }

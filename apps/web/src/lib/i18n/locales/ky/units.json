@@ -97,7 +97,8 @@
     "noDeals": "Бул жай үчүн азырынча бүтүм жок.",
     "bookButton": "Брондоо",
     "bookingClosed": "Брондоо жабык: долбоордун статусу — {{status}}.",
-    "infoSheetButton": "Маалымат баракчасы"
+    "infoSheetButton": "Маалымат баракчасы",
+    "offerButton": "Сунуш"
   },
   "infoSheet": {
     "title": "№{{number}} жай",
@@ -154,5 +155,37 @@
     "pricePresetUnder": "{{value}}-ге чейин",
     "pricePresetOver": "{{value}}-ден баштап",
     "pricePresetRange": "{{min}} – {{max}}"
+  },
+  "offer": {
+    "settings": "Баа сунушу",
+    "client": "Кимге",
+    "clientPlaceholder": "Кардардын аты (милдеттүү эмес)",
+    "validUntil": "Баа жарактуу",
+    "includePlan": "Бөлүп төлөөнү кошуу",
+    "downPayment": "Алгачкы төлөм, %",
+    "installments": "Төлөмдөр",
+    "interval": "Төлөө",
+    "firstPayment": "Биринчи төлөм",
+    "every_one": "Ай сайын",
+    "every_few": "{{count}} айда бир",
+    "every_many": "{{count}} айда бир",
+    "every_other": "{{count}} айда бир",
+    "notAvailable": "Жайдын азыркы абалы: {{status}}. Сунушту басып чыгарса болот, бирок азыр брондоого болбойт.",
+    "preparedFor": "Кимге: {{name}}",
+    "paymentOptions": "Төлөө варианттары",
+    "fullPayment": "Толук төлөм",
+    "installmentPlan": "Бөлүп төлөө",
+    "perInstallment": "ар бир төлөм",
+    "planSummary_one": "Алгачкы төлөм {{down}} ({{percent}}%), андан кийин {{count}} төлөм, {{every}}",
+    "planSummary_few": "Алгачкы төлөм {{down}} ({{percent}}%), андан кийин {{count}} төлөм, {{every}}",
+    "planSummary_many": "Алгачкы төлөм {{down}} ({{percent}}%), андан кийин {{count}} төлөм, {{every}}",
+    "planSummary_other": "Алгачкы төлөм {{down}} ({{percent}}%), андан кийин {{count}} төлөм, {{every}}",
+    "dueDate": "Мөөнөтү",
+    "amount": "Сумма",
+    "downPaymentRow": "Алгачкы төлөм",
+    "total": "Жалпы",
+    "lastDiffers": "Акыркы төлөм тегеректөөгө ылайыкталган.",
+    "yourManager": "Сиздин менеджериңиз",
+    "validNote": "Баа {{date}} чейин жарактуу — график болжолдуу, келишимде бекитилет."
   }
 }
