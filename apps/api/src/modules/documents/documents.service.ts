@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ActivityAction,
@@ -95,6 +96,12 @@ export class DocumentsService {
       type: query.type,
     };
 
+    if (query.clientId) {
+      where.ownerType = undefined;
+      where.ownerId = undefined;
+      where.OR = await this.clientOwnerFilter(user, query.clientId);
+    }
+
     if (query.search) {
       where.originalName = { contains: query.search, mode: 'insensitive' };
     }
@@ -114,6 +121,35 @@ export class DocumentsService {
       items,
       meta: { page, limit, total, pages: Math.ceil(total / limit) },
     };
+  }
+
+  /**
+   * The client's own documents and those on each of their deals, so the
+   * client card shows the contract next to the passport scan. The client is
+   * looked up with the same company and branch scope as GET /clients/:id.
+   */
+  private async clientOwnerFilter(
+    user: AuthUser,
+    clientId: string,
+  ): Promise<Prisma.DocumentWhereInput[]> {
+    const client = await this.prisma.client.findFirst({
+      where: {
+        id: clientId,
+        companyId: user.companyId!,
+        deletedAt: null,
+        ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
+      },
+      select: { deals: { select: { id: true } } },
+    });
+    if (!client) throw new NotFoundException('Client not found');
+
+    const dealIds = client.deals.map((deal) => deal.id);
+    return [
+      { ownerType: DocumentOwnerType.CLIENT, ownerId: clientId },
+      ...(dealIds.length
+        ? [{ ownerType: DocumentOwnerType.DEAL, ownerId: { in: dealIds } }]
+        : []),
+    ];
   }
 
   async findOne(user: AuthUser, id: string) {

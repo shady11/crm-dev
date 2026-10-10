@@ -108,5 +108,28 @@
     "cancel": "Жокко чыгаруу",
     "deleting": "Өчүрүлүп жатат...",
     "delete": "Өчүрүү"
+  },
+  "history": {
+    "title": "Тарых",
+    "contactsOnly_one": "Чалуулар жана жолугушуулар ({{count}})",
+    "contactsOnly_few": "Чалуулар жана жолугушуулар ({{count}})",
+    "contactsOnly_many": "Чалуулар жана жолугушуулар ({{count}})",
+    "contactsOnly_other": "Чалуулар жана жолугушуулар ({{count}})",
+    "empty": "Азырынча эч нерсе жазылган жок.",
+    "noContacts": "Азырынча чалуулар, билдирүүлөр же жолугушуулар жок.",
+    "deal": "Бүтүм {{number}}",
+    "lead": "Лид",
+    "client": "Кардар",
+    "system": "Система",
+    "showMore_one": "Дагы көрсөтүү ({{count}} калды)",
+    "showMore_few": "Дагы көрсөтүү ({{count}} калды)",
+    "showMore_many": "Дагы көрсөтүү ({{count}} калды)",
+    "showMore_other": "Дагы көрсөтүү ({{count}} калды)",
+    "types": {
+      "CALL": "Чалуу",
+      "MESSAGE_SENT": "Билдирүү",
+      "MEETING": "Жолугушуу",
+      "EMAIL": "Кат"
+    }
   }
 }

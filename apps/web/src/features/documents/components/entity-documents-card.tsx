@@ -1,4 +1,5 @@
 import {type ReactNode, useRef, useState} from "react";
+import {Link} from "react-router-dom";
 import {createListCollection} from "@ark-ui/react";
 import {DownloadIcon, FileIcon, Trash2Icon} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
@@ -16,21 +17,28 @@ import {
 import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {hasPermission} from "@/features/auth/access.ts";
+import {paths} from "@/routes/paths.ts";
 
 interface EntityDocumentsCardProps {
     ownerType: DocumentOwnerType;
     ownerId: string;
     /** Extra controls next to Upload, e.g. a deal's "Generate" menu. */
     headerActions?: ReactNode;
+    /**
+     * On a client card: the client's deals. Their documents are listed too,
+     * each tagged with its deal; uploads still go to the client.
+     */
+    clientDeals?: { id: string; dealNumber: string }[];
 }
 
-export function EntityDocumentsCard({ ownerType, ownerId, headerActions }: EntityDocumentsCardProps) {
+export function EntityDocumentsCard({ ownerType, ownerId, headerActions, clientDeals }: EntityDocumentsCardProps) {
     const { t } = useTranslation("documents");
     const { user } = useAuth();
     const canUpload = hasPermission(user, "documents.upload");
     const canDelete = hasPermission(user, "documents.delete");
 
-    const { documents, isLoading } = useEntityDocuments(ownerType, ownerId);
+    const { documents, isLoading } = useEntityDocuments(ownerType, ownerId, !!clientDeals);
+    const dealNumbers = new Map(clientDeals?.map((deal) => [deal.id, deal.dealNumber]));
     const actions = useDocumentActions();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedType, setSelectedType] = useState<DocumentType>(DocumentType.OTHER);
@@ -91,6 +99,14 @@ export function EntityDocumentsCard({ ownerType, ownerId, headerActions }: Entit
                                 <div className="min-w-0 flex-1">
                                     <p className="truncate font-medium">{doc.originalName}</p>
                                     <p className="text-xs text-muted-foreground">
+                                        {doc.ownerType === "DEAL" && dealNumbers.has(doc.ownerId) && (
+                                            <>
+                                                <Link to={paths.deals.detail(doc.ownerId)} className="font-medium text-foreground hover:underline">
+                                                    {t("card.fromDeal", { number: dealNumbers.get(doc.ownerId) })}
+                                                </Link>
+                                                {" · "}
+                                            </>
+                                        )}
                                         {t(DOCUMENT_TYPE_LABEL_KEYS[doc.type])} · {formatFileSize(doc.size)} · {doc.uploadedBy.fullName}
                                     </p>
                                 </div>

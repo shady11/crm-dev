@@ -11,6 +11,12 @@ export class QueryDocumentsDto {
     @IsUUID()
     ownerId?: string;
 
+    // A client's own documents plus those on each of their deals. Takes the
+    // place of ownerType/ownerId when set.
+    @IsOptional()
+    @IsUUID()
+    clientId?: string;
+
     @IsOptional()
     @IsEnum(DocumentType)
     type?: DocumentType;

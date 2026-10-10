@@ -54,6 +54,7 @@ describe('ClientsService', () => {
             },
             activity: {
                 create: jest.fn().mockResolvedValue({}),
+                findMany: jest.fn().mockResolvedValue([]),
             },
         };
 
@@ -65,6 +66,31 @@ describe('ClientsService', () => {
         fullName: 'Jane Client',
         phone: '+996700000001',
     }) as any;
+
+    describe('listActivities', () => {
+        it('collects activity on the client, its leads and its deals', async () => {
+            const {service, prisma} = build({
+                client: {id: 'client-1', leads: [{id: 'lead-1'}], deals: [{id: 'deal-1'}, {id: 'deal-2'}]},
+            });
+            await service.listActivities(branchUser, 'client-1');
+
+            const {where} = prisma.activity.findMany.mock.calls[0][0];
+            expect(where).toEqual({
+                companyId: 'company-1',
+                OR: [
+                    {clientId: 'client-1'},
+                    {leadId: {in: ['lead-1']}},
+                    {dealId: {in: ['deal-1', 'deal-2']}},
+                ],
+            });
+        });
+
+        it('404s a client outside the caller branch before reading activity', async () => {
+            const {service, prisma} = build({client: null});
+            await expect(service.listActivities(branchUser, 'client-x')).rejects.toThrow(NotFoundException);
+            expect(prisma.activity.findMany).not.toHaveBeenCalled();
+        });
+    });
 
     describe('findAll', () => {
         it('rejects when the user has no company', async () => {

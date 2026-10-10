@@ -19,6 +19,8 @@ export type Document = {
 export type GetDocumentsParams = {
     ownerType?: DocumentOwnerType;
     ownerId?: string;
+    // The client's own documents plus those on each of their deals.
+    clientId?: string;
     type?: DocumentType;
     search?: string;
     page?: number;
