@@ -14,5 +14,73 @@
     "minutesAgo": "{{count}} мин. назад",
     "hoursAgo": "{{count}} ч. назад",
     "daysAgo": "{{count}} дн. назад"
+  },
+  "templates": {
+    "discountApprovalRequested": {
+      "title": "Нужно согласовать скидку по сделке {{dealNumber}}",
+      "message": "Запрошено {{percent}}%"
+    },
+    "discountApproved": {
+      "title": "Скидка по сделке {{dealNumber}} согласована"
+    },
+    "discountRejected": {
+      "title": "Скидка по сделке {{dealNumber}} отклонена",
+      "message": "{{reason}}"
+    },
+    "dealStatusChanged": {
+      "title": "Сделка {{dealNumber}}: {{status}}"
+    },
+    "reservationExpired": {
+      "title": "Бронь по сделке {{dealNumber}} истекла",
+      "message": "Помещение снова свободно."
+    },
+    "reservationExpiring": {
+      "title": "Бронь по сделке {{dealNumber}} скоро истекает",
+      "message": "До {{date}}"
+    },
+    "paymentReceived": {
+      "title": "Получен платёж по сделке {{dealNumber}}",
+      "message": "{{amount}}"
+    },
+    "refundIssued": {
+      "title": "Оформлен возврат по сделке {{dealNumber}}",
+      "message": "{{amount}}"
+    },
+    "paymentDueSoon": {
+      "title": "Скоро платёж по сделке {{dealNumber}}"
+    },
+    "paymentDueToday": {
+      "title": "Сегодня платёж по сделке {{dealNumber}}"
+    },
+    "paymentOverdue": {
+      "title": "Просрочен платёж по сделке {{dealNumber}}",
+      "message_one": "Просрочка {{count}} день",
+      "message_few": "Просрочка {{count}} дня",
+      "message_many": "Просрочка {{count}} дней",
+      "message_other": "Просрочка {{count}} дня"
+    },
+    "taskAssigned": {
+      "title": "Вам назначена новая задача",
+      "message": "{{taskTitle}}"
+    },
+    "taskDueSoon": {
+      "title": "Скоро срок задачи",
+      "message": "{{taskTitle}}"
+    },
+    "taskOverdue": {
+      "title": "Задача просрочена",
+      "message": "{{taskTitle}}"
+    },
+    "taskEscalated": {
+      "title_one": "Задача просрочена более {{count}} дня",
+      "title_few": "Задача просрочена более {{count}} дней",
+      "title_many": "Задача просрочена более {{count}} дней",
+      "title_other": "Задача просрочена более {{count}} дня",
+      "message": "{{taskTitle}}"
+    },
+    "documentUploaded": {
+      "title": "Загружен документ по сделке {{dealNumber}}",
+      "message": "{{fileName}}"
+    }
   }
 }

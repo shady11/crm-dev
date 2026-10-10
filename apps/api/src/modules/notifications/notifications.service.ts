@@ -4,8 +4,11 @@ import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {QueryNotificationsDto} from "./dto/query-notifications.dto";
 import {NotificationsGateway} from "@/modules/notifications/notifications.gateway";
+import type {NotificationTemplate} from "@/modules/notifications/notification-templates";
 
-interface CreateNotificationParams {
+// title/message stay required: they're the English fallback for anything
+// that can't render the template.
+type CreateNotificationParams = {
     companyId: string;
     userId: string;
     type: NotificationType;
@@ -13,7 +16,7 @@ interface CreateNotificationParams {
     message?: string;
     entityType?: NotificationEntityType;
     entityId?: string;
-}
+} & (NotificationTemplate | {templateKey?: undefined; params?: undefined});
 
 @Injectable()
 export class NotificationsService {

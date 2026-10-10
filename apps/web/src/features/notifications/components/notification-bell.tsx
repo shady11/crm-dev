@@ -11,13 +11,15 @@ import {
     useUnreadCount
 } from "@/features/notifications/hooks/use-notifications.ts";
 import {getNotificationLink} from "@/features/notifications/utils/notification-link.ts";
-import {NOTIFICATION_VISUALS} from "@/features/notifications/types/notification.types.ts";
+import {notificationVisual} from "@/features/notifications/types/notification.types.ts";
 import type {Notification} from "@/features/notifications/api/notifications.api.ts";
 import {Float} from "@/components/ui/float.tsx";
 import {useTranslation} from "react-i18next";
+import {useNotificationText} from "@/features/notifications/hooks/use-notification-text.ts";
 
 export function NotificationBell() {
     const { t } = useTranslation("notifications");
+    const notificationText = useNotificationText();
     const [open, setOpen] = useState(false);
     const [tab, setTab] = useState<"all" | "unread">("all");
     const navigate = useNavigate();
@@ -86,8 +88,9 @@ export function NotificationBell() {
                         ) : (
                             <div className="flex flex-col divide-y">
                                 {notifications.map((n) => {
-                                    const visual = NOTIFICATION_VISUALS[n.type];
+                                    const visual = notificationVisual(n.type);
                                     const Icon = visual.icon;
+                                    const { title, message } = notificationText(n);
 
                                     return (
                                         <button
@@ -107,12 +110,14 @@ export function NotificationBell() {
                                             </div>
 
                                             <div className="min-w-0 flex-1 flex flex-col gap-0.5">
-                                                <p className="text-sm font-medium">{n.title}</p>
+                                                <p className="text-sm font-medium">{title}</p>
                                                 <div className="flex items-center gap-2 text-xs truncate text-muted-foreground">
                                                     {timeAgo(n.createdAt)}
-                                                    <div className="size-1 bg-muted-foreground rounded-full"></div>
-                                                    {n.message && (
-                                                        <span>{n.message}</span>
+                                                    {message && (
+                                                        <>
+                                                            <div className="size-1 shrink-0 bg-muted-foreground rounded-full"></div>
+                                                            <span className="truncate">{message}</span>
+                                                        </>
                                                     )}
                                                 </div>
                                             </div>

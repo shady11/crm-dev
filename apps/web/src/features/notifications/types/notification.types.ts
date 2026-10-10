@@ -1,6 +1,9 @@
 import {
+    BadgePercentIcon,
     BanknoteArrowDown,
     BellIcon,
+    CalendarClockIcon,
+    CalendarX2Icon,
     CheckCircle2Icon,
     ClockIcon,
     FileUp,
@@ -16,11 +19,16 @@ export const NotificationType = {
     RESERVATION_EXPIRING: "RESERVATION_EXPIRING",
     PAYMENT_RECEIVED: "PAYMENT_RECEIVED",
     DOCUMENT_UPLOADED: "DOCUMENT_UPLOADED",
+    TASK_ESCALATED: "TASK_ESCALATED",
+    PAYMENT_DUE_SOON: "PAYMENT_DUE_SOON",
+    PAYMENT_OVERDUE: "PAYMENT_OVERDUE",
+    DISCOUNT_APPROVAL_REQUESTED: "DISCOUNT_APPROVAL_REQUESTED",
+    DISCOUNT_DECIDED: "DISCOUNT_DECIDED",
 } as const;
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
 
 export const NotificationEntityType = {
-    TASK: "TASK", DEAL: "DEAL", CLIENT: "CLIENT", DOCUMENT: "DOCUMENT",
+    TASK: "TASK", DEAL: "DEAL", CLIENT: "CLIENT", DOCUMENT: "DOCUMENT", PAYMENT_SCHEDULE: "PAYMENT_SCHEDULE",
 } as const;
 export type NotificationEntityType = (typeof NotificationEntityType)[keyof typeof NotificationEntityType];
 
@@ -32,4 +40,18 @@ export const NOTIFICATION_VISUALS: Record<NotificationType, { icon: typeof BellI
     RESERVATION_EXPIRING: { icon: ClockIcon, bg: "bg-amber-400" },
     PAYMENT_RECEIVED: { icon: BanknoteArrowDown, bg: "bg-emerald-500" },
     DOCUMENT_UPLOADED: { icon: FileUp, bg: "bg-gray-400" },
+    TASK_ESCALATED: { icon: StickyNoteX, bg: "bg-rose-500" },
+    PAYMENT_DUE_SOON: { icon: CalendarClockIcon, bg: "bg-amber-400" },
+    PAYMENT_OVERDUE: { icon: CalendarX2Icon, bg: "bg-rose-500" },
+    DISCOUNT_APPROVAL_REQUESTED: { icon: BadgePercentIcon, bg: "bg-amber-500" },
+    DISCOUNT_DECIDED: { icon: BadgePercentIcon, bg: "bg-blue-500" },
 };
+
+/**
+ * Icon and colour for a notification. Falls back to a plain bell for a type
+ * this build doesn't know yet: the API can add types before the web app
+ * ships, and one unknown row used to crash the whole bell.
+ */
+export function notificationVisual(type: string) {
+    return NOTIFICATION_VISUALS[type as NotificationType] ?? { icon: BellIcon, bg: "bg-gray-400" };
+}

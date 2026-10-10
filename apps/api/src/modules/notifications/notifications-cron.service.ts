@@ -1,5 +1,6 @@
 import {Injectable, Logger} from "@nestjs/common";
 import {Cron, CronExpression} from "@nestjs/schedule";
+import type {NotificationTemplate} from "@/modules/notifications/notification-templates";
 import {NotificationEntityType, NotificationType, TaskStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {NotificationsService} from "./notifications.service";
@@ -41,6 +42,8 @@ export class NotificationsCronService {
                 entityId: deal.id,
                 title: `Reservation for ${deal.dealNumber} expires soon`,
                 message: `Expires ${deal.reservationExpiresAt!.toLocaleDateString()}`,
+                templateKey: "reservationExpiring",
+                params: {dealNumber: deal.dealNumber, date: deal.reservationExpiresAt!.toISOString()},
             });
         }
 
@@ -67,6 +70,8 @@ export class NotificationsCronService {
                 entityId: task.id,
                 title: "Task due soon",
                 message: task.title,
+                templateKey: "taskDueSoon",
+                params: {taskTitle: task.title},
             });
         }
 
@@ -84,6 +89,8 @@ export class NotificationsCronService {
                 entityId: task.id,
                 title: "Task overdue",
                 message: task.title,
+                templateKey: "taskOverdue",
+                params: {taskTitle: task.title},
             });
         }
 
@@ -118,6 +125,8 @@ export class NotificationsCronService {
                     entityId: task.id,
                     title: `Task overdue ${TASK_ESCALATION_DAYS}+ days`,
                     message: task.title,
+                    templateKey: "taskEscalated",
+                    params: {taskTitle: task.title, days: TASK_ESCALATION_DAYS},
                 });
                 escalations++;
             }
@@ -138,7 +147,7 @@ export class NotificationsCronService {
         entityId: string;
         title: string;
         message?: string;
-    }) {
+    } & NotificationTemplate) {
         const existing = await this.prisma.notification.findFirst({
             where: {
                 userId: params.userId,

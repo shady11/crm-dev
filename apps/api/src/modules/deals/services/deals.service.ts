@@ -417,6 +417,8 @@ export class DealsService {
             userId: approver.id,
             type: NotificationType.DISCOUNT_APPROVAL_REQUESTED,
             title: `Discount approval needed for deal ${dealNumber}`,
+            templateKey: 'discountApprovalRequested',
+            params: { dealNumber, percent: effectiveDiscountPercent.toNumber() },
             entityType: NotificationEntityType.DEAL,
             entityId: deal.id,
           });
@@ -574,6 +576,8 @@ export class DealsService {
           userId: deal.managerId,
           type: NotificationType.DEAL_STATUS_CHANGED,
           title: dealStatusTitle(deal.dealNumber, this.domain.nextStatusAfterReservation()),
+          templateKey: 'dealStatusChanged',
+          params: { dealNumber: deal.dealNumber, status: this.domain.nextStatusAfterReservation() },
           entityType: NotificationEntityType.DEAL,
           entityId: deal.id,
         });
@@ -630,6 +634,8 @@ export class DealsService {
           userId: deal.managerId,
           type: NotificationType.DEAL_STATUS_CHANGED,
           title: dealStatusTitle(deal.dealNumber, this.domain.nextStatusAfterContract()),
+          templateKey: 'dealStatusChanged',
+          params: { dealNumber: deal.dealNumber, status: this.domain.nextStatusAfterContract() },
           entityType: NotificationEntityType.DEAL,
           entityId: deal.id,
         });
@@ -693,6 +699,8 @@ export class DealsService {
           userId: deal.managerId,
           type: NotificationType.DISCOUNT_DECIDED,
           title: `Discount approved for deal ${deal.dealNumber}`,
+          templateKey: 'discountApproved',
+          params: { dealNumber: deal.dealNumber },
           entityType: NotificationEntityType.DEAL,
           entityId: deal.id,
         });
@@ -757,6 +765,8 @@ export class DealsService {
           type: NotificationType.DISCOUNT_DECIDED,
           title: `Discount rejected for deal ${deal.dealNumber}`,
           message: dto.reason,
+          templateKey: 'discountRejected',
+          params: { dealNumber: deal.dealNumber, reason: dto.reason },
           entityType: NotificationEntityType.DEAL,
           entityId: deal.id,
         });
@@ -901,6 +911,8 @@ export class DealsService {
           userId: deal.managerId,
           type: NotificationType.DEAL_STATUS_CHANGED,
           title: dealStatusTitle(deal.dealNumber, DealStatus.CANCELLED),
+          templateKey: 'dealStatusChanged',
+          params: { dealNumber: deal.dealNumber, status: DealStatus.CANCELLED },
           entityType: NotificationEntityType.DEAL,
           entityId: deal.id,
         });
@@ -1000,6 +1012,8 @@ export class DealsService {
         userId: deal.managerId,
         type: NotificationType.DEAL_STATUS_CHANGED,
         title: dealStatusTitle(deal.dealNumber, this.domain.nextStatusAfterCompletion()),
+        templateKey: 'dealStatusChanged',
+        params: { dealNumber: deal.dealNumber, status: this.domain.nextStatusAfterCompletion() },
         entityType: NotificationEntityType.DEAL,
         entityId: deal.id,
       });

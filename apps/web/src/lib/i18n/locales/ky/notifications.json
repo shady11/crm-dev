@@ -14,5 +14,73 @@
     "minutesAgo": "{{count}} мүн. мурун",
     "hoursAgo": "{{count}} саат мурун",
     "daysAgo": "{{count}} күн мурун"
+  },
+  "templates": {
+    "discountApprovalRequested": {
+      "title": "{{dealNumber}} бүтүмү боюнча арзандатууну макулдашуу керек",
+      "message": "{{percent}}% суралды"
+    },
+    "discountApproved": {
+      "title": "{{dealNumber}} бүтүмү боюнча арзандатуу макулдашылды"
+    },
+    "discountRejected": {
+      "title": "{{dealNumber}} бүтүмү боюнча арзандатуу четке кагылды",
+      "message": "{{reason}}"
+    },
+    "dealStatusChanged": {
+      "title": "{{dealNumber}} бүтүмү: {{status}}"
+    },
+    "reservationExpired": {
+      "title": "{{dealNumber}} бүтүмү боюнча брондун мөөнөтү бүттү",
+      "message": "Жай кайра бош."
+    },
+    "reservationExpiring": {
+      "title": "{{dealNumber}} бүтүмү боюнча брондун мөөнөтү жакында бүтөт",
+      "message": "{{date}} чейин"
+    },
+    "paymentReceived": {
+      "title": "{{dealNumber}} бүтүмү боюнча төлөм алынды",
+      "message": "{{amount}}"
+    },
+    "refundIssued": {
+      "title": "{{dealNumber}} бүтүмү боюнча кайтаруу жасалды",
+      "message": "{{amount}}"
+    },
+    "paymentDueSoon": {
+      "title": "{{dealNumber}} бүтүмү боюнча төлөм мөөнөтү жакындады"
+    },
+    "paymentDueToday": {
+      "title": "{{dealNumber}} бүтүмү боюнча төлөм бүгүн"
+    },
+    "paymentOverdue": {
+      "title": "{{dealNumber}} бүтүмү боюнча төлөм кечиктирилди",
+      "message_one": "{{count}} күн кечикти",
+      "message_few": "{{count}} күн кечикти",
+      "message_many": "{{count}} күн кечикти",
+      "message_other": "{{count}} күн кечикти"
+    },
+    "taskAssigned": {
+      "title": "Сизге жаңы тапшырма берилди",
+      "message": "{{taskTitle}}"
+    },
+    "taskDueSoon": {
+      "title": "Тапшырманын мөөнөтү жакындады",
+      "message": "{{taskTitle}}"
+    },
+    "taskOverdue": {
+      "title": "Тапшырманын мөөнөтү өттү",
+      "message": "{{taskTitle}}"
+    },
+    "taskEscalated": {
+      "title_one": "Тапшырма {{count}}+ күн кечикти",
+      "title_few": "Тапшырма {{count}}+ күн кечикти",
+      "title_many": "Тапшырма {{count}}+ күн кечикти",
+      "title_other": "Тапшырма {{count}}+ күн кечикти",
+      "message": "{{taskTitle}}"
+    },
+    "documentUploaded": {
+      "title": "{{dealNumber}} бүтүмүнө документ жүктөлдү",
+      "message": "{{fileName}}"
+    }
   }
 }

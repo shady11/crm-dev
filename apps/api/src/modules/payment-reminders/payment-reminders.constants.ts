@@ -1,4 +1,5 @@
 import { NotificationType } from '@/generated/prisma/client';
+import type { NotificationTemplate } from '@/modules/notifications/notification-templates';
 
 export interface ReminderStage {
   /** dueDate minus today, in whole days. Negative means overdue. */
@@ -6,6 +7,8 @@ export interface ReminderStage {
   templateKey: string;
   notificationType: NotificationType;
   managerTitle: (dealNumber: string) => string;
+  /** The same notice for the web app to render in the reader's language. */
+  managerTemplate: (dealNumber: string) => NotificationTemplate;
   /** Only true at the escalation point where a team lead should also hear about it. */
   notifySalesHead?: boolean;
 }
@@ -22,18 +25,21 @@ export const REMINDER_STAGES: ReminderStage[] = [
     templateKey: 'payment_due_soon',
     notificationType: NotificationType.PAYMENT_DUE_SOON,
     managerTitle: (dealNumber) => `Payment due soon for deal ${dealNumber}`,
+    managerTemplate: (dealNumber) => ({ templateKey: 'paymentDueSoon', params: { dealNumber } }),
   },
   {
     offsetDays: 0,
     templateKey: 'payment_due_today',
     notificationType: NotificationType.PAYMENT_DUE_SOON,
     managerTitle: (dealNumber) => `Payment due today for deal ${dealNumber}`,
+    managerTemplate: (dealNumber) => ({ templateKey: 'paymentDueToday', params: { dealNumber } }),
   },
   {
     offsetDays: -1,
     templateKey: 'payment_overdue_1',
     notificationType: NotificationType.PAYMENT_OVERDUE,
     managerTitle: (dealNumber) => `Payment overdue for deal ${dealNumber}`,
+    managerTemplate: (dealNumber) => ({ templateKey: 'paymentOverdue', params: { dealNumber, days: 1 } }),
   },
   {
     offsetDays: -7,
@@ -41,6 +47,7 @@ export const REMINDER_STAGES: ReminderStage[] = [
     notificationType: NotificationType.PAYMENT_OVERDUE,
     managerTitle: (dealNumber) =>
       `Payment 7 days overdue for deal ${dealNumber}`,
+    managerTemplate: (dealNumber) => ({ templateKey: 'paymentOverdue', params: { dealNumber, days: 7 } }),
   },
   {
     offsetDays: -30,
@@ -48,6 +55,7 @@ export const REMINDER_STAGES: ReminderStage[] = [
     notificationType: NotificationType.PAYMENT_OVERDUE,
     managerTitle: (dealNumber) =>
       `Payment 30 days overdue for deal ${dealNumber}`,
+    managerTemplate: (dealNumber) => ({ templateKey: 'paymentOverdue', params: { dealNumber, days: 30 } }),
     notifySalesHead: true,
   },
 ];

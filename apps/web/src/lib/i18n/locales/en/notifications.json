@@ -14,5 +14,73 @@
     "minutesAgo": "{{count}}m ago",
     "hoursAgo": "{{count}}h ago",
     "daysAgo": "{{count}}d ago"
+  },
+  "templates": {
+    "discountApprovalRequested": {
+      "title": "Discount approval needed for deal {{dealNumber}}",
+      "message": "{{percent}}% requested"
+    },
+    "discountApproved": {
+      "title": "Discount approved for deal {{dealNumber}}"
+    },
+    "discountRejected": {
+      "title": "Discount rejected for deal {{dealNumber}}",
+      "message": "{{reason}}"
+    },
+    "dealStatusChanged": {
+      "title": "Deal {{dealNumber}}: {{status}}"
+    },
+    "reservationExpired": {
+      "title": "Reservation for deal {{dealNumber}} has expired",
+      "message": "The unit is available again."
+    },
+    "reservationExpiring": {
+      "title": "Reservation for deal {{dealNumber}} expires soon",
+      "message": "Expires {{date}}"
+    },
+    "paymentReceived": {
+      "title": "Payment received for deal {{dealNumber}}",
+      "message": "{{amount}}"
+    },
+    "refundIssued": {
+      "title": "Refund issued for deal {{dealNumber}}",
+      "message": "{{amount}}"
+    },
+    "paymentDueSoon": {
+      "title": "Payment due soon for deal {{dealNumber}}"
+    },
+    "paymentDueToday": {
+      "title": "Payment due today for deal {{dealNumber}}"
+    },
+    "paymentOverdue": {
+      "title": "Payment overdue for deal {{dealNumber}}",
+      "message_one": "{{count}} day overdue",
+      "message_few": "{{count}} days overdue",
+      "message_many": "{{count}} days overdue",
+      "message_other": "{{count}} days overdue"
+    },
+    "taskAssigned": {
+      "title": "New task assigned to you",
+      "message": "{{taskTitle}}"
+    },
+    "taskDueSoon": {
+      "title": "Task due soon",
+      "message": "{{taskTitle}}"
+    },
+    "taskOverdue": {
+      "title": "Task overdue",
+      "message": "{{taskTitle}}"
+    },
+    "taskEscalated": {
+      "title_one": "Task overdue {{count}}+ day",
+      "title_few": "Task overdue {{count}}+ days",
+      "title_many": "Task overdue {{count}}+ days",
+      "title_other": "Task overdue {{count}}+ days",
+      "message": "{{taskTitle}}"
+    },
+    "documentUploaded": {
+      "title": "Document uploaded to deal {{dealNumber}}",
+      "message": "{{fileName}}"
+    }
   }
 }

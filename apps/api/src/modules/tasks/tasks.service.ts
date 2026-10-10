@@ -184,6 +184,8 @@ export class TasksService {
                 type: NotificationType.TASK_ASSIGNED,
                 title: "New task assigned to you",
                 message: task.title,
+                templateKey: "taskAssigned",
+                params: {taskTitle: task.title},
                 entityType: NotificationEntityType.TASK,
                 entityId: task.id,
             });
@@ -248,6 +250,8 @@ export class TasksService {
                 type: NotificationType.TASK_ASSIGNED,
                 title: "New task assigned to you",
                 message: task.title,
+                templateKey: "taskAssigned",
+                params: {taskTitle: task.title},
                 entityType: NotificationEntityType.TASK,
                 entityId: task.id,
             });
@@ -510,6 +514,8 @@ export class TasksService {
                 type: NotificationType.TASK_ASSIGNED,
                 title: "New task assigned to you",
                 message: task.title,
+                templateKey: "taskAssigned",
+                params: {taskTitle: task.title},
                 entityType: NotificationEntityType.TASK,
                 entityId: task.id,
             });
