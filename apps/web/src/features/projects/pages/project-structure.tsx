@@ -16,6 +16,8 @@ import {toast} from "@/components/ui/toast";
 import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {hasPermission} from "@/features/auth/access";
+import {PhasesPanel} from "@/features/phases/components/phases-panel.tsx";
+import {usePhases} from "@/features/phases/hooks/use-phases.ts";
 
 export function ProjectStructure() {
     const { t } = useTranslation("projects");
@@ -25,6 +27,7 @@ export function ProjectStructure() {
     const { projectId } = useParams<{ projectId: string }>();
     const queryClient = useQueryClient();
 
+    const { phases } = usePhases(projectId);
     const [expandedBlocks, setExpandedBlocks] = useState<Set<string>>(new Set());
     const [open, setOpen] = useState(false);
 
@@ -106,12 +109,18 @@ export function ProjectStructure() {
                 </div>
             </div>
 
+            <div className="mb-4">
+                <PhasesPanel projectId={projectId!} canManage={canCreateBlock} />
+            </div>
+
             <div className="space-y-4">
                 {tree.blocks.length > 0 ? (
                     tree.blocks.map((block: Block) => (
                         <BlockItem
                             key={block.id}
-                            block={block}
+                            block={{ ...block, projectId: projectId! }}
+                            phases={phases}
+                            canManagePhases={canCreateBlock}
                             isExpanded={expandedBlocks.has(block.id)}
                             onToggle={() => toggleBlock(block.id)}
                         />

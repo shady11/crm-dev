@@ -98,7 +98,8 @@
     "bookButton": "Забронировать",
     "bookingClosed": "Бронирование закрыто: статус проекта — {{status}}.",
     "infoSheetButton": "Инфолист",
-    "offerButton": "Предложение"
+    "offerButton": "Предложение",
+    "phaseNotOnSale": "Пока не в продаже: «{{phase}}» откроется для продаж позже (сдача {{completion}})."
   },
   "infoSheet": {
     "title": "Помещение №{{number}}",
@@ -114,7 +115,8 @@
     "pricePerSqm": "Цена за м²",
     "status": "Статус",
     "printButton": "Печать / Сохранить как PDF",
-    "notFound": "Помещение не найдено."
+    "notFound": "Помещение не найдено.",
+    "completion": "Сдача"
   },
   "chessboard": {
     "entranceLabel": "Подъезд {{name}}",

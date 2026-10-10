@@ -9,6 +9,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {DateField} from "@/components/shared/date-field.tsx";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {addDays, buildPaymentPlan} from "@/features/units/utils/payment-plan.ts";
+import {completionQuarter} from "@/features/phases/types/phase.types.ts";
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {toast} from "@/components/ui/toast.tsx";
 import {useUnit} from "@/features/units/hooks/use-unit.ts";
@@ -216,6 +217,15 @@ export function UnitInfoSheetPage() {
                                 .join(" / ") || "—"}
                         </dd>
                     </div>
+                    {/* Clients weigh a finished block against one due later. */}
+                    {unit.block?.phase && (
+                        <div>
+                            <dt className="text-muted-foreground">{t("infoSheet.completion")}</dt>
+                            <dd className="font-medium">
+                                {[unit.block.phase.name, completionQuarter(t, unit.block.phase.completionDate)].filter(Boolean).join(" · ")}
+                            </dd>
+                        </div>
+                    )}
                     <div>
                         <dt className="text-muted-foreground">{t("infoSheet.type")}</dt>
                         <dd className="font-medium">{t(UNIT_TYPE_LABEL_KEYS[unit.type])}</dd>

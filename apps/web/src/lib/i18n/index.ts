@@ -18,6 +18,7 @@ import tasksEn from "./locales/en/tasks.json";
 import dashboardEn from "./locales/en/dashboard.json";
 import clientsEn from "./locales/en/clients.json";
 import blocksEn from "./locales/en/blocks.json";
+import phasesEn from "./locales/en/phases.json";
 import entrancesEn from "./locales/en/entrances.json";
 import floorsEn from "./locales/en/floors.json";
 import auditLogEn from "./locales/en/auditLog.json";
@@ -43,6 +44,7 @@ import tasksRu from "./locales/ru/tasks.json";
 import dashboardRu from "./locales/ru/dashboard.json";
 import clientsRu from "./locales/ru/clients.json";
 import blocksRu from "./locales/ru/blocks.json";
+import phasesRu from "./locales/ru/phases.json";
 import entrancesRu from "./locales/ru/entrances.json";
 import floorsRu from "./locales/ru/floors.json";
 import auditLogRu from "./locales/ru/auditLog.json";
@@ -68,6 +70,7 @@ import tasksKy from "./locales/ky/tasks.json";
 import dashboardKy from "./locales/ky/dashboard.json";
 import clientsKy from "./locales/ky/clients.json";
 import blocksKy from "./locales/ky/blocks.json";
+import phasesKy from "./locales/ky/phases.json";
 import entrancesKy from "./locales/ky/entrances.json";
 import floorsKy from "./locales/ky/floors.json";
 import auditLogKy from "./locales/ky/auditLog.json";
@@ -95,6 +98,7 @@ export const resources = {
         dashboard: dashboardEn,
         clients: clientsEn,
         blocks: blocksEn,
+        phases: phasesEn,
         entrances: entrancesEn,
         floors: floorsEn,
         auditLog: auditLogEn,
@@ -121,6 +125,7 @@ export const resources = {
         dashboard: dashboardRu,
         clients: clientsRu,
         blocks: blocksRu,
+        phases: phasesRu,
         entrances: entrancesRu,
         floors: floorsRu,
         auditLog: auditLogRu,
@@ -147,6 +152,7 @@ export const resources = {
         dashboard: dashboardKy,
         clients: clientsKy,
         blocks: blocksKy,
+        phases: phasesKy,
         entrances: entrancesKy,
         floors: floorsKy,
         auditLog: auditLogKy,

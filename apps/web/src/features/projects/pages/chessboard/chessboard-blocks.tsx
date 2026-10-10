@@ -14,6 +14,14 @@ import {
 import {getProjectChessboard} from "@/features/projects/api/projects.api.ts";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {useTranslation} from "react-i18next";
+import {Badge} from "@/components/ui/badge.tsx";
+import {cn} from "@/lib/utils";
+import {
+    completionQuarter,
+    isPhaseBookable,
+    PHASE_STATUS_BADGE_CLASSES,
+    PHASE_STATUS_LABEL_KEYS,
+} from "@/features/phases/types/phase.types.ts";
 import {chessboardLanding, isBrowsing} from "@/features/projects/utils/chessboard-navigation.ts";
 
 export function ChessboardBlocks() {
@@ -75,7 +83,7 @@ export function ChessboardBlocks() {
                     return (
                         <Card
                             key={block.id}
-                            className="cursor-pointer border border-secondary shadow-none"
+                            className={cn("cursor-pointer border border-secondary shadow-none", !isPhaseBookable(block.phase) && "border-dashed")}
                             onClick={() => navigate(`./${block.id}`)}
                         >
                             <CardContent>
@@ -88,6 +96,17 @@ export function ChessboardBlocks() {
                                             <h3 className="text-lg font-bold">{t("chessboard.blockLabel", { name: block.name })}</h3>
                                             {(block as any).code && (
                                                 <p className="text-xs text-muted-foreground">{(block as any).code}</p>
+                                            )}
+                                            {block.phase && (
+                                                <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+                                                    <span>{block.phase.name}</span>
+                                                    {completionQuarter(t, block.phase.completionDate) && (
+                                                        <span>· {completionQuarter(t, block.phase.completionDate)}</span>
+                                                    )}
+                                                    <Badge className={PHASE_STATUS_BADGE_CLASSES[block.phase.salesStatus]}>
+                                                        {t(PHASE_STATUS_LABEL_KEYS[block.phase.salesStatus])}
+                                                    </Badge>
+                                                </div>
                                             )}
                                         </div>
                                     </div>

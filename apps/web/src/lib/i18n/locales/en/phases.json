@@ -1,0 +1,49 @@
+{
+  "quarter": "Q{{quarter}} {{year}}",
+  "status": {
+    "upcoming": "Not on sale yet",
+    "onSale": "On sale",
+    "completed": "Completed"
+  },
+  "panel": {
+    "title": "Phases",
+    "description": "Group blocks that are built and handed over together. Units in a phase that isn't on sale yet can't be booked.",
+    "add": "Add phase",
+    "empty": "No phases. Blocks without a phase are on sale with no completion date.",
+    "blocks_one": "{{count}} block",
+    "blocks_few": "{{count}} blocks",
+    "blocks_many": "{{count}} blocks",
+    "blocks_other": "{{count}} blocks",
+    "noBlocks": "No blocks yet"
+  },
+  "form": {
+    "createTitle": "Add phase",
+    "editTitle": "Edit phase",
+    "name": "Name",
+    "namePlaceholder": "e.g. Phase 1",
+    "salesStatus": "Sales",
+    "completionDate": "Expected completion",
+    "save": "Save",
+    "create": "Add phase",
+    "cancel": "Cancel",
+    "nameRequired": "Enter a name"
+  },
+  "delete": {
+    "title": "Delete phase \"{{name}}\"?",
+    "description": "Its blocks stay, just without a phase."
+  },
+  "block": {
+    "label": "Phase",
+    "none": "No phase"
+  },
+  "toasts": {
+    "saved": "Phase saved",
+    "deleted": "Phase deleted",
+    "error": "Couldn't save the phase",
+    "nameTaken": "A phase with this name already exists",
+    "blockUpdated": "Block moved to {{phase}}",
+    "blockCleared": "Block taken out of its phase"
+  },
+  "completion": "Completion {{quarter}}",
+  "notBookable": "units can't be booked yet"
+}

@@ -98,7 +98,8 @@
     "bookButton": "Брондоо",
     "bookingClosed": "Брондоо жабык: долбоордун статусу — {{status}}.",
     "infoSheetButton": "Маалымат баракчасы",
-    "offerButton": "Сунуш"
+    "offerButton": "Сунуш",
+    "phaseNotOnSale": "Азырынча сатыкта эмес: «{{phase}}» кийинчерээк сатыкка чыгат (тапшыруу {{completion}})."
   },
   "infoSheet": {
     "title": "№{{number}} жай",
@@ -114,7 +115,8 @@
     "pricePerSqm": "м² үчүн баасы",
     "status": "Статус",
     "printButton": "Басып чыгаруу / PDF катары сактоо",
-    "notFound": "Жай табылган жок."
+    "notFound": "Жай табылган жок.",
+    "completion": "Тапшыруу"
   },
   "chessboard": {
     "entranceLabel": "{{name}} кире бериши",

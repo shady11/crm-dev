@@ -29,7 +29,8 @@ export async function createBlock(
 
 export async function updateBlock(
     blockId: string,
-    payload: BlockPayload,
+    // phaseId: the construction phase; null takes the block out of it.
+    payload: Partial<BlockPayload> & { phaseId?: string | null },
 ) {
     const response = await api.patch<Block>(
         `/blocks/${blockId}`,

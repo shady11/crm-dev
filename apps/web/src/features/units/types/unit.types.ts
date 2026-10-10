@@ -1,3 +1,4 @@
+import type {PhaseSummary} from "@/features/phases/types/phase.types";
 import type {UnitDealHistoryEntry} from "@/features/deals/types/deal.types.ts";
 
 export const UnitType = {
@@ -107,6 +108,8 @@ export type Unit = {
     block?: {
         id: string;
         name: string;
+        // Construction phase, on the full unit (GET /units/:id).
+        phase?: PhaseSummary | null;
     };
     entrance?: {
         id: string;

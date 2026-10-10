@@ -8,14 +8,19 @@ import {AddEntranceButton} from "@/features/entrances/components/add-entrance-bu
 import {EntranceItem} from "@/features/entrances/components/entrance-item.tsx";
 import {DuplicateBlockButton} from "@/features/blocks/components/duplicate-block-button.tsx";
 import {useTranslation} from "react-i18next";
+import type {Phase} from "@/features/phases/types/phase.types.ts";
+import {BlockPhaseSelect} from "@/features/phases/components/block-phase-select.tsx";
 
 interface BlockItemProps {
     block: Block;
     isExpanded: boolean;
     onToggle: () => void;
+    /** The project's phases; the phase picker shows when there are any. */
+    phases?: Phase[];
+    canManagePhases?: boolean;
 }
 
-export function BlockItem({ block, isExpanded, onToggle }: BlockItemProps) {
+export function BlockItem({ block, isExpanded, onToggle, phases = [], canManagePhases = false }: BlockItemProps) {
     const { t } = useTranslation("blocks");
 
     return (
@@ -36,6 +41,14 @@ export function BlockItem({ block, isExpanded, onToggle }: BlockItemProps) {
                     <ItemDescription>{t("item.entrances", { count: block.entrances.length })}</ItemDescription>
                 </ItemContent>
                 <ItemActions onClick={(e) => e.stopPropagation()}>
+                    {canManagePhases && phases.length > 0 && (
+                        <BlockPhaseSelect
+                            blockId={block.id}
+                            projectId={block.projectId}
+                            phaseId={block.phaseId ?? null}
+                            phases={phases}
+                        />
+                    )}
                     <AddEntranceButton
                         block={block}
                     />
