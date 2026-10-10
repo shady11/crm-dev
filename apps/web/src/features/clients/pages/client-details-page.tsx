@@ -17,6 +17,7 @@ import {
     updateClient,
     type UpdateClientPayload,
 } from "@/features/clients/api/clients.api.ts";
+import {ClientHistoryCard} from "@/features/clients/components/client-history-card.tsx";
 import {ClientTasksCard} from "@/features/tasks/components/client-tasks-card.tsx";
 import {DEAL_STATUS_LABEL_KEYS, DEAL_STATUS_VISUALS} from "@/features/deals/types/deal.types.ts";
 import {LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
@@ -231,8 +232,13 @@ export function ClientDetailsPage() {
                 </Card>
             </div>
 
-            <ClientTasksCard clientId={client.id} />
-            <EntityDocumentsCard ownerType="CLIENT" ownerId={client.id} />
+            <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+                <ClientHistoryCard clientId={client.id} />
+                <div className="flex flex-col gap-4">
+                    <EntityDocumentsCard ownerType="CLIENT" ownerId={client.id} clientDeals={client.deals} />
+                    <ClientTasksCard clientId={client.id} />
+                </div>
+            </div>
 
             <ClientFormSheet
                 open={editOpen}

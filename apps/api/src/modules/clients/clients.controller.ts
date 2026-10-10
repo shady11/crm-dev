@@ -29,6 +29,14 @@ export class ClientsController {
         return this.clientsService.findOne(user, id);
     }
 
+    // Everything that happened with this person, across the client record,
+    // the leads they came in as and their deals.
+    @RequirePermissions("clients.view")
+    @Get(":id/activities")
+    listActivities(@CurrentUser() user: AuthUser, @Param("id") id: string) {
+        return this.clientsService.listActivities(user, id);
+    }
+
     @RequirePermissions("clients.create")
     @Post()
     create(@CurrentUser() user: AuthUser, @Body() dto: CreateClientDto) {

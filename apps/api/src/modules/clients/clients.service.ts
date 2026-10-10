@@ -9,6 +9,9 @@ import {UpdateClientDto} from "@/modules/clients/dto/update-client.dto";
 import {resolveOrderBy} from "@/common/utils/sort.util";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
 
+// Newest first; enough for years of a single client's history.
+const CLIENT_ACTIVITY_LIMIT = 200;
+
 @Injectable()
 export class ClientsService {
     constructor(private readonly prisma: PrismaService) {}
@@ -70,6 +73,36 @@ export class ClientsService {
             items,
             meta: { page, limit, total, pages: Math.ceil(total / limit) },
         };
+    }
+
+    /**
+     * One timeline for the client: activity on the client itself, on every
+     * lead linked to it (calls, messages, meetings logged before the deal)
+     * and on each of its deals. findOne() scopes access first, so a client
+     * outside the caller's company or branch 404s before anything is read.
+     */
+    async listActivities(user: AuthUser, id: string) {
+        const client = await this.findOne(user, id);
+        const leadIds = client.leads.map((lead) => lead.id);
+        const dealIds = client.deals.map((deal) => deal.id);
+
+        return this.prisma.activity.findMany({
+            where: {
+                companyId: user.companyId!,
+                OR: [
+                    { clientId: id },
+                    ...(leadIds.length ? [{ leadId: { in: leadIds } }] : []),
+                    ...(dealIds.length ? [{ dealId: { in: dealIds } }] : []),
+                ],
+            },
+            orderBy: { createdAt: "desc" },
+            take: CLIENT_ACTIVITY_LIMIT,
+            include: {
+                user: { select: { id: true, fullName: true } },
+                lead: { select: { id: true, fullName: true } },
+                deal: { select: { id: true, dealNumber: true } },
+            },
+        });
     }
 
     async findOne(user: AuthUser, id: string) {

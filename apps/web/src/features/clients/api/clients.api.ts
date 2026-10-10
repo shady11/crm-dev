@@ -110,3 +110,21 @@ export async function transferClientBranch(id: string, branchId: string) {
     const response = await api.post<Client>(`/clients/${id}/transfer-branch`, { branchId });
     return response.data;
 }
+export type ClientActivity = {
+    id: string;
+    type: string;
+    action: string;
+    title: string;
+    description: string | null;
+    createdAt: string;
+    user: { id: string; fullName: string } | null;
+    // Which record the entry came from; both null for the client itself.
+    lead: { id: string; fullName: string } | null;
+    deal: { id: string; dealNumber: string } | null;
+};
+
+// Activity on the client, the leads it came from and its deals, newest first.
+export async function getClientActivities(id: string) {
+    const response = await api.get<ClientActivity[]>(`/clients/${id}/activities`);
+    return response.data;
+}

@@ -108,5 +108,28 @@
     "cancel": "Отмена",
     "deleting": "Удаление...",
     "delete": "Удалить"
+  },
+  "history": {
+    "title": "История",
+    "contactsOnly_one": "Звонки и встречи ({{count}})",
+    "contactsOnly_few": "Звонки и встречи ({{count}})",
+    "contactsOnly_many": "Звонки и встречи ({{count}})",
+    "contactsOnly_other": "Звонки и встречи ({{count}})",
+    "empty": "Пока ничего не записано.",
+    "noContacts": "Звонков, сообщений и встреч пока нет.",
+    "deal": "Сделка {{number}}",
+    "lead": "Лид",
+    "client": "Клиент",
+    "system": "Система",
+    "showMore_one": "Показать ещё (осталось {{count}})",
+    "showMore_few": "Показать ещё (осталось {{count}})",
+    "showMore_many": "Показать ещё (осталось {{count}})",
+    "showMore_other": "Показать ещё (осталось {{count}})",
+    "types": {
+      "CALL": "Звонок",
+      "MESSAGE_SENT": "Сообщение",
+      "MEETING": "Встреча",
+      "EMAIL": "Письмо"
+    }
   }
 }

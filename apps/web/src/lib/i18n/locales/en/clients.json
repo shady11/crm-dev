@@ -108,5 +108,28 @@
     "cancel": "Cancel",
     "deleting": "Deleting...",
     "delete": "Delete"
+  },
+  "history": {
+    "title": "History",
+    "contactsOnly_one": "Calls & meetings ({{count}})",
+    "contactsOnly_few": "Calls & meetings ({{count}})",
+    "contactsOnly_many": "Calls & meetings ({{count}})",
+    "contactsOnly_other": "Calls & meetings ({{count}})",
+    "empty": "Nothing recorded yet.",
+    "noContacts": "No calls, messages or meetings logged yet.",
+    "deal": "Deal {{number}}",
+    "lead": "Lead",
+    "client": "Client",
+    "system": "System",
+    "showMore_one": "Show more ({{count}} left)",
+    "showMore_few": "Show more ({{count}} left)",
+    "showMore_many": "Show more ({{count}} left)",
+    "showMore_other": "Show more ({{count}} left)",
+    "types": {
+      "CALL": "Call",
+      "MESSAGE_SENT": "Message",
+      "MEETING": "Meeting",
+      "EMAIL": "Email"
+    }
   }
 }

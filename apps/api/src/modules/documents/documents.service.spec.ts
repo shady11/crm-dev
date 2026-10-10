@@ -1,4 +1,4 @@
-import {BadRequestException, ForbiddenException} from '@nestjs/common';
+import {BadRequestException, ForbiddenException, NotFoundException} from '@nestjs/common';
 import {DocumentOwnerType, DocumentType, NotificationType} from '@/generated/prisma/client';
 import {AuthUser} from '@/common/types/auth-user.type';
 import {DocumentsService} from './documents.service';
@@ -93,6 +93,29 @@ describe('DocumentsService', () => {
             expect(prisma.document.findMany).toHaveBeenCalledWith(
                 expect.objectContaining({where: expect.objectContaining({originalName: {contains: 'contract', mode: 'insensitive'}})}),
             );
+        });
+    });
+
+    describe('findAll by client', () => {
+        it("returns the client's own documents and those on its deals", async () => {
+            const {service, prisma} = build({owner: {deals: [{id: 'deal-1'}, {id: 'deal-2'}]}});
+            await service.findAll({...user, isBranchScoped: true}, {clientId: 'client-1'} as any);
+
+            expect(prisma.client.findFirst).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({id: 'client-1', companyId: 'company-1', branchId: 'branch-1'})}),
+            );
+            const where = prisma.document.findMany.mock.calls[0][0].where;
+            expect(where.OR).toEqual([
+                {ownerType: DocumentOwnerType.CLIENT, ownerId: 'client-1'},
+                {ownerType: DocumentOwnerType.DEAL, ownerId: {in: ['deal-1', 'deal-2']}},
+            ]);
+            expect(where.ownerType).toBeUndefined();
+        });
+
+        it('404s a client outside the caller scope', async () => {
+            const {service, prisma} = build({owner: null});
+            await expect(service.findAll(user, {clientId: 'client-x'} as any)).rejects.toThrow(NotFoundException);
+            expect(prisma.document.findMany).not.toHaveBeenCalled();
         });
     });
 

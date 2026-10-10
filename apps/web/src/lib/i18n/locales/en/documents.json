@@ -14,7 +14,8 @@
   "card": {
     "title": "Documents",
     "upload": "Upload",
-    "empty": "No documents uploaded yet."
+    "empty": "No documents uploaded yet.",
+    "fromDeal": "From deal {{number}}"
   },
   "toast": {
     "uploaded": "Document uploaded",
