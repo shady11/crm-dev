@@ -45,6 +45,31 @@ describe("ActivitiesService", () => {
         );
     });
 
+    it("returns the lead, client and deal each row is about", async () => {
+        const {service, findMany} = build();
+
+        await service.findAll(baseUser, {});
+
+        const {include} = findMany.mock.calls[0][0];
+        expect(include.lead).toEqual({select: {id: true, fullName: true}});
+        expect(include.client).toEqual({select: {id: true, fullName: true}});
+        expect(include.deal).toEqual({select: {id: true, dealNumber: true, client: {select: {id: true, fullName: true}}}});
+    });
+
+    it.each([
+        ["deal", {dealId: {not: null}}],
+        ["client", {clientId: {not: null}, dealId: null}],
+        ["lead", {leadId: {not: null}}],
+    ])("narrows to rows about a %s", async (subject, filter) => {
+        const {service, findMany, count} = build();
+
+        await service.findAll(baseUser, {subject} as any);
+
+        const expected = {companyId: "company-1", AND: [filter]};
+        expect(findMany).toHaveBeenCalledWith(expect.objectContaining({where: expected}));
+        expect(count).toHaveBeenCalledWith({where: expected});
+    });
+
     it("lets COMPANY_ADMIN narrow to one branch via the query param", async () => {
         const {service, findMany} = build();
 

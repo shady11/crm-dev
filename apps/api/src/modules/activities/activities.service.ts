@@ -2,7 +2,7 @@ import {ForbiddenException, Injectable} from "@nestjs/common";
 import {Prisma} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
-import {QueryActivitiesDto} from "./dto/query-activities.dto";
+import {ActivitySubject, QueryActivitiesDto} from "./dto/query-activities.dto";
 
 /**
  * Company-wide activity feed. COMPANY_ADMIN sees every activity raised by
@@ -16,6 +16,28 @@ import {QueryActivitiesDto} from "./dto/query-activities.dto";
  * with them to their new branch, rather than staying pinned to the branch
  * they were in when the row was written.
  */
+// What each row is about, so the log can say "Deal D-2026-0027 · Ermek
+// Kydyrov" rather than a bare "Unit reserved".
+const ACTIVITY_INCLUDE = {
+    user: {select: {id: true, fullName: true, branchId: true}},
+    lead: {select: {id: true, fullName: true}},
+    client: {select: {id: true, fullName: true}},
+    // Some deal rows (e.g. payments) don't carry clientId; the deal's client fills in.
+    deal: {select: {id: true, dealNumber: true, client: {select: {id: true, fullName: true}}}},
+    task: {select: {id: true, title: true}},
+    unit: {select: {id: true, number: true, project: {select: {id: true, name: true}}}},
+    project: {select: {id: true, name: true}},
+} satisfies Prisma.ActivityInclude;
+
+// "Related to" filter: rows linked to that kind of record.
+const SUBJECT_FILTERS: Record<ActivitySubject, Prisma.ActivityWhereInput> = {
+    lead: {leadId: {not: null}},
+    client: {clientId: {not: null}, dealId: null},
+    deal: {dealId: {not: null}},
+    task: {taskId: {not: null}},
+    inventory: {OR: [{unitId: {not: null}}, {projectId: {not: null}}, {blockId: {not: null}}, {entranceId: {not: null}}, {floorId: {not: null}}]},
+};
+
 @Injectable()
 export class ActivitiesService {
     constructor(private readonly prisma: PrismaService) {}
@@ -45,6 +67,7 @@ export class ActivitiesService {
         if (query.leadId) where.leadId = query.leadId;
         if (query.clientId) where.clientId = query.clientId;
         if (query.dealId) where.dealId = query.dealId;
+        if (query.subject) where.AND = [SUBJECT_FILTERS[query.subject]];
 
         if (query.dateFrom || query.dateTo) {
             where.createdAt = {
@@ -59,9 +82,7 @@ export class ActivitiesService {
                 skip,
                 take: limit,
                 orderBy: {createdAt: "desc"},
-                include: {
-                    user: {select: {id: true, fullName: true, branchId: true}},
-                },
+                include: ACTIVITY_INCLUDE,
             }),
             this.prisma.activity.count({where}),
         ]);

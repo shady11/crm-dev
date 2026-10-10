@@ -7,7 +7,17 @@
       "branch": "Филиал",
       "allBranches": "Все филиалы",
       "dateFrom": "С",
-      "dateTo": "По"
+      "dateTo": "По",
+      "subject": "Связано с",
+      "anything": "Всё",
+      "mineOnly": "Мои действия",
+      "subjects": {
+        "lead": "Лиды",
+        "client": "Клиенты",
+        "deal": "Сделки",
+        "task": "Задачи",
+        "inventory": "Помещения и проекты"
+      }
     },
     "table": {
       "headers": {
@@ -21,5 +31,10 @@
       "description": "Ничего не соответствует этим фильтрам."
     },
     "system": "Система"
+  },
+  "subjects": {
+    "deal": "Сделка {{number}}",
+    "lead": "Лид: {{name}}",
+    "unit": "Помещение №{{number}}"
   }
 }

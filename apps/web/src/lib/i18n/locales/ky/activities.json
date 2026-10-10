@@ -7,7 +7,17 @@
       "branch": "Филиал",
       "allBranches": "Бардык филиалдар",
       "dateFrom": "Баштап",
-      "dateTo": "Чейин"
+      "dateTo": "Чейин",
+      "subject": "Байланышкан",
+      "anything": "Баары",
+      "mineOnly": "Менин аракеттерим",
+      "subjects": {
+        "lead": "Лиддер",
+        "client": "Кардарлар",
+        "deal": "Бүтүмдөр",
+        "task": "Тапшырмалар",
+        "inventory": "Жайлар жана долбоорлор"
+      }
     },
     "table": {
       "headers": {
@@ -21,5 +31,10 @@
       "description": "Бул чыпкаларга эч нерсе туура келбейт."
     },
     "system": "Система"
+  },
+  "subjects": {
+    "deal": "Бүтүм {{number}}",
+    "lead": "Лид: {{name}}",
+    "unit": "№{{number}} жай"
   }
 }

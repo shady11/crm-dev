@@ -1,8 +1,17 @@
-import {IsDateString, IsEnum, IsInt, IsOptional, IsUUID, Max, Min} from "class-validator";
+import {IsDateString, IsEnum, IsIn, IsInt, IsOptional, IsUUID, Max, Min} from "class-validator";
 import {Transform} from "class-transformer";
 import {ActivityAction, ActivityType} from "@/generated/prisma/enums";
 
+export const ACTIVITY_SUBJECTS = ["lead", "client", "deal", "task", "inventory"] as const;
+export type ActivitySubject = (typeof ACTIVITY_SUBJECTS)[number];
+
 export class QueryActivitiesDto {
+    // Only rows about this kind of record ("inventory" = units, floors,
+    // blocks, entrances and projects).
+    @IsOptional()
+    @IsIn(ACTIVITY_SUBJECTS)
+    subject?: ActivitySubject;
+
     @IsOptional()
     @IsEnum(ActivityType)
     type?: ActivityType;
