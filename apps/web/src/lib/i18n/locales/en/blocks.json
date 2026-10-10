@@ -9,7 +9,9 @@
     "namePlaceholder": "Block name (e.g., A, B, C)",
     "orderLabel": "Order (Optional)",
     "submitCreate": "Create block",
-    "errorGeneric": "Block could not be saved. Check the details and try again."
+    "errorGeneric": "Block could not be saved. Check the details and try again.",
+    "salesStatusLabel": "Sales",
+    "completionLabel": "Expected completion"
   },
   "validation": {
     "nameRequired": "Block name is required"
@@ -41,5 +43,13 @@
     "deletedDescription": "Block {{name}} has been deleted.",
     "duplicatedTitle": "Successfully created",
     "duplicatedDescription": "Block {{name}} has been duplicated."
-  }
+  },
+  "salesStatus": {
+    "upcoming": "Not on sale yet",
+    "onSale": "On sale",
+    "completed": "Completed"
+  },
+  "quarter": "Q{{quarter}} {{year}}",
+  "completion": "Completion {{quarter}}",
+  "notBookable": "units can't be booked yet"
 }

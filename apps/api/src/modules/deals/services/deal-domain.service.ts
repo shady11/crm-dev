@@ -1,5 +1,6 @@
 import {Injectable} from '@nestjs/common';
 import {
+    BlockSalesStatus,
     Company,
     Deal,
     DealStatus,
@@ -14,6 +15,7 @@ import {
 
 import {
     ActiveDealExistsException,
+    BlockNotOnSaleException,
     ClientDetailsMissingException,
     type ContractClientField,
     DiscountPendingApprovalException,
@@ -58,6 +60,16 @@ export class DealDomainService {
     ensureProjectOpenForSales(project: Pick<Project, 'name' | 'status'>): void {
         if (!BOOKABLE_PROJECT_STATUSES.includes(project.status)) {
             throw new ProjectNotOpenForSalesException(project.name, project.status);
+        }
+    }
+
+    /**
+     * A block that hasn't opened for sales can't be booked yet; a completed
+     * (handed-over) block still sells its remaining units.
+     */
+    ensureBlockOpenForSales(block: {name: string; salesStatus: BlockSalesStatus}): void {
+        if (block.salesStatus === BlockSalesStatus.UPCOMING) {
+            throw new BlockNotOnSaleException(block.name);
         }
     }
 

@@ -9,7 +9,9 @@
     "namePlaceholder": "Название блока (например, A, B, C)",
     "orderLabel": "Порядок (необязательно)",
     "submitCreate": "Создать блок",
-    "errorGeneric": "Не удалось сохранить блок. Проверьте данные и попробуйте снова."
+    "errorGeneric": "Не удалось сохранить блок. Проверьте данные и попробуйте снова.",
+    "salesStatusLabel": "Продажи",
+    "completionLabel": "Плановая сдача"
   },
   "validation": {
     "nameRequired": "Название блока обязательно"
@@ -41,5 +43,13 @@
     "deletedDescription": "Блок {{name}} удалён.",
     "duplicatedTitle": "Успешно создано",
     "duplicatedDescription": "Блок {{name}} продублирован."
-  }
+  },
+  "salesStatus": {
+    "upcoming": "Ещё не в продаже",
+    "onSale": "В продаже",
+    "completed": "Сдан"
+  },
+  "quarter": "{{quarter}} кв. {{year}}",
+  "completion": "Сдача {{quarter}}",
+  "notBookable": "бронирование пока закрыто"
 }

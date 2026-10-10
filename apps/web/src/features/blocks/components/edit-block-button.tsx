@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Pen } from "lucide-react";
 import { IconTooltipButton } from "@/components/shared/icon-tooltip-button.tsx";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet.tsx";
-import { updateBlock } from "@/features/blocks/api/blocks.api.ts";
+import { type BlockPayload, updateBlock } from "@/features/blocks/api/blocks.api.ts";
 import type { Block } from "@/features/blocks/types/block.types.ts";
 import { BlockForm } from "./block-form.tsx";
 import {toast} from "@/components/ui/toast.tsx";
@@ -22,7 +22,7 @@ export function EditBlockButton({ block }: EditBlockButtonProps) {
     const [open, setOpen] = useState(false);
 
     const updateBlockMutation = useMutation({
-        mutationFn: (payload: { name: string; code?: string }) =>
+        mutationFn: (payload: BlockPayload) =>
             updateBlock(block.id, payload),
         onSuccess: async (_, variables) => {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });

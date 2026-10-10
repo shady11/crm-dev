@@ -16,6 +16,7 @@ import {
     isProjectStatus,
     PROJECT_STATUS_LABEL_KEYS,
 } from "@/features/projects/types/project.types.ts";
+import {completionQuarter, isBlockBookable} from "@/features/blocks/types/block-sales.ts";
 
 interface UnitDetailsSheetProps {
     unit: Unit | null;
@@ -54,9 +55,17 @@ export function UnitDetailsSheet({
     const closedProjectStatus = isProjectStatus(projectStatus) && !BOOKABLE_PROJECT_STATUSES.includes(projectStatus)
         ? projectStatus
         : null;
+    // Same for a block that isn't on sale yet.
+    const block = fullUnit?.block;
+    const blockQuarter = completionQuarter(t, block?.completionDate);
     const bookingClosedReason = closedProjectStatus
         ? t("details.bookingClosed", { status: t(PROJECT_STATUS_LABEL_KEYS[closedProjectStatus]) })
-        : null;
+        : block && !isBlockBookable(block.salesStatus)
+            ? t("details.blockNotOnSale", {
+                block: block.name,
+                completion: blockQuarter ? t("details.blockNotOnSaleCompletion", { quarter: blockQuarter }) : "",
+            })
+            : null;
 
     if (!unit || !floor) {
         return null;

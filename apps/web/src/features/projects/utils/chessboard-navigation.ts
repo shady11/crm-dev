@@ -1,4 +1,5 @@
 import type {Block} from "@/features/blocks/types/block.types.ts";
+import {BlockSalesStatus} from "@/features/blocks/types/block-sales.ts";
 
 /**
  * Navigation state that marks a deliberate trip back to a picker (the Back
@@ -39,8 +40,9 @@ export function saveLastView(projectId: string, view: LastView) {
 
 /**
  * Where opening the chessboard should land: the last entrance viewed if it
- * still exists, else straight into the only block. Null means show the
- * block list.
+ * still exists; else, when some blocks aren't on sale (yet or any more),
+ * the first block that is; else straight into the only block. Null means
+ * show the block list.
  */
 export function chessboardLanding(projectId: string, blocks: Block[]): string | null {
     const last = readLastView(projectId);
@@ -49,6 +51,11 @@ export function chessboardLanding(projectId: string, blocks: Block[]): string | 
         if (block?.entrances?.some((e) => e.id === last.entranceId)) {
             return `${last.blockId}/${last.entranceId}`;
         }
+    }
+    if (blocks.some((b) => b.salesStatus && b.salesStatus !== BlockSalesStatus.ON_SALE)) {
+        const onSale = blocks.find((b) => b.salesStatus === BlockSalesStatus.ON_SALE);
+        const entrance = onSale?.entrances?.[0];
+        if (onSale && entrance) return `${onSale.id}/${entrance.id}`;
     }
     if (blocks.length === 1) {
         const [only] = blocks;

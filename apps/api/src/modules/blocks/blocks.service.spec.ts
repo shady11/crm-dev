@@ -112,6 +112,36 @@ describe('BlocksService', () => {
         });
     });
 
+    describe('sales status and completion', () => {
+        it('creates a block with its sales status and completion date', async () => {
+            const {service, prisma} = build();
+            await service.create(user, 'project-1', {name: 'C', salesStatus: 'UPCOMING', completionDate: '2027-11-30'} as any);
+
+            const {data} = prisma.block.create.mock.calls[0][0];
+            expect(data.salesStatus).toBe('UPCOMING');
+            expect(data.completionDate).toEqual(new Date('2027-11-30'));
+        });
+
+        it('clears the completion date with null and leaves it alone when omitted', async () => {
+            const {service, prisma} = build({block: {id: 'block-1', projectId: 'project-1', completionDate: new Date('2027-11-30')}});
+
+            await service.update(user, 'block-1', {completionDate: null} as any);
+            expect(prisma.block.update.mock.calls[0][0].data.completionDate).toBeNull();
+
+            await service.update(user, 'block-1', {salesStatus: 'COMPLETED'} as any);
+            expect(prisma.block.update.mock.calls[1][0].data.completionDate).toBeUndefined();
+            expect(prisma.block.update.mock.calls[1][0].data.salesStatus).toBe('COMPLETED');
+        });
+
+        it('records a status change in the block activity', async () => {
+            const {service, prisma} = build({block: {id: 'block-1', projectId: 'project-1', salesStatus: 'UPCOMING', completionDate: null}});
+            await service.update(user, 'block-1', {salesStatus: 'ON_SALE'} as any);
+
+            const activity = prisma.activity.create.mock.calls[0][0].data;
+            expect(activity.metadata).toEqual(expect.objectContaining({salesStatus: {from: 'UPCOMING', to: 'ON_SALE'}}));
+        });
+    });
+
     describe('duplicate', () => {
         function sourceBlock(overrides: Record<string, unknown> = {}) {
             return {
