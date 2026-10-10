@@ -8,7 +8,7 @@ import type {TaskStatusFilter} from "@/features/tasks/hooks/use-tasks-list.ts";
 import {useAssignableUsers} from "@/features/users/hooks/use-assignable-users.ts";
 import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {hasPermission} from "@/features/auth/access";
+import {canCreateTask} from "@/features/tasks/utils/task-access.ts";
 import {useTranslation} from "react-i18next";
 
 interface TasksToolbarProps {
@@ -76,7 +76,7 @@ export function TasksToolbar({ statusFilter, onStatusFilterChange, assignedToId,
                     <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
                 </InputGroup>
 
-                {hasPermission(user, "tasks.create") && (
+                {canCreateTask(user) && (
                     <Button onClick={onAddTask}>
                         <PlusIcon className="size-4" />
                         {t("toolbar.addTask")}

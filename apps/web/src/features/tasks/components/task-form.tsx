@@ -14,7 +14,9 @@ import {Input} from "@/components/ui/input.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {SheetBody, SheetClose, SheetFooter} from "@/components/ui/sheet.tsx";
 import {Textarea} from "@/components/ui/textarea.tsx";
-import {useAssignableUsers} from "@/features/users/hooks/use-assignable-users.ts";
+import {useTaskAssignees} from "@/features/tasks/hooks/use-task-assignees.ts";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {canAssignTasks} from "@/features/tasks/utils/task-access.ts";
 import {
     TASK_PRIORITY_LABEL_KEYS,
     TASK_STATUS_LABEL_KEYS,
@@ -63,8 +65,8 @@ const DEFAULT_VALUES: TaskFormValues = {
     priority: TaskPriority.MEDIUM, type: TaskType.OTHER, outcome: "", assignedToId: "",
 };
 
-function toFormValues(task?: Task | null): TaskFormValues {
-    if (!task) return DEFAULT_VALUES;
+function toFormValues(task?: Task | null, defaultAssigneeId = ""): TaskFormValues {
+    if (!task) return { ...DEFAULT_VALUES, assignedToId: defaultAssigneeId };
     return {
         title: task.title,
         description: task.description ?? "",
@@ -87,7 +89,10 @@ function outcomeRequired(status: TaskStatus, previousStatus?: TaskStatus) {
 export function TaskForm({ task, errorMessage, isSubmitting, submitLabel, onCancel, onSubmit }: TaskFormProps) {
     const { t, i18n } = useTranslation("tasks");
 
-    const assignableUsers = useAssignableUsers();
+    const assignableUsers = useTaskAssignees();
+    const { user } = useAuth();
+    // tasks.create_own: the task is always the user's own, so there is nothing to pick.
+    const canAssign = canAssignTasks(user);
 
     // Rebuilt whenever the language changes, so a validation message that
     // fired before a language switch doesn't stay frozen in the old language.
@@ -108,10 +113,10 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel, onCanc
 
     const form = useForm<TaskFormValues>({
         resolver: zodResolver(taskSchema),
-        defaultValues: toFormValues(task),
+        defaultValues: toFormValues(task, user?.id),
     });
 
-    useEffect(() => { form.reset(toFormValues(task)); }, [task]);
+    useEffect(() => { form.reset(toFormValues(task, user?.id)); }, [task, user?.id]);
 
     const watchedStatus = form.watch("status");
     const showOutcome = !!task && outcomeRequired(watchedStatus, task.status);
@@ -176,18 +181,20 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel, onCanc
                         </Field>
                     )} />
 
-                    <Controller control={form.control} name="assignedToId" render={({ field, fieldState }) => (
-                        <Field invalid={fieldState.invalid}>
-                            <FieldLabel>{t("form.assignee")}</FieldLabel>
-                            <Select collection={assigneeCollection} value={field.value ? [field.value] : []} onValueChange={(item) => field.onChange(item.value[0])}>
-                                <SelectTrigger className="w-full"><SelectValue placeholder={t("form.selectAssignee")} /></SelectTrigger>
-                                <SelectContent>
-                                    {assigneeCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            <FieldError>{fieldState.error?.message}</FieldError>
-                        </Field>
-                    )} />
+                    {canAssign && (
+                        <Controller control={form.control} name="assignedToId" render={({ field, fieldState }) => (
+                            <Field invalid={fieldState.invalid}>
+                                <FieldLabel>{t("form.assignee")}</FieldLabel>
+                                <Select collection={assigneeCollection} value={field.value ? [field.value] : []} onValueChange={(item) => field.onChange(item.value[0])}>
+                                    <SelectTrigger className="w-full"><SelectValue placeholder={t("form.selectAssignee")} /></SelectTrigger>
+                                    <SelectContent>
+                                        {assigneeCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                                <FieldError>{fieldState.error?.message}</FieldError>
+                            </Field>
+                        )} />
+                    )}
 
                     <Controller control={form.control} name="status" render={({ field, fieldState }) => (
                         <Field invalid={fieldState.invalid}>

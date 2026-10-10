@@ -4,6 +4,16 @@ import type {Task} from "@/features/tasks/api/tasks.api.ts";
 
 type Viewer = Pick<AuthUser, "id" | "permissions"> | undefined;
 
+/** Mirrors POST /tasks: tasks.create, or tasks.create_own for tasks assigned to yourself. */
+export function canCreateTask(user: Viewer) {
+    return hasPermission(user, "tasks.create") || hasPermission(user, "tasks.create_own");
+}
+
+/** Whether the task form may assign to someone else (tasks.create), or only to the user. */
+export function canAssignTasks(user: Viewer) {
+    return hasPermission(user, "tasks.create");
+}
+
 /** Mirrors PATCH /tasks/:id (tasks.edit). */
 export function canEditTask(user: Viewer) {
     return hasPermission(user, "tasks.edit");

@@ -87,8 +87,9 @@ export const DEFAULT_ROLES: DefaultRoleSeed[] = [
             "inventory.view",
             "chessboard.view",
             // Sees every task in their branch, but can only move the ones
-            // assigned to them — see TasksService.updateStatus.
-            "tasks.view", "tasks.change_status",
+            // assigned to them (TasksService.updateStatus) and only create
+            // tasks for themselves (TasksService.create).
+            "tasks.view", "tasks.create_own", "tasks.change_status",
             "documents.view", "documents.upload", "documents.generate",
             "activities.view",
             "dashboard.view", "dashboard.my_performance",
