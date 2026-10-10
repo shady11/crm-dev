@@ -32,6 +32,7 @@ describe('BlocksService', () => {
         lastBlock?: unknown;
         existingNames?: {name: string}[];
         duplicatedResult?: unknown;
+        phase?: unknown;
     } = {}) {
         const prisma = {
             project: {findFirst: jest.fn().mockResolvedValue(opts.project === undefined ? {id: 'project-1'} : opts.project)},
@@ -51,6 +52,7 @@ describe('BlocksService', () => {
             floor: {create: jest.fn().mockImplementation(({data}) => Promise.resolve({id: 'floor-new', ...data}))},
             unit: {createMany: jest.fn().mockResolvedValue({count: 0})},
             activity: {create: jest.fn().mockResolvedValue({id: 'activity-1'})},
+            projectPhase: {findFirst: jest.fn().mockResolvedValue(opts.phase ?? null)},
         };
 
         const service = new BlocksService(prisma as any);
@@ -109,6 +111,32 @@ describe('BlocksService', () => {
             expect(prisma.block.findFirst).toHaveBeenCalledWith(
                 expect.objectContaining({where: expect.objectContaining({id: {not: 'block-1'}})}),
             );
+        });
+    });
+
+    describe('update phase', () => {
+        it('assigns a phase from the same project', async () => {
+            const {service, prisma} = build({block: {id: 'block-1', projectId: 'project-1', phaseId: null}, phase: {id: 'phase-1'}});
+            await service.update(user, 'block-1', {phaseId: 'phase-1'} as any);
+
+            expect(prisma.projectPhase.findFirst).toHaveBeenCalledWith(
+                expect.objectContaining({where: {id: 'phase-1', projectId: 'project-1'}}),
+            );
+            expect(prisma.block.update.mock.calls[0][0].data.phaseId).toBe('phase-1');
+        });
+
+        it("rejects another project's phase", async () => {
+            const {service, prisma} = build({block: {id: 'block-1', projectId: 'project-1'}, phase: null});
+            await expect(service.update(user, 'block-1', {phaseId: 'phase-x'} as any)).rejects.toThrow(BadRequestException);
+            expect(prisma.block.update).not.toHaveBeenCalled();
+        });
+
+        it('takes the block out of its phase with null', async () => {
+            const {service, prisma} = build({block: {id: 'block-1', projectId: 'project-1', phaseId: 'phase-1'}});
+            await service.update(user, 'block-1', {phaseId: null} as any);
+
+            expect(prisma.projectPhase.findFirst).not.toHaveBeenCalled();
+            expect(prisma.block.update.mock.calls[0][0].data.phaseId).toBeNull();
         });
     });
 

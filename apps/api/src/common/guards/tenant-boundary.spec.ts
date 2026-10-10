@@ -120,6 +120,7 @@ describe("branch boundary", () => {
         // phase (BR-C1). Any branch can see and reserve any unit.
         projects: "inventory — see BR-C1 decision",
         blocks: "inventory — see BR-C1 decision",
+        phases: "inventory — see BR-C1 decision",
         entrances: "inventory — see BR-C1 decision",
         floors: "inventory — see BR-C1 decision",
         units: "inventory — see BR-C1 decision",

@@ -233,6 +233,16 @@ export class BlocksService {
             );
         }
 
+        if (dto.phaseId) {
+            const phase = await this.prisma.projectPhase.findFirst({
+                where: { id: dto.phaseId, projectId: block.projectId },
+                select: { id: true },
+            });
+            if (!phase) {
+                throw new BadRequestException("Phase not found in this project");
+            }
+        }
+
         const updated = await this.prisma.block.update({
             where: {
                 id,
@@ -240,10 +250,11 @@ export class BlocksService {
             data: {
                 name: dto.name,
                 order: dto.order,
+                phaseId: dto.phaseId,
             },
         });
 
-        const changes = diffChangedFields(dto, block, ["name", "order"]);
+        const changes = diffChangedFields(dto, block, ["name", "order", "phaseId"]);
 
         if (changes) {
             await this.logBlockActivity({

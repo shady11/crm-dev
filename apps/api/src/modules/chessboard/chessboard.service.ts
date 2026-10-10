@@ -1,5 +1,5 @@
 import {BadRequestException, ForbiddenException, Injectable, NotFoundException,} from "@nestjs/common";
-import {Prisma, UnitStatus, UnitType} from "@/generated/prisma/client";
+import {PhaseSalesStatus, Prisma, UnitStatus, UnitType} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {QueryChessboardDto} from "./dto/query-chessboard.dto";
@@ -31,12 +31,31 @@ type ChessboardEntrance = {
     floors: ChessboardFloor[];
 };
 
+type ChessboardPhase = {
+    id: string;
+    name: string;
+    order: number;
+    salesStatus: PhaseSalesStatus;
+    completionDate: Date | null;
+};
+
 type ChessboardBlock = {
     id: string;
     name: string;
     order: number;
+    // The construction phase, so the grid can say "Phase 2 · Q4 2027" and
+    // whether the block is on sale yet. Null when not grouped into one.
+    phase: ChessboardPhase | null;
     entrances: ChessboardEntrance[];
 };
+
+const PHASE_SELECT = {
+    id: true,
+    name: true,
+    order: true,
+    salesStatus: true,
+    completionDate: true,
+} as const;
 
 @Injectable()
 export class ChessboardService {
@@ -161,6 +180,7 @@ export class ChessboardService {
                         id: true,
                         name: true,
                         order: true,
+                        phase: { select: PHASE_SELECT },
                     },
                 },
                 entrance: {
@@ -190,6 +210,7 @@ export class ChessboardService {
                     id: unit.block.id,
                     name: unit.block.name,
                     order: unit.block.order,
+                    phase: unit.block.phase ?? null,
                     entrances: [],
                 };
 
@@ -250,7 +271,11 @@ export class ChessboardService {
                     }))
                     .sort((a, b) => a.order - b.order),
             }))
-            .sort((a, b) => a.order - b.order);
+            // Phase by phase (blocks outside a phase last), then block order.
+            .sort((a, b) =>
+                (a.phase?.order ?? Number.MAX_SAFE_INTEGER) - (b.phase?.order ?? Number.MAX_SAFE_INTEGER)
+                || (a.phase?.name ?? "").localeCompare(b.phase?.name ?? "")
+                || a.order - b.order);
 
         const summary = this.buildSummary(units);
 

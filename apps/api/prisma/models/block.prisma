@@ -7,6 +7,9 @@ model Block {
   projectId String
   project   Project @relation(fields: [projectId], references: [id])
 
+  phaseId String?
+  phase   ProjectPhase? @relation(fields: [phaseId], references: [id], onDelete: SetNull)
+
   entrancesCount Int @default(0)
   floorsCount    Int @default(0)
   unitsCount     Int @default(0)
@@ -22,4 +25,5 @@ model Block {
 
   @@unique([projectId, name])
   @@index([projectId])
+  @@index([phaseId])
 }

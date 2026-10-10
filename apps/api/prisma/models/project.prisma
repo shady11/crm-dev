@@ -24,6 +24,7 @@ model Project {
   company   Company @relation(fields: [companyId], references: [id])
 
   blocks     Block[]
+  phases     ProjectPhase[]
   units      Unit[]
   entrances  Entrance[]
   floors     Floor[]

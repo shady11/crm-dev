@@ -1,0 +1,23 @@
+import {IsDateString, IsEnum, IsInt, IsOptional, IsString, Min, MinLength, ValidateIf} from "class-validator";
+import {PhaseSalesStatus} from "@/generated/prisma/enums";
+
+export class CreatePhaseDto {
+    @IsString()
+    @MinLength(1)
+    name!: string;
+
+    @IsOptional()
+    @IsInt()
+    @Min(0)
+    order?: number;
+
+    @IsOptional()
+    @IsEnum(PhaseSalesStatus)
+    salesStatus?: PhaseSalesStatus;
+
+    // YYYY-MM-DD; null clears it on update.
+    @IsOptional()
+    @ValidateIf((_, value) => value !== null)
+    @IsDateString()
+    completionDate?: string | null;
+}

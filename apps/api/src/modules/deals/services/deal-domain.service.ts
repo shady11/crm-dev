@@ -6,6 +6,7 @@ import {
     DiscountApprovalStatus,
     PaymentSchedule,
     PaymentScheduleStatus,
+    PhaseSalesStatus,
     Prisma,
     Project,
     Unit,
@@ -20,6 +21,7 @@ import {
     InvalidDealStateException,
     ProjectNotOpenForSalesException,
     PaymentExceedsBalanceException,
+    PhaseNotOnSaleException,
     RefundExceedsPaidException,
     ReservationDateInvalidException,
     ReservationExpiredException,
@@ -58,6 +60,16 @@ export class DealDomainService {
     ensureProjectOpenForSales(project: Pick<Project, 'name' | 'status'>): void {
         if (!BOOKABLE_PROJECT_STATUSES.includes(project.status)) {
             throw new ProjectNotOpenForSalesException(project.name, project.status);
+        }
+    }
+
+    /**
+     * A block whose construction phase hasn't opened for sales can't be
+     * booked yet. Blocks outside any phase follow the project alone.
+     */
+    ensureBlockOpenForSales(block: {name: string; phase: {name: string; salesStatus: PhaseSalesStatus} | null}): void {
+        if (block.phase?.salesStatus === PhaseSalesStatus.UPCOMING) {
+            throw new PhaseNotOnSaleException(block.name, block.phase.name);
         }
     }
 

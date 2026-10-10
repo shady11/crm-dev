@@ -15,6 +15,7 @@ import {
     DealNotFoundException,
     DiscountApprovalNotAllowedException,
     DiscountNotPendingException,
+    PhaseNotOnSaleException,
     ProjectNotOpenForSalesException,
     ReservationDateInvalidException,
     ReservationExtensionLimitException,
@@ -146,12 +147,13 @@ describe('DealsService', () => {
         }) as any;
 
         const openProject = {name: 'Sunrise', status: 'ACTIVE'};
+        const unphasedBlock = {name: 'A', phase: null};
 
         function build(opts: {unit?: unknown; client?: unknown; activeDeal?: unknown; company?: unknown} = {}) {
             const b = buildBase();
             b.prisma.unit.findFirst.mockResolvedValue(
                 opts.unit === undefined
-                    ? {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.AVAILABLE, projectId: 'p1', number: '101', project: openProject}
+                    ? {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.AVAILABLE, projectId: 'p1', number: '101', project: openProject, block: unphasedBlock}
                     : opts.unit,
             );
             b.prisma.client.findFirst.mockResolvedValue(
@@ -202,7 +204,7 @@ describe('DealsService', () => {
             'throws ProjectNotOpenForSalesException when the project is %s, before claiming the unit',
             async (status) => {
                 const {service, prisma} = build({
-                    unit: {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.AVAILABLE, projectId: 'p1', number: '101', project: {name: 'Sunrise', status}},
+                    unit: {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.AVAILABLE, projectId: 'p1', number: '101', project: {name: 'Sunrise', status}, block: unphasedBlock},
                 });
 
                 await expect(service.reserveUnit(managerUser, reserveDto())).rejects.toThrow(ProjectNotOpenForSalesException);
@@ -213,8 +215,28 @@ describe('DealsService', () => {
 
         it.each(['PLANNING', 'ACTIVE', 'COMPLETED'])('allows booking when the project is %s', async (status) => {
             const {service, prisma} = build({
-                unit: {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.AVAILABLE, projectId: 'p1', number: '101', project: {name: 'Sunrise', status}},
+                unit: {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.AVAILABLE, projectId: 'p1', number: '101', project: {name: 'Sunrise', status}, block: unphasedBlock},
             });
+
+            await service.reserveUnit(managerUser, reserveDto());
+            expect(prisma.deal.create).toHaveBeenCalled();
+        });
+
+        const unitInPhase = (salesStatus: string) => ({
+            id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.AVAILABLE, projectId: 'p1', number: '101',
+            project: openProject, block: {name: 'B', phase: {name: 'Phase 2', salesStatus}},
+        });
+
+        it('refuses a unit whose block is in a phase not on sale yet, before claiming it', async () => {
+            const {service, prisma} = build({unit: unitInPhase('UPCOMING')});
+
+            await expect(service.reserveUnit(managerUser, reserveDto())).rejects.toThrow(PhaseNotOnSaleException);
+            expect(prisma.unit.updateMany).not.toHaveBeenCalled();
+            expect(prisma.deal.create).not.toHaveBeenCalled();
+        });
+
+        it.each(['ON_SALE', 'COMPLETED'])('books a unit in a phase that is %s', async (salesStatus) => {
+            const {service, prisma} = build({unit: unitInPhase(salesStatus)});
 
             await service.reserveUnit(managerUser, reserveDto());
             expect(prisma.deal.create).toHaveBeenCalled();
@@ -256,7 +278,7 @@ describe('DealsService', () => {
         });
 
         it('throws UnitNotAvailableException when the unit is not AVAILABLE', async () => {
-            const {service} = build({unit: {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.RESERVED, projectId: 'p1', number: '101', project: openProject}});
+            const {service} = build({unit: {id: 'unit-1', price: new Prisma.Decimal(100000), status: UnitStatus.RESERVED, projectId: 'p1', number: '101', project: openProject, block: unphasedBlock}});
             await expect(service.reserveUnit(managerUser, reserveDto())).rejects.toThrow(UnitNotAvailableException);
         });
 

@@ -223,6 +223,9 @@ export class DealsService {
           project: {
             select: {name: true, status: true},
           },
+          block: {
+            select: {name: true, phase: {select: {name: true, salesStatus: true}}},
+          },
         },
       });
 
@@ -231,6 +234,7 @@ export class DealsService {
       }
 
       this.domain.ensureProjectOpenForSales(unit.project);
+      this.domain.ensureBlockOpenForSales(unit.block);
       this.domain.ensureUnitCanBeReserved(unit);
 
       const activeDeal = await db.deal.findFirst({

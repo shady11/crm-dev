@@ -14,6 +14,7 @@ import {LeadsModule} from "@/modules/leads/leads.module";
 import {ClientsModule} from '@/modules/clients/clients.module';
 import {ProjectsModule} from './modules/projects/projects.module';
 import {BlocksModule} from './modules/blocks/blocks.module';
+import {PhasesModule} from './modules/phases/phases.module';
 import {EntrancesModule} from './modules/entrances/entrances.module';
 import {FloorsModule} from './modules/floors/floors.module';
 import {UnitsModule} from './modules/units/units.module';
@@ -67,6 +68,7 @@ import {RbacModule} from "@/modules/rbac/rbac.module";
       ClientsModule,
       ProjectsModule,
       BlocksModule,
+      PhasesModule,
       EntrancesModule,
       FloorsModule,
       UnitsModule,

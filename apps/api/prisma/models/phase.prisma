@@ -1,0 +1,30 @@
+// Where a construction phase (очередь) stands for sales. Booking is refused
+// only while UPCOMING; a COMPLETED phase still sells what's left.
+enum PhaseSalesStatus {
+  UPCOMING
+  ON_SALE
+  COMPLETED
+}
+
+// A construction phase of a project: blocks built and handed over together.
+// Optional — blocks without a phase behave as on sale, with no date.
+model ProjectPhase {
+  id String @id @default(uuid())
+
+  name        String
+  order       Int              @default(0)
+  salesStatus PhaseSalesStatus @default(ON_SALE)
+  // Expected handover; shown to clients by quarter.
+  completionDate DateTime? @db.Date
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  blocks Block[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([projectId, name])
+  @@index([projectId])
+}

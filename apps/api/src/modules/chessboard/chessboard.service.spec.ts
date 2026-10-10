@@ -110,6 +110,25 @@ describe('ChessboardService.getProjectChessboard', () => {
         expect(floorsOfBlock1.map((f: any) => f.order)).toEqual([2, 1]);
     });
 
+    it('orders blocks by phase, unphased last, and returns each block\'s phase', async () => {
+        const phase1 = {id: 'ph1', name: 'Phase 1', order: 0, salesStatus: 'ON_SALE', completionDate: null};
+        const phase2 = {id: 'ph2', name: 'Phase 2', order: 1, salesStatus: 'UPCOMING', completionDate: new Date('2027-12-31')};
+        const {service} = build({
+            units: [
+                unitRow({id: 'u1', block: {id: 'block-loose', name: 'Z', order: 0, phase: null}}),
+                unitRow({id: 'u2', block: {id: 'block-c', name: 'C', order: 3, phase: phase2}}),
+                unitRow({id: 'u3', block: {id: 'block-b', name: 'B', order: 2, phase: phase1}}),
+                unitRow({id: 'u4', block: {id: 'block-a', name: 'A', order: 5, phase: phase1}}),
+            ],
+        });
+
+        const result = await service.getProjectChessboard(user, 'project-1', {});
+
+        expect(result.blocks.map((b: any) => b.id)).toEqual(['block-b', 'block-a', 'block-c', 'block-loose']);
+        expect(result.blocks[2].phase).toEqual(phase2);
+        expect(result.blocks[3].phase).toBeNull();
+    });
+
     it('builds a summary with counts by status/type and total price', async () => {
         const {service} = build({
             units: [
