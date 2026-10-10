@@ -46,10 +46,13 @@ export function ChessboardBreadcrumbs({
     onEntranceSelect,
 }: ChessboardBreadcrumbsProps) {
     const {t} = useTranslation("projects");
+    // With a single row (one switcher, or just the label) the Back button
+    // centres on it; with both rows it lines up with the first.
+    const singleRow = blocks.length <= 1 || blockEntrances.length <= 1;
 
     return (
-        <div className="flex items-start gap-3">
-            <Button variant="outline" size="icon-sm" className="mt-0.5 shrink-0" onClick={onBack} aria-label={t("common:actions.back")}>
+        <div className={cn("flex gap-3", singleRow ? "items-center" : "items-start")}>
+            <Button variant="outline" size="icon-sm" className={cn("shrink-0", !singleRow && "mt-0.5")} onClick={onBack} aria-label={t("common:actions.back")}>
                 <ArrowLeftIcon className="size-3" />
             </Button>
             <div className="flex min-w-0 flex-1 flex-col gap-2">
@@ -72,7 +75,7 @@ export function ChessboardBreadcrumbs({
                     </nav>
                 ) : (
                     blocks.length <= 1 && (
-                        <p className="py-1 text-sm font-medium">
+                        <p className="text-sm font-medium">
                             {t("chessboard.blockLabel", {name: block.name})} · {t("chessboard.entranceLabel", {name: entrance.name})}
                         </p>
                     )

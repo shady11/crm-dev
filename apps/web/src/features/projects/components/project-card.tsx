@@ -4,9 +4,8 @@ import {
     PROJECT_STATUS_BADGE_CLASSES,
     PROJECT_STATUS_LABEL_KEYS
 } from "@/features/projects/types/project.types.ts";
-import {Building2, LayoutGridIcon} from "lucide-react";
+import {Building2} from "lucide-react";
 import {Link} from "react-router-dom";
-import {Button} from "@/components/ui/button.tsx";
 import {paths} from "@/routes/paths.ts";
 import {
     AlertDialog,
@@ -38,44 +37,33 @@ export function ProjectCard({project, onDelete, isDeleting}: Props) {
     return (
         <>
             <Item variant="default" className="border border-secondary p-4">
-                <div className="flex w-full flex-col gap-4">
-                    <Link to={paths.projects.detail(project.id)} className="flex w-full flex-col gap-4">
-                        <div className="flex w-full items-center gap-4">
-                            <ItemMedia variant="icon">
-                                <Building2 className="size-10" strokeWidth={1} />
-                            </ItemMedia>
-                            <ItemContent className="gap-0">
-                                <ItemTitle className="text-lg">{project.name}</ItemTitle>
-                                <ItemDescription className="text-xs">{project.address}</ItemDescription>
-                            </ItemContent>
-                            <Badge variant="default"
-                                   className={PROJECT_STATUS_BADGE_CLASSES[project.status]}>
-                                {t(PROJECT_STATUS_LABEL_KEYS[project.status])}
-                            </Badge>
-                        </div>
-                        <Separator/>
-                    </Link>
-                    <div className="flex items-center justify-between gap-3">
-                        <Link to={paths.projects.detail(project.id)} className="flex items-center gap-4 text-sm *:[div]:space-y-1">
-                            <div>
-                                <p className="font-medium leading-none">{t("counts.blocksLabel")}</p>
-                                <p className="text-muted-foreground">{project._count?.blocks}</p>
-                            </div>
-                            <Separator orientation="vertical" />
-                            <div>
-                                <p className="font-medium leading-none">{t("counts.unitsLabel")}</p>
-                                <p className="text-muted-foreground">{project._count?.units}</p>
-                            </div>
-                        </Link>
-                        {/* Straight to the grid, where the chessboard reopens at the last entrance viewed. */}
-                        <Button variant="secondary" size="sm" asChild>
-                            <Link to={paths.projects.chessboard.root(project.id)}>
-                                <LayoutGridIcon className="size-3.5" />
-                                {t("card.openChessboard")}
-                            </Link>
-                        </Button>
+                <Link to={paths.projects.detail(project.id)} className="flex w-full flex-col gap-4">
+                    <div className="flex w-full items-center gap-4">
+                        <ItemMedia variant="icon">
+                            <Building2 className="size-10" strokeWidth={1} />
+                        </ItemMedia>
+                        <ItemContent className="gap-0">
+                            <ItemTitle className="text-lg">{project.name}</ItemTitle>
+                            <ItemDescription className="text-xs">{project.address}</ItemDescription>
+                        </ItemContent>
+                        <Badge variant="default"
+                               className={PROJECT_STATUS_BADGE_CLASSES[project.status]}>
+                            {t(PROJECT_STATUS_LABEL_KEYS[project.status])}
+                        </Badge>
                     </div>
-                </div>
+                    <Separator/>
+                    <div className="flex items-center gap-4 text-sm *:[div]:space-y-1">
+                        <div>
+                            <p className="font-medium leading-none">{t("counts.blocksLabel")}</p>
+                            <p className="text-muted-foreground">{project._count?.blocks}</p>
+                        </div>
+                        <Separator orientation="vertical" />
+                        <div>
+                            <p className="font-medium leading-none">{t("counts.unitsLabel")}</p>
+                            <p className="text-muted-foreground">{project._count?.units}</p>
+                        </div>
+                    </div>
+                </Link>
             </Item>
             <AlertDialog
                 open={deleteOpen}
