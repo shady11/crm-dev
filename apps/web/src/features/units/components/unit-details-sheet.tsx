@@ -106,11 +106,11 @@ export function UnitDetailsSheet({
                 <SheetFooter>
                     <Button
                         variant="secondary"
-                        size="icon-md"
-                        aria-label={t("details.infoSheetButton")}
+                        title={t("details.infoSheetButton")}
                         onClick={() => window.open(paths.units.infoSheet(unit.id), "_blank", "noopener,noreferrer")}
                     >
                         <FileTextIcon className="size-4" />
+                        {t("details.offerButton")}
                     </Button>
                     {canEdit && (
                         <Button variant="secondary" className="flex-1" onClick={onEdit}>{t("common:actions.edit")}</Button>

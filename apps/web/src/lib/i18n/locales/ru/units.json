@@ -97,7 +97,8 @@
     "noDeals": "Для этого помещения пока нет сделок.",
     "bookButton": "Забронировать",
     "bookingClosed": "Бронирование закрыто: статус проекта — {{status}}.",
-    "infoSheetButton": "Инфолист"
+    "infoSheetButton": "Инфолист",
+    "offerButton": "Предложение"
   },
   "infoSheet": {
     "title": "Помещение №{{number}}",
@@ -154,5 +155,37 @@
     "pricePresetUnder": "До {{value}}",
     "pricePresetOver": "От {{value}}",
     "pricePresetRange": "{{min}} – {{max}}"
+  },
+  "offer": {
+    "settings": "Коммерческое предложение",
+    "client": "Для кого",
+    "clientPlaceholder": "Имя клиента (необязательно)",
+    "validUntil": "Цена действует до",
+    "includePlan": "Добавить рассрочку",
+    "downPayment": "Первый взнос, %",
+    "installments": "Платежей",
+    "interval": "Оплата",
+    "firstPayment": "Первый платёж",
+    "every_one": "Ежемесячно",
+    "every_few": "Раз в {{count}} месяца",
+    "every_many": "Раз в {{count}} месяцев",
+    "every_other": "Раз в {{count}} месяца",
+    "notAvailable": "Сейчас статус помещения: {{status}}. Предложение можно распечатать, но забронировать помещение сейчас нельзя.",
+    "preparedFor": "Для: {{name}}",
+    "paymentOptions": "Варианты оплаты",
+    "fullPayment": "100% оплата",
+    "installmentPlan": "Рассрочка",
+    "perInstallment": "за платёж",
+    "planSummary_one": "Первый взнос {{down}} ({{percent}}%), затем {{count}} платёж, {{every}}",
+    "planSummary_few": "Первый взнос {{down}} ({{percent}}%), затем {{count}} платежа, {{every}}",
+    "planSummary_many": "Первый взнос {{down}} ({{percent}}%), затем {{count}} платежей, {{every}}",
+    "planSummary_other": "Первый взнос {{down}} ({{percent}}%), затем {{count}} платежа, {{every}}",
+    "dueDate": "Дата",
+    "amount": "Сумма",
+    "downPaymentRow": "Первый взнос",
+    "total": "Итого",
+    "lastDiffers": "Последний платёж скорректирован на округление.",
+    "yourManager": "Ваш менеджер",
+    "validNote": "Цена действует до {{date}} — график предварительный и фиксируется в договоре."
   }
 }
