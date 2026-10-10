@@ -1,4 +1,4 @@
-import {useNavigate, useParams} from "react-router-dom";
+import {Navigate, useLocation, useNavigate, useParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {Card, CardContent} from "@/components/ui/card.tsx";
 import type {Block} from "@/features/blocks/types/block.types.ts";
@@ -14,11 +14,13 @@ import {
 import {getProjectChessboard} from "@/features/projects/api/projects.api.ts";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {useTranslation} from "react-i18next";
+import {chessboardLanding, isBrowsing} from "@/features/projects/utils/chessboard-navigation.ts";
 
 export function ChessboardBlocks() {
     const { t } = useTranslation("projects");
     const { projectId } = useParams<{ projectId: string }>();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const chessboardQuery = useQuery({
         queryKey: ["project-chessboard", projectId],
@@ -35,6 +37,11 @@ export function ChessboardBlocks() {
     }
 
     const blocks = (chessboardQuery.data?.blocks ?? []) as Block[];
+
+    // Opening the chessboard goes straight to the grid where possible; the
+    // list only shows when there's a real choice, or the user came back to it.
+    const landing = !isBrowsing(location.state) && chessboardLanding(projectId!, blocks);
+    if (landing) return <Navigate to={landing} replace />;
 
     if (blocks.length === 0) {
         return (

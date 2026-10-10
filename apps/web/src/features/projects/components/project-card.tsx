@@ -5,6 +5,8 @@ import {
     PROJECT_STATUS_LABEL_KEYS
 } from "@/features/projects/types/project.types.ts";
 import {Building2} from "lucide-react";
+import {Link} from "react-router-dom";
+import {paths} from "@/routes/paths.ts";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -35,7 +37,7 @@ export function ProjectCard({project, onDelete, isDeleting}: Props) {
     return (
         <>
             <Item variant="default" className="border border-secondary p-4">
-                <a href={`/projects/${project.id}`} className="flex w-full flex-col gap-4">
+                <Link to={paths.projects.detail(project.id)} className="flex w-full flex-col gap-4">
                     <div className="flex w-full items-center gap-4">
                         <ItemMedia variant="icon">
                             <Building2 className="size-10" strokeWidth={1} />
@@ -61,7 +63,7 @@ export function ProjectCard({project, onDelete, isDeleting}: Props) {
                             <p className="text-muted-foreground">{project._count?.units}</p>
                         </div>
                     </div>
-                </a>
+                </Link>
             </Item>
             <AlertDialog
                 open={deleteOpen}

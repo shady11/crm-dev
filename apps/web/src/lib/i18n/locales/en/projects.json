@@ -80,6 +80,8 @@
     "units_one": "{{count}} unit",
     "units_few": "{{count}} units",
     "units_many": "{{count}} units",
-    "units_other": "{{count}} units"
+    "units_other": "{{count}} units",
+    "blocksNav": "Blocks",
+    "entrancesNav": "Entrances"
   }
 }

@@ -80,6 +80,8 @@
     "units_one": "{{count}} жай",
     "units_few": "{{count}} жай",
     "units_many": "{{count}} жай",
-    "units_other": "{{count}} жай"
+    "units_other": "{{count}} жай",
+    "blocksNav": "Блоктор",
+    "entrancesNav": "Кире бериштер"
   }
 }

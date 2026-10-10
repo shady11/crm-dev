@@ -1,4 +1,4 @@
-import {useNavigate, useParams} from "react-router-dom";
+import {Navigate, useLocation, useNavigate, useParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {ArrowLeftIcon, Building2Icon, ChevronDownIcon, DoorOpenIcon, Loader2Icon} from "lucide-react";
 import {Card, CardContent} from "@/components/ui/card.tsx";
@@ -9,11 +9,14 @@ import {Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList} from "@/comp
 import {getProjectChessboard} from "@/features/projects/api/projects.api.ts";
 import {Menu, MenuContent, MenuGroup, MenuItem, MenuTrigger} from "@/components/ui/menu.tsx";
 import {useTranslation} from "react-i18next";
+import {paths} from "@/routes/paths.ts";
+import {BROWSE_STATE, isBrowsing} from "@/features/projects/utils/chessboard-navigation.ts";
 
 export function ChessboardEntrances() {
     const { t } = useTranslation("projects");
     const { projectId, blockId } = useParams<{ projectId: string; blockId: string }>();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const chessboardQuery = useQuery({
         queryKey: ["project-chessboard", projectId],
@@ -43,6 +46,11 @@ export function ChessboardEntrances() {
         );
     }
 
+    // A block with one entrance has nothing to pick.
+    if (block.entrances?.length === 1 && !isBrowsing(location.state)) {
+        return <Navigate to={block.entrances[0].id} replace />;
+    }
+
     return (
         <div className="space-y-6">
 
@@ -50,7 +58,7 @@ export function ChessboardEntrances() {
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink asChild>
-                            <Button variant="outline" size="icon-sm" onClick={() => navigate("..")} aria-label={t("common:actions.back")}>
+                            <Button variant="outline" size="icon-sm" onClick={() => navigate(paths.projects.chessboard.root(projectId!), {state: BROWSE_STATE})} aria-label={t("common:actions.back")}>
                                 <ArrowLeftIcon className="size-3" />
                             </Button>
                         </BreadcrumbLink>
@@ -66,7 +74,7 @@ export function ChessboardEntrances() {
                             <MenuContent>
                                 <MenuGroup>
                                     {blocks.map((block, index) => (
-                                        <MenuItem value={`block-${index}`} onClick={() => navigate(`../${block.id}`)}>{t("chessboard.blockLabel", { name: block.name })}</MenuItem>
+                                        <MenuItem key={block.id} value={`block-${index}`} onClick={() => navigate(`../${block.id}`)}>{t("chessboard.blockLabel", { name: block.name })}</MenuItem>
                                     ))}
                                 </MenuGroup>
                             </MenuContent>

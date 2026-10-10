@@ -80,6 +80,8 @@
     "units_one": "{{count}} помещение",
     "units_few": "{{count}} помещения",
     "units_many": "{{count}} помещений",
-    "units_other": "{{count}} помещения"
+    "units_other": "{{count}} помещения",
+    "blocksNav": "Блоки",
+    "entrancesNav": "Подъезды"
   }
 }
