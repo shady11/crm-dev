@@ -117,6 +117,21 @@ describe('TasksService', () => {
             await expect(service.create(adminUser, createDto({leadId: 'lead-1'}))).resolves.toBeDefined();
         });
 
+        it('lets tasks.create_own create a task for yourself, assigned to you by default', async () => {
+            const {service, prisma} = build({assignee: {id: branchUser.id, branchId: 'branch-1'}});
+            const own: AuthUser = {...branchUser, permissions: ['tasks.view', 'tasks.create_own']};
+            await service.create(own, createDto({assignedToId: undefined}));
+
+            expect(prisma.task.create.mock.calls[0][0].data.assignedToId).toBe(branchUser.id);
+        });
+
+        it('refuses tasks.create_own a task for someone else', async () => {
+            const {service, prisma} = build({assignee: {id: 'assignee-1', branchId: 'branch-1'}});
+            const own: AuthUser = {...branchUser, permissions: ['tasks.view', 'tasks.create_own']};
+            await expect(service.create(own, createDto({assignedToId: 'assignee-1'}))).rejects.toThrow(ForbiddenException);
+            expect(prisma.task.create).not.toHaveBeenCalled();
+        });
+
         it('rejects assigning to a user outside the branch-scoped actor own branch', async () => {
             const {service} = build({assignee: null});
             await expect(service.create(branchUser, createDto())).rejects.toThrow(BadRequestException);

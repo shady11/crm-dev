@@ -339,20 +339,34 @@ describe('DashboardService', () => {
             expect(result.leadToWonConversionRate).toBe(0);
         });
 
-        it('computes conversion rates against total leads', async () => {
+        it('computes conversion as the share of leads whose client reached the stage', async () => {
             const {service, prisma} = build();
-            prisma.lead.count.mockResolvedValue(20);
+            // total leads, leads whose client has any deal, leads whose client has a won deal
+            prisma.lead.count.mockImplementation(({where}: any) => {
+                if (!where.client) return Promise.resolve(20);
+                return Promise.resolve(where.client.deals.some.status ? 3 : 6);
+            });
             prisma.deal.groupBy.mockResolvedValue([
-                {status: DealStatus.ACTIVE, _count: {_all: 5}},
+                {status: DealStatus.ACTIVE, _count: {_all: 25}},
                 {status: DealStatus.COMPLETED, _count: {_all: 2}},
             ]);
             prisma.deal.count.mockResolvedValue(2);
 
             const result = await service.getFunnel(adminUser);
 
-            expect(result.totalDeals).toBe(7);
-            expect(result.leadToDealConversionRate).toBe(7 / 20);
-            expect(result.leadToWonConversionRate).toBe(2 / 20);
+            expect(result.totalDeals).toBe(27);
+            expect(result.leadToDealConversionRate).toBe(6 / 20);
+            expect(result.leadToWonConversionRate).toBe(3 / 20);
+        });
+
+        it('stays at or below 100% when deals outnumber leads (walk-in bookings)', async () => {
+            const {service, prisma} = build();
+            prisma.lead.count.mockImplementation(({where}: any) => Promise.resolve(where.client ? 11 : 11));
+            prisma.deal.groupBy.mockResolvedValue([{status: DealStatus.ACTIVE, _count: {_all: 12}}]);
+
+            const result = await service.getFunnel(adminUser);
+
+            expect(result.leadToDealConversionRate).toBeLessThanOrEqual(1);
         });
 
         it('fills every LeadStatus and DealStatus with zero when absent from the groupBy', async () => {

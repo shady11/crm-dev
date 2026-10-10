@@ -7,6 +7,9 @@ export type Notification = {
     type: NotificationType;
     title: string;
     message: string | null;
+    // Rendered in the reader's language by useNotificationText; null on older rows.
+    templateKey: string | null;
+    params: Record<string, string | number | null> | null;
     entityType: NotificationEntityType | null;
     entityId: string | null;
     isRead: boolean;

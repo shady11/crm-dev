@@ -85,6 +85,8 @@ export class PaymentService {
                         ? `Refund issued for deal ${deal.dealNumber}`
                         : `Payment received for deal ${deal.dealNumber}`,
                     message: formatMoney(magnitude, user.company?.currency),
+                    templateKey: isRefund ? 'refundIssued' : 'paymentReceived',
+                    params: { dealNumber: deal.dealNumber, amount: magnitude.toNumber(), currency: user.company?.currency ?? null },
                     entityType: NotificationEntityType.DEAL,
                     entityId: dealId,
                 });

@@ -6,7 +6,7 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx
 import {TaskFormSheet} from "@/features/tasks/components/task-form-sheet.tsx";
 import {TaskDetailsSheet} from "@/features/tasks/components/task-details-sheet.tsx";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {hasPermission} from "@/features/auth/access";
+import {canCreateTask} from "@/features/tasks/utils/task-access.ts";
 import {useTaskActions} from "@/features/tasks/hooks/use-task-actions.ts";
 import {TASK_STATUS_CLASSES, TASK_STATUS_LABEL_KEYS} from "@/features/tasks/types/task.types.ts";
 import type {Task, TaskPayload} from "@/features/tasks/api/tasks.api.ts";
@@ -53,7 +53,7 @@ export function ClientTasksCard({ clientId }: { clientId: string }) {
                 <CardTitle className="text-sm text-muted-foreground">
                     {tasks.length > 0 ? t("clientCard.titleWithCount", { count: tasks.length }) : t("clientCard.title")}
                 </CardTitle>
-                {hasPermission(user, "tasks.create") && (
+                {canCreateTask(user) && (
                     <Button variant="secondary" size="sm" onClick={openCreate}>
                         {t("clientCard.addTask")}
                     </Button>

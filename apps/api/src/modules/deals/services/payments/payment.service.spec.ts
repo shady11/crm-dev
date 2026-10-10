@@ -127,6 +127,18 @@ describe('PaymentService.create', () => {
         expect(created.toString()).toBe('200');
     });
 
+    it('stores a translatable notice for the manager: amount, company currency, refund or not', async () => {
+        const {service, notifications} = build({totalPaid: 300});
+        const kgsUser = {...user, company: {id: 'company-1', name: 'C', currency: 'KGS', locale: null, timezone: null}};
+
+        await service.create(kgsUser, 'deal-1', paymentDto({amount: 200}));
+        await service.create(kgsUser, 'deal-1', paymentDto({amount: 50, paymentType: PaymentType.REFUND}));
+
+        const [payment, refund] = (notifications.create as jest.Mock).mock.calls.map((call) => call[0]);
+        expect(payment).toMatchObject({templateKey: 'paymentReceived', params: {amount: 200, currency: 'KGS'}, message: '200.00 KGS'});
+        expect(refund).toMatchObject({templateKey: 'refundIssued', params: {amount: 50, currency: 'KGS'}});
+    });
+
     it('stores a refund as a negated (negative) signed amount', async () => {
         const {service, prisma} = build({totalPaid: 300});
         await service.create(user, 'deal-1', paymentDto({amount: 200, paymentType: PaymentType.REFUND}));

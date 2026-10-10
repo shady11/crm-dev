@@ -554,7 +554,13 @@ export class DashboardService {
         // manage, not the whole branch's.
         const selfScoped = this.isSelfScoped(user) ? { managerId: user.id } : {};
 
-        const [leadCounts, dealCounts, wonDeals, totalLeads] = await Promise.all([
+        const leadWhere = { companyId, branchId: effectiveBranchId, ...selfScoped, deletedAt: null };
+        // A lead "reached" a stage when the client it became has a deal at
+        // that stage. Counting leads, not deals, keeps both rates at or below
+        // 100%: deals booked for walk-in clients have no lead behind them.
+        const dealWhere = { deletedAt: null, projectId };
+
+        const [leadCounts, dealCounts, wonDeals, totalLeads, leadsWithDeal, leadsWon] = await Promise.all([
             this.prisma.lead.groupBy({
                 by: ["status"],
                 where: { companyId, branchId: effectiveBranchId, ...selfScoped, deletedAt: null },
@@ -568,8 +574,12 @@ export class DashboardService {
             this.prisma.deal.count({
                 where: { companyId, projectId, branchId: effectiveBranchId, ...selfScoped, status: { in: WON_DEAL_STATUSES } },
             }),
+            this.prisma.lead.count({ where: leadWhere }),
             this.prisma.lead.count({
-                where: { companyId, branchId: effectiveBranchId, ...selfScoped, deletedAt: null },
+                where: { ...leadWhere, client: { deals: { some: dealWhere } } },
+            }),
+            this.prisma.lead.count({
+                where: { ...leadWhere, client: { deals: { some: { ...dealWhere, status: { in: WON_DEAL_STATUSES } } } } },
             }),
         ]);
 
@@ -589,10 +599,10 @@ export class DashboardService {
             totalLeads,
             totalDeals: dealCounts.reduce((sum, c) => sum + c._count._all, 0),
             dealsWon: wonDeals,
-            leadToDealConversionRate: totalLeads > 0
-                ? dealCounts.reduce((sum, c) => sum + c._count._all, 0) / totalLeads
-                : 0,
-            leadToWonConversionRate: totalLeads > 0 ? wonDeals / totalLeads : 0,
+            leadsWithDeal,
+            leadsWon,
+            leadToDealConversionRate: totalLeads > 0 ? leadsWithDeal / totalLeads : 0,
+            leadToWonConversionRate: totalLeads > 0 ? leadsWon / totalLeads : 0,
         };
     }
 

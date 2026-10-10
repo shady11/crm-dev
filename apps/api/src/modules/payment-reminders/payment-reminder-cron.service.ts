@@ -8,6 +8,7 @@ import {
   PaymentScheduleStatus,
 } from '@/generated/prisma/client';
 import { NotificationsService } from '@/modules/notifications/notifications.service';
+import type { NotificationTemplate } from '@/modules/notifications/notification-templates';
 import { RbacService } from '@/modules/rbac/rbac.service';
 
 import { REMINDER_STAGES } from './payment-reminders.constants';
@@ -104,6 +105,7 @@ export class PaymentReminderCronService {
           type: stage.notificationType,
           entityId: schedule.id,
           title: stage.managerTitle(deal.dealNumber),
+          template: stage.managerTemplate(deal.dealNumber),
         });
       }
 
@@ -131,6 +133,7 @@ export class PaymentReminderCronService {
             type: stage.notificationType,
             entityId: schedule.id,
             title: stage.managerTitle(deal.dealNumber),
+            template: stage.managerTemplate(deal.dealNumber),
           });
         }
       }
@@ -148,6 +151,7 @@ export class PaymentReminderCronService {
     type: NotificationType;
     entityId: string;
     title: string;
+    template: NotificationTemplate;
   }) {
     const existing = await this.prisma.notification.findFirst({
       where: {
@@ -168,6 +172,7 @@ export class PaymentReminderCronService {
       entityType: NotificationEntityType.PAYMENT_SCHEDULE,
       entityId: params.entityId,
       title: params.title,
+      ...params.template,
     });
   }
 }

@@ -7,6 +7,7 @@ import {type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent} fro
 import {toast} from "@/components/ui/toast.tsx";
 import {downloadFunnelExport, type Funnel} from "@/features/dashboard/api/dashboard.api.ts";
 import {useTranslation} from "react-i18next";
+import {LEAD_STATUS_LABEL_KEYS, type LeadStatus} from "@/features/leads/types/lead.types.ts";
 
 function percent(value: number) {
     return `${(value * 100).toFixed(1)}%`;
@@ -28,7 +29,11 @@ export function FunnelCard({
         count: { label: t("funnel.leadsSeriesLabel"), color: "var(--chart-1)" },
     } satisfies ChartConfig;
 
-    const chartData = data.leadsByStatus.map((row) => ({ status: row.status, count: row.count }));
+    // Axis labels in the reader's language rather than the raw status codes.
+    const chartData = data.leadsByStatus.map((row) => ({
+        status: t(LEAD_STATUS_LABEL_KEYS[row.status as LeadStatus] ?? row.status),
+        count: row.count,
+    }));
 
     const handleExport = async () => {
         setIsExporting(true);

@@ -19,6 +19,7 @@ import {resolveOrderBy} from "@/common/utils/sort.util";
 import {TaskNotFoundException} from "./exceptions/task-not-found.exception";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
+import {hasPermission} from "@/common/utils/permissions.util";
 
 const TERMINAL_STATUSES: TaskStatus[] = [TaskStatus.DONE, TaskStatus.CANCELLED];
 
@@ -144,7 +145,15 @@ export class TasksService {
         }
 
         this.ensureSingleEntityLink(dto);
-        const assignee = await this.ensureAssigneeAssignable(dto.assignedToId, user);
+
+        // tasks.create_own (a Sales Manager) writes reminders for themselves
+        // only; handing work to someone else needs tasks.create.
+        const ownOnly = !hasPermission(user, "tasks.create") && hasPermission(user, "tasks.create_own");
+        const assignedToId = dto.assignedToId ?? user.id;
+        if (ownOnly && assignedToId !== user.id) {
+            throw new ForbiddenException("You can only create tasks assigned to yourself.");
+        }
+        const assignee = await this.ensureAssigneeAssignable(assignedToId, user);
 
         const task = await this.prisma.task.create({
             data: {
@@ -154,7 +163,7 @@ export class TasksService {
                 status: dto.status ?? TaskStatus.TODO,
                 priority: dto.priority ?? TaskPriority.MEDIUM,
                 type: dto.type ?? TaskType.OTHER,
-                assignedToId: dto.assignedToId,
+                assignedToId,
                 // Derived from the assignee's branch, not stamped from the
                 // creating user — a COMPANY_ADMIN assigning a task to a
                 // branch's sales manager should produce a task that branch
@@ -175,6 +184,8 @@ export class TasksService {
                 type: NotificationType.TASK_ASSIGNED,
                 title: "New task assigned to you",
                 message: task.title,
+                templateKey: "taskAssigned",
+                params: {taskTitle: task.title},
                 entityType: NotificationEntityType.TASK,
                 entityId: task.id,
             });
@@ -239,6 +250,8 @@ export class TasksService {
                 type: NotificationType.TASK_ASSIGNED,
                 title: "New task assigned to you",
                 message: task.title,
+                templateKey: "taskAssigned",
+                params: {taskTitle: task.title},
                 entityType: NotificationEntityType.TASK,
                 entityId: task.id,
             });
@@ -501,6 +514,8 @@ export class TasksService {
                 type: NotificationType.TASK_ASSIGNED,
                 title: "New task assigned to you",
                 message: task.title,
+                templateKey: "taskAssigned",
+                params: {taskTitle: task.title},
                 entityType: NotificationEntityType.TASK,
                 entityId: task.id,
             });

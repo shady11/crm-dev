@@ -76,6 +76,7 @@ export const PERMISSIONS_CATALOG: PermissionDefinition[] = [
     ...group("tasks", {
         view: "View tasks",
         create: "Create tasks",
+        create_own: "Create tasks assigned to yourself",
         edit: "Edit any task and its status",
         change_status: "Move tasks assigned to you between statuses",
         delete: "Delete tasks",

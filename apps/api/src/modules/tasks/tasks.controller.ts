@@ -35,7 +35,9 @@ export class TasksController {
         return this.tasksService.findOne(user, id);
     }
 
-    @RequirePermissions("tasks.create")
+    // tasks.create_own alone only creates tasks assigned to the caller;
+    // TasksService.create enforces that.
+    @RequirePermissions("tasks.create", "tasks.create_own")
     @Post()
     create(@CurrentUser() user: AuthUser, @Body() dto: CreateTaskDto) {
         return this.tasksService.create(user, dto);

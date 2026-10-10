@@ -95,6 +95,8 @@ export class DealExpiryService {
                     type: NotificationType.DEAL_STATUS_CHANGED,
                     title: `Reservation for deal ${deal.dealNumber} has expired`,
                     message: 'The unit has been released back to available inventory.',
+                    templateKey: 'reservationExpired',
+                    params: { dealNumber: deal.dealNumber },
                     entityType: NotificationEntityType.DEAL,
                     entityId: deal.id,
                 });

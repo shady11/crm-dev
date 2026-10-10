@@ -31,8 +31,15 @@ model Notification {
   user   User   @relation(fields: [userId], references: [id])
 
   type    NotificationType
+  // English text, kept as written: what older clients and rows without a
+  // template show.
   title   String
   message String?
+  // What the web app renders, in the reader's language: a key into its
+  // "notifications:templates" translations and the raw values to fill in
+  // (deal number, status code, amount and currency, ISO date).
+  templateKey String?
+  params      Json?
 
   entityType NotificationEntityType?
   entityId   String?

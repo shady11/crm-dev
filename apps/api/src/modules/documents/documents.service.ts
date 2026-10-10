@@ -186,6 +186,8 @@ export class DocumentsService {
           type: NotificationType.DOCUMENT_UPLOADED,
           title: `Document uploaded to deal ${deal.dealNumber}`,
           message: file.originalname,
+          templateKey: 'documentUploaded',
+          params: { dealNumber: deal.dealNumber, fileName: file.originalname },
           entityType: NotificationEntityType.DEAL,
           entityId: dto.ownerId,
         });

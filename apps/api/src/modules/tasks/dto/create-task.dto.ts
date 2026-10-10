@@ -28,8 +28,10 @@ export class CreateTaskDto {
     @IsEnum(TaskType)
     type?: TaskType;
 
+    // Defaults to the caller: a task you write for yourself is the common case.
+    @IsOptional()
     @IsUUID()
-    assignedToId!: string;
+    assignedToId?: string;
 
     @IsOptional()
     @IsUUID()
