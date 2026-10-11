@@ -12,12 +12,6 @@ export const BLOCK_SALES_STATUS_LABEL_KEYS: Record<BlockSalesStatus, string> = {
     COMPLETED: "blocks:salesStatus.completed",
 };
 
-export const BLOCK_SALES_STATUS_BADGE_CLASSES: Record<BlockSalesStatus, string> = {
-    UPCOMING: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200",
-    ON_SALE: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200",
-    COMPLETED: "bg-secondary text-secondary-foreground",
-};
-
 /** Units can be booked unless the block hasn't opened for sales yet. */
 export function isBlockBookable(salesStatus: BlockSalesStatus | null | undefined) {
     return salesStatus !== BlockSalesStatus.UPCOMING;
