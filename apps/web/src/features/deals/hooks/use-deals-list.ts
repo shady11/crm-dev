@@ -1,6 +1,13 @@
 import {useMemo, useState} from "react";
+import {useSearchParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
-import {type DealSortField, getDeals, getDealStatusSummary} from "@/features/deals/api/deals.api";
+import {
+    DEAL_ATTENTION_FILTERS,
+    type DealAttentionFilter,
+    type DealSortField,
+    getDeals,
+    getDealStatusSummary,
+} from "@/features/deals/api/deals.api";
 import {DealStatus} from "@/features/deals/types/deal.types";
 import {useSort} from "@/hooks/use-sort.ts";
 import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
@@ -16,11 +23,15 @@ export function useDealsList() {
     const [projectId, setProjectIdState] = useState<string | undefined>();
     const [managerId, setManagerIdState] = useState<string | undefined>();
     const [branchId, setBranchIdState] = useState<string | undefined>();
+    // In the URL, so the dashboard's "View all" can open the list pre-filtered.
+    const [searchParams, setSearchParams] = useSearchParams();
+    const attentionParam = searchParams.get("attention");
+    const attention = DEAL_ATTENTION_FILTERS.find((f) => f === attentionParam);
     const {sortBy, sortOrder, toggleSort} = useSort<DealSortField>();
     const debouncedSearch = useDebouncedValue(search);
 
     const tableQuery = useQuery({
-        queryKey: ["deals", { statusFilter, search: debouncedSearch, projectId, managerId, branchId, page, limit, sortBy, sortOrder }],
+        queryKey: ["deals", { statusFilter, search: debouncedSearch, projectId, managerId, branchId, attention, page, limit, sortBy, sortOrder }],
         queryFn: () =>
             getDeals({
                 page, limit,
@@ -29,6 +40,7 @@ export function useDealsList() {
                 projectId,
                 managerId,
                 branchId,
+                attention,
                 sortBy,
                 sortOrder,
             }),
@@ -68,6 +80,16 @@ export function useDealsList() {
             setManagerId: (value: string | undefined) => { setManagerIdState(value); setPage(1); },
             branchId,
             setBranchId: (value: string | undefined) => { setBranchIdState(value); setPage(1); },
+            attention,
+            setAttention: (value: DealAttentionFilter | undefined) => {
+                setSearchParams((prev) => {
+                    const params = new URLSearchParams(prev);
+                    if (value) params.set("attention", value);
+                    else params.delete("attention");
+                    return params;
+                }, { replace: true });
+                setPage(1);
+            },
         },
         pagination: {
             page,

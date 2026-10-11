@@ -36,7 +36,12 @@
     "managerPlaceholder": "Менеджер",
     "filterByStatus": "Фильтр по статусу",
     "statusPlaceholder": "Статус",
-    "searchPlaceholder": "Поиск по клиенту, телефону, помещению..."
+    "searchPlaceholder": "Поиск по клиенту, телефону, помещению...",
+    "allDeals": "Все сделки",
+    "attention": {
+      "discount_pending": "Скидка на согласовании",
+      "overdue_payments": "Просроченные платежи"
+    }
   },
   "table": {
     "dealNumber": "№ сделки",
@@ -47,7 +52,8 @@
     "salePrice": "Цена продажи",
     "created": "Создана",
     "emptyTitle": "Сделки не найдены",
-    "emptyDescription": "Попробуйте изменить фильтры или поиск."
+    "emptyDescription": "Попробуйте изменить фильтры или поиск.",
+    "discountPending": "Скидка на согласовании"
   },
   "pagination": {
     "rowsPerPage": "Строк на странице"

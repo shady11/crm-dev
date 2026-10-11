@@ -20,6 +20,19 @@ interface DealsTableProps {
     onSort(field: DealSortField): void;
 }
 
+// The deal page holds the decision; this just keeps a waiting request
+// visible from the list.
+function DiscountPendingBadge({ deal }: { deal: Deal }) {
+    const { t } = useTranslation("deals");
+    if (deal.discountApprovalStatus !== "PENDING" || deal.status !== "RESERVED") return null;
+
+    return (
+        <Badge variant="warning">
+            {t("table.discountPending")}
+        </Badge>
+    );
+}
+
 export function DealsTable({ deals, isLoading, sortBy, sortOrder, onSort }: DealsTableProps) {
     const { t, i18n } = useTranslation("deals");
     const { formatCurrency } = useCompanyFormatters();
@@ -48,9 +61,12 @@ export function DealsTable({ deals, isLoading, sortBy, sortOrder, onSort }: Deal
                                 <p className="truncate font-medium">{deal.dealNumber}</p>
                                 <p className="truncate text-xs text-muted-foreground">№{deal.unit.number} · {deal.project.name}</p>
                             </div>
-                            <Badge className={`shrink-0 ${visual?.bg} text-white`}>
-                                {t(DEAL_STATUS_LABEL_KEYS[deal.status])}
-                            </Badge>
+                            <div className="flex shrink-0 flex-col items-end gap-1">
+                                <Badge className={`${visual?.bg} text-white`}>
+                                    {t(DEAL_STATUS_LABEL_KEYS[deal.status])}
+                                </Badge>
+                                <DiscountPendingBadge deal={deal} />
+                            </div>
                         </div>
                         <div className="mt-3 flex min-w-0 items-center gap-3">
                             <Avatar className="size-9 shrink-0">
@@ -114,9 +130,12 @@ export function DealsTable({ deals, isLoading, sortBy, sortOrder, onSort }: Deal
                             </TableCell>
                             <TableCell>{deal.manager?.fullName ?? "—"}</TableCell>
                             <TableCell>
-                                <Badge className={`${visual?.bg} text-white`}>
-                                    {t(DEAL_STATUS_LABEL_KEYS[deal.status])}
-                                </Badge>
+                                <div className="flex flex-wrap items-center gap-1">
+                                    <Badge className={`${visual?.bg} text-white`}>
+                                        {t(DEAL_STATUS_LABEL_KEYS[deal.status])}
+                                    </Badge>
+                                    <DiscountPendingBadge deal={deal} />
+                                </div>
                             </TableCell>
                             <TableCell>{formatCurrency(deal.salePrice)}</TableCell>
                             <TableCell className="pr-4">

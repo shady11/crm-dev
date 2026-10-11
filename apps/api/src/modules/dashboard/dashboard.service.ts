@@ -4,7 +4,7 @@ import {DealStatus, LeadStatus, PaymentMethod, PaymentScheduleStatus, Prisma, Ta
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {hasPermission} from "@/common/utils/permissions.util";
-import {ACTIVE_DEAL_STATUSES, WON_DEAL_STATUSES} from "@/modules/deals/deal.constants";
+import {ACTIVE_DEAL_STATUSES, dealAttentionWhere, OVERDUE_INSTALLMENT_WHERE, WON_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 import {OPEN_LEAD_STATUSES} from "@/modules/leads/lead.constants";
 import {RbacService} from "@/modules/rbac/rbac.service";
 
@@ -161,14 +161,24 @@ export class DashboardService {
         const effectiveBranchId = this.resolveBranchId(user, branchId);
         const selfScoped = this.isSelfScoped(user);
         const in3Days = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+        const dealScope: Prisma.DealWhereInput = {
+            companyId,
+            projectId,
+            branchId: effectiveBranchId,
+            ...(selfScoped ? { managerId: user.id } : {}),
+        };
+        // Shared with the deals list's attention filter, so "View all" opens
+        // exactly the deals counted here.
+        const pendingWhere: Prisma.DealWhereInput = { ...dealScope, ...dealAttentionWhere("discount_pending") };
+        const overdueWhere: Prisma.PaymentScheduleWhereInput = {
+            ...OVERDUE_INSTALLMENT_WHERE,
+            deal: { ...dealScope, ...dealAttentionWhere("overdue_payments") },
+        };
 
-        const [expiringDeals, urgentTasks] = await Promise.all([
+        const [expiringDeals, urgentTasks, pendingApprovals, pendingTotal, overdueByDeal, overdueTotals] = await Promise.all([
             this.prisma.deal.findMany({
                 where: {
-                    companyId,
-                    projectId,
-                    branchId: effectiveBranchId,
-                    ...(selfScoped ? { managerId: user.id } : {}),
+                    ...dealScope,
                     status: DealStatus.RESERVED,
                     reservationExpiresAt: { lte: in3Days },
                 },
@@ -196,9 +206,81 @@ export class DashboardService {
                 orderBy: { dueDate: "asc" },
                 take: 5,
             }),
+            // Oldest request first. For a self-scoped viewer these are their
+            // own requests; for an approver, the queue they need to clear.
+            this.prisma.deal.findMany({
+                where: pendingWhere,
+                select: {
+                    id: true, dealNumber: true, reservedAt: true,
+                    requestedDiscountPercent: true, requestedDiscountAmount: true,
+                    client: { select: { fullName: true } },
+                    manager: { select: { id: true, fullName: true } },
+                },
+                orderBy: { reservedAt: "asc" },
+                take: 5,
+            }),
+            this.prisma.deal.count({ where: pendingWhere }),
+            // One row per deal rather than per installment: chasing a
+            // payment means calling the client, however many installments
+            // they're behind on.
+            this.prisma.paymentSchedule.groupBy({
+                by: ["dealId"],
+                where: overdueWhere,
+                _sum: { amount: true, paidAmount: true },
+                _min: { dueDate: true },
+                _count: { _all: true },
+                orderBy: { _min: { dueDate: "asc" } },
+                take: 5,
+            }),
+            this.prisma.paymentSchedule.aggregate({
+                where: overdueWhere,
+                _sum: { amount: true, paidAmount: true },
+                _count: { _all: true },
+            }),
         ]);
 
-        return { expiringDeals, urgentTasks };
+        const overdueDeals = overdueByDeal.length > 0
+            ? await this.prisma.deal.findMany({
+                where: { id: { in: overdueByDeal.map((row) => row.dealId) } },
+                select: {
+                    id: true, dealNumber: true,
+                    client: { select: { fullName: true } },
+                    manager: { select: { id: true, fullName: true } },
+                },
+            })
+            : [];
+
+        const remaining = (sum: { amount: Prisma.Decimal | null; paidAmount: Prisma.Decimal | null }) =>
+            Number(sum.amount ?? 0) - Number(sum.paidAmount ?? 0);
+
+        const overduePayments = {
+            installments: overdueTotals._count._all,
+            amount: remaining(overdueTotals._sum),
+            deals: overdueByDeal.flatMap((row) => {
+                const deal = overdueDeals.find((d) => d.id === row.dealId);
+                if (!deal) return [];
+                return [{
+                    ...deal,
+                    installments: row._count._all,
+                    amount: remaining(row._sum),
+                    oldestDueDate: row._min.dueDate,
+                }];
+            }),
+        };
+
+        return {
+            expiringDeals,
+            urgentTasks,
+            pendingApprovals: {
+                total: pendingTotal,
+                deals: pendingApprovals.map((deal) => ({
+                    ...deal,
+                    requestedDiscountPercent: deal.requestedDiscountPercent == null ? null : Number(deal.requestedDiscountPercent),
+                    requestedDiscountAmount: deal.requestedDiscountAmount == null ? null : Number(deal.requestedDiscountAmount),
+                })),
+            },
+            overduePayments,
+        };
     }
 
     async getRecentActivity(user: AuthUser, projectId?: string, branchId?: string) {

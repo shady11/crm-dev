@@ -34,7 +34,7 @@ import {DEAL_SORTABLE_FIELDS, DealQueryDto} from '../dto/deal-query.dto';
 import {resolveOrderBy} from '@/common/utils/sort.util';
 import {DealDomainService} from './deal-domain.service';
 import {DealActivityService} from './deal-activity.service';
-import {ACTIVE_DEAL_STATUSES, DEAL_DETAILS_INCLUDE, dealStatusTitle, RESERVATION_POLICY_SELECT} from "../deal.constants";
+import {ACTIVE_DEAL_STATUSES, DEAL_DETAILS_INCLUDE, dealAttentionWhere, dealStatusTitle, RESERVATION_POLICY_SELECT} from "../deal.constants";
 import {ReserveUnitDto} from "../dto/reserve-unit.dto";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ExtendReservationDto} from "@/modules/deals/dto/extend-reservation.dto";
@@ -132,6 +132,10 @@ export class DealsService {
       where.branchId = user.branchId;
     } else if (query.branchId) {
       where.branchId = query.branchId;
+    }
+
+    if (query.attention) {
+      where.AND = [dealAttentionWhere(query.attention)];
     }
 
     if (query.search) {

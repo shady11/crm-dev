@@ -20,7 +20,36 @@ export type AttentionTask = {
     id: string; title: string; dueDate: string;
     assignedTo: { id: string; fullName: string };
 };
-export type AttentionItems = { expiringDeals: AttentionDeal[]; urgentTasks: AttentionTask[] };
+// Discounts awaiting a decision, oldest request first. For a Sales Manager
+// these are their own requests; for an approver, the queue to clear.
+export type AttentionApproval = {
+    id: string; dealNumber: string; reservedAt: string | null;
+    requestedDiscountPercent: number | null; requestedDiscountAmount: number | null;
+    client: { fullName: string };
+    manager: { id: string; fullName: string } | null;
+};
+// One row per deal with at least one overdue installment, oldest first.
+export type AttentionOverdueDeal = {
+    id: string; dealNumber: string;
+    client: { fullName: string };
+    manager: { id: string; fullName: string } | null;
+    installments: number;
+    amount: number;
+    oldestDueDate: string;
+};
+export type AttentionItems = {
+    expiringDeals: AttentionDeal[];
+    urgentTasks: AttentionTask[];
+    pendingApprovals: { total: number; deals: AttentionApproval[] };
+    overduePayments: { installments: number; amount: number; deals: AttentionOverdueDeal[] };
+};
+
+export const EMPTY_ATTENTION_ITEMS: AttentionItems = {
+    expiringDeals: [],
+    urgentTasks: [],
+    pendingApprovals: { total: 0, deals: [] },
+    overduePayments: { installments: 0, amount: 0, deals: [] },
+};
 
 export type RecentActivity = {
     id: string; title: string; description: string | null; type: string; createdAt: string;

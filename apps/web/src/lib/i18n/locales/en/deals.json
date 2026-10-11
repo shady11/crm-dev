@@ -36,7 +36,12 @@
     "managerPlaceholder": "Manager",
     "filterByStatus": "Filter by status",
     "statusPlaceholder": "Status",
-    "searchPlaceholder": "Search by client, phone, unit..."
+    "searchPlaceholder": "Search by client, phone, unit...",
+    "allDeals": "All deals",
+    "attention": {
+      "discount_pending": "Discount awaiting approval",
+      "overdue_payments": "Overdue payments"
+    }
   },
   "table": {
     "dealNumber": "Deal #",
@@ -47,7 +52,8 @@
     "salePrice": "Sale price",
     "created": "Created",
     "emptyTitle": "No deals found",
-    "emptyDescription": "Try adjusting your filters or search."
+    "emptyDescription": "Try adjusting your filters or search.",
+    "discountPending": "Discount pending"
   },
   "pagination": {
     "rowsPerPage": "Rows per page"

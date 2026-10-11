@@ -36,7 +36,12 @@
     "managerPlaceholder": "Менеджер",
     "filterByStatus": "Статус боюнча чыпка",
     "statusPlaceholder": "Статус",
-    "searchPlaceholder": "Клиент, телефон, жай боюнча издөө..."
+    "searchPlaceholder": "Клиент, телефон, жай боюнча издөө...",
+    "allDeals": "Бардык бүтүмдөр",
+    "attention": {
+      "discount_pending": "Арзандатуу макулдатууда",
+      "overdue_payments": "Мөөнөтү өткөн төлөмдөр"
+    }
   },
   "table": {
     "dealNumber": "Бүтүм №",
@@ -47,7 +52,8 @@
     "salePrice": "Сатуу баасы",
     "created": "Түзүлдү",
     "emptyTitle": "Бүтүмдөр табылган жок",
-    "emptyDescription": "Чыпкаларды же издөөнү өзгөртүп көрүңүз."
+    "emptyDescription": "Чыпкаларды же издөөнү өзгөртүп көрүңүз.",
+    "discountPending": "Арзандатуу макулдатууда"
   },
   "pagination": {
     "rowsPerPage": "Барактагы саптар"

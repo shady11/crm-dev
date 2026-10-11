@@ -58,6 +58,7 @@ describe('DashboardService', () => {
             unit: {groupBy: jest.fn().mockResolvedValue([])},
             paymentSchedule: {
                 aggregate: jest.fn().mockResolvedValue({_sum: {amount: null, paidAmount: null}, _count: {_all: 0}}),
+                groupBy: jest.fn().mockResolvedValue([]),
             },
             task: {count: jest.fn().mockResolvedValue(0), findMany: jest.fn().mockResolvedValue([])},
             activity: {findMany: jest.fn().mockResolvedValue([]), findFirst: jest.fn().mockResolvedValue(null)},
@@ -378,6 +379,49 @@ describe('DashboardService', () => {
             expect(result.leadsByStatus).toHaveLength(Object.values(LeadStatus).length);
             expect(result.dealsByStatus).toHaveLength(Object.values(DealStatus).length);
             expect(result.leadsByStatus.every((r) => r.count === 0)).toBe(true);
+        });
+    });
+
+    describe('getAttentionItems', () => {
+        it('pins a Sales Head\'s approval and overdue queues to their own branch', async () => {
+            const {service, prisma} = build();
+            await service.getAttentionItems(salesHeadUser, undefined, 'other-branch');
+
+            expect(prisma.deal.count).toHaveBeenCalledWith({
+                where: expect.objectContaining({branchId: 'branch-1', discountApprovalStatus: 'PENDING', status: 'RESERVED'}),
+            });
+            expect(prisma.paymentSchedule.aggregate).toHaveBeenCalledWith(expect.objectContaining({
+                where: expect.objectContaining({status: 'OVERDUE', deal: expect.objectContaining({branchId: 'branch-1'})}),
+            }));
+        });
+
+        it('lists only the caller\'s own pending requests and overdue deals for a self-scoped viewer', async () => {
+            const {service, prisma} = build();
+            await service.getAttentionItems(selfScopedUser);
+
+            expect(prisma.deal.count).toHaveBeenCalledWith({where: expect.objectContaining({managerId: 'self-1'})});
+            expect(prisma.paymentSchedule.groupBy).toHaveBeenCalledWith(expect.objectContaining({
+                where: expect.objectContaining({deal: expect.objectContaining({managerId: 'self-1'})}),
+            }));
+        });
+
+        it('reports what is still owed per overdue deal, oldest first, plus the overall total', async () => {
+            const {service, prisma} = build();
+            prisma.paymentSchedule.groupBy.mockResolvedValue([
+                {dealId: 'deal-1', _sum: {amount: 30000, paidAmount: 5000}, _min: {dueDate: new Date('2026-09-01')}, _count: {_all: 2}},
+            ]);
+            prisma.paymentSchedule.aggregate.mockResolvedValue({_sum: {amount: 90000, paidAmount: 5000}, _count: {_all: 6}});
+            prisma.deal.findMany.mockImplementation(({where}: any) => Promise.resolve(where.id
+                ? [{id: 'deal-1', dealNumber: 'D-2026-0001', client: {fullName: 'Client'}, manager: {id: 'm-1', fullName: 'Aidana'}}]
+                : []));
+
+            const result = await service.getAttentionItems(salesHeadUser);
+
+            expect(result.overduePayments).toEqual({
+                installments: 6,
+                amount: 85000,
+                deals: [expect.objectContaining({id: 'deal-1', installments: 2, amount: 25000, oldestDueDate: new Date('2026-09-01')})],
+            });
         });
     });
 
