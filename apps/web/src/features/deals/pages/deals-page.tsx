@@ -27,6 +27,8 @@ export function DealsPage() {
                     onManagerIdChange={filters.setManagerId}
                     branchId={filters.branchId}
                     onBranchIdChange={filters.setBranchId}
+                    attention={filters.attention}
+                    onAttentionChange={filters.setAttention}
                     search={filters.search}
                     onSearchChange={filters.setSearch}
                 />

@@ -22,6 +22,7 @@ import {
     useMyWorkToday,
     useTeamSnapshot,
 } from "@/features/dashboard/hooks/use-dashboard.ts";
+import {EMPTY_ATTENTION_ITEMS} from "@/features/dashboard/api/dashboard.api.ts";
 import {useProjectsFilter} from "@/features/projects/hooks/use-projects-filter.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
@@ -54,6 +55,13 @@ export function DashboardPage() {
         items: [{ label: t("allProjects"), value: "all" }, ...projects.data.map((p) => ({ label: p.name, value: p.id }))],
     });
 
+    // A Sales Manager starts from their own day (My work today); anyone
+    // looking after a whole branch or company starts from what's waiting on
+    // them, so their inbox goes to the top.
+    const attentionCard = (
+        <AttentionCard data={attention.data ?? EMPTY_ATTENTION_ITEMS} showOwner={!canViewMyPerformance} />
+    );
+
     const countsByStatus = new Map(dealsStatus.data?.map((d) => [d.status, d.count]) ?? []);
 
     return (
@@ -80,6 +88,7 @@ export function DashboardPage() {
             {/* A manager's own day comes first: what to do today, then how they're doing. */}
             {canViewMyPerformance && myWorkToday.data ? <MyWorkTodayCard data={myWorkToday.data} /> : null}
             {canViewMyPerformance && myPerformance.data ? <MyPerformanceCard data={myPerformance.data} /> : null}
+            {canViewMyPerformance ? null : attentionCard}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <KpiCard
@@ -125,10 +134,14 @@ export function DashboardPage() {
                 <FunnelCard data={funnel.data} projectId={projectId} branchId={branchId === "all" ? undefined : branchId} />
             ) : null}
 
-            <div className="grid gap-4 lg:grid-cols-2">
-                <AttentionCard data={attention.data ?? { expiringDeals: [], urgentTasks: [] }} />
+            {canViewMyPerformance ? (
+                <div className="grid gap-4 lg:grid-cols-2">
+                    {attentionCard}
+                    <RecentActivityCard activities={recentActivity.data ?? []} />
+                </div>
+            ) : (
                 <RecentActivityCard activities={recentActivity.data ?? []} />
-            </div>
+            )}
 
             {canViewBranchComparison ? <BranchComparisonChart data={branchComparison.data ?? []} /> : null}
             {canViewTeamSnapshot ? <TeamSnapshotCard data={teamSnapshot.data ?? []} /> : null}

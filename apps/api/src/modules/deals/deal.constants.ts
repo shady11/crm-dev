@@ -1,4 +1,4 @@
-import {DealStatus, Prisma, ProjectStatus} from "@/generated/prisma/client";
+import {DealStatus, DiscountApprovalStatus, PaymentScheduleStatus, Prisma, ProjectStatus} from "@/generated/prisma/client";
 
 // Project statuses in which units may be booked: off-plan pre-sales while
 // PLANNING, normal sales while ACTIVE, and remaining stock once COMPLETED.
@@ -14,6 +14,29 @@ export const ACTIVE_DEAL_STATUSES: DealStatus[]  = [
     'CONTRACT_SIGNED',
     'ACTIVE',
 ];
+
+// The dashboard's "Needs attention" queues, shared with the deals list's
+// attention filter so "View all" opens exactly the deals the dashboard
+// counted. A discount is only requested at reservation and signing waits
+// on the decision, so a pending request always sits on a reservation; an
+// installment counts once the reminder cron has flipped it to OVERDUE,
+// and only while the deal is still in progress.
+export const OVERDUE_INSTALLMENT_WHERE: Prisma.PaymentScheduleWhereInput = {
+    deletedAt: null,
+    status: PaymentScheduleStatus.OVERDUE,
+};
+
+export function dealAttentionWhere(filter: "discount_pending" | "overdue_payments"): Prisma.DealWhereInput {
+    if (filter === "discount_pending") {
+        return { deletedAt: null, status: DealStatus.RESERVED, discountApprovalStatus: DiscountApprovalStatus.PENDING };
+    }
+
+    return {
+        deletedAt: null,
+        status: { in: ACTIVE_DEAL_STATUSES },
+        paymentSchedules: { some: OVERDUE_INSTALLMENT_WHERE },
+    };
+}
 
 // How a deal's status reads in a notification title ("Deal D-2026-0001:
 // contract signed"), rather than the raw enum value.

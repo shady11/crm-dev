@@ -6,6 +6,12 @@ import {Transform} from "class-transformer";
 // column keys DealsTable passes to SortableTableHead on the frontend.
 export const DEAL_SORTABLE_FIELDS = ["dealNumber", "status", "salePrice", "createdAt"] as const;
 
+// The dashboard's "Needs attention" queues, as list filters, so "View all"
+// opens the same set of deals the dashboard counted (see
+// DashboardService.getAttentionItems for the definitions).
+export const DEAL_ATTENTION_FILTERS = ["discount_pending", "overdue_payments"] as const;
+export type DealAttentionFilter = typeof DEAL_ATTENTION_FILTERS[number];
+
 export class DealQueryDto {
     @IsOptional()
     @IsEnum(DealStatus)
@@ -28,6 +34,10 @@ export class DealQueryDto {
     @IsOptional()
     @IsUUID()
     branchId?: string;
+
+    @IsOptional()
+    @IsIn(DEAL_ATTENTION_FILTERS)
+    attention?: DealAttentionFilter;
 
     @IsOptional()
     @IsString()

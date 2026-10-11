@@ -764,6 +764,30 @@ describe('DealsService', () => {
             );
         });
 
+        it('narrows findAll to pending discount requests on reservations, alongside the status filter', async () => {
+            const {service, prisma} = buildBase();
+            await service.findAll(managerUser, {attention: 'discount_pending', status: DealStatus.RESERVED});
+
+            const where = prisma.deal.findMany.mock.calls[0][0].where;
+            expect(where.status).toBe(DealStatus.RESERVED);
+            expect(where.AND).toEqual([
+                expect.objectContaining({status: DealStatus.RESERVED, discountApprovalStatus: DiscountApprovalStatus.PENDING}),
+            ]);
+        });
+
+        it('narrows findAll to in-progress deals with an overdue installment', async () => {
+            const {service, prisma} = buildBase();
+            await service.findAll(managerUser, {attention: 'overdue_payments'});
+
+            const where = prisma.deal.findMany.mock.calls[0][0].where;
+            expect(where.AND).toEqual([
+                expect.objectContaining({
+                    status: {in: ['RESERVED', 'CONTRACT_SIGNED', 'ACTIVE']},
+                    paymentSchedules: {some: {deletedAt: null, status: 'OVERDUE'}},
+                }),
+            ]);
+        });
+
         it('findOne throws DealNotFoundException outside caller scope', async () => {
             const {service, prisma} = buildBase();
             prisma.deal.findFirst.mockResolvedValue(null);

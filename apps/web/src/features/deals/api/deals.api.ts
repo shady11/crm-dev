@@ -139,7 +139,13 @@ export type GetDealsParams = {
     limit?: number;
     sortBy?: DealSortField;
     sortOrder?: "asc" | "desc";
+    attention?: DealAttentionFilter;
 };
+
+// The dashboard's "Needs attention" queues as a list filter, so "View all"
+// opens the same deals the dashboard counted.
+export const DEAL_ATTENTION_FILTERS = ["discount_pending", "overdue_payments"] as const;
+export type DealAttentionFilter = typeof DEAL_ATTENTION_FILTERS[number];
 
 export type GeneratePaymentSchedulePayload = {
     installments: number;

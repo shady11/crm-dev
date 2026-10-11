@@ -4,6 +4,7 @@ import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/inpu
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {DEAL_STATUS_LABEL_KEYS, DealStatus} from "@/features/deals/types/deal.types";
 import type {DealStatusFilter} from "@/features/deals/hooks/use-deals-list.ts";
+import {DEAL_ATTENTION_FILTERS, type DealAttentionFilter} from "@/features/deals/api/deals.api.ts";
 import {useProjectsFilter} from "@/features/projects/hooks/use-projects-filter.ts";
 import {useManagers} from "@/features/users/hooks/use-managers.ts";
 import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
@@ -18,11 +19,13 @@ interface DealsToolbarProps {
     onManagerIdChange(value: string | undefined): void;
     branchId?: string;
     onBranchIdChange(value: string | undefined): void;
+    attention?: DealAttentionFilter;
+    onAttentionChange(value: DealAttentionFilter | undefined): void;
     search: string;
     onSearchChange(value: string): void;
 }
 
-export function DealsToolbar({ statusFilter, onStatusFilterChange, projectId, onProjectIdChange, managerId, onManagerIdChange, branchId, onBranchIdChange, search, onSearchChange }: DealsToolbarProps) {
+export function DealsToolbar({ statusFilter, onStatusFilterChange, projectId, onProjectIdChange, managerId, onManagerIdChange, branchId, onBranchIdChange, attention, onAttentionChange, search, onSearchChange }: DealsToolbarProps) {
     const { t } = useTranslation("deals");
     const projects = useProjectsFilter();
     const managers = useManagers();
@@ -43,6 +46,13 @@ export function DealsToolbar({ statusFilter, onStatusFilterChange, projectId, on
     });
     const managerCollection = createListCollection({
         items: [{ label: t("toolbar.allManagers"), value: "all" }, ...managers.data.map((m) => ({ label: m.fullName, value: m.id }))],
+    });
+
+    const attentionCollection = createListCollection({
+        items: [
+            { label: t("toolbar.allDeals"), value: "all" },
+            ...DEAL_ATTENTION_FILTERS.map((filter) => ({ label: t(`toolbar.attention.${filter}`), value: filter })),
+        ],
     });
 
     return (
@@ -85,6 +95,17 @@ export function DealsToolbar({ statusFilter, onStatusFilterChange, projectId, on
                     <SelectTrigger className="w-48"><SelectValue placeholder={t("toolbar.filterByStatus")} /></SelectTrigger>
                     <SelectContent>
                         {statusCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                    </SelectContent>
+                </Select>
+
+                <Select
+                    collection={attentionCollection}
+                    value={[attention ?? "all"]}
+                    onValueChange={({ value }) => onAttentionChange(value[0] === "all" ? undefined : (value[0] as DealAttentionFilter))}
+                >
+                    <SelectTrigger className="w-56"><SelectValue placeholder={t("toolbar.allDeals")} /></SelectTrigger>
+                    <SelectContent>
+                        {attentionCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
                     </SelectContent>
                 </Select>
 
