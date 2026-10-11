@@ -1,6 +1,8 @@
 import {Link, useLocation} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {getBreadcrumbs} from "@/lib/breadcrumbs.ts";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {activityLogNavKey} from "@/features/auth/access.ts";
 import {Separator} from "@/components/ui/separator.tsx";
 import {SidebarTrigger} from "@/components/ui/sidebar.tsx";
 import LanguageDropdown from "@/components/layout/header/language-dropdown.tsx";
@@ -31,6 +33,7 @@ function findIdAfterSegment(segments: string[], segmentKey: string, offset = 1) 
 export function AppHeader() {
 
     const { t } = useTranslation("common");
+    const { user } = useAuth();
     const location = useLocation();
     const { theme, toggleTheme } = useTheme();
 
@@ -88,7 +91,12 @@ export function AppHeader() {
     if (blockId && block) entityNames[blockId] = block.name;
     if (entranceId && entrance) entityNames[entranceId] = entrance.name;
 
-    const breadcrumbs = getBreadcrumbs(location.pathname, t, entityNames);
+    // Matches the sidebar: "My activity" for someone who only sees their own.
+    const breadcrumbs = getBreadcrumbs(
+        location.pathname,
+        (key) => t(key === "nav.activityLog" ? activityLogNavKey(user) : key),
+        entityNames,
+    );
 
     return (
         <header className="h-16 px-6 shrink-0 flex items-center justify-between bg-background">

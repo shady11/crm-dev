@@ -12,6 +12,7 @@ import {Pagination, PaginationItems, PaginationNext, PaginationPrevious} from "@
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {formatDate} from "@/utils/date-formatter";
 import {useAuth} from "@/features/auth/hooks/use-auth";
+import {hasPermission} from "@/features/auth/access";
 import {getBranches} from "@/features/branches/api/branches.api";
 import {getActivities} from "../api/activities.api";
 import {ActivitySubjects} from "../components/activity-subjects";
@@ -26,6 +27,9 @@ export function ActivitiesPage() {
     const {t, i18n} = useTranslation("activities");
     const {user} = useAuth();
     const isCompanyWide = !!user && !user.isBranchScoped;
+    // activities.view_own only: the API returns just this user's actions,
+    // so the page is "My activity" and the "My actions" toggle is moot.
+    const ownOnly = !hasPermission(user, "activities.view");
 
     const [branchId, setBranchId] = useState("");
     const [dateFrom, setDateFrom] = useState("");
@@ -48,7 +52,7 @@ export function ActivitiesPage() {
                 branchId: isCompanyWide && branchId ? branchId : undefined,
                 dateFrom: dateFrom || undefined,
                 dateTo: dateTo || undefined,
-                userId: mineOnly ? user?.id : undefined,
+                userId: mineOnly && !ownOnly ? user?.id : undefined,
                 subject: subject || undefined,
                 page,
                 limit,
@@ -75,9 +79,11 @@ export function ActivitiesPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
+                <h2 className="text-2xl font-bold tracking-tight">{ownOnly ? t("page.headingOwn") : t("page.heading")}</h2>
                 <p className="text-muted-foreground text-sm">
-                    {isCompanyWide ? t("page.descriptionCompanyAdmin") : t("page.descriptionBranchScoped")}
+                    {ownOnly
+                        ? t("page.descriptionOwn")
+                        : isCompanyWide ? t("page.descriptionCompanyAdmin") : t("page.descriptionBranchScoped")}
                 </p>
             </div>
 
@@ -158,18 +164,20 @@ export function ActivitiesPage() {
                     />
                 </div>
 
-                <Toggle
-                    variant="outline"
-                    size="lg"
-                    pressed={mineOnly}
-                    onPressedChange={(pressed) => {
-                        setMineOnly(pressed);
-                        setPage(1);
-                    }}
-                >
-                    <UserRoundIcon className="size-4" />
-                    {t("page.filters.mineOnly")}
-                </Toggle>
+                {!ownOnly && (
+                    <Toggle
+                        variant="outline"
+                        size="lg"
+                        pressed={mineOnly}
+                        onPressedChange={(pressed) => {
+                            setMineOnly(pressed);
+                            setPage(1);
+                        }}
+                    >
+                        <UserRoundIcon className="size-4" />
+                        {t("page.filters.mineOnly")}
+                    </Toggle>
+                )}
             </div>
 
             {activitiesQuery.isLoading ? (
@@ -200,7 +208,7 @@ export function ActivitiesPage() {
                                     ) : null}
                                     <ActivitySubjects activity={activity} />
                                     <p className="text-muted-foreground mt-1.5 text-xs">
-                                        {activity.user?.fullName ?? t("page.system")} · {date} {time}
+                                        {ownOnly ? `${date} ${time}` : `${activity.user?.fullName ?? t("page.system")} · ${date} ${time}`}
                                     </p>
                                 </div>
                             );
@@ -211,7 +219,8 @@ export function ActivitiesPage() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>{t("page.table.headers.timestamp")}</TableHead>
-                                    <TableHead>{t("page.table.headers.user")}</TableHead>
+                                    {/* Every row is yours on "My activity". */}
+                                    {!ownOnly && <TableHead>{t("page.table.headers.user")}</TableHead>}
                                     <TableHead>{t("page.table.headers.activity")}</TableHead>
                                 </TableRow>
                             </TableHeader>
@@ -224,7 +233,7 @@ export function ActivitiesPage() {
                                             <TableCell className="text-muted-foreground whitespace-nowrap text-xs">
                                                 {date} {time}
                                             </TableCell>
-                                            <TableCell>{activity.user?.fullName ?? t("page.system")}</TableCell>
+                                            {!ownOnly && <TableCell>{activity.user?.fullName ?? t("page.system")}</TableCell>}
                                             <TableCell>
                                                 <p className="font-medium">{activity.title}</p>
                                                 {activity.description ? (

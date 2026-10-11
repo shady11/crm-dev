@@ -39,14 +39,15 @@ export const FEATURE_PERMISSIONS = {
     // the platform-wide audit log already covers every tenant's logins.
     loginActivity: "audit_log.view_own",
     // Company-wide activity feed: branch-scoped roles see only their own
-    // branch (enforced by the API — see ActivitiesService.findAll).
-    activities: "activities.view",
+    // branch (enforced by the API — see ActivitiesService.findAll). With
+    // activities.view_own alone it's "My activity": the caller's own actions.
+    activities: ["activities.view", "activities.view_own"],
     // A tenant's own admin editing their own company's name/currency/locale/
     // timezone (CA-A1) — distinct from `companies` above, which is the
     // platform operator's cross-tenant management screen.
     companySettings: "company_settings.view",
     rolesPermissions: "rbac.manage",
-} as const satisfies Record<string, string>;
+} as const satisfies Record<string, string | readonly string[]>;
 
 export type Feature = keyof typeof FEATURE_PERMISSIONS;
 
@@ -81,7 +82,17 @@ export function canAccess(user: Pick<AuthUser, "permissions" | "isSuperAdmin"> |
         return SUPER_ADMIN_FEATURES.includes(feature);
     }
 
-    return hasPermission(user, FEATURE_PERMISSIONS[feature]);
+    // A list means any one of them unlocks the feature, like the API's
+    // @RequirePermissions(a, b).
+    const required: string | readonly string[] = FEATURE_PERMISSIONS[feature];
+    return typeof required === "string"
+        ? hasPermission(user, required)
+        : required.some((permission) => hasPermission(user, permission));
+}
+
+/** The activity log is "My activity" for someone limited to their own actions. */
+export function activityLogNavKey(user: Pick<AuthUser, "permissions"> | undefined) {
+    return hasPermission(user, "activities.view") ? "nav.activityLog" : "nav.myActivity";
 }
 
 /**

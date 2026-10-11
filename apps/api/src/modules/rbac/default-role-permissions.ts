@@ -91,7 +91,9 @@ export const DEFAULT_ROLES: DefaultRoleSeed[] = [
             // tasks for themselves (TasksService.create).
             "tasks.view", "tasks.create_own", "tasks.change_status",
             "documents.view", "documents.upload", "documents.generate",
-            "activities.view",
+            // Their own actions only ("My activity"); the branch-wide feed
+            // is the Sales Head's supervision tool.
+            "activities.view_own",
             "dashboard.view", "dashboard.my_performance",
         ],
     },
