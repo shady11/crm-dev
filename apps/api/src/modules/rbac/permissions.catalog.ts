@@ -101,6 +101,7 @@ export const PERMISSIONS_CATALOG: PermissionDefinition[] = [
     }),
     ...group("activities", {
         view: "View the company activity feed",
+        view_own: "View your own activity",
     }),
     ...group("dashboard", {
         view: "View the dashboard",

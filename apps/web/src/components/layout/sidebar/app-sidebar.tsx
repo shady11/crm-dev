@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sidebar.tsx"
 import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {canAccess, type Feature} from "@/features/auth/access";
+import {activityLogNavKey, canAccess, type Feature} from "@/features/auth/access";
 import {
     Building2,
     GalleryVerticalEnd,
@@ -67,7 +67,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
     const navMain = NAV_ITEMS
         .filter((item) => canAccess(user, item.feature))
-        .map((item) => ({ title: t(item.titleKey), url: item.url, icon: item.icon }));
+        .map((item) => ({
+            title: t(item.feature === "activities" ? activityLogNavKey(user) : item.titleKey),
+            url: item.url,
+            icon: item.icon,
+        }));
 
     return (
         <Sidebar

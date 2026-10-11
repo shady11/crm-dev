@@ -13,6 +13,7 @@ const baseUser: AuthUser = {
     company: null,
     branchId: null,
     branch: null,
+    permissions: ["activities.view"],
 };
 
 function build() {
@@ -68,6 +69,25 @@ describe("ActivitiesService", () => {
         const expected = {companyId: "company-1", AND: [filter]};
         expect(findMany).toHaveBeenCalledWith(expect.objectContaining({where: expected}));
         expect(count).toHaveBeenCalledWith({where: expected});
+    });
+
+    it("limits activities.view_own to the caller's own actions, ignoring another userId", async () => {
+        const {service, findMany, count} = build();
+        const manager = {...baseUser, id: "manager-1", isBranchScoped: true, branchId: "branch-1", permissions: ["activities.view_own"]};
+
+        await service.findAll(manager, {userId: "someone-else"} as any);
+
+        const where = findMany.mock.calls[0][0].where;
+        expect(where.userId).toBe("manager-1");
+        expect(count).toHaveBeenCalledWith({where});
+    });
+
+    it("lets activities.view filter by any user", async () => {
+        const {service, findMany} = build();
+
+        await service.findAll(baseUser, {userId: "user-2"} as any);
+
+        expect(findMany.mock.calls[0][0].where.userId).toBe("user-2");
     });
 
     it("lets COMPANY_ADMIN narrow to one branch via the query param", async () => {

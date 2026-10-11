@@ -30,7 +30,9 @@
       "title": "No activity",
       "description": "Nothing matches these filters."
     },
-    "system": "System"
+    "system": "System",
+    "headingOwn": "My activity",
+    "descriptionOwn": "Everything you did in the app, newest first."
   },
   "subjects": {
     "deal": "Deal {{number}}",

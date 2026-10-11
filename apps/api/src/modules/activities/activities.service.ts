@@ -2,6 +2,7 @@ import {ForbiddenException, Injectable} from "@nestjs/common";
 import {Prisma} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
+import {hasPermission} from "@/common/utils/permissions.util";
 import {ActivitySubject, QueryActivitiesDto} from "./dto/query-activities.dto";
 
 /**
@@ -61,7 +62,13 @@ export class ActivitiesService {
             where.user = {branchId: query.branchId};
         }
 
-        if (query.userId) where.userId = query.userId;
+        // Without activities.view (only activities.view_own) the feed is the
+        // caller's own actions, whatever userId was asked for.
+        if (!hasPermission(user, "activities.view")) {
+            where.userId = user.id;
+        } else if (query.userId) {
+            where.userId = query.userId;
+        }
         if (query.type) where.type = query.type;
         if (query.action) where.action = query.action;
         if (query.leadId) where.leadId = query.leadId;
