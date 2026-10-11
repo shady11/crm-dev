@@ -14,10 +14,8 @@ import {
 import {getProjectChessboard} from "@/features/projects/api/projects.api.ts";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {useTranslation} from "react-i18next";
-import {Badge} from "@/components/ui/badge.tsx";
 import {cn} from "@/lib/utils";
 import {
-    BLOCK_SALES_STATUS_BADGE_CLASSES,
     BLOCK_SALES_STATUS_LABEL_KEYS,
     BlockSalesStatus,
     completionQuarter,
@@ -98,21 +96,19 @@ export function ChessboardBlocks() {
                                             {(block as any).code && (
                                                 <p className="text-xs text-muted-foreground">{(block as any).code}</p>
                                             )}
-                                            {(completionQuarter(t, block.completionDate) || (block.salesStatus && block.salesStatus !== BlockSalesStatus.ON_SALE)) && (
-                                                <div className="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-                                                    {block.salesStatus && (
-                                                        <Badge className={BLOCK_SALES_STATUS_BADGE_CLASSES[block.salesStatus]}>
-                                                            {t(BLOCK_SALES_STATUS_LABEL_KEYS[block.salesStatus])}
-                                                        </Badge>
-                                                    )}
-                                                    {completionQuarter(t, block.completionDate) && (
-                                                        <span>{t("blocks:completion", {quarter: completionQuarter(t, block.completionDate)})}</span>
-                                                    )}
-                                                </div>
-                                            )}
                                         </div>
                                     </div>
                                 </div>
+
+                                {(completionQuarter(t, block.completionDate) || (block.salesStatus && block.salesStatus !== BlockSalesStatus.ON_SALE)) && (
+                                    // Under the header, one fact per line: the cards are narrow.
+                                    <div className="mt-3 text-xs text-muted-foreground">
+                                        {block.salesStatus && <p>{t(BLOCK_SALES_STATUS_LABEL_KEYS[block.salesStatus])}</p>}
+                                        {completionQuarter(t, block.completionDate) && (
+                                            <p>{t("blocks:completion", {quarter: completionQuarter(t, block.completionDate)})}</p>
+                                        )}
+                                    </div>
+                                )}
 
                                 <Separator className="my-4"/>
 
