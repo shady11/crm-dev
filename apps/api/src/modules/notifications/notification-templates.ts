@@ -20,4 +20,6 @@ export type NotificationTemplate =
     | {templateKey: "taskDueSoon"; params: {taskTitle: string}}
     | {templateKey: "taskOverdue"; params: {taskTitle: string}}
     | {templateKey: "taskEscalated"; params: {taskTitle: string; days: number}}
-    | {templateKey: "documentUploaded"; params: {dealNumber: string; fileName: string}};
+    | {templateKey: "documentUploaded"; params: {dealNumber: string; fileName: string}}
+    | {templateKey: "leadReassigned"; params: {leadName: string; byName: string; tasks: number}}
+    | {templateKey: "dealReassigned"; params: {dealNumber: string; byName: string; tasks: number}};

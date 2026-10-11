@@ -49,7 +49,8 @@
     "placeholder": "Select a manager",
     "confirm": "Reassign",
     "successTitle": "Reassigned",
-    "errorTitle": "Failed to reassign. Please try again."
+    "errorTitle": "Failed to reassign. Please try again.",
+    "hint": "Their open tasks on it move to the new manager, who gets a notification."
   },
   "form": {
     "fields": {

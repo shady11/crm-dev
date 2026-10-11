@@ -30,10 +30,14 @@ export function useNotificationText() {
             if (typeof values.date === "string") values.date = formatDate(values.date, i18n.language).date;
             // Day counts drive plural forms ("1 day" / "7 days", "день/дня/дней").
             if (typeof values.days === "number") values.count = values.days;
+            // Same for the number of open tasks a reassignment handed over.
+            if (typeof values.tasks === "number") values.count = values.tasks;
 
             return {
                 title: t(`${base}.title`, values),
-                message: i18n.exists(`${base}.message`) ? t(`${base}.message`, values) : n.message,
+                // With the values, so a message that only has plural forms
+                // (message_one, message_other…) is found too.
+                message: i18n.exists(`${base}.message`, values) ? t(`${base}.message`, values) : n.message,
             };
         },
         [t, i18n, formatCurrency],

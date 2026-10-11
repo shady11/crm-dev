@@ -3,6 +3,8 @@ export const paths = {
     login: "/login",
     dashboard: "/dashboard",
     leads: "/leads",
+    // Opens the leads page with that lead's details sheet open.
+    leadDetail: (leadId: string) => `/leads?lead=${leadId}`,
     clients: {
         root: "/clients",
         detail: (clientId: string) => `/clients/${clientId}`,

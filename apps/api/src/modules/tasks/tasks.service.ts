@@ -10,6 +10,7 @@ import {
     TaskType,
 } from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
+import type {DbClient} from "@/database/prisma.types";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CreateTaskDto} from "./dto/create-task.dto";
 import {UpdateTaskDto} from "./dto/update-task.dto";
@@ -453,6 +454,59 @@ export class TasksService {
         if (closing && !wasAlreadyClosed && !outcome?.trim()) {
             throw new BadRequestException("An outcome is required to close a task.");
         }
+    }
+
+    /**
+     * When a Sales Head moves a lead or deal to another manager, the work
+     * attached to it goes too: every open task on that lead or deal still
+     * assigned to the previous manager (the auto-created "Call …" and
+     * "Confirm documents …" ones included) is handed to the new one. Tasks
+     * the previous manager doesn't hold — say, one the Sales Head assigned
+     * to themselves — stay where they are. Runs inside the caller's
+     * transaction; the caller sends the single "reassigned to you"
+     * notification, so there's no per-task TASK_ASSIGNED here.
+     */
+    async handOverOpenTasks(db: DbClient, params: {
+        companyId: string;
+        actorId: string;
+        link: {leadId: string} | {dealId: string};
+        fromUserId: string | null;
+        toUserId: string;
+    }): Promise<{id: string; title: string}[]> {
+        if (!params.fromUserId || params.fromUserId === params.toUserId) return [];
+
+        const tasks = await db.task.findMany({
+            where: {
+                companyId: params.companyId,
+                ...params.link,
+                assignedToId: params.fromUserId,
+                deletedAt: null,
+                status: {in: [TaskStatus.TODO, TaskStatus.IN_PROGRESS]},
+            },
+            select: {id: true, title: true},
+        });
+        if (tasks.length === 0) return [];
+
+        const assignee = await db.user.findUniqueOrThrow({where: {id: params.toUserId}, select: {branchId: true}});
+
+        await db.task.updateMany({
+            where: {id: {in: tasks.map((t) => t.id)}},
+            data: {assignedToId: params.toUserId, branchId: assignee.branchId},
+        });
+
+        await db.activity.createMany({
+            data: tasks.map((task) => ({
+                companyId: params.companyId,
+                userId: params.actorId,
+                taskId: task.id,
+                action: ActivityAction.REASSIGNED,
+                type: ActivityType.TASK_REASSIGNED,
+                title: `Task "${task.title}" reassigned`,
+                metadata: {fromAssignedToId: params.fromUserId, toAssignedToId: params.toUserId, ...params.link},
+            })),
+        });
+
+        return tasks;
     }
 
     /**

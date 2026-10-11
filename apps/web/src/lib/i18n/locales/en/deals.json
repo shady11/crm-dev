@@ -198,7 +198,8 @@
     },
     "discountApproved": "Discount approved",
     "discountRejected": "Discount rejected",
-    "discountDecisionError": "Could not save the decision"
+    "discountDecisionError": "Could not save the decision",
+    "reservationReissued": "The reservation agreement was reissued at the approved price."
   },
   "booking": {
     "rooms": "{{count}} rooms",

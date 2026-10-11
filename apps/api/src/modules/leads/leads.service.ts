@@ -1,6 +1,7 @@
 import {BadRequestException, ConflictException, ForbiddenException, Injectable, Logger, NotFoundException} from "@nestjs/common";
-import {ActivityAction, ActivityType, Prisma, TaskPriority, TaskType} from "@/generated/prisma/client";
+import {ActivityAction, ActivityType, NotificationEntityType, NotificationType, Prisma, TaskPriority, TaskType} from "@/generated/prisma/client";
 import {LeadStatus} from "@/generated/prisma/enums";
+import {NotificationsService} from "@/modules/notifications/notifications.service";
 import {PrismaService} from "@/database/prisma.service";
 import {ClientsService} from "@/modules/clients/clients.service";
 import {RbacService} from "@/modules/rbac/rbac.service";
@@ -42,6 +43,7 @@ export class LeadsService {
         private readonly clientsService: ClientsService,
         private readonly rbacService: RbacService,
         private readonly tasksService: TasksService,
+        private readonly notifications: NotificationsService,
     ) {}
 
     async findAll(user: AuthUser, query: QueryLeadsDto) {
@@ -515,30 +517,59 @@ export class LeadsService {
 
         await this.ensureReassignable(user, lead.branchId, dto.managerId);
 
-        const updated = await this.prisma.lead.update({
-            where: { id },
-            data: { managerId: dto.managerId },
-            include: {
-                manager: {
-                    select: { id: true, fullName: true, email: true },
+        const companyId = user.companyId;
+
+        const {updated, movedTasks} = await this.prisma.$transaction(async (db) => {
+            const updated = await db.lead.update({
+                where: { id },
+                data: { managerId: dto.managerId },
+                include: {
+                    manager: {
+                        select: { id: true, fullName: true, email: true },
+                    },
+                    client: {
+                        select: { id: true, fullName: true, phone: true },
+                    },
                 },
-                client: {
-                    select: { id: true, fullName: true, phone: true },
+            });
+
+            const movedTasks = await this.tasksService.handOverOpenTasks(db, {
+                companyId,
+                actorId: user.id,
+                link: { leadId: id },
+                fromUserId: lead.managerId,
+                toUserId: dto.managerId,
+            });
+
+            await db.activity.create({
+                data: {
+                    companyId,
+                    userId: user.id,
+                    leadId: id,
+                    action: ActivityAction.REASSIGNED,
+                    type: ActivityType.LEAD_REASSIGNED,
+                    title: "Lead reassigned to another manager",
+                    metadata: { fromManagerId: lead.managerId, toManagerId: dto.managerId, movedTaskCount: movedTasks.length },
                 },
-            },
+            });
+
+            return {updated, movedTasks};
         });
 
-        await this.prisma.activity.create({
-            data: {
-                companyId: user.companyId,
-                userId: user.id,
-                leadId: id,
-                action: ActivityAction.REASSIGNED,
-                type: ActivityType.LEAD_REASSIGNED,
-                title: "Lead reassigned to another manager",
-                metadata: { fromManagerId: lead.managerId, toManagerId: dto.managerId },
-            },
-        });
+        // After commit, so the new owner never opens a lead that isn't theirs yet.
+        if (lead.managerId !== dto.managerId && dto.managerId !== user.id) {
+            await this.notifications.create({
+                companyId,
+                userId: dto.managerId,
+                type: NotificationType.LEAD_REASSIGNED,
+                title: `Lead ${updated.fullName} reassigned to you`,
+                message: movedTasks.length > 0 ? `${movedTasks.length} open task(s) moved to you` : undefined,
+                templateKey: "leadReassigned",
+                params: { leadName: updated.fullName, byName: user.name, tasks: movedTasks.length },
+                entityType: NotificationEntityType.LEAD,
+                entityId: id,
+            });
+        }
 
         return updated;
     }

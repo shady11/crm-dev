@@ -717,6 +717,19 @@ export class DealsService {
       return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
     });
 
+    // The reservation agreement was generated at reservation time, while
+    // the deal was held at list price. Reissue it at the approved price so
+    // the PDF on file matches the deal; the earlier one stays in the
+    // documents list as a record of what was printed then.
+    await this.generateAndLogDocument({
+      companyId,
+      dealId: result.id,
+      clientId: result.clientId,
+      type: DocumentType.RESERVATION,
+      userId: user.id,
+      activityTitle: 'Reservation agreement reissued at the approved price',
+    });
+
     return this.mapper.toDetails(result);
   }
 
@@ -838,16 +851,39 @@ export class DealsService {
         data: { managerId: dto.managerId },
       });
 
+      const movedTasks = await this.tasksService.handOverOpenTasks(db, {
+        companyId, actorId: user.id,
+        link: { dealId: deal.id },
+        fromUserId: deal.managerId,
+        toUserId: dto.managerId,
+      });
+
       await this.activityService.reassignManager({
         db, companyId, userId: user.id,
         dealId: deal.id, clientId: deal.clientId,
-        metadata: { fromManagerId: deal.managerId, toManagerId: dto.managerId },
+        metadata: { fromManagerId: deal.managerId, toManagerId: dto.managerId, movedTaskCount: movedTasks.length },
       });
 
-      return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
+      const updated = await db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
+      return { deal: updated, previousManagerId: deal.managerId, movedTaskCount: movedTasks.length };
     });
 
-    return this.mapper.toDetails(result);
+    // After commit, so the new owner never opens a deal that isn't theirs yet.
+    if (result.previousManagerId !== dto.managerId && dto.managerId !== user.id) {
+      await this.notifications.create({
+        companyId,
+        userId: dto.managerId,
+        type: NotificationType.DEAL_REASSIGNED,
+        title: `Deal ${result.deal.dealNumber} reassigned to you`,
+        message: result.movedTaskCount > 0 ? `${result.movedTaskCount} open task(s) moved to you` : undefined,
+        templateKey: 'dealReassigned',
+        params: { dealNumber: result.deal.dealNumber, byName: user.name, tasks: result.movedTaskCount },
+        entityType: NotificationEntityType.DEAL,
+        entityId: result.deal.id,
+      });
+    }
+
+    return this.mapper.toDetails(result.deal);
   }
 
   async cancelDeal(user: AuthUser, id: string, dto: CancelDealDto) {

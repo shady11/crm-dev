@@ -1,4 +1,5 @@
 import {useState} from "react";
+import {useSearchParams} from "react-router-dom";
 import {isAxiosError} from "axios";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "@/components/ui/toast.tsx";
@@ -10,6 +11,7 @@ import {
     type CreateLeadPayload,
     deleteLead,
     type DuplicateLeadConflict,
+    getLead,
     getLeads,
     type Lead,
     type LeadSortField,
@@ -56,6 +58,16 @@ export function useLeadsList() {
     const [detailsTarget, setDetailsTarget] = useState<Lead | null>(null);
     const [transferTarget, setTransferTarget] = useState<Lead | null>(null);
     const [reassignTarget, setReassignTarget] = useState<Lead | null>(null);
+
+    // ?lead=<id> opens that lead's details sheet: where a "lead reassigned
+    // to you" notification points, since a lead has no page of its own.
+    const [searchParams, setSearchParams] = useSearchParams();
+    const linkedLeadId = searchParams.get("lead");
+    const linkedLeadQuery = useQuery({
+        queryKey: ["leads", "detail", linkedLeadId],
+        queryFn: () => getLead(linkedLeadId!),
+        enabled: !!linkedLeadId,
+    });
 
     const tableQuery = useQuery({
         queryKey: ["leads", { search: debouncedSearch, statusFilter, branchFilter, sourceFilter, mineOnly, page, limit, sortBy, sortOrder }],
@@ -116,6 +128,11 @@ export function useLeadsList() {
     });
 
     const invalidateLeads = () => queryClient.invalidateQueries({ queryKey: ["leads"] });
+    // Reassigning a lead moves its open tasks too.
+    const invalidateAfterReassign = async () => {
+        await invalidateLeads();
+        await queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    };
 
     const deleteMutation = useMutation({
         mutationFn: deleteLead,
@@ -164,13 +181,13 @@ export function useLeadsList() {
         mutationFn: ({ id, managerId }: { id: string; managerId: string; previousManagerId: string | null }) =>
             reassignLeadManager(id, managerId),
         onSuccess: async (_data, { id, previousManagerId }) => {
-            await invalidateLeads();
+            await invalidateAfterReassign();
             const title = t("reassignDialog.successTitle", { ns: "users" });
             if (previousManagerId) {
                 toastWithUndo({
                     title,
                     undo: () => reassignLeadManager(id, previousManagerId),
-                    onUndone: invalidateLeads,
+                    onUndone: invalidateAfterReassign,
                 });
             } else {
                 toast.success({ title });
@@ -295,10 +312,20 @@ export function useLeadsList() {
     // Resolve to the freshest copy from the list query (so edits/conversions made
     // while the sheet is open are reflected immediately), falling back to the
     // originally clicked lead if it's no longer in the current page/filter.
-    const detailsLead = detailsTarget ? (leads.find((l) => l.id === detailsTarget.id) ?? detailsTarget) : null;
+    const detailsSource = detailsTarget ?? (linkedLeadId ? linkedLeadQuery.data ?? null : null);
+    const detailsLead = detailsSource ? (leads.find((l) => l.id === detailsSource.id) ?? detailsSource) : null;
 
     const openDetails = (lead: Lead) => setDetailsTarget(lead);
-    const closeDetails = () => setDetailsTarget(null);
+    const closeDetails = () => {
+        setDetailsTarget(null);
+        if (linkedLeadId) {
+            setSearchParams((prev) => {
+                const params = new URLSearchParams(prev);
+                params.delete("lead");
+                return params;
+            }, { replace: true });
+        }
+    };
 
     return {
         filters: {
@@ -405,7 +432,7 @@ export function useLeadsList() {
 
         detailsSheet: {
             lead: detailsLead,
-            open: !!detailsTarget,
+            open: !!detailsLead,
             onOpen: openDetails,
             onOpenChange: (isOpen: boolean) => {
                 if (!isOpen) closeDetails();

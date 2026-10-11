@@ -198,7 +198,8 @@
     },
     "discountApproved": "Арзандатуу макулдашылды",
     "discountRejected": "Арзандатуу четке кагылды",
-    "discountDecisionError": "Чечимди сактоо мүмкүн болбоду"
+    "discountDecisionError": "Чечимди сактоо мүмкүн болбоду",
+    "reservationReissued": "Брондоо келишими макулдашылган баа менен кайра түзүлдү."
   },
   "booking": {
     "rooms": "{{count}} бөлм.",

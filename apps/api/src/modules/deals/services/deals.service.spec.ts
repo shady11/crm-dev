@@ -128,7 +128,10 @@ describe('DealsService', () => {
             ]),
             findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-manager']),
         };
-        const tasksService = {createAutomated: jest.fn().mockResolvedValue(null)};
+        const tasksService = {
+            createAutomated: jest.fn().mockResolvedValue(null),
+            handOverOpenTasks: jest.fn().mockResolvedValue([]),
+        };
 
         const service = new DealsService(
             prisma, mapper, domain, activityService as any, notifications as any,
@@ -615,6 +618,26 @@ describe('DealsService', () => {
             expect(notifications.create).not.toHaveBeenCalled();
         });
 
+        it('approveDiscount: reissues the reservation agreement at the approved price', async () => {
+            const {service, prisma, documentGeneration} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(pendingDeal());
+
+            await service.approveDiscount(adminUser, 'deal-1');
+
+            expect(documentGeneration.generateForDeal).toHaveBeenCalledWith(
+                expect.objectContaining({dealId: 'deal-1', type: 'RESERVATION'}),
+            );
+        });
+
+        it('rejectDiscount: leaves the reservation agreement as it is (the deal stays at list price)', async () => {
+            const {service, prisma, documentGeneration} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(pendingDeal());
+
+            await service.rejectDiscount(adminUser, 'deal-1', {reason: 'too high'} as any);
+
+            expect(documentGeneration.generateForDeal).not.toHaveBeenCalled();
+        });
+
         it('rejectDiscount: rejects when the deal has no pending discount request', async () => {
             const {service, prisma} = buildBase();
             prisma.deal.findFirst.mockResolvedValue(pendingDeal({discountApprovalStatus: DiscountApprovalStatus.APPROVED}));
@@ -663,8 +686,38 @@ describe('DealsService', () => {
 
             expect(prisma.deal.update).toHaveBeenCalledWith({where: {id: 'deal-1'}, data: {managerId: 'new-manager'}});
             expect(activityService.reassignManager).toHaveBeenCalledWith(
-                expect.objectContaining({metadata: {fromManagerId: 'old-manager', toManagerId: 'new-manager'}}),
+                expect.objectContaining({metadata: {fromManagerId: 'old-manager', toManagerId: 'new-manager', movedTaskCount: 0}}),
             );
+        });
+
+        it('hands the previous manager\'s open tasks to the new one and tells them, after the change commits', async () => {
+            const {service, prisma, tasksService, notifications} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', branchId: 'branch-1', managerId: 'old-manager', clientId: 'c1'});
+            prisma.user.findFirst.mockResolvedValue({id: 'new-manager', roleId: 'role-sales-manager', isActive: true});
+            tasksService.handOverOpenTasks.mockResolvedValue([{id: 't1', title: 'Call'}, {id: 't2', title: 'Confirm documents'}]);
+
+            await service.reassignManager(salesHeadUser, 'deal-1', {managerId: 'new-manager'} as any);
+
+            expect(tasksService.handOverOpenTasks).toHaveBeenCalledWith(prisma, expect.objectContaining({
+                link: {dealId: 'deal-1'}, fromUserId: 'old-manager', toUserId: 'new-manager',
+            }));
+            expect(notifications.create).toHaveBeenCalledWith(expect.objectContaining({
+                userId: 'new-manager',
+                type: 'DEAL_REASSIGNED',
+                templateKey: 'dealReassigned',
+                params: expect.objectContaining({tasks: 2}),
+                entityId: 'deal-1',
+            }));
+        });
+
+        it('sends no notification when the deal stays with the same manager', async () => {
+            const {service, prisma, notifications} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', branchId: 'branch-1', managerId: 'new-manager', clientId: 'c1'});
+            prisma.user.findFirst.mockResolvedValue({id: 'new-manager', roleId: 'role-sales-manager', isActive: true});
+
+            await service.reassignManager(salesHeadUser, 'deal-1', {managerId: 'new-manager'} as any);
+
+            expect(notifications.create).not.toHaveBeenCalled();
         });
     });
 

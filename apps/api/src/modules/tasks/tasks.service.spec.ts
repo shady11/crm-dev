@@ -394,4 +394,57 @@ describe('TasksService', () => {
             );
         });
     });
+
+    describe('handOverOpenTasks', () => {
+        function db(tasks: {id: string; title: string}[]) {
+            return {
+                task: {findMany: jest.fn().mockResolvedValue(tasks), updateMany: jest.fn().mockResolvedValue({count: tasks.length})},
+                user: {findUniqueOrThrow: jest.fn().mockResolvedValue({branchId: 'branch-1'})},
+                activity: {createMany: jest.fn().mockResolvedValue({count: tasks.length})},
+            };
+        }
+        const params = {companyId: 'company-1', actorId: 'head-1', link: {dealId: 'deal-1'}, fromUserId: 'old', toUserId: 'new'};
+
+        it('moves only the previous manager\'s open tasks on that deal, and logs each move', async () => {
+            const {service} = build();
+            const tx = db([{id: 't1', title: 'Call'}, {id: 't2', title: 'Confirm documents'}]);
+
+            const moved = await service.handOverOpenTasks(tx as any, params);
+
+            expect(tx.task.findMany).toHaveBeenCalledWith(expect.objectContaining({
+                where: {
+                    companyId: 'company-1',
+                    dealId: 'deal-1',
+                    assignedToId: 'old',
+                    deletedAt: null,
+                    status: {in: ['TODO', 'IN_PROGRESS']},
+                },
+            }));
+            expect(tx.task.updateMany).toHaveBeenCalledWith({
+                where: {id: {in: ['t1', 't2']}},
+                data: {assignedToId: 'new', branchId: 'branch-1'},
+            });
+            expect(tx.activity.createMany.mock.calls[0][0].data).toHaveLength(2);
+            expect(moved).toHaveLength(2);
+        });
+
+        it('does nothing when there was no previous manager or it is the same person', async () => {
+            const {service} = build();
+            const tx = db([{id: 't1', title: 'Call'}]);
+
+            await expect(service.handOverOpenTasks(tx as any, {...params, fromUserId: null})).resolves.toEqual([]);
+            await expect(service.handOverOpenTasks(tx as any, {...params, fromUserId: 'new'})).resolves.toEqual([]);
+            expect(tx.task.findMany).not.toHaveBeenCalled();
+        });
+
+        it('writes nothing when the previous manager holds no open tasks on it', async () => {
+            const {service} = build();
+            const tx = db([]);
+
+            await service.handOverOpenTasks(tx as any, params);
+
+            expect(tx.task.updateMany).not.toHaveBeenCalled();
+            expect(tx.activity.createMany).not.toHaveBeenCalled();
+        });
+    });
 });

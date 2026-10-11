@@ -198,7 +198,8 @@
     },
     "discountApproved": "Скидка согласована",
     "discountRejected": "Скидка отклонена",
-    "discountDecisionError": "Не удалось сохранить решение"
+    "discountDecisionError": "Не удалось сохранить решение",
+    "reservationReissued": "Договор бронирования переоформлен по согласованной цене."
   },
   "booking": {
     "rooms": "{{count}} комн.",
