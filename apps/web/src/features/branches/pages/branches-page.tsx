@@ -42,6 +42,8 @@ import {type Branch, BRANCH_STATUS_BADGE_CLASSES, isDeactivated} from "../types/
 import {BranchFormSheet} from "../components/branch-form-sheet";
 import {paths} from "@/routes/paths";
 import {Menu, MenuContent, MenuItem, MenuTrigger} from "@/components/ui/menu.tsx";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {hasPermission} from "@/features/auth/access.ts";
 
 type Pending = {action: "deactivate" | "reactivate"; branch: Branch} | null;
 
@@ -53,6 +55,10 @@ export function BranchesPage() {
     const [formOpen, setFormOpen] = useState(false);
     const [editing, setEditing] = useState<Branch | null>(null);
     const [pending, setPending] = useState<Pending>(null);
+    const {user} = useAuth();
+    // branches.view alone (Finance) reads the list; changing it needs these.
+    const canCreate = hasPermission(user, "branches.create");
+    const canEdit = hasPermission(user, "branches.edit");
 
     const branches = useQuery({
         queryKey: ["branches", search],
@@ -108,15 +114,17 @@ export function BranchesPage() {
                         onChange={(event) => setSearch(event.target.value)}
                         className="max-w-sm"
                     />
-                    <Button
-                        onClick={() => {
-                            setEditing(null);
-                            setFormOpen(true);
-                        }}
-                    >
-                        <Plus className="size-4" />
-                        {t("page.newBranch")}
-                    </Button>
+                    {canCreate && (
+                        <Button
+                            onClick={() => {
+                                setEditing(null);
+                                setFormOpen(true);
+                            }}
+                        >
+                            <Plus className="size-4" />
+                            {t("page.newBranch")}
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -161,24 +169,28 @@ export function BranchesPage() {
                                                         {t("page.card.view")}
                                                     </Link>
                                                 </MenuItem>
-                                                <MenuItem value="edit"
-                                                          onClick={() => {
-                                                              setEditing(branch);
-                                                              setFormOpen(true);
-                                                          }}>
-                                                    <PencilIcon />
-                                                    {t("page.card.edit")}
-                                                </MenuItem>
-                                                <MenuItem value="share"
-                                                          onClick={() =>
-                                                              setPending({
-                                                                  action: deactivated ? "reactivate" : "deactivate",
-                                                                  branch,
-                                                              })
-                                                          }>
-                                                    {deactivated ? <PlayCircle /> : <PauseCircle />}
-                                                    {deactivated ? t("page.card.reactivate") : t("page.card.deactivate")}
-                                                </MenuItem>
+                                                {canEdit && (
+                                                    <MenuItem value="edit"
+                                                              onClick={() => {
+                                                                  setEditing(branch);
+                                                                  setFormOpen(true);
+                                                              }}>
+                                                        <PencilIcon />
+                                                        {t("page.card.edit")}
+                                                    </MenuItem>
+                                                )}
+                                                {canEdit && (
+                                                    <MenuItem value="share"
+                                                              onClick={() =>
+                                                                  setPending({
+                                                                      action: deactivated ? "reactivate" : "deactivate",
+                                                                      branch,
+                                                                  })
+                                                              }>
+                                                        {deactivated ? <PlayCircle /> : <PauseCircle />}
+                                                        {deactivated ? t("page.card.reactivate") : t("page.card.deactivate")}
+                                                    </MenuItem>
+                                                )}
                                             </MenuContent>
                                         </Menu>
                                     </CardAction>

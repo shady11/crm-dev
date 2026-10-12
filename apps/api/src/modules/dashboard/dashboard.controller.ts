@@ -138,7 +138,11 @@ export class DashboardController {
     // dashboard.finance_overview is only in FINANCE's default bundle.
     @RequirePermissions("dashboard.finance_overview")
     @Get("finance-overview")
-    getFinanceOverview(@CurrentUser() user: AuthUser, @Query("branchId") branchId?: string) {
-        return this.dashboardService.getFinanceOverview(user, branchId);
+    getFinanceOverview(
+        @CurrentUser() user: AuthUser,
+        @Query("branchId") branchId?: string,
+        @Query("projectId") projectId?: string,
+    ) {
+        return this.dashboardService.getFinanceOverview(user, branchId, projectId);
     }
 }

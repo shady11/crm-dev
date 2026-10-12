@@ -24,7 +24,8 @@ const SCHEDULE_STATUS_LABEL_KEYS: Record<string, string> = {
 interface DealPaymentScheduleCardProps {
     status: string;
     schedules: DealDetails["paymentSchedules"];
-    onGenerateSchedule(): void;
+    /** Omitted without deals.manage_payments, which hides the button. */
+    onGenerateSchedule?(): void;
 }
 
 export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule }: DealPaymentScheduleCardProps) {
@@ -59,7 +60,7 @@ export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule 
                         //     <CircularProgressValue className="absolute" />
                         // </CircularProgress>
                     )}
-                    {schedules.length === 0 && canGenerate && (
+                    {schedules.length === 0 && canGenerate && onGenerateSchedule && (
                         <Button variant="secondary" size="xs" onClick={onGenerateSchedule}>
                             {t("paymentSchedule.generate", { ns: "deals" })}
                         </Button>

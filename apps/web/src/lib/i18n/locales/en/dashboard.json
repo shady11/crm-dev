@@ -114,7 +114,7 @@
     "upcomingCount_few": "{{count}} installments",
     "upcomingCount_many": "{{count}} installments",
     "upcomingCount_other": "{{count}} installments",
-    "cashFlowTitle": "Cash flow by payment method",
+    "cashFlowTitle": "Collected this month by payment method",
     "cashFlowLabel": "Collected",
     "empty": "No payments recorded yet.",
     "method": {

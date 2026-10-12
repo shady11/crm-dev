@@ -114,7 +114,7 @@
     "upcomingCount_few": "{{count}} платежа",
     "upcomingCount_many": "{{count}} платежей",
     "upcomingCount_other": "{{count}} платежа",
-    "cashFlowTitle": "Денежный поток по способу оплаты",
+    "cashFlowTitle": "Поступления за месяц по способам оплаты",
     "cashFlowLabel": "Собрано",
     "empty": "Платежи пока не зафиксированы.",
     "method": {

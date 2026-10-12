@@ -78,6 +78,8 @@ export function DealDetailsPage() {
     const canDecideDiscount = hasPermission(user, "deals.approve_discount");
     const canCancel = hasPermission(user, "deals.cancel");
     const canManagePayments = hasPermission(user, "deals.manage_payments");
+    // Extend, sign, activate and complete: the deal's own lifecycle.
+    const canManage = hasPermission(user, "deals.manage");
     const [rejectOpen, setRejectOpen] = useState(false);
     const [activateOpen, setActivateOpen] = useState(false);
     const [rejectReason, setRejectReason] = useState("");
@@ -227,7 +229,7 @@ export function DealDetailsPage() {
                         <ArrowLeft className="size-3"/>
                         {t("detailsPage.back")}
                     </Button>
-                    {deal.status === "RESERVED" && (
+                    {deal.status === "RESERVED" && canManage && (
                         <>
                             <Button
                                 variant="secondary"
@@ -246,22 +248,22 @@ export function DealDetailsPage() {
                             </Button>
                         </>
                     )}
-                    {deal.status === "CONTRACT_SIGNED" && (
+                    {deal.status === "CONTRACT_SIGNED" && canManage && (
                         <Button onClick={() => setActivateOpen(true)}>
                             {t("detailsPage.activateDeal")}
                         </Button>
                     )}
-                    {deal.status === "ACTIVE" && (
+                    {deal.status === "ACTIVE" && canManagePayments && (
                         deal.paymentSchedules.length === 0 ? (
                             <Button variant="secondary" onClick={() => setScheduleOpen(true)}>
                                 {t("paymentSchedule.generate")}
                             </Button>
                         ) : null
                     )}
-                    {deal.status === "ACTIVE" && (
+                    {deal.status === "ACTIVE" && canManagePayments && (
                         <Button onClick={() => setPaymentOpen(true)}>{t("paymentsHistory.record")}</Button>
                     )}
-                    {isOpen && (canCancel || deal.status === "ACTIVE") && (
+                    {isOpen && (canCancel || (deal.status === "ACTIVE" && canManage)) && (
                         <Menu>
                             <MenuTrigger asChild>
                                 <Button variant="ghost" size="icon-sm" aria-label={t("detailsPage.moreActions")}>
@@ -269,12 +271,12 @@ export function DealDetailsPage() {
                                 </Button>
                             </MenuTrigger>
                             <MenuContent>
-                                {deal.status === "ACTIVE" && (
+                                {deal.status === "ACTIVE" && canManage && (
                                     <MenuItem value="complete" onSelect={() => actions.complete.mutate()}>
                                         {t("detailsPage.markCompleted")}
                                     </MenuItem>
                                 )}
-                                {deal.status === "ACTIVE" && canCancel && <MenuSeparator />}
+                                {deal.status === "ACTIVE" && canManage && canCancel && <MenuSeparator />}
                                 {canCancel && (
                                     <MenuItem value="cancel" variant="destructive" onSelect={() => setCancelOpen(true)}>
                                         {t("detailsPage.cancelDeal")}
@@ -329,11 +331,11 @@ export function DealDetailsPage() {
                             <DealPaymentScheduleCard
                                 status={deal.status}
                                 schedules={deal.paymentSchedules}
-                                onGenerateSchedule={() => setScheduleOpen(true)}
+                                onGenerateSchedule={canManagePayments ? () => setScheduleOpen(true) : undefined}
                             />
                             <DealPaymentsHistoryCard
                                 payments={deal.payments}
-                                canRecordPayment={deal.status === "ACTIVE"}
+                                canRecordPayment={deal.status === "ACTIVE" && canManagePayments}
                                 onRecordPayment={() => setPaymentOpen(true)}
                                 canRecordRefund={canRecordRefund}
                                 onRecordRefund={openRefundDialog}

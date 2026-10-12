@@ -36,6 +36,7 @@ export function ClientDetailsPage() {
     const { formatCurrency } = useCompanyFormatters();
     const { user } = useAuth();
     const canTransferBranch = hasPermission(user, "clients.transfer_branch");
+    const canEdit = hasPermission(user, "clients.edit");
     const { clientId } = useParams<{ clientId: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -114,10 +115,12 @@ export function ClientDetailsPage() {
                                 {t("moveDialog.title", { ns: "branches" })}
                             </Button>
                         )}
-                        <Button variant="default" onClick={() => setEditOpen(true)}>
-                            <Pen className="size-3"/>
-                            {t("actions.edit", { ns: "common" })}
-                        </Button>
+                        {canEdit && (
+                            <Button variant="default" onClick={() => setEditOpen(true)}>
+                                <Pen className="size-3"/>
+                                {t("actions.edit", { ns: "common" })}
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>

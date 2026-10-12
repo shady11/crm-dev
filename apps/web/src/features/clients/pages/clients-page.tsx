@@ -7,10 +7,14 @@ import {DeleteClientDialog} from "@/features/clients/components/delete-client-di
 import {DeleteClientsDialog} from "@/features/clients/components/delete-clients-dialog.tsx";
 import {useClientsList} from "@/features/clients/hooks/use-clients-list.ts";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {hasPermission} from "@/features/auth/access.ts";
 
 export function ClientsPage() {
     const { t } = useTranslation("clients");
     const { filters, pagination, table, selection, form, actions, deleteDialog, bulkDeleteDialog } = useClientsList();
+    const { user } = useAuth();
+    const canCreate = hasPermission(user, "clients.create");
 
     return (
         <div className="space-y-6">
@@ -26,7 +30,7 @@ export function ClientsPage() {
                     onProjectFilterChange={filters.setProjectFilter}
                     branchFilter={filters.branchFilter}
                     onBranchFilterChange={filters.setBranchFilter}
-                    onAddClient={form.openCreateForm}
+                    onAddClient={canCreate ? form.openCreateForm : undefined}
                 />
 
                 <ClientsTable

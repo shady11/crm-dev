@@ -530,6 +530,28 @@ describe('DashboardService', () => {
             expect(other?.amount).toBe(0);
         });
 
+        it('narrows every figure to the chosen project', async () => {
+            const {service, prisma} = build();
+            await service.getFinanceOverview(adminUser, undefined, 'project-7');
+
+            const scoped = expect.objectContaining({where: expect.objectContaining({deal: expect.objectContaining({projectId: 'project-7'})})});
+            expect(prisma.payment.aggregate).toHaveBeenCalledWith(scoped);
+            expect(prisma.payment.groupBy).toHaveBeenCalledWith(scoped);
+            expect(prisma.paymentSchedule.aggregate).toHaveBeenCalledWith(scoped);
+        });
+
+        it('counts part-paid installments as coming due, and splits only this month\'s cash by method', async () => {
+            const {service, prisma} = build();
+            await service.getFinanceOverview(adminUser);
+
+            const upcomingWhere = (prisma.paymentSchedule.aggregate as jest.Mock).mock.calls[1][0].where;
+            expect(upcomingWhere.status).toEqual({in: ['PENDING', 'PARTIAL']});
+
+            const collectedWhere = (prisma.payment.aggregate as jest.Mock).mock.calls[0][0].where;
+            const byMethodWhere = (prisma.payment.groupBy as jest.Mock).mock.calls[0][0].where;
+            expect(byMethodWhere.paidAt).toEqual(collectedWhere.paidAt);
+        });
+
         it('pins a branch-scoped role to their own branch, ignoring any passed branchId', async () => {
             const {service, prisma} = build();
             await service.getFinanceOverview(branchUser, 'other-branch');

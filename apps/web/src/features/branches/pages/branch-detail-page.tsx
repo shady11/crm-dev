@@ -6,6 +6,8 @@ import {useTranslation} from "react-i18next";
 import {ArrowLeft, PauseCircle, Pencil, PlayCircle, Users} from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {hasPermission} from "@/features/auth/access.ts";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/components/ui/data-list.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
@@ -42,6 +44,8 @@ export function BranchDetailPage() {
     const queryClient = useQueryClient();
     const [formOpen, setFormOpen] = useState(false);
     const [pending, setPending] = useState<PendingAction>(null);
+    const {user} = useAuth();
+    const canEdit = hasPermission(user, "branches.edit");
 
     const branch = useQuery({
         queryKey: ["branches", branchId],
@@ -112,17 +116,21 @@ export function BranchDetailPage() {
                             <ArrowLeft className="size-3"/> {t("common:actions.back")}
                         </Link>
                     </Button>
-                    <Button variant="default" onClick={() => setFormOpen(true)}>
-                        <Pencil className="size-3.5" />
-                        {t("detail.edit")}
-                    </Button>
-                    <Button
-                        variant="destructive"
-                        onClick={() => setPending(deactivated ? "reactivate" : "deactivate")}
-                    >
-                        {deactivated ? <PlayCircle className="size-3.5" /> : <PauseCircle className="size-3.5" />}
-                        {deactivated ? t("detail.reactivate") : t("detail.deactivate")}
-                    </Button>
+                    {canEdit && (
+                        <>
+                            <Button variant="default" onClick={() => setFormOpen(true)}>
+                                <Pencil className="size-3.5" />
+                                {t("detail.edit")}
+                            </Button>
+                            <Button
+                                variant="destructive"
+                                onClick={() => setPending(deactivated ? "reactivate" : "deactivate")}
+                            >
+                                {deactivated ? <PlayCircle className="size-3.5" /> : <PauseCircle className="size-3.5" />}
+                                {deactivated ? t("detail.reactivate") : t("detail.deactivate")}
+                            </Button>
+                        </>
+                    )}
                 </div>
             </div>
 

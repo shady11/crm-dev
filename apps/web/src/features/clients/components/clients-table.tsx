@@ -49,6 +49,7 @@ export function ClientsTable({
     const { t, i18n } = useTranslation("clients");
     const navigate = useNavigate();
     const { user } = useAuth();
+    const canEdit = hasPermission(user, "clients.edit");
     const canDelete = hasPermission(user, "clients.delete");
 
     return (
@@ -83,9 +84,11 @@ export function ClientsTable({
                                 </div>
                             </div>
                             <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                                <IconTooltipButton variant="ghost" size="icon-sm" onClick={() => onEdit(client)} label={t("common:actions.edit")}>
-                                    <Pen className="size-3.5" />
-                                </IconTooltipButton>
+                                {canEdit && (
+                                    <IconTooltipButton variant="ghost" size="icon-sm" onClick={() => onEdit(client)} label={t("common:actions.edit")}>
+                                        <Pen className="size-3.5" />
+                                    </IconTooltipButton>
+                                )}
                                 {canDelete && (
                                     <IconTooltipButton
                                         variant="destructive"
@@ -179,9 +182,11 @@ export function ClientsTable({
                             </TableCell>
                             <TableCell onClick={(e) => e.stopPropagation()}>
                                 <div className="flex items-center justify-end gap-1">
-                                    <IconTooltipButton variant="ghost" size="icon-sm" onClick={() => onEdit(client)} label={t("common:actions.edit")}>
-                                        <Pen className="size-3.5" />
-                                    </IconTooltipButton>
+                                    {canEdit && (
+                                        <IconTooltipButton variant="ghost" size="icon-sm" onClick={() => onEdit(client)} label={t("common:actions.edit")}>
+                                            <Pen className="size-3.5" />
+                                        </IconTooltipButton>
+                                    )}
                                     {canDelete && (
                                         <IconTooltipButton
                                             variant="destructive"
