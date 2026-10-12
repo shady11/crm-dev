@@ -588,6 +588,12 @@ async function seedDemoTenantData(args: {
             if (deposit > 0) {
                 await recordPayment(deposit, PaymentType.DEPOSIT, createdAt, 0);
             }
+            // Money is taken before activation too (FIN-9): every other
+            // signed contract has its first payment, made at signing.
+            if (status === DealStatus.CONTRACT_SIGNED && dealSeed % 2 === 1) {
+                await recordPayment(Math.round(salePrice * 0.1), PaymentType.INSTALLMENT, createdAt, 1);
+            }
+
             if (deposit > 0 && depositRefunded) {
                 const refundedAt = status === DealStatus.CANCELLED ? monthsAgo(1) : createdAt;
                 await prisma.payment.create({

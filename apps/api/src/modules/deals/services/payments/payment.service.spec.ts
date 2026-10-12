@@ -100,9 +100,26 @@ describe('PaymentService.create', () => {
         await expect(service.create(user, 'deal-1', paymentDto())).rejects.toThrow(DealNotFoundException);
     });
 
-    it('rejects recording a payment on a deal that is not ACTIVE', async () => {
-        const {service} = build({deal: {status: DealStatus.RESERVED}});
-        await expect(service.create(user, 'deal-1', paymentDto())).rejects.toThrow();
+    it.each([DealStatus.RESERVED, DealStatus.CONTRACT_SIGNED])(
+        'accepts money on a %s deal before activation, outside any schedule and without completing it',
+        async (status) => {
+            const {service, prisma, dealsService} = build({deal: {status}, totalPaid: 0});
+
+            await service.create(user, 'deal-1', paymentDto({amount: 500}));
+
+            expect(prisma.payment.create).toHaveBeenCalledWith(
+                expect.objectContaining({data: expect.objectContaining({amount: new Prisma.Decimal(500)})}),
+            );
+            expect(prisma.paymentSchedule.update).not.toHaveBeenCalled();
+            expect(dealsService.tryCompleteWithinTransaction).toHaveBeenCalled(); // a no-op until ACTIVE
+        },
+    );
+
+    it('still refuses money on a completed deal', async () => {
+        const {service, prisma} = build({deal: {status: DealStatus.COMPLETED}, totalPaid: 1000});
+
+        await expect(service.create(user, 'deal-1', paymentDto({amount: 1}))).rejects.toThrow();
+        expect(prisma.payment.create).not.toHaveBeenCalled();
     });
 
     it.each([DealStatus.CANCELLED, DealStatus.EXPIRED, DealStatus.RESERVED])(

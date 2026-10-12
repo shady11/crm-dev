@@ -23,6 +23,7 @@ import {
   ClientNotFoundException,
   DealNotFoundException,
   DiscountApprovalNotAllowedException,
+  PaidExceedsDiscountedPriceException,
   DiscountNotPendingException,
   SalePriceMismatchException,
   UnitNotAvailableException,
@@ -644,6 +645,10 @@ export class DealsService {
         metadata: { status: "ACTIVE" },
       });
 
+      // Paid in full before activation (FIN-9): there's nothing left to
+      // schedule, so the sale is complete.
+      await this.tryCompleteWithinTransaction(db, user, deal.id);
+
       if (deal.managerId) {
         await this.notifications.create({
           companyId,
@@ -704,6 +709,13 @@ export class DealsService {
 
       if (!this.domain.canDecideDiscount(deal.requestedDiscountPercent, hasPermission(user, 'deals.approve_discount'), user.discountLimit)) {
         throw new DiscountApprovalNotAllowedException();
+      }
+
+      // Payments are accepted before the decision (FIN-9), against the list
+      // price; the discount can't leave the client paid beyond the new price.
+      const paid = await db.payment.aggregate({ where: { dealId: deal.id, deletedAt: null }, _sum: { amount: true } });
+      if ((paid._sum.amount ?? new Prisma.Decimal(0)).greaterThan(deal.listPrice.minus(deal.requestedDiscountAmount ?? 0))) {
+        throw new PaidExceedsDiscountedPriceException();
       }
 
       await db.deal.update({
