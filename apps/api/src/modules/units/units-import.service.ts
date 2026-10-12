@@ -5,6 +5,7 @@ import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {UNIT_IMPORT_COLUMN_ALIASES} from "./units-import.constants";
 import {ImportUnitsResult} from "./dto/import-units-result.dto";
+import {activityText} from "@/modules/activities/activity-templates";
 
 type ParsedUnitRow = {
     block: string;
@@ -81,7 +82,7 @@ export class UnitsImportService {
                     userId: user.id,
                     action: ActivityAction.IMPORTED_UNITS,
                     type: ActivityType.UNITS_IMPORTED,
-                    title: `${created} units imported`,
+                    ...activityText('unitsImported', { count: created }),
                     metadata: {projectId, created, failed: errors.length},
                 },
             });

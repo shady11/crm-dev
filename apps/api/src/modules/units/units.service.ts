@@ -14,6 +14,7 @@ import {CreateUnitsBulkDto} from "@/modules/units/dto/create-units-bulk.dto";
 import {PrismaService} from "@/database/prisma.service";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
+import {activityText} from "@/modules/activities/activity-templates";
 
 /**
  * The only statuses a person may set by hand. RESERVED and SOLD belong to
@@ -59,6 +60,8 @@ export class UnitsService {
         action: ActivityAction;
         type: ActivityType;
         title: string;
+        templateKey?: string;
+        templateParams?: Prisma.InputJsonValue;
         metadata?: Prisma.InputJsonValue;
     }) {
         return this.prisma.activity.create({
@@ -69,6 +72,8 @@ export class UnitsService {
                 action: params.action,
                 type: params.type,
                 title: params.title,
+                templateKey: params.templateKey,
+                templateParams: params.templateParams,
                 metadata: params.metadata,
             },
         });
@@ -474,7 +479,7 @@ export class UnitsService {
             unitId: created.id,
             action: ActivityAction.CREATED_UNIT,
             type: ActivityType.UNIT_CREATED,
-            title: `Unit "${created.number}" created`,
+            ...activityText('unitCreated', { unit: created.number }),
             metadata: {blockId: created.blockId, floorId: created.floorId},
         });
 
@@ -512,7 +517,7 @@ export class UnitsService {
             actorId: user.id,
             action: ActivityAction.IMPORTED_UNITS,
             type: ActivityType.UNITS_IMPORTED,
-            title: `${created.length} units created on floor`,
+            ...activityText('unitsCreated', { count: created.length }),
             metadata: {floorId, blockId: floor.blockId, count: created.length},
         });
 
@@ -585,7 +590,7 @@ export class UnitsService {
                 unitId: id,
                 action: ActivityAction.CHANGED_UNIT_STATUS,
                 type: ActivityType.UNIT_STATUS_CHANGED,
-                title: `Unit "${updated.number}" status changed`,
+                ...activityText('unitStatusChanged', { unit: updated.number }),
                 metadata: {fromStatus: unit.status, toStatus: updated.status},
             });
         }
@@ -597,7 +602,7 @@ export class UnitsService {
                 unitId: id,
                 action: ActivityAction.UPDATED_UNIT,
                 type: ActivityType.UNIT_UPDATED,
-                title: `Unit "${updated.number}" updated`,
+                ...activityText('unitUpdated', { unit: updated.number }),
                 metadata: changes,
             });
         }
@@ -656,7 +661,7 @@ export class UnitsService {
             unitId: created.id,
             action: ActivityAction.CREATED_UNIT,
             type: ActivityType.UNIT_CREATED,
-            title: `Unit "${created.number}" created (duplicated from "${unit.number}")`,
+            ...activityText('unitDuplicated', { unit: created.number, source: unit.number }),
             metadata: {duplicatedFromUnitId: unit.id},
         });
 
@@ -707,7 +712,7 @@ export class UnitsService {
             actorId: user.id,
             action: ActivityAction.DELETED_UNIT,
             type: ActivityType.UNIT_DELETED,
-            title: `Unit "${unit.number}" deleted`,
+            ...activityText('unitDeleted', { unit: unit.number }),
             metadata: {unitId: unit.id, blockId: unit.blockId},
         });
 
@@ -740,7 +745,7 @@ export class UnitsService {
                 unitId: id,
                 action: ActivityAction.CHANGED_UNIT_STATUS,
                 type: ActivityType.UNIT_STATUS_CHANGED,
-                title: `Unit "${updated.number}" status changed`,
+                ...activityText('unitStatusChanged', { unit: updated.number }),
                 metadata: {fromStatus, toStatus: updated.status},
             });
         }

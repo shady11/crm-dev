@@ -34,7 +34,7 @@ import {DealMapper} from '../mappers/deal.mapper';
 import {DEAL_SORTABLE_FIELDS, DealQueryDto} from '../dto/deal-query.dto';
 import {resolveOrderBy} from '@/common/utils/sort.util';
 import {DealDomainService} from './deal-domain.service';
-import {DealActivityService} from './deal-activity.service';
+import {ActivityTitle, DealActivityService} from './deal-activity.service';
 import {ACTIVE_DEAL_STATUSES, DEAL_DETAILS_INCLUDE, dealAttentionWhere, dealStatusTitle, OVERDUE_INSTALLMENT_WHERE, RESERVATION_POLICY_SELECT} from "../deal.constants";
 import {ReserveUnitDto} from "../dto/reserve-unit.dto";
 import {AuthUser} from "@/common/types/auth-user.type";
@@ -52,6 +52,7 @@ import {GENERATABLE_DOCUMENT_TYPES} from "@/modules/document-generation/document
 import {TasksService} from "@/modules/tasks/tasks.service";
 import {MoneyHeldNotifier} from "./money-held-notifier.service";
 import {ReceiptNumberService} from "./payments/receipt-number.service";
+import { activityText } from '@/modules/activities/activity-templates';
 
 @Injectable()
 export class DealsService {
@@ -83,7 +84,7 @@ export class DealsService {
     clientId: string;
     type: DocumentType;
     userId: string;
-    activityTitle: string;
+    activityTitle: ActivityTitle;
   }) {
     try {
       const document = await this.documentGeneration.generateForDeal({
@@ -475,7 +476,7 @@ export class DealsService {
       clientId: result.clientId,
       type: DocumentType.RESERVATION,
       userId: user.id,
-      activityTitle: 'Reservation agreement generated',
+      activityTitle: activityText('reservationAgreementGenerated'),
     });
 
     // Best-effort, non-fatal — same reasoning as generateAndLogDocument
@@ -628,7 +629,7 @@ export class DealsService {
       clientId: result.clientId,
       type: DocumentType.CONTRACT,
       userId: user.id,
-      activityTitle: 'Sale contract generated',
+      activityTitle: activityText('saleContractGenerated'),
     });
 
     return this.mapper.toDetails(result);
@@ -781,7 +782,7 @@ export class DealsService {
       clientId: result.clientId,
       type: DocumentType.RESERVATION,
       userId: user.id,
-      activityTitle: 'Reservation agreement reissued at the approved price',
+      activityTitle: activityText('reservationAgreementReissued'),
     });
 
     await this.resolveDiscountNotifications(result, { outcome: 'approved', byName: user.name });
@@ -987,7 +988,7 @@ export class DealsService {
           unitId: deal.unitId,
           action: ActivityAction.CHANGED_UNIT_STATUS,
           type: ActivityType.UNIT_STATUS_CHANGED,
-          title: 'Unit relisted after deal cancellation',
+          ...activityText('unitRelistedAfterCancellation'),
           metadata: { toStatus: UnitStatus.AVAILABLE, dealId: deal.id, reason: dto.reason ?? null },
         },
       });
@@ -1107,7 +1108,7 @@ export class DealsService {
         unitId: deal.unitId,
         action: ActivityAction.CHANGED_UNIT_STATUS,
         type: ActivityType.UNIT_STATUS_CHANGED,
-        title: 'Unit marked sold',
+        ...activityText('unitMarkedSold'),
         metadata: { toStatus: UnitStatus.SOLD, dealId },
       },
     });
@@ -1230,7 +1231,7 @@ export class DealsService {
           clientId: deal.clientId,
           metadata: {documentId: document.id, documentType: type},
         },
-        `${type} document regenerated`,
+        activityText('documentRegenerated', {documentType: type}),
     );
 
     return document;

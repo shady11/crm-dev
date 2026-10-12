@@ -187,6 +187,11 @@ model Activity {
   description String?
   metadata    Json?
 
+  // The title as a key and its values (see activity-templates.ts), so the
+  // web shows it in the reader's language; title stays the English fallback.
+  templateKey    String?
+  templateParams Json?
+
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 

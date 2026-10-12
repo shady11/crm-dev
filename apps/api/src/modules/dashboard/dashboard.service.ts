@@ -313,7 +313,7 @@ export class DashboardService {
             orderBy: { createdAt: "desc" },
             take: 10,
             select: {
-                id: true, title: true, description: true, type: true, createdAt: true,
+                id: true, title: true, templateKey: true, templateParams: true, description: true, type: true, createdAt: true,
                 user: { select: { id: true, fullName: true } },
                 deal: { select: { id: true, dealNumber: true } },
             },

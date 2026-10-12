@@ -9,6 +9,7 @@ import { AuthUser } from '@/common/types/auth-user.type';
 import { DocumentGenerationService } from '@/modules/document-generation/document-generation.service';
 import { DealActivityService } from '../deal-activity.service';
 import { DealNotFoundException } from '../../exceptions';
+import { activityText } from '@/modules/activities/activity-templates';
 
 /**
  * FIN-8: the receipt for one incoming payment. Generated the first time it's
@@ -89,7 +90,7 @@ export class PaymentReceiptService {
           paymentId,
         },
       },
-      `Receipt ${payment.receiptNumber} issued`,
+      activityText('receiptIssued', { receipt: payment.receiptNumber }),
     );
 
     return document;

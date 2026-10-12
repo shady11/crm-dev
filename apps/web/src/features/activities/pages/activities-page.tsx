@@ -17,6 +17,7 @@ import {getBranches} from "@/features/branches/api/branches.api";
 import {getActivities} from "../api/activities.api";
 import {ActivitySubjects} from "../components/activity-subjects";
 import {ACTIVITY_SUBJECTS, type ActivitySubject} from "../types/activity.types";
+import {useActivityTitle} from "@/features/activities/hooks/use-activity-title.ts";
 
 // Company-wide activity feed. A company-wide (non-branch-scoped) role sees
 // every company user's activity; a branch-scoped role only sees their own
@@ -25,6 +26,7 @@ import {ACTIVITY_SUBJECTS, type ActivitySubject} from "../types/activity.types";
 // server enforces this regardless of what's sent from here.
 export function ActivitiesPage() {
     const {t, i18n} = useTranslation("activities");
+    const activityTitle = useActivityTitle();
     const {user} = useAuth();
     const isCompanyWide = !!user && !user.isBranchScoped;
     // activities.view_own only: the API returns just this user's actions,
@@ -202,7 +204,7 @@ export function ActivitiesPage() {
                             const {date, time} = formatDate(activity.createdAt, i18n.language);
                             return (
                                 <div key={activity.id} className="p-3 text-sm">
-                                    <p className="font-medium">{activity.title}</p>
+                                    <p className="font-medium">{activityTitle(activity)}</p>
                                     {activity.description ? (
                                         <p className="text-muted-foreground text-xs">{activity.description}</p>
                                     ) : null}
@@ -235,7 +237,7 @@ export function ActivitiesPage() {
                                             </TableCell>
                                             {!ownOnly && <TableCell>{activity.user?.fullName ?? t("page.system")}</TableCell>}
                                             <TableCell>
-                                                <p className="font-medium">{activity.title}</p>
+                                                <p className="font-medium">{activityTitle(activity)}</p>
                                                 {activity.description ? (
                                                     <p className="text-muted-foreground text-xs">
                                                         {activity.description}

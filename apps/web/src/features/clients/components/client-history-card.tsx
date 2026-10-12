@@ -10,6 +10,7 @@ import {Toggle} from "@/components/ui/toggle.tsx";
 import {getClientActivities} from "@/features/clients/api/clients.api.ts";
 import {formatDate} from "@/utils/date-formatter.ts";
 import {paths} from "@/routes/paths.ts";
+import {useActivityTitle} from "@/features/activities/hooks/use-activity-title.ts";
 
 // Activity types that are a conversation with the client, as logged from a lead.
 const CONTACT_ICONS: Record<string, typeof PhoneCallIcon> = {
@@ -28,6 +29,7 @@ const PAGE = 15;
  */
 export function ClientHistoryCard({ clientId }: { clientId: string }) {
     const { t, i18n } = useTranslation("clients");
+    const activityTitle = useActivityTitle();
     const [contactsOnly, setContactsOnly] = useState(false);
     const [shown, setShown] = useState(PAGE);
 
@@ -75,7 +77,7 @@ export function ClientHistoryCard({ clientId }: { clientId: string }) {
                                     <Icon className={`mt-0.5 size-4 shrink-0 ${isContact ? "text-primary" : "text-muted-foreground"}`} />
                                     <div className="min-w-0 flex-1">
                                         {/* A logged contact is stored as "Contact attempt logged"; say what it was. */}
-                                        <p className="font-medium">{isContact ? t(`history.types.${activity.type}`) : activity.title}</p>
+                                        <p className="font-medium">{isContact ? t(`history.types.${activity.type}`) : activityTitle(activity)}</p>
                                         {activity.description && (
                                             <p className="whitespace-pre-line text-muted-foreground">{activity.description}</p>
                                         )}

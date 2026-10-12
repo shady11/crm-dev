@@ -6,6 +6,7 @@ import {CreateEntranceDto} from "./dto/create-entrance.dto";
 import {UpdateEntranceDto} from "./dto/update-entrance.dto";
 import {QueryEntrancesDto} from "./dto/query-entrances.dto";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
+import {activityText} from "@/modules/activities/activity-templates";
 
 @Injectable()
 export class EntrancesService {
@@ -23,6 +24,8 @@ export class EntrancesService {
         action: ActivityAction;
         type: ActivityType;
         title: string;
+        templateKey?: string;
+        templateParams?: Prisma.InputJsonValue;
         metadata?: Prisma.InputJsonValue;
     }) {
         return this.prisma.activity.create({
@@ -33,6 +36,8 @@ export class EntrancesService {
                 action: params.action,
                 type: params.type,
                 title: params.title,
+                templateKey: params.templateKey,
+                templateParams: params.templateParams,
                 metadata: params.metadata,
             },
         });
@@ -211,7 +216,7 @@ export class EntrancesService {
             entranceId: created.id,
             action: ActivityAction.CREATED_ENTRANCE,
             type: ActivityType.ENTRANCE_CREATED,
-            title: `Entrance "${created.name}" created`,
+            ...activityText('entranceCreated', { name: created.name }),
         });
 
         return created;
@@ -264,7 +269,7 @@ export class EntrancesService {
                 entranceId: id,
                 action: ActivityAction.UPDATED_ENTRANCE,
                 type: ActivityType.ENTRANCE_UPDATED,
-                title: `Entrance "${updated.name}" updated`,
+                ...activityText('entranceUpdated', { name: updated.name }),
                 metadata: changes,
             });
         }
@@ -353,7 +358,7 @@ export class EntrancesService {
             entranceId: newEntrance.id,
             action: ActivityAction.CREATED_ENTRANCE,
             type: ActivityType.ENTRANCE_CREATED,
-            title: `Entrance "${newEntrance.name}" created (duplicated from "${entrance.name}")`,
+            ...activityText('entranceDuplicated', { name: newEntrance.name, source: entrance.name }),
             metadata: {duplicatedFromEntranceId: entrance.id},
         });
 
@@ -451,7 +456,7 @@ export class EntrancesService {
             actorId: user.id,
             action: ActivityAction.DELETED_ENTRANCE,
             type: ActivityType.ENTRANCE_DELETED,
-            title: `Entrance "${entrance.name}" deleted`,
+            ...activityText('entranceDeleted', { name: entrance.name }),
             metadata: {entranceId: entrance.id},
         });
 

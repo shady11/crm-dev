@@ -1,6 +1,7 @@
 import {Injectable} from '@nestjs/common';
 import {ActivityAction, ActivityType, Prisma} from '@/generated/prisma/client';
 import {DbClient} from '@/database/prisma.types';
+import {activityText} from '@/modules/activities/activity-templates';
 
 interface CreateActivityParams {
     db: DbClient;
@@ -15,10 +16,20 @@ interface CreateActivityParams {
     type: ActivityType;
 
     title: string;
+    templateKey?: string;
+    templateParams?: Prisma.InputJsonValue;
     description?: string;
 
     metadata?: Prisma.InputJsonValue;
 }
+
+type EventParams = Omit<
+    CreateActivityParams,
+    'action' | 'type' | 'title' | 'templateKey' | 'templateParams'
+>;
+
+/** A title from activityText(), e.g. activityText('receiptIssued', {...}). */
+export type ActivityTitle = ReturnType<typeof activityText>;
 
 @Injectable()
 export class DealActivityService {
@@ -33,6 +44,8 @@ export class DealActivityService {
             action,
             type,
             title,
+            templateKey,
+            templateParams,
             description,
             metadata,
         } = params;
@@ -50,6 +63,8 @@ export class DealActivityService {
                 type,
 
                 title,
+                templateKey,
+                templateParams,
                 description,
 
                 metadata,
@@ -58,146 +73,146 @@ export class DealActivityService {
     }
 
     reserve(
-        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+        params: EventParams,
     ) {
         return this.create({
             ...params,
             action: ActivityAction.RESERVED_UNIT,
             type: ActivityType.UNIT_RESERVED,
-            title: 'Unit reserved',
+            ...activityText('unitReserved'),
         });
     }
 
     extendReservation(
-        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+        params: EventParams,
     ) {
         return this.create({
             ...params,
             action: ActivityAction.UPDATED,
             type: ActivityType.RESERVATION_EXTENDED,
-            title: 'Reservation extended',
+            ...activityText('reservationExtended'),
         });
     }
 
     cancelReservation(
-        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+        params: EventParams,
     ) {
         return this.create({
             ...params,
             action: ActivityAction.CANCELLED_RESERVATION,
             type: ActivityType.RESERVATION_CANCELLED,
-            title: 'Reservation cancelled',
+            ...activityText('reservationCancelled'),
         });
     }
 
     expireReservation(
-        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+        params: EventParams,
     ) {
         return this.create({
             ...params,
             action: ActivityAction.CHANGED_DEAL_STATUS,
             type: ActivityType.RESERVATION_EXPIRED,
-            title: 'Reservation expired',
+            ...activityText('reservationExpired'),
         });
     }
 
     signContract(
-        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+        params: EventParams,
     ) {
         return this.create({
             ...params,
             action: ActivityAction.GENERATED_CONTRACT,
             type: ActivityType.CONTRACT_SIGNED,
-            title: 'Contract signed',
+            ...activityText('contractSigned'),
         });
     }
 
     paymentReceived(
-        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+        params: EventParams,
     ) {
         return this.create({
             ...params,
             action: ActivityAction.RECEIVED_PAYMENT,
             type: ActivityType.PAYMENT_RECEIVED,
-            title: 'Payment received',
+            ...activityText('paymentReceived'),
         });
     }
 
     paymentRefunded(
-        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+        params: EventParams,
     ) {
         return this.create({
             ...params,
             action: ActivityAction.RECEIVED_PAYMENT,
             type: ActivityType.PAYMENT_REFUNDED,
-            title: 'Refund issued',
+            ...activityText('refundIssued'),
         });
     }
 
     dealUpdated(
-        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+        params: EventParams,
     ) {
         return this.create({
             ...params,
             action: ActivityAction.UPDATED_DEAL,
             type: ActivityType.DEAL_UPDATED,
-            title: 'Deal updated',
+            ...activityText('dealUpdated'),
         });
     }
 
     reassignManager(
-        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+        params: EventParams,
     ) {
         return this.create({
             ...params,
             action: ActivityAction.REASSIGNED,
             type: ActivityType.DEAL_REASSIGNED,
-            title: 'Deal reassigned to another manager',
+            ...activityText('dealReassigned'),
         });
     }
 
     documentGenerated(
-        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
-        title: string,
+        params: EventParams,
+        text: ActivityTitle,
     ) {
         return this.create({
             ...params,
             action: ActivityAction.GENERATED_DOCUMENT,
             type: ActivityType.DOCUMENT_GENERATED,
-            title,
+            ...text,
         });
     }
 
     discountRequested(
-        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+        params: EventParams,
     ) {
         return this.create({
             ...params,
             action: ActivityAction.DISCOUNT_REQUESTED,
             type: ActivityType.DISCOUNT_REQUESTED,
-            title: 'Discount requested approval',
+            ...activityText('discountRequested'),
         });
     }
 
     discountApproved(
-        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+        params: EventParams,
     ) {
         return this.create({
             ...params,
             action: ActivityAction.DISCOUNT_APPROVED,
             type: ActivityType.DISCOUNT_APPROVED,
-            title: 'Discount approved',
+            ...activityText('discountApproved'),
         });
     }
 
     discountRejected(
-        params: Omit<CreateActivityParams, 'action' | 'type' | 'title'>,
+        params: EventParams,
     ) {
         return this.create({
             ...params,
             action: ActivityAction.DISCOUNT_REJECTED,
             type: ActivityType.DISCOUNT_REJECTED,
-            title: 'Discount rejected',
+            ...activityText('discountRejected'),
         });
     }
 }
