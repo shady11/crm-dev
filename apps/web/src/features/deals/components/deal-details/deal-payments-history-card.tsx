@@ -60,6 +60,12 @@ export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPa
                                         {t(PAYMENT_METHOD_LABEL_KEYS[p.paymentMethod]) ?? p.paymentMethod}
                                         {p.reference && ` · ${p.reference}`}
                                     </p>
+                                    {p.user && (
+                                        <p className="text-xs text-muted-foreground">
+                                            {t("paymentsHistory.recordedBy", { ns: "deals", name: p.user.fullName })}
+                                        </p>
+                                    )}
+                                    {p.note && <p className="mt-0.5 text-xs italic text-muted-foreground">{p.note}</p>}
                                 </div>
                                 <div className="text-right">
                                     <p className="font-medium">{formatCurrency(p.amount)}</p>

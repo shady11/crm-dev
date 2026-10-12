@@ -43,6 +43,7 @@ import {DealDetailsSidebar} from "@/features/deals/components/deal-details/deal-
 import {useTranslation} from "react-i18next";
 import {PAYMENT_METHOD_LABEL_KEYS, PAYMENT_TYPE_LABEL_KEYS} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useReservationPolicy} from "@/features/deals/hooks/use-reservation-policy.ts";
 import {reservationDateBounds} from "@/features/deals/utils/reservation-dates.ts";
 import {hasPermission} from "@/features/auth/access";
@@ -66,6 +67,7 @@ function TabCount({ count }: { count: number }) {
 
 export function DealDetailsPage() {
     const { t, i18n } = useTranslation(["deals", "payments"]);
+    const { formatCurrency } = useCompanyFormatters();
     const { dealId } = useParams<{ dealId: string }>();
     const navigate = useNavigate();
     const dealQuery = useDeal(dealId);
@@ -106,6 +108,7 @@ export function DealDetailsPage() {
     const [paymentType, setPaymentType] = useState<PaymentType | "">("");
     const [paidAt, setPaidAt] = useState([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
     const [reference, setReference] = useState("");
+    const [paymentNote, setPaymentNote] = useState("");
 
     const [reassignOpen, setReassignOpen] = useState(false);
 
@@ -134,6 +137,17 @@ export function DealDetailsPage() {
     const openRefundDialog = () => {
         setPaymentType("REFUND");
         setPaymentAmount(totalPaid);
+        setPaymentOpen(true);
+    };
+
+    // The cashier's usual case is the next installment, so the form starts
+    // there: its unpaid part, capped at what's left on the deal.
+    const nextInstallment = deal.paymentSchedules.find((s) => s.status !== "PAID");
+    const nextInstallmentDue = nextInstallment ? Math.max(nextInstallment.amount - nextInstallment.paidAmount, 0) : 0;
+    const openPaymentDialog = () => {
+        const amount = Math.min(nextInstallmentDue || remaining, remaining);
+        setPaymentAmount(Math.round(amount * 100) / 100);
+        setPaymentType(amount > 0 && amount >= remaining ? "FINAL" : "INSTALLMENT");
         setPaymentOpen(true);
     };
 
@@ -261,7 +275,7 @@ export function DealDetailsPage() {
                         ) : null
                     )}
                     {deal.status === "ACTIVE" && canManagePayments && (
-                        <Button onClick={() => setPaymentOpen(true)}>{t("paymentsHistory.record")}</Button>
+                        <Button onClick={openPaymentDialog}>{t("paymentsHistory.record")}</Button>
                     )}
                     {isOpen && (canCancel || (deal.status === "ACTIVE" && canManage)) && (
                         <Menu>
@@ -336,7 +350,7 @@ export function DealDetailsPage() {
                             <DealPaymentsHistoryCard
                                 payments={deal.payments}
                                 canRecordPayment={deal.status === "ACTIVE" && canManagePayments}
-                                onRecordPayment={() => setPaymentOpen(true)}
+                                onRecordPayment={openPaymentDialog}
                                 canRecordRefund={canRecordRefund}
                                 onRecordRefund={openRefundDialog}
                             />
@@ -679,6 +693,17 @@ export function DealDetailsPage() {
                             >
                                 <NumberInputGroup><NumberInputInput /></NumberInputGroup>
                             </NumberInput>
+                            <FieldDescription>
+                                {paymentType === "REFUND"
+                                    ? t("detailsPage.amountHintRefund", { paid: formatCurrency(totalPaid) })
+                                    : [
+                                        t("detailsPage.amountHintRemaining", { remaining: formatCurrency(remaining) }),
+                                        nextInstallment && t("detailsPage.amountHintNext", {
+                                            amount: formatCurrency(nextInstallmentDue),
+                                            date: formatDate(nextInstallment.dueDate, i18n.language).date,
+                                        }),
+                                    ].filter(Boolean).join(" · ")}
+                            </FieldDescription>
                         </Field>
                         <Field>
                             <FieldLabel>{t("detailsPage.paymentMethodLabel")}</FieldLabel>
@@ -742,6 +767,16 @@ export function DealDetailsPage() {
                             <FieldLabel>{t("detailsPage.reference")}</FieldLabel>
                             <Input placeholder={t("detailsPage.referencePlaceholder")} value={reference} onChange={(e) => setReference(e.target.value)} />
                         </Field>
+                        <Field>
+                            <FieldLabel>{t("detailsPage.paymentNote")}</FieldLabel>
+                            <Textarea
+                                rows={2}
+                                maxLength={2000}
+                                placeholder={t("detailsPage.paymentNotePlaceholder")}
+                                value={paymentNote}
+                                onChange={(e) => setPaymentNote(e.target.value)}
+                            />
+                        </Field>
                     </DialogBody>
                     <DialogFooter>
                         <Button variant="secondary" onClick={() => setPaymentOpen(false)}>{t("detailsPage.back")}</Button>
@@ -756,6 +791,7 @@ export function DealDetailsPage() {
                                         paymentType: paymentType as PaymentType,
                                         paidAt: new Date(paidAt[0].toString()).toISOString(),
                                         reference: reference || undefined,
+                                        note: paymentNote.trim() || undefined,
                                     },
                                     {
                                         onSuccess: () => {
@@ -764,6 +800,7 @@ export function DealDetailsPage() {
                                             setPaymentMethod("");
                                             setPaymentType("");
                                             setReference("");
+                                            setPaymentNote("");
                                             setPaidAt([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
                                         }
                                     },

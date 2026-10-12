@@ -124,7 +124,8 @@
     "title": "Платежи",
     "record": "Записать платёж",
     "empty": "Платежи пока не зафиксированы.",
-    "recordRefund": "Оформить возврат"
+    "recordRefund": "Оформить возврат",
+    "recordedBy": "Внёс(ла): {{name}}"
   },
   "detailsPage": {
     "dealNumber": "Сделка №{{number}}",
@@ -170,7 +171,12 @@
     "generateContract": "Договор купли-продажи",
     "activateDialogTitle": "Активировать сделку?",
     "activateDialogDescription": "С этого момента начинается оплата: можно сформировать график платежей и вносить взносы. Активную сделку нельзя вернуть в статус «Договор подписан».",
-    "refundDialogTitle": "Оформить возврат"
+    "refundDialogTitle": "Оформить возврат",
+    "paymentNote": "Комментарий (необязательно)",
+    "paymentNotePlaceholder": "например, оплатил брат клиента",
+    "amountHintRemaining": "Осталось по сделке: {{remaining}}",
+    "amountHintNext": "следующий платёж {{amount}}, срок {{date}}",
+    "amountHintRefund": "Можно вернуть до {{paid}}"
   },
   "toasts": {
     "unitReserved": "Помещение забронировано",

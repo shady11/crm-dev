@@ -96,6 +96,8 @@ export const DEAL_DETAILS_INCLUDE = {
     payments: {
         where: { deletedAt: null },
         orderBy: { paidAt: 'desc' },
+        // Who recorded it, for the deal's payment list (FIN-10).
+        include: { user: { select: { id: true, fullName: true } } },
     },
 
     paymentSchedules: {

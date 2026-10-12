@@ -124,7 +124,8 @@
     "title": "Төлөмдөр",
     "record": "Төлөм жаздыруу",
     "empty": "Азырынча төлөм катталган жок.",
-    "recordRefund": "Кайтарууну каттоо"
+    "recordRefund": "Кайтарууну каттоо",
+    "recordedBy": "Киргизген: {{name}}"
   },
   "detailsPage": {
     "dealNumber": "Бүтүм №{{number}}",
@@ -170,7 +171,12 @@
     "generateContract": "Сатып алуу-сатуу келишими",
     "activateDialogTitle": "Бүтүмдү активдештирүү керекпи?",
     "activateDialogDescription": "Мындан ары төлөмдөр башталат: төлөм графигин түзүп, төлөмдөрдү киргизүүгө болот. Активдүү бүтүмдү «Келишимге кол коюлду» статусуна кайтаруу мүмкүн эмес.",
-    "refundDialogTitle": "Кайтарууну каттоо"
+    "refundDialogTitle": "Кайтарууну каттоо",
+    "paymentNote": "Эскертүү (милдеттүү эмес)",
+    "paymentNotePlaceholder": "мисалы, кардардын агасы төлөдү",
+    "amountHintRemaining": "Бүтүм боюнча калды: {{remaining}}",
+    "amountHintNext": "кийинки төлөм {{amount}}, мөөнөтү {{date}}",
+    "amountHintRefund": "{{paid}} чейин кайтарууга болот"
   },
   "toasts": {
     "unitReserved": "Жай бронделди",

@@ -124,7 +124,8 @@
     "title": "Payments",
     "record": "Record payment",
     "empty": "No payments recorded yet.",
-    "recordRefund": "Record refund"
+    "recordRefund": "Record refund",
+    "recordedBy": "Recorded by {{name}}"
   },
   "detailsPage": {
     "dealNumber": "Deal #{{number}}",
@@ -170,7 +171,12 @@
     "generateContract": "Sale contract",
     "activateDialogTitle": "Activate this deal?",
     "activateDialogDescription": "Payments start from here: you can then generate the payment schedule and record installments. An active deal can't go back to \"Contract signed\".",
-    "refundDialogTitle": "Record refund"
+    "refundDialogTitle": "Record refund",
+    "paymentNote": "Note (optional)",
+    "paymentNotePlaceholder": "e.g. paid by the client's brother",
+    "amountHintRemaining": "{{remaining}} left on this deal",
+    "amountHintNext": "next installment {{amount}}, due {{date}}",
+    "amountHintRefund": "Up to {{paid}} can be refunded"
   },
   "toasts": {
     "unitReserved": "Unit reserved",
