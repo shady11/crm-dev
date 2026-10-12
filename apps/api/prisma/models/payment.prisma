@@ -41,10 +41,21 @@ model Payment {
 
   note String?
 
+  // FIN-8: R-YYYY-NNNN, from ReceiptNumberCounter when the payment is
+  // recorded. Every incoming payment gets one, gap-free per company and
+  // year; a refund doesn't, since it isn't a receipt.
+  receiptNumber String?
+
+  // The receipt PDF, once someone has asked for it. Generated on request
+  // and reused after that, so the same number always prints the same file.
+  receiptDocumentId String?   @unique
+  receiptDocument   Document? @relation(fields: [receiptDocumentId], references: [id], onDelete: SetNull)
+
   createdAt DateTime  @default(now())
   deletedAt DateTime?
 
   @@index([dealId])
+  @@index([receiptNumber])
   @@index([paidAt])
   @@index([paymentMethod])
   @@index([paymentType])
@@ -76,4 +87,16 @@ model PaymentSchedule {
   @@index([status])
   @@index([dueDate])
   @@index([dealId, dueDate])
+}
+
+// Hands out receipt numbers the way DealNumberCounter hands out deal numbers:
+// one row per company and year, incremented under a row lock.
+model ReceiptNumberCounter {
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  year         Int
+  lastSequence Int @default(0)
+
+  @@id([companyId, year])
 }

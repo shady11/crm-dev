@@ -131,6 +131,7 @@ export class PaymentRegisterService {
     const sheet = XLSX.utils.json_to_sheet(
       rows.map((row) => ({
         Date: dayOf(row.paidAt),
+        Receipt: row.receiptNumber ?? '',
         Deal: row.deal.dealNumber,
         Client: row.deal.client.fullName,
         Project: row.deal.project.name,
@@ -313,6 +314,7 @@ export class PaymentRegisterService {
       paymentType: row.paymentType,
       reference: row.reference,
       note: row.note,
+      receiptNumber: row.receiptNumber,
       recordedBy: row.user,
       deal: {
         id: row.deal.id,

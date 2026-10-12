@@ -93,6 +93,8 @@ type DealPayment = {
     reference: string | null;
     note: string | null;
     createdAt: string;
+    /** R-YYYY-NNNN; null for a refund. */
+    receiptNumber: string | null;
     /** Who recorded it; null for payments from before this was tracked. */
     user: { id: string; fullName: string } | null;
 };

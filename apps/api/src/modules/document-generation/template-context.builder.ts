@@ -155,3 +155,87 @@ export function buildTemplateContext(
     today: date(new Date()),
   };
 }
+
+// English labels, matching the English default templates. A company that
+// wants its own language replaces the template, not these values.
+const PAYMENT_METHOD_LABELS: Record<string, string> = {
+  CASH: 'Cash',
+  BANK_TRANSFER: 'Bank transfer',
+  MBANK: 'MBank',
+  OPTIMA: 'Optima',
+  ELKART: 'Elkart',
+  OTHER: 'Other',
+};
+const PAYMENT_TYPE_LABELS: Record<string, string> = {
+  DEPOSIT: 'Deposit',
+  INSTALLMENT: 'Installment',
+  FINAL: 'Final payment',
+  REFUND: 'Refund',
+};
+
+type ReceiptPayment = Prisma.PaymentGetPayload<{
+  include: { user: { select: { fullName: true } } };
+}>;
+
+/**
+ * FIN-8: everything a PAYMENT_RECEIPT template can print - the deal's usual
+ * context, the payment itself, and where the deal stands after it.
+ */
+export interface ReceiptTemplateContext extends TemplateContext {
+  payment: {
+    receiptNumber: string;
+    date: string;
+    amount: string;
+    method: string;
+    type: string;
+    reference: string;
+    note: string;
+    receivedBy: string;
+  };
+  totals: {
+    paidToDate: string;
+    remaining: string;
+  };
+}
+
+export function buildReceiptContext(
+  deal: DealWithDetails,
+  company: Company,
+  payment: ReceiptPayment,
+): ReceiptTemplateContext {
+  const base = buildTemplateContext(deal, company);
+  const currency = company.currency ?? undefined;
+
+  // Paid up to and including this payment, net of refunds before it, so a
+  // receipt reprinted later still shows the balance as it was that day.
+  const paidToDate = deal.payments
+    .filter(
+      (p) =>
+        p.paidAt < payment.paidAt ||
+        (p.paidAt.getTime() === payment.paidAt.getTime() &&
+          p.createdAt <= payment.createdAt),
+    )
+    .reduce((sum, p) => sum + Number(p.amount), 0);
+
+  return {
+    ...base,
+    payment: {
+      receiptNumber: payment.receiptNumber ?? '',
+      date: date(payment.paidAt),
+      amount: money(payment.amount, currency),
+      method:
+        PAYMENT_METHOD_LABELS[payment.paymentMethod] ?? payment.paymentMethod,
+      type: PAYMENT_TYPE_LABELS[payment.paymentType] ?? payment.paymentType,
+      reference: payment.reference ?? '',
+      note: payment.note ?? '',
+      receivedBy: payment.user?.fullName ?? '',
+    },
+    totals: {
+      paidToDate: money(paidToDate, currency),
+      remaining: money(
+        Math.max(Number(deal.salePrice) - paidToDate, 0),
+        currency,
+      ),
+    },
+  };
+}

@@ -134,11 +134,12 @@ describe('DealsService', () => {
         };
 
         const moneyHeld = {notifyIfHeld: jest.fn().mockResolvedValue(undefined)};
+        const receiptNumbers = {next: jest.fn().mockResolvedValue('R-2026-0001')};
 
         const service = new DealsService(
             prisma, mapper, domain, activityService as any, notifications as any,
             dealNumberService as any, documentGeneration as any, rbacService as any, tasksService as any,
-            moneyHeld as any,
+            moneyHeld as any, receiptNumbers as any,
         );
 
         return {service, prisma, activityService, notifications, dealNumberService, documentGeneration, tasksService, moneyHeld};
@@ -344,7 +345,7 @@ describe('DealsService', () => {
             await service.reserveUnit(managerUser, reserveDto({salePrice: 100000, deposit: 5000}));
 
             expect(prisma.payment.create).toHaveBeenCalledWith(
-                expect.objectContaining({data: expect.objectContaining({amount: 5000, dealId: 'deal-1'})}),
+                expect.objectContaining({data: expect.objectContaining({amount: 5000, dealId: 'deal-1', receiptNumber: 'R-2026-0001'})}),
             );
         });
 

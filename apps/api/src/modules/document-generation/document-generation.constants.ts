@@ -12,3 +12,13 @@ export const GENERATABLE_DOCUMENT_TYPES: DocumentType[] = [
   DocumentType.RESERVATION,
   DocumentType.CONTRACT,
 ];
+
+/**
+ * Types a company can supply its own template for. PAYMENT_RECEIPT renders
+ * per payment (DocumentGenerationService.generateReceipt), so it's
+ * templatable but not in GENERATABLE_DOCUMENT_TYPES, the per-deal list.
+ */
+export const TEMPLATABLE_DOCUMENT_TYPES: DocumentType[] = [
+  ...GENERATABLE_DOCUMENT_TYPES,
+  DocumentType.PAYMENT_RECEIPT,
+];

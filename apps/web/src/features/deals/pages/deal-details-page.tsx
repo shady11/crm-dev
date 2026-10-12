@@ -353,6 +353,8 @@ export function DealDetailsPage() {
                                 onRecordPayment={openPaymentDialog}
                                 canRecordRefund={canRecordRefund}
                                 onRecordRefund={openRefundDialog}
+                                dealId={deal.id}
+                                canIssueReceipts={canManagePayments}
                             />
                         </TabsContent>
 

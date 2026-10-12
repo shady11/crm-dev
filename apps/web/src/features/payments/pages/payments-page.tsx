@@ -19,6 +19,7 @@ import {PAYMENT_METHOD_LABEL_KEYS, PAYMENT_TYPE_LABEL_KEYS} from "@/features/dea
 import type {PaymentMethod, PaymentType} from "@/features/deals/api/deals.api";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
+import {ReceiptButton} from "@/features/payments/components/receipt-button.tsx";
 import {paths} from "@/routes/paths";
 import {
     downloadPaymentsExport,
@@ -216,11 +217,15 @@ export function PaymentsPage() {
                                 <Link to={paths.deals.payments(p.deal.id)} className="font-medium hover:underline">{p.deal.dealNumber}</Link>
                                 <p className="truncate text-xs text-muted-foreground">{p.client.fullName}</p>
                             </div>
-                            <p className={`shrink-0 font-medium tabular-nums ${amountClass(p.amount)}`}>{formatCurrency(p.amount)}</p>
+                            <div className="flex shrink-0 items-center gap-1">
+                                <p className={`font-medium tabular-nums ${amountClass(p.amount)}`}>{formatCurrency(p.amount)}</p>
+                                {p.receiptNumber && <ReceiptButton dealId={p.deal.id} paymentId={p.id} receiptNumber={p.receiptNumber} />}
+                            </div>
                         </div>
                         <p className="mt-2 text-xs text-muted-foreground">
                             {date(p.paidAt)} · {t(PAYMENT_TYPE_LABEL_KEYS[p.paymentType])} · {t(PAYMENT_METHOD_LABEL_KEYS[p.paymentMethod])}
                             {p.reference && ` · ${p.reference}`}
+                            {p.receiptNumber && ` · ${p.receiptNumber}`}
                         </p>
                     </div>
                 ))}
@@ -233,13 +238,17 @@ export function PaymentsPage() {
                         <TableHead>{t("page.table.type")}</TableHead>
                         <TableHead>{t("page.table.method")}</TableHead>
                         <TableHead>{t("page.table.recordedBy")}</TableHead>
-                        <TableHead className="pr-4 text-right">{t("page.table.amount")}</TableHead>
+                        <TableHead className="text-right">{t("page.table.amount")}</TableHead>
+                        <TableHead className="w-10 pr-4"><span className="sr-only">{t("page.table.receipt")}</span></TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {items.map((p) => (
                         <TableRow key={p.id}>
-                            <TableCell className="pl-4 tabular-nums">{date(p.paidAt)}</TableCell>
+                            <TableCell className="pl-4 tabular-nums">
+                                <p>{date(p.paidAt)}</p>
+                                {p.receiptNumber && <p className="text-xs text-muted-foreground">{p.receiptNumber}</p>}
+                            </TableCell>
                             <TableCell>
                                 <Link to={paths.deals.payments(p.deal.id)} className="font-medium hover:underline">{p.deal.dealNumber}</Link>
                                 <p className="text-xs text-muted-foreground">{p.client.fullName}</p>
@@ -254,7 +263,10 @@ export function PaymentsPage() {
                                 {p.reference && <p className="text-xs text-muted-foreground">{p.reference}</p>}
                             </TableCell>
                             <TableCell>{p.recordedBy?.fullName ?? "—"}</TableCell>
-                            <TableCell className={`pr-4 text-right font-medium tabular-nums ${amountClass(p.amount)}`}>{formatCurrency(p.amount)}</TableCell>
+                            <TableCell className={`text-right font-medium tabular-nums ${amountClass(p.amount)}`}>{formatCurrency(p.amount)}</TableCell>
+                            <TableCell className="pr-4">
+                                {p.receiptNumber && <ReceiptButton dealId={p.deal.id} paymentId={p.id} receiptNumber={p.receiptNumber} />}
+                            </TableCell>
                         </TableRow>
                     ))}
                 </TableBody>

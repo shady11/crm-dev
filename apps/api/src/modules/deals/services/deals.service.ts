@@ -50,6 +50,7 @@ import {DocumentGenerationService} from "@/modules/document-generation/document-
 import {GENERATABLE_DOCUMENT_TYPES} from "@/modules/document-generation/document-generation.constants";
 import {TasksService} from "@/modules/tasks/tasks.service";
 import {MoneyHeldNotifier} from "./money-held-notifier.service";
+import {ReceiptNumberService} from "./payments/receipt-number.service";
 
 @Injectable()
 export class DealsService {
@@ -66,6 +67,7 @@ export class DealsService {
       private readonly rbacService: RbacService,
       private readonly tasksService: TasksService,
       private readonly moneyHeld: MoneyHeldNotifier,
+      private readonly receiptNumbers: ReceiptNumberService,
   ) {}
 
   /**
@@ -392,6 +394,7 @@ export class DealsService {
             paymentMethod: dto.depositPaymentMethod ?? PaymentMethod.CASH,
             paymentType: PaymentType.DEPOSIT,
             paidAt: new Date(),
+            receiptNumber: await this.receiptNumbers.next(db, companyId),
           },
         });
       }

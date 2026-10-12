@@ -95,7 +95,8 @@ export const DEAL_DETAILS_INCLUDE = {
 
     payments: {
         where: { deletedAt: null },
-        orderBy: { paidAt: 'desc' },
+        // Newest first; same-day payments by when they were recorded.
+        orderBy: [{ paidAt: 'desc' }, { createdAt: 'desc' }],
         // Who recorded it, for the deal's payment list (FIN-10).
         include: { user: { select: { id: true, fullName: true } } },
     },
