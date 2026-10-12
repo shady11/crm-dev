@@ -39,10 +39,21 @@ export class PaymentReceiptService {
     if (!deal) throw new DealNotFoundException(dealId);
 
     const payment = await this.prisma.payment.findFirst({
-      where: { id: paymentId, dealId, deletedAt: null },
-      select: { id: true, receiptNumber: true, receiptDocument: true },
+      where: { id: paymentId, dealId },
+      select: {
+        id: true,
+        receiptNumber: true,
+        receiptDocument: true,
+        deletedAt: true,
+      },
     });
     if (!payment) throw new NotFoundException('Payment not found');
+    // Voided (FIN-3): the number stays taken, but the receipt doesn't stand.
+    if (payment.deletedAt) {
+      throw new BadRequestException(
+        'This payment was voided, so its receipt no longer stands.',
+      );
+    }
     if (!payment.receiptNumber) {
       throw new BadRequestException(
         "This payment has no receipt: refunds aren't receipts.",

@@ -29,7 +29,7 @@ import {Field, FieldDescription, FieldGroup, FieldLabel, FieldSet} from "@/compo
 import {DealPaymentScheduleCard} from "@/features/deals/components/deal-details/deal-payment-schedule-card.tsx";
 import {DealPaymentsHistoryCard} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
 import {NumberInput, NumberInputGroup, NumberInputInput} from "@/components/ui/number-input";
-import type {PaymentMethod, PaymentType} from "../api/deals.api";
+import type {DealDetails, PaymentMethod, PaymentType} from "../api/deals.api";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {DealTasksCard} from "@/features/deals/components/deal-tasks-card.tsx";
 import {DealDiscountBanner} from "@/features/deals/components/deal-details/deal-discount-banner.tsx";
@@ -80,6 +80,7 @@ export function DealDetailsPage() {
     const canDecideDiscount = hasPermission(user, "deals.approve_discount");
     const canCancel = hasPermission(user, "deals.cancel");
     const canManagePayments = hasPermission(user, "deals.manage_payments");
+    const canVoidPayments = hasPermission(user, "deals.void_payments");
     // Extend, sign, activate and complete: the deal's own lifecycle.
     const canManage = hasPermission(user, "deals.manage");
     const [rejectOpen, setRejectOpen] = useState(false);
@@ -109,6 +110,8 @@ export function DealDetailsPage() {
     const [paidAt, setPaidAt] = useState([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
     const [reference, setReference] = useState("");
     const [paymentNote, setPaymentNote] = useState("");
+    const [voidTarget, setVoidTarget] = useState<DealDetails["payments"][number] | null>(null);
+    const [voidReason, setVoidReason] = useState("");
 
     const [reassignOpen, setReassignOpen] = useState(false);
 
@@ -364,6 +367,9 @@ export function DealDetailsPage() {
                                 onRecordRefund={openRefundDialog}
                                 dealId={deal.id}
                                 canIssueReceipts={canManagePayments}
+                                canVoid={canVoidPayments}
+                                onVoid={(payment) => { setVoidReason(""); setVoidTarget(payment); }}
+                                voidedPayments={deal.voidedPayments}
                             />
                         </TabsContent>
 
@@ -685,6 +691,45 @@ export function DealDetailsPage() {
                             }
                         >
                             {t("detailsPage.generate")}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Void payment dialog (FIN-3) */}
+            <Dialog open={voidTarget !== null} onOpenChange={({ open }) => { if (!open) setVoidTarget(null); }}>
+                <DialogContent size="sm">
+                    <DialogHeader
+                        title={t("detailsPage.voidDialogTitle", { amount: voidTarget ? formatCurrency(voidTarget.amount) : "" })}
+                        description={t("detailsPage.voidDialogDescription")}
+                    />
+                    <DialogBody className="flex flex-col gap-3">
+                        <Field>
+                            <FieldLabel>{t("detailsPage.voidReason")}</FieldLabel>
+                            <Textarea
+                                rows={3}
+                                maxLength={500}
+                                placeholder={t("detailsPage.voidReasonPlaceholder")}
+                                value={voidReason}
+                                onChange={(e) => setVoidReason(e.target.value)}
+                            />
+                            <FieldDescription>{t("detailsPage.voidReasonHint")}</FieldDescription>
+                        </Field>
+                    </DialogBody>
+                    <DialogFooter>
+                        <Button variant="secondary" onClick={() => setVoidTarget(null)}>{t("detailsPage.back")}</Button>
+                        <Button
+                            variant="destructive"
+                            disabled={voidReason.trim().length < 5 || actions.voidPayment.isPending}
+                            isLoading={actions.voidPayment.isPending}
+                            onClick={() =>
+                                voidTarget && actions.voidPayment.mutate(
+                                    { paymentId: voidTarget.id, reason: voidReason.trim() },
+                                    { onSuccess: () => setVoidTarget(null) },
+                                )
+                            }
+                        >
+                            {t("detailsPage.voidConfirm")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

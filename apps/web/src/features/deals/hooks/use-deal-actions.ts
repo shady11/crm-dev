@@ -15,7 +15,8 @@ import {
     generatePaymentSchedule,
     type GeneratePaymentSchedulePayload,
     reassignDealManager,
-    signContract
+    signContract,
+    voidPayment
 } from "@/features/deals/api/deals.api";
 import {useTranslation} from "react-i18next";
 import {toastWithUndo} from "@/lib/undo-toast.ts";
@@ -92,6 +93,16 @@ export function useDealActions(dealId: string) {
         onError: () => toast.error({ title: t("toasts.scheduleError") }),
     });
 
+    const voidPaymentAction = useMutation({
+        mutationFn: ({ paymentId, reason }: { paymentId: string; reason: string }) => voidPayment(dealId, paymentId, reason),
+        onSuccess: async () => {
+            await invalidate();
+            await queryClient.invalidateQueries({ queryKey: ["payments"] });
+            toast.success({ title: t("toasts.paymentVoided") });
+        },
+        onError: () => toast.error({ title: t("toasts.voidError") }),
+    });
+
     const recordPayment = useMutation({
         mutationFn: (payload: CreatePaymentPayload) => createPayment(dealId, payload),
         onSuccess: async () => {
@@ -160,6 +171,7 @@ export function useDealActions(dealId: string) {
 
     return {
         extend, sign, activate, cancel, generateSchedule, recordPayment, complete, reassign, generateDocument,
+        voidPayment: voidPaymentAction,
         approveDiscount: approveDiscountRequest,
         rejectDiscount: rejectDiscountRequest,
     };

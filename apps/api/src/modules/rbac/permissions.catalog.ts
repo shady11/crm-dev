@@ -56,6 +56,7 @@ export const PERMISSIONS_CATALOG: PermissionDefinition[] = [
         reassign: "Reassign a deal to another manager",
         approve_discount: "Approve or reject a discount above the requester's own band",
         manage_payments: "Generate payment schedules and record payments",
+        void_payments: "Void a mistyped payment, with a reason",
     }),
     ...group("projects", {
         view: "View projects",

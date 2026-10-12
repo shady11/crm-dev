@@ -27,7 +27,7 @@ model Payment {
   dealId String
   deal   Deal   @relation(fields: [dealId], references: [id], onDelete: Cascade)
 
-  user   User?   @relation(fields: [userId], references: [id])
+  user   User?   @relation("PaymentRecordedBy", fields: [userId], references: [id])
   userId String?
 
   amount Decimal @db.Decimal(14, 2)
@@ -52,7 +52,13 @@ model Payment {
   receiptDocument   Document? @relation(fields: [receiptDocumentId], references: [id], onDelete: SetNull)
 
   createdAt DateTime  @default(now())
+  // Set when the payment is voided (FIN-3): it stops counting everywhere a
+  // payment is summed, but the row, its receipt number and the reason stay.
   deletedAt DateTime?
+
+  voidReason  String?
+  voidedById  String?
+  voidedBy    User?   @relation("PaymentVoidedBy", fields: [voidedById], references: [id])
 
   @@index([dealId])
   @@index([receiptNumber])
