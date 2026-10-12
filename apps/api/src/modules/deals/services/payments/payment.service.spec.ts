@@ -2,7 +2,7 @@ import {ForbiddenException} from '@nestjs/common';
 import {DealStatus, PaymentMethod, PaymentScheduleStatus, PaymentType, Prisma} from '@/generated/prisma/client';
 import {PaymentService} from './payment.service';
 import {DealDomainService} from '../deal-domain.service';
-import {DealNotFoundException, PaymentExceedsBalanceException, RefundExceedsPaidException} from '../../exceptions';
+import {DealNotFoundException, PaymentDateInFutureException, PaymentExceedsBalanceException, RefundExceedsPaidException} from '../../exceptions';
 
 /**
  * Recording a payment/refund is where real money changes state: it must
@@ -186,6 +186,53 @@ describe('PaymentService.create', () => {
         expect(updateCalls[0][0]).toEqual({
             where: {id: 'sch-1'},
             data: {paidAmount: new Prisma.Decimal(100), status: PaymentScheduleStatus.PARTIAL},
+        });
+    });
+
+    it('refuses a payment dated after today, before touching the deal', async () => {
+        const {service, prisma} = build({totalPaid: 0});
+        const tomorrow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
+
+        await expect(service.create(user, 'deal-1', paymentDto({paidAt: tomorrow}))).rejects.toBeInstanceOf(PaymentDateInFutureException);
+        expect(prisma.payment.create).not.toHaveBeenCalled();
+    });
+
+    it('accepts a payment dated today', async () => {
+        const {service, prisma} = build({totalPaid: 0});
+
+        await service.create(user, 'deal-1', paymentDto({paidAt: new Date().toISOString()}));
+
+        expect(prisma.payment.create).toHaveBeenCalled();
+    });
+
+    it('keeps a part-paid overdue installment OVERDUE, so the remainder still counts as overdue', async () => {
+        const {service, prisma} = build({
+            totalPaid: 0,
+            schedules: [
+                schedule({id: 'sch-1', status: PaymentScheduleStatus.OVERDUE}),
+                schedule({id: 'sch-2', order: 2}),
+            ],
+        });
+
+        await service.create(user, 'deal-1', paymentDto({amount: 100}));
+
+        expect((prisma.paymentSchedule.update as jest.Mock).mock.calls[0][0]).toEqual({
+            where: {id: 'sch-1'},
+            data: {paidAmount: new Prisma.Decimal(100), status: PaymentScheduleStatus.OVERDUE},
+        });
+    });
+
+    it('marks an overdue installment PAID once it is covered in full', async () => {
+        const {service, prisma} = build({
+            totalPaid: 0,
+            schedules: [schedule({id: 'sch-1', status: PaymentScheduleStatus.OVERDUE})],
+        });
+
+        await service.create(user, 'deal-1', paymentDto({amount: 300}));
+
+        expect((prisma.paymentSchedule.update as jest.Mock).mock.calls[0][0]).toEqual({
+            where: {id: 'sch-1'},
+            data: {paidAmount: new Prisma.Decimal(300), status: PaymentScheduleStatus.PAID},
         });
     });
 

@@ -184,6 +184,18 @@ describe('DashboardService', () => {
             await expect(service.getKpis({...adminUser, companyId: null})).rejects.toThrow(ForbiddenException);
         });
 
+        it('counts only payments dated within this month, not later ones', async () => {
+            const {service, prisma} = build();
+            await service.getKpis(adminUser);
+
+            const now = new Date();
+            const paidAt = (prisma.payment.aggregate as jest.Mock).mock.calls[0][0].where.paidAt;
+            expect(paidAt).toEqual({
+                gte: new Date(now.getFullYear(), now.getMonth(), 1),
+                lt: new Date(now.getFullYear(), now.getMonth() + 1, 1),
+            });
+        });
+
         it('defaults revenue to 0 when there are no payments this month', async () => {
             const {service} = build();
             const result = await service.getKpis(adminUser);
