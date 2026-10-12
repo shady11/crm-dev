@@ -128,10 +128,11 @@ export function DealDetailsPage() {
 
     const visual = DEAL_STATUS_VISUALS[deal.status];
 
-    // Outside ACTIVE only a refund can be recorded: a reservation's deposit,
-    // or money still held after it was cancelled or expired. Mirrors
+    // Money comes in from the reservation onwards (FIN-9); once the deal is
+    // cancelled or expired only a refund can be recorded. Mirrors
     // DealDomainService.ensureCanRecordPayment.
-    const refundOnly = deal.status !== "ACTIVE";
+    const takesPayments = ["RESERVED", "CONTRACT_SIGNED", "ACTIVE"].includes(deal.status);
+    const refundOnly = !takesPayments;
     const canRecordRefund = canManagePayments && totalPaid > 0
         && ["RESERVED", "CONTRACT_SIGNED", "CANCELLED", "EXPIRED"].includes(deal.status);
     const openRefundDialog = () => {
@@ -145,6 +146,14 @@ export function DealDetailsPage() {
     const nextInstallment = deal.paymentSchedules.find((s) => s.status !== "PAID");
     const nextInstallmentDue = nextInstallment ? Math.max(nextInstallment.amount - nextInstallment.paidAmount, 0) : 0;
     const openPaymentDialog = () => {
+        // Before activation there's no schedule to suggest an amount from:
+        // the cashier types it. On a reservation it's usually more deposit.
+        if (deal.status !== "ACTIVE") {
+            setPaymentAmount(0);
+            setPaymentType(deal.status === "RESERVED" ? "DEPOSIT" : "INSTALLMENT");
+            setPaymentOpen(true);
+            return;
+        }
         const amount = Math.min(nextInstallmentDue || remaining, remaining);
         setPaymentAmount(Math.round(amount * 100) / 100);
         setPaymentType(amount > 0 && amount >= remaining ? "FINAL" : "INSTALLMENT");
@@ -349,7 +358,7 @@ export function DealDetailsPage() {
                             />
                             <DealPaymentsHistoryCard
                                 payments={deal.payments}
-                                canRecordPayment={deal.status === "ACTIVE" && canManagePayments}
+                                canRecordPayment={takesPayments && canManagePayments}
                                 onRecordPayment={openPaymentDialog}
                                 canRecordRefund={canRecordRefund}
                                 onRecordRefund={openRefundDialog}
@@ -684,7 +693,7 @@ export function DealDetailsPage() {
             {/* Record payment dialog */}
             <Dialog open={paymentOpen} onOpenChange={({ open }) => setPaymentOpen(open)}>
                 <DialogContent size="sm">
-                    <DialogHeader title={t(refundOnly ? "detailsPage.refundDialogTitle" : "detailsPage.paymentDialogTitle")}/>
+                    <DialogHeader title={t(paymentType === "REFUND" ? "detailsPage.refundDialogTitle" : "detailsPage.paymentDialogTitle")}/>
                     <DialogBody className="flex flex-col gap-3">
                         <Field>
                             <FieldLabel>{t("detailsPage.amount")}</FieldLabel>

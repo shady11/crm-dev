@@ -15,6 +15,7 @@ import {
     DealNotFoundException,
     DiscountApprovalNotAllowedException,
     DiscountNotPendingException,
+    PaidExceedsDiscountedPriceException,
     BlockNotOnSaleException,
     ProjectNotOpenForSalesException,
     ReservationDateInvalidException,
@@ -567,6 +568,16 @@ describe('DealsService', () => {
                 expect.objectContaining({data: {status: DealStatus.ACTIVE}}),
             );
         });
+
+        it('completes the deal on activation when it was paid in full beforehand', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', status: DealStatus.CONTRACT_SIGNED, managerId: null, clientId: 'c1', dealNumber: '2026-0001'});
+            const tryComplete = jest.spyOn(service, 'tryCompleteWithinTransaction').mockResolvedValue(true);
+
+            await service.activate(managerUser, 'deal-1');
+
+            expect(tryComplete).toHaveBeenCalledWith(prisma, managerUser, 'deal-1');
+        });
     });
 
     describe('approveDiscount / rejectDiscount', () => {
@@ -601,6 +612,23 @@ describe('DealsService', () => {
             const b = buildBase();
             b.prisma.deal.findFirst.mockResolvedValue(pendingDeal());
             await expect(b.service.approveDiscount(salesHeadUser, 'deal-1')).resolves.toBeDefined();
+        });
+
+        it('approveDiscount: refuses when the client has already paid more than the discounted price', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(pendingDeal());
+            prisma.payment.aggregate.mockResolvedValue({_sum: {amount: new Prisma.Decimal(95000)}});
+
+            await expect(service.approveDiscount(adminUser, 'deal-1')).rejects.toThrow(PaidExceedsDiscountedPriceException);
+            expect(prisma.deal.update).not.toHaveBeenCalled();
+        });
+
+        it('approveDiscount: allows it when what was paid fits within the discounted price', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(pendingDeal());
+            prisma.payment.aggregate.mockResolvedValue({_sum: {amount: new Prisma.Decimal(90000)}});
+
+            await expect(service.approveDiscount(adminUser, 'deal-1')).resolves.toBeDefined();
         });
 
         it('approveDiscount: recomputes salePrice from listPrice minus the requested discount amount', async () => {
