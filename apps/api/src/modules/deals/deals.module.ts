@@ -9,6 +9,7 @@ import {DealActivityService} from './services/deal-activity.service';
 import {PaymentService} from './services/payments/payment.service';
 import {PaymentScheduleService} from './services/payments/payment-schedule.service';
 import {PaymentRegisterService} from './services/payments/payment-register.service';
+import {MoneyHeldNotifier} from './services/money-held-notifier.service';
 import {DealMapper} from "@/modules/deals/mappers/deal.mapper";
 import {DealDomainService} from "@/modules/deals/services/deal-domain.service";
 import {NotificationsModule} from "@/modules/notifications/notifications.module";
@@ -29,6 +30,7 @@ import {TasksModule} from "@/modules/tasks/tasks.module";
     PaymentService,
     PaymentScheduleService,
     PaymentRegisterService,
+    MoneyHeldNotifier,
     DealMapper,
     DealExpiryService,
     DiscountApprovalReminderService,

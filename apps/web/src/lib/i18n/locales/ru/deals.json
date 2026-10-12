@@ -53,7 +53,8 @@
     "created": "Создана",
     "emptyTitle": "Сделки не найдены",
     "emptyDescription": "Попробуйте изменить фильтры или поиск.",
-    "discountPending": "Скидка на согласовании"
+    "discountPending": "Скидка на согласовании",
+    "overdue": "Просрочено {{amount}} с {{date}}"
   },
   "pagination": {
     "rowsPerPage": "Строк на странице"

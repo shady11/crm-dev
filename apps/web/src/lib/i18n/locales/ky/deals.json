@@ -53,7 +53,8 @@
     "created": "Түзүлдү",
     "emptyTitle": "Бүтүмдөр табылган жок",
     "emptyDescription": "Чыпкаларды же издөөнү өзгөртүп көрүңүз.",
-    "discountPending": "Арзандатуу макулдатууда"
+    "discountPending": "Арзандатуу макулдатууда",
+    "overdue": "{{date}} бери {{amount}} мөөнөтү өттү"
   },
   "pagination": {
     "rowsPerPage": "Барактагы саптар"

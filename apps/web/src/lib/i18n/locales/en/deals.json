@@ -53,7 +53,8 @@
     "created": "Created",
     "emptyTitle": "No deals found",
     "emptyDescription": "Try adjusting your filters or search.",
-    "discountPending": "Discount pending"
+    "discountPending": "Discount pending",
+    "overdue": "Overdue {{amount}} since {{date}}"
   },
   "pagination": {
     "rowsPerPage": "Rows per page"

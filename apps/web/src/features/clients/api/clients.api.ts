@@ -54,6 +54,10 @@ export type ClientDealSummary = {
     salePrice: number;
     unit: ClientDealUnitSummary;
     createdAt: string;
+    /** Received on this deal, net of refunds. */
+    paid: number;
+    /** Unpaid part of its overdue installments. */
+    overdue: number;
 };
 
 // GET /clients/:id returns leads/deals as full (slim) arrays, unlike the list

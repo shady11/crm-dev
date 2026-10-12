@@ -1,5 +1,6 @@
 import {BadRequestException, ForbiddenException, NotFoundException} from '@nestjs/common';
 import {AuthUser} from '@/common/types/auth-user.type';
+import {Prisma} from '@/generated/prisma/client';
 import {ClientsService} from './clients.service';
 
 /**
@@ -33,6 +34,15 @@ describe('ClientsService', () => {
         branchId: null,
     };
 
+    // findOne reads each deal's payments and overdue installments; fixtures
+    // that don't care about money get empty ones.
+    function withDealMoney(client: any) {
+        return {
+            ...client,
+            deals: (client.deals ?? []).map((deal: any) => ({payments: [], paymentSchedules: [], ...deal})),
+        };
+    }
+
     function build(opts: {client?: unknown; existingPhoneClient?: unknown; branch?: unknown} = {}) {
         const prisma = {
             client: {
@@ -44,7 +54,7 @@ describe('ClientsService', () => {
                         // ensurePhoneIsUniqueInsideCompany lookups filter by phone; the
                         // findOne/remove/transferBranch lookups filter by id.
                         if (where.phone !== undefined) return Promise.resolve(opts.existingPhoneClient ?? null);
-                        return Promise.resolve(opts.client ?? null);
+                        return Promise.resolve(opts.client ? withDealMoney(opts.client) : null);
                     }),
                 create: jest.fn().mockImplementation(({data}) => Promise.resolve({id: 'client-new', ...data})),
                 update: jest.fn().mockImplementation(({data}) => Promise.resolve({id: 'client-1', ...data})),
@@ -137,6 +147,23 @@ describe('ClientsService', () => {
     });
 
     describe('findOne', () => {
+        it('adds each deal\'s net paid and overdue amounts, and drops the raw rows', async () => {
+            const {service} = build({
+                client: {
+                    id: 'client-1',
+                    deals: [{
+                        id: 'deal-1',
+                        payments: [{amount: new Prisma.Decimal(5000)}, {amount: new Prisma.Decimal(-1000)}],
+                        paymentSchedules: [{amount: new Prisma.Decimal(3000), paidAmount: new Prisma.Decimal(500)}],
+                    }],
+                },
+            });
+
+            const client = await service.findOne(adminUser, 'client-1');
+
+            expect(client.deals[0]).toEqual({id: 'deal-1', paid: 4000, overdue: 2500});
+        });
+
         it('throws NotFoundException when the client does not exist in the caller scope', async () => {
             const {service} = build({client: null});
             await expect(service.findOne(adminUser, 'missing')).rejects.toThrow(NotFoundException);

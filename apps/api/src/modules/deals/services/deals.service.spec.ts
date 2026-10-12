@@ -99,7 +99,7 @@ describe('DealsService', () => {
             user: {findFirstOrThrow: jest.fn(), findFirst: jest.fn(), findMany: jest.fn().mockResolvedValue([])},
             company: {findUniqueOrThrow: jest.fn().mockResolvedValue(company())},
             payment: {create: jest.fn().mockResolvedValue({}), aggregate: jest.fn().mockResolvedValue({_sum: {amount: null}})},
-            paymentSchedule: {findMany: jest.fn().mockResolvedValue([]), updateMany: jest.fn().mockResolvedValue({count: 0})},
+            paymentSchedule: {findMany: jest.fn().mockResolvedValue([]), updateMany: jest.fn().mockResolvedValue({count: 0}), groupBy: jest.fn().mockResolvedValue([])},
             activity: {create: jest.fn().mockResolvedValue({id: 'activity-1'})},
             $transaction: jest.fn(async (fn: any) => fn(prisma)),
         };
@@ -133,12 +133,15 @@ describe('DealsService', () => {
             handOverOpenTasks: jest.fn().mockResolvedValue([]),
         };
 
+        const moneyHeld = {notifyIfHeld: jest.fn().mockResolvedValue(undefined)};
+
         const service = new DealsService(
             prisma, mapper, domain, activityService as any, notifications as any,
             dealNumberService as any, documentGeneration as any, rbacService as any, tasksService as any,
+            moneyHeld as any,
         );
 
-        return {service, prisma, activityService, notifications, dealNumberService, documentGeneration, tasksService};
+        return {service, prisma, activityService, notifications, dealNumberService, documentGeneration, tasksService, moneyHeld};
     }
 
     describe('reserveUnit', () => {
@@ -817,6 +820,15 @@ describe('DealsService', () => {
                 }),
             );
         });
+
+        it('asks Finance to refund whatever the cancelled deal still holds', async () => {
+            const {service, prisma, moneyHeld} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', status: DealStatus.RESERVED, unitId: 'unit-1', managerId: null, clientId: 'c1', dealNumber: '2026-0001'});
+
+            await service.cancelDeal(managerUser, 'deal-1', {} as any);
+
+            expect(moneyHeld.notifyIfHeld).toHaveBeenCalledWith(expect.objectContaining({id: 'deal-1'}));
+        });
     });
 
     describe('complete / tryCompleteWithinTransaction', () => {
@@ -890,6 +902,27 @@ describe('DealsService', () => {
                     status: {in: ['RESERVED', 'CONTRACT_SIGNED', 'ACTIVE']},
                     paymentSchedules: {some: {deletedAt: null, status: 'OVERDUE'}},
                 }),
+            ]);
+        });
+
+        it('adds what is overdue on each listed deal, and null where nothing is', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findMany.mockResolvedValue([{id: 'deal-1'}, {id: 'deal-2'}]);
+            prisma.paymentSchedule.groupBy.mockResolvedValue([{
+                dealId: 'deal-1',
+                _sum: {amount: new Prisma.Decimal(3000), paidAmount: new Prisma.Decimal(1000)},
+                _min: {dueDate: new Date('2026-09-01')},
+                _count: {_all: 2},
+            }]);
+
+            const result = await service.findAll(managerUser, {});
+
+            expect(prisma.paymentSchedule.groupBy.mock.calls[0][0].where).toEqual(
+                expect.objectContaining({status: 'OVERDUE', dealId: {in: ['deal-1', 'deal-2']}}),
+            );
+            expect(result.items).toEqual([
+                expect.objectContaining({id: 'deal-1', overdue: {amount: 2000, installments: 2, since: new Date('2026-09-01')}}),
+                expect.objectContaining({id: 'deal-2', overdue: null}),
             ]);
         });
 

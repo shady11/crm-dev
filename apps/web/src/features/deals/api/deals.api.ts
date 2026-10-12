@@ -71,6 +71,8 @@ export type Deal = {
     manager: DealManager;
     project: DealProject;
     unit: DealUnit;
+    /** Overdue installments on this deal; only on list rows, null when none. */
+    overdue?: { amount: number; installments: number; since: string } | null;
 };
 
 export type DealActivity = {

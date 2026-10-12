@@ -71,7 +71,14 @@
     "updateSuccessTitle": "Успешно обновлено",
     "updateSuccessDescription": "Данные клиента обновлены.",
     "updateErrorTitle": "Не удалось обновить клиента",
-    "updateErrorDescription": "Попробуйте снова."
+    "updateErrorDescription": "Попробуйте снова.",
+    "money": {
+      "paid": "Оплачено",
+      "owed": "Осталось оплатить",
+      "overdue": "Просрочено",
+      "paidOnDeal": "Оплачено {{amount}}",
+      "overdueOnDeal": "Просрочено {{amount}}"
+    }
   },
   "toasts": {
     "createSuccessTitle": "Успешно создано",
