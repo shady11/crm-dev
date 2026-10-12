@@ -52,6 +52,7 @@ model Company {
 
   notifications      Notification[]
   dealNumberCounters DealNumberCounter[]
+  receiptNumberCounters ReceiptNumberCounter[]
 
   auditLogs AuditLog[]
 

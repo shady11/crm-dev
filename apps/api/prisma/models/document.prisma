@@ -55,6 +55,9 @@ model Document {
 
   activities Activity[]
 
+  // Set when this file is a payment's receipt (FIN-8).
+  receiptForPayment Payment?
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?

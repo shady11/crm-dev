@@ -11,12 +11,22 @@ import {
 } from '@/modules/documents/storage/file-storage.interface';
 
 import { DEFAULT_TEMPLATES } from './templates/default-templates';
-import { buildTemplateContext } from './template-context.builder';
+import {
+  buildReceiptContext,
+  buildTemplateContext,
+} from './template-context.builder';
 import { renderHtmlToPdf } from './pdf-renderer';
 import {
   TemplateRenderFailedException,
   UnsupportedDocumentTypeException,
 } from './exceptions';
+
+interface GenerateReceiptParams {
+  companyId: string;
+  dealId: string;
+  paymentId: string;
+  userId: string;
+}
 
 interface GenerateForDealParams {
   companyId: string;
@@ -56,6 +66,57 @@ export class DocumentGenerationService {
       this.prisma.company.findUniqueOrThrow({ where: { id: companyId } }),
     ]);
 
+    const context = buildTemplateContext(deal, company);
+    return this.renderAndStore({
+      companyId,
+      dealId,
+      type,
+      userId,
+      context,
+      originalName: `${type.toLowerCase()}-${deal.dealNumber}.pdf`,
+    });
+  }
+
+  /**
+   * FIN-8: a payment's receipt, rendered from the company's PAYMENT_RECEIPT
+   * template or the default, and stored like any generated deal document.
+   * The caller links it to the payment (Payment.receiptDocumentId).
+   */
+  async generateReceipt(params: GenerateReceiptParams) {
+    const { companyId, dealId, paymentId, userId } = params;
+
+    const [deal, company, payment] = await Promise.all([
+      this.prisma.deal.findUniqueOrThrow({
+        where: { id: dealId },
+        include: DEAL_DETAILS_INCLUDE,
+      }),
+      this.prisma.company.findUniqueOrThrow({ where: { id: companyId } }),
+      this.prisma.payment.findUniqueOrThrow({
+        where: { id: paymentId },
+        include: { user: { select: { fullName: true } } },
+      }),
+    ]);
+
+    return this.renderAndStore({
+      companyId,
+      dealId,
+      type: DocumentType.PAYMENT_RECEIPT,
+      userId,
+      context: buildReceiptContext(deal, company, payment),
+      originalName: `receipt-${payment.receiptNumber ?? payment.id}.pdf`,
+    });
+  }
+
+  private async renderAndStore(params: {
+    companyId: string;
+    dealId: string;
+    type: DocumentType;
+    userId: string;
+    context: object;
+    originalName: string;
+  }) {
+    const { companyId, dealId, type, userId, context, originalName } = params;
+
     const template = await this.prisma.documentTemplate.findFirst({
       where: { companyId, type, isActive: true, deletedAt: null },
       orderBy: { version: 'desc' },
@@ -65,8 +126,6 @@ export class DocumentGenerationService {
     if (!bodyHtml) {
       throw new UnsupportedDocumentTypeException(type);
     }
-
-    const context = buildTemplateContext(deal, company);
 
     let html: string;
     try {
@@ -92,7 +151,6 @@ export class DocumentGenerationService {
       storedName,
       pdfBuffer,
     );
-    const originalName = `${type.toLowerCase()}-${deal.dealNumber}.pdf`;
 
     return this.prisma.document.create({
       data: {

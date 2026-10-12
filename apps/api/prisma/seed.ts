@@ -52,6 +52,7 @@ import {
 import {PrismaPg} from "@prisma/adapter-pg";
 import {RbacService} from "@/modules/rbac/rbac.service";
 import {DEFAULT_ROLES} from "@/modules/rbac/default-role-permissions";
+import {numberUnnumberedPayments} from "@/modules/deals/services/payments/receipt-number.service";
 
 const prisma = new PrismaClient({
     adapter: new PrismaPg({connectionString: process.env.DATABASE_URL!}),
@@ -678,6 +679,10 @@ async function seedDemoTenantData(args: {
             dealSeed += 1;
         }
     }
+
+    // Receipt numbers for the payments above, as the app gives every
+    // incoming payment (FIN-8).
+    await numberUnnumberedPayments(prisma);
 
     // --- Tasks (mix of overdue, due today, upcoming, done) --------------
     const taskTitles = [

@@ -19,6 +19,7 @@ import {GeneratePaymentScheduleDto} from "@/modules/deals/dto/payments/generate-
 import {CreatePaymentDto} from "@/modules/deals/dto/payments/create-payment.dto";
 import {PaymentScheduleService} from "@/modules/deals/services/payments/payment-schedule.service";
 import {PaymentService} from "@/modules/deals/services/payments/payment.service";
+import {PaymentReceiptService} from "@/modules/deals/services/payments/payment-receipt.service";
 import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
 
 @UseGuards(JwtAuthGuard, CompanyGuard, BranchGuard, PermissionsGuard)
@@ -28,6 +29,7 @@ export class DealsController {
       private readonly dealsService: DealsService,
       private readonly paymentScheduleService: PaymentScheduleService,
       private readonly paymentService: PaymentService,
+      private readonly paymentReceipts: PaymentReceiptService,
   ) {}
 
   @RequirePermissions('deals.view')
@@ -156,6 +158,18 @@ export class DealsController {
       @Body() dto: CreatePaymentDto,
   ) {
     return this.paymentService.create(user, id, dto);
+  }
+
+  // FIN-8: issued by whoever records payments, so Finance can hand one over.
+  // Returns the Document; the file comes from GET /documents/:id/download.
+  @RequirePermissions('deals.manage_payments')
+  @Post(':id/payments/:paymentId/receipt')
+  receipt(
+      @CurrentUser() user: AuthUser,
+      @Param('id') id: string,
+      @Param('paymentId') paymentId: string,
+  ) {
+    return this.paymentReceipts.getOrCreate(user, id, paymentId);
   }
 
   @RequirePermissions('deals.manage')

@@ -71,10 +71,13 @@ describe('PaymentService.create', () => {
         const dealsService = {tryCompleteWithinTransaction: jest.fn().mockResolvedValue(undefined)};
         const notifications = {create: jest.fn().mockResolvedValue({})};
 
+        const receiptNumbers = {next: jest.fn().mockResolvedValue('R-2026-0042')};
+
         const service = new PaymentService(
             prisma as any, mapper as any, domain, activityService as any, dealsService as any, notifications as any,
+            receiptNumbers as any,
         );
-        return {service, prisma, activityService, dealsService, notifications};
+        return {service, prisma, activityService, dealsService, notifications, receiptNumbers};
     }
 
     const paymentDto = (overrides: Record<string, unknown> = {}) => ({
@@ -265,6 +268,28 @@ describe('PaymentService.create', () => {
             where: {id: 'sch-1'},
             data: {paidAmount: new Prisma.Decimal(300), status: PaymentScheduleStatus.PAID},
         });
+    });
+
+    it('gives incoming money a receipt number, inside the payment\'s transaction', async () => {
+        const {service, prisma, receiptNumbers} = build({totalPaid: 0});
+
+        await service.create(user, 'deal-1', paymentDto({paymentType: PaymentType.INSTALLMENT}));
+
+        expect(receiptNumbers.next).toHaveBeenCalledWith(prisma, 'company-1');
+        expect(prisma.payment.create).toHaveBeenCalledWith(
+            expect.objectContaining({data: expect.objectContaining({receiptNumber: 'R-2026-0042'})}),
+        );
+    });
+
+    it('gives a refund no receipt number', async () => {
+        const {service, prisma, receiptNumbers} = build({totalPaid: 300});
+
+        await service.create(user, 'deal-1', paymentDto({amount: 100, paymentType: PaymentType.REFUND}));
+
+        expect(receiptNumbers.next).not.toHaveBeenCalled();
+        expect(prisma.payment.create).toHaveBeenCalledWith(
+            expect.objectContaining({data: expect.objectContaining({receiptNumber: null})}),
+        );
     });
 
     it('never touches payment-schedule rows for a refund', async () => {

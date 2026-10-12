@@ -36,6 +36,7 @@ describe('PaymentRegisterService', () => {
       paymentMethod: PaymentMethod.CASH,
       paymentType: PaymentType.INSTALLMENT,
       reference: 'PMT-1',
+      receiptNumber: 'R-2026-0001',
       note: null,
       user: { id: 'finance-1', fullName: 'Nurgul Baktybekova' },
       deal: {
@@ -62,14 +63,12 @@ describe('PaymentRegisterService', () => {
           .mockResolvedValueOnce({
             _sum: { amount: new Prisma.Decimal(-500) },
           }),
-        groupBy: jest
-          .fn()
-          .mockResolvedValue([
-            {
-              paymentMethod: PaymentMethod.CASH,
-              _sum: { amount: new Prisma.Decimal(1000) },
-            },
-          ]),
+        groupBy: jest.fn().mockResolvedValue([
+          {
+            paymentMethod: PaymentMethod.CASH,
+            _sum: { amount: new Prisma.Decimal(1000) },
+          },
+        ]),
       },
       deal: { findMany: jest.fn().mockResolvedValue([]) },
     };
@@ -157,6 +156,7 @@ describe('PaymentRegisterService', () => {
     expect(result.items[0]).toEqual(
       expect.objectContaining({
         amount: 1000,
+        receiptNumber: 'R-2026-0001',
         recordedBy: { id: 'finance-1', fullName: 'Nurgul Baktybekova' },
         deal: {
           id: 'deal-1',
@@ -176,6 +176,7 @@ describe('PaymentRegisterService', () => {
       paymentRow({
         id: 'pay-2',
         amount: new Prisma.Decimal(-300),
+        receiptNumber: null,
         paymentType: PaymentType.REFUND,
         paymentMethod: PaymentMethod.BANK_TRANSFER,
       }),
@@ -195,9 +196,13 @@ describe('PaymentRegisterService', () => {
     );
 
     expect(payments).toHaveLength(2);
+    expect(payments[0]).toEqual(
+      expect.objectContaining({ Receipt: 'R-2026-0001' }),
+    );
     expect(payments[1]).toEqual(
       expect.objectContaining({
         Date: '2026-10-05',
+        Receipt: '',
         Type: 'Refund',
         Method: 'Bank transfer',
         Amount: -300,

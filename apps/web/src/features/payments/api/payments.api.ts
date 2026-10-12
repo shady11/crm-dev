@@ -1,6 +1,7 @@
 import {api} from "@/lib/api";
 import type {DealStatus} from "@/features/deals/types/deal.types";
 import type {PaymentMethod, PaymentType} from "@/features/deals/api/deals.api";
+import type {Document} from "@/features/documents/api/documents.api";
 
 export type PaymentRegisterFilters = {
     /** Calendar days, both inclusive, as YYYY-MM-DD. */
@@ -22,6 +23,8 @@ export type PaymentRegisterItem = {
     paymentType: PaymentType;
     reference: string | null;
     note: string | null;
+    /** R-YYYY-NNNN; null for a refund. */
+    receiptNumber: string | null;
     recordedBy: {id: string; fullName: string} | null;
     deal: {id: string; dealNumber: string; status: DealStatus};
     client: {id: string; fullName: string};
@@ -72,4 +75,13 @@ async function downloadXlsx(path: string, params: object, filename: string) {
 
 function today() {
     return new Date().toISOString().slice(0, 10);
+}
+
+/**
+ * FIN-8: the payment's receipt, generated the first time and reused after
+ * that. Returns the stored Document; the file comes from its download URL.
+ */
+export async function issueReceipt(dealId: string, paymentId: string) {
+    const response = await api.post<Document>(`/deals/${dealId}/payments/${paymentId}/receipt`);
+    return response.data;
 }

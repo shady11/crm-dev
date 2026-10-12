@@ -49,9 +49,14 @@
       "type": "Type",
       "method": "Method",
       "recordedBy": "Recorded by",
-      "amount": "Amount"
+      "amount": "Amount",
+      "receipt": "Receipt"
     },
     "emptyTitle": "No payments in this period",
     "emptyDescription": "Try another period or clear the filters."
+  },
+  "receipt": {
+    "download": "Receipt {{number}}",
+    "error": "Could not prepare the receipt. Please try again."
   }
 }
