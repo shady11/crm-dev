@@ -215,6 +215,18 @@ export class DealDomainService {
         }
     }
 
+    /**
+     * New money only while the deal is ACTIVE (its schedule exists). A refund
+     * wherever the client's money may be held: a reservation's deposit, and
+     * after the reservation ends cancelled or expired. A COMPLETED deal is
+     * settled and stays that way.
+     */
+    ensureCanRecordPayment(deal: Deal, isRefund: boolean): void {
+        this.ensureStatus(deal, isRefund
+            ? [...this.activeStatuses, DealStatus.CANCELLED, DealStatus.EXPIRED]
+            : DealStatus.ACTIVE);
+    }
+
     ensureCanCancel(deal: Deal): void {
         this.ensureStatus(deal, this.activeStatuses);
     }

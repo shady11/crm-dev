@@ -102,6 +102,37 @@ describe('PaymentService.create', () => {
         await expect(service.create(user, 'deal-1', paymentDto())).rejects.toThrow();
     });
 
+    it.each([DealStatus.CANCELLED, DealStatus.EXPIRED, DealStatus.RESERVED])(
+        'records a refund of the deposit on a %s deal, without touching a schedule or completing it',
+        async (status) => {
+            const {service, prisma, dealsService, activityService} = build({deal: {status}, totalPaid: 500});
+
+            await service.create(user, 'deal-1', paymentDto({amount: 500, paymentType: PaymentType.REFUND}));
+
+            expect(prisma.payment.create).toHaveBeenCalledWith(
+                expect.objectContaining({data: expect.objectContaining({amount: new Prisma.Decimal(-500)})}),
+            );
+            expect(activityService.paymentRefunded).toHaveBeenCalled();
+            expect(prisma.paymentSchedule.update).not.toHaveBeenCalled();
+            expect(dealsService.tryCompleteWithinTransaction).not.toHaveBeenCalled();
+        },
+    );
+
+    it('rejects a forward payment on a cancelled deal', async () => {
+        const {service, prisma} = build({deal: {status: DealStatus.CANCELLED}, totalPaid: 500});
+
+        await expect(service.create(user, 'deal-1', paymentDto({paymentType: PaymentType.INSTALLMENT}))).rejects.toThrow();
+        expect(prisma.payment.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects a refund on a completed deal', async () => {
+        const {service} = build({deal: {status: DealStatus.COMPLETED}, totalPaid: 1000});
+
+        await expect(
+            service.create(user, 'deal-1', paymentDto({amount: 100, paymentType: PaymentType.REFUND})),
+        ).rejects.toThrow();
+    });
+
     it('rejects a payment that would overpay the deal balance', async () => {
         const {service} = build({totalPaid: 900});
         await expect(service.create(user, 'deal-1', paymentDto({amount: 200}))).rejects.toThrow(

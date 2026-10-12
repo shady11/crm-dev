@@ -123,7 +123,8 @@
   "paymentsHistory": {
     "title": "Payments",
     "record": "Record payment",
-    "empty": "No payments recorded yet."
+    "empty": "No payments recorded yet.",
+    "recordRefund": "Record refund"
   },
   "detailsPage": {
     "dealNumber": "Deal #{{number}}",
@@ -168,7 +169,8 @@
     "generateReservation": "Reservation agreement",
     "generateContract": "Sale contract",
     "activateDialogTitle": "Activate this deal?",
-    "activateDialogDescription": "Payments start from here: you can then generate the payment schedule and record installments. An active deal can't go back to \"Contract signed\"."
+    "activateDialogDescription": "Payments start from here: you can then generate the payment schedule and record installments. An active deal can't go back to \"Contract signed\".",
+    "refundDialogTitle": "Record refund"
   },
   "toasts": {
     "unitReserved": "Unit reserved",
@@ -301,5 +303,9 @@
     "you": "You",
     "managerInactive": "This manager has been deactivated. Reassign the deal so someone follows it up.",
     "noManager": "No manager on this deal. Reassign it so someone follows it up."
+  },
+  "moneyHeldBanner": {
+    "title": "The client's money is still held: {{amount}}",
+    "description": "This deal is closed. Record the refund once the money has been returned to the client."
   }
 }
