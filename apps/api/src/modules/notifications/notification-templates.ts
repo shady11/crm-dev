@@ -21,5 +21,9 @@ export type NotificationTemplate =
     | {templateKey: "taskOverdue"; params: {taskTitle: string}}
     | {templateKey: "taskEscalated"; params: {taskTitle: string; days: number}}
     | {templateKey: "documentUploaded"; params: {dealNumber: string; fileName: string}}
+    | {templateKey: "discountApprovalReminder"; params: {dealNumber: string; percent: number; days: number}}
+    | {templateKey: "discountRequestApproved"; params: {dealNumber: string; percent: number; byName: string}}
+    | {templateKey: "discountRequestRejected"; params: {dealNumber: string; percent: number; byName: string}}
+    | {templateKey: "discountRequestWithdrawn"; params: {dealNumber: string; percent: number}}
     | {templateKey: "leadReassigned"; params: {leadName: string; byName: string; tasks: number}}
     | {templateKey: "dealReassigned"; params: {dealNumber: string; byName: string; tasks: number}};

@@ -118,7 +118,7 @@ describe('DealsService', () => {
             discountApproved: jest.fn().mockResolvedValue({}),
             discountRejected: jest.fn().mockResolvedValue({}),
         };
-        const notifications = {create: jest.fn().mockResolvedValue({})};
+        const notifications = {create: jest.fn().mockResolvedValue({}), resolveForEntity: jest.fn().mockResolvedValue(0)};
         const dealNumberService = {generateDealNumber: jest.fn().mockResolvedValue('2026-0001')};
         const documentGeneration = {generateForDeal: jest.fn().mockResolvedValue({id: 'doc-1'})};
         const rbacService = {
@@ -618,6 +618,39 @@ describe('DealsService', () => {
             expect(notifications.create).not.toHaveBeenCalled();
         });
 
+        it('approveDiscount: rewrites the approvers\' "approval needed" notifications to say who approved it', async () => {
+            const {service, prisma, notifications} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(pendingDeal());
+            prisma.deal.findUniqueOrThrow.mockResolvedValue({
+                id: 'deal-1', companyId: 'company-1', dealNumber: '2026-0001', requestedDiscountPercent: new Prisma.Decimal(10),
+            });
+
+            await service.approveDiscount(salesHeadUser, 'deal-1');
+
+            expect(notifications.resolveForEntity).toHaveBeenCalledWith(expect.objectContaining({
+                type: 'DISCOUNT_APPROVAL_REQUESTED', entityType: 'DEAL', entityId: 'deal-1', resolvedType: 'DISCOUNT_DECIDED',
+                templateKey: 'discountRequestApproved',
+                params: {dealNumber: '2026-0001', percent: 10, byName: salesHeadUser.name},
+            }));
+        });
+
+        it('rejectDiscount: rewrites them to say who rejected it', async () => {
+            const {service, prisma, notifications} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(pendingDeal());
+
+            await service.rejectDiscount(adminUser, 'deal-1', {reason: 'too high'} as any);
+
+            expect(notifications.resolveForEntity).toHaveBeenCalledWith(expect.objectContaining({templateKey: 'discountRequestRejected'}));
+        });
+
+        it('approveDiscount: still succeeds if updating the old notifications fails', async () => {
+            const {service, prisma, notifications} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(pendingDeal());
+            notifications.resolveForEntity.mockRejectedValue(new Error('boom'));
+
+            await expect(service.approveDiscount(adminUser, 'deal-1')).resolves.toBeDefined();
+        });
+
         it('approveDiscount: reissues the reservation agreement at the approved price', async () => {
             const {service, prisma, documentGeneration} = buildBase();
             prisma.deal.findFirst.mockResolvedValue(pendingDeal());
@@ -726,6 +759,25 @@ describe('DealsService', () => {
             const {service, prisma} = buildBase();
             prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', status: DealStatus.COMPLETED});
             await expect(service.cancelDeal(managerUser, 'deal-1', {} as any)).rejects.toThrow();
+        });
+
+        it('withdraws a discount request still waiting on the cancelled reservation', async () => {
+            const {service, prisma, notifications} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', status: DealStatus.RESERVED, unitId: 'unit-1', managerId: null, clientId: 'c1', dealNumber: '2026-0001'});
+            prisma.deal.findUniqueOrThrow.mockResolvedValue({id: 'deal-1', discountApprovalStatus: DiscountApprovalStatus.PENDING});
+
+            await service.cancelDeal(managerUser, 'deal-1', {} as any);
+
+            expect(notifications.resolveForEntity).toHaveBeenCalledWith(expect.objectContaining({templateKey: 'discountRequestWithdrawn'}));
+        });
+
+        it('leaves notifications alone when no discount request was waiting', async () => {
+            const {service, prisma, notifications} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', status: DealStatus.ACTIVE, unitId: 'unit-1', managerId: null, clientId: 'c1', dealNumber: '2026-0001'});
+
+            await service.cancelDeal(managerUser, 'deal-1', {} as any);
+
+            expect(notifications.resolveForEntity).not.toHaveBeenCalled();
         });
 
         it('releases the unit back to AVAILABLE', async () => {

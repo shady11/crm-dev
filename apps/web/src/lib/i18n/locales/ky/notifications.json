@@ -97,6 +97,25 @@
       "message_few": "Өткөргөн: {{byName}}. Сизге {{count}} ачык тапшырма өттү.",
       "message_many": "Өткөргөн: {{byName}}. Сизге {{count}} ачык тапшырма өттү.",
       "message_other": "Өткөргөн: {{byName}}. Сизге {{count}} ачык тапшырма өттү."
+    },
+    "discountApprovalReminder": {
+      "title": "{{dealNumber}} бүтүмү боюнча арзандатуу дагы эле макулдашууну күтүүдө",
+      "message_one": "{{percent}}% {{count}} күн мурун суралган. Чечим болмоюнча келишимге кол коюуга болбойт.",
+      "message_few": "{{percent}}% {{count}} күн мурун суралган. Чечим болмоюнча келишимге кол коюуга болбойт.",
+      "message_many": "{{percent}}% {{count}} күн мурун суралган. Чечим болмоюнча келишимге кол коюуга болбойт.",
+      "message_other": "{{percent}}% {{count}} күн мурун суралган. Чечим болмоюнча келишимге кол коюуга болбойт."
+    },
+    "discountRequestApproved": {
+      "title": "{{dealNumber}} бүтүмү боюнча арзандатуу макулдашылды",
+      "message": "{{percent}}%, макулдашкан: {{byName}}"
+    },
+    "discountRequestRejected": {
+      "title": "{{dealNumber}} бүтүмү боюнча арзандатуу четке кагылды",
+      "message": "{{percent}}%, четке каккан: {{byName}}"
+    },
+    "discountRequestWithdrawn": {
+      "title": "{{dealNumber}} бүтүмү боюнча арзандатуу боюнча чечим керек эмес",
+      "message": "Брондоо жокко чыгарылды же мөөнөтү бүттү."
     }
   }
 }

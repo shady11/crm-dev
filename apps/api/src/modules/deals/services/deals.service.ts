@@ -43,6 +43,7 @@ import {CancelDealDto} from "@/modules/deals/dto/cancel-deal.dto";
 import {RejectDiscountDto} from "@/modules/deals/dto/reject-discount.dto";
 import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
 import {DbClient} from "@/database/prisma.types";
+import {findDiscountApproverIds, resolveDiscountRequestNotifications} from "./discount-approval";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 import {DealNumberService} from "@/modules/deals/services/deal-number.service";
 import {DocumentGenerationService} from "@/modules/document-generation/document-generation.service";
@@ -397,32 +398,14 @@ export class DealsService {
           },
         });
 
-        // The same threshold that decided PENDING also decides who gets
-        // asked — a request a branch-scoped approver's own band already
-        // covers goes to that branch's holder(s); otherwise it needs
-        // someone whose ceiling isn't branch-scoped (company-wide).
-        const approverRoles = await this.rbacService.findApproverRoles(companyId, 'deals.approve_discount');
-        const qualifying = approverRoles.filter(
-            (r) => r.discountLimit === null || new Prisma.Decimal(r.discountLimit).greaterThanOrEqualTo(effectiveDiscountPercent),
-        );
-        const branchScopedRoleIds = qualifying.filter((r) => r.isBranchScoped).map((r) => r.id);
-        const companyWideRoleIds = qualifying.filter((r) => !r.isBranchScoped).map((r) => r.id);
-        const targetRoleIds = branchScopedRoleIds.length > 0 ? branchScopedRoleIds : companyWideRoleIds;
-
-        const approvers = await db.user.findMany({
-          where: {
-            companyId,
-            roleId: {in: targetRoleIds},
-            isActive: true,
-            ...(branchScopedRoleIds.length > 0 ? {branchId: client.branchId} : {}),
-          },
-          select: {id: true},
+        const approverIds = await findDiscountApproverIds(db, this.rbacService, {
+          companyId, branchId: client.branchId, percent: effectiveDiscountPercent,
         });
 
-        for (const approver of approvers) {
+        for (const approverId of approverIds) {
           await this.notifications.create({
             companyId,
-            userId: approver.id,
+            userId: approverId,
             type: NotificationType.DISCOUNT_APPROVAL_REQUESTED,
             title: `Discount approval needed for deal ${dealNumber}`,
             templateKey: 'discountApprovalRequested',
@@ -659,6 +642,21 @@ export class DealsService {
   // Discount approval
   // --------------------------------------------------------------------------
 
+  /** See resolveDiscountRequestNotifications; never fails the action that triggered it. */
+  private async resolveDiscountNotifications(
+      deal: Parameters<typeof resolveDiscountRequestNotifications>[1],
+      result: Parameters<typeof resolveDiscountRequestNotifications>[2],
+  ) {
+    try {
+      await resolveDiscountRequestNotifications(this.notifications, deal, result);
+    } catch (error) {
+      this.logger.error(
+          `Failed to update discount-request notifications for deal ${deal.id}`,
+          error instanceof Error ? error.stack : String(error),
+      );
+    }
+  }
+
   async approveDiscount(user: AuthUser, id: string) {
     if (!user.companyId) {
       throw new ForbiddenException("User does not belong to a company");
@@ -730,6 +728,8 @@ export class DealsService {
       activityTitle: 'Reservation agreement reissued at the approved price',
     });
 
+    await this.resolveDiscountNotifications(result, { outcome: 'approved', byName: user.name });
+
     return this.mapper.toDetails(result);
   }
 
@@ -795,6 +795,8 @@ export class DealsService {
 
       return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
     });
+
+    await this.resolveDiscountNotifications(result, { outcome: 'rejected', byName: user.name });
 
     return this.mapper.toDetails(result);
   }
@@ -964,6 +966,12 @@ export class DealsService {
 
       return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
     });
+
+    // A request still waiting when the reservation is cancelled no longer
+    // needs anyone's decision.
+    if (result.discountApprovalStatus === DiscountApprovalStatus.PENDING) {
+      await this.resolveDiscountNotifications(result, { outcome: 'withdrawn' });
+    }
 
     return this.mapper.toDetails(result);
   }
