@@ -58,12 +58,6 @@
   "pagination": {
     "rowsPerPage": "Rows per page"
   },
-  "statusCard": {
-    "count_one": "{{count}} deal",
-    "count_few": "{{count}} deals",
-    "count_many": "{{count}} deals",
-    "count_other": "{{count}} deals"
-  },
   "card": {
     "client": "Client",
     "reservedAt": "Reserved at",

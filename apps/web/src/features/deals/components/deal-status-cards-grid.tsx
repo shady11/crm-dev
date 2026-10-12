@@ -10,7 +10,7 @@ interface DealStatusCardsGridProps {
 
 export function DealStatusCardsGrid({ countsByStatus, hrefFor, selectedStatus, onSelect }: DealStatusCardsGridProps) {
     return (
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-6">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
             {Object.values(DealStatus).map((status) => (
                 <DealStatusCard
                     key={status}
