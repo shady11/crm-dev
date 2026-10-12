@@ -71,10 +71,13 @@ describe('PaymentService.create', () => {
         const dealsService = {tryCompleteWithinTransaction: jest.fn().mockResolvedValue(undefined)};
         const notifications = {create: jest.fn().mockResolvedValue({})};
 
+        const receiptNumbers = {next: jest.fn().mockResolvedValue('R-2026-0042')};
+
         const service = new PaymentService(
             prisma as any, mapper as any, domain, activityService as any, dealsService as any, notifications as any,
+            receiptNumbers as any,
         );
-        return {service, prisma, activityService, dealsService, notifications};
+        return {service, prisma, activityService, dealsService, notifications, receiptNumbers};
     }
 
     const paymentDto = (overrides: Record<string, unknown> = {}) => ({
@@ -97,9 +100,26 @@ describe('PaymentService.create', () => {
         await expect(service.create(user, 'deal-1', paymentDto())).rejects.toThrow(DealNotFoundException);
     });
 
-    it('rejects recording a payment on a deal that is not ACTIVE', async () => {
-        const {service} = build({deal: {status: DealStatus.RESERVED}});
-        await expect(service.create(user, 'deal-1', paymentDto())).rejects.toThrow();
+    it.each([DealStatus.RESERVED, DealStatus.CONTRACT_SIGNED])(
+        'accepts money on a %s deal before activation, outside any schedule and without completing it',
+        async (status) => {
+            const {service, prisma, dealsService} = build({deal: {status}, totalPaid: 0});
+
+            await service.create(user, 'deal-1', paymentDto({amount: 500}));
+
+            expect(prisma.payment.create).toHaveBeenCalledWith(
+                expect.objectContaining({data: expect.objectContaining({amount: new Prisma.Decimal(500)})}),
+            );
+            expect(prisma.paymentSchedule.update).not.toHaveBeenCalled();
+            expect(dealsService.tryCompleteWithinTransaction).toHaveBeenCalled(); // a no-op until ACTIVE
+        },
+    );
+
+    it('still refuses money on a completed deal', async () => {
+        const {service, prisma} = build({deal: {status: DealStatus.COMPLETED}, totalPaid: 1000});
+
+        await expect(service.create(user, 'deal-1', paymentDto({amount: 1}))).rejects.toThrow();
+        expect(prisma.payment.create).not.toHaveBeenCalled();
     });
 
     it.each([DealStatus.CANCELLED, DealStatus.EXPIRED, DealStatus.RESERVED])(
@@ -265,6 +285,28 @@ describe('PaymentService.create', () => {
             where: {id: 'sch-1'},
             data: {paidAmount: new Prisma.Decimal(300), status: PaymentScheduleStatus.PAID},
         });
+    });
+
+    it('gives incoming money a receipt number, inside the payment\'s transaction', async () => {
+        const {service, prisma, receiptNumbers} = build({totalPaid: 0});
+
+        await service.create(user, 'deal-1', paymentDto({paymentType: PaymentType.INSTALLMENT}));
+
+        expect(receiptNumbers.next).toHaveBeenCalledWith(prisma, 'company-1');
+        expect(prisma.payment.create).toHaveBeenCalledWith(
+            expect.objectContaining({data: expect.objectContaining({receiptNumber: 'R-2026-0042'})}),
+        );
+    });
+
+    it('gives a refund no receipt number', async () => {
+        const {service, prisma, receiptNumbers} = build({totalPaid: 300});
+
+        await service.create(user, 'deal-1', paymentDto({amount: 100, paymentType: PaymentType.REFUND}));
+
+        expect(receiptNumbers.next).not.toHaveBeenCalled();
+        expect(prisma.payment.create).toHaveBeenCalledWith(
+            expect.objectContaining({data: expect.objectContaining({receiptNumber: null})}),
+        );
     });
 
     it('never touches payment-schedule rows for a refund', async () => {

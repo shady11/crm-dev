@@ -17,6 +17,7 @@ import {DealNotFoundException, PaymentDateInFutureException} from '../../excepti
 import {CreatePaymentDto} from '../../dto/payments/create-payment.dto';
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 import {endOfToday} from "@/common/utils/day-bounds.util";
+import {ReceiptNumberService} from "./receipt-number.service";
 
 @Injectable()
 export class PaymentService {
@@ -27,6 +28,7 @@ export class PaymentService {
         private readonly activityService: DealActivityService,
         private readonly dealsService: DealsService,
         private readonly notifications: NotificationsService,
+        private readonly receiptNumbers: ReceiptNumberService,
     ) {}
 
     async create(user: AuthUser, dealId: string, dto: CreatePaymentDto) {
@@ -80,6 +82,8 @@ export class PaymentService {
                     paidAt,
                     reference: dto.reference,
                     note: dto.note,
+                    // Money in gets a receipt number; a refund isn't a receipt.
+                    receiptNumber: isRefund ? null : await this.receiptNumbers.next(db, companyId),
                 },
             });
 

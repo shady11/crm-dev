@@ -169,7 +169,69 @@ const CONTRACT_TEMPLATE = `<!DOCTYPE html>
 </body>
 </html>`;
 
+const PAYMENT_RECEIPT_TEMPLATE = `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><style>${SHARED_STYLE}</style></head>
+<body>
+  <h1>Payment Receipt</h1>
+  <p class="subtitle">Receipt No. {{payment.receiptNumber}} &middot; {{payment.date}}</p>
+
+  <div class="parties">
+    <div class="party">
+      <div class="label">Received by</div>
+      <div>{{company.legalName}}</div>
+      {{#if company.address}}<div>{{company.address}}</div>{{/if}}
+      {{#if company.taxId}}<div>Tax ID: {{company.taxId}}</div>{{/if}}
+      {{#if company.phone}}<div>{{company.phone}}</div>{{/if}}
+    </div>
+    <div class="party">
+      <div class="label">Received from</div>
+      <div>{{client.fullName}}</div>
+      {{#if client.passport}}<div>Passport: {{client.passport}}</div>{{/if}}
+      {{#if client.pin}}<div>PIN: {{client.pin}}</div>{{/if}}
+      <div>{{client.phone}}</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr><th>Description</th><th>Type</th><th>Method</th><th style="text-align:right">Amount</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          Payment for unit No. {{unit.number}}, {{unit.projectName}}<br>
+          Deal {{deal.dealNumber}}{{#if deal.contractNumber}}, contract No. {{deal.contractNumber}} of {{deal.contractDate}}{{/if}}
+          {{#if payment.reference}}<br>Reference: {{payment.reference}}{{/if}}
+        </td>
+        <td>{{payment.type}}</td>
+        <td>{{payment.method}}</td>
+        <td style="text-align:right"><strong>{{payment.amount}}</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <div class="row"><span>Sale price</span><span>{{deal.salePrice}}</span></div>
+    <div class="row"><span>Paid to date, including this payment</span><span>{{totals.paidToDate}}</span></div>
+    <div class="row grand"><span>Remaining</span><span>{{totals.remaining}}</span></div>
+  </div>
+
+  {{#if payment.note}}<p class="note">Note: {{payment.note}}</p>{{/if}}
+
+  <div class="signatures">
+    <div class="signature-block">
+      <div class="signature-line">{{payment.receivedBy}} — Received by, for {{company.legalName}}</div>
+    </div>
+    <div class="signature-block">
+      <div class="signature-line">{{client.fullName}} — Paid by</div>
+    </div>
+  </div>
+</body>
+</html>`;
+
 export const DEFAULT_TEMPLATES: Partial<Record<DocumentType, string>> = {
   [DocumentType.RESERVATION]: RESERVATION_TEMPLATE,
   [DocumentType.CONTRACT]: CONTRACT_TEMPLATE,
+  [DocumentType.PAYMENT_RECEIPT]: PAYMENT_RECEIPT_TEMPLATE,
 };

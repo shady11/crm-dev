@@ -116,6 +116,10 @@
     "discountRequestWithdrawn": {
       "title": "Discount for deal {{dealNumber}} no longer needs a decision",
       "message": "The reservation was cancelled or expired."
+    },
+    "moneyHeld": {
+      "title": "Deal {{dealNumber}} closed with {{amount}} still held",
+      "message": "Record the refund once the money has been returned to the client."
     }
   }
 }

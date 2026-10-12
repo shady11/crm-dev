@@ -53,7 +53,8 @@
     "created": "Created",
     "emptyTitle": "No deals found",
     "emptyDescription": "Try adjusting your filters or search.",
-    "discountPending": "Discount pending"
+    "discountPending": "Discount pending",
+    "overdue": "Overdue {{amount}} since {{date}}"
   },
   "pagination": {
     "rowsPerPage": "Rows per page"
@@ -124,7 +125,8 @@
     "title": "Payments",
     "record": "Record payment",
     "empty": "No payments recorded yet.",
-    "recordRefund": "Record refund"
+    "recordRefund": "Record refund",
+    "recordedBy": "Recorded by {{name}}"
   },
   "detailsPage": {
     "dealNumber": "Deal #{{number}}",
@@ -169,8 +171,13 @@
     "generateReservation": "Reservation agreement",
     "generateContract": "Sale contract",
     "activateDialogTitle": "Activate this deal?",
-    "activateDialogDescription": "Payments start from here: you can then generate the payment schedule and record installments. An active deal can't go back to \"Contract signed\".",
-    "refundDialogTitle": "Record refund"
+    "activateDialogDescription": "The payment schedule starts here: it spreads whatever is still owed, after any money already paid. An active deal can't go back to \"Contract signed\".",
+    "refundDialogTitle": "Record refund",
+    "paymentNote": "Note (optional)",
+    "paymentNotePlaceholder": "e.g. paid by the client's brother",
+    "amountHintRemaining": "{{remaining}} left on this deal",
+    "amountHintNext": "next installment {{amount}}, due {{date}}",
+    "amountHintRefund": "Up to {{paid}} can be refunded"
   },
   "toasts": {
     "unitReserved": "Unit reserved",
@@ -274,7 +281,7 @@
     "ofSalePrice": "Of {{total}}",
     "reservationExpires": "Reservation expires",
     "contract": "Contract",
-    "activateHint": "Activate to start payments",
+    "activateHint": "Schedule starts on activation",
     "nextPayment": "Next payment",
     "dueOn": "Due {{date}}",
     "overdueSince": "Overdue since {{date}}",

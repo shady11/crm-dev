@@ -33,6 +33,22 @@ function DiscountPendingBadge({ deal }: { deal: Deal }) {
     );
 }
 
+// What the client owes right now, under the sale price: the overdue list's
+// point, and a warning on any other list (FIN-12).
+function OverdueLine({ deal }: { deal: Deal }) {
+    const { t, i18n } = useTranslation("deals");
+    const { formatCurrency } = useCompanyFormatters();
+    if (!deal.overdue) return null;
+    return (
+        <p className="text-xs font-medium text-rose-600">
+            {t("table.overdue", {
+                amount: formatCurrency(deal.overdue.amount),
+                date: new Date(deal.overdue.since).toLocaleDateString(i18n.language, { day: "numeric", month: "short" }),
+            })}
+        </p>
+    );
+}
+
 export function DealsTable({ deals, isLoading, sortBy, sortOrder, onSort }: DealsTableProps) {
     const { t, i18n } = useTranslation("deals");
     const { formatCurrency } = useCompanyFormatters();
@@ -79,7 +95,10 @@ export function DealsTable({ deals, isLoading, sortBy, sortOrder, onSort }: Deal
                         </div>
                         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                             <span className="truncate text-muted-foreground">{deal.manager?.fullName ?? "—"}</span>
-                            <span className="ml-auto font-medium">{formatCurrency(deal.salePrice)}</span>
+                            <span className="ml-auto text-right">
+                                <span className="font-medium">{formatCurrency(deal.salePrice)}</span>
+                                <OverdueLine deal={deal} />
+                            </span>
                         </div>
                         <p className="mt-1 text-xs text-muted-foreground">{created.date}</p>
                     </div>
@@ -137,7 +156,10 @@ export function DealsTable({ deals, isLoading, sortBy, sortOrder, onSort }: Deal
                                     <DiscountPendingBadge deal={deal} />
                                 </div>
                             </TableCell>
-                            <TableCell>{formatCurrency(deal.salePrice)}</TableCell>
+                            <TableCell>
+                                <p>{formatCurrency(deal.salePrice)}</p>
+                                <OverdueLine deal={deal} />
+                            </TableCell>
                             <TableCell className="pr-4">
                                 <p>{created.date}</p>
                                 <p className="text-xs text-muted-foreground">{created.time}</p>

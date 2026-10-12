@@ -52,6 +52,7 @@ import {
 import {PrismaPg} from "@prisma/adapter-pg";
 import {RbacService} from "@/modules/rbac/rbac.service";
 import {DEFAULT_ROLES} from "@/modules/rbac/default-role-permissions";
+import {numberUnnumberedPayments} from "@/modules/deals/services/payments/receipt-number.service";
 
 const prisma = new PrismaClient({
     adapter: new PrismaPg({connectionString: process.env.DATABASE_URL!}),
@@ -587,6 +588,12 @@ async function seedDemoTenantData(args: {
             if (deposit > 0) {
                 await recordPayment(deposit, PaymentType.DEPOSIT, createdAt, 0);
             }
+            // Money is taken before activation too (FIN-9): every other
+            // signed contract has its first payment, made at signing.
+            if (status === DealStatus.CONTRACT_SIGNED && dealSeed % 2 === 1) {
+                await recordPayment(Math.round(salePrice * 0.1), PaymentType.INSTALLMENT, createdAt, 1);
+            }
+
             if (deposit > 0 && depositRefunded) {
                 const refundedAt = status === DealStatus.CANCELLED ? monthsAgo(1) : createdAt;
                 await prisma.payment.create({
@@ -678,6 +685,10 @@ async function seedDemoTenantData(args: {
             dealSeed += 1;
         }
     }
+
+    // Receipt numbers for the payments above, as the app gives every
+    // incoming payment (FIN-8).
+    await numberUnnumberedPayments(prisma);
 
     // --- Tasks (mix of overdue, due today, upcoming, done) --------------
     const taskTitles = [

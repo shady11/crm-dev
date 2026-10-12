@@ -8,6 +8,7 @@ import {CreateClientDto} from "@/modules/clients/dto/create-client.dto";
 import {UpdateClientDto} from "@/modules/clients/dto/update-client.dto";
 import {resolveOrderBy} from "@/common/utils/sort.util";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
+import {OVERDUE_INSTALLMENT_WHERE} from "@/modules/deals/deal.constants";
 
 // Newest first; enough for years of a single client's history.
 const CLIENT_ACTIVITY_LIMIT = 200;
@@ -146,6 +147,13 @@ export class ClientsService {
                             },
                         },
                         createdAt: true,
+                        // For the card's money summary (FIN-12): what each
+                        // deal has received and what's overdue on it.
+                        payments: { where: { deletedAt: null }, select: { amount: true } },
+                        paymentSchedules: {
+                            where: OVERDUE_INSTALLMENT_WHERE,
+                            select: { amount: true, paidAmount: true },
+                        },
                     },
                 },
             },
@@ -155,7 +163,15 @@ export class ClientsService {
             throw new NotFoundException("Client not found");
         }
 
-        return client;
+        return {
+            ...client,
+            deals: client.deals.map(({ payments, paymentSchedules, ...deal }) => ({
+                ...deal,
+                // Net of refunds, like everywhere else payments are summed.
+                paid: payments.reduce((sum, p) => sum + Number(p.amount), 0),
+                overdue: paymentSchedules.reduce((sum, s) => sum + Number(s.amount) - Number(s.paidAmount), 0),
+            })),
+        };
     }
 
     async create(user: AuthUser, dto: CreateClientDto) {

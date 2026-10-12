@@ -71,6 +71,8 @@ export type Deal = {
     manager: DealManager;
     project: DealProject;
     unit: DealUnit;
+    /** Overdue installments on this deal; only on list rows, null when none. */
+    overdue?: { amount: number; installments: number; since: string } | null;
 };
 
 export type DealActivity = {
@@ -91,6 +93,10 @@ type DealPayment = {
     reference: string | null;
     note: string | null;
     createdAt: string;
+    /** R-YYYY-NNNN; null for a refund. */
+    receiptNumber: string | null;
+    /** Who recorded it; null for payments from before this was tracked. */
+    user: { id: string; fullName: string } | null;
 };
 
 type DealPaymentSchedule = {

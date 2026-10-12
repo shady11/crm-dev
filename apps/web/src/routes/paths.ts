@@ -38,6 +38,7 @@ export const paths = {
             `/deals?attention=${filter}${managerId ? `&managerId=${managerId}` : ""}`,
         byManager: (managerId: string) => `/deals?managerId=${managerId}`,
     },
+    payments: "/payments",
     tasks: {
         root: "/tasks",
     },

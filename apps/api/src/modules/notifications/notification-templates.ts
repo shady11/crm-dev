@@ -13,6 +13,7 @@ export type NotificationTemplate =
     | {templateKey: "reservationExpiring"; params: {dealNumber: string; date: string}}
     | {templateKey: "paymentReceived"; params: {dealNumber: string; amount: number; currency: string | null}}
     | {templateKey: "refundIssued"; params: {dealNumber: string; amount: number; currency: string | null}}
+    | {templateKey: "moneyHeld"; params: {dealNumber: string; amount: number; currency: string | null}}
     | {templateKey: "paymentDueSoon"; params: {dealNumber: string}}
     | {templateKey: "paymentDueToday"; params: {dealNumber: string}}
     | {templateKey: "paymentOverdue"; params: {dealNumber: string; days: number}}

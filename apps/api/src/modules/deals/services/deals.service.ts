@@ -23,6 +23,7 @@ import {
   ClientNotFoundException,
   DealNotFoundException,
   DiscountApprovalNotAllowedException,
+  PaidExceedsDiscountedPriceException,
   DiscountNotPendingException,
   SalePriceMismatchException,
   UnitNotAvailableException,
@@ -34,7 +35,7 @@ import {DEAL_SORTABLE_FIELDS, DealQueryDto} from '../dto/deal-query.dto';
 import {resolveOrderBy} from '@/common/utils/sort.util';
 import {DealDomainService} from './deal-domain.service';
 import {DealActivityService} from './deal-activity.service';
-import {ACTIVE_DEAL_STATUSES, DEAL_DETAILS_INCLUDE, dealAttentionWhere, dealStatusTitle, RESERVATION_POLICY_SELECT} from "../deal.constants";
+import {ACTIVE_DEAL_STATUSES, DEAL_DETAILS_INCLUDE, dealAttentionWhere, dealStatusTitle, OVERDUE_INSTALLMENT_WHERE, RESERVATION_POLICY_SELECT} from "../deal.constants";
 import {ReserveUnitDto} from "../dto/reserve-unit.dto";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ExtendReservationDto} from "@/modules/deals/dto/extend-reservation.dto";
@@ -49,6 +50,8 @@ import {DealNumberService} from "@/modules/deals/services/deal-number.service";
 import {DocumentGenerationService} from "@/modules/document-generation/document-generation.service";
 import {GENERATABLE_DOCUMENT_TYPES} from "@/modules/document-generation/document-generation.constants";
 import {TasksService} from "@/modules/tasks/tasks.service";
+import {MoneyHeldNotifier} from "./money-held-notifier.service";
+import {ReceiptNumberService} from "./payments/receipt-number.service";
 
 @Injectable()
 export class DealsService {
@@ -64,6 +67,8 @@ export class DealsService {
       private readonly documentGeneration: DocumentGenerationService,
       private readonly rbacService: RbacService,
       private readonly tasksService: TasksService,
+      private readonly moneyHeld: MoneyHeldNotifier,
+      private readonly receiptNumbers: ReceiptNumberService,
   ) {}
 
   /**
@@ -171,8 +176,28 @@ export class DealsService {
       this.prisma.deal.count({ where }),
     ]);
 
+    // What's overdue on each deal on this page, so the list can show the
+    // money owed, not only the sale price (FIN-12). One query per page.
+    const overdueByDeal = deals.length === 0 ? [] : await this.prisma.paymentSchedule.groupBy({
+      by: ['dealId'],
+      where: { ...OVERDUE_INSTALLMENT_WHERE, dealId: { in: deals.map((deal) => deal.id) } },
+      _sum: { amount: true, paidAmount: true },
+      _min: { dueDate: true },
+      _count: { _all: true },
+    });
+    const overdueOf = (dealId: string) => {
+      const row = overdueByDeal.find((r) => r.dealId === dealId);
+      return row
+        ? {
+            amount: Number(row._sum.amount ?? 0) - Number(row._sum.paidAmount ?? 0),
+            installments: row._count._all,
+            since: row._min.dueDate,
+          }
+        : null;
+    };
+
     return {
-      items: this.mapper.toList(deals),
+      items: this.mapper.toList(deals).map((deal) => ({ ...deal, overdue: overdueOf(deal.id) })),
       meta: {
         page,
         limit,
@@ -370,6 +395,7 @@ export class DealsService {
             paymentMethod: dto.depositPaymentMethod ?? PaymentMethod.CASH,
             paymentType: PaymentType.DEPOSIT,
             paidAt: new Date(),
+            receiptNumber: await this.receiptNumbers.next(db, companyId),
           },
         });
       }
@@ -619,6 +645,10 @@ export class DealsService {
         metadata: { status: "ACTIVE" },
       });
 
+      // Paid in full before activation (FIN-9): there's nothing left to
+      // schedule, so the sale is complete.
+      await this.tryCompleteWithinTransaction(db, user, deal.id);
+
       if (deal.managerId) {
         await this.notifications.create({
           companyId,
@@ -679,6 +709,13 @@ export class DealsService {
 
       if (!this.domain.canDecideDiscount(deal.requestedDiscountPercent, hasPermission(user, 'deals.approve_discount'), user.discountLimit)) {
         throw new DiscountApprovalNotAllowedException();
+      }
+
+      // Payments are accepted before the decision (FIN-9), against the list
+      // price; the discount can't leave the client paid beyond the new price.
+      const paid = await db.payment.aggregate({ where: { dealId: deal.id, deletedAt: null }, _sum: { amount: true } });
+      if ((paid._sum.amount ?? new Prisma.Decimal(0)).greaterThan(deal.listPrice.minus(deal.requestedDiscountAmount ?? 0))) {
+        throw new PaidExceedsDiscountedPriceException();
       }
 
       await db.deal.update({
@@ -966,6 +1003,10 @@ export class DealsService {
 
       return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
     });
+
+    // A deposit taken on the reservation is still the client's: Finance has
+    // a refund to record.
+    await this.moneyHeld.notifyIfHeld(result);
 
     // A request still waiting when the reservation is cancelled no longer
     // needs anyone's decision.

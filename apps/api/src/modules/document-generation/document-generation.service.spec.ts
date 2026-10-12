@@ -1,5 +1,6 @@
 import { DocumentGenerationService } from './document-generation.service';
-import { DocumentOwnerType, DocumentType } from '@/generated/prisma/client';
+import { DocumentOwnerType, DocumentType, Prisma } from '@/generated/prisma/client';
+import { buildReceiptContext } from './template-context.builder';
 import { TemplateRenderFailedException, UnsupportedDocumentTypeException } from './exceptions';
 import { renderHtmlToPdf } from './pdf-renderer';
 
@@ -278,4 +279,34 @@ describe('DocumentGenerationService', () => {
       expect.objectContaining({ orderBy: { version: 'desc' } }),
     );
   });
+});
+
+describe('buildReceiptContext', () => {
+    const day = (d: string) => new Date(`${d}T00:00:00.000Z`);
+    const pay = (id: string, amount: number, paidAt: string, created = '2026-01-01T10:00:00.000Z') =>
+        ({id, amount: new Prisma.Decimal(amount), paidAt: day(paidAt), createdAt: new Date(created)});
+
+    const deal = {
+        dealNumber: 'D-2026-0001', status: 'ACTIVE', financingType: null, listPrice: new Prisma.Decimal(10000),
+        salePrice: new Prisma.Decimal(10000), discountAmount: null, discountPercent: null, deposit: null,
+        reservedAt: null, reservationExpiresAt: null, contractNumber: 'CN-1', contractDate: day('2026-01-01'), note: null,
+        client: {fullName: 'Aibek Asanov', phone: '+996555000000', email: null, passport: 'AN1', pin: '2', address: null},
+        unit: {number: '101', type: 'APARTMENT', rooms: 2, area: new Prisma.Decimal(50), block: {name: 'A'}, entrance: {name: '1'}, floor: {number: 1}},
+        project: {name: 'Orion'}, manager: null, paymentSchedules: [],
+        payments: [pay('p1', 3000, '2026-01-05'), pay('p2', 2000, '2026-02-05'), pay('p3', 1000, '2026-03-05')],
+    };
+    const company = {name: 'Kerege', legalName: 'Kerege LLC', address: null, phone: null, taxId: null, signatoryName: null, signatoryTitle: null, currency: 'KGS'};
+
+    it('prints the payment and the balance as it stood that day', () => {
+        const payment = {...pay('p2', 2000, '2026-02-05'), receiptNumber: 'R-2026-0002', paymentMethod: 'BANK_TRANSFER', paymentType: 'INSTALLMENT', reference: 'TX-9', note: null, user: {fullName: 'Nurgul Baktybekova'}};
+
+        const context = buildReceiptContext(deal as any, company as any, payment as any);
+
+        expect(context.payment).toEqual(expect.objectContaining({
+            receiptNumber: 'R-2026-0002', date: '2026-02-05', amount: '2,000.00 KGS',
+            method: 'Bank transfer', type: 'Installment', reference: 'TX-9', receivedBy: 'Nurgul Baktybekova',
+        }));
+        expect(context.totals).toEqual({paidToDate: '5,000.00 KGS', remaining: '5,000.00 KGS'});
+        expect(context.deal.contractNumber).toBe('CN-1');
+    });
 });

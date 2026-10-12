@@ -53,7 +53,8 @@
     "created": "Түзүлдү",
     "emptyTitle": "Бүтүмдөр табылган жок",
     "emptyDescription": "Чыпкаларды же издөөнү өзгөртүп көрүңүз.",
-    "discountPending": "Арзандатуу макулдатууда"
+    "discountPending": "Арзандатуу макулдатууда",
+    "overdue": "{{date}} бери {{amount}} мөөнөтү өттү"
   },
   "pagination": {
     "rowsPerPage": "Барактагы саптар"
@@ -124,7 +125,8 @@
     "title": "Төлөмдөр",
     "record": "Төлөм жаздыруу",
     "empty": "Азырынча төлөм катталган жок.",
-    "recordRefund": "Кайтарууну каттоо"
+    "recordRefund": "Кайтарууну каттоо",
+    "recordedBy": "Киргизген: {{name}}"
   },
   "detailsPage": {
     "dealNumber": "Бүтүм №{{number}}",
@@ -169,8 +171,13 @@
     "generateReservation": "Брондоо келишими",
     "generateContract": "Сатып алуу-сатуу келишими",
     "activateDialogTitle": "Бүтүмдү активдештирүү керекпи?",
-    "activateDialogDescription": "Мындан ары төлөмдөр башталат: төлөм графигин түзүп, төлөмдөрдү киргизүүгө болот. Активдүү бүтүмдү «Келишимге кол коюлду» статусуна кайтаруу мүмкүн эмес.",
-    "refundDialogTitle": "Кайтарууну каттоо"
+    "activateDialogDescription": "Төлөм графиги ушул жерден башталат: ал мурун төлөнгөн акчаны эсепке алып, калган сумманы бөлүштүрөт. Активдүү бүтүмдү «Келишимге кол коюлду» абалына кайтарууга болбойт.",
+    "refundDialogTitle": "Кайтарууну каттоо",
+    "paymentNote": "Эскертүү (милдеттүү эмес)",
+    "paymentNotePlaceholder": "мисалы, кардардын агасы төлөдү",
+    "amountHintRemaining": "Бүтүм боюнча калды: {{remaining}}",
+    "amountHintNext": "кийинки төлөм {{amount}}, мөөнөтү {{date}}",
+    "amountHintRefund": "{{paid}} чейин кайтарууга болот"
   },
   "toasts": {
     "unitReserved": "Жай бронделди",
@@ -274,7 +281,7 @@
     "ofSalePrice": "{{total}} ичинен",
     "reservationExpires": "Брондун мөөнөтү",
     "contract": "Келишим",
-    "activateHint": "Төлөмдөрдү баштоо үчүн активдештириңиз",
+    "activateHint": "Төлөм графиги активдештиргенден кийин",
     "nextPayment": "Кийинки төлөм",
     "dueOn": "{{date}} чейин",
     "overdueSince": "{{date}} бери мөөнөтү өттү",

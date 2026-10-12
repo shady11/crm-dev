@@ -3,6 +3,7 @@ import {Button} from "@/components/ui/button.tsx";
 import type {DealDetails} from "@/features/deals/api/deals.api.ts";
 import {useTranslation} from "react-i18next";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
+import {ReceiptButton} from "@/features/payments/components/receipt-button.tsx";
 
 export const PAYMENT_TYPE_LABEL_KEYS: Record<string, string> = {
     DEPOSIT: "payments:type.deposit",
@@ -27,9 +28,12 @@ interface DealPaymentsHistoryCardProps {
     /** A refund outside the ACTIVE stage, where Record payment isn't offered. */
     canRecordRefund?: boolean;
     onRecordRefund?(): void;
+    /** Shows each payment's Receipt button (deals.manage_payments). */
+    dealId: string;
+    canIssueReceipts: boolean;
 }
 
-export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPayment, canRecordRefund, onRecordRefund }: DealPaymentsHistoryCardProps) {
+export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPayment, canRecordRefund, onRecordRefund, dealId, canIssueReceipts }: DealPaymentsHistoryCardProps) {
     const { t, i18n } = useTranslation(["payments", "deals"]);
     const { formatCurrency } = useCompanyFormatters();
     return (
@@ -59,13 +63,25 @@ export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPa
                                     <p className="text-xs text-muted-foreground">
                                         {t(PAYMENT_METHOD_LABEL_KEYS[p.paymentMethod]) ?? p.paymentMethod}
                                         {p.reference && ` · ${p.reference}`}
+                                        {p.receiptNumber && ` · ${p.receiptNumber}`}
                                     </p>
+                                    {p.user && (
+                                        <p className="text-xs text-muted-foreground">
+                                            {t("paymentsHistory.recordedBy", { ns: "deals", name: p.user.fullName })}
+                                        </p>
+                                    )}
+                                    {p.note && <p className="mt-0.5 text-xs italic text-muted-foreground">{p.note}</p>}
                                 </div>
-                                <div className="text-right">
-                                    <p className="font-medium">{formatCurrency(p.amount)}</p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {new Date(p.paidAt).toLocaleDateString(i18n.language)}
-                                    </p>
+                                <div className="flex items-center gap-2">
+                                    <div className="text-right">
+                                        <p className="font-medium">{formatCurrency(p.amount)}</p>
+                                        <p className="text-xs text-muted-foreground">
+                                            {new Date(p.paidAt).toLocaleDateString(i18n.language)}
+                                        </p>
+                                    </div>
+                                    {canIssueReceipts && p.receiptNumber && (
+                                        <ReceiptButton dealId={dealId} paymentId={p.id} receiptNumber={p.receiptNumber} />
+                                    )}
                                 </div>
                             </div>
                         ))}

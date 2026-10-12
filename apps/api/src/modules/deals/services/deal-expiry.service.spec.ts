@@ -39,8 +39,10 @@ describe('DealExpiryService.expireOverdueReservations', () => {
         const notifications = {create: jest.fn().mockResolvedValue({}), resolveForEntity: jest.fn().mockResolvedValue(0)};
         const activityService = {expireReservation: jest.fn().mockResolvedValue({})};
 
-        const service = new DealExpiryService(prisma as any, notifications as any, activityService as any);
-        return {service, prisma, notifications, activityService};
+        const moneyHeld = {notifyIfHeld: jest.fn().mockResolvedValue(undefined)};
+
+        const service = new DealExpiryService(prisma as any, notifications as any, activityService as any, moneyHeld as any);
+        return {service, prisma, notifications, activityService, moneyHeld};
     }
 
     it('does nothing when there are no overdue reservations', async () => {
@@ -72,6 +74,13 @@ describe('DealExpiryService.expireOverdueReservations', () => {
             where: {id: 'unit-1', status: UnitStatus.RESERVED},
             data: {status: UnitStatus.AVAILABLE},
         });
+    });
+
+    it('asks Finance to refund whatever the expired reservation still holds', async () => {
+        const {service, moneyHeld} = build([candidate()]);
+        await service.expireOverdueReservations();
+
+        expect(moneyHeld.notifyIfHeld).toHaveBeenCalledWith(expect.objectContaining({id: 'deal-1'}));
     });
 
     it('notifies the deal manager once the reservation is expired', async () => {

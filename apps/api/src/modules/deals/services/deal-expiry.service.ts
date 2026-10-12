@@ -5,6 +5,7 @@ import {PrismaService} from "@/database/prisma.service";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 import {DealActivityService} from "./deal-activity.service";
 import {resolveDiscountRequestNotifications} from "./discount-approval";
+import {MoneyHeldNotifier} from "./money-held-notifier.service";
 
 @Injectable()
 export class DealExpiryService {
@@ -14,6 +15,7 @@ export class DealExpiryService {
         private readonly prisma: PrismaService,
         private readonly notifications: NotificationsService,
         private readonly activityService: DealActivityService,
+        private readonly moneyHeld: MoneyHeldNotifier,
     ) {}
 
     @Cron(CronExpression.EVERY_10_MINUTES)
@@ -104,6 +106,8 @@ export class DealExpiryService {
                     entityId: deal.id,
                 });
             }
+
+            await this.moneyHeld.notifyIfHeld(deal);
 
             // A discount request still waiting on a lapsed reservation no
             // longer needs anyone's decision.
