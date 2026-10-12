@@ -11,7 +11,13 @@ import {
     SidebarMenuSubItem,
 } from "@/components/ui/sidebar.tsx"
 import {ChevronRight, type LucideIcon} from "lucide-react";
-import {Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
+
+// A nav item is active on its own page and on any page nested under it
+// (e.g. /projects/:id highlights «Projects»).
+function isPathActive(pathname: string, url: string) {
+    return pathname === url || pathname.startsWith(`${url}/`);
+}
 
 export function NavMain({
                             items,
@@ -28,6 +34,8 @@ export function NavMain({
         }[]
     }[]
 }) {
+    const { pathname } = useLocation();
+
     return (
         <SidebarGroup>
             <SidebarMenu>
@@ -36,7 +44,7 @@ export function NavMain({
                         <Collapsible
                             key={item.title}
                             asChild
-                            defaultOpen={item.isActive}
+                            defaultOpen={item.isActive ?? item.items.some((subItem) => isPathActive(pathname, subItem.url))}
                             className="group/collapsible"
                         >
                             <SidebarMenuItem>
@@ -51,7 +59,7 @@ export function NavMain({
                                     <SidebarMenuSub>
                                         {item.items?.map((subItem) => (
                                             <SidebarMenuSubItem key={subItem.title}>
-                                                <SidebarMenuSubButton asChild>
+                                                <SidebarMenuSubButton asChild isActive={isPathActive(pathname, subItem.url)}>
                                                     <Link to={subItem.url}>
                                                         <span className="font-medium">{subItem.title}</span>
                                                     </Link>
@@ -64,7 +72,7 @@ export function NavMain({
                         </Collapsible>
                     ): (
                         <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton asChild tooltip={item.title}>
+                            <SidebarMenuButton asChild tooltip={item.title} isActive={isPathActive(pathname, item.url)}>
                                 <Link to={item.url}>
                                     {item.icon && <item.icon />}
                                     <span className="font-medium group-data-[collapsible=icon]:hidden">{item.title}</span>
