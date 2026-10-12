@@ -81,7 +81,8 @@
       "errorTitle": "Failed to move lead. Please try again."
     },
     "reassign": {
-      "action": "Reassign to another manager"
+      "action": "Reassign to another manager",
+      "short": "Reassign"
     }
   },
   "activityTab": {

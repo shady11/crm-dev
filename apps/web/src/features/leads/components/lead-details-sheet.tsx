@@ -82,23 +82,23 @@ export function LeadDetailsSheet({
                         </IconTooltipButton>
                     )}
                     {canTransferBranch && (
-                        <Button
+                        <IconTooltipButton
                             variant="secondary"
                             size="icon-md"
-                            aria-label={t("detailsSheet.transferBranch.action")}
+                            label={t("detailsSheet.transferBranch.action")}
                             onClick={onRequestTransferBranch}
                         >
                             <ArrowLeftRight className="size-4" />
-                        </Button>
+                        </IconTooltipButton>
                     )}
                     {canReassign && (
                         <Button
                             variant="secondary"
-                            size="icon-md"
-                            aria-label={t("detailsSheet.reassign.action")}
+                            title={t("detailsSheet.reassign.action")}
                             onClick={onRequestReassign}
                         >
                             <Repeat className="size-4" />
+                            {t("detailsSheet.reassign.short")}
                         </Button>
                     )}
                     <Button variant="secondary" className="flex-1" onClick={onEdit}>

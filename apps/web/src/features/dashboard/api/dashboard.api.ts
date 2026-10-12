@@ -169,8 +169,8 @@ export type Funnel = {
     leadToWonConversionRate: number;
 };
 
-export async function getFunnel(projectId?: string, branchId?: string) {
-    const response = await api.get<Funnel>("/dashboard/funnel", { params: { projectId, branchId } });
+export async function getFunnel(projectId?: string, branchId?: string, managerId?: string) {
+    const response = await api.get<Funnel>("/dashboard/funnel", { params: { projectId, branchId, managerId } });
     return response.data;
 }
 
@@ -190,9 +190,9 @@ export async function getFinanceOverview(branchId?: string, projectId?: string) 
     return response.data;
 }
 
-export async function downloadFunnelExport(projectId?: string, branchId?: string) {
+export async function downloadFunnelExport(projectId?: string, branchId?: string, managerId?: string) {
     const response = await api.get<Blob>("/dashboard/funnel/export", {
-        params: { projectId, branchId },
+        params: { projectId, branchId, managerId },
         responseType: "blob",
     });
 

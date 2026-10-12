@@ -31,7 +31,8 @@
     "totalLeads": "Всего лидов",
     "totalDeals": "Всего сделок",
     "leadToDeal": "Лид → сделка",
-    "leadToWon": "Лид → успех"
+    "leadToWon": "Лид → успех",
+    "allManagers": "Все менеджеры"
   },
   "attention": {
     "title": "Требует внимания",
@@ -82,7 +83,8 @@
     "tasksDue_few": "{{count}} задачи к сроку",
     "tasksDue_many": "{{count}} задач к сроку",
     "tasksDue_other": "{{count}} задачи к сроку",
-    "noActivity": "Пока нет активности"
+    "noActivity": "Пока нет активности",
+    "openTeam": "Открыть команду"
   },
   "myWorkToday": {
     "title": "Моя работа сегодня",

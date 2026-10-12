@@ -402,6 +402,27 @@ describe('DashboardService', () => {
     });
 
     describe('getFunnel', () => {
+        it('narrows to one manager when a branch or company viewer picks one, keeping the branch filter', async () => {
+            const {service, prisma} = build();
+            await service.getFunnel(salesHeadUser, undefined, undefined, 'manager-7');
+
+            expect(prisma.lead.groupBy).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({managerId: 'manager-7', branchId: 'branch-1'})}),
+            );
+            expect(prisma.deal.groupBy).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({managerId: 'manager-7'})}),
+            );
+        });
+
+        it('ignores a picked manager for a self-scoped viewer, who only ever sees their own', async () => {
+            const {service, prisma} = build();
+            await service.getFunnel(selfScopedUser, undefined, undefined, 'manager-7');
+
+            expect(prisma.lead.groupBy).toHaveBeenCalledWith(
+                expect.objectContaining({where: expect.objectContaining({managerId: 'self-1'})}),
+            );
+        });
+
         it('reports zero conversion rates when there are no leads at all', async () => {
             const {service, prisma} = build();
             prisma.lead.count.mockResolvedValue(0);

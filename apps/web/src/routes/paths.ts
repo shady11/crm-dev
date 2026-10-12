@@ -37,6 +37,7 @@ export const paths = {
         attention: (filter: "discount_pending" | "overdue_payments", managerId?: string) =>
             `/deals?attention=${filter}${managerId ? `&managerId=${managerId}` : ""}`,
         byManager: (managerId: string) => `/deals?managerId=${managerId}`,
+        byStatus: (status: string) => `/deals?status=${status}`,
     },
     payments: "/payments",
     tasks: {

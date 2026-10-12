@@ -1,4 +1,6 @@
+import {Link} from "react-router-dom";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
+import {paths} from "@/routes/paths.ts";
 import {Badge} from "@/components/ui/badge.tsx";
 import type {MyWorkToday} from "@/features/dashboard/api/dashboard.api.ts";
 import {useTranslation} from "react-i18next";
@@ -30,10 +32,10 @@ export function MyWorkTodayCard({data}: {data: MyWorkToday}) {
                     ) : (
                         <div className="space-y-2">
                             {data.leadsNeedingFollowUp.map((lead) => (
-                                <div key={lead.id} className="text-sm">
+                                <Link key={lead.id} to={paths.leadDetail(lead.id)} className="-mx-2 block rounded-md px-2 py-1 text-sm hover:bg-secondary/40">
                                     <p className="truncate font-medium">{lead.fullName}</p>
                                     <p className="text-xs text-muted-foreground">{formatDate(lead.nextContactAt)}</p>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     )}
@@ -48,10 +50,10 @@ export function MyWorkTodayCard({data}: {data: MyWorkToday}) {
                     ) : (
                         <div className="space-y-2">
                             {data.tasksDueToday.map((task) => (
-                                <div key={task.id} className="text-sm">
+                                <Link key={task.id} to={paths.tasks.root} className="-mx-2 block rounded-md px-2 py-1 text-sm hover:bg-secondary/40">
                                     <p className="truncate font-medium">{task.title}</p>
                                     <p className="text-xs text-muted-foreground">{formatDate(task.dueDate)}</p>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     )}
@@ -66,13 +68,13 @@ export function MyWorkTodayCard({data}: {data: MyWorkToday}) {
                     ) : (
                         <div className="space-y-2">
                             {data.dealsWaitingOnClient.map((deal) => (
-                                <div key={deal.id} className="flex items-center justify-between gap-2 text-sm">
+                                <Link key={deal.id} to={paths.deals.detail(deal.id)} className="-mx-2 flex items-center justify-between gap-2 rounded-md px-2 py-1 text-sm hover:bg-secondary/40">
                                     <div className="min-w-0">
                                         <p className="truncate font-medium">{deal.client.fullName}</p>
                                         <p className="text-xs text-muted-foreground">№{deal.unit.number}</p>
                                     </div>
                                     <Badge variant="secondary">{t(DEAL_STATUS_LABEL_KEYS[deal.status as DealStatus])}</Badge>
-                                </div>
+                                </Link>
                             ))}
                         </div>
                     )}

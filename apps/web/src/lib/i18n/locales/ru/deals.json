@@ -59,12 +59,6 @@
   "pagination": {
     "rowsPerPage": "Строк на странице"
   },
-  "statusCard": {
-    "count_one": "{{count}} сделка",
-    "count_few": "{{count}} сделки",
-    "count_many": "{{count}} сделок",
-    "count_other": "{{count}} сделки"
-  },
   "card": {
     "client": "Клиент",
     "reservedAt": "Забронировано",

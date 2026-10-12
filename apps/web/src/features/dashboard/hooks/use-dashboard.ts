@@ -15,7 +15,9 @@ import {
 } from "@/features/dashboard/api/dashboard.api.ts";
 import {getDealStatusSummary} from "@/features/deals/api/deals.api.ts";
 
-export function useDashboard(projectId?: string, branchId?: string) {
+// funnelManagerId narrows only the funnel — the one widget a Sales Head
+// can split by manager.
+export function useDashboard(projectId?: string, branchId?: string, funnelManagerId?: string) {
     return {
         kpis: useQuery({ queryKey: ["dashboard", "kpis", { projectId, branchId }], queryFn: () => getDashboardKpis(projectId, branchId) }),
         revenueTrend: useQuery({ queryKey: ["dashboard", "revenue-trend", { projectId, branchId }], queryFn: () => getRevenueTrend(projectId, branchId) }),
@@ -25,7 +27,10 @@ export function useDashboard(projectId?: string, branchId?: string) {
         // mine: true — a self-scoped viewer (SALES_MANAGER) sees only their
         // own deals here; ignored server-side for every other role.
         dealsStatus: useQuery({ queryKey: ["deals", "status-summary", { projectId, branchId }], queryFn: () => getDealStatusSummary(projectId, branchId, true) }),
-        funnel: useQuery({ queryKey: ["dashboard", "funnel", { projectId, branchId }], queryFn: () => getFunnel(projectId, branchId) }),
+        funnel: useQuery({
+            queryKey: ["dashboard", "funnel", { projectId, branchId, funnelManagerId }],
+            queryFn: () => getFunnel(projectId, branchId, funnelManagerId),
+        }),
     };
 }
 

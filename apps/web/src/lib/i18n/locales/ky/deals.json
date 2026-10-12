@@ -59,12 +59,6 @@
   "pagination": {
     "rowsPerPage": "Барактагы саптар"
   },
-  "statusCard": {
-    "count_one": "{{count}} бүтүм",
-    "count_few": "{{count}} бүтүм",
-    "count_many": "{{count}} бүтүм",
-    "count_other": "{{count}} бүтүм"
-  },
   "card": {
     "client": "Клиент",
     "reservedAt": "Бронделди",

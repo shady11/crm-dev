@@ -15,7 +15,12 @@ export function DealsPage() {
                 <h2 className="text-2xl font-bold tracking-tight">{t("page.title")}</h2>
             </div>
 
-            <DealStatusCardsGrid countsByStatus={statusSummary.countsByStatus} />
+            {/* A tile filters the list below to its stage; clicking it again clears that. */}
+            <DealStatusCardsGrid
+                countsByStatus={statusSummary.countsByStatus}
+                selectedStatus={filters.statusFilter === "all" ? undefined : filters.statusFilter}
+                onSelect={(status) => filters.setStatusFilter(filters.statusFilter === status ? "all" : status)}
+            />
 
             <div className="space-y-4">
                 <DealsToolbar
