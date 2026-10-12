@@ -217,7 +217,9 @@ export class TasksService {
 
         let branchId: string | null | undefined;
 
-        if (dto.assignedToId) {
+        // Only when it changes: editing the title of a task still held by
+        // someone since deactivated shouldn't fail on the unchanged assignee.
+        if (dto.assignedToId && dto.assignedToId !== existing.assignedToId) {
             const assignee = await this.ensureAssigneeAssignable(dto.assignedToId, user);
             // Reassigning to someone in a different branch moves the task
             // with them — there's no dedicated task-handoff story like leads/
@@ -591,17 +593,50 @@ export class TasksService {
      * A branch-scoped actor may only assign a task within their own branch —
      * same reasoning as LeadsService.ensureManagerAssignable.
      */
+    /**
+     * Who the caller may put a task in the name of: active people in their
+     * company, or only in their own branch for a branch-scoped role. One
+     * definition for both the check below and findAssignees, so the pickers
+     * never offer someone the server would refuse.
+     */
+    private assignableUsersWhere(user: AuthUser): Prisma.UserWhereInput {
+        return {
+            companyId: user.companyId,
+            deletedAt: null,
+            isActive: true,
+            isSuperAdmin: false,
+            ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
+        };
+    }
+
+    /**
+     * The task assignee picker and the tasks list's "assigned to" filter.
+     * Readable with tasks.view alone, unlike GET /users (users.view), which
+     * a Sales Manager or Finance doesn't have.
+     */
+    async findAssignees(user: AuthUser) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        return this.prisma.user.findMany({
+            where: this.assignableUsersWhere(user),
+            orderBy: { fullName: "asc" },
+            select: { id: true, fullName: true, branchId: true },
+        });
+    }
+
     private async ensureAssigneeAssignable(assignedToId: string, user: AuthUser) {
         const assignee = await this.prisma.user.findFirst({
-            where: {
-                id: assignedToId,
-                companyId: user.companyId,
-                ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
-            },
+            where: { id: assignedToId, ...this.assignableUsersWhere(user) },
         });
 
         if (!assignee) {
-            throw new BadRequestException("Assignee must belong to your company.");
+            throw new BadRequestException(
+                user.isBranchScoped
+                    ? "Assignee must be an active member of your branch."
+                    : "Assignee must be an active member of your company.",
+            );
         }
 
         return assignee;

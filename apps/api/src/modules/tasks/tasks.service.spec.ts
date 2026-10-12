@@ -196,6 +196,46 @@ describe('TasksService', () => {
             const data = (prisma.task.update as jest.Mock).mock.calls[0][0].data;
             expect(data.branchId).toBeUndefined();
         });
+        it('keeps working on a task whose unchanged assignee has since been deactivated', async () => {
+            const {service, prisma} = build({task: {id: 'task-1', assignedToId: 'gone-1'}, assignee: null});
+
+            await service.update(adminUser, 'task-1', {assignedToId: 'gone-1', title: 'New title'} as any);
+
+            expect(prisma.user.findFirst).not.toHaveBeenCalled();
+            expect(prisma.task.update).toHaveBeenCalled();
+        });
+    });
+
+    describe('assignees', () => {
+        it('lists active, non-platform people in the caller\'s own branch for a branch-scoped role', async () => {
+            const {service, prisma} = build();
+            (prisma.user as any).findMany = jest.fn().mockResolvedValue([]);
+
+            await service.findAssignees(branchUser);
+
+            expect((prisma.user as any).findMany).toHaveBeenCalledWith(expect.objectContaining({
+                where: {companyId: 'company-1', deletedAt: null, isActive: true, isSuperAdmin: false, branchId: 'branch-1'},
+            }));
+        });
+
+        it('lists the whole company for a company-wide role', async () => {
+            const {service, prisma} = build();
+            (prisma.user as any).findMany = jest.fn().mockResolvedValue([]);
+
+            await service.findAssignees(adminUser);
+
+            expect((prisma.user as any).findMany.mock.calls[0][0].where.branchId).toBeUndefined();
+        });
+
+        it('refuses an assignee outside that list, naming the branch for a branch-scoped role', async () => {
+            const {service, prisma} = build({assignee: null});
+
+            await expect(service.create({...branchUser, permissions: ['tasks.create']}, createDto({assignedToId: 'other-branch'})))
+                .rejects.toThrow('Assignee must be an active member of your branch.');
+            expect(prisma.user.findFirst).toHaveBeenCalledWith({
+                where: expect.objectContaining({id: 'other-branch', branchId: 'branch-1', isActive: true, deletedAt: null}),
+            });
+        });
     });
 
     describe('updateStatus', () => {

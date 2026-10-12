@@ -5,7 +5,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {Button} from "@/components/ui/button.tsx";
 import {TASK_STATUS_LABEL_KEYS, TaskStatus} from "@/features/tasks/types/task.types.ts";
 import type {TaskStatusFilter} from "@/features/tasks/hooks/use-tasks-list.ts";
-import {useAssignableUsers} from "@/features/users/hooks/use-assignable-users.ts";
+import {useTaskAssignees} from "@/features/tasks/hooks/use-task-assignees.ts";
 import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {canCreateTask} from "@/features/tasks/utils/task-access.ts";
@@ -28,9 +28,10 @@ export function TasksToolbar({ statusFilter, onStatusFilterChange, assignedToId,
     const { t } = useTranslation("tasks");
     const { user } = useAuth();
 
-    const assignableUsers = useAssignableUsers();
+    // Narrowed to the chosen branch when a company-wide viewer picks one.
+    const assignees = useTaskAssignees().data.filter((u) => !branchId || u.branchId === branchId);
     const assigneeCollection = createListCollection({
-        items: [{ label: t("toolbar.everyone"), value: "all" }, ...assignableUsers.data.map((u) => ({ label: u.fullName, value: u.id }))],
+        items: [{ label: t("toolbar.everyone"), value: "all" }, ...assignees.map((u) => ({ label: u.fullName, value: u.id }))],
     });
 
     const statusCollection = createListCollection({
