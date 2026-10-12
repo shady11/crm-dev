@@ -56,7 +56,7 @@ export function NotificationBell() {
                 </Button>
                 {unreadCount > 0 && (
                     <Float>
-                        <Badge pill size="xs" variant="default">
+                        <Badge pill size="xs" variant="default" className="bg-primary text-primary-foreground">
                             <small>{unreadCount > 9 ? "9+" : unreadCount}</small>
                         </Badge>
                     </Float>
