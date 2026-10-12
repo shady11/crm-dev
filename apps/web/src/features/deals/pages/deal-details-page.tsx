@@ -33,6 +33,7 @@ import type {PaymentMethod, PaymentType} from "../api/deals.api";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {DealTasksCard} from "@/features/deals/components/deal-tasks-card.tsx";
 import {DealDiscountBanner} from "@/features/deals/components/deal-details/deal-discount-banner.tsx";
+import {DealMoneyHeldBanner} from "@/features/deals/components/deal-details/deal-money-held-banner.tsx";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
 import {useEntityDocuments} from "@/features/documents/hooks/use-entity-documents.ts";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
@@ -76,6 +77,9 @@ export function DealDetailsPage() {
     const canGenerateDocuments = hasPermission(user, "documents.generate");
     const canDecideDiscount = hasPermission(user, "deals.approve_discount");
     const canCancel = hasPermission(user, "deals.cancel");
+    const canManagePayments = hasPermission(user, "deals.manage_payments");
+    // Extend, sign, activate and complete: the deal's own lifecycle.
+    const canManage = hasPermission(user, "deals.manage");
     const [rejectOpen, setRejectOpen] = useState(false);
     const [activateOpen, setActivateOpen] = useState(false);
     const [rejectReason, setRejectReason] = useState("");
@@ -121,6 +125,18 @@ export function DealDetailsPage() {
 
     const visual = DEAL_STATUS_VISUALS[deal.status];
 
+    // Outside ACTIVE only a refund can be recorded: a reservation's deposit,
+    // or money still held after it was cancelled or expired. Mirrors
+    // DealDomainService.ensureCanRecordPayment.
+    const refundOnly = deal.status !== "ACTIVE";
+    const canRecordRefund = canManagePayments && totalPaid > 0
+        && ["RESERVED", "CONTRACT_SIGNED", "CANCELLED", "EXPIRED"].includes(deal.status);
+    const openRefundDialog = () => {
+        setPaymentType("REFUND");
+        setPaymentAmount(totalPaid);
+        setPaymentOpen(true);
+    };
+
     // Mirrors DealDomainService.ensureCanExtendReservation: a limited number
     // of extensions, each to a later date within the company's maximum term.
     const extensionsLeft = reservationPolicy
@@ -148,7 +164,9 @@ export function DealDetailsPage() {
     });
 
     const paymentTypeCollection = createListCollection({
-        items: Object.entries(PAYMENT_TYPE_LABEL_KEYS).map(([value, key]) => ({ label: t(key), value })),
+        items: Object.entries(PAYMENT_TYPE_LABEL_KEYS)
+            .filter(([value]) => !refundOnly || value === "REFUND")
+            .map(([value, key]) => ({ label: t(key), value })),
     });
 
     const isOpen = ["RESERVED", "CONTRACT_SIGNED", "ACTIVE"].includes(deal.status);
@@ -211,7 +229,7 @@ export function DealDetailsPage() {
                         <ArrowLeft className="size-3"/>
                         {t("detailsPage.back")}
                     </Button>
-                    {deal.status === "RESERVED" && (
+                    {deal.status === "RESERVED" && canManage && (
                         <>
                             <Button
                                 variant="secondary"
@@ -230,22 +248,22 @@ export function DealDetailsPage() {
                             </Button>
                         </>
                     )}
-                    {deal.status === "CONTRACT_SIGNED" && (
+                    {deal.status === "CONTRACT_SIGNED" && canManage && (
                         <Button onClick={() => setActivateOpen(true)}>
                             {t("detailsPage.activateDeal")}
                         </Button>
                     )}
-                    {deal.status === "ACTIVE" && (
+                    {deal.status === "ACTIVE" && canManagePayments && (
                         deal.paymentSchedules.length === 0 ? (
                             <Button variant="secondary" onClick={() => setScheduleOpen(true)}>
                                 {t("paymentSchedule.generate")}
                             </Button>
                         ) : null
                     )}
-                    {deal.status === "ACTIVE" && (
+                    {deal.status === "ACTIVE" && canManagePayments && (
                         <Button onClick={() => setPaymentOpen(true)}>{t("paymentsHistory.record")}</Button>
                     )}
-                    {isOpen && (canCancel || deal.status === "ACTIVE") && (
+                    {isOpen && (canCancel || (deal.status === "ACTIVE" && canManage)) && (
                         <Menu>
                             <MenuTrigger asChild>
                                 <Button variant="ghost" size="icon-sm" aria-label={t("detailsPage.moreActions")}>
@@ -253,12 +271,12 @@ export function DealDetailsPage() {
                                 </Button>
                             </MenuTrigger>
                             <MenuContent>
-                                {deal.status === "ACTIVE" && (
+                                {deal.status === "ACTIVE" && canManage && (
                                     <MenuItem value="complete" onSelect={() => actions.complete.mutate()}>
                                         {t("detailsPage.markCompleted")}
                                     </MenuItem>
                                 )}
-                                {deal.status === "ACTIVE" && canCancel && <MenuSeparator />}
+                                {deal.status === "ACTIVE" && canManage && canCancel && <MenuSeparator />}
                                 {canCancel && (
                                     <MenuItem value="cancel" variant="destructive" onSelect={() => setCancelOpen(true)}>
                                         {t("detailsPage.cancelDeal")}
@@ -278,6 +296,13 @@ export function DealDetailsPage() {
                 isDeciding={actions.approveDiscount.isPending || actions.rejectDiscount.isPending}
                 onApprove={() => actions.approveDiscount.mutate()}
                 onReject={() => setRejectOpen(true)}
+            />
+
+            <DealMoneyHeldBanner
+                status={deal.status}
+                totalPaid={totalPaid}
+                canRefund={canManagePayments}
+                onRecordRefund={openRefundDialog}
             />
 
             <DealKeyFigures deal={deal} totalPaid={totalPaid} remaining={remaining} />
@@ -306,12 +331,14 @@ export function DealDetailsPage() {
                             <DealPaymentScheduleCard
                                 status={deal.status}
                                 schedules={deal.paymentSchedules}
-                                onGenerateSchedule={() => setScheduleOpen(true)}
+                                onGenerateSchedule={canManagePayments ? () => setScheduleOpen(true) : undefined}
                             />
                             <DealPaymentsHistoryCard
                                 payments={deal.payments}
-                                canRecordPayment={deal.status === "ACTIVE"}
+                                canRecordPayment={deal.status === "ACTIVE" && canManagePayments}
                                 onRecordPayment={() => setPaymentOpen(true)}
+                                canRecordRefund={canRecordRefund}
+                                onRecordRefund={openRefundDialog}
                             />
                         </TabsContent>
 
@@ -641,7 +668,7 @@ export function DealDetailsPage() {
             {/* Record payment dialog */}
             <Dialog open={paymentOpen} onOpenChange={({ open }) => setPaymentOpen(open)}>
                 <DialogContent size="sm">
-                    <DialogHeader title={t("detailsPage.paymentDialogTitle")}/>
+                    <DialogHeader title={t(refundOnly ? "detailsPage.refundDialogTitle" : "detailsPage.paymentDialogTitle")}/>
                     <DialogBody className="flex flex-col gap-3">
                         <Field>
                             <FieldLabel>{t("detailsPage.amount")}</FieldLabel>

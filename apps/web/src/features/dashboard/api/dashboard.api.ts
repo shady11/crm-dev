@@ -184,8 +184,8 @@ export type FinanceOverview = {
     cashFlowByMethod: CashFlowByMethod[];
 };
 
-export async function getFinanceOverview(branchId?: string) {
-    const response = await api.get<FinanceOverview>("/dashboard/finance-overview", { params: { branchId } });
+export async function getFinanceOverview(branchId?: string, projectId?: string) {
+    const response = await api.get<FinanceOverview>("/dashboard/finance-overview", { params: { branchId, projectId } });
     return response.data;
 }
 

@@ -12,6 +12,8 @@ import {useTranslation} from "react-i18next";
 export function FinanceOverviewCard({data}: {data: FinanceOverview}) {
     const {t} = useTranslation("dashboard");
     const {formatCurrency} = useCompanyFormatters();
+    const {i18n} = useTranslation();
+    const compact = new Intl.NumberFormat(i18n.language, {notation: "compact", maximumFractionDigits: 1});
 
     const chartConfig = {
         amount: {label: t("financeOverview.cashFlowLabel"), color: "var(--chart-1)"},
@@ -59,8 +61,10 @@ export function FinanceOverviewCard({data}: {data: FinanceOverview}) {
                             <BarChart data={chartData}>
                                 <CartesianGrid vertical={false} />
                                 <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} />
-                                <YAxis tickLine={false} axisLine={false} />
-                                <ChartTooltip content={<ChartTooltipContent />} />
+                                <YAxis tickLine={false} axisLine={false} tickFormatter={(value: number) => compact.format(value)} />
+                                <ChartTooltip
+                                    content={<ChartTooltipContent formatter={(value) => formatCurrency(Number(value))} />}
+                                />
                                 <Bar dataKey="amount" fill="var(--color-amount)" radius={4} />
                             </BarChart>
                         </ChartContainer>

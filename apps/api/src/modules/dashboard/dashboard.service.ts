@@ -645,7 +645,7 @@ export class DashboardService {
      * reconciliation view gated by dashboard.finance_overview (FINANCE's
      * default bundle only).
      */
-    async getFinanceOverview(user: AuthUser, branchId?: string) {
+    async getFinanceOverview(user: AuthUser, branchId?: string, projectId?: string) {
         if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
         const companyId = user.companyId;
         const effectiveBranchId = this.resolveBranchId(user, branchId);
@@ -654,7 +654,7 @@ export class DashboardService {
 
         const in30Days = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
-        const dealScope: Prisma.DealWhereInput = { companyId, branchId: effectiveBranchId };
+        const dealScope: Prisma.DealWhereInput = { companyId, branchId: effectiveBranchId, projectId };
 
         const [collectedThisMonth, overdue, upcoming, outstanding, cashFlowByMethod] = await Promise.all([
             this.prisma.payment.aggregate({
@@ -669,7 +669,8 @@ export class DashboardService {
             this.prisma.paymentSchedule.aggregate({
                 where: {
                     deal: dealScope,
-                    status: PaymentScheduleStatus.PENDING,
+                    // Part-paid but not yet overdue is still coming due.
+                    status: { in: [PaymentScheduleStatus.PENDING, PaymentScheduleStatus.PARTIAL] },
                     dueDate: { lte: in30Days },
                     deletedAt: null,
                 },
@@ -686,7 +687,8 @@ export class DashboardService {
             }),
             this.prisma.payment.groupBy({
                 by: ["paymentMethod"],
-                where: { deal: dealScope, deletedAt: null },
+                // The same month as "collected", so the bars add up to it.
+                where: { deal: dealScope, paidAt: { gte: startOfMonth, lt: startOfNextMonth }, deletedAt: null },
                 _sum: { amount: true },
             }),
         ]);

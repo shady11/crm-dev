@@ -15,7 +15,8 @@ interface ClientsToolbarProps {
     onProjectFilterChange(value: ProjectFilterValue): void;
     branchFilter: string | "all";
     onBranchFilterChange(value: string | "all"): void;
-    onAddClient(): void;
+    /** Omitted when the user can't create clients, which hides the button. */
+    onAddClient?(): void;
 }
 
 export function ClientsToolbar({
@@ -72,10 +73,12 @@ export function ClientsToolbar({
                     </InputGroupAddon>
                 </InputGroup>
 
-                <Button onClick={onAddClient}>
-                    <Plus className="size-3" />
-                    {t("toolbar.addClient")}
-                </Button>
+                {onAddClient && (
+                    <Button onClick={onAddClient}>
+                        <Plus className="size-3" />
+                        {t("toolbar.addClient")}
+                    </Button>
+                )}
             </div>
         </div>
     );

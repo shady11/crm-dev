@@ -49,7 +49,9 @@ export function DashboardPage() {
     const myWorkToday = useMyWorkToday(canViewMyPerformance);
     const myPerformance = useMyPerformance(canViewMyPerformance);
     const canViewFinanceOverview = hasPermission(user, "dashboard.finance_overview");
-    const financeOverview = useFinanceOverview(canViewFinanceOverview, branchId === "all" ? undefined : branchId);
+    const financeOverview = useFinanceOverview(canViewFinanceOverview, branchId === "all" ? undefined : branchId, projectId);
+    // The lead funnel is the sales team's view; Finance has no leads to read.
+    const canViewFunnel = hasPermission(user, "leads.view");
 
     const projectCollection = createListCollection({
         items: [{ label: t("allProjects"), value: "all" }, ...projects.data.map((p) => ({ label: p.name, value: p.id }))],
@@ -84,6 +86,9 @@ export function DashboardPage() {
                     </Select>
                 </div>
             </div>
+
+            {/* Finance starts from the money: collected, owed, overdue. */}
+            {canViewFinanceOverview && financeOverview.data ? <FinanceOverviewCard data={financeOverview.data} /> : null}
 
             {/* A manager's own day comes first: what to do today, then how they're doing. */}
             {canViewMyPerformance && myWorkToday.data ? <MyWorkTodayCard data={myWorkToday.data} /> : null}
@@ -130,7 +135,7 @@ export function DashboardPage() {
                 <DealStatusCardsGrid countsByStatus={countsByStatus} />
             </div>
 
-            {funnel.data ? (
+            {canViewFunnel && funnel.data ? (
                 <FunnelCard data={funnel.data} projectId={projectId} branchId={branchId === "all" ? undefined : branchId} />
             ) : null}
 
@@ -145,7 +150,6 @@ export function DashboardPage() {
 
             {canViewBranchComparison ? <BranchComparisonChart data={branchComparison.data ?? []} /> : null}
             {canViewTeamSnapshot ? <TeamSnapshotCard data={teamSnapshot.data ?? []} /> : null}
-            {canViewFinanceOverview && financeOverview.data ? <FinanceOverviewCard data={financeOverview.data} /> : null}
         </div>
     );
 }

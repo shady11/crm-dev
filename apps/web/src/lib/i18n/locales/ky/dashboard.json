@@ -114,7 +114,7 @@
     "upcomingCount_few": "{{count}} төлөм",
     "upcomingCount_many": "{{count}} төлөм",
     "upcomingCount_other": "{{count}} төлөм",
-    "cashFlowTitle": "Төлөм ыкмасы боюнча акча агымы",
+    "cashFlowTitle": "Ушул айдагы түшүүлөр төлөм ыкмасы боюнча",
     "cashFlowLabel": "Чогултулду",
     "empty": "Азырынча төлөм катталган жок.",
     "method": {

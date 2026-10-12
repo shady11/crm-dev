@@ -1,6 +1,5 @@
 import {ForbiddenException, Injectable} from '@nestjs/common';
 import {
-    DealStatus,
     NotificationEntityType,
     NotificationType,
     PaymentScheduleStatus,
@@ -55,7 +54,7 @@ export class PaymentService {
             });
             if (!deal) throw new DealNotFoundException(dealId);
 
-            this.domain.ensureStatus(deal, DealStatus.ACTIVE);
+            this.domain.ensureCanRecordPayment(deal, isRefund);
 
             const paidAgg = await db.payment.aggregate({
                 where: { dealId, deletedAt: null },

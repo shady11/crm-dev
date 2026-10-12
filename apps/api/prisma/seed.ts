@@ -488,10 +488,13 @@ async function seedDemoTenantData(args: {
             // Some reservations are seeded already past their expiry, for the
             // "Reservations expiring" list; the expiry job turns them EXPIRED.
             const reservationLapsed = status === DealStatus.RESERVED && dealSeed % 5 === 0;
-            // Taken at booking, as the booking form does. Reservations that end
-            // cancelled or expired get none: the app can't record a refund on
-            // them yet, so a deposit there would sit as money held forever.
-            const takesDeposit = status !== DealStatus.CANCELLED && status !== DealStatus.EXPIRED && !reservationLapsed;
+            // Taken at booking, as the booking form does. Reservations that
+            // ended cancelled or expired took one too: the first cancelled deal
+            // and the expired one have it refunded, the other cancelled deal
+            // still holds it, to show the "money held" banner. Reservations
+            // seeded to lapse get none, since the expiry job closes them later.
+            const takesDeposit = !reservationLapsed;
+            const depositRefunded = (status === DealStatus.CANCELLED && i === 0) || status === DealStatus.EXPIRED;
             const deposit = takesDeposit ? Math.round(salePrice * 0.15) : 0;
 
             // CONTRACT_SIGNED deals are recent and hold only the deposit.
@@ -583,6 +586,31 @@ async function seedDemoTenantData(args: {
 
             if (deposit > 0) {
                 await recordPayment(deposit, PaymentType.DEPOSIT, createdAt, 0);
+            }
+            if (deposit > 0 && depositRefunded) {
+                const refundedAt = status === DealStatus.CANCELLED ? monthsAgo(1) : createdAt;
+                await prisma.payment.create({
+                    data: {
+                        dealId: deal.id,
+                        userId: financeUser.id,
+                        amount: -deposit,
+                        paymentMethod: PaymentMethod.BANK_TRANSFER,
+                        paymentType: PaymentType.REFUND,
+                        paidAt: refundedAt,
+                        reference: `RFD-${dealSeq}`,
+                    },
+                });
+                await prisma.activity.create({
+                    data: {
+                        action: ActivityAction.RECEIVED_PAYMENT,
+                        type: ActivityType.PAYMENT_REFUNDED,
+                        title: "Refund issued",
+                        companyId: company.id,
+                        userId: financeUser.id,
+                        dealId: deal.id,
+                        createdAt: refundedAt,
+                    },
+                });
             }
 
             // The app only generates a schedule once a deal is ACTIVE, and

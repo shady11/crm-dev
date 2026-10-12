@@ -24,9 +24,12 @@ interface DealPaymentsHistoryCardProps {
     payments: DealDetails["payments"];
     canRecordPayment: boolean;
     onRecordPayment(): void;
+    /** A refund outside the ACTIVE stage, where Record payment isn't offered. */
+    canRecordRefund?: boolean;
+    onRecordRefund?(): void;
 }
 
-export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPayment }: DealPaymentsHistoryCardProps) {
+export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPayment, canRecordRefund, onRecordRefund }: DealPaymentsHistoryCardProps) {
     const { t, i18n } = useTranslation(["payments", "deals"]);
     const { formatCurrency } = useCompanyFormatters();
     return (
@@ -36,6 +39,11 @@ export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPa
                 {canRecordPayment && (
                     <Button size="xs" onClick={onRecordPayment}>
                         {t("paymentsHistory.record", { ns: "deals" })}
+                    </Button>
+                )}
+                {canRecordRefund && (
+                    <Button size="xs" variant="secondary" onClick={onRecordRefund}>
+                        {t("paymentsHistory.recordRefund", { ns: "deals" })}
                     </Button>
                 )}
             </CardHeader>
