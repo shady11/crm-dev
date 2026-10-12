@@ -380,19 +380,7 @@ export class DashboardService {
         const companyId = user.companyId;
         const branchId = user.branchId;
 
-        const targetRoleIds = await this.rbacService.findRoleIdsWithPermission(companyId, "deals.manage", "deals.reassign");
-
-        const managers = await this.prisma.user.findMany({
-            where: {
-                companyId,
-                branchId,
-                roleId: {in: targetRoleIds},
-                isActive: true,
-                deletedAt: null,
-            },
-            select: { id: true, fullName: true, email: true },
-            orderBy: { fullName: "asc" },
-        });
+        const managers = await this.findTeamManagers(companyId, branchId);
 
         const now = new Date();
 
@@ -440,6 +428,109 @@ export class DashboardService {
                 };
             }),
         );
+    }
+
+    /**
+     * The individual contributors on one branch's sales team: roles that can
+     * manage deals but not reassign them (i.e. not a team lead themselves),
+     * active, not deleted. Shared by the team snapshot and team performance
+     * so both list the same people.
+     */
+    private async findTeamManagers(companyId: string, branchId: string) {
+        const targetRoleIds = await this.rbacService.findRoleIdsWithPermission(companyId, "deals.manage", "deals.reassign");
+
+        return this.prisma.user.findMany({
+            where: {
+                companyId,
+                branchId,
+                roleId: {in: targetRoleIds},
+                isActive: true,
+                deletedAt: null,
+            },
+            select: { id: true, fullName: true, email: true },
+            orderBy: { fullName: "asc" },
+        });
+    }
+
+    /**
+     * A Sales Head's per-manager results over a period, for the "My team"
+     * page: the same numbers getMyPerformance gives a manager about
+     * themselves (leads assigned, deals created, deals won = contracts
+     * signed in the period, conversion), plus cash collected on their deals
+     * in the period and what's overdue on them right now. Branch-pinned the
+     * same way as getTeamSnapshot.
+     */
+    async getTeamPerformance(user: AuthUser, days: number) {
+        if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
+        if (!user.branchId) throw new ForbiddenException("User is not assigned to a branch");
+
+        const companyId = user.companyId;
+        const branchId = user.branchId;
+
+        const since = new Date();
+        since.setDate(since.getDate() - days);
+        since.setHours(0, 0, 0, 0);
+
+        const managers = await this.findTeamManagers(companyId, branchId);
+        const managerIds = managers.map((m) => m.id);
+        if (managerIds.length === 0) return { periodDays: days, managers: [] };
+
+        const byManager = { companyId, branchId, managerId: { in: managerIds }, deletedAt: null };
+
+        const [leadCounts, dealCounts, wonCounts, revenue, overdue] = await Promise.all([
+            this.prisma.lead.groupBy({
+                by: ["managerId"],
+                where: { ...byManager, createdAt: { gte: since } },
+                _count: { _all: true },
+            }),
+            this.prisma.deal.groupBy({
+                by: ["managerId"],
+                where: { ...byManager, createdAt: { gte: since } },
+                _count: { _all: true },
+            }),
+            this.prisma.deal.groupBy({
+                by: ["managerId"],
+                where: { ...byManager, status: { in: WON_DEAL_STATUSES }, contractDate: { gte: since } },
+                _count: { _all: true },
+            }),
+            // Payment has no managerId of its own; summed per manager via the
+            // deal it belongs to.
+            Promise.all(managerIds.map((managerId) => this.prisma.payment.aggregate({
+                where: { deal: { companyId, branchId, managerId }, paidAt: { gte: since }, deletedAt: null },
+                _sum: { amount: true },
+            }))),
+            Promise.all(managerIds.map((managerId) => this.prisma.paymentSchedule.aggregate({
+                where: {
+                    ...OVERDUE_INSTALLMENT_WHERE,
+                    deal: { companyId, branchId, managerId, ...dealAttentionWhere("overdue_payments") },
+                },
+                _sum: { amount: true, paidAmount: true },
+                _count: { _all: true },
+            }))),
+        ]);
+
+        const countFor = (rows: { managerId: string | null; _count: { _all: number } }[], id: string) =>
+            rows.find((r) => r.managerId === id)?._count._all ?? 0;
+
+        return {
+            periodDays: days,
+            managers: managers.map((manager, index) => {
+                const leadsAssigned = countFor(leadCounts, manager.id);
+                const dealsWon = countFor(wonCounts, manager.id);
+                return {
+                    manager,
+                    leadsAssigned,
+                    dealsCreated: countFor(dealCounts, manager.id),
+                    dealsWon,
+                    conversionRate: leadsAssigned > 0 ? dealsWon / leadsAssigned : 0,
+                    revenue: Number(revenue[index]._sum.amount ?? 0),
+                    overduePayments: {
+                        installments: overdue[index]._count._all,
+                        amount: Number(overdue[index]._sum.amount ?? 0) - Number(overdue[index]._sum.paidAmount ?? 0),
+                    },
+                };
+            }),
+        };
     }
 
     /**

@@ -101,6 +101,23 @@ export async function getTeamSnapshot() {
     return response.data;
 }
 
+// A Sales Head's per-manager results over a period, for the "My team" page.
+export type TeamPerformanceItem = {
+    manager: { id: string; fullName: string; email: string };
+    leadsAssigned: number;
+    dealsCreated: number;
+    dealsWon: number;
+    conversionRate: number;
+    revenue: number;
+    overduePayments: { installments: number; amount: number };
+};
+export type TeamPerformance = { periodDays: number; managers: TeamPerformanceItem[] };
+
+export async function getTeamPerformance(days: number) {
+    const response = await api.get<TeamPerformance>("/dashboard/team-performance", { params: { days } });
+    return response.data;
+}
+
 // SM-A2: a SALES_MANAGER's own "what needs doing today" view, SALES_MANAGER
 // only — leads waiting on follow-up, tasks due today, and deals waiting on
 // the client, all hardcoded to the caller's own records.

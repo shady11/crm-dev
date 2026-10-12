@@ -195,6 +195,38 @@ describe("UsersService — role boundaries", () => {
             expect(where.deletedAt).toBeNull();
             expect(where.isSuperAdmin).toBe(false);
         });
+
+        it("pins a branch-scoped actor (Sales Head) to their own branch, ignoring any branchId they pass", async () => {
+            const {service, prisma} = build();
+
+            await service.findAll({...admin, isBranchScoped: true, branchId: "branch-1"}, {branchId: "branch-2"});
+
+            expect(prisma.user.findMany.mock.calls[0][0].where.branchId).toBe("branch-1");
+        });
+
+        it("lets a company-wide actor narrow to one branch", async () => {
+            const {service, prisma} = build();
+
+            await service.findAll(admin, {branchId: "branch-2"});
+
+            expect(prisma.user.findMany.mock.calls[0][0].where.branchId).toBe("branch-2");
+        });
+    });
+
+    describe("findOne", () => {
+        it("hides another branch's user from a branch-scoped actor", async () => {
+            const {service} = build({...managerRow, branchId: "branch-2"});
+
+            await expect(service.findOne({...admin, isBranchScoped: true, branchId: "branch-1"}, "manager-1"))
+                .rejects.toThrow(NotFoundException);
+        });
+
+        it("shows a same-branch user to a branch-scoped actor", async () => {
+            const {service} = build({...managerRow, branchId: "branch-1"});
+
+            await expect(service.findOne({...admin, isBranchScoped: true, branchId: "branch-1"}, "manager-1"))
+                .resolves.toMatchObject({id: "manager-1"});
+        });
     });
 });
 

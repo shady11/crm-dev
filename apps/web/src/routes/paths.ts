@@ -34,7 +34,9 @@ export const paths = {
         root: "/deals",
         detail: (dealId: string) => `/deals/${dealId}`,
         payments: (dealId: string) => `/deals/${dealId}?tab=payments`,
-        attention: (filter: "discount_pending" | "overdue_payments") => `/deals?attention=${filter}`,
+        attention: (filter: "discount_pending" | "overdue_payments", managerId?: string) =>
+            `/deals?attention=${filter}${managerId ? `&managerId=${managerId}` : ""}`,
+        byManager: (managerId: string) => `/deals?managerId=${managerId}`,
     },
     tasks: {
         root: "/tasks",

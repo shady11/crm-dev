@@ -2,7 +2,7 @@ import {Link, useLocation} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {getBreadcrumbs} from "@/lib/breadcrumbs.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
-import {activityLogNavKey} from "@/features/auth/access.ts";
+import {navTitleKey} from "@/features/auth/access.ts";
 import {Separator} from "@/components/ui/separator.tsx";
 import {SidebarTrigger} from "@/components/ui/sidebar.tsx";
 import LanguageDropdown from "@/components/layout/header/language-dropdown.tsx";
@@ -94,7 +94,7 @@ export function AppHeader() {
     // Matches the sidebar: "My activity" for someone who only sees their own.
     const breadcrumbs = getBreadcrumbs(
         location.pathname,
-        (key) => t(key === "nav.activityLog" ? activityLogNavKey(user) : key),
+        (key) => t(navTitleKey(user, key)),
         entityNames,
     );
 

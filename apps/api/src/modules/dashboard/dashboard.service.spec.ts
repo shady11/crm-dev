@@ -288,6 +288,65 @@ describe('DashboardService', () => {
         });
     });
 
+    describe('getTeamPerformance', () => {
+        it('rejects a SALES_HEAD not assigned to a branch', async () => {
+            const {service} = build();
+            await expect(service.getTeamPerformance({...salesHeadUser, branchId: null}, 30)).rejects.toThrow(ForbiddenException);
+        });
+
+        it('returns an empty team without querying results when the branch has no managers', async () => {
+            const {service, prisma} = build();
+            prisma.user.findMany.mockResolvedValue([]);
+
+            await expect(service.getTeamPerformance(salesHeadUser, 30)).resolves.toEqual({periodDays: 30, managers: []});
+            expect(prisma.lead.groupBy).not.toHaveBeenCalled();
+        });
+
+        it('puts each manager\'s period results, cash collected and overdue balance side by side', async () => {
+            const {service, prisma} = build();
+            prisma.user.findMany.mockResolvedValue([
+                {id: 'm-1', fullName: 'Aidana', email: 'a@crm.dev'},
+                {id: 'm-2', fullName: 'Cholpon', email: 'c@crm.dev'},
+            ]);
+            prisma.lead.groupBy.mockResolvedValue([{managerId: 'm-1', _count: {_all: 10}}, {managerId: 'm-2', _count: {_all: 4}}]);
+            prisma.deal.groupBy
+                .mockResolvedValueOnce([{managerId: 'm-1', _count: {_all: 5}}]) // created
+                .mockResolvedValueOnce([{managerId: 'm-1', _count: {_all: 2}}]); // won
+            prisma.payment.aggregate
+                .mockResolvedValueOnce({_sum: {amount: 30000}})
+                .mockResolvedValueOnce({_sum: {amount: null}});
+            prisma.paymentSchedule.aggregate
+                .mockResolvedValueOnce({_sum: {amount: 90000, paidAmount: 5000}, _count: {_all: 6}})
+                .mockResolvedValueOnce({_sum: {amount: null, paidAmount: null}, _count: {_all: 0}});
+
+            const result = await service.getTeamPerformance(salesHeadUser, 30);
+
+            expect(result.managers).toEqual([
+                expect.objectContaining({
+                    manager: expect.objectContaining({id: 'm-1'}),
+                    leadsAssigned: 10, dealsCreated: 5, dealsWon: 2, conversionRate: 0.2, revenue: 30000,
+                    overduePayments: {installments: 6, amount: 85000},
+                }),
+                expect.objectContaining({
+                    manager: expect.objectContaining({id: 'm-2'}),
+                    leadsAssigned: 4, dealsCreated: 0, dealsWon: 0, conversionRate: 0, revenue: 0,
+                    overduePayments: {installments: 0, amount: 0},
+                }),
+            ]);
+        });
+
+        it('keeps every query on the Sales Head\'s own branch', async () => {
+            const {service, prisma} = build();
+            prisma.user.findMany.mockResolvedValue([{id: 'm-1', fullName: 'Aidana', email: 'a@crm.dev'}]);
+
+            await service.getTeamPerformance(salesHeadUser, 30);
+
+            expect(prisma.user.findMany.mock.calls[0][0].where.branchId).toBe('branch-1');
+            expect(prisma.lead.groupBy.mock.calls[0][0].where.branchId).toBe('branch-1');
+            expect(prisma.payment.aggregate.mock.calls[0][0].where.deal.branchId).toBe('branch-1');
+        });
+    });
+
     describe('getMyPerformance', () => {
         it('reports a zero conversion rate when no leads were assigned, instead of dividing by zero', async () => {
             const {service, prisma} = build();

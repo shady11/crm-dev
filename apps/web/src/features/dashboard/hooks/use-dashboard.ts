@@ -9,6 +9,7 @@ import {
     getMyWorkToday,
     getRecentActivity,
     getRevenueTrend,
+    getTeamPerformance,
     getTeamSnapshot,
     getUnitsSummary
 } from "@/features/dashboard/api/dashboard.api.ts";
@@ -44,6 +45,15 @@ export function useTeamSnapshot(enabled: boolean) {
     return useQuery({
         queryKey: ["dashboard", "team-snapshot"],
         queryFn: getTeamSnapshot,
+        enabled,
+    });
+}
+
+// SALES_HEAD only, for the "My team" page.
+export function useTeamPerformance(enabled: boolean, days: number) {
+    return useQuery({
+        queryKey: ["dashboard", "team-performance", days],
+        queryFn: () => getTeamPerformance(days),
         enabled,
     });
 }

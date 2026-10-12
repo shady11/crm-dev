@@ -21,10 +21,12 @@ export function useDealsList() {
     const [limit, setLimitState] = useState(10);
 
     const [projectId, setProjectIdState] = useState<string | undefined>();
-    const [managerId, setManagerIdState] = useState<string | undefined>();
+    // Seeded from the URL so a link (the "My team" page) can open one
+    // manager's deals; the toolbar's picker takes over from there.
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [managerId, setManagerIdState] = useState<string | undefined>(() => searchParams.get("managerId") ?? undefined);
     const [branchId, setBranchIdState] = useState<string | undefined>();
     // In the URL, so the dashboard's "View all" can open the list pre-filtered.
-    const [searchParams, setSearchParams] = useSearchParams();
     const attentionParam = searchParams.get("attention");
     const attention = DEAL_ATTENTION_FILTERS.find((f) => f === attentionParam);
     const {sortBy, sortOrder, toggleSort} = useSort<DealSortField>();
@@ -77,7 +79,18 @@ export function useDealsList() {
             projectId,
             setProjectId: (value: string | undefined) => { setProjectIdState(value); setPage(1); },
             managerId,
-            setManagerId: (value: string | undefined) => { setManagerIdState(value); setPage(1); },
+            setManagerId: (value: string | undefined) => {
+                setManagerIdState(value);
+                setPage(1);
+                // The picker owns the filter now; drop the link's seed.
+                if (searchParams.has("managerId")) {
+                    setSearchParams((prev) => {
+                        const params = new URLSearchParams(prev);
+                        params.delete("managerId");
+                        return params;
+                    }, { replace: true });
+                }
+            },
             branchId,
             setBranchId: (value: string | undefined) => { setBranchIdState(value); setPage(1); },
             attention,

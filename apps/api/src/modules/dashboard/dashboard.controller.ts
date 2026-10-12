@@ -107,6 +107,15 @@ export class DashboardController {
         return this.dashboardService.getTeamSnapshot(user);
     }
 
+    // Per-manager results over a period, for the Sales Head's "My team"
+    // page. Same team-lead-only permission as the snapshot above.
+    @RequirePermissions("dashboard.team_snapshot")
+    @Get("team-performance")
+    getTeamPerformance(@CurrentUser() user: AuthUser, @Query("days") days?: string) {
+        const parsed = Number(days);
+        return this.dashboardService.getTeamPerformance(user, Number.isFinite(parsed) && parsed > 0 ? parsed : 30);
+    }
+
     // SM-A2/SM-D1: a SALES_MANAGER's own "what needs doing today" view and
     // own deal count/conversion rate. dashboard.my_performance is only in
     // SALES_MANAGER's default bundle — the individual contributor's standup

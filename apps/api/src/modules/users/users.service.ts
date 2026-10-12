@@ -127,7 +127,12 @@ export class UsersService {
             ];
         }
 
-        if (query.branchId) {
+        // A branch-scoped role (Sales Head) sees only their own branch's
+        // people, whatever branchId they pass; a company-wide role may
+        // narrow to one branch. Same rule as leads/deals findAll (BR-B1/B3).
+        if (user.isBranchScoped) {
+            where.branchId = user.branchId;
+        } else if (query.branchId) {
             where.branchId = query.branchId;
         }
 
@@ -181,7 +186,7 @@ export class UsersService {
             select: USER_SAFE_SELECT,
         });
 
-        if (!target || !canActorSeeUser(user, target)) {
+        if (!target || !canActorSeeUser(user, target) || (user.isBranchScoped && target.branchId !== user.branchId)) {
             throw new NotFoundException("User not found");
         }
 
@@ -736,12 +741,14 @@ export class UsersService {
         }
 
         const companyId = user.companyId;
+        const branchScope = user.isBranchScoped ? { branchId: user.branchId } : {};
 
         const [counts, roles] = await Promise.all([
             this.prisma.user.groupBy({
                 by: ["roleId"],
                 where: {
                     companyId,
+                    ...branchScope,
                     isSuperAdmin: user.isSuperAdmin ? undefined : false,
                     deletedAt: null,
                 },
@@ -759,7 +766,7 @@ export class UsersService {
         const samples = await Promise.all(
             rolesWithMembers.map((role) =>
                 this.prisma.user.findMany({
-                    where: { companyId, roleId: role.id, deletedAt: null },
+                    where: { companyId, ...branchScope, roleId: role.id, deletedAt: null },
                     orderBy: { createdAt: "desc" },
                     take: 3,
                     select: { id: true, fullName: true },
