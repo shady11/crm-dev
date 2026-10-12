@@ -126,7 +126,13 @@
     "record": "Record payment",
     "empty": "No payments recorded yet.",
     "recordRefund": "Record refund",
-    "recordedBy": "Recorded by {{name}}"
+    "recordedBy": "Recorded by {{name}}",
+    "void": "Void payment",
+    "voidedBy": "Voided by {{name}} on {{date}}",
+    "voided_one": "Voided ({{count}})",
+    "voided_other": "Voided ({{count}})",
+    "voided_few": "Voided ({{count}})",
+    "voided_many": "Voided ({{count}})"
   },
   "detailsPage": {
     "dealNumber": "Deal #{{number}}",
@@ -177,7 +183,13 @@
     "paymentNotePlaceholder": "e.g. paid by the client's brother",
     "amountHintRemaining": "{{remaining}} left on this deal",
     "amountHintNext": "next installment {{amount}}, due {{date}}",
-    "amountHintRefund": "Up to {{paid}} can be refunded"
+    "amountHintRefund": "Up to {{paid}} can be refunded",
+    "voidDialogTitle": "Void this {{amount}} payment?",
+    "voidDialogDescription": "It stops counting towards the deal and every total. It stays listed here as voided, with your reason, and its receipt number isn't reused.",
+    "voidReason": "Reason",
+    "voidReasonPlaceholder": "e.g. typed 10,000 instead of 1,000",
+    "voidReasonHint": "At least 5 characters. The deal manager sees it.",
+    "voidConfirm": "Void payment"
   },
   "toasts": {
     "unitReserved": "Unit reserved",
@@ -208,7 +220,9 @@
     "discountApproved": "Discount approved",
     "discountRejected": "Discount rejected",
     "discountDecisionError": "Could not save the decision",
-    "reservationReissued": "The reservation agreement was reissued at the approved price."
+    "reservationReissued": "The reservation agreement was reissued at the approved price.",
+    "paymentVoided": "Payment voided",
+    "voidError": "Could not void the payment"
   },
   "booking": {
     "rooms": "{{count}} rooms",

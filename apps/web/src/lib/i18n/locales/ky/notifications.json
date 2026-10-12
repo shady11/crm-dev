@@ -120,6 +120,10 @@
     "moneyHeld": {
       "title": "{{dealNumber}} бүтүмү жабылды, компанияда {{amount}} калды",
       "message": "Акча кардарга кайтарылгандан кийин кайтарууну каттаңыз."
+    },
+    "paymentVoided": {
+      "title": "{{dealNumber}} бүтүмү боюнча {{amount}} төлөм жокко чыгарылды",
+      "message": "{{reason}}"
     }
   }
 }

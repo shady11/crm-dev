@@ -126,7 +126,13 @@
     "record": "Төлөм жаздыруу",
     "empty": "Азырынча төлөм катталган жок.",
     "recordRefund": "Кайтарууну каттоо",
-    "recordedBy": "Киргизген: {{name}}"
+    "recordedBy": "Киргизген: {{name}}",
+    "void": "Төлөмдү жокко чыгаруу",
+    "voidedBy": "{{name}} жокко чыгарды, {{date}}",
+    "voided_one": "Жокко чыгарылды ({{count}})",
+    "voided_other": "Жокко чыгарылды ({{count}})",
+    "voided_few": "Жокко чыгарылды ({{count}})",
+    "voided_many": "Жокко чыгарылды ({{count}})"
   },
   "detailsPage": {
     "dealNumber": "Бүтүм №{{number}}",
@@ -177,7 +183,13 @@
     "paymentNotePlaceholder": "мисалы, кардардын агасы төлөдү",
     "amountHintRemaining": "Бүтүм боюнча калды: {{remaining}}",
     "amountHintNext": "кийинки төлөм {{amount}}, мөөнөтү {{date}}",
-    "amountHintRefund": "{{paid}} чейин кайтарууга болот"
+    "amountHintRefund": "{{paid}} чейин кайтарууга болот",
+    "voidDialogTitle": "{{amount}} төлөмдү жокко чыгарасызбы?",
+    "voidDialogDescription": "Төлөм бүтүмдө жана бардык жыйынтыктарда эсептелбей калат. Ал себеби менен жокко чыгарылган катары тизмеде калат; квитанция номери кайра колдонулбайт.",
+    "voidReason": "Себеби",
+    "voidReasonPlaceholder": "мисалы, 1 000 ордуна 10 000 киргизилди",
+    "voidReasonHint": "Кеминде 5 белги. Бүтүмдүн менеджери көрөт.",
+    "voidConfirm": "Жокко чыгаруу"
   },
   "toasts": {
     "unitReserved": "Жай бронделди",
@@ -208,7 +220,9 @@
     "discountApproved": "Арзандатуу макулдашылды",
     "discountRejected": "Арзандатуу четке кагылды",
     "discountDecisionError": "Чечимди сактоо мүмкүн болбоду",
-    "reservationReissued": "Брондоо келишими макулдашылган баа менен кайра түзүлдү."
+    "reservationReissued": "Брондоо келишими макулдашылган баа менен кайра түзүлдү.",
+    "paymentVoided": "Төлөм жокко чыгарылды",
+    "voidError": "Төлөмдү жокко чыгаруу мүмкүн болгон жок"
   },
   "booking": {
     "rooms": "{{count}} бөлм.",

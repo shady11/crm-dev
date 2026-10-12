@@ -1,6 +1,8 @@
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import type {DealDetails} from "@/features/deals/api/deals.api.ts";
+import type {DealDetails, VoidedPayment} from "@/features/deals/api/deals.api.ts";
+import {IconTooltipButton} from "@/components/shared/icon-tooltip-button.tsx";
+import {Ban} from "lucide-react";
 import {useTranslation} from "react-i18next";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {ReceiptButton} from "@/features/payments/components/receipt-button.tsx";
@@ -31,9 +33,13 @@ interface DealPaymentsHistoryCardProps {
     /** Shows each payment's Receipt button (deals.manage_payments). */
     dealId: string;
     canIssueReceipts: boolean;
+    /** deals.void_payments: shows Void on each payment (FIN-3). */
+    canVoid: boolean;
+    onVoid(payment: DealDetails["payments"][number]): void;
+    voidedPayments?: VoidedPayment[];
 }
 
-export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPayment, canRecordRefund, onRecordRefund, dealId, canIssueReceipts }: DealPaymentsHistoryCardProps) {
+export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPayment, canRecordRefund, onRecordRefund, dealId, canIssueReceipts, canVoid, onVoid, voidedPayments = [] }: DealPaymentsHistoryCardProps) {
     const { t, i18n } = useTranslation(["payments", "deals"]);
     const { formatCurrency } = useCompanyFormatters();
     return (
@@ -82,9 +88,44 @@ export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPa
                                     {canIssueReceipts && p.receiptNumber && (
                                         <ReceiptButton dealId={dealId} paymentId={p.id} receiptNumber={p.receiptNumber} />
                                     )}
+                                    {canVoid && (
+                                        <IconTooltipButton variant="ghost" size="icon-sm" onClick={() => onVoid(p)} label={t("paymentsHistory.void", { ns: "deals" })}>
+                                            <Ban className="size-3.5" />
+                                        </IconTooltipButton>
+                                    )}
                                 </div>
                             </div>
                         ))}
+                    </div>
+                )}
+                {/* Voided payments count nowhere, but stay on the record (FIN-3). */}
+                {voidedPayments.length > 0 && (
+                    <div className="mt-4 border-t pt-3">
+                        <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                            {t("paymentsHistory.voided", { ns: "deals", count: voidedPayments.length })}
+                        </p>
+                        <div className="flex flex-col divide-y">
+                            {voidedPayments.map((p) => (
+                                <div key={p.id} className="flex items-start justify-between gap-3 py-2 text-sm text-muted-foreground">
+                                    <div className="min-w-0">
+                                        <p>
+                                            {t(PAYMENT_TYPE_LABEL_KEYS[p.paymentType]) ?? p.paymentType}
+                                            {" · "}{t(PAYMENT_METHOD_LABEL_KEYS[p.paymentMethod]) ?? p.paymentMethod}
+                                            {p.receiptNumber && ` · ${p.receiptNumber}`}
+                                        </p>
+                                        <p className="text-xs">
+                                            {t("paymentsHistory.voidedBy", {
+                                                ns: "deals",
+                                                name: p.voidedBy?.fullName ?? "—",
+                                                date: new Date(p.voidedAt).toLocaleDateString(i18n.language),
+                                            })}
+                                        </p>
+                                        {p.voidReason && <p className="text-xs italic">{p.voidReason}</p>}
+                                    </div>
+                                    <p className="shrink-0 line-through tabular-nums">{formatCurrency(p.amount)}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 )}
             </CardContent>

@@ -14,6 +14,7 @@ export type NotificationTemplate =
     | {templateKey: "paymentReceived"; params: {dealNumber: string; amount: number; currency: string | null}}
     | {templateKey: "refundIssued"; params: {dealNumber: string; amount: number; currency: string | null}}
     | {templateKey: "moneyHeld"; params: {dealNumber: string; amount: number; currency: string | null}}
+    | {templateKey: "paymentVoided"; params: {dealNumber: string; amount: number; currency: string | null; reason: string}}
     | {templateKey: "paymentDueSoon"; params: {dealNumber: string}}
     | {templateKey: "paymentDueToday"; params: {dealNumber: string}}
     | {templateKey: "paymentOverdue"; params: {dealNumber: string; days: number}}

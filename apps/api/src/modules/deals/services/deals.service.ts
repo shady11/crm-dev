@@ -214,7 +214,26 @@ export class DealsService {
 
     const deal = await this.getDealOrThrow(user, id);
 
-    return this.mapper.toDetails(deal);
+    // Voided payments (FIN-3) count nowhere, but the deal page lists them,
+    // with who voided them and why, so the correction stays visible.
+    const voided = await this.prisma.payment.findMany({
+      where: { dealId: deal.id, deletedAt: { not: null } },
+      orderBy: { deletedAt: 'desc' },
+      select: {
+        id: true, amount: true, paymentType: true, paymentMethod: true, paidAt: true,
+        receiptNumber: true, voidReason: true, deletedAt: true,
+        voidedBy: { select: { id: true, fullName: true } },
+      },
+    });
+
+    return {
+      ...this.mapper.toDetails(deal),
+      voidedPayments: voided.map(({ deletedAt, ...payment }) => ({
+        ...payment,
+        amount: Number(payment.amount),
+        voidedAt: deletedAt,
+      })),
+    };
   }
 
   // --------------------------------------------------------------------------

@@ -120,6 +120,10 @@
     "moneyHeld": {
       "title": "Deal {{dealNumber}} closed with {{amount}} still held",
       "message": "Record the refund once the money has been returned to the client."
+    },
+    "paymentVoided": {
+      "title": "Payment of {{amount}} on deal {{dealNumber}} was voided",
+      "message": "{{reason}}"
     }
   }
 }

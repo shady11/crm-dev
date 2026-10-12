@@ -135,7 +135,23 @@ describe('PaymentReceiptService.getOrCreate', () => {
     );
   });
 
-  it('404s a payment that belongs to another deal or was deleted', async () => {
+  it('refuses a voided payment, whose receipt no longer stands', async () => {
+    const { service, documentGeneration } = build({
+      payment: {
+        id: 'pay-1',
+        receiptNumber: 'R-2026-0007',
+        receiptDocument: null,
+        deletedAt: new Date(),
+      },
+    });
+
+    await expect(
+      service.getOrCreate(finance, 'deal-1', 'pay-1'),
+    ).rejects.toThrow(BadRequestException);
+    expect(documentGeneration.generateReceipt).not.toHaveBeenCalled();
+  });
+
+  it('404s a payment that belongs to another deal', async () => {
     const { service, prisma } = build({ payment: null });
 
     await expect(
@@ -144,7 +160,6 @@ describe('PaymentReceiptService.getOrCreate', () => {
     expect(prisma.payment.findFirst.mock.calls[0][0].where).toEqual({
       id: 'pay-9',
       dealId: 'deal-1',
-      deletedAt: null,
     });
   });
 });

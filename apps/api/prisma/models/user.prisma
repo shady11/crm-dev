@@ -46,7 +46,8 @@ model User {
   deals         Deal[]
   reservedDeals Deal[]     @relation("ReservedBy")
   discountApprovals Deal[] @relation("DiscountApprovedBy")
-  payments      Payment[]
+  payments      Payment[] @relation("PaymentRecordedBy")
+  voidedPayments Payment[] @relation("PaymentVoidedBy")
   activities    Activity[]
   targetOfActivities Activity[] @relation("ActivityTargetUser")
   tasks         Task[]

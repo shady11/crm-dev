@@ -108,10 +108,25 @@ type DealPaymentSchedule = {
     order: number;
 };
 
+/** A payment taken off the books (FIN-3): kept for the record, counted nowhere. */
+export type VoidedPayment = {
+    id: string;
+    amount: number;
+    paymentType: PaymentType;
+    paymentMethod: PaymentMethod;
+    paidAt: string;
+    receiptNumber: string | null;
+    voidReason: string | null;
+    voidedAt: string;
+    voidedBy: { id: string; fullName: string } | null;
+};
+
 export type DealDetails = Deal & {
     activities: DealActivity[];
     payments: DealPayment[];
     paymentSchedules: DealPaymentSchedule[];
+    /** Only on GET /deals/:id; mutation responses leave it out. */
+    voidedPayments?: VoidedPayment[];
 };
 
 export type ReserveUnitPayload = {
@@ -247,6 +262,11 @@ export async function cancelDeal(id: string, reason?: string) {
 
 export async function generatePaymentSchedule(dealId: string, payload: GeneratePaymentSchedulePayload) {
     const response = await api.post<DealDetails>(`/deals/${dealId}/payment-schedule`, payload);
+    return response.data;
+}
+
+export async function voidPayment(dealId: string, paymentId: string, reason: string) {
+    const response = await api.post<DealDetails>(`/deals/${dealId}/payments/${paymentId}/void`, { reason });
     return response.data;
 }
 

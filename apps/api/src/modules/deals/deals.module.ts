@@ -12,6 +12,7 @@ import {PaymentRegisterService} from './services/payments/payment-register.servi
 import {MoneyHeldNotifier} from './services/money-held-notifier.service';
 import {ReceiptNumberService} from './services/payments/receipt-number.service';
 import {PaymentReceiptService} from './services/payments/payment-receipt.service';
+import {PaymentVoidService} from './services/payments/payment-void.service';
 import {DealMapper} from "@/modules/deals/mappers/deal.mapper";
 import {DealDomainService} from "@/modules/deals/services/deal-domain.service";
 import {NotificationsModule} from "@/modules/notifications/notifications.module";
@@ -35,6 +36,7 @@ import {TasksModule} from "@/modules/tasks/tasks.module";
     MoneyHeldNotifier,
     ReceiptNumberService,
     PaymentReceiptService,
+    PaymentVoidService,
     DealMapper,
     DealExpiryService,
     DiscountApprovalReminderService,
