@@ -6,6 +6,7 @@ import {NotificationsService} from "@/modules/notifications/notifications.servic
 import {DealActivityService} from "./deal-activity.service";
 import {resolveDiscountRequestNotifications} from "./discount-approval";
 import {MoneyHeldNotifier} from "./money-held-notifier.service";
+import {activityText} from "@/modules/activities/activity-templates";
 
 @Injectable()
 export class DealExpiryService {
@@ -80,7 +81,7 @@ export class DealExpiryService {
                                 unitId: deal.unitId,
                                 action: ActivityAction.CHANGED_UNIT_STATUS,
                                 type: ActivityType.UNIT_STATUS_CHANGED,
-                                title: 'Unit relisted after reservation expired',
+                                ...activityText('unitRelistedAfterExpiry'),
                                 metadata: { toStatus: UnitStatus.AVAILABLE, dealId: deal.id, reason: 'reservation_expiry_cron' },
                             },
                         });

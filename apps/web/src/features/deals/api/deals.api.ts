@@ -80,6 +80,8 @@ export type DealActivity = {
     type: string;
     action: string;
     title: string;
+    templateKey?: string | null;
+    templateParams?: Record<string, unknown> | null;
     description: string | null;
     createdAt: string;
 };

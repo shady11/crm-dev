@@ -6,6 +6,7 @@ import {CreateBlockDto} from "./dto/create-block.dto";
 import {UpdateBlockDto} from "./dto/update-block.dto";
 import {QueryBlocksDto} from "./dto/query-blocks.dto";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
+import {activityText} from "@/modules/activities/activity-templates";
 
 @Injectable()
 export class BlocksService {
@@ -23,6 +24,8 @@ export class BlocksService {
         action: ActivityAction;
         type: ActivityType;
         title: string;
+        templateKey?: string;
+        templateParams?: Prisma.InputJsonValue;
         metadata?: Prisma.InputJsonValue;
     }) {
         return this.prisma.activity.create({
@@ -33,6 +36,8 @@ export class BlocksService {
                 action: params.action,
                 type: params.type,
                 title: params.title,
+                templateKey: params.templateKey,
+                templateParams: params.templateParams,
                 metadata: params.metadata,
             },
         });
@@ -203,7 +208,7 @@ export class BlocksService {
             blockId: created.id,
             action: ActivityAction.CREATED_BLOCK,
             type: ActivityType.BLOCK_CREATED,
-            title: `Block "${created.name}" created`,
+            ...activityText('blockCreated', { name: created.name }),
         });
 
         return created;
@@ -267,7 +272,7 @@ export class BlocksService {
                 blockId: id,
                 action: ActivityAction.UPDATED_BLOCK,
                 type: ActivityType.BLOCK_UPDATED,
-                title: `Block "${updated.name}" updated`,
+                ...activityText('blockUpdated', { name: updated.name }),
                 metadata: changes,
             });
         }
@@ -344,7 +349,7 @@ export class BlocksService {
             blockId: newBlock.id,
             action: ActivityAction.CREATED_BLOCK,
             type: ActivityType.BLOCK_CREATED,
-            title: `Block "${newBlock.name}" created (duplicated from "${block.name}")`,
+            ...activityText('blockDuplicated', { name: newBlock.name, source: block.name }),
             metadata: {duplicatedFromBlockId: block.id},
         });
 
@@ -465,7 +470,7 @@ export class BlocksService {
             actorId: user.id,
             action: ActivityAction.DELETED_BLOCK,
             type: ActivityType.BLOCK_DELETED,
-            title: `Block "${block.name}" deleted`,
+            ...activityText('blockDeleted', { name: block.name }),
             metadata: {blockId: block.id},
         });
 

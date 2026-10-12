@@ -53,6 +53,7 @@ import {PrismaPg} from "@prisma/adapter-pg";
 import {RbacService} from "@/modules/rbac/rbac.service";
 import {DEFAULT_ROLES} from "@/modules/rbac/default-role-permissions";
 import {numberUnnumberedPayments} from "@/modules/deals/services/payments/receipt-number.service";
+import {activityText} from "@/modules/activities/activity-templates";
 
 const prisma = new PrismaClient({
     adapter: new PrismaPg({connectionString: process.env.DATABASE_URL!}),
@@ -549,9 +550,10 @@ async function seedDemoTenantData(args: {
 
             await prisma.activity.create({
                 data: {
-                    action: ActivityAction.CREATED_DEAL,
-                    type: ActivityType.DEAL_CREATED,
-                    title: `Deal ${deal.dealNumber} created`,
+                    // What the app logs when a deal opens: its reservation.
+                    action: ActivityAction.RESERVED_UNIT,
+                    type: ActivityType.UNIT_RESERVED,
+                    ...activityText('unitReserved'),
                     companyId: company.id,
                     userId: manager.id,
                     dealId: deal.id,
@@ -576,7 +578,7 @@ async function seedDemoTenantData(args: {
                     data: {
                         action: ActivityAction.RECEIVED_PAYMENT,
                         type: ActivityType.PAYMENT_RECEIVED,
-                        title: `Payment received for ${deal.dealNumber}`,
+                        ...activityText('paymentReceived'),
                         companyId: company.id,
                         userId: manager.id,
                         dealId: deal.id,
@@ -611,7 +613,7 @@ async function seedDemoTenantData(args: {
                     data: {
                         action: ActivityAction.RECEIVED_PAYMENT,
                         type: ActivityType.PAYMENT_REFUNDED,
-                        title: "Refund issued",
+                        ...activityText('refundIssued'),
                         companyId: company.id,
                         userId: financeUser.id,
                         dealId: deal.id,
@@ -720,7 +722,7 @@ async function seedDemoTenantData(args: {
             data: {
                 action: ActivityAction.CREATED_TASK,
                 type: ActivityType.TASK_CREATED,
-                title: `Task "${task.title}" created`,
+                ...activityText('taskCreated', {task: task.title}),
                 companyId: company.id,
                 userId: assignee.id,
                 taskId: task.id,

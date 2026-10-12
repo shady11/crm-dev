@@ -18,6 +18,7 @@ import {ConvertLeadDto} from "@/modules/leads/dto/convert-lead.dto";
 import {ContactAttemptType, LogContactAttemptDto} from "@/modules/leads/dto/log-contact-attempt.dto";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
 import {normalizePhone} from "@/common/utils/phone.util";
+import {activityText} from "@/modules/activities/activity-templates";
 
 // What every lead response carries besides the lead's own columns.
 const LEAD_INCLUDE = {
@@ -229,7 +230,7 @@ export class LeadsService {
                 leadId: created.id,
                 action: ActivityAction.CREATED,
                 type: ActivityType.LEAD_CREATED,
-                title: `Lead "${created.fullName}" created`,
+                ...activityText('leadCreated', { name: created.fullName }),
             },
         });
 
@@ -320,7 +321,7 @@ export class LeadsService {
                     leadId: id,
                     action: ActivityAction.UPDATED,
                     type: ActivityType.LEAD_UPDATED,
-                    title: `Lead "${updated.fullName}" updated`,
+                    ...activityText('leadUpdated', { name: updated.fullName }),
                     metadata: changes,
                 },
             });
@@ -378,7 +379,7 @@ export class LeadsService {
                 clientId,
                 action: ActivityAction.CONVERTED_LEAD,
                 type: ActivityType.LEAD_CONVERTED,
-                title: `Lead "${converted.fullName}" converted to client`,
+                ...activityText('leadConverted', { name: converted.fullName }),
             },
         });
 
@@ -490,7 +491,7 @@ export class LeadsService {
                 leadId: id,
                 action: ActivityAction.BRANCH_TRANSFERRED,
                 type: ActivityType.LEAD_BRANCH_TRANSFERRED,
-                title: "Lead moved to another branch",
+                ...activityText('leadMovedBranch'),
                 metadata: { fromBranchId: lead.branchId, toBranchId: dto.branchId },
             },
         });
@@ -548,7 +549,7 @@ export class LeadsService {
                     leadId: id,
                     action: ActivityAction.REASSIGNED,
                     type: ActivityType.LEAD_REASSIGNED,
-                    title: "Lead reassigned to another manager",
+                    ...activityText('leadReassigned'),
                     metadata: { fromManagerId: lead.managerId, toManagerId: dto.managerId, movedTaskCount: movedTasks.length },
                 },
             });
@@ -606,7 +607,7 @@ export class LeadsService {
                 leadId: id,
                 action: ActivityAction.LOGGED_CONTACT_ATTEMPT,
                 type: CONTACT_ATTEMPT_TYPE_MAP[dto.type],
-                title: "Contact attempt logged",
+                ...activityText('contactLogged'),
                 description: dto.note,
             },
             include: {

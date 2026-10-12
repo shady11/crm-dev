@@ -22,6 +22,7 @@ import { DealMapper } from '../../mappers/deal.mapper';
 import { DEAL_DETAILS_INCLUDE, formatMoney } from '../../deal.constants';
 import { DealNotFoundException } from '../../exceptions';
 import { VoidPaymentDto } from '../../dto/payments/void-payment.dto';
+import { activityText } from '@/modules/activities/activity-templates';
 
 /**
  * FIN-3: takes a mistyped payment off the books. The row stays, marked void
@@ -109,7 +110,7 @@ export class PaymentVoidService {
           clientId: deal.clientId,
           action: ActivityAction.UPDATED_DEAL,
           type: ActivityType.DEAL_UPDATED,
-          title: `Payment ${label} voided`,
+          ...activityText('paymentVoided', { payment: label }),
           description: dto.reason,
           metadata: {
             paymentId,

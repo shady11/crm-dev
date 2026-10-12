@@ -80,7 +80,7 @@ describe('PaymentReceiptService.getOrCreate', () => {
     });
     expect(activityService.documentGenerated).toHaveBeenCalledWith(
       expect.anything(),
-      'Receipt R-2026-0007 issued',
+      expect.objectContaining({ title: 'Receipt R-2026-0007 issued', templateKey: 'receiptIssued', templateParams: { receipt: 'R-2026-0007' } }),
     );
   });
 

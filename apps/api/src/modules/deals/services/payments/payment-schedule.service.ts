@@ -8,6 +8,7 @@ import {DealNotFoundException, PaymentScheduleAlreadyGeneratedException} from '.
 import {GeneratePaymentScheduleDto} from '../../dto/payments/generate-payment-schedule.dto';
 import {DealMapper} from "@/modules/deals/mappers/deal.mapper";
 import {DEAL_DETAILS_INCLUDE} from "../../deal.constants";
+import { activityText } from '@/modules/activities/activity-templates';
 
 @Injectable()
 export class PaymentScheduleService {
@@ -89,7 +90,7 @@ export class PaymentScheduleService {
                 dealId,
                 action: ActivityAction.UPDATED_DEAL,
                 type: ActivityType.DEAL_UPDATED,
-                title: 'Payment schedule generated',
+                ...activityText('paymentScheduleGenerated'),
                 description: `${installments} installments starting ${firstDate.toLocaleDateString()}`,
             });
 

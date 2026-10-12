@@ -9,6 +9,7 @@ import {UpdateClientDto} from "@/modules/clients/dto/update-client.dto";
 import {resolveOrderBy} from "@/common/utils/sort.util";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
 import {OVERDUE_INSTALLMENT_WHERE} from "@/modules/deals/deal.constants";
+import {activityText} from "@/modules/activities/activity-templates";
 
 // Newest first; enough for years of a single client's history.
 const CLIENT_ACTIVITY_LIMIT = 200;
@@ -208,7 +209,7 @@ export class ClientsService {
                 clientId: created.id,
                 action: ActivityAction.CREATED,
                 type: ActivityType.CLIENT_CREATED,
-                title: `Client "${created.fullName}" created`,
+                ...activityText('clientCreated', { name: created.fullName }),
             },
         });
 
@@ -250,7 +251,7 @@ export class ClientsService {
                     clientId: id,
                     action: ActivityAction.UPDATED,
                     type: ActivityType.CLIENT_UPDATED,
-                    title: `Client "${updated.fullName}" updated`,
+                    ...activityText('clientUpdated', { name: updated.fullName }),
                     metadata: changes,
                 },
             });
@@ -353,7 +354,7 @@ export class ClientsService {
                 clientId: id,
                 action: ActivityAction.BRANCH_TRANSFERRED,
                 type: ActivityType.CLIENT_BRANCH_TRANSFERRED,
-                title: "Client moved to another branch",
+                ...activityText('clientMovedBranch'),
                 metadata: { fromBranchId: client.branchId, toBranchId: dto.branchId },
             },
         });

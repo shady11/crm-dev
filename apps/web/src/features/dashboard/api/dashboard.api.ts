@@ -53,6 +53,7 @@ export const EMPTY_ATTENTION_ITEMS: AttentionItems = {
 
 export type RecentActivity = {
     id: string; title: string; description: string | null; type: string; createdAt: string;
+    templateKey?: string | null; templateParams?: Record<string, unknown> | null;
     user: { id: string; fullName: string } | null;
     deal: { id: string; dealNumber: string } | null;
 };

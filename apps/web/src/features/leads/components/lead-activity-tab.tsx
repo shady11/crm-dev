@@ -16,6 +16,7 @@ import {
     type Lead,
 } from "@/features/leads/api/leads.api.ts";
 import {formatCreatedAt, nextContactToIso} from "@/features/leads/utils/format.ts";
+import {useActivityTitle} from "@/features/activities/hooks/use-activity-title.ts";
 
 const CONTACT_TYPE_ICON: Record<ContactAttemptType, typeof PhoneCall> = {
     [ContactAttemptType.CALL]: PhoneCall,
@@ -33,6 +34,7 @@ interface LeadActivityTabProps {
 // answer looked identical to one that had gone cold untouched.
 export function LeadActivityTab({lead}: LeadActivityTabProps) {
     const {t, i18n} = useTranslation("leads");
+    const activityTitle = useActivityTitle();
     const queryClient = useQueryClient();
     const [type, setType] = useState<ContactAttemptType>(ContactAttemptType.CALL);
     const [note, setNote] = useState("");
@@ -133,7 +135,7 @@ export function LeadActivityTab({lead}: LeadActivityTabProps) {
                             <div key={activity.id} className="flex gap-3 py-3 text-sm">
                                 <Icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                                 <div className="min-w-0 flex-1">
-                                    <p className="font-medium">{activity.title}</p>
+                                    <p className="font-medium">{activityTitle(activity)}</p>
                                     {activity.description && (
                                         <p className="text-muted-foreground">{activity.description}</p>
                                     )}

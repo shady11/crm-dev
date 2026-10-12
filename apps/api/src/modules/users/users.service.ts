@@ -20,6 +20,7 @@ import {TransferUserBranchDto} from "./dto/transfer-user-branch.dto";
 import {QueryUsersDto, USER_SORTABLE_FIELDS} from "./dto/query-users.dto";
 import {resolveOrderBy} from "@/common/utils/sort.util";
 import {canActorSeeUser} from "@/modules/users/users.constants";
+import {activityText} from "@/modules/activities/activity-templates";
 
 const USER_SAFE_SELECT = {
     id: true,
@@ -56,6 +57,8 @@ export class UsersService {
         action: ActivityAction;
         type: ActivityType;
         title: string;
+        templateKey?: string;
+        templateParams?: Prisma.InputJsonValue;
         metadata?: Prisma.InputJsonValue;
     }) {
         return this.prisma.activity.create({
@@ -66,6 +69,8 @@ export class UsersService {
                 action: params.action,
                 type: params.type,
                 title: params.title,
+                templateKey: params.templateKey,
+                templateParams: params.templateParams,
                 metadata: params.metadata,
             },
         });
@@ -225,7 +230,7 @@ export class UsersService {
             targetUserId: created.id,
             action: ActivityAction.CREATED_USER,
             type: ActivityType.USER_CREATED,
-            title: `User "${created.fullName}" created`,
+            ...activityText('userCreated', { name: created.fullName }),
             metadata: { roleId: created.roleId, branchId: created.branchId },
         });
 
@@ -291,7 +296,7 @@ export class UsersService {
                 ...activityParams,
                 action: ActivityAction.ROLE_CHANGED,
                 type: ActivityType.USER_ROLE_CHANGED,
-                title: `Role changed for "${updated.fullName}"`,
+                ...activityText('userRoleChanged', { name: updated.fullName }),
                 metadata: { fromRoleId: target.roleId, toRoleId: updated.roleId },
             });
         }
@@ -301,7 +306,7 @@ export class UsersService {
                 ...activityParams,
                 action: ActivityAction.DEACTIVATED_USER,
                 type: ActivityType.USER_DEACTIVATED,
-                title: `User "${updated.fullName}" deactivated`,
+                ...activityText('userDeactivated', { name: updated.fullName }),
             });
         }
 
@@ -310,7 +315,7 @@ export class UsersService {
                 ...activityParams,
                 action: ActivityAction.REACTIVATED_USER,
                 type: ActivityType.USER_REACTIVATED,
-                title: `User "${updated.fullName}" reactivated`,
+                ...activityText('userReactivated', { name: updated.fullName }),
             });
         }
 
@@ -319,7 +324,7 @@ export class UsersService {
                 ...activityParams,
                 action: ActivityAction.UPDATED_USER,
                 type: ActivityType.USER_UPDATED,
-                title: `User "${updated.fullName}" updated`,
+                ...activityText('userUpdated', { name: updated.fullName }),
                 metadata: changes,
             });
         }
@@ -439,7 +444,7 @@ export class UsersService {
             targetUserId: id,
             action: ActivityAction.BRANCH_TRANSFERRED,
             type: ActivityType.USER_BRANCH_TRANSFERRED,
-            title: `User "${target.fullName}" moved to another branch`,
+            ...activityText('userMovedBranch', { name: target.fullName }),
             metadata: { fromBranchId: target.branchId, toBranchId: dto.branchId, reassignToId },
         });
 
@@ -469,7 +474,7 @@ export class UsersService {
             targetUserId: id,
             action: ActivityAction.RESET_PASSWORD,
             type: ActivityType.USER_PASSWORD_RESET,
-            title: `Password reset for "${target.fullName}"`,
+            ...activityText('userPasswordReset', { name: target.fullName }),
         });
 
         return { success: true };
@@ -493,7 +498,7 @@ export class UsersService {
             targetUserId: id,
             action: ActivityAction.REVOKED_SESSIONS,
             type: ActivityType.USER_SESSIONS_REVOKED,
-            title: `Sessions revoked for "${target.fullName}"`,
+            ...activityText('userSessionsRevoked', { name: target.fullName }),
         });
 
         return { success: true };
@@ -606,7 +611,7 @@ export class UsersService {
             targetUserId: id,
             action: ActivityAction.DEACTIVATED_USER,
             type: ActivityType.USER_DEACTIVATED,
-            title: `User "${target.fullName}" deactivated`,
+            ...activityText('userDeactivated', { name: target.fullName }),
             metadata: { reassignToId },
         });
 

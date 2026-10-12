@@ -21,6 +21,7 @@ import {TaskNotFoundException} from "./exceptions/task-not-found.exception";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
 import {hasPermission} from "@/common/utils/permissions.util";
+import {activityText} from "@/modules/activities/activity-templates";
 
 const TERMINAL_STATUSES: TaskStatus[] = [TaskStatus.DONE, TaskStatus.CANCELLED];
 
@@ -46,6 +47,8 @@ export class TasksService {
         action: ActivityAction;
         type: ActivityType;
         title: string;
+        templateKey?: string;
+        templateParams?: Prisma.InputJsonValue;
         metadata?: Prisma.InputJsonValue;
     }) {
         return this.prisma.activity.create({
@@ -56,6 +59,8 @@ export class TasksService {
                 action: params.action,
                 type: params.type,
                 title: params.title,
+                templateKey: params.templateKey,
+                templateParams: params.templateParams,
                 metadata: params.metadata,
             },
         });
@@ -198,7 +203,7 @@ export class TasksService {
             taskId: task.id,
             action: ActivityAction.CREATED_TASK,
             type: ActivityType.TASK_CREATED,
-            title: `Task "${task.title}" created`,
+            ...activityText('taskCreated', { task: task.title }),
         });
 
         return task;
@@ -274,7 +279,7 @@ export class TasksService {
                 taskId: id,
                 action: ActivityAction.REASSIGNED,
                 type: ActivityType.TASK_REASSIGNED,
-                title: `Task "${task.title}" reassigned`,
+                ...activityText('taskReassigned', { task: task.title }),
                 metadata: {fromAssignedToId: existing.assignedToId, toAssignedToId: task.assignedToId},
             });
         }
@@ -286,7 +291,7 @@ export class TasksService {
                 taskId: id,
                 action: task.status === TaskStatus.DONE ? ActivityAction.COMPLETED_TASK : ActivityAction.CHANGED_TASK_STATUS,
                 type: task.status === TaskStatus.DONE ? ActivityType.TASK_COMPLETED : ActivityType.TASK_STATUS_CHANGED,
-                title: task.status === TaskStatus.DONE ? `Task "${task.title}" completed` : `Task "${task.title}" status changed`,
+                ...activityText(task.status === TaskStatus.DONE ? 'taskCompleted' : 'taskStatusChanged', { task: task.title }),
                 metadata: {fromStatus: existing.status, toStatus: task.status},
             });
         }
@@ -298,7 +303,7 @@ export class TasksService {
                 taskId: id,
                 action: ActivityAction.UPDATED_TASK,
                 type: ActivityType.TASK_UPDATED,
-                title: `Task "${task.title}" updated`,
+                ...activityText('taskUpdated', { task: task.title }),
                 metadata: changes,
             });
         }
@@ -328,7 +333,7 @@ export class TasksService {
                 taskId: id,
                 action: task.status === TaskStatus.DONE ? ActivityAction.COMPLETED_TASK : ActivityAction.CHANGED_TASK_STATUS,
                 type: task.status === TaskStatus.DONE ? ActivityType.TASK_COMPLETED : ActivityType.TASK_STATUS_CHANGED,
-                title: task.status === TaskStatus.DONE ? `Task "${task.title}" completed` : `Task "${task.title}" status changed`,
+                ...activityText(task.status === TaskStatus.DONE ? 'taskCompleted' : 'taskStatusChanged', { task: task.title }),
                 metadata: {fromStatus: existing.status, toStatus: task.status},
             });
         }
@@ -354,7 +359,7 @@ export class TasksService {
             taskId: id,
             action: ActivityAction.DELETED_TASK,
             type: ActivityType.TASK_DELETED,
-            title: `Task "${existing.title}" deleted`,
+            ...activityText('taskDeleted', { task: existing.title }),
         });
 
         return { success: true };
@@ -392,7 +397,7 @@ export class TasksService {
             taskId: id,
             action: ActivityAction.RESTORED_TASK,
             type: ActivityType.TASK_RESTORED,
-            title: `Task "${task.title}" restored`,
+            ...activityText('taskRestored', { task: task.title }),
         });
 
         return task;
@@ -503,7 +508,7 @@ export class TasksService {
                 taskId: task.id,
                 action: ActivityAction.REASSIGNED,
                 type: ActivityType.TASK_REASSIGNED,
-                title: `Task "${task.title}" reassigned`,
+                ...activityText('taskReassigned', { task: task.title }),
                 metadata: {fromAssignedToId: params.fromUserId, toAssignedToId: params.toUserId, ...params.link},
             })),
         });
@@ -583,7 +588,7 @@ export class TasksService {
             taskId: task.id,
             action: ActivityAction.CREATED_TASK,
             type: ActivityType.TASK_CREATED,
-            title: `Task "${task.title}" auto-created`,
+            ...activityText('taskAutoCreated', { task: task.title }),
         });
 
         return task;

@@ -26,6 +26,7 @@ import {
   FileStorageProvider,
 } from './storage/file-storage.interface';
 import { NotificationsService } from '@/modules/notifications/notifications.service';
+import { activityText } from '@/modules/activities/activity-templates';
 
 const DOCUMENT_INCLUDE = {
   uploadedBy: { select: { id: true, fullName: true } },
@@ -55,6 +56,8 @@ export class DocumentsService {
     action: ActivityAction;
     type: ActivityType;
     title: string;
+    templateKey?: string;
+    templateParams?: Prisma.InputJsonValue;
     metadata?: Prisma.InputJsonValue;
   }) {
     const ownerFk = {
@@ -74,6 +77,8 @@ export class DocumentsService {
         action: params.action,
         type: params.type,
         title: params.title,
+        templateKey: params.templateKey,
+        templateParams: params.templateParams,
         metadata: params.metadata,
       },
     });
@@ -238,7 +243,7 @@ export class DocumentsService {
       ownerId: dto.ownerId,
       action: ActivityAction.UPLOADED_DOCUMENT,
       type: ActivityType.DOCUMENT_UPLOADED,
-      title: `Document "${document.originalName}" uploaded`,
+      ...activityText('documentUploaded', { name: document.originalName }),
     });
 
     return document;
@@ -270,7 +275,7 @@ export class DocumentsService {
       ownerId: document.ownerId,
       action: ActivityAction.DELETED_DOCUMENT,
       type: ActivityType.DOCUMENT_DELETED,
-      title: `Document "${document.originalName}" deleted`,
+      ...activityText('documentDeleted', { name: document.originalName }),
     });
 
     return { success: true };
@@ -310,7 +315,7 @@ export class DocumentsService {
       ownerId: document.ownerId,
       action: ActivityAction.RESTORED_DOCUMENT,
       type: ActivityType.DOCUMENT_RESTORED,
-      title: `Document "${document.originalName}" restored`,
+      ...activityText('documentRestored', { name: document.originalName }),
     });
 
     return document;

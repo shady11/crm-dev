@@ -1,5 +1,6 @@
 import {ActivityAction, ActivityType} from '@/generated/prisma/client';
 import {DealActivityService} from './deal-activity.service';
+import {activityText} from '@/modules/activities/activity-templates';
 
 /**
  * Every deal-mutating path (reserve, cancel, sign, pay, discount decide...)
@@ -73,13 +74,15 @@ describe('DealActivityService', () => {
 
     it('documentGenerated() logs a fixed action/type but uses the caller-supplied title', async () => {
         const {service, db} = build();
-        await service.documentGenerated(baseParams(db), 'Reservation agreement generated');
+        await service.documentGenerated(baseParams(db), activityText('receiptIssued', {receipt: 'RCP-1'}));
 
         expect(db.activity.create).toHaveBeenCalledWith({
             data: expect.objectContaining({
                 action: ActivityAction.GENERATED_DOCUMENT,
                 type: ActivityType.DOCUMENT_GENERATED,
-                title: 'Reservation agreement generated',
+                title: 'Receipt RCP-1 issued',
+                templateKey: 'receiptIssued',
+                templateParams: {receipt: 'RCP-1'},
             }),
         });
     });
