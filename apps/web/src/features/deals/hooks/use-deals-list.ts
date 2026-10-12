@@ -15,7 +15,12 @@ import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
 export type DealStatusFilter = DealStatus | "all";
 
 export function useDealsList() {
-    const [statusFilter, setStatusFilterState] = useState<DealStatusFilter>("all");
+    const [searchParams, setSearchParams] = useSearchParams();
+    // Seeded from the URL so the dashboard's stage tiles can open one stage.
+    const [statusFilter, setStatusFilterState] = useState<DealStatusFilter>(() => {
+        const fromUrl = searchParams.get("status");
+        return Object.values(DealStatus).find((s) => s === fromUrl) ?? "all";
+    });
     const [search, setSearchState] = useState("");
     const [page, setPage] = useState(1);
     const [limit, setLimitState] = useState(10);
@@ -23,7 +28,6 @@ export function useDealsList() {
     const [projectId, setProjectIdState] = useState<string | undefined>();
     // Seeded from the URL so a link (the "My team" page) can open one
     // manager's deals; the toolbar's picker takes over from there.
-    const [searchParams, setSearchParams] = useSearchParams();
     const [managerId, setManagerIdState] = useState<string | undefined>(() => searchParams.get("managerId") ?? undefined);
     const [branchId, setBranchIdState] = useState<string | undefined>();
     // In the URL, so the dashboard's "View all" can open the list pre-filtered.
@@ -70,6 +74,13 @@ export function useDealsList() {
             setStatusFilter: (value: DealStatusFilter) => {
                 setStatusFilterState(value);
                 setPage(1);
+                if (searchParams.has("status")) {
+                    setSearchParams((prev) => {
+                        const params = new URLSearchParams(prev);
+                        params.delete("status");
+                        return params;
+                    }, { replace: true });
+                }
             },
             search,
             setSearch: (value: string) => {

@@ -719,13 +719,17 @@ export class DashboardService {
      * different rows), so the funnel below is assembled from both rather
      * than a single groupBy.
      */
-    async getFunnel(user: AuthUser, projectId?: string, branchId?: string) {
+    async getFunnel(user: AuthUser, projectId?: string, branchId?: string, managerId?: string) {
         if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
         const companyId = user.companyId;
         const effectiveBranchId = this.resolveBranchId(user, branchId);
         // SM-A1: a self-scoped viewer's funnel counts only leads/deals they
-        // manage, not the whole branch's.
-        const selfScoped = this.isSelfScoped(user) ? { managerId: user.id } : {};
+        // manage, not the whole branch's. Anyone else may narrow it to one
+        // manager; the branch filter above still applies, so a Sales Head
+        // naming another branch's manager just gets an empty funnel.
+        const selfScoped = this.isSelfScoped(user)
+            ? { managerId: user.id }
+            : managerId ? { managerId } : {};
 
         const leadWhere = { companyId, branchId: effectiveBranchId, ...selfScoped, deletedAt: null };
         // A lead "reached" a stage when the client it became has a deal at
@@ -786,8 +790,8 @@ export class DashboardService {
      * (see units-import.service.ts) rather than adding a CSV library for
      * the same job.
      */
-    async exportFunnelXlsx(user: AuthUser, projectId?: string, branchId?: string): Promise<Buffer> {
-        const funnel = await this.getFunnel(user, projectId, branchId);
+    async exportFunnelXlsx(user: AuthUser, projectId?: string, branchId?: string, managerId?: string): Promise<Buffer> {
+        const funnel = await this.getFunnel(user, projectId, branchId, managerId);
 
         const workbook = XLSX.utils.book_new();
 

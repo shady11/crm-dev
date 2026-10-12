@@ -1,4 +1,6 @@
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
+import {Link} from "react-router-dom";
+import {Card, CardAction, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
+import {paths} from "@/routes/paths.ts";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
 import {initials} from "@/features/deals/utils/format.ts";
 import type {TeamSnapshotItem} from "@/features/dashboard/api/dashboard.api.ts";
@@ -16,6 +18,9 @@ export function TeamSnapshotCard({data}: {data: TeamSnapshotItem[]}) {
         <Card className="border border-secondary shadow-none pt-0">
             <CardHeader className="border-b py-4">
                 <CardTitle className="text-sm text-muted-foreground">{t("teamSnapshot.title")}</CardTitle>
+                <CardAction>
+                    <Link to={paths.users} className="text-xs font-medium text-primary hover:underline">{t("teamSnapshot.openTeam")}</Link>
+                </CardAction>
             </CardHeader>
             <CardContent>
                 {data.length === 0 ? (
@@ -23,7 +28,11 @@ export function TeamSnapshotCard({data}: {data: TeamSnapshotItem[]}) {
                 ) : (
                     <div className="flex flex-col divide-y">
                         {data.map((item) => (
-                            <div key={item.manager.id} className="flex items-center gap-3 py-2.5 text-sm">
+                            <Link
+                                key={item.manager.id}
+                                to={paths.deals.byManager(item.manager.id)}
+                                className="flex items-center gap-3 rounded-md px-2 py-2.5 text-sm hover:bg-secondary/40"
+                            >
                                 <Avatar className="size-8 shrink-0">
                                     <AvatarFallback>{initials(item.manager.fullName)}</AvatarFallback>
                                 </Avatar>
@@ -40,7 +49,7 @@ export function TeamSnapshotCard({data}: {data: TeamSnapshotItem[]}) {
                                 <p className="shrink-0 text-xs text-muted-foreground">
                                     {item.lastActivityAt ? timeAgo(t, item.lastActivityAt) : t("teamSnapshot.noActivity")}
                                 </p>
-                            </div>
+                            </Link>
                         ))}
                     </div>
                 )}

@@ -67,8 +67,10 @@ export class DashboardController {
         @CurrentUser() user: AuthUser,
         @Query("projectId") projectId?: string,
         @Query("branchId") branchId?: string,
+        @Query("managerId") managerId?: string,
     ) {
-        return this.dashboardService.getFunnel(user, projectId, branchId);
+        // Empty means "everyone"; it only ever narrows within the caller's own scope.
+        return this.dashboardService.getFunnel(user, projectId, branchId, managerId || undefined);
     }
 
     @Get("funnel/export")
@@ -77,8 +79,9 @@ export class DashboardController {
         @Res({ passthrough: true }) res: Response,
         @Query("projectId") projectId?: string,
         @Query("branchId") branchId?: string,
+        @Query("managerId") managerId?: string,
     ) {
-        const buffer = await this.dashboardService.exportFunnelXlsx(user, projectId, branchId);
+        const buffer = await this.dashboardService.exportFunnelXlsx(user, projectId, branchId, managerId || undefined);
 
         res.set({
             "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -121,7 +124,9 @@ export class DashboardController {
     // SALES_MANAGER's default bundle — the individual contributor's standup
     // view, self-scoped only with no cross-visibility into teammates (see
     // DashboardService.getMyPerformance).
-    @RequirePermissions("dashboard.my_performance")
+    // Also a team lead's (dashboard.team_snapshot): a Sales Head has leads
+    // and tasks of their own too. The result is always the caller's own.
+    @RequirePermissions("dashboard.my_performance", "dashboard.team_snapshot")
     @Get("my-work-today")
     getMyWorkToday(@CurrentUser() user: AuthUser) {
         return this.dashboardService.getMyWorkToday(user);

@@ -31,7 +31,8 @@
     "totalLeads": "Total leads",
     "totalDeals": "Total deals",
     "leadToDeal": "Lead → deal",
-    "leadToWon": "Lead → won"
+    "leadToWon": "Lead → won",
+    "allManagers": "All managers"
   },
   "attention": {
     "title": "Needs attention",
@@ -82,7 +83,8 @@
     "tasksDue_few": "{{count}} tasks due",
     "tasksDue_many": "{{count}} tasks due",
     "tasksDue_other": "{{count}} tasks due",
-    "noActivity": "No activity yet"
+    "noActivity": "No activity yet",
+    "openTeam": "Open my team"
   },
   "myWorkToday": {
     "title": "My work today",

@@ -28,6 +28,8 @@ import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
 import {hasPermission} from "@/features/auth/access";
+import {useManagers} from "@/features/users/hooks/use-managers.ts";
+import {paths} from "@/routes/paths.ts";
 import {useTranslation} from "react-i18next";
 
 export function DashboardPage() {
@@ -35,18 +37,29 @@ export function DashboardPage() {
     const { user } = useAuth();
     const [projectId, setProjectId] = useState<string | undefined>();
     const [branchId, setBranchId] = useState<string | "all">("all");
+    const [funnelManagerId, setFunnelManagerId] = useState<string | undefined>();
     const { formatCurrency } = useCompanyFormatters();
     const projects = useProjectsFilter();
     const { kpis, revenueTrend, unitsSummary, attention, recentActivity, dealsStatus, funnel } = useDashboard(
         projectId,
         branchId === "all" ? undefined : branchId,
+        funnelManagerId,
     );
     const canViewBranchComparison = hasPermission(user, "dashboard.branch_comparison");
     const branchComparison = useBranchComparison(canViewBranchComparison);
     const canViewTeamSnapshot = hasPermission(user, "dashboard.team_snapshot");
     const teamSnapshot = useTeamSnapshot(canViewTeamSnapshot);
     const canViewMyPerformance = hasPermission(user, "dashboard.my_performance");
-    const myWorkToday = useMyWorkToday(canViewMyPerformance);
+    // A Sales Head has leads and tasks of their own too.
+    const canViewMyWorkToday = canViewMyPerformance || canViewTeamSnapshot;
+    const myWorkToday = useMyWorkToday(canViewMyWorkToday);
+    // Who the funnel can be split by: not offered to a manager, who only
+    // ever sees their own; narrowed to the chosen branch for a company-wide
+    // viewer.
+    const managers = useManagers();
+    const funnelManagers = canViewMyPerformance
+        ? undefined
+        : managers.data.filter((m) => branchId === "all" || m.branchId === branchId);
     const myPerformance = useMyPerformance(canViewMyPerformance);
     const canViewFinanceOverview = hasPermission(user, "dashboard.finance_overview");
     const financeOverview = useFinanceOverview(canViewFinanceOverview, branchId === "all" ? undefined : branchId);
@@ -89,6 +102,9 @@ export function DashboardPage() {
             {canViewMyPerformance && myWorkToday.data ? <MyWorkTodayCard data={myWorkToday.data} /> : null}
             {canViewMyPerformance && myPerformance.data ? <MyPerformanceCard data={myPerformance.data} /> : null}
             {canViewMyPerformance ? null : attentionCard}
+            {/* A Sales Head's main block: their team, then their own day. */}
+            {canViewTeamSnapshot ? <TeamSnapshotCard data={teamSnapshot.data ?? []} /> : null}
+            {!canViewMyPerformance && canViewMyWorkToday && myWorkToday.data ? <MyWorkTodayCard data={myWorkToday.data} /> : null}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <KpiCard
@@ -102,6 +118,7 @@ export function DashboardPage() {
                     label={t("kpi.activeDeals")}
                     value={kpis.data ? String(kpis.data.activeDealsCount) : "—"}
                     accent="bg-blue-500"
+                    to={paths.deals.root}
                 />
                 <KpiCard
                     icon={HouseIcon}
@@ -109,12 +126,14 @@ export function DashboardPage() {
                     value={kpis.data ? String(kpis.data.availableUnits) : "—"}
                     subtext={kpis.data ? t("kpi.unitsOfTotal", { total: kpis.data.totalUnits }) : undefined}
                     accent="bg-violet-500"
+                    to={paths.projects.root}
                 />
                 <KpiCard
                     icon={ListTodoIcon}
                     label={t("kpi.overdueTasks")}
                     value={kpis.data ? String(kpis.data.overdueTasksCount) : "—"}
                     accent={kpis.data && kpis.data.overdueTasksCount > 0 ? "bg-rose-500" : "bg-gray-400"}
+                    to={paths.tasks.root}
                 />
             </div>
 
@@ -127,11 +146,18 @@ export function DashboardPage() {
 
             <div className="space-y-2">
                 <h3 className="text-sm font-medium text-muted-foreground">{t("dealsByStage")}</h3>
-                <DealStatusCardsGrid countsByStatus={countsByStatus} />
+                <DealStatusCardsGrid countsByStatus={countsByStatus} hrefFor={paths.deals.byStatus} />
             </div>
 
             {funnel.data ? (
-                <FunnelCard data={funnel.data} projectId={projectId} branchId={branchId === "all" ? undefined : branchId} />
+                <FunnelCard
+                    data={funnel.data}
+                    projectId={projectId}
+                    branchId={branchId === "all" ? undefined : branchId}
+                    managerId={funnelManagerId}
+                    managers={funnelManagers}
+                    onManagerChange={setFunnelManagerId}
+                />
             ) : null}
 
             {canViewMyPerformance ? (
@@ -144,7 +170,6 @@ export function DashboardPage() {
             )}
 
             {canViewBranchComparison ? <BranchComparisonChart data={branchComparison.data ?? []} /> : null}
-            {canViewTeamSnapshot ? <TeamSnapshotCard data={teamSnapshot.data ?? []} /> : null}
             {canViewFinanceOverview && financeOverview.data ? <FinanceOverviewCard data={financeOverview.data} /> : null}
         </div>
     );

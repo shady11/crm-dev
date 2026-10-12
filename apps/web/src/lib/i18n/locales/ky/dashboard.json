@@ -31,7 +31,8 @@
     "totalLeads": "Бардыгы лиддер",
     "totalDeals": "Бардыгы бүтүмдөр",
     "leadToDeal": "Лид → бүтүм",
-    "leadToWon": "Лид → ийгилик"
+    "leadToWon": "Лид → ийгилик",
+    "allManagers": "Бардык менеджерлер"
   },
   "attention": {
     "title": "Көңүл буруу керек",
@@ -82,7 +83,8 @@
     "tasksDue_few": "{{count}} мөөнөттүү тапшырма",
     "tasksDue_many": "{{count}} мөөнөттүү тапшырма",
     "tasksDue_other": "{{count}} мөөнөттүү тапшырма",
-    "noActivity": "Азырынча активдүүлүк жок"
+    "noActivity": "Азырынча активдүүлүк жок",
+    "openTeam": "Команданы ачуу"
   },
   "myWorkToday": {
     "title": "Менин бүгүнкү ишим",
