@@ -17,6 +17,9 @@ export const FEATURE_PERMISSIONS = {
     tasks: "tasks.view",
     clients: "clients.view",
     deals: "deals.view",
+    // The payments register: everyone who records payments, branch-scoped
+    // by the API like the deals list.
+    payments: "deals.manage_payments",
     // Everyone with projects.view can read a project and its chessboard;
     // only projects.create/edit/delete can write, enforced per endpoint.
     projects: "projects.view",

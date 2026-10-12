@@ -28,7 +28,8 @@ import {
     ShieldCheck,
     SlidersHorizontal,
     SquareUser,
-    Users
+    Users,
+    Wallet
 } from "lucide-react";
 import {Link} from "react-router-dom";
 import {KeregeLogo, KeregeMark} from "@/components/shared/kerege-logo.tsx";
@@ -48,6 +49,7 @@ const NAV_ITEMS: {
     { titleKey: "nav.tasks", feature: "tasks", url: "/tasks", icon: ListTodo },
     { titleKey: "nav.clients", feature: "clients", url: "/clients", icon: SquareUser },
     { titleKey: "nav.deals", feature: "deals", url: "/deals", icon: Handshake },
+    { titleKey: "nav.payments", feature: "payments", url: "/payments", icon: Wallet },
     { titleKey: "nav.projects", feature: "projects", url: "/projects", icon: Building2 },
     { titleKey: "nav.companies", feature: "companies", url: "/companies", icon: Landmark },
     { titleKey: "nav.settingOptions", feature: "settingOptions", url: "/setting-options", icon: SlidersHorizontal },

@@ -79,7 +79,8 @@
     "mainNavigation": "Основная навигация",
     "toggleSidebar": "Переключить боковую панель",
     "myActivity": "Мои действия",
-    "myTeam": "Моя команда"
+    "myTeam": "Моя команда",
+    "payments": "Платежи"
   },
   "language": {
     "switchLabel": "Язык",

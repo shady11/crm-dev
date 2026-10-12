@@ -1,4 +1,4 @@
-import {Controller, Get, Query, Res, UseGuards} from "@nestjs/common";
+import {Controller, Get, Query, Res, UseGuards, StreamableFile} from "@nestjs/common";
 import type {Response} from "express";
 import {JwtAuthGuard} from "@/modules/auth/guards/jwt-auth.guard";
 import {CompanyGuard} from "@/common/guards/company.guard";
@@ -85,7 +85,9 @@ export class DashboardController {
             "Content-Disposition": `attachment; filename="funnel-${new Date().toISOString().slice(0, 10)}.xlsx"`,
         });
 
-        return buffer;
+        // A bare Buffer is serialised as JSON ({"type":"Buffer",...});
+        // StreamableFile sends the bytes, so Excel can open the file.
+        return new StreamableFile(buffer);
     }
 
     // BR-E1: cross-branch comparison. dashboard.branch_comparison is only in
