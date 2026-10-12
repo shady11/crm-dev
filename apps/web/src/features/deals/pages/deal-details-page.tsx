@@ -685,7 +685,12 @@ export function DealDetailsPage() {
                         </Field>
                         <Field>
                             <FieldLabel>{t("detailsPage.paymentDate")}</FieldLabel>
-                            <DatePicker onValueChange={({ value }) => setPaidAt(value)} value={paidAt ?? []}>
+                            {/* Only money already received: the API refuses later dates. */}
+                            <DatePicker
+                                onValueChange={({ value }) => setPaidAt(value)}
+                                value={paidAt ?? []}
+                                max={parseDate(format(new Date(), 'yyyy-MM-dd'))}
+                            >
                                 <DatePickerTrigger asChild>
                                     <Button className="w-full flex justify-between" variant="outline">
                                         {formatDate(paidAt[0].toString(), i18n.language).date}
