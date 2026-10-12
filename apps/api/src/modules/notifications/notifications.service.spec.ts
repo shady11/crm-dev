@@ -172,4 +172,50 @@ describe('NotificationsService', () => {
             expect(prisma.notification.count).not.toHaveBeenCalled();
         });
     });
+
+    describe('resolveForEntity', () => {
+        const resolveParams = {
+            companyId: 'company-1',
+            type: NotificationType.DISCOUNT_APPROVAL_REQUESTED,
+            entityType: 'DEAL' as const,
+            entityId: 'deal-1',
+            resolvedType: NotificationType.DISCOUNT_DECIDED,
+            title: 'Discount for deal D-1 approved by Nurlan',
+            templateKey: 'discountRequestApproved' as const,
+            params: {dealNumber: 'D-1', percent: 10, byName: 'Nurlan'},
+        };
+
+        it('does nothing when nobody was notified about that record', async () => {
+            const {service, prisma, gateway} = build();
+
+            await expect(service.resolveForEntity(resolveParams)).resolves.toBe(0);
+            expect(prisma.notification.updateMany).not.toHaveBeenCalled();
+            expect(gateway.emitToUser).not.toHaveBeenCalled();
+        });
+
+        it('marks them read before rewriting their content, then tells each reader\'s bell', async () => {
+            const {service, prisma, gateway} = build({unreadCount: 4});
+            prisma.notification.findMany.mockResolvedValue([{userId: 'head-1'}, {userId: 'admin-1'}]);
+
+            await service.resolveForEntity(resolveParams);
+
+            const [readCall, contentCall] = prisma.notification.updateMany.mock.calls;
+            const where = {companyId: 'company-1', type: 'DISCOUNT_APPROVAL_REQUESTED', entityType: 'DEAL', entityId: 'deal-1'};
+            expect(readCall[0]).toEqual({where: {...where, isRead: false}, data: {isRead: true, readAt: expect.any(Date)}});
+            expect(contentCall[0]).toEqual({
+                where,
+                data: {
+                    type: 'DISCOUNT_DECIDED',
+                    title: 'Discount for deal D-1 approved by Nurlan',
+                    message: null,
+                    templateKey: 'discountRequestApproved',
+                    params: {dealNumber: 'D-1', percent: 10, byName: 'Nurlan'},
+                },
+            });
+            for (const userId of ['head-1', 'admin-1']) {
+                expect(gateway.emitToUser).toHaveBeenCalledWith(userId, 'notification:updated', {entityType: 'DEAL', entityId: 'deal-1'});
+                expect(gateway.emitToUser).toHaveBeenCalledWith(userId, 'notification:unread-count', {count: 4});
+            }
+        });
+    });
 });

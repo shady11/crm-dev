@@ -97,6 +97,25 @@
       "message_few": "Передал(а): {{byName}}. Вам перешли {{count}} открытые задачи.",
       "message_many": "Передал(а): {{byName}}. Вам перешли {{count}} открытых задач.",
       "message_other": "Передал(а): {{byName}}. Вам перешли {{count}} открытой задачи."
+    },
+    "discountApprovalReminder": {
+      "title": "Скидка по сделке {{dealNumber}} всё ещё ждёт согласования",
+      "message_one": "{{percent}}% запрошено {{count}} день назад. Договор нельзя подписать, пока нет решения.",
+      "message_few": "{{percent}}% запрошено {{count}} дня назад. Договор нельзя подписать, пока нет решения.",
+      "message_many": "{{percent}}% запрошено {{count}} дней назад. Договор нельзя подписать, пока нет решения.",
+      "message_other": "{{percent}}% запрошено {{count}} дня назад. Договор нельзя подписать, пока нет решения."
+    },
+    "discountRequestApproved": {
+      "title": "Скидка по сделке {{dealNumber}} согласована",
+      "message": "{{percent}}%, согласовал(а): {{byName}}"
+    },
+    "discountRequestRejected": {
+      "title": "Скидка по сделке {{dealNumber}} отклонена",
+      "message": "{{percent}}%, отклонил(а): {{byName}}"
+    },
+    "discountRequestWithdrawn": {
+      "title": "Скидка по сделке {{dealNumber}} больше не требует решения",
+      "message": "Бронь отменена или истекла."
     }
   }
 }

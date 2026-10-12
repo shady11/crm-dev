@@ -24,15 +24,23 @@ export function useNotificationsSocket() {
             toast.info({ title, description: message ?? undefined });
         };
 
+        // A notification was rewritten in place (e.g. "approval needed"
+        // after someone decided): refetch, without a toast.
+        const handleUpdated = () => {
+            queryClient.invalidateQueries({ queryKey: ["notifications", "list"] });
+        };
+
         const handleUnreadCount = ({ count }: { count: number }) => {
             queryClient.setQueryData(["notifications", "unread-count"], count);
         };
 
         socket.on("notification:new", handleNew);
+        socket.on("notification:updated", handleUpdated);
         socket.on("notification:unread-count", handleUnreadCount);
 
         return () => {
             socket.off("notification:new", handleNew);
+            socket.off("notification:updated", handleUpdated);
             socket.off("notification:unread-count", handleUnreadCount);
         };
     }, [queryClient]);

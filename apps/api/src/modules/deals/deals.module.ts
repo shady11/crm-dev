@@ -11,6 +11,7 @@ import {DealMapper} from "@/modules/deals/mappers/deal.mapper";
 import {DealDomainService} from "@/modules/deals/services/deal-domain.service";
 import {NotificationsModule} from "@/modules/notifications/notifications.module";
 import {DealExpiryService} from "@/modules/deals/services/deal-expiry.service";
+import {DiscountApprovalReminderService} from "@/modules/deals/services/discount-approval-reminder.service";
 import { DealNumberService } from '@/modules/deals/services/deal-number.service';
 import {DocumentGenerationModule} from "@/modules/document-generation/document-generation.module";
 import {RbacModule} from "@/modules/rbac/rbac.module";
@@ -27,6 +28,7 @@ import {TasksModule} from "@/modules/tasks/tasks.module";
     PaymentScheduleService,
     DealMapper,
     DealExpiryService,
+    DiscountApprovalReminderService,
     DealNumberService,
   ],
   exports: [DealsService, PaymentService, PaymentScheduleService],

@@ -36,7 +36,7 @@ describe('DealExpiryService.expireOverdueReservations', () => {
             },
             $transaction: jest.fn(async (fn: any) => fn(prisma)),
         };
-        const notifications = {create: jest.fn().mockResolvedValue({})};
+        const notifications = {create: jest.fn().mockResolvedValue({}), resolveForEntity: jest.fn().mockResolvedValue(0)};
         const activityService = {expireReservation: jest.fn().mockResolvedValue({})};
 
         const service = new DealExpiryService(prisma as any, notifications as any, activityService as any);
@@ -119,5 +119,23 @@ describe('DealExpiryService.expireOverdueReservations', () => {
         await service.expireOverdueReservations();
 
         expect(prisma.$transaction).toHaveBeenCalledTimes(2);
+    });
+
+    it('withdraws a discount request still waiting on a reservation that lapsed', async () => {
+        const {service, notifications} = build([candidate({discountApprovalStatus: 'PENDING', requestedDiscountPercent: 10})]);
+
+        await service.expireOverdueReservations();
+
+        expect(notifications.resolveForEntity).toHaveBeenCalledWith(expect.objectContaining({
+            entityId: 'deal-1', templateKey: 'discountRequestWithdrawn', params: {dealNumber: '2026-0001', percent: 10},
+        }));
+    });
+
+    it('leaves notifications alone for a lapsed reservation with no pending discount', async () => {
+        const {service, notifications} = build([candidate({discountApprovalStatus: 'NONE'})]);
+
+        await service.expireOverdueReservations();
+
+        expect(notifications.resolveForEntity).not.toHaveBeenCalled();
     });
 });
