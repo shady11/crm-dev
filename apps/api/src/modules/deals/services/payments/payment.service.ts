@@ -1,6 +1,5 @@
 import {ForbiddenException, Injectable} from '@nestjs/common';
 import {
-    DealStatus,
     NotificationEntityType,
     NotificationType,
     PaymentScheduleStatus,
@@ -14,9 +13,11 @@ import {DealActivityService} from '../deal-activity.service';
 import {DealsService} from '../deals.service';
 import {DealMapper} from '../../mappers/deal.mapper';
 import {DEAL_DETAILS_INCLUDE, formatMoney} from '../../deal.constants';
-import {DealNotFoundException} from '../../exceptions';
+import {DealNotFoundException, PaymentDateInFutureException} from '../../exceptions';
 import {CreatePaymentDto} from '../../dto/payments/create-payment.dto';
 import {NotificationsService} from "@/modules/notifications/notifications.service";
+import {endOfToday} from "@/common/utils/day-bounds.util";
+import {ReceiptNumberService} from "./receipt-number.service";
 
 @Injectable()
 export class PaymentService {
@@ -27,6 +28,7 @@ export class PaymentService {
         private readonly activityService: DealActivityService,
         private readonly dealsService: DealsService,
         private readonly notifications: NotificationsService,
+        private readonly receiptNumbers: ReceiptNumberService,
     ) {}
 
     async create(user: AuthUser, dealId: string, dto: CreatePaymentDto) {
@@ -36,6 +38,13 @@ export class PaymentService {
 
         const companyId = user.companyId;
         const isRefund = dto.paymentType === PaymentType.REFUND;
+
+        // Money not yet received can't be recorded: a payment dated next
+        // month would count as collected this month on every dashboard.
+        const paidAt = new Date(dto.paidAt);
+        if (paidAt > endOfToday(user.company?.timezone)) {
+            throw new PaymentDateInFutureException();
+        }
 
         const result = await this.prisma.$transaction(async db => {
             const deal = await db.deal.findFirst({
@@ -47,7 +56,7 @@ export class PaymentService {
             });
             if (!deal) throw new DealNotFoundException(dealId);
 
-            this.domain.ensureStatus(deal, DealStatus.ACTIVE);
+            this.domain.ensureCanRecordPayment(deal, isRefund);
 
             const paidAgg = await db.payment.aggregate({
                 where: { dealId, deletedAt: null },
@@ -70,9 +79,11 @@ export class PaymentService {
                     amount: signedAmount,
                     paymentMethod: dto.paymentMethod,
                     paymentType: dto.paymentType,
-                    paidAt: new Date(dto.paidAt),
+                    paidAt,
                     reference: dto.reference,
                     note: dto.note,
+                    // Money in gets a receipt number; a refund isn't a receipt.
+                    receiptNumber: isRefund ? null : await this.receiptNumbers.next(db, companyId),
                 },
             });
 
@@ -116,13 +127,19 @@ export class PaymentService {
                     const applied = Prisma.Decimal.min(due, remainingToApply);
                     const newPaidAmount = schedule.paidAmount.plus(applied);
 
+                    // A part-payment on an overdue installment leaves the rest
+                    // overdue. Every overdue figure (dashboard, attention list,
+                    // deals filter) keys off status OVERDUE, so PARTIAL here
+                    // would hide the remainder until the next reminder run.
                     await db.paymentSchedule.update({
                         where: { id: schedule.id },
                         data: {
                             paidAmount: newPaidAmount,
                             status: newPaidAmount.greaterThanOrEqualTo(schedule.amount)
                                 ? PaymentScheduleStatus.PAID
-                                : PaymentScheduleStatus.PARTIAL,
+                                : schedule.status === PaymentScheduleStatus.OVERDUE
+                                    ? PaymentScheduleStatus.OVERDUE
+                                    : PaymentScheduleStatus.PARTIAL,
                         },
                     });
 

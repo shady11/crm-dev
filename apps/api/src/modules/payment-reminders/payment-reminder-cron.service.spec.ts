@@ -83,6 +83,23 @@ describe('PaymentReminderCronService', () => {
     });
   });
 
+  it('loads OVERDUE installments, so the later escalation stages can reach them', async () => {
+    const { service, prisma } = build([]);
+
+    await service.runDailyReminders();
+
+    const [[findManyArgs]] = prisma.paymentSchedule.findMany.mock.calls as [
+      [{ where: { status: { in: PaymentScheduleStatus[] } } }],
+    ];
+    expect(findManyArgs.where.status.in).toEqual(
+      expect.arrayContaining([
+        PaymentScheduleStatus.PENDING,
+        PaymentScheduleStatus.PARTIAL,
+        PaymentScheduleStatus.OVERDUE,
+      ]),
+    );
+  });
+
   it('does not re-flip a schedule already marked OVERDUE', async () => {
     const { service, prisma } = build([
       scheduleRow({

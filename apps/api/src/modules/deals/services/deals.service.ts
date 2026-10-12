@@ -23,6 +23,7 @@ import {
   ClientNotFoundException,
   DealNotFoundException,
   DiscountApprovalNotAllowedException,
+  PaidExceedsDiscountedPriceException,
   DiscountNotPendingException,
   SalePriceMismatchException,
   UnitNotAvailableException,
@@ -33,8 +34,8 @@ import {DealMapper} from '../mappers/deal.mapper';
 import {DEAL_SORTABLE_FIELDS, DealQueryDto} from '../dto/deal-query.dto';
 import {resolveOrderBy} from '@/common/utils/sort.util';
 import {DealDomainService} from './deal-domain.service';
-import {DealActivityService} from './deal-activity.service';
-import {ACTIVE_DEAL_STATUSES, DEAL_DETAILS_INCLUDE, dealAttentionWhere, dealStatusTitle, RESERVATION_POLICY_SELECT} from "../deal.constants";
+import {ActivityTitle, DealActivityService} from './deal-activity.service';
+import {ACTIVE_DEAL_STATUSES, DEAL_DETAILS_INCLUDE, dealAttentionWhere, dealStatusTitle, OVERDUE_INSTALLMENT_WHERE, RESERVATION_POLICY_SELECT} from "../deal.constants";
 import {ReserveUnitDto} from "../dto/reserve-unit.dto";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ExtendReservationDto} from "@/modules/deals/dto/extend-reservation.dto";
@@ -43,11 +44,15 @@ import {CancelDealDto} from "@/modules/deals/dto/cancel-deal.dto";
 import {RejectDiscountDto} from "@/modules/deals/dto/reject-discount.dto";
 import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
 import {DbClient} from "@/database/prisma.types";
+import {findDiscountApproverIds, resolveDiscountRequestNotifications} from "./discount-approval";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 import {DealNumberService} from "@/modules/deals/services/deal-number.service";
 import {DocumentGenerationService} from "@/modules/document-generation/document-generation.service";
 import {GENERATABLE_DOCUMENT_TYPES} from "@/modules/document-generation/document-generation.constants";
 import {TasksService} from "@/modules/tasks/tasks.service";
+import {MoneyHeldNotifier} from "./money-held-notifier.service";
+import {ReceiptNumberService} from "./payments/receipt-number.service";
+import { activityText } from '@/modules/activities/activity-templates';
 
 @Injectable()
 export class DealsService {
@@ -63,6 +68,8 @@ export class DealsService {
       private readonly documentGeneration: DocumentGenerationService,
       private readonly rbacService: RbacService,
       private readonly tasksService: TasksService,
+      private readonly moneyHeld: MoneyHeldNotifier,
+      private readonly receiptNumbers: ReceiptNumberService,
   ) {}
 
   /**
@@ -77,7 +84,7 @@ export class DealsService {
     clientId: string;
     type: DocumentType;
     userId: string;
-    activityTitle: string;
+    activityTitle: ActivityTitle;
   }) {
     try {
       const document = await this.documentGeneration.generateForDeal({
@@ -170,8 +177,28 @@ export class DealsService {
       this.prisma.deal.count({ where }),
     ]);
 
+    // What's overdue on each deal on this page, so the list can show the
+    // money owed, not only the sale price (FIN-12). One query per page.
+    const overdueByDeal = deals.length === 0 ? [] : await this.prisma.paymentSchedule.groupBy({
+      by: ['dealId'],
+      where: { ...OVERDUE_INSTALLMENT_WHERE, dealId: { in: deals.map((deal) => deal.id) } },
+      _sum: { amount: true, paidAmount: true },
+      _min: { dueDate: true },
+      _count: { _all: true },
+    });
+    const overdueOf = (dealId: string) => {
+      const row = overdueByDeal.find((r) => r.dealId === dealId);
+      return row
+        ? {
+            amount: Number(row._sum.amount ?? 0) - Number(row._sum.paidAmount ?? 0),
+            installments: row._count._all,
+            since: row._min.dueDate,
+          }
+        : null;
+    };
+
     return {
-      items: this.mapper.toList(deals),
+      items: this.mapper.toList(deals).map((deal) => ({ ...deal, overdue: overdueOf(deal.id) })),
       meta: {
         page,
         limit,
@@ -188,7 +215,26 @@ export class DealsService {
 
     const deal = await this.getDealOrThrow(user, id);
 
-    return this.mapper.toDetails(deal);
+    // Voided payments (FIN-3) count nowhere, but the deal page lists them,
+    // with who voided them and why, so the correction stays visible.
+    const voided = await this.prisma.payment.findMany({
+      where: { dealId: deal.id, deletedAt: { not: null } },
+      orderBy: { deletedAt: 'desc' },
+      select: {
+        id: true, amount: true, paymentType: true, paymentMethod: true, paidAt: true,
+        receiptNumber: true, voidReason: true, deletedAt: true,
+        voidedBy: { select: { id: true, fullName: true } },
+      },
+    });
+
+    return {
+      ...this.mapper.toDetails(deal),
+      voidedPayments: voided.map(({ deletedAt, ...payment }) => ({
+        ...payment,
+        amount: Number(payment.amount),
+        voidedAt: deletedAt,
+      })),
+    };
   }
 
   // --------------------------------------------------------------------------
@@ -369,6 +415,7 @@ export class DealsService {
             paymentMethod: dto.depositPaymentMethod ?? PaymentMethod.CASH,
             paymentType: PaymentType.DEPOSIT,
             paidAt: new Date(),
+            receiptNumber: await this.receiptNumbers.next(db, companyId),
           },
         });
       }
@@ -397,32 +444,14 @@ export class DealsService {
           },
         });
 
-        // The same threshold that decided PENDING also decides who gets
-        // asked — a request a branch-scoped approver's own band already
-        // covers goes to that branch's holder(s); otherwise it needs
-        // someone whose ceiling isn't branch-scoped (company-wide).
-        const approverRoles = await this.rbacService.findApproverRoles(companyId, 'deals.approve_discount');
-        const qualifying = approverRoles.filter(
-            (r) => r.discountLimit === null || new Prisma.Decimal(r.discountLimit).greaterThanOrEqualTo(effectiveDiscountPercent),
-        );
-        const branchScopedRoleIds = qualifying.filter((r) => r.isBranchScoped).map((r) => r.id);
-        const companyWideRoleIds = qualifying.filter((r) => !r.isBranchScoped).map((r) => r.id);
-        const targetRoleIds = branchScopedRoleIds.length > 0 ? branchScopedRoleIds : companyWideRoleIds;
-
-        const approvers = await db.user.findMany({
-          where: {
-            companyId,
-            roleId: {in: targetRoleIds},
-            isActive: true,
-            ...(branchScopedRoleIds.length > 0 ? {branchId: client.branchId} : {}),
-          },
-          select: {id: true},
+        const approverIds = await findDiscountApproverIds(db, this.rbacService, {
+          companyId, branchId: client.branchId, percent: effectiveDiscountPercent,
         });
 
-        for (const approver of approvers) {
+        for (const approverId of approverIds) {
           await this.notifications.create({
             companyId,
-            userId: approver.id,
+            userId: approverId,
             type: NotificationType.DISCOUNT_APPROVAL_REQUESTED,
             title: `Discount approval needed for deal ${dealNumber}`,
             templateKey: 'discountApprovalRequested',
@@ -447,7 +476,7 @@ export class DealsService {
       clientId: result.clientId,
       type: DocumentType.RESERVATION,
       userId: user.id,
-      activityTitle: 'Reservation agreement generated',
+      activityTitle: activityText('reservationAgreementGenerated'),
     });
 
     // Best-effort, non-fatal — same reasoning as generateAndLogDocument
@@ -600,7 +629,7 @@ export class DealsService {
       clientId: result.clientId,
       type: DocumentType.CONTRACT,
       userId: user.id,
-      activityTitle: 'Sale contract generated',
+      activityTitle: activityText('saleContractGenerated'),
     });
 
     return this.mapper.toDetails(result);
@@ -636,6 +665,10 @@ export class DealsService {
         metadata: { status: "ACTIVE" },
       });
 
+      // Paid in full before activation (FIN-9): there's nothing left to
+      // schedule, so the sale is complete.
+      await this.tryCompleteWithinTransaction(db, user, deal.id);
+
       if (deal.managerId) {
         await this.notifications.create({
           companyId,
@@ -659,6 +692,21 @@ export class DealsService {
   // Discount approval
   // --------------------------------------------------------------------------
 
+  /** See resolveDiscountRequestNotifications; never fails the action that triggered it. */
+  private async resolveDiscountNotifications(
+      deal: Parameters<typeof resolveDiscountRequestNotifications>[1],
+      result: Parameters<typeof resolveDiscountRequestNotifications>[2],
+  ) {
+    try {
+      await resolveDiscountRequestNotifications(this.notifications, deal, result);
+    } catch (error) {
+      this.logger.error(
+          `Failed to update discount-request notifications for deal ${deal.id}`,
+          error instanceof Error ? error.stack : String(error),
+      );
+    }
+  }
+
   async approveDiscount(user: AuthUser, id: string) {
     if (!user.companyId) {
       throw new ForbiddenException("User does not belong to a company");
@@ -681,6 +729,13 @@ export class DealsService {
 
       if (!this.domain.canDecideDiscount(deal.requestedDiscountPercent, hasPermission(user, 'deals.approve_discount'), user.discountLimit)) {
         throw new DiscountApprovalNotAllowedException();
+      }
+
+      // Payments are accepted before the decision (FIN-9), against the list
+      // price; the discount can't leave the client paid beyond the new price.
+      const paid = await db.payment.aggregate({ where: { dealId: deal.id, deletedAt: null }, _sum: { amount: true } });
+      if ((paid._sum.amount ?? new Prisma.Decimal(0)).greaterThan(deal.listPrice.minus(deal.requestedDiscountAmount ?? 0))) {
+        throw new PaidExceedsDiscountedPriceException();
       }
 
       await db.deal.update({
@@ -727,8 +782,10 @@ export class DealsService {
       clientId: result.clientId,
       type: DocumentType.RESERVATION,
       userId: user.id,
-      activityTitle: 'Reservation agreement reissued at the approved price',
+      activityTitle: activityText('reservationAgreementReissued'),
     });
+
+    await this.resolveDiscountNotifications(result, { outcome: 'approved', byName: user.name });
 
     return this.mapper.toDetails(result);
   }
@@ -795,6 +852,8 @@ export class DealsService {
 
       return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
     });
+
+    await this.resolveDiscountNotifications(result, { outcome: 'rejected', byName: user.name });
 
     return this.mapper.toDetails(result);
   }
@@ -929,7 +988,7 @@ export class DealsService {
           unitId: deal.unitId,
           action: ActivityAction.CHANGED_UNIT_STATUS,
           type: ActivityType.UNIT_STATUS_CHANGED,
-          title: 'Unit relisted after deal cancellation',
+          ...activityText('unitRelistedAfterCancellation'),
           metadata: { toStatus: UnitStatus.AVAILABLE, dealId: deal.id, reason: dto.reason ?? null },
         },
       });
@@ -964,6 +1023,16 @@ export class DealsService {
 
       return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
     });
+
+    // A deposit taken on the reservation is still the client's: Finance has
+    // a refund to record.
+    await this.moneyHeld.notifyIfHeld(result);
+
+    // A request still waiting when the reservation is cancelled no longer
+    // needs anyone's decision.
+    if (result.discountApprovalStatus === DiscountApprovalStatus.PENDING) {
+      await this.resolveDiscountNotifications(result, { outcome: 'withdrawn' });
+    }
 
     return this.mapper.toDetails(result);
   }
@@ -1039,7 +1108,7 @@ export class DealsService {
         unitId: deal.unitId,
         action: ActivityAction.CHANGED_UNIT_STATUS,
         type: ActivityType.UNIT_STATUS_CHANGED,
-        title: 'Unit marked sold',
+        ...activityText('unitMarkedSold'),
         metadata: { toStatus: UnitStatus.SOLD, dealId },
       },
     });
@@ -1162,7 +1231,7 @@ export class DealsService {
           clientId: deal.clientId,
           metadata: {documentId: document.id, documentType: type},
         },
-        `${type} document regenerated`,
+        activityText('documentRegenerated', {documentType: type}),
     );
 
     return document;

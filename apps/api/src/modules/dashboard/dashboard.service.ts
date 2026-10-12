@@ -56,15 +56,13 @@ export class DashboardService {
         const selfScoped = this.isSelfScoped(user) ? { managerId: user.id } : {};
         const selfScopedTasks = this.isSelfScoped(user) ? { assignedToId: user.id } : {};
 
-        const startOfMonth = new Date();
-        startOfMonth.setDate(1);
-        startOfMonth.setHours(0, 0, 0, 0);
+        const { startOfMonth, startOfNextMonth } = currentMonthBounds();
 
         const [revenueAgg, activeDealsCount, unitsAgg, overdueTasksCount] = await Promise.all([
             this.prisma.payment.aggregate({
                 where: {
                     deal: { companyId, projectId, branchId: effectiveBranchId, ...selfScoped },
-                    paidAt: { gte: startOfMonth },
+                    paidAt: { gte: startOfMonth, lt: startOfNextMonth },
                     deletedAt: null,
                 },
                 _sum: { amount: true },
@@ -315,7 +313,7 @@ export class DashboardService {
             orderBy: { createdAt: "desc" },
             take: 10,
             select: {
-                id: true, title: true, description: true, type: true, createdAt: true,
+                id: true, title: true, templateKey: true, templateParams: true, description: true, type: true, createdAt: true,
                 user: { select: { id: true, fullName: true } },
                 deal: { select: { id: true, dealNumber: true } },
             },
@@ -647,22 +645,20 @@ export class DashboardService {
      * reconciliation view gated by dashboard.finance_overview (FINANCE's
      * default bundle only).
      */
-    async getFinanceOverview(user: AuthUser, branchId?: string) {
+    async getFinanceOverview(user: AuthUser, branchId?: string, projectId?: string) {
         if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
         const companyId = user.companyId;
         const effectiveBranchId = this.resolveBranchId(user, branchId);
 
-        const startOfMonth = new Date();
-        startOfMonth.setDate(1);
-        startOfMonth.setHours(0, 0, 0, 0);
+        const { startOfMonth, startOfNextMonth } = currentMonthBounds();
 
         const in30Days = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
-        const dealScope: Prisma.DealWhereInput = { companyId, branchId: effectiveBranchId };
+        const dealScope: Prisma.DealWhereInput = { companyId, branchId: effectiveBranchId, projectId };
 
         const [collectedThisMonth, overdue, upcoming, outstanding, cashFlowByMethod] = await Promise.all([
             this.prisma.payment.aggregate({
-                where: { deal: dealScope, paidAt: { gte: startOfMonth }, deletedAt: null },
+                where: { deal: dealScope, paidAt: { gte: startOfMonth, lt: startOfNextMonth }, deletedAt: null },
                 _sum: { amount: true },
             }),
             this.prisma.paymentSchedule.aggregate({
@@ -673,7 +669,8 @@ export class DashboardService {
             this.prisma.paymentSchedule.aggregate({
                 where: {
                     deal: dealScope,
-                    status: PaymentScheduleStatus.PENDING,
+                    // Part-paid but not yet overdue is still coming due.
+                    status: { in: [PaymentScheduleStatus.PENDING, PaymentScheduleStatus.PARTIAL] },
                     dueDate: { lte: in30Days },
                     deletedAt: null,
                 },
@@ -690,7 +687,8 @@ export class DashboardService {
             }),
             this.prisma.payment.groupBy({
                 by: ["paymentMethod"],
-                where: { deal: dealScope, deletedAt: null },
+                // The same month as "collected", so the bars add up to it.
+                where: { deal: dealScope, paidAt: { gte: startOfMonth, lt: startOfNextMonth }, deletedAt: null },
                 _sum: { amount: true },
             }),
         ]);
@@ -816,4 +814,15 @@ export class DashboardService {
 
         return XLSX.write(workbook, { type: "buffer", bookType: "xlsx" }) as Buffer;
     }
+}
+
+/**
+ * "This month" on the dashboard: both ends bounded, so a payment dated in a
+ * later month (recorded before the API refused future dates) isn't counted
+ * as collected now.
+ */
+function currentMonthBounds(now: Date = new Date()) {
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    return { startOfMonth, startOfNextMonth };
 }

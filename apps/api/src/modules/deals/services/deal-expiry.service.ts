@@ -1,9 +1,12 @@
 import {Injectable, Logger} from "@nestjs/common";
 import {Cron, CronExpression} from "@nestjs/schedule";
-import {ActivityAction, ActivityType, DealStatus, NotificationEntityType, NotificationType, UnitStatus} from "@/generated/prisma/client";
+import {ActivityAction, ActivityType, DealStatus, DiscountApprovalStatus, NotificationEntityType, NotificationType, UnitStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 import {DealActivityService} from "./deal-activity.service";
+import {resolveDiscountRequestNotifications} from "./discount-approval";
+import {MoneyHeldNotifier} from "./money-held-notifier.service";
+import {activityText} from "@/modules/activities/activity-templates";
 
 @Injectable()
 export class DealExpiryService {
@@ -13,6 +16,7 @@ export class DealExpiryService {
         private readonly prisma: PrismaService,
         private readonly notifications: NotificationsService,
         private readonly activityService: DealActivityService,
+        private readonly moneyHeld: MoneyHeldNotifier,
     ) {}
 
     @Cron(CronExpression.EVERY_10_MINUTES)
@@ -29,6 +33,8 @@ export class DealExpiryService {
                 managerId: true,
                 companyId: true,
                 clientId: true,
+                discountApprovalStatus: true,
+                requestedDiscountPercent: true,
             },
         });
 
@@ -75,7 +81,7 @@ export class DealExpiryService {
                                 unitId: deal.unitId,
                                 action: ActivityAction.CHANGED_UNIT_STATUS,
                                 type: ActivityType.UNIT_STATUS_CHANGED,
-                                title: 'Unit relisted after reservation expired',
+                                ...activityText('unitRelistedAfterExpiry'),
                                 metadata: { toStatus: UnitStatus.AVAILABLE, dealId: deal.id, reason: 'reservation_expiry_cron' },
                             },
                         });
@@ -100,6 +106,18 @@ export class DealExpiryService {
                     entityType: NotificationEntityType.DEAL,
                     entityId: deal.id,
                 });
+            }
+
+            await this.moneyHeld.notifyIfHeld(deal);
+
+            // A discount request still waiting on a lapsed reservation no
+            // longer needs anyone's decision.
+            if (deal.discountApprovalStatus === DiscountApprovalStatus.PENDING) {
+                try {
+                    await resolveDiscountRequestNotifications(this.notifications, deal, {outcome: "withdrawn"});
+                } catch (error) {
+                    this.logger.error(`Failed to update discount-request notifications for deal ${deal.id}`, error instanceof Error ? error.stack : String(error));
+                }
             }
         }
 

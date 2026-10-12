@@ -71,6 +71,8 @@ export type Deal = {
     manager: DealManager;
     project: DealProject;
     unit: DealUnit;
+    /** Overdue installments on this deal; only on list rows, null when none. */
+    overdue?: { amount: number; installments: number; since: string } | null;
 };
 
 export type DealActivity = {
@@ -78,6 +80,8 @@ export type DealActivity = {
     type: string;
     action: string;
     title: string;
+    templateKey?: string | null;
+    templateParams?: Record<string, unknown> | null;
     description: string | null;
     createdAt: string;
 };
@@ -91,6 +95,10 @@ type DealPayment = {
     reference: string | null;
     note: string | null;
     createdAt: string;
+    /** R-YYYY-NNNN; null for a refund. */
+    receiptNumber: string | null;
+    /** Who recorded it; null for payments from before this was tracked. */
+    user: { id: string; fullName: string } | null;
 };
 
 type DealPaymentSchedule = {
@@ -102,10 +110,25 @@ type DealPaymentSchedule = {
     order: number;
 };
 
+/** A payment taken off the books (FIN-3): kept for the record, counted nowhere. */
+export type VoidedPayment = {
+    id: string;
+    amount: number;
+    paymentType: PaymentType;
+    paymentMethod: PaymentMethod;
+    paidAt: string;
+    receiptNumber: string | null;
+    voidReason: string | null;
+    voidedAt: string;
+    voidedBy: { id: string; fullName: string } | null;
+};
+
 export type DealDetails = Deal & {
     activities: DealActivity[];
     payments: DealPayment[];
     paymentSchedules: DealPaymentSchedule[];
+    /** Only on GET /deals/:id; mutation responses leave it out. */
+    voidedPayments?: VoidedPayment[];
 };
 
 export type ReserveUnitPayload = {
@@ -241,6 +264,11 @@ export async function cancelDeal(id: string, reason?: string) {
 
 export async function generatePaymentSchedule(dealId: string, payload: GeneratePaymentSchedulePayload) {
     const response = await api.post<DealDetails>(`/deals/${dealId}/payment-schedule`, payload);
+    return response.data;
+}
+
+export async function voidPayment(dealId: string, paymentId: string, reason: string) {
+    const response = await api.post<DealDetails>(`/deals/${dealId}/payments/${paymentId}/void`, { reason });
     return response.data;
 }
 

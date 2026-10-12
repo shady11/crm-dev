@@ -71,7 +71,14 @@
     "updateSuccessTitle": "Ийгиликтүү жаңырды",
     "updateSuccessDescription": "Клиенттин дайындары жаңырды.",
     "updateErrorTitle": "Клиентти жаңыртуу мүмкүн болбоду",
-    "updateErrorDescription": "Кайра аракет кылыңыз."
+    "updateErrorDescription": "Кайра аракет кылыңыз.",
+    "money": {
+      "paid": "Төлөндү",
+      "owed": "Төлөнө элек",
+      "overdue": "Мөөнөтү өттү",
+      "paidOnDeal": "Төлөндү {{amount}}",
+      "overdueOnDeal": "Мөөнөтү өттү {{amount}}"
+    }
   },
   "toasts": {
     "createSuccessTitle": "Ийгиликтүү түзүлдү",

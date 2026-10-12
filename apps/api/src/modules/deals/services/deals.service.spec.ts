@@ -15,6 +15,7 @@ import {
     DealNotFoundException,
     DiscountApprovalNotAllowedException,
     DiscountNotPendingException,
+    PaidExceedsDiscountedPriceException,
     BlockNotOnSaleException,
     ProjectNotOpenForSalesException,
     ReservationDateInvalidException,
@@ -99,7 +100,7 @@ describe('DealsService', () => {
             user: {findFirstOrThrow: jest.fn(), findFirst: jest.fn(), findMany: jest.fn().mockResolvedValue([])},
             company: {findUniqueOrThrow: jest.fn().mockResolvedValue(company())},
             payment: {create: jest.fn().mockResolvedValue({}), aggregate: jest.fn().mockResolvedValue({_sum: {amount: null}})},
-            paymentSchedule: {findMany: jest.fn().mockResolvedValue([]), updateMany: jest.fn().mockResolvedValue({count: 0})},
+            paymentSchedule: {findMany: jest.fn().mockResolvedValue([]), updateMany: jest.fn().mockResolvedValue({count: 0}), groupBy: jest.fn().mockResolvedValue([])},
             activity: {create: jest.fn().mockResolvedValue({id: 'activity-1'})},
             $transaction: jest.fn(async (fn: any) => fn(prisma)),
         };
@@ -118,7 +119,7 @@ describe('DealsService', () => {
             discountApproved: jest.fn().mockResolvedValue({}),
             discountRejected: jest.fn().mockResolvedValue({}),
         };
-        const notifications = {create: jest.fn().mockResolvedValue({})};
+        const notifications = {create: jest.fn().mockResolvedValue({}), resolveForEntity: jest.fn().mockResolvedValue(0)};
         const dealNumberService = {generateDealNumber: jest.fn().mockResolvedValue('2026-0001')};
         const documentGeneration = {generateForDeal: jest.fn().mockResolvedValue({id: 'doc-1'})};
         const rbacService = {
@@ -133,12 +134,16 @@ describe('DealsService', () => {
             handOverOpenTasks: jest.fn().mockResolvedValue([]),
         };
 
+        const moneyHeld = {notifyIfHeld: jest.fn().mockResolvedValue(undefined)};
+        const receiptNumbers = {next: jest.fn().mockResolvedValue('R-2026-0001')};
+
         const service = new DealsService(
             prisma, mapper, domain, activityService as any, notifications as any,
             dealNumberService as any, documentGeneration as any, rbacService as any, tasksService as any,
+            moneyHeld as any, receiptNumbers as any,
         );
 
-        return {service, prisma, activityService, notifications, dealNumberService, documentGeneration, tasksService};
+        return {service, prisma, activityService, notifications, dealNumberService, documentGeneration, tasksService, moneyHeld};
     }
 
     describe('reserveUnit', () => {
@@ -341,7 +346,7 @@ describe('DealsService', () => {
             await service.reserveUnit(managerUser, reserveDto({salePrice: 100000, deposit: 5000}));
 
             expect(prisma.payment.create).toHaveBeenCalledWith(
-                expect.objectContaining({data: expect.objectContaining({amount: 5000, dealId: 'deal-1'})}),
+                expect.objectContaining({data: expect.objectContaining({amount: 5000, dealId: 'deal-1', receiptNumber: 'R-2026-0001'})}),
             );
         });
 
@@ -563,6 +568,16 @@ describe('DealsService', () => {
                 expect.objectContaining({data: {status: DealStatus.ACTIVE}}),
             );
         });
+
+        it('completes the deal on activation when it was paid in full beforehand', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', status: DealStatus.CONTRACT_SIGNED, managerId: null, clientId: 'c1', dealNumber: '2026-0001'});
+            const tryComplete = jest.spyOn(service, 'tryCompleteWithinTransaction').mockResolvedValue(true);
+
+            await service.activate(managerUser, 'deal-1');
+
+            expect(tryComplete).toHaveBeenCalledWith(prisma, managerUser, 'deal-1');
+        });
     });
 
     describe('approveDiscount / rejectDiscount', () => {
@@ -599,6 +614,23 @@ describe('DealsService', () => {
             await expect(b.service.approveDiscount(salesHeadUser, 'deal-1')).resolves.toBeDefined();
         });
 
+        it('approveDiscount: refuses when the client has already paid more than the discounted price', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(pendingDeal());
+            prisma.payment.aggregate.mockResolvedValue({_sum: {amount: new Prisma.Decimal(95000)}});
+
+            await expect(service.approveDiscount(adminUser, 'deal-1')).rejects.toThrow(PaidExceedsDiscountedPriceException);
+            expect(prisma.deal.update).not.toHaveBeenCalled();
+        });
+
+        it('approveDiscount: allows it when what was paid fits within the discounted price', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(pendingDeal());
+            prisma.payment.aggregate.mockResolvedValue({_sum: {amount: new Prisma.Decimal(90000)}});
+
+            await expect(service.approveDiscount(adminUser, 'deal-1')).resolves.toBeDefined();
+        });
+
         it('approveDiscount: recomputes salePrice from listPrice minus the requested discount amount', async () => {
             const {service, prisma} = buildBase();
             prisma.deal.findFirst.mockResolvedValue(pendingDeal());
@@ -616,6 +648,39 @@ describe('DealsService', () => {
 
             await service.approveDiscount(adminUser, 'deal-1');
             expect(notifications.create).not.toHaveBeenCalled();
+        });
+
+        it('approveDiscount: rewrites the approvers\' "approval needed" notifications to say who approved it', async () => {
+            const {service, prisma, notifications} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(pendingDeal());
+            prisma.deal.findUniqueOrThrow.mockResolvedValue({
+                id: 'deal-1', companyId: 'company-1', dealNumber: '2026-0001', requestedDiscountPercent: new Prisma.Decimal(10),
+            });
+
+            await service.approveDiscount(salesHeadUser, 'deal-1');
+
+            expect(notifications.resolveForEntity).toHaveBeenCalledWith(expect.objectContaining({
+                type: 'DISCOUNT_APPROVAL_REQUESTED', entityType: 'DEAL', entityId: 'deal-1', resolvedType: 'DISCOUNT_DECIDED',
+                templateKey: 'discountRequestApproved',
+                params: {dealNumber: '2026-0001', percent: 10, byName: salesHeadUser.name},
+            }));
+        });
+
+        it('rejectDiscount: rewrites them to say who rejected it', async () => {
+            const {service, prisma, notifications} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(pendingDeal());
+
+            await service.rejectDiscount(adminUser, 'deal-1', {reason: 'too high'} as any);
+
+            expect(notifications.resolveForEntity).toHaveBeenCalledWith(expect.objectContaining({templateKey: 'discountRequestRejected'}));
+        });
+
+        it('approveDiscount: still succeeds if updating the old notifications fails', async () => {
+            const {service, prisma, notifications} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(pendingDeal());
+            notifications.resolveForEntity.mockRejectedValue(new Error('boom'));
+
+            await expect(service.approveDiscount(adminUser, 'deal-1')).resolves.toBeDefined();
         });
 
         it('approveDiscount: reissues the reservation agreement at the approved price', async () => {
@@ -728,6 +793,25 @@ describe('DealsService', () => {
             await expect(service.cancelDeal(managerUser, 'deal-1', {} as any)).rejects.toThrow();
         });
 
+        it('withdraws a discount request still waiting on the cancelled reservation', async () => {
+            const {service, prisma, notifications} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', status: DealStatus.RESERVED, unitId: 'unit-1', managerId: null, clientId: 'c1', dealNumber: '2026-0001'});
+            prisma.deal.findUniqueOrThrow.mockResolvedValue({id: 'deal-1', discountApprovalStatus: DiscountApprovalStatus.PENDING});
+
+            await service.cancelDeal(managerUser, 'deal-1', {} as any);
+
+            expect(notifications.resolveForEntity).toHaveBeenCalledWith(expect.objectContaining({templateKey: 'discountRequestWithdrawn'}));
+        });
+
+        it('leaves notifications alone when no discount request was waiting', async () => {
+            const {service, prisma, notifications} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', status: DealStatus.ACTIVE, unitId: 'unit-1', managerId: null, clientId: 'c1', dealNumber: '2026-0001'});
+
+            await service.cancelDeal(managerUser, 'deal-1', {} as any);
+
+            expect(notifications.resolveForEntity).not.toHaveBeenCalled();
+        });
+
         it('releases the unit back to AVAILABLE', async () => {
             const {service, prisma} = buildBase();
             prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', status: DealStatus.ACTIVE, unitId: 'unit-1', managerId: null, clientId: 'c1', dealNumber: '2026-0001'});
@@ -764,6 +848,15 @@ describe('DealsService', () => {
                     data: expect.objectContaining({status: DealStatus.CANCELLED, cancelReason: 'client backed out'}),
                 }),
             );
+        });
+
+        it('asks Finance to refund whatever the cancelled deal still holds', async () => {
+            const {service, prisma, moneyHeld} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', status: DealStatus.RESERVED, unitId: 'unit-1', managerId: null, clientId: 'c1', dealNumber: '2026-0001'});
+
+            await service.cancelDeal(managerUser, 'deal-1', {} as any);
+
+            expect(moneyHeld.notifyIfHeld).toHaveBeenCalledWith(expect.objectContaining({id: 'deal-1'}));
         });
     });
 
@@ -838,6 +931,27 @@ describe('DealsService', () => {
                     status: {in: ['RESERVED', 'CONTRACT_SIGNED', 'ACTIVE']},
                     paymentSchedules: {some: {deletedAt: null, status: 'OVERDUE'}},
                 }),
+            ]);
+        });
+
+        it('adds what is overdue on each listed deal, and null where nothing is', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findMany.mockResolvedValue([{id: 'deal-1'}, {id: 'deal-2'}]);
+            prisma.paymentSchedule.groupBy.mockResolvedValue([{
+                dealId: 'deal-1',
+                _sum: {amount: new Prisma.Decimal(3000), paidAmount: new Prisma.Decimal(1000)},
+                _min: {dueDate: new Date('2026-09-01')},
+                _count: {_all: 2},
+            }]);
+
+            const result = await service.findAll(managerUser, {});
+
+            expect(prisma.paymentSchedule.groupBy.mock.calls[0][0].where).toEqual(
+                expect.objectContaining({status: 'OVERDUE', dealId: {in: ['deal-1', 'deal-2']}}),
+            );
+            expect(result.items).toEqual([
+                expect.objectContaining({id: 'deal-1', overdue: {amount: 2000, installments: 2, since: new Date('2026-09-01')}}),
+                expect.objectContaining({id: 'deal-2', overdue: null}),
             ]);
         });
 

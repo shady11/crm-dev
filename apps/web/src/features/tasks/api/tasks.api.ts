@@ -55,6 +55,18 @@ export type TaskPayload = {
     dealId?: string;
 };
 
+export type TaskAssignee = {id: string; fullName: string; branchId: string | null};
+
+/**
+ * Who the caller may assign a task to (and filter the list by): active
+ * people in their company, or only their own branch for a branch-scoped
+ * role. The same rule the API checks on save.
+ */
+export async function getTaskAssignees() {
+    const response = await api.get<TaskAssignee[]>("/tasks/assignees");
+    return response.data;
+}
+
 export async function getTasks(params?: GetTasksParams) {
     const response = await api.get<PaginatedResponse<Task>>("/tasks", { params });
     return response.data;

@@ -97,6 +97,33 @@
       "message_few": "By {{byName}}. {{count}} open tasks moved to you.",
       "message_many": "By {{byName}}. {{count}} open tasks moved to you.",
       "message_other": "By {{byName}}. {{count}} open tasks moved to you."
+    },
+    "discountApprovalReminder": {
+      "title": "Discount approval for deal {{dealNumber}} is still waiting",
+      "message_one": "{{percent}}% requested {{count}} day ago. The contract can't be signed until someone decides.",
+      "message_few": "{{percent}}% requested {{count}} days ago. The contract can't be signed until someone decides.",
+      "message_many": "{{percent}}% requested {{count}} days ago. The contract can't be signed until someone decides.",
+      "message_other": "{{percent}}% requested {{count}} days ago. The contract can't be signed until someone decides."
+    },
+    "discountRequestApproved": {
+      "title": "Discount for deal {{dealNumber}} approved",
+      "message": "{{percent}}%, approved by {{byName}}"
+    },
+    "discountRequestRejected": {
+      "title": "Discount for deal {{dealNumber}} rejected",
+      "message": "{{percent}}%, rejected by {{byName}}"
+    },
+    "discountRequestWithdrawn": {
+      "title": "Discount for deal {{dealNumber}} no longer needs a decision",
+      "message": "The reservation was cancelled or expired."
+    },
+    "moneyHeld": {
+      "title": "Deal {{dealNumber}} closed with {{amount}} still held",
+      "message": "Record the refund once the money has been returned to the client."
+    },
+    "paymentVoided": {
+      "title": "Payment of {{amount}} on deal {{dealNumber}} was voided",
+      "message": "{{reason}}"
     }
   }
 }

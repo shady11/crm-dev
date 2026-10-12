@@ -53,7 +53,8 @@
     "created": "Created",
     "emptyTitle": "No deals found",
     "emptyDescription": "Try adjusting your filters or search.",
-    "discountPending": "Discount pending"
+    "discountPending": "Discount pending",
+    "overdue": "Overdue {{amount}} since {{date}}"
   },
   "pagination": {
     "rowsPerPage": "Rows per page"
@@ -117,7 +118,15 @@
   "paymentsHistory": {
     "title": "Payments",
     "record": "Record payment",
-    "empty": "No payments recorded yet."
+    "empty": "No payments recorded yet.",
+    "recordRefund": "Record refund",
+    "recordedBy": "Recorded by {{name}}",
+    "void": "Void payment",
+    "voidedBy": "Voided by {{name}} on {{date}}",
+    "voided_one": "Voided ({{count}})",
+    "voided_other": "Voided ({{count}})",
+    "voided_few": "Voided ({{count}})",
+    "voided_many": "Voided ({{count}})"
   },
   "detailsPage": {
     "dealNumber": "Deal #{{number}}",
@@ -162,7 +171,19 @@
     "generateReservation": "Reservation agreement",
     "generateContract": "Sale contract",
     "activateDialogTitle": "Activate this deal?",
-    "activateDialogDescription": "Payments start from here: you can then generate the payment schedule and record installments. An active deal can't go back to \"Contract signed\"."
+    "activateDialogDescription": "The payment schedule starts here: it spreads whatever is still owed, after any money already paid. An active deal can't go back to \"Contract signed\".",
+    "refundDialogTitle": "Record refund",
+    "paymentNote": "Note (optional)",
+    "paymentNotePlaceholder": "e.g. paid by the client's brother",
+    "amountHintRemaining": "{{remaining}} left on this deal",
+    "amountHintNext": "next installment {{amount}}, due {{date}}",
+    "amountHintRefund": "Up to {{paid}} can be refunded",
+    "voidDialogTitle": "Void this {{amount}} payment?",
+    "voidDialogDescription": "It stops counting towards the deal and every total. It stays listed here as voided, with your reason, and its receipt number isn't reused.",
+    "voidReason": "Reason",
+    "voidReasonPlaceholder": "e.g. typed 10,000 instead of 1,000",
+    "voidReasonHint": "At least 5 characters. The deal manager sees it.",
+    "voidConfirm": "Void payment"
   },
   "toasts": {
     "unitReserved": "Unit reserved",
@@ -193,7 +214,9 @@
     "discountApproved": "Discount approved",
     "discountRejected": "Discount rejected",
     "discountDecisionError": "Could not save the decision",
-    "reservationReissued": "The reservation agreement was reissued at the approved price."
+    "reservationReissued": "The reservation agreement was reissued at the approved price.",
+    "paymentVoided": "Payment voided",
+    "voidError": "Could not void the payment"
   },
   "booking": {
     "rooms": "{{count}} rooms",
@@ -266,7 +289,7 @@
     "ofSalePrice": "Of {{total}}",
     "reservationExpires": "Reservation expires",
     "contract": "Contract",
-    "activateHint": "Activate to start payments",
+    "activateHint": "Schedule starts on activation",
     "nextPayment": "Next payment",
     "dueOn": "Due {{date}}",
     "overdueSince": "Overdue since {{date}}",
@@ -295,5 +318,9 @@
     "you": "You",
     "managerInactive": "This manager has been deactivated. Reassign the deal so someone follows it up.",
     "noManager": "No manager on this deal. Reassign it so someone follows it up."
+  },
+  "moneyHeldBanner": {
+    "title": "The client's money is still held: {{amount}}",
+    "description": "This deal is closed. Record the refund once the money has been returned to the client."
   }
 }

@@ -17,10 +17,8 @@ export function useNotificationText() {
 
     return useCallback(
         (n: Pick<Notification, "title" | "message" | "templateKey" | "params">) => {
+            if (!n.templateKey) return {title: n.title, message: n.message};
             const base = `notifications:templates.${n.templateKey}`;
-            if (!n.templateKey || !i18n.exists(`${base}.title`)) {
-                return {title: n.title, message: n.message};
-            }
 
             const values: Record<string, unknown> = {...(n.params ?? {})};
             if (typeof values.amount === "number") values.amount = formatCurrency(values.amount);
@@ -32,6 +30,10 @@ export function useNotificationText() {
             if (typeof values.days === "number") values.count = values.days;
             // Same for the number of open tasks a reassignment handed over.
             if (typeof values.tasks === "number") values.count = values.tasks;
+
+            // Checked with the values, so a title that only has plural forms
+            // (title_one, title_other…) is found too.
+            if (!i18n.exists(`${base}.title`, values)) return {title: n.title, message: n.message};
 
             return {
                 title: t(`${base}.title`, values),

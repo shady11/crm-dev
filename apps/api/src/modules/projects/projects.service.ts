@@ -7,6 +7,7 @@ import {CreateProjectDto} from "@/modules/projects/dto/create-project.dto";
 import {UpdateProjectDto} from "@/modules/projects/dto/update-project.dto";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
+import {activityText} from "@/modules/activities/activity-templates";
 
 @Injectable()
 export class ProjectsService {
@@ -25,6 +26,8 @@ export class ProjectsService {
         action: ActivityAction;
         type: ActivityType;
         title: string;
+        templateKey?: string;
+        templateParams?: Prisma.InputJsonValue;
         metadata?: Prisma.InputJsonValue;
     }) {
         return this.prisma.activity.create({
@@ -35,6 +38,8 @@ export class ProjectsService {
                 action: params.action,
                 type: params.type,
                 title: params.title,
+                templateKey: params.templateKey,
+                templateParams: params.templateParams,
                 metadata: params.metadata,
             },
         });
@@ -170,7 +175,7 @@ export class ProjectsService {
             projectId: created.id,
             action: ActivityAction.CREATED_PROJECT,
             type: ActivityType.PROJECT_CREATED,
-            title: `Project "${created.name}" created`,
+            ...activityText('projectCreated', { name: created.name }),
         });
 
         return created;
@@ -212,7 +217,7 @@ export class ProjectsService {
                 projectId: id,
                 action: ActivityAction.CHANGED_PROJECT_STATUS,
                 type: ActivityType.PROJECT_STATUS_CHANGED,
-                title: `Project "${updated.name}" status changed`,
+                ...activityText('projectStatusChanged', { name: updated.name }),
                 metadata: {fromStatus: existing.status, toStatus: updated.status},
             });
         }
@@ -224,7 +229,7 @@ export class ProjectsService {
                 projectId: id,
                 action: ActivityAction.UPDATED_PROJECT,
                 type: ActivityType.PROJECT_UPDATED,
-                title: `Project "${updated.name}" updated`,
+                ...activityText('projectUpdated', { name: updated.name }),
                 metadata: changes,
             });
         }
@@ -275,7 +280,7 @@ export class ProjectsService {
             actorId: user.id,
             action: ActivityAction.DELETED_PROJECT,
             type: ActivityType.PROJECT_DELETED,
-            title: `Project "${project.name}" deleted`,
+            ...activityText('projectDeleted', { name: project.name }),
             metadata: {projectId: project.id},
         });
 

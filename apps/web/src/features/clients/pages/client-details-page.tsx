@@ -36,6 +36,7 @@ export function ClientDetailsPage() {
     const { formatCurrency } = useCompanyFormatters();
     const { user } = useAuth();
     const canTransferBranch = hasPermission(user, "clients.transfer_branch");
+    const canEdit = hasPermission(user, "clients.edit");
     const { clientId } = useParams<{ clientId: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -88,6 +89,15 @@ export function ClientDetailsPage() {
     if (clientQuery.isLoading) return <PageSkeleton />;
     if (clientQuery.isError || !client) return <PageError onRetry={() => clientQuery.refetch()} />;
 
+    // Owed once the contract is signed and until the sale completes, as in
+    // the receivables export: a reservation can still fall through.
+    const OWING = ["CONTRACT_SIGNED", "ACTIVE"];
+    const totalPaid = client.deals.reduce((sum, deal) => sum + deal.paid, 0);
+    const totalOwed = client.deals
+        .filter((deal) => OWING.includes(deal.status))
+        .reduce((sum, deal) => sum + Math.max(Number(deal.salePrice) - deal.paid, 0), 0);
+    const totalOverdue = client.deals.reduce((sum, deal) => sum + deal.overdue, 0);
+
     return (
         <div className="space-y-6">
             <div className="space-y-3">
@@ -114,10 +124,12 @@ export function ClientDetailsPage() {
                                 {t("moveDialog.title", { ns: "branches" })}
                             </Button>
                         )}
-                        <Button variant="default" onClick={() => setEditOpen(true)}>
-                            <Pen className="size-3"/>
-                            {t("actions.edit", { ns: "common" })}
-                        </Button>
+                        {canEdit && (
+                            <Button variant="default" onClick={() => setEditOpen(true)}>
+                                <Pen className="size-3"/>
+                                {t("actions.edit", { ns: "common" })}
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -177,6 +189,24 @@ export function ClientDetailsPage() {
                         {client.deals.length === 0 ? (
                             <p className="py-6 text-center text-sm text-muted-foreground">{t("detail.noDeals")}</p>
                         ) : (
+                            <>
+                            {/* What the client has paid and still owes across their deals (FIN-12). */}
+                            {(totalPaid !== 0 || totalOwed > 0) && (
+                                <div className="grid grid-cols-3 gap-3 border-b pb-3 pt-1 text-sm">
+                                    <div>
+                                        <p className="text-xs text-muted-foreground">{t("detail.money.paid")}</p>
+                                        <p className="font-medium tabular-nums">{formatCurrency(totalPaid)}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-muted-foreground">{t("detail.money.owed")}</p>
+                                        <p className="font-medium tabular-nums">{formatCurrency(totalOwed)}</p>
+                                    </div>
+                                    <div>
+                                        <p className="text-xs text-muted-foreground">{t("detail.money.overdue")}</p>
+                                        <p className={`font-medium tabular-nums ${totalOverdue > 0 ? "text-rose-600" : ""}`}>{formatCurrency(totalOverdue)}</p>
+                                    </div>
+                                </div>
+                            )}
                             <div className="flex flex-col divide-y">
                                 {client.deals.map((deal) => {
                                     const visual = DEAL_STATUS_VISUALS[deal.status];
@@ -197,11 +227,18 @@ export function ClientDetailsPage() {
                                                     <p className="font-medium">{formatCurrency(Number(deal.salePrice))}</p>
                                                 )}
                                                 <Badge className={`${visual?.bg} text-white`}>{t(DEAL_STATUS_LABEL_KEYS[deal.status])}</Badge>
+                                                {deal.paid !== 0 && (
+                                                    <p className="mt-1 text-xs text-muted-foreground">{t("detail.money.paidOnDeal", { amount: formatCurrency(deal.paid) })}</p>
+                                                )}
+                                                {deal.overdue > 0 && (
+                                                    <p className="text-xs font-medium text-rose-600">{t("detail.money.overdueOnDeal", { amount: formatCurrency(deal.overdue) })}</p>
+                                                )}
                                             </div>
                                         </Link>
                                     );
                                 })}
                             </div>
+                            </>
                         )}
                     </CardContent>
                 </Card>

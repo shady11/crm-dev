@@ -36,11 +36,13 @@ describe('DealExpiryService.expireOverdueReservations', () => {
             },
             $transaction: jest.fn(async (fn: any) => fn(prisma)),
         };
-        const notifications = {create: jest.fn().mockResolvedValue({})};
+        const notifications = {create: jest.fn().mockResolvedValue({}), resolveForEntity: jest.fn().mockResolvedValue(0)};
         const activityService = {expireReservation: jest.fn().mockResolvedValue({})};
 
-        const service = new DealExpiryService(prisma as any, notifications as any, activityService as any);
-        return {service, prisma, notifications, activityService};
+        const moneyHeld = {notifyIfHeld: jest.fn().mockResolvedValue(undefined)};
+
+        const service = new DealExpiryService(prisma as any, notifications as any, activityService as any, moneyHeld as any);
+        return {service, prisma, notifications, activityService, moneyHeld};
     }
 
     it('does nothing when there are no overdue reservations', async () => {
@@ -72,6 +74,13 @@ describe('DealExpiryService.expireOverdueReservations', () => {
             where: {id: 'unit-1', status: UnitStatus.RESERVED},
             data: {status: UnitStatus.AVAILABLE},
         });
+    });
+
+    it('asks Finance to refund whatever the expired reservation still holds', async () => {
+        const {service, moneyHeld} = build([candidate()]);
+        await service.expireOverdueReservations();
+
+        expect(moneyHeld.notifyIfHeld).toHaveBeenCalledWith(expect.objectContaining({id: 'deal-1'}));
     });
 
     it('notifies the deal manager once the reservation is expired', async () => {
@@ -119,5 +128,23 @@ describe('DealExpiryService.expireOverdueReservations', () => {
         await service.expireOverdueReservations();
 
         expect(prisma.$transaction).toHaveBeenCalledTimes(2);
+    });
+
+    it('withdraws a discount request still waiting on a reservation that lapsed', async () => {
+        const {service, notifications} = build([candidate({discountApprovalStatus: 'PENDING', requestedDiscountPercent: 10})]);
+
+        await service.expireOverdueReservations();
+
+        expect(notifications.resolveForEntity).toHaveBeenCalledWith(expect.objectContaining({
+            entityId: 'deal-1', templateKey: 'discountRequestWithdrawn', params: {dealNumber: '2026-0001', percent: 10},
+        }));
+    });
+
+    it('leaves notifications alone for a lapsed reservation with no pending discount', async () => {
+        const {service, notifications} = build([candidate({discountApprovalStatus: 'NONE'})]);
+
+        await service.expireOverdueReservations();
+
+        expect(notifications.resolveForEntity).not.toHaveBeenCalled();
     });
 });

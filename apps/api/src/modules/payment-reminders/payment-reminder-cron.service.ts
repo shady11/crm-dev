@@ -46,8 +46,14 @@ export class PaymentReminderCronService {
 
     const schedules = await this.prisma.paymentSchedule.findMany({
       where: {
+        // OVERDUE rows too: the -7 and -30 day escalations land on
+        // installments the -1 day run has already flipped to OVERDUE.
         status: {
-          in: [PaymentScheduleStatus.PENDING, PaymentScheduleStatus.PARTIAL],
+          in: [
+            PaymentScheduleStatus.PENDING,
+            PaymentScheduleStatus.PARTIAL,
+            PaymentScheduleStatus.OVERDUE,
+          ],
         },
         deletedAt: null,
         deal: { deletedAt: null },

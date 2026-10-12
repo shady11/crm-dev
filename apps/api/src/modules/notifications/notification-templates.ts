@@ -13,6 +13,8 @@ export type NotificationTemplate =
     | {templateKey: "reservationExpiring"; params: {dealNumber: string; date: string}}
     | {templateKey: "paymentReceived"; params: {dealNumber: string; amount: number; currency: string | null}}
     | {templateKey: "refundIssued"; params: {dealNumber: string; amount: number; currency: string | null}}
+    | {templateKey: "moneyHeld"; params: {dealNumber: string; amount: number; currency: string | null}}
+    | {templateKey: "paymentVoided"; params: {dealNumber: string; amount: number; currency: string | null; reason: string}}
     | {templateKey: "paymentDueSoon"; params: {dealNumber: string}}
     | {templateKey: "paymentDueToday"; params: {dealNumber: string}}
     | {templateKey: "paymentOverdue"; params: {dealNumber: string; days: number}}
@@ -21,5 +23,9 @@ export type NotificationTemplate =
     | {templateKey: "taskOverdue"; params: {taskTitle: string}}
     | {templateKey: "taskEscalated"; params: {taskTitle: string; days: number}}
     | {templateKey: "documentUploaded"; params: {dealNumber: string; fileName: string}}
+    | {templateKey: "discountApprovalReminder"; params: {dealNumber: string; percent: number; days: number}}
+    | {templateKey: "discountRequestApproved"; params: {dealNumber: string; percent: number; byName: string}}
+    | {templateKey: "discountRequestRejected"; params: {dealNumber: string; percent: number; byName: string}}
+    | {templateKey: "discountRequestWithdrawn"; params: {dealNumber: string; percent: number}}
     | {templateKey: "leadReassigned"; params: {leadName: string; byName: string; tasks: number}}
     | {templateKey: "dealReassigned"; params: {dealNumber: string; byName: string; tasks: number}};

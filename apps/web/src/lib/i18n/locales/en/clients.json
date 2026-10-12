@@ -71,7 +71,14 @@
     "updateSuccessTitle": "Successfully updated",
     "updateSuccessDescription": "The client has been updated.",
     "updateErrorTitle": "Failed to update client",
-    "updateErrorDescription": "Please try again."
+    "updateErrorDescription": "Please try again.",
+    "money": {
+      "paid": "Paid",
+      "owed": "Still owed",
+      "overdue": "Overdue",
+      "paidOnDeal": "Paid {{amount}}",
+      "overdueOnDeal": "Overdue {{amount}}"
+    }
   },
   "toasts": {
     "createSuccessTitle": "Successfully created",

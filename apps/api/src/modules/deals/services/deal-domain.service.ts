@@ -215,6 +215,21 @@ export class DealDomainService {
         }
     }
 
+    /**
+     * FIN-9: money in from the reservation onwards - a further deposit on
+     * booking day, the first payment at signing - not only once the deal is
+     * ACTIVE. Money taken before activation isn't tied to an installment; the
+     * schedule generated at activation spreads only what's left. A refund
+     * wherever the client's money may be held, including after the
+     * reservation ends cancelled or expired. A COMPLETED deal is settled and
+     * stays that way.
+     */
+    ensureCanRecordPayment(deal: Deal, isRefund: boolean): void {
+        this.ensureStatus(deal, isRefund
+            ? [...this.activeStatuses, DealStatus.CANCELLED, DealStatus.EXPIRED]
+            : this.activeStatuses);
+    }
+
     ensureCanCancel(deal: Deal): void {
         this.ensureStatus(deal, this.activeStatuses);
     }

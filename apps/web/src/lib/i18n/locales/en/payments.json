@@ -20,5 +20,43 @@
       "paid": "Paid",
       "overdue": "Overdue"
     }
+  },
+  "page": {
+    "title": "Payments",
+    "subtitle": "Every payment and refund across deals, for reconciling against the bank and the cash book.",
+    "exportPayments": "Export to Excel",
+    "exportReceivables": "Receivables (Excel)",
+    "exportError": "Could not prepare the file. Please try again.",
+    "period": {
+      "thisMonth": "This month",
+      "lastMonth": "Last month",
+      "last30Days": "Last 30 days",
+      "custom": "Custom period"
+    },
+    "allMethods": "All methods",
+    "allTypes": "All types",
+    "searchPlaceholder": "Deal, client or reference",
+    "totals": {
+      "received": "Received",
+      "refunded": "Refunded",
+      "net": "Net",
+      "count": "Payments"
+    },
+    "table": {
+      "date": "Date",
+      "deal": "Deal",
+      "unit": "Unit",
+      "type": "Type",
+      "method": "Method",
+      "recordedBy": "Recorded by",
+      "amount": "Amount",
+      "receipt": "Receipt"
+    },
+    "emptyTitle": "No payments in this period",
+    "emptyDescription": "Try another period or clear the filters."
+  },
+  "receipt": {
+    "download": "Receipt {{number}}",
+    "error": "Could not prepare the receipt. Please try again."
   }
 }

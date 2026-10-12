@@ -2,7 +2,7 @@ import {ForbiddenException} from '@nestjs/common';
 import {DealStatus, PaymentMethod, PaymentScheduleStatus, PaymentType, Prisma} from '@/generated/prisma/client';
 import {PaymentService} from './payment.service';
 import {DealDomainService} from '../deal-domain.service';
-import {DealNotFoundException, PaymentExceedsBalanceException, RefundExceedsPaidException} from '../../exceptions';
+import {DealNotFoundException, PaymentDateInFutureException, PaymentExceedsBalanceException, RefundExceedsPaidException} from '../../exceptions';
 
 /**
  * Recording a payment/refund is where real money changes state: it must
@@ -71,10 +71,13 @@ describe('PaymentService.create', () => {
         const dealsService = {tryCompleteWithinTransaction: jest.fn().mockResolvedValue(undefined)};
         const notifications = {create: jest.fn().mockResolvedValue({})};
 
+        const receiptNumbers = {next: jest.fn().mockResolvedValue('R-2026-0042')};
+
         const service = new PaymentService(
             prisma as any, mapper as any, domain, activityService as any, dealsService as any, notifications as any,
+            receiptNumbers as any,
         );
-        return {service, prisma, activityService, dealsService, notifications};
+        return {service, prisma, activityService, dealsService, notifications, receiptNumbers};
     }
 
     const paymentDto = (overrides: Record<string, unknown> = {}) => ({
@@ -97,9 +100,57 @@ describe('PaymentService.create', () => {
         await expect(service.create(user, 'deal-1', paymentDto())).rejects.toThrow(DealNotFoundException);
     });
 
-    it('rejects recording a payment on a deal that is not ACTIVE', async () => {
-        const {service} = build({deal: {status: DealStatus.RESERVED}});
-        await expect(service.create(user, 'deal-1', paymentDto())).rejects.toThrow();
+    it.each([DealStatus.RESERVED, DealStatus.CONTRACT_SIGNED])(
+        'accepts money on a %s deal before activation, outside any schedule and without completing it',
+        async (status) => {
+            const {service, prisma, dealsService} = build({deal: {status}, totalPaid: 0});
+
+            await service.create(user, 'deal-1', paymentDto({amount: 500}));
+
+            expect(prisma.payment.create).toHaveBeenCalledWith(
+                expect.objectContaining({data: expect.objectContaining({amount: new Prisma.Decimal(500)})}),
+            );
+            expect(prisma.paymentSchedule.update).not.toHaveBeenCalled();
+            expect(dealsService.tryCompleteWithinTransaction).toHaveBeenCalled(); // a no-op until ACTIVE
+        },
+    );
+
+    it('still refuses money on a completed deal', async () => {
+        const {service, prisma} = build({deal: {status: DealStatus.COMPLETED}, totalPaid: 1000});
+
+        await expect(service.create(user, 'deal-1', paymentDto({amount: 1}))).rejects.toThrow();
+        expect(prisma.payment.create).not.toHaveBeenCalled();
+    });
+
+    it.each([DealStatus.CANCELLED, DealStatus.EXPIRED, DealStatus.RESERVED])(
+        'records a refund of the deposit on a %s deal, without touching a schedule or completing it',
+        async (status) => {
+            const {service, prisma, dealsService, activityService} = build({deal: {status}, totalPaid: 500});
+
+            await service.create(user, 'deal-1', paymentDto({amount: 500, paymentType: PaymentType.REFUND}));
+
+            expect(prisma.payment.create).toHaveBeenCalledWith(
+                expect.objectContaining({data: expect.objectContaining({amount: new Prisma.Decimal(-500)})}),
+            );
+            expect(activityService.paymentRefunded).toHaveBeenCalled();
+            expect(prisma.paymentSchedule.update).not.toHaveBeenCalled();
+            expect(dealsService.tryCompleteWithinTransaction).not.toHaveBeenCalled();
+        },
+    );
+
+    it('rejects a forward payment on a cancelled deal', async () => {
+        const {service, prisma} = build({deal: {status: DealStatus.CANCELLED}, totalPaid: 500});
+
+        await expect(service.create(user, 'deal-1', paymentDto({paymentType: PaymentType.INSTALLMENT}))).rejects.toThrow();
+        expect(prisma.payment.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects a refund on a completed deal', async () => {
+        const {service} = build({deal: {status: DealStatus.COMPLETED}, totalPaid: 1000});
+
+        await expect(
+            service.create(user, 'deal-1', paymentDto({amount: 100, paymentType: PaymentType.REFUND})),
+        ).rejects.toThrow();
     });
 
     it('rejects a payment that would overpay the deal balance', async () => {
@@ -187,6 +238,75 @@ describe('PaymentService.create', () => {
             where: {id: 'sch-1'},
             data: {paidAmount: new Prisma.Decimal(100), status: PaymentScheduleStatus.PARTIAL},
         });
+    });
+
+    it('refuses a payment dated after today, before touching the deal', async () => {
+        const {service, prisma} = build({totalPaid: 0});
+        const tomorrow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
+
+        await expect(service.create(user, 'deal-1', paymentDto({paidAt: tomorrow}))).rejects.toBeInstanceOf(PaymentDateInFutureException);
+        expect(prisma.payment.create).not.toHaveBeenCalled();
+    });
+
+    it('accepts a payment dated today', async () => {
+        const {service, prisma} = build({totalPaid: 0});
+
+        await service.create(user, 'deal-1', paymentDto({paidAt: new Date().toISOString()}));
+
+        expect(prisma.payment.create).toHaveBeenCalled();
+    });
+
+    it('keeps a part-paid overdue installment OVERDUE, so the remainder still counts as overdue', async () => {
+        const {service, prisma} = build({
+            totalPaid: 0,
+            schedules: [
+                schedule({id: 'sch-1', status: PaymentScheduleStatus.OVERDUE}),
+                schedule({id: 'sch-2', order: 2}),
+            ],
+        });
+
+        await service.create(user, 'deal-1', paymentDto({amount: 100}));
+
+        expect((prisma.paymentSchedule.update as jest.Mock).mock.calls[0][0]).toEqual({
+            where: {id: 'sch-1'},
+            data: {paidAmount: new Prisma.Decimal(100), status: PaymentScheduleStatus.OVERDUE},
+        });
+    });
+
+    it('marks an overdue installment PAID once it is covered in full', async () => {
+        const {service, prisma} = build({
+            totalPaid: 0,
+            schedules: [schedule({id: 'sch-1', status: PaymentScheduleStatus.OVERDUE})],
+        });
+
+        await service.create(user, 'deal-1', paymentDto({amount: 300}));
+
+        expect((prisma.paymentSchedule.update as jest.Mock).mock.calls[0][0]).toEqual({
+            where: {id: 'sch-1'},
+            data: {paidAmount: new Prisma.Decimal(300), status: PaymentScheduleStatus.PAID},
+        });
+    });
+
+    it('gives incoming money a receipt number, inside the payment\'s transaction', async () => {
+        const {service, prisma, receiptNumbers} = build({totalPaid: 0});
+
+        await service.create(user, 'deal-1', paymentDto({paymentType: PaymentType.INSTALLMENT}));
+
+        expect(receiptNumbers.next).toHaveBeenCalledWith(prisma, 'company-1');
+        expect(prisma.payment.create).toHaveBeenCalledWith(
+            expect.objectContaining({data: expect.objectContaining({receiptNumber: 'R-2026-0042'})}),
+        );
+    });
+
+    it('gives a refund no receipt number', async () => {
+        const {service, prisma, receiptNumbers} = build({totalPaid: 300});
+
+        await service.create(user, 'deal-1', paymentDto({amount: 100, paymentType: PaymentType.REFUND}));
+
+        expect(receiptNumbers.next).not.toHaveBeenCalled();
+        expect(prisma.payment.create).toHaveBeenCalledWith(
+            expect.objectContaining({data: expect.objectContaining({receiptNumber: null})}),
+        );
     });
 
     it('never touches payment-schedule rows for a refund', async () => {

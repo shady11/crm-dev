@@ -5,6 +5,7 @@ import { ActivityAction, ActivityType, DocumentType } from '@/generated/prisma/c
 import { AuthUser } from '@/common/types/auth-user.type';
 
 import { UpsertDocumentTemplateDto } from './dto/upsert-document-template.dto';
+import { activityText } from '@/modules/activities/activity-templates';
 
 @Injectable()
 export class DocumentTemplatesService {
@@ -79,7 +80,7 @@ export class DocumentTemplatesService {
         userId: user.id,
         action: ActivityAction.UPDATED_DOCUMENT_TEMPLATE,
         type: ActivityType.DOCUMENT_TEMPLATE_UPDATED,
-        title: `Document template "${created.name}" updated`,
+        ...activityText('documentTemplateUpdated', { name: created.name }),
         metadata: { documentTemplateId: created.id, documentType: created.type, version: created.version },
       },
     });

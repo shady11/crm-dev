@@ -6,6 +6,7 @@ import {CreateBranchDto} from "./dto/create-branch.dto";
 import {UpdateBranchDto} from "./dto/update-branch.dto";
 import {QueryBranchesDto} from "./dto/query-branches.dto";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
+import {activityText} from "@/modules/activities/activity-templates";
 
 const BRANCH_SELECT = {
     id: true,
@@ -31,6 +32,8 @@ export class BranchesService {
         action: ActivityAction;
         type: ActivityType;
         title: string;
+        templateKey?: string;
+        templateParams?: Prisma.InputJsonValue;
         metadata?: Prisma.InputJsonValue;
     }) {
         return this.prisma.activity.create({
@@ -41,6 +44,8 @@ export class BranchesService {
                 action: params.action,
                 type: params.type,
                 title: params.title,
+                templateKey: params.templateKey,
+                templateParams: params.templateParams,
                 metadata: params.metadata,
             },
         });
@@ -169,7 +174,7 @@ export class BranchesService {
             branchId: created.id,
             action: ActivityAction.CREATED_BRANCH,
             type: ActivityType.BRANCH_CREATED,
-            title: `Branch "${created.name}" created`,
+            ...activityText('branchCreated', { name: created.name }),
         });
 
         return created;
@@ -202,7 +207,7 @@ export class BranchesService {
                 branchId: id,
                 action: ActivityAction.UPDATED_BRANCH,
                 type: ActivityType.BRANCH_UPDATED,
-                title: `Branch "${updated.name}" updated`,
+                ...activityText('branchUpdated', { name: updated.name }),
                 metadata: changes,
             });
         }
@@ -244,7 +249,7 @@ export class BranchesService {
             branchId: id,
             action: ActivityAction.DEACTIVATED_BRANCH,
             type: ActivityType.BRANCH_DEACTIVATED,
-            title: `Branch "${updated.name}" deactivated`,
+            ...activityText('branchDeactivated', { name: updated.name }),
         });
 
         return updated;
@@ -269,7 +274,7 @@ export class BranchesService {
             branchId: id,
             action: ActivityAction.REACTIVATED_BRANCH,
             type: ActivityType.BRANCH_REACTIVATED,
-            title: `Branch "${updated.name}" reactivated`,
+            ...activityText('branchReactivated', { name: updated.name }),
         });
 
         return updated;

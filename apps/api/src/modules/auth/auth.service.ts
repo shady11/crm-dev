@@ -9,6 +9,7 @@ import {AuditLogService} from "@/modules/audit-log/audit-log.service";
 import {ChangePasswordDto} from "@/modules/auth/dto/change-password.dto";
 import {UpdateOwnProfileDto} from "@/modules/auth/dto/update-own-profile.dto";
 import {TotpService} from "@/modules/auth/totp.service";
+import {activityText} from "@/modules/activities/activity-templates";
 
 // Failed logins before an account is locked, and how long the lock lasts.
 // Configurable per deployment since a small pilot team behind one shared
@@ -200,7 +201,7 @@ export class AuthService {
                     targetUserId: record.id,
                     action: ActivityAction.CHANGED_PASSWORD,
                     type: ActivityType.USER_PASSWORD_CHANGED,
-                    title: `"${record.fullName}" changed their password`,
+                    ...activityText('userChangedOwnPassword', { name: record.fullName }),
                 },
             });
         }

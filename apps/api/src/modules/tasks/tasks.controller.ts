@@ -29,6 +29,13 @@ export class TasksController {
         return this.tasksService.getStatusSummary(user, branchId);
     }
 
+    // Declared before ":id" so "assignees" isn't read as a task id.
+    @RequirePermissions("tasks.view")
+    @Get("assignees")
+    findAssignees(@CurrentUser() user: AuthUser) {
+        return this.tasksService.findAssignees(user);
+    }
+
     @RequirePermissions("tasks.view")
     @Get(":id")
     findOne(@CurrentUser() user: AuthUser, @Param("id") id: string) {

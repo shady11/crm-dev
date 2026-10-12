@@ -21,6 +21,7 @@ import {TaskNotFoundException} from "./exceptions/task-not-found.exception";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
 import {hasPermission} from "@/common/utils/permissions.util";
+import {activityText} from "@/modules/activities/activity-templates";
 
 const TERMINAL_STATUSES: TaskStatus[] = [TaskStatus.DONE, TaskStatus.CANCELLED];
 
@@ -46,6 +47,8 @@ export class TasksService {
         action: ActivityAction;
         type: ActivityType;
         title: string;
+        templateKey?: string;
+        templateParams?: Prisma.InputJsonValue;
         metadata?: Prisma.InputJsonValue;
     }) {
         return this.prisma.activity.create({
@@ -56,6 +59,8 @@ export class TasksService {
                 action: params.action,
                 type: params.type,
                 title: params.title,
+                templateKey: params.templateKey,
+                templateParams: params.templateParams,
                 metadata: params.metadata,
             },
         });
@@ -198,7 +203,7 @@ export class TasksService {
             taskId: task.id,
             action: ActivityAction.CREATED_TASK,
             type: ActivityType.TASK_CREATED,
-            title: `Task "${task.title}" created`,
+            ...activityText('taskCreated', { task: task.title }),
         });
 
         return task;
@@ -217,7 +222,9 @@ export class TasksService {
 
         let branchId: string | null | undefined;
 
-        if (dto.assignedToId) {
+        // Only when it changes: editing the title of a task still held by
+        // someone since deactivated shouldn't fail on the unchanged assignee.
+        if (dto.assignedToId && dto.assignedToId !== existing.assignedToId) {
             const assignee = await this.ensureAssigneeAssignable(dto.assignedToId, user);
             // Reassigning to someone in a different branch moves the task
             // with them — there's no dedicated task-handoff story like leads/
@@ -272,7 +279,7 @@ export class TasksService {
                 taskId: id,
                 action: ActivityAction.REASSIGNED,
                 type: ActivityType.TASK_REASSIGNED,
-                title: `Task "${task.title}" reassigned`,
+                ...activityText('taskReassigned', { task: task.title }),
                 metadata: {fromAssignedToId: existing.assignedToId, toAssignedToId: task.assignedToId},
             });
         }
@@ -284,7 +291,7 @@ export class TasksService {
                 taskId: id,
                 action: task.status === TaskStatus.DONE ? ActivityAction.COMPLETED_TASK : ActivityAction.CHANGED_TASK_STATUS,
                 type: task.status === TaskStatus.DONE ? ActivityType.TASK_COMPLETED : ActivityType.TASK_STATUS_CHANGED,
-                title: task.status === TaskStatus.DONE ? `Task "${task.title}" completed` : `Task "${task.title}" status changed`,
+                ...activityText(task.status === TaskStatus.DONE ? 'taskCompleted' : 'taskStatusChanged', { task: task.title }),
                 metadata: {fromStatus: existing.status, toStatus: task.status},
             });
         }
@@ -296,7 +303,7 @@ export class TasksService {
                 taskId: id,
                 action: ActivityAction.UPDATED_TASK,
                 type: ActivityType.TASK_UPDATED,
-                title: `Task "${task.title}" updated`,
+                ...activityText('taskUpdated', { task: task.title }),
                 metadata: changes,
             });
         }
@@ -326,7 +333,7 @@ export class TasksService {
                 taskId: id,
                 action: task.status === TaskStatus.DONE ? ActivityAction.COMPLETED_TASK : ActivityAction.CHANGED_TASK_STATUS,
                 type: task.status === TaskStatus.DONE ? ActivityType.TASK_COMPLETED : ActivityType.TASK_STATUS_CHANGED,
-                title: task.status === TaskStatus.DONE ? `Task "${task.title}" completed` : `Task "${task.title}" status changed`,
+                ...activityText(task.status === TaskStatus.DONE ? 'taskCompleted' : 'taskStatusChanged', { task: task.title }),
                 metadata: {fromStatus: existing.status, toStatus: task.status},
             });
         }
@@ -352,7 +359,7 @@ export class TasksService {
             taskId: id,
             action: ActivityAction.DELETED_TASK,
             type: ActivityType.TASK_DELETED,
-            title: `Task "${existing.title}" deleted`,
+            ...activityText('taskDeleted', { task: existing.title }),
         });
 
         return { success: true };
@@ -390,7 +397,7 @@ export class TasksService {
             taskId: id,
             action: ActivityAction.RESTORED_TASK,
             type: ActivityType.TASK_RESTORED,
-            title: `Task "${task.title}" restored`,
+            ...activityText('taskRestored', { task: task.title }),
         });
 
         return task;
@@ -501,7 +508,7 @@ export class TasksService {
                 taskId: task.id,
                 action: ActivityAction.REASSIGNED,
                 type: ActivityType.TASK_REASSIGNED,
-                title: `Task "${task.title}" reassigned`,
+                ...activityText('taskReassigned', { task: task.title }),
                 metadata: {fromAssignedToId: params.fromUserId, toAssignedToId: params.toUserId, ...params.link},
             })),
         });
@@ -581,7 +588,7 @@ export class TasksService {
             taskId: task.id,
             action: ActivityAction.CREATED_TASK,
             type: ActivityType.TASK_CREATED,
-            title: `Task "${task.title}" auto-created`,
+            ...activityText('taskAutoCreated', { task: task.title }),
         });
 
         return task;
@@ -591,17 +598,50 @@ export class TasksService {
      * A branch-scoped actor may only assign a task within their own branch —
      * same reasoning as LeadsService.ensureManagerAssignable.
      */
+    /**
+     * Who the caller may put a task in the name of: active people in their
+     * company, or only in their own branch for a branch-scoped role. One
+     * definition for both the check below and findAssignees, so the pickers
+     * never offer someone the server would refuse.
+     */
+    private assignableUsersWhere(user: AuthUser): Prisma.UserWhereInput {
+        return {
+            companyId: user.companyId,
+            deletedAt: null,
+            isActive: true,
+            isSuperAdmin: false,
+            ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
+        };
+    }
+
+    /**
+     * The task assignee picker and the tasks list's "assigned to" filter.
+     * Readable with tasks.view alone, unlike GET /users (users.view), which
+     * a Sales Manager or Finance doesn't have.
+     */
+    async findAssignees(user: AuthUser) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+
+        return this.prisma.user.findMany({
+            where: this.assignableUsersWhere(user),
+            orderBy: { fullName: "asc" },
+            select: { id: true, fullName: true, branchId: true },
+        });
+    }
+
     private async ensureAssigneeAssignable(assignedToId: string, user: AuthUser) {
         const assignee = await this.prisma.user.findFirst({
-            where: {
-                id: assignedToId,
-                companyId: user.companyId,
-                ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
-            },
+            where: { id: assignedToId, ...this.assignableUsersWhere(user) },
         });
 
         if (!assignee) {
-            throw new BadRequestException("Assignee must belong to your company.");
+            throw new BadRequestException(
+                user.isBranchScoped
+                    ? "Assignee must be an active member of your branch."
+                    : "Assignee must be an active member of your company.",
+            );
         }
 
         return assignee;

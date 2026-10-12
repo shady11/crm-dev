@@ -7,6 +7,7 @@ import {UpdateFloorDto} from "./dto/update-floor.dto";
 import {QueryFloorsDto} from "./dto/query-floors.dto";
 import {CreateFloorsBulkDto} from "@/modules/floors/dto/create-floors-bulk.dto";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
+import {activityText} from "@/modules/activities/activity-templates";
 
 @Injectable()
 export class FloorsService {
@@ -24,6 +25,8 @@ export class FloorsService {
         action: ActivityAction;
         type: ActivityType;
         title: string;
+        templateKey?: string;
+        templateParams?: Prisma.InputJsonValue;
         metadata?: Prisma.InputJsonValue;
     }) {
         return this.prisma.activity.create({
@@ -34,6 +37,8 @@ export class FloorsService {
                 action: params.action,
                 type: params.type,
                 title: params.title,
+                templateKey: params.templateKey,
+                templateParams: params.templateParams,
                 metadata: params.metadata,
             },
         });
@@ -218,7 +223,7 @@ export class FloorsService {
             floorId: created.id,
             action: ActivityAction.CREATED_FLOOR,
             type: ActivityType.FLOOR_CREATED,
-            title: `Floor ${created.number} created`,
+            ...activityText('floorCreated', { floor: created.number }),
         });
 
         return created;
@@ -250,7 +255,7 @@ export class FloorsService {
             actorId: user.id,
             action: ActivityAction.IMPORTED_FLOORS,
             type: ActivityType.FLOORS_IMPORTED,
-            title: `${created.length} floors created on entrance`,
+            ...activityText('floorsCreated', { count: created.length }),
             metadata: {entranceId, blockId: entrance.blockId, count: created.length},
         });
 
@@ -306,7 +311,7 @@ export class FloorsService {
                 floorId: id,
                 action: ActivityAction.UPDATED_FLOOR,
                 type: ActivityType.FLOOR_UPDATED,
-                title: `Floor ${updated.number} updated`,
+                ...activityText('floorUpdated', { floor: updated.number }),
                 metadata: changes,
             });
         }
@@ -394,7 +399,7 @@ export class FloorsService {
             floorId: newFloor.id,
             action: ActivityAction.CREATED_FLOOR,
             type: ActivityType.FLOOR_CREATED,
-            title: `Floor ${newFloor.number} created (duplicated from floor ${floor.number})`,
+            ...activityText('floorDuplicated', { floor: newFloor.number, source: floor.number }),
             metadata: {duplicatedFromFloorId: floor.id},
         });
 
@@ -471,7 +476,7 @@ export class FloorsService {
             actorId: user.id,
             action: ActivityAction.DELETED_FLOOR,
             type: ActivityType.FLOOR_DELETED,
-            title: `Floor ${floor.number} deleted`,
+            ...activityText('floorDeleted', { floor: floor.number }),
             metadata: {floorId: floor.id},
         });
 

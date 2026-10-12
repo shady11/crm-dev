@@ -29,10 +29,11 @@ import {Field, FieldDescription, FieldGroup, FieldLabel, FieldSet} from "@/compo
 import {DealPaymentScheduleCard} from "@/features/deals/components/deal-details/deal-payment-schedule-card.tsx";
 import {DealPaymentsHistoryCard} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
 import {NumberInput, NumberInputGroup, NumberInputInput} from "@/components/ui/number-input";
-import type {PaymentMethod, PaymentType} from "../api/deals.api";
+import type {DealDetails, PaymentMethod, PaymentType} from "../api/deals.api";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {DealTasksCard} from "@/features/deals/components/deal-tasks-card.tsx";
 import {DealDiscountBanner} from "@/features/deals/components/deal-details/deal-discount-banner.tsx";
+import {DealMoneyHeldBanner} from "@/features/deals/components/deal-details/deal-money-held-banner.tsx";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
 import {useEntityDocuments} from "@/features/documents/hooks/use-entity-documents.ts";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
@@ -42,6 +43,7 @@ import {DealDetailsSidebar} from "@/features/deals/components/deal-details/deal-
 import {useTranslation} from "react-i18next";
 import {PAYMENT_METHOD_LABEL_KEYS, PAYMENT_TYPE_LABEL_KEYS} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useReservationPolicy} from "@/features/deals/hooks/use-reservation-policy.ts";
 import {reservationDateBounds} from "@/features/deals/utils/reservation-dates.ts";
 import {hasPermission} from "@/features/auth/access";
@@ -65,6 +67,7 @@ function TabCount({ count }: { count: number }) {
 
 export function DealDetailsPage() {
     const { t, i18n } = useTranslation(["deals", "payments"]);
+    const { formatCurrency } = useCompanyFormatters();
     const { dealId } = useParams<{ dealId: string }>();
     const navigate = useNavigate();
     const dealQuery = useDeal(dealId);
@@ -76,6 +79,10 @@ export function DealDetailsPage() {
     const canGenerateDocuments = hasPermission(user, "documents.generate");
     const canDecideDiscount = hasPermission(user, "deals.approve_discount");
     const canCancel = hasPermission(user, "deals.cancel");
+    const canManagePayments = hasPermission(user, "deals.manage_payments");
+    const canVoidPayments = hasPermission(user, "deals.void_payments");
+    // Extend, sign, activate and complete: the deal's own lifecycle.
+    const canManage = hasPermission(user, "deals.manage");
     const [rejectOpen, setRejectOpen] = useState(false);
     const [activateOpen, setActivateOpen] = useState(false);
     const [rejectReason, setRejectReason] = useState("");
@@ -102,6 +109,9 @@ export function DealDetailsPage() {
     const [paymentType, setPaymentType] = useState<PaymentType | "">("");
     const [paidAt, setPaidAt] = useState([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
     const [reference, setReference] = useState("");
+    const [paymentNote, setPaymentNote] = useState("");
+    const [voidTarget, setVoidTarget] = useState<DealDetails["payments"][number] | null>(null);
+    const [voidReason, setVoidReason] = useState("");
 
     const [reassignOpen, setReassignOpen] = useState(false);
 
@@ -120,6 +130,38 @@ export function DealDetailsPage() {
     const remaining = Math.max(deal.salePrice - totalPaid, 0);
 
     const visual = DEAL_STATUS_VISUALS[deal.status];
+
+    // Money comes in from the reservation onwards (FIN-9); once the deal is
+    // cancelled or expired only a refund can be recorded. Mirrors
+    // DealDomainService.ensureCanRecordPayment.
+    const takesPayments = ["RESERVED", "CONTRACT_SIGNED", "ACTIVE"].includes(deal.status);
+    const refundOnly = !takesPayments;
+    const canRecordRefund = canManagePayments && totalPaid > 0
+        && ["RESERVED", "CONTRACT_SIGNED", "CANCELLED", "EXPIRED"].includes(deal.status);
+    const openRefundDialog = () => {
+        setPaymentType("REFUND");
+        setPaymentAmount(totalPaid);
+        setPaymentOpen(true);
+    };
+
+    // The cashier's usual case is the next installment, so the form starts
+    // there: its unpaid part, capped at what's left on the deal.
+    const nextInstallment = deal.paymentSchedules.find((s) => s.status !== "PAID");
+    const nextInstallmentDue = nextInstallment ? Math.max(nextInstallment.amount - nextInstallment.paidAmount, 0) : 0;
+    const openPaymentDialog = () => {
+        // Before activation there's no schedule to suggest an amount from:
+        // the cashier types it. On a reservation it's usually more deposit.
+        if (deal.status !== "ACTIVE") {
+            setPaymentAmount(0);
+            setPaymentType(deal.status === "RESERVED" ? "DEPOSIT" : "INSTALLMENT");
+            setPaymentOpen(true);
+            return;
+        }
+        const amount = Math.min(nextInstallmentDue || remaining, remaining);
+        setPaymentAmount(Math.round(amount * 100) / 100);
+        setPaymentType(amount > 0 && amount >= remaining ? "FINAL" : "INSTALLMENT");
+        setPaymentOpen(true);
+    };
 
     // Mirrors DealDomainService.ensureCanExtendReservation: a limited number
     // of extensions, each to a later date within the company's maximum term.
@@ -148,7 +190,9 @@ export function DealDetailsPage() {
     });
 
     const paymentTypeCollection = createListCollection({
-        items: Object.entries(PAYMENT_TYPE_LABEL_KEYS).map(([value, key]) => ({ label: t(key), value })),
+        items: Object.entries(PAYMENT_TYPE_LABEL_KEYS)
+            .filter(([value]) => !refundOnly || value === "REFUND")
+            .map(([value, key]) => ({ label: t(key), value })),
     });
 
     const isOpen = ["RESERVED", "CONTRACT_SIGNED", "ACTIVE"].includes(deal.status);
@@ -211,7 +255,7 @@ export function DealDetailsPage() {
                         <ArrowLeft className="size-3"/>
                         {t("detailsPage.back")}
                     </Button>
-                    {deal.status === "RESERVED" && (
+                    {deal.status === "RESERVED" && canManage && (
                         <>
                             <Button
                                 variant="secondary"
@@ -230,22 +274,22 @@ export function DealDetailsPage() {
                             </Button>
                         </>
                     )}
-                    {deal.status === "CONTRACT_SIGNED" && (
+                    {deal.status === "CONTRACT_SIGNED" && canManage && (
                         <Button onClick={() => setActivateOpen(true)}>
                             {t("detailsPage.activateDeal")}
                         </Button>
                     )}
-                    {deal.status === "ACTIVE" && (
+                    {deal.status === "ACTIVE" && canManagePayments && (
                         deal.paymentSchedules.length === 0 ? (
                             <Button variant="secondary" onClick={() => setScheduleOpen(true)}>
                                 {t("paymentSchedule.generate")}
                             </Button>
                         ) : null
                     )}
-                    {deal.status === "ACTIVE" && (
-                        <Button onClick={() => setPaymentOpen(true)}>{t("paymentsHistory.record")}</Button>
+                    {deal.status === "ACTIVE" && canManagePayments && (
+                        <Button onClick={openPaymentDialog}>{t("paymentsHistory.record")}</Button>
                     )}
-                    {isOpen && (canCancel || deal.status === "ACTIVE") && (
+                    {isOpen && (canCancel || (deal.status === "ACTIVE" && canManage)) && (
                         <Menu>
                             <MenuTrigger asChild>
                                 <Button variant="ghost" size="icon-sm" aria-label={t("detailsPage.moreActions")}>
@@ -253,12 +297,12 @@ export function DealDetailsPage() {
                                 </Button>
                             </MenuTrigger>
                             <MenuContent>
-                                {deal.status === "ACTIVE" && (
+                                {deal.status === "ACTIVE" && canManage && (
                                     <MenuItem value="complete" onSelect={() => actions.complete.mutate()}>
                                         {t("detailsPage.markCompleted")}
                                     </MenuItem>
                                 )}
-                                {deal.status === "ACTIVE" && canCancel && <MenuSeparator />}
+                                {deal.status === "ACTIVE" && canManage && canCancel && <MenuSeparator />}
                                 {canCancel && (
                                     <MenuItem value="cancel" variant="destructive" onSelect={() => setCancelOpen(true)}>
                                         {t("detailsPage.cancelDeal")}
@@ -278,6 +322,13 @@ export function DealDetailsPage() {
                 isDeciding={actions.approveDiscount.isPending || actions.rejectDiscount.isPending}
                 onApprove={() => actions.approveDiscount.mutate()}
                 onReject={() => setRejectOpen(true)}
+            />
+
+            <DealMoneyHeldBanner
+                status={deal.status}
+                totalPaid={totalPaid}
+                canRefund={canManagePayments}
+                onRecordRefund={openRefundDialog}
             />
 
             <DealKeyFigures deal={deal} totalPaid={totalPaid} remaining={remaining} />
@@ -306,12 +357,19 @@ export function DealDetailsPage() {
                             <DealPaymentScheduleCard
                                 status={deal.status}
                                 schedules={deal.paymentSchedules}
-                                onGenerateSchedule={() => setScheduleOpen(true)}
+                                onGenerateSchedule={canManagePayments ? () => setScheduleOpen(true) : undefined}
                             />
                             <DealPaymentsHistoryCard
                                 payments={deal.payments}
-                                canRecordPayment={deal.status === "ACTIVE"}
-                                onRecordPayment={() => setPaymentOpen(true)}
+                                canRecordPayment={takesPayments && canManagePayments}
+                                onRecordPayment={openPaymentDialog}
+                                canRecordRefund={canRecordRefund}
+                                onRecordRefund={openRefundDialog}
+                                dealId={deal.id}
+                                canIssueReceipts={canManagePayments}
+                                canVoid={canVoidPayments}
+                                onVoid={(payment) => { setVoidReason(""); setVoidTarget(payment); }}
+                                voidedPayments={deal.voidedPayments}
                             />
                         </TabsContent>
 
@@ -638,10 +696,49 @@ export function DealDetailsPage() {
                 </DialogContent>
             </Dialog>
 
+            {/* Void payment dialog (FIN-3) */}
+            <Dialog open={voidTarget !== null} onOpenChange={({ open }) => { if (!open) setVoidTarget(null); }}>
+                <DialogContent size="sm">
+                    <DialogHeader
+                        title={t("detailsPage.voidDialogTitle", { amount: voidTarget ? formatCurrency(voidTarget.amount) : "" })}
+                        description={t("detailsPage.voidDialogDescription")}
+                    />
+                    <DialogBody className="flex flex-col gap-3">
+                        <Field>
+                            <FieldLabel>{t("detailsPage.voidReason")}</FieldLabel>
+                            <Textarea
+                                rows={3}
+                                maxLength={500}
+                                placeholder={t("detailsPage.voidReasonPlaceholder")}
+                                value={voidReason}
+                                onChange={(e) => setVoidReason(e.target.value)}
+                            />
+                            <FieldDescription>{t("detailsPage.voidReasonHint")}</FieldDescription>
+                        </Field>
+                    </DialogBody>
+                    <DialogFooter>
+                        <Button variant="secondary" onClick={() => setVoidTarget(null)}>{t("detailsPage.back")}</Button>
+                        <Button
+                            variant="destructive"
+                            disabled={voidReason.trim().length < 5 || actions.voidPayment.isPending}
+                            isLoading={actions.voidPayment.isPending}
+                            onClick={() =>
+                                voidTarget && actions.voidPayment.mutate(
+                                    { paymentId: voidTarget.id, reason: voidReason.trim() },
+                                    { onSuccess: () => setVoidTarget(null) },
+                                )
+                            }
+                        >
+                            {t("detailsPage.voidConfirm")}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
             {/* Record payment dialog */}
             <Dialog open={paymentOpen} onOpenChange={({ open }) => setPaymentOpen(open)}>
                 <DialogContent size="sm">
-                    <DialogHeader title={t("detailsPage.paymentDialogTitle")}/>
+                    <DialogHeader title={t(paymentType === "REFUND" ? "detailsPage.refundDialogTitle" : "detailsPage.paymentDialogTitle")}/>
                     <DialogBody className="flex flex-col gap-3">
                         <Field>
                             <FieldLabel>{t("detailsPage.amount")}</FieldLabel>
@@ -652,6 +749,17 @@ export function DealDetailsPage() {
                             >
                                 <NumberInputGroup><NumberInputInput /></NumberInputGroup>
                             </NumberInput>
+                            <FieldDescription>
+                                {paymentType === "REFUND"
+                                    ? t("detailsPage.amountHintRefund", { paid: formatCurrency(totalPaid) })
+                                    : [
+                                        t("detailsPage.amountHintRemaining", { remaining: formatCurrency(remaining) }),
+                                        nextInstallment && t("detailsPage.amountHintNext", {
+                                            amount: formatCurrency(nextInstallmentDue),
+                                            date: formatDate(nextInstallment.dueDate, i18n.language).date,
+                                        }),
+                                    ].filter(Boolean).join(" · ")}
+                            </FieldDescription>
                         </Field>
                         <Field>
                             <FieldLabel>{t("detailsPage.paymentMethodLabel")}</FieldLabel>
@@ -685,7 +793,12 @@ export function DealDetailsPage() {
                         </Field>
                         <Field>
                             <FieldLabel>{t("detailsPage.paymentDate")}</FieldLabel>
-                            <DatePicker onValueChange={({ value }) => setPaidAt(value)} value={paidAt ?? []}>
+                            {/* Only money already received: the API refuses later dates. */}
+                            <DatePicker
+                                onValueChange={({ value }) => setPaidAt(value)}
+                                value={paidAt ?? []}
+                                max={parseDate(format(new Date(), 'yyyy-MM-dd'))}
+                            >
                                 <DatePickerTrigger asChild>
                                     <Button className="w-full flex justify-between" variant="outline">
                                         {formatDate(paidAt[0].toString(), i18n.language).date}
@@ -710,6 +823,16 @@ export function DealDetailsPage() {
                             <FieldLabel>{t("detailsPage.reference")}</FieldLabel>
                             <Input placeholder={t("detailsPage.referencePlaceholder")} value={reference} onChange={(e) => setReference(e.target.value)} />
                         </Field>
+                        <Field>
+                            <FieldLabel>{t("detailsPage.paymentNote")}</FieldLabel>
+                            <Textarea
+                                rows={2}
+                                maxLength={2000}
+                                placeholder={t("detailsPage.paymentNotePlaceholder")}
+                                value={paymentNote}
+                                onChange={(e) => setPaymentNote(e.target.value)}
+                            />
+                        </Field>
                     </DialogBody>
                     <DialogFooter>
                         <Button variant="secondary" onClick={() => setPaymentOpen(false)}>{t("detailsPage.back")}</Button>
@@ -724,6 +847,7 @@ export function DealDetailsPage() {
                                         paymentType: paymentType as PaymentType,
                                         paidAt: new Date(paidAt[0].toString()).toISOString(),
                                         reference: reference || undefined,
+                                        note: paymentNote.trim() || undefined,
                                     },
                                     {
                                         onSuccess: () => {
@@ -732,6 +856,7 @@ export function DealDetailsPage() {
                                             setPaymentMethod("");
                                             setPaymentType("");
                                             setReference("");
+                                            setPaymentNote("");
                                             setPaidAt([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
                                         }
                                     },

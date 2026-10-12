@@ -53,6 +53,7 @@ export const EMPTY_ATTENTION_ITEMS: AttentionItems = {
 
 export type RecentActivity = {
     id: string; title: string; description: string | null; type: string; createdAt: string;
+    templateKey?: string | null; templateParams?: Record<string, unknown> | null;
     user: { id: string; fullName: string } | null;
     deal: { id: string; dealNumber: string } | null;
 };
@@ -184,8 +185,8 @@ export type FinanceOverview = {
     cashFlowByMethod: CashFlowByMethod[];
 };
 
-export async function getFinanceOverview(branchId?: string) {
-    const response = await api.get<FinanceOverview>("/dashboard/finance-overview", { params: { branchId } });
+export async function getFinanceOverview(branchId?: string, projectId?: string) {
+    const response = await api.get<FinanceOverview>("/dashboard/finance-overview", { params: { branchId, projectId } });
     return response.data;
 }
 

@@ -27,7 +27,7 @@ export function DealsPagination({ page, limit, total, onPageChange, onLimitChang
     }
 
     return (
-        <div className="flex items-center justify-between gap-3 text-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
             <div className="flex items-center gap-2">
                 <span className="text-muted-foreground">{t("pagination.rowsPerPage")}</span>
                 <Select

@@ -3,9 +3,11 @@ import {Card, CardContent, CardHeader} from "@/components/ui/card.tsx";
 import type {DealActivity} from "@/features/deals/api/deals.api.ts";
 import {formatDate} from "@/utils/date-formatter.ts";
 import {useTranslation} from "react-i18next";
+import {useActivityTitle} from "@/features/activities/hooks/use-activity-title.ts";
 
 export function DealHistoryCard({ activities }: { activities: DealActivity[] }) {
     const { t, i18n } = useTranslation("deals");
+    const activityTitle = useActivityTitle();
     const sorted = [...activities].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
@@ -28,7 +30,7 @@ export function DealHistoryCard({ activities }: { activities: DealActivity[] }) 
                                         <CheckCircle2Icon size={14} className="text-muted-foreground" />
                                     </div>
                                     <div className="flex-1 pt-1">
-                                        <p className="text-sm font-medium">{activity.title}</p>
+                                        <p className="text-sm font-medium">{activityTitle(activity)}</p>
                                         {activity.description && (
                                             <p className="text-sm text-muted-foreground">{activity.description}</p>
                                         )}

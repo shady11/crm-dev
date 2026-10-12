@@ -38,7 +38,7 @@ export const DEFAULT_ROLES: DefaultRoleSeed[] = [
         permissionKeys: [
             "leads.view", "leads.create", "leads.edit", "leads.delete", "leads.assign", "leads.transfer_branch",
             "clients.view", "clients.create", "clients.edit", "clients.delete", "clients.transfer_branch",
-            "deals.view", "deals.create", "deals.manage", "deals.cancel", "deals.reassign", "deals.approve_discount", "deals.manage_payments",
+            "deals.view", "deals.create", "deals.manage", "deals.cancel", "deals.reassign", "deals.approve_discount", "deals.manage_payments", "deals.void_payments",
             "projects.view", "projects.create", "projects.edit", "projects.delete",
             "inventory.view", "inventory.manage",
             "units.edit",
@@ -102,7 +102,7 @@ export const DEFAULT_ROLES: DefaultRoleSeed[] = [
         description: "Read access to deals and payments across the company, for reconciliation and reporting.",
         permissionKeys: [
             "clients.view",
-            "deals.view", "deals.manage_payments",
+            "deals.view", "deals.manage_payments", "deals.void_payments",
             "projects.view",
             "inventory.view",
             "chessboard.view",

@@ -82,10 +82,10 @@ export function useMyPerformance(enabled: boolean, days = 30) {
 }
 
 // FIN-A1, FINANCE only — same reasoning as useBranchComparison above.
-export function useFinanceOverview(enabled: boolean, branchId?: string) {
+export function useFinanceOverview(enabled: boolean, branchId?: string, projectId?: string) {
     return useQuery({
-        queryKey: ["dashboard", "finance-overview", { branchId }],
-        queryFn: () => getFinanceOverview(branchId),
+        queryKey: ["dashboard", "finance-overview", { branchId, projectId }],
+        queryFn: () => getFinanceOverview(branchId, projectId),
         enabled,
     });
 }

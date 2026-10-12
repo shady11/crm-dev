@@ -18,4 +18,6 @@ export * from './payments/payment-exceeds-balance.exception';
 export * from './payments/payment-schedule-already-generated.exception';
 export * from './payments/payment-schedule-not-found.exception';
 export * from './payments/refund-exceeds-paid.exception';
+export * from './payments/payment-date-in-future.exception';
+export * from './payments/paid-exceeds-discounted-price.exception';
 export * from './block-not-on-sale.exception';

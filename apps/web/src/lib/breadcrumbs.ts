@@ -14,6 +14,7 @@ const ROUTE_LABEL_KEYS: Record<string, string> = {
     projects: "nav.projects",
     chessboard: "nav.chessboard",
     deals: "nav.deals",
+    payments: "nav.payments",
     tasks: "nav.tasks",
     users: "nav.users",
     companies: "nav.companies",

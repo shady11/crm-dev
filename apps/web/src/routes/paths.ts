@@ -39,6 +39,7 @@ export const paths = {
         byManager: (managerId: string) => `/deals?managerId=${managerId}`,
         byStatus: (status: string) => `/deals?status=${status}`,
     },
+    payments: "/payments",
     tasks: {
         root: "/tasks",
     },

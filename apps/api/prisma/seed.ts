@@ -52,6 +52,8 @@ import {
 import {PrismaPg} from "@prisma/adapter-pg";
 import {RbacService} from "@/modules/rbac/rbac.service";
 import {DEFAULT_ROLES} from "@/modules/rbac/default-role-permissions";
+import {numberUnnumberedPayments} from "@/modules/deals/services/payments/receipt-number.service";
+import {activityText} from "@/modules/activities/activity-templates";
 
 const prisma = new PrismaClient({
     adapter: new PrismaPg({connectionString: process.env.DATABASE_URL!}),
@@ -485,15 +487,26 @@ async function seedDemoTenantData(args: {
             const hasDiscount = dealSeed % 8 === 0;
             const discountPercent = hasDiscount ? 8 : undefined;
             const salePrice = hasDiscount ? Math.round(listPrice * (1 - discountPercent! / 100)) : listPrice;
-            const deposit = Math.round(salePrice * 0.15);
+            // Some reservations are seeded already past their expiry, for the
+            // "Reservations expiring" list; the expiry job turns them EXPIRED.
+            const reservationLapsed = status === DealStatus.RESERVED && dealSeed % 5 === 0;
+            // Taken at booking, as the booking form does. Reservations that
+            // ended cancelled or expired took one too: the first cancelled deal
+            // and the expired one have it refunded, the other cancelled deal
+            // still holds it, to show the "money held" banner. Reservations
+            // seeded to lapse get none, since the expiry job closes them later.
+            const takesDeposit = !reservationLapsed;
+            const depositRefunded = (status === DealStatus.CANCELLED && i === 0) || status === DealStatus.EXPIRED;
+            const deposit = takesDeposit ? Math.round(salePrice * 0.15) : 0;
 
-            // CONTRACT_SIGNED deals are recent (only the deposit is due so
-            // far, the rest sits PENDING in the future) — ACTIVE/COMPLETED
-            // ones are older, so their installment schedule has had time to
-            // include a genuinely OVERDUE row.
+            // CONTRACT_SIGNED deals are recent and hold only the deposit.
+            // ACTIVE ones are 3-6 months into a 6-month schedule, so they mix
+            // paid, overdue and upcoming installments. COMPLETED ones started
+            // long enough ago that every installment fell due in the past.
             const createdAt = monthsAgo(
                 status === DealStatus.RESERVED ? 0 :
                 status === DealStatus.CONTRACT_SIGNED ? 1 :
+                status === DealStatus.COMPLETED ? 8 + (dealSeed % 4) :
                 3 + (dealSeed % 4),
             );
 
@@ -518,7 +531,7 @@ async function seedDemoTenantData(args: {
                     discountApprovedAt: hasDiscount ? createdAt : undefined,
                     reservedAt: createdAt,
                     reservedById: manager.id,
-                    reservationExpiresAt: status === DealStatus.RESERVED ? daysFromNow(dealSeed % 5 === 0 ? -1 : 2) : undefined,
+                    reservationExpiresAt: status === DealStatus.RESERVED ? daysFromNow(reservationLapsed ? -1 : 2) : undefined,
                     contractNumber: status === DealStatus.CONTRACT_SIGNED || status === DealStatus.ACTIVE || status === DealStatus.COMPLETED
                         ? `CN-${dealSeq}` : undefined,
                     contractDate: status === DealStatus.CONTRACT_SIGNED || status === DealStatus.ACTIVE || status === DealStatus.COMPLETED
@@ -537,9 +550,10 @@ async function seedDemoTenantData(args: {
 
             await prisma.activity.create({
                 data: {
-                    action: ActivityAction.CREATED_DEAL,
-                    type: ActivityType.DEAL_CREATED,
-                    title: `Deal ${deal.dealNumber} created`,
+                    // What the app logs when a deal opens: its reservation.
+                    action: ActivityAction.RESERVED_UNIT,
+                    type: ActivityType.UNIT_RESERVED,
+                    ...activityText('unitReserved'),
                     companyId: company.id,
                     userId: manager.id,
                     dealId: deal.id,
@@ -548,79 +562,123 @@ async function seedDemoTenantData(args: {
                 },
             });
 
-            // Payment schedules + payments only make sense once a contract
-            // exists — RESERVED/CANCELLED/EXPIRED deals never got that far.
-            const hasSchedule = status === DealStatus.CONTRACT_SIGNED || status === DealStatus.ACTIVE || status === DealStatus.COMPLETED;
-            if (hasSchedule) {
-                const installmentCount = 4;
-                const installmentAmount = Math.round((salePrice - deposit) / (installmentCount - 1));
+            const recordPayment = async (amount: number, paymentType: PaymentType, paidAt: Date, order: number) => {
+                await prisma.payment.create({
+                    data: {
+                        dealId: deal.id,
+                        userId: manager.id,
+                        amount,
+                        paymentMethod: pick(paymentMethods, dealSeed + order),
+                        paymentType,
+                        paidAt,
+                        reference: `PMT-${dealSeq}-${order}`,
+                    },
+                });
+                await prisma.activity.create({
+                    data: {
+                        action: ActivityAction.RECEIVED_PAYMENT,
+                        type: ActivityType.PAYMENT_RECEIVED,
+                        ...activityText('paymentReceived'),
+                        companyId: company.id,
+                        userId: manager.id,
+                        dealId: deal.id,
+                        createdAt: paidAt,
+                    },
+                });
+            };
 
-                for (let order = 1; order <= installmentCount; order++) {
-                    const isDeposit = order === 1;
-                    const amount = isDeposit ? deposit : installmentAmount;
+            if (deposit > 0) {
+                await recordPayment(deposit, PaymentType.DEPOSIT, createdAt, 0);
+            }
+            // Money is taken before activation too (FIN-9): every other
+            // signed contract has its first payment, made at signing.
+            if (status === DealStatus.CONTRACT_SIGNED && dealSeed % 2 === 1) {
+                await recordPayment(Math.round(salePrice * 0.1), PaymentType.INSTALLMENT, createdAt, 1);
+            }
+
+            if (deposit > 0 && depositRefunded) {
+                const refundedAt = status === DealStatus.CANCELLED ? monthsAgo(1) : createdAt;
+                await prisma.payment.create({
+                    data: {
+                        dealId: deal.id,
+                        userId: financeUser.id,
+                        amount: -deposit,
+                        paymentMethod: PaymentMethod.BANK_TRANSFER,
+                        paymentType: PaymentType.REFUND,
+                        paidAt: refundedAt,
+                        reference: `RFD-${dealSeq}`,
+                    },
+                });
+                await prisma.activity.create({
+                    data: {
+                        action: ActivityAction.RECEIVED_PAYMENT,
+                        type: ActivityType.PAYMENT_REFUNDED,
+                        ...activityText('refundIssued'),
+                        companyId: company.id,
+                        userId: financeUser.id,
+                        dealId: deal.id,
+                        createdAt: refundedAt,
+                    },
+                });
+            }
+
+            // The app only generates a schedule once a deal is ACTIVE, and
+            // splits what's left after the deposit the way
+            // PaymentScheduleService does: equal shares rounded down to two
+            // decimals, the remainder on the last one, so the rows add up to
+            // the sale price exactly.
+            if (status === DealStatus.ACTIVE || status === DealStatus.COMPLETED) {
+                const installmentCount = 6;
+                const remainingCents = Math.round((salePrice - deposit) * 100);
+                const baseCents = Math.floor(remainingCents / installmentCount);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const dueDates = Array.from({length: installmentCount}, (_, i) => {
                     const dueDate = new Date(createdAt);
-                    dueDate.setMonth(dueDate.getMonth() + (order - 1));
+                    dueDate.setMonth(dueDate.getMonth() + i + 1);
+                    return dueDate;
+                });
+                // Overdue the way the reminder job decides it: due before today.
+                const pastDue = dueDates.filter((d) => d < today).length;
+                // COMPLETED: everything paid. ACTIVE: all but the latest past-due
+                // installment, which is left overdue; every other ACTIVE deal
+                // has a part-payment on it, which keeps it OVERDUE.
+                const paidCount = status === DealStatus.COMPLETED ? installmentCount : Math.max(pastDue - 1, 0);
+                const hasPartPayment = status === DealStatus.ACTIVE && dealSeed % 2 === 1 && pastDue > 0;
 
-                    // COMPLETED deals: fully paid. ACTIVE: paid up through
-                    // "today", remainder pending/overdue. CONTRACT_SIGNED:
-                    // only the deposit paid so far.
-                    const monthsSinceCreation = status === DealStatus.COMPLETED
-                        ? installmentCount
-                        : status === DealStatus.ACTIVE
-                            // Capped below the last installment so an ACTIVE
-                            // deal always has at least one schedule row left
-                            // pending/overdue — otherwise it'd look identical
-                            // to COMPLETED on the finance/revenue dashboards.
-                            ? Math.min(
-                                Math.floor((Date.now() - createdAt.getTime()) / (30 * 24 * 60 * 60 * 1000)),
-                                installmentCount - 1,
-                            )
-                            : 1;
-                    const isPaid = order <= monthsSinceCreation;
-                    const isOverdue = !isPaid && dueDate.getTime() < Date.now();
-
-                    const scheduleStatus = isPaid
-                        ? PaymentScheduleStatus.PAID
-                        : isOverdue
-                            ? PaymentScheduleStatus.OVERDUE
-                            : PaymentScheduleStatus.PENDING;
+                for (let i = 0; i < installmentCount; i++) {
+                    const order = i + 1;
+                    const isLast = order === installmentCount;
+                    const amount = (isLast ? remainingCents - baseCents * (installmentCount - 1) : baseCents) / 100;
+                    const dueDate = dueDates[i];
+                    const isPaid = i < paidCount;
+                    const isPartPaid = !isPaid && hasPartPayment && i === paidCount;
+                    const partAmount = Math.round(amount * 0.4);
+                    const isOverdue = !isPaid && dueDate < today;
 
                     await prisma.paymentSchedule.create({
                         data: {
                             dealId: deal.id,
                             dueDate,
                             amount,
-                            paidAmount: isPaid ? amount : 0,
-                            status: scheduleStatus,
+                            paidAmount: isPaid ? amount : isPartPaid ? partAmount : 0,
+                            status: isPaid
+                                ? PaymentScheduleStatus.PAID
+                                : isOverdue
+                                    ? PaymentScheduleStatus.OVERDUE
+                                    : PaymentScheduleStatus.PENDING,
                             order,
                         },
                     });
 
                     if (isPaid) {
-                        const paidAt = dueDate;
-                        await prisma.payment.create({
-                            data: {
-                                dealId: deal.id,
-                                userId: manager.id,
-                                amount,
-                                paymentMethod: pick(paymentMethods, dealSeed + order),
-                                paymentType: isDeposit ? PaymentType.DEPOSIT : order === installmentCount ? PaymentType.FINAL : PaymentType.INSTALLMENT,
-                                paidAt,
-                                reference: `PMT-${dealSeq}-${order}`,
-                            },
-                        });
-
-                        await prisma.activity.create({
-                            data: {
-                                action: ActivityAction.RECEIVED_PAYMENT,
-                                type: ActivityType.PAYMENT_RECEIVED,
-                                title: `Payment received for ${deal.dealNumber}`,
-                                companyId: company.id,
-                                userId: manager.id,
-                                dealId: deal.id,
-                                createdAt: paidAt,
-                            },
-                        });
+                        await recordPayment(amount, isLast ? PaymentType.FINAL : PaymentType.INSTALLMENT, dueDate, order);
+                    } else if (isPartPaid) {
+                        // A few days after it fell due.
+                        const paidAt = new Date(dueDate);
+                        paidAt.setDate(paidAt.getDate() + 3);
+                        await recordPayment(partAmount, PaymentType.INSTALLMENT, paidAt < today ? paidAt : dueDate, order);
                     }
                 }
             }
@@ -629,6 +687,10 @@ async function seedDemoTenantData(args: {
             dealSeed += 1;
         }
     }
+
+    // Receipt numbers for the payments above, as the app gives every
+    // incoming payment (FIN-8).
+    await numberUnnumberedPayments(prisma);
 
     // --- Tasks (mix of overdue, due today, upcoming, done) --------------
     const taskTitles = [
@@ -660,7 +722,7 @@ async function seedDemoTenantData(args: {
             data: {
                 action: ActivityAction.CREATED_TASK,
                 type: ActivityType.TASK_CREATED,
-                title: `Task "${task.title}" created`,
+                ...activityText('taskCreated', {task: task.title}),
                 companyId: company.id,
                 userId: assignee.id,
                 taskId: task.id,
