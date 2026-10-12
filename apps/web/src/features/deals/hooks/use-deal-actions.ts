@@ -29,6 +29,10 @@ export function useDealActions(dealId: string) {
         await queryClient.invalidateQueries({ queryKey: ["deals"] });
         await queryClient.invalidateQueries({ queryKey: ["unit"] });
         await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
+        // Reassigning moves the deal's open tasks, and approving a discount
+        // reissues the reservation agreement.
+        await queryClient.invalidateQueries({ queryKey: ["tasks"] });
+        await queryClient.invalidateQueries({ queryKey: ["documents", { ownerType: "DEAL", ownerId: dealId }] });
     };
 
     const extend = useMutation({
@@ -140,7 +144,7 @@ export function useDealActions(dealId: string) {
         mutationFn: () => approveDiscount(dealId),
         onSuccess: async () => {
             await invalidate();
-            toast.success({ title: t("toasts.discountApproved") });
+            toast.success({ title: t("toasts.discountApproved"), description: t("toasts.reservationReissued") });
         },
         onError: () => toast.error({ title: t("toasts.discountDecisionError"), description: t("toasts.tryAgain") }),
     });

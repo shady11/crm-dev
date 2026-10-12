@@ -81,6 +81,22 @@
     "documentUploaded": {
       "title": "{{dealNumber}} бүтүмүнө документ жүктөлдү",
       "message": "{{fileName}}"
+    },
+    "leadReassigned": {
+      "title": "{{leadName}} лиди сизге өткөрүлдү",
+      "message_zero": "Өткөргөн: {{byName}}.",
+      "message_one": "Өткөргөн: {{byName}}. Сизге {{count}} ачык тапшырма өттү.",
+      "message_few": "Өткөргөн: {{byName}}. Сизге {{count}} ачык тапшырма өттү.",
+      "message_many": "Өткөргөн: {{byName}}. Сизге {{count}} ачык тапшырма өттү.",
+      "message_other": "Өткөргөн: {{byName}}. Сизге {{count}} ачык тапшырма өттү."
+    },
+    "dealReassigned": {
+      "title": "{{dealNumber}} бүтүмү сизге өткөрүлдү",
+      "message_zero": "Өткөргөн: {{byName}}.",
+      "message_one": "Өткөргөн: {{byName}}. Сизге {{count}} ачык тапшырма өттү.",
+      "message_few": "Өткөргөн: {{byName}}. Сизге {{count}} ачык тапшырма өттү.",
+      "message_many": "Өткөргөн: {{byName}}. Сизге {{count}} ачык тапшырма өттү.",
+      "message_other": "Өткөргөн: {{byName}}. Сизге {{count}} ачык тапшырма өттү."
     }
   }
 }

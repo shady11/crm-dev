@@ -61,7 +61,9 @@ export function ReassignManagerDialog({
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>{t("reassignDialog.title")}</AlertDialogTitle>
-                    <AlertDialogDescription>{t("reassignDialog.description", {name: entityName})}</AlertDialogDescription>
+                    <AlertDialogDescription>
+                        {t("reassignDialog.description", {name: entityName})} {t("reassignDialog.hint")}
+                    </AlertDialogDescription>
                 </AlertDialogHeader>
 
                 <AlertDialogBody>

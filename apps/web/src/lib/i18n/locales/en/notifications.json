@@ -81,6 +81,22 @@
     "documentUploaded": {
       "title": "Document uploaded to deal {{dealNumber}}",
       "message": "{{fileName}}"
+    },
+    "leadReassigned": {
+      "title": "Lead {{leadName}} reassigned to you",
+      "message_zero": "By {{byName}}.",
+      "message_one": "By {{byName}}. {{count}} open task moved to you.",
+      "message_few": "By {{byName}}. {{count}} open tasks moved to you.",
+      "message_many": "By {{byName}}. {{count}} open tasks moved to you.",
+      "message_other": "By {{byName}}. {{count}} open tasks moved to you."
+    },
+    "dealReassigned": {
+      "title": "Deal {{dealNumber}} reassigned to you",
+      "message_zero": "By {{byName}}.",
+      "message_one": "By {{byName}}. {{count}} open task moved to you.",
+      "message_few": "By {{byName}}. {{count}} open tasks moved to you.",
+      "message_many": "By {{byName}}. {{count}} open tasks moved to you.",
+      "message_other": "By {{byName}}. {{count}} open tasks moved to you."
     }
   }
 }

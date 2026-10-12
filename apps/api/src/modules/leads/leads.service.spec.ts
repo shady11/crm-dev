@@ -85,16 +85,22 @@ describe('LeadsService', () => {
                 create: jest.fn().mockResolvedValue({}),
                 findMany: jest.fn().mockResolvedValue([]),
             },
+            $transaction: jest.fn(),
         };
+        prisma.$transaction.mockImplementation((fn: (db: typeof prisma) => unknown) => fn(prisma));
 
         const clientsService = {
             create: jest.fn().mockResolvedValue({id: 'client-created'}),
         } as unknown as ClientsService;
 
         const rbacService = {findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-manager'])};
-        const tasksService = {createAutomated: jest.fn().mockResolvedValue(null)};
-        const service = new LeadsService(prisma as any, clientsService, rbacService as any, tasksService as any);
-        return {service, prisma, clientsService, tasksService};
+        const tasksService = {
+            createAutomated: jest.fn().mockResolvedValue(null),
+            handOverOpenTasks: jest.fn().mockResolvedValue([]),
+        };
+        const notifications = {create: jest.fn().mockResolvedValue({})};
+        const service = new LeadsService(prisma as any, clientsService, rbacService as any, tasksService as any, notifications as any);
+        return {service, prisma, clientsService, tasksService, notifications};
     }
 
     const createDto = (overrides: Record<string, unknown> = {}) => ({
@@ -414,9 +420,42 @@ describe('LeadsService', () => {
             );
             expect(prisma.activity.create).toHaveBeenCalledWith(
                 expect.objectContaining({
-                    data: expect.objectContaining({metadata: {fromManagerId: 'old-manager', toManagerId: 'new-manager'}}),
+                    data: expect.objectContaining({metadata: {fromManagerId: 'old-manager', toManagerId: 'new-manager', movedTaskCount: 0}}),
                 }),
             );
+        });
+
+        it('hands the previous manager\'s open tasks on the lead to the new one and tells them', async () => {
+            const {service, tasksService, notifications} = build({
+                lead: {id: 'lead-1', branchId: 'branch-1', managerId: 'old-manager'},
+                manager: {id: 'new-manager', roleId: 'role-sales-manager', isActive: true},
+            });
+            tasksService.handOverOpenTasks.mockResolvedValue([{id: 'task-1', title: 'Call Ulan'}]);
+
+            await service.reassignManager(salesHeadUser, 'lead-1', {managerId: 'new-manager'} as any);
+
+            expect(tasksService.handOverOpenTasks).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
+                link: {leadId: 'lead-1'}, fromUserId: 'old-manager', toUserId: 'new-manager', actorId: 'head-1',
+            }));
+            expect(notifications.create).toHaveBeenCalledWith(expect.objectContaining({
+                userId: 'new-manager',
+                type: 'LEAD_REASSIGNED',
+                templateKey: 'leadReassigned',
+                params: expect.objectContaining({tasks: 1}),
+                entityType: 'LEAD',
+                entityId: 'lead-1',
+            }));
+        });
+
+        it('sends no notification when the lead stays with the same manager', async () => {
+            const {service, notifications} = build({
+                lead: {id: 'lead-1', branchId: 'branch-1', managerId: 'new-manager'},
+                manager: {id: 'new-manager', roleId: 'role-sales-manager', isActive: true},
+            });
+
+            await service.reassignManager(salesHeadUser, 'lead-1', {managerId: 'new-manager'} as any);
+
+            expect(notifications.create).not.toHaveBeenCalled();
         });
     });
 

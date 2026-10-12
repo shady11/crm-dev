@@ -8,7 +8,8 @@ import {
     ClockIcon,
     FileUp,
     StickyNotePlus,
-    StickyNoteX
+    StickyNoteX,
+    UserRoundPlusIcon,
 } from "lucide-react";
 
 export const NotificationType = {
@@ -24,11 +25,13 @@ export const NotificationType = {
     PAYMENT_OVERDUE: "PAYMENT_OVERDUE",
     DISCOUNT_APPROVAL_REQUESTED: "DISCOUNT_APPROVAL_REQUESTED",
     DISCOUNT_DECIDED: "DISCOUNT_DECIDED",
+    LEAD_REASSIGNED: "LEAD_REASSIGNED",
+    DEAL_REASSIGNED: "DEAL_REASSIGNED",
 } as const;
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
 
 export const NotificationEntityType = {
-    TASK: "TASK", DEAL: "DEAL", CLIENT: "CLIENT", DOCUMENT: "DOCUMENT", PAYMENT_SCHEDULE: "PAYMENT_SCHEDULE",
+    LEAD: "LEAD", TASK: "TASK", DEAL: "DEAL", CLIENT: "CLIENT", DOCUMENT: "DOCUMENT", PAYMENT_SCHEDULE: "PAYMENT_SCHEDULE",
 } as const;
 export type NotificationEntityType = (typeof NotificationEntityType)[keyof typeof NotificationEntityType];
 
@@ -45,6 +48,8 @@ export const NOTIFICATION_VISUALS: Record<NotificationType, { icon: typeof BellI
     PAYMENT_OVERDUE: { icon: CalendarX2Icon, bg: "bg-rose-500" },
     DISCOUNT_APPROVAL_REQUESTED: { icon: BadgePercentIcon, bg: "bg-amber-500" },
     DISCOUNT_DECIDED: { icon: BadgePercentIcon, bg: "bg-blue-500" },
+    LEAD_REASSIGNED: { icon: UserRoundPlusIcon, bg: "bg-blue-500" },
+    DEAL_REASSIGNED: { icon: UserRoundPlusIcon, bg: "bg-blue-500" },
 };
 
 /**

@@ -81,6 +81,22 @@
     "documentUploaded": {
       "title": "Загружен документ по сделке {{dealNumber}}",
       "message": "{{fileName}}"
+    },
+    "leadReassigned": {
+      "title": "Лид {{leadName}} передан вам",
+      "message_zero": "Передал(а): {{byName}}.",
+      "message_one": "Передал(а): {{byName}}. Вам перешла {{count}} открытая задача.",
+      "message_few": "Передал(а): {{byName}}. Вам перешли {{count}} открытые задачи.",
+      "message_many": "Передал(а): {{byName}}. Вам перешли {{count}} открытых задач.",
+      "message_other": "Передал(а): {{byName}}. Вам перешли {{count}} открытой задачи."
+    },
+    "dealReassigned": {
+      "title": "Сделка {{dealNumber}} передана вам",
+      "message_zero": "Передал(а): {{byName}}.",
+      "message_one": "Передал(а): {{byName}}. Вам перешла {{count}} открытая задача.",
+      "message_few": "Передал(а): {{byName}}. Вам перешли {{count}} открытые задачи.",
+      "message_many": "Передал(а): {{byName}}. Вам перешли {{count}} открытых задач.",
+      "message_other": "Передал(а): {{byName}}. Вам перешли {{count}} открытой задачи."
     }
   }
 }
