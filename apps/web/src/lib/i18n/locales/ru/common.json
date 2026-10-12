@@ -78,7 +78,8 @@
     "skipToContent": "Перейти к содержимому",
     "mainNavigation": "Основная навигация",
     "toggleSidebar": "Переключить боковую панель",
-    "myActivity": "Мои действия"
+    "myActivity": "Мои действия",
+    "myTeam": "Моя команда"
   },
   "language": {
     "switchLabel": "Язык",

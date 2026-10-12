@@ -3,6 +3,7 @@ import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
 import {initials} from "@/features/deals/utils/format.ts";
 import type {TeamSnapshotItem} from "@/features/dashboard/api/dashboard.api.ts";
 import {useTranslation} from "react-i18next";
+import {timeAgo} from "@/features/dashboard/utils/time-ago.ts";
 
 // SH-A2: a SALES_HEAD's daily-standup view of their own team — counts and a
 // "last activity" timestamp per SALES_MANAGER, deliberately not full
@@ -10,16 +11,6 @@ import {useTranslation} from "react-i18next";
 // branch's managers.
 export function TeamSnapshotCard({data}: {data: TeamSnapshotItem[]}) {
     const {t} = useTranslation("dashboard");
-
-    function timeAgo(iso: string) {
-        const diffMs = Date.now() - new Date(iso).getTime();
-        const mins = Math.floor(diffMs / 60000);
-        if (mins < 1) return t("recentActivity.justNow");
-        if (mins < 60) return t("recentActivity.minutesAgo", {count: mins});
-        const hours = Math.floor(mins / 60);
-        if (hours < 24) return t("recentActivity.hoursAgo", {count: hours});
-        return t("recentActivity.daysAgo", {count: Math.floor(hours / 24)});
-    }
 
     return (
         <Card className="border border-secondary shadow-none pt-0">
@@ -47,7 +38,7 @@ export function TeamSnapshotCard({data}: {data: TeamSnapshotItem[]}) {
                                     </p>
                                 </div>
                                 <p className="shrink-0 text-xs text-muted-foreground">
-                                    {item.lastActivityAt ? timeAgo(item.lastActivityAt) : t("teamSnapshot.noActivity")}
+                                    {item.lastActivityAt ? timeAgo(t, item.lastActivityAt) : t("teamSnapshot.noActivity")}
                                 </p>
                             </div>
                         ))}

@@ -137,5 +137,33 @@
     "bulkDeactivateErrorTitle": "Bulk deactivation had issues",
     "bulkDeactivateAllFailed": "None of the selected users could be deactivated.",
     "bulkDeactivatePartialFailed": "{{failed}} of {{count}} selected users could not be deactivated."
+  },
+  "team": {
+    "title": "My team",
+    "resultsHeading": "Results by manager",
+    "period_one": "Last {{count}} day",
+    "period_few": "Last {{count}} days",
+    "period_many": "Last {{count}} days",
+    "period_other": "Last {{count}} days",
+    "columns": {
+      "manager": "Manager",
+      "openLeads": "Open leads",
+      "activeDeals": "Active deals",
+      "tasksOverdue": "Overdue tasks",
+      "overduePayments": "Overdue payments",
+      "leadsAssigned": "New leads",
+      "dealsWon": "Contracts signed",
+      "conversion": "Conversion",
+      "collected": "Collected",
+      "phone": "Phone"
+    },
+    "total": "Team total",
+    "membersHeading": "People in the branch",
+    "emptyTitle": "No one here yet",
+    "emptyDescription": "People assigned to your branch will appear here.",
+    "legend_one": "Open leads, active deals, overdue tasks and overdue payments are as of now. New leads, contracts signed, conversion and money collected cover the last {{count}} day.",
+    "legend_few": "Open leads, active deals, overdue tasks and overdue payments are as of now. New leads, contracts signed, conversion and money collected cover the last {{count}} days.",
+    "legend_many": "Open leads, active deals, overdue tasks and overdue payments are as of now. New leads, contracts signed, conversion and money collected cover the last {{count}} days.",
+    "legend_other": "Open leads, active deals, overdue tasks and overdue payments are as of now. New leads, contracts signed, conversion and money collected cover the last {{count}} days."
   }
 }

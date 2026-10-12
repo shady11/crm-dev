@@ -114,7 +114,7 @@ describe("branch boundary", () => {
         "setting-options": "platform-wide currency/locale/timezone pool, not data inside a tenant",
 
         branches: "manages the branches themselves, not branch-scoped data",
-        users: "branch assignment is a field on User, not row-level isolation",
+        users: "branch assignment is a field on User; reads narrow a branch-scoped role to its own branch inside UsersService",
 
         // Theme C — inventory stays company-wide, deliberately unscoped this
         // phase (BR-C1). Any branch can see and reserve any unit.

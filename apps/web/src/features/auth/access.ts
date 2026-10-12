@@ -96,6 +96,25 @@ export function activityLogNavKey(user: Pick<AuthUser, "permissions"> | undefine
 }
 
 /**
+ * Whether the Users page is the admin screen (add, edit, move, deactivate)
+ * or the read-only "My team" view for someone who can only look — a Sales
+ * Head, whose users.view the API limits to their own branch.
+ */
+export function canManageUsers(user: Pick<AuthUser, "permissions"> | undefined) {
+    return ["users.create", "users.edit", "users.delete"].some((permission) => hasPermission(user, permission));
+}
+
+/**
+ * A nav item's label for this user: the activity log and the Users page
+ * read differently for someone who sees only their own part of them.
+ */
+export function navTitleKey(user: Pick<AuthUser, "permissions"> | undefined, key: string) {
+    if (key === "nav.activityLog") return activityLogNavKey(user);
+    if (key === "nav.users") return canManageUsers(user) ? "nav.users" : "nav.myTeam";
+    return key;
+}
+
+/**
  * Where a user should land, and where RoleGuard should bounce them back to.
  *
  * This has to depend on isSuperAdmin rather than a fixed "/dashboard": a
