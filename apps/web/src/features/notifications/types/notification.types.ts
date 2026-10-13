@@ -9,6 +9,7 @@ import {
     FileUp,
     StickyNotePlus,
     StickyNoteX,
+    TagIcon,
     UserRoundPlusIcon,
 } from "lucide-react";
 
@@ -27,11 +28,15 @@ export const NotificationType = {
     DISCOUNT_DECIDED: "DISCOUNT_DECIDED",
     LEAD_REASSIGNED: "LEAD_REASSIGNED",
     DEAL_REASSIGNED: "DEAL_REASSIGNED",
+    UNIT_PRICE_CHANGE_REQUESTED: "UNIT_PRICE_CHANGE_REQUESTED",
+    UNIT_PRICE_CHANGE_DECIDED: "UNIT_PRICE_CHANGE_DECIDED",
+    UNIT_PRICE_CHANGED: "UNIT_PRICE_CHANGED",
 } as const;
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
 
 export const NotificationEntityType = {
     LEAD: "LEAD", TASK: "TASK", DEAL: "DEAL", CLIENT: "CLIENT", DOCUMENT: "DOCUMENT", PAYMENT_SCHEDULE: "PAYMENT_SCHEDULE",
+    UNIT_PRICE_REQUEST: "UNIT_PRICE_REQUEST", UNIT: "UNIT",
 } as const;
 export type NotificationEntityType = (typeof NotificationEntityType)[keyof typeof NotificationEntityType];
 
@@ -50,6 +55,9 @@ export const NOTIFICATION_VISUALS: Record<NotificationType, { icon: typeof BellI
     DISCOUNT_DECIDED: { icon: BadgePercentIcon, bg: "bg-blue-500" },
     LEAD_REASSIGNED: { icon: UserRoundPlusIcon, bg: "bg-blue-500" },
     DEAL_REASSIGNED: { icon: UserRoundPlusIcon, bg: "bg-blue-500" },
+    UNIT_PRICE_CHANGE_REQUESTED: { icon: TagIcon, bg: "bg-amber-500" },
+    UNIT_PRICE_CHANGE_DECIDED: { icon: TagIcon, bg: "bg-blue-500" },
+    UNIT_PRICE_CHANGED: { icon: TagIcon, bg: "bg-gray-400" },
 };
 
 /**

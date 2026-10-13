@@ -43,7 +43,9 @@
     "submitCreate": "Create Unit",
     "errorCreate": "Unit could not be created. Check the details and try again.",
     "errorSave": "Unit could not be saved. Check the details and try again.",
-    "statusManagedByDeal": "Set by the deal. Cancel or complete the deal to change it."
+    "statusManagedByDeal": "Set by the deal. Cancel or complete the deal to change it.",
+    "priceLocked": "Only roles allowed to change prices can edit this.",
+    "priceNeedsApproval": "A new price goes to the Company Admin for approval. Until then the unit keeps its current price."
   },
   "bulk": {
     "unitsHeading": "Units",
@@ -84,7 +86,8 @@
     "createdDescription": "Unit {{number}} has been created.",
     "updatedTitle": "Successfully updated",
     "duplicatedTitle": "Successfully duplicated",
-    "deletedTitle": "Successfully deleted"
+    "deletedTitle": "Successfully deleted",
+    "priceSentForApproval": "The new price was sent to the Company Admin for approval."
   },
   "overview": {
     "numberLabel": "Unit Number",
@@ -100,7 +103,10 @@
     "infoSheetButton": "Info sheet",
     "offerButton": "Price offer",
     "blockNotOnSale": "Not on sale yet: Block {{block}} opens for sales later{{completion}}.",
-    "blockNotOnSaleCompletion": " (completion {{quarter}})"
+    "blockNotOnSaleCompletion": " (completion {{quarter}})",
+    "pendingPriceTitle": "New price waiting for approval: {{price}}",
+    "pendingPriceDescription": "Requested by {{name}}. The unit stays at {{price}} until it is approved.",
+    "reviewPriceChange": "Review"
   },
   "infoSheet": {
     "title": "Unit №{{number}}",
@@ -190,5 +196,42 @@
     "lastDiffers": "The last installment is adjusted by the rounding.",
     "yourManager": "Your manager",
     "validNote": "Price valid until {{date}}. The schedule is indicative and is fixed in the contract."
+  },
+  "priceChanges": {
+    "title": "Price changes",
+    "descriptionApprover": "List-price changes waiting for your decision, and every change made so far.",
+    "descriptionRequester": "Price changes you asked for, and what was decided.",
+    "tabs": {
+      "pending": "Waiting for approval",
+      "all": "All changes"
+    },
+    "table": {
+      "unit": "Unit",
+      "change": "Price",
+      "requestedBy": "Requested by",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "PENDING": "Waiting",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "CANCELLED": "Replaced"
+    },
+    "decidedBy": "by {{name}}",
+    "approve": "Approve",
+    "reject": "Reject",
+    "back": "Back",
+    "approved": "New price applied",
+    "rejected": "Price change rejected",
+    "alreadyDecided": "Someone has already decided this change",
+    "decisionError": "Could not save the decision",
+    "rejectDialogTitle": "Reject the new price for unit {{unit}}",
+    "rejectDialogDescription": "The unit keeps its current price. The person who asked sees your reason.",
+    "rejectReason": "Reason",
+    "emptyPendingTitle": "Nothing waiting",
+    "emptyPendingDescription": "No price changes are waiting for a decision.",
+    "emptyTitle": "No price changes",
+    "emptyDescription": "Changes to unit prices will appear here."
   }
 }

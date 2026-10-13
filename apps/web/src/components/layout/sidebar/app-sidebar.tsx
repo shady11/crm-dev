@@ -28,6 +28,7 @@ import {
     ShieldCheck,
     SlidersHorizontal,
     SquareUser,
+    TagIcon,
     Users,
     Wallet
 } from "lucide-react";
@@ -51,6 +52,7 @@ const NAV_ITEMS: {
     { titleKey: "nav.deals", feature: "deals", url: "/deals", icon: Handshake },
     { titleKey: "nav.payments", feature: "payments", url: "/payments", icon: Wallet },
     { titleKey: "nav.projects", feature: "projects", url: "/projects", icon: Building2 },
+    { titleKey: "nav.priceChanges", feature: "priceChanges", url: "/price-changes", icon: TagIcon },
     { titleKey: "nav.companies", feature: "companies", url: "/companies", icon: Landmark },
     { titleKey: "nav.settingOptions", feature: "settingOptions", url: "/setting-options", icon: SlidersHorizontal },
     { titleKey: "nav.users", feature: "users", url: "/users", icon: Users },

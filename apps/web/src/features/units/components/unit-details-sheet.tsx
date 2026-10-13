@@ -17,6 +17,10 @@ import {
     PROJECT_STATUS_LABEL_KEYS,
 } from "@/features/projects/types/project.types.ts";
 import {completionQuarter, isBlockBookable} from "@/features/blocks/types/block-sales.ts";
+import {Link} from "react-router-dom";
+import {TagIcon} from "lucide-react";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
+import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
 interface UnitDetailsSheetProps {
     unit: Unit | null;
@@ -40,6 +44,7 @@ export function UnitDetailsSheet({
 
     const { t } = useTranslation("units");
     const { user } = useAuth();
+    const { formatCurrency } = useCompanyFormatters();
     const unitDetailsQuery = useUnit(open ? unit?.id : undefined);
     const fullUnit = unitDetailsQuery.data ?? unit;
 
@@ -81,6 +86,27 @@ export function UnitDetailsSheet({
                 </SheetHeader>
 
                 <SheetBody scrollFade>
+                    {fullUnit?.pendingPriceRequest ? (
+                        // SH-2: the unit keeps its price until an approver decides.
+                        <Alert variant="warning" className="mt-4">
+                            <TagIcon />
+                            <AlertTitle>
+                                {t("details.pendingPriceTitle", {price: formatCurrency(fullUnit.pendingPriceRequest.requestedPrice)})}
+                            </AlertTitle>
+                            <AlertDescription>
+                                {t("details.pendingPriceDescription", {
+                                    name: fullUnit.pendingPriceRequest.requestedBy?.fullName ?? "—",
+                                    price: formatCurrency(fullUnit.pendingPriceRequest.currentPrice),
+                                })}
+                                {hasPermission(user, "units.approve_price") ? (
+                                    <>
+                                        {" "}
+                                        <Link to={paths.priceChanges} className="font-medium underline">{t("details.reviewPriceChange")}</Link>
+                                    </>
+                                ) : null}
+                            </AlertDescription>
+                        </Alert>
+                    ) : null}
                     <div className="py-4">
                         <Tabs defaultValue="overview" className="gap-6">
                             <TabsList>

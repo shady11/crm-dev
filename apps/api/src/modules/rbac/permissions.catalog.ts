@@ -70,6 +70,11 @@ export const PERMISSIONS_CATALOG: PermissionDefinition[] = [
     }),
     ...group("units", {
         edit: "Edit a unit's details and status",
+        // SH-2: a lower list price is a discount nobody approved, so price
+        // changes are their own permission, and need approval without the
+        // second one.
+        edit_price: "Change a unit's list price (needs approval without units.approve_price)",
+        approve_price: "Approve or reject list-price changes, and change prices without approval",
     }),
     ...group("chessboard", {
         view: "View the unit-availability chessboard",

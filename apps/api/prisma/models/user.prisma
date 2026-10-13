@@ -65,6 +65,9 @@ model User {
   impersonationsStarted  ImpersonationSession[] @relation("ImpersonationsStarted")
   impersonationsReceived ImpersonationSession[] @relation("ImpersonationsReceived")
 
+  unitPriceRequestsMade    UnitPriceRequest[] @relation("UnitPriceRequestedBy")
+  unitPriceRequestsDecided UnitPriceRequest[] @relation("UnitPriceDecidedBy")
+
   @@index([companyId, branchId])
   @@index([roleId])
 }

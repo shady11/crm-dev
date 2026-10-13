@@ -39,6 +39,8 @@ model Unit {
   deals      Deal[]
   activities Activity[]
 
+  priceRequests UnitPriceRequest[]
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?

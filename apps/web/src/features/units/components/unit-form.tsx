@@ -30,6 +30,8 @@ import {
 import {Alert, AlertTitle} from "@/components/ui/alert.tsx";
 import type {CreateUnitPayload} from "@/features/units/types/unit-payload.ts";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {hasPermission} from "@/features/auth/access";
 
 const unitSchema = z.object({
     number: z.string().trim().min(1),
@@ -74,6 +76,13 @@ export function UnitForm({
                              onSubmit,
                          }: UnitFormProps) {
     const { t } = useTranslation("units");
+    const { user } = useAuth();
+    // SH-2: an existing unit's list price needs units.edit_price, and goes to
+    // an approver without units.approve_price. A new unit's price is part of
+    // creating it (inventory.manage).
+    const isEdit = !!unit;
+    const canEditPrice = !isEdit || hasPermission(user, "units.edit_price");
+    const priceNeedsApproval = isEdit && canEditPrice && !hasPermission(user, "units.approve_price");
 
     const initialType = normalizeUnitType(unit?.type);
     const [, setSelectedType] =
@@ -237,7 +246,13 @@ export function UnitForm({
                                 <FieldLabel>{t("common:labels.price")}</FieldLabel>
                                 <Input
                                     {...field}
+                                    disabled={!canEditPrice}
                                 />
+                                {!canEditPrice ? (
+                                    <FieldDescription>{t("form.priceLocked")}</FieldDescription>
+                                ) : priceNeedsApproval ? (
+                                    <FieldDescription>{t("form.priceNeedsApproval")}</FieldDescription>
+                                ) : null}
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}

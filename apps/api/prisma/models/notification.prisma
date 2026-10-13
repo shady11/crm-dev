@@ -13,6 +13,9 @@ enum NotificationType {
   DISCOUNT_DECIDED
   LEAD_REASSIGNED
   DEAL_REASSIGNED
+  UNIT_PRICE_CHANGE_REQUESTED
+  UNIT_PRICE_CHANGE_DECIDED
+  UNIT_PRICE_CHANGED
 }
 
 enum NotificationEntityType {
@@ -22,6 +25,8 @@ enum NotificationEntityType {
   CLIENT
   DOCUMENT
   PAYMENT_SCHEDULE
+  UNIT_PRICE_REQUEST
+  UNIT
 }
 
 model Notification {

@@ -124,6 +124,30 @@
     "paymentVoided": {
       "title": "{{dealNumber}} бүтүмү боюнча {{amount}} төлөм жокко чыгарылды",
       "message": "{{reason}}"
+    },
+    "unitPriceChangeRequested": {
+      "title": "{{unit}} объектинин ({{project}}) жаңы баасы макулдашууну күтүүдө",
+      "message": "{{fromPrice}} → {{toPrice}}, сураган: {{byName}}"
+    },
+    "unitPriceChangeApproved": {
+      "title": "{{unit}} объектинин ({{project}}) жаңы баасы макулдашылды",
+      "message": "Эми {{toPrice}}, макулдашкан: {{byName}}"
+    },
+    "unitPriceChangeRejected": {
+      "title": "{{unit}} объектинин ({{project}}) жаңы баасы четке кагылды",
+      "message": "{{byName}}: {{reason}}"
+    },
+    "unitPriceChanged": {
+      "title": "{{unit}} объектинин ({{project}}) баасы өзгөрдү",
+      "message": "{{fromPrice}} → {{toPrice}}, өзгөрткөн: {{byName}}"
+    },
+    "unitPriceRequestApproved": {
+      "title": "{{unit}} объектинин ({{project}}) баа өзгөрүүсү макулдашылды",
+      "message": "Макулдашкан: {{byName}}"
+    },
+    "unitPriceRequestRejected": {
+      "title": "{{unit}} объектинин ({{project}}) баа өзгөрүүсү четке кагылды",
+      "message": "Четке каккан: {{byName}}"
     }
   }
 }

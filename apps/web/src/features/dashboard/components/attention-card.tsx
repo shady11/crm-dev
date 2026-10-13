@@ -1,11 +1,12 @@
 import type {ReactNode} from "react";
 import {Link} from "react-router-dom";
-import {AlertTriangleIcon, BadgePercentIcon, ClockIcon, WalletIcon} from "lucide-react";
+import {AlertTriangleIcon, BadgePercentIcon, ClockIcon, TagIcon, WalletIcon} from "lucide-react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {paths} from "@/routes/paths.ts";
 import type {AttentionItems} from "@/features/dashboard/api/dashboard.api.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useTranslation} from "react-i18next";
+import {priceChangePercent} from "@/features/units/api/unit-price-requests.api.ts";
 
 function daysUntil(iso: string) {
     return Math.ceil((new Date(iso).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
@@ -41,7 +42,9 @@ export function AttentionCard({data, showOwner}: {data: AttentionItems; showOwne
     const {t} = useTranslation("dashboard");
     const {formatCurrency, formatDate} = useCompanyFormatters();
     const {pendingApprovals, overduePayments, expiringDeals, urgentTasks} = data;
+    const priceChanges = data.pendingPriceChanges ?? {total: 0, requests: []};
     const hasNothing = pendingApprovals.deals.length === 0
+        && priceChanges.requests.length === 0
         && overduePayments.deals.length === 0
         && expiringDeals.length === 0
         && urgentTasks.length === 0;
@@ -82,6 +85,29 @@ export function AttentionCard({data, showOwner}: {data: AttentionItems; showOwne
                                                     {" · "}
                                                     {waitingDays === 0 ? t("attention.waitingToday") : t("attention.waitingDays", {count: waitingDays})}
                                                     {deal.aboveYourLimit ? ` · ${t("attention.aboveYourLimit")}` : null}
+                                                </p>
+                                            </div>
+                                        </Link>
+                                    );
+                                })}
+                            </Section>
+                        ) : null}
+
+                        {priceChanges.requests.length > 0 ? (
+                            <Section
+                                title={t("attention.priceChangesHeading", {count: priceChanges.total})}
+                                viewAll={{to: paths.priceChanges, label: t("attention.review")}}
+                            >
+                                {priceChanges.requests.map((r) => {
+                                    const pct = priceChangePercent(r.currentPrice, r.requestedPrice);
+                                    return (
+                                        <Link key={r.id} to={paths.priceChanges} className={ROW_CLASS}>
+                                            <TagIcon size={16} className={`shrink-0 ${pct < 0 ? "text-destructive" : "text-amber-500"}`} />
+                                            <div className="min-w-0 flex-1">
+                                                <p className="truncate font-medium">{t("attention.priceChangeUnit", {unit: r.unit.number, project: r.unit.project.name})}</p>
+                                                <p className="truncate text-xs text-muted-foreground">
+                                                    {r.requestedBy ? `${r.requestedBy.fullName} · ` : ""}
+                                                    {formatCurrency(r.currentPrice)} → {formatCurrency(r.requestedPrice)} ({pct > 0 ? "+" : ""}{pct}%)
                                                 </p>
                                             </div>
                                         </Link>

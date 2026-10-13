@@ -44,6 +44,14 @@ export type AttentionItems = {
     urgentTasks: AttentionTask[];
     pendingApprovals: { total: number; deals: AttentionApproval[] };
     overduePayments: { installments: number; amount: number; deals: AttentionOverdueDeal[] };
+    /** SH-2: list-price changes waiting on this viewer (approvers only). */
+    pendingPriceChanges?: { total: number; requests: AttentionPriceChange[] };
+};
+
+export type AttentionPriceChange = {
+    id: string; createdAt: string; currentPrice: number; requestedPrice: number;
+    unit: { id: string; number: string; project: { id: string; name: string } };
+    requestedBy: { id: string; fullName: string } | null;
 };
 
 export const EMPTY_ATTENTION_ITEMS: AttentionItems = {
@@ -51,6 +59,7 @@ export const EMPTY_ATTENTION_ITEMS: AttentionItems = {
     urgentTasks: [],
     pendingApprovals: { total: 0, deals: [] },
     overduePayments: { installments: 0, amount: 0, deals: [] },
+    pendingPriceChanges: { total: 0, requests: [] },
 };
 
 export type RecentActivity = {

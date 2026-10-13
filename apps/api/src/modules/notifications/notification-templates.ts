@@ -28,4 +28,14 @@ export type NotificationTemplate =
     | {templateKey: "discountRequestRejected"; params: {dealNumber: string; percent: number; byName: string}}
     | {templateKey: "discountRequestWithdrawn"; params: {dealNumber: string; percent: number}}
     | {templateKey: "leadReassigned"; params: {leadName: string; byName: string; tasks: number}}
-    | {templateKey: "dealReassigned"; params: {dealNumber: string; byName: string; tasks: number}};
+    | {templateKey: "dealReassigned"; params: {dealNumber: string; byName: string; tasks: number}}
+    // SH-2: list-price changes. fromPrice / toPrice are raw numbers in the
+    // company currency.
+    | {templateKey: "unitPriceChangeRequested"; params: UnitPriceParams & {fromPrice: number; toPrice: number; byName: string}}
+    | {templateKey: "unitPriceChangeApproved"; params: UnitPriceParams & {toPrice: number; byName: string}}
+    | {templateKey: "unitPriceChangeRejected"; params: UnitPriceParams & {byName: string; reason: string}}
+    | {templateKey: "unitPriceChanged"; params: UnitPriceParams & {fromPrice: number; toPrice: number; byName: string}}
+    | {templateKey: "unitPriceRequestApproved"; params: UnitPriceParams & {byName: string}}
+    | {templateKey: "unitPriceRequestRejected"; params: UnitPriceParams & {byName: string}};
+
+type UnitPriceParams = {unit: string; project: string; currency: string | null};

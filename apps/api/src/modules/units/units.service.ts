@@ -15,6 +15,7 @@ import {PrismaService} from "@/database/prisma.service";
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 import {activityText} from "@/modules/activities/activity-templates";
+import {UnitPriceRequestsService} from "./unit-price-requests.service";
 
 /**
  * The only statuses a person may set by hand. RESERVED and SOLD belong to
@@ -44,7 +45,10 @@ const UNIT_LOCATION_INCLUDE = {
 
 @Injectable()
 export class UnitsService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly priceRequests: UnitPriceRequestsService,
+    ) {}
 
     /**
      * Records a company-scoped inventory activity, same idea as
@@ -410,7 +414,10 @@ export class UnitsService {
             throw new NotFoundException("Unit not found");
         }
 
-        return unit;
+        // SH-2: a list-price change waiting on an approver, shown on the unit.
+        const pendingPriceRequest = await this.priceRequests.findPendingForUnit(user.companyId, unit.id);
+
+        return {...unit, pendingPriceRequest};
     }
 
     async create(user: AuthUser, floorId: string, dto: CreateUnitDto) {
@@ -536,6 +543,7 @@ export class UnitsService {
                     companyId: user.companyId,
                 },
             },
+            include: {project: {select: {name: true}}},
         });
 
         if (!unit) {
@@ -557,7 +565,19 @@ export class UnitsService {
             await this.ensureManualStatusChangeAllowed(unit, dto.status);
         }
 
-        const changes = diffChangedFields(dto, unit, [
+        // SH-2: the edit form sends the price back unchanged on every save; only
+        // a different one is a price change, which needs units.edit_price and,
+        // without units.approve_price, waits as a request (the unit keeps its
+        // price meanwhile).
+        const priceChanged = dto.price !== undefined && Number(dto.price) !== Number(unit.price);
+        let priceRequestId: string | null = null;
+        if (priceChanged) {
+            const result = await this.priceRequests.handlePriceChange(user, unit, Number(dto.price));
+            if (result.outcome === "requested") priceRequestId = result.requestId;
+        }
+        const priceToWrite = priceChanged && !priceRequestId ? dto.price : undefined;
+
+        const changes = diffChangedFields({...dto, price: priceToWrite}, unit, [
             "number", "type", "rooms",
             {field: "area", normalize: (v) => Number(v)},
             {field: "price", normalize: (v) => Number(v)},
@@ -569,7 +589,7 @@ export class UnitsService {
             status: statusChanged ? dto.status : undefined,
             rooms: dto.rooms,
             area: dto.area,
-            price: dto.price,
+            price: priceToWrite,
         };
 
         if (statusChanged) {
@@ -607,7 +627,9 @@ export class UnitsService {
             });
         }
 
-        return updated;
+        // Tells the client the price change was sent for approval rather
+        // than applied.
+        return {...updated, priceRequestId};
     }
 
     async duplicate(user: AuthUser, id: string) {

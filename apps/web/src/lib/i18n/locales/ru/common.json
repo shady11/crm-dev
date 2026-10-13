@@ -80,7 +80,8 @@
     "toggleSidebar": "Переключить боковую панель",
     "myActivity": "Мои действия",
     "myTeam": "Моя команда",
-    "payments": "Платежи"
+    "payments": "Платежи",
+    "priceChanges": "Изменения цен"
   },
   "language": {
     "switchLabel": "Язык",

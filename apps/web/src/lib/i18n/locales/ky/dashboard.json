@@ -58,7 +58,10 @@
     "reservationsHeading": "Мөөнөтү бүтүп жаткан брондор",
     "tasksHeading": "Мөөнөтү жеткен тапшырмалар",
     "viewAll": "Баары",
-    "aboveYourLimit": "лимитиңизден жогору"
+    "aboveYourLimit": "лимитиңизден жогору",
+    "priceChangesHeading": "Макулдашууга баа өзгөрүүлөрү ({{count}})",
+    "review": "Карап чыгуу",
+    "priceChangeUnit": "{{unit}} объекти · {{project}}"
   },
   "recentActivity": {
     "title": "Акыркы активдүүлүк",

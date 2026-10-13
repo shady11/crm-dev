@@ -58,7 +58,10 @@
     "reservationsHeading": "Истекающие брони",
     "tasksHeading": "Задачи со сроком",
     "viewAll": "Все",
-    "aboveYourLimit": "выше вашего лимита"
+    "aboveYourLimit": "выше вашего лимита",
+    "priceChangesHeading": "Изменения цен на согласование ({{count}})",
+    "review": "Рассмотреть",
+    "priceChangeUnit": "Объект {{unit}} · {{project}}"
   },
   "recentActivity": {
     "title": "Последняя активность",

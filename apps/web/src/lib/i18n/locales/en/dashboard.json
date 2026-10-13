@@ -58,7 +58,10 @@
     "reservationsHeading": "Reservations expiring",
     "tasksHeading": "Tasks due",
     "viewAll": "View all",
-    "aboveYourLimit": "above your limit"
+    "aboveYourLimit": "above your limit",
+    "priceChangesHeading": "Price changes to approve ({{count}})",
+    "review": "Review",
+    "priceChangeUnit": "Unit {{unit}} · {{project}}"
   },
   "recentActivity": {
     "title": "Recent activity",

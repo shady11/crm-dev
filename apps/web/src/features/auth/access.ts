@@ -50,6 +50,9 @@ export const FEATURE_PERMISSIONS = {
     // platform operator's cross-tenant management screen.
     companySettings: "company_settings.view",
     rolesPermissions: "rbac.manage",
+    // SH-2: list-price changes. Approvers decide them; someone who can only
+    // ask follows their own requests.
+    priceChanges: ["units.approve_price", "units.edit_price"],
 } as const satisfies Record<string, string | readonly string[]>;
 
 export type Feature = keyof typeof FEATURE_PERMISSIONS;

@@ -80,7 +80,8 @@
     "toggleSidebar": "Каптал панелин которуу",
     "myActivity": "Менин аракеттерим",
     "myTeam": "Менин командам",
-    "payments": "Төлөмдөр"
+    "payments": "Төлөмдөр",
+    "priceChanges": "Баа өзгөрүүлөрү"
   },
   "language": {
     "switchLabel": "Тил",

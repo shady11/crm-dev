@@ -95,6 +95,11 @@ const MATRICES: {name: string; controller: {prototype: object}; expected: Matrix
             importUnits: MANAGE,
             duplicate: MANAGE,
             remove: MANAGE,
+            // SH-2: list-price changes. Asking needs units.edit_price (checked
+            // inside update), deciding units.approve_price; either may read.
+            findPriceRequests: ["units.edit_price", "units.approve_price"],
+            approvePriceRequest: ["units.approve_price"],
+            rejectPriceRequest: ["units.approve_price"],
         },
     },
 ];

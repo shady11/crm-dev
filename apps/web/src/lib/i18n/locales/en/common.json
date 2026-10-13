@@ -80,7 +80,8 @@
     "toggleSidebar": "Toggle sidebar",
     "myActivity": "My activity",
     "myTeam": "My team",
-    "payments": "Payments"
+    "payments": "Payments",
+    "priceChanges": "Price changes"
   },
   "language": {
     "switchLabel": "Language",

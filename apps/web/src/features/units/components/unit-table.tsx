@@ -59,12 +59,12 @@ export function UnitTable({ units }: UnitTableProps) {
     const updateUnitMutation = useMutation({
         mutationFn: ({ unitId, payload }: { unitId: string; payload: any }) =>
             updateUnit(unitId, payload),
-        onSuccess: async () => {
+        onSuccess: async (unit) => {
             await queryClient.invalidateQueries({ queryKey: ["project-tree"] });
 
-            toast.success({
-                title: t("toasts.updatedTitle"),
-            });
+            toast.success(unit.priceRequestId
+                ? { title: t("toasts.updatedTitle"), description: t("toasts.priceSentForApproval") }
+                : { title: t("toasts.updatedTitle") });
 
             setUnitSheet(null);
         },

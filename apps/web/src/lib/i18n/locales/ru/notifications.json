@@ -124,6 +124,30 @@
     "paymentVoided": {
       "title": "Платёж {{amount}} по сделке {{dealNumber}} аннулирован",
       "message": "{{reason}}"
+    },
+    "unitPriceChangeRequested": {
+      "title": "Новая цена объекта {{unit}} ({{project}}) ждёт согласования",
+      "message": "{{fromPrice}} → {{toPrice}}, запросил(а) {{byName}}"
+    },
+    "unitPriceChangeApproved": {
+      "title": "Новая цена объекта {{unit}} ({{project}}) согласована",
+      "message": "Теперь {{toPrice}}, согласовал(а) {{byName}}"
+    },
+    "unitPriceChangeRejected": {
+      "title": "Новая цена объекта {{unit}} ({{project}}) отклонена",
+      "message": "{{byName}}: {{reason}}"
+    },
+    "unitPriceChanged": {
+      "title": "Цена объекта {{unit}} ({{project}}) изменена",
+      "message": "{{fromPrice}} → {{toPrice}}, изменил(а) {{byName}}"
+    },
+    "unitPriceRequestApproved": {
+      "title": "Изменение цены объекта {{unit}} ({{project}}) согласовано",
+      "message": "Согласовал(а) {{byName}}"
+    },
+    "unitPriceRequestRejected": {
+      "title": "Изменение цены объекта {{unit}} ({{project}}) отклонено",
+      "message": "Отклонил(а) {{byName}}"
     }
   }
 }

@@ -97,6 +97,12 @@ const ACTIVITY_TEMPLATES = {
   unitDuplicated: (p: { unit: string; source: string }) =>
     `Unit "${p.unit}" created (duplicated from "${p.source}")`,
   unitDeleted: (p: { unit: string }) => `Unit "${p.unit}" deleted`,
+  unitPriceChangeRequested: (p: { unit: string }) =>
+    `Price change requested for unit "${p.unit}"`,
+  unitPriceChangeApproved: (p: { unit: string }) =>
+    `Price change approved for unit "${p.unit}"`,
+  unitPriceChangeRejected: (p: { unit: string }) =>
+    `Price change rejected for unit "${p.unit}"`,
 
   // Company: branches and users
   branchCreated: (p: { name: string }) => `Branch "${p.name}" created`,

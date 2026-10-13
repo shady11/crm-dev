@@ -1,0 +1,42 @@
+enum UnitPriceRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  // Replaced by a newer request for the same unit before anyone decided.
+  CANCELLED
+}
+
+// SH-2: a list-price change waiting on someone with units.approve_price.
+// A lower list price is a discount nobody approved, so a change by anyone
+// without that permission waits here; the unit keeps its price until it's
+// approved. At most one PENDING request per unit (a new one cancels the old).
+model UnitPriceRequest {
+  id String @id @default(uuid())
+
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id])
+
+  unitId String
+  unit   Unit   @relation(fields: [unitId], references: [id], onDelete: Cascade)
+
+  status UnitPriceRequestStatus @default(PENDING)
+
+  // The list price when the request was made, and the one asked for.
+  currentPrice   Decimal @db.Decimal(14, 2)
+  requestedPrice Decimal @db.Decimal(14, 2)
+
+  requestedById String
+  requestedBy   User   @relation("UnitPriceRequestedBy", fields: [requestedById], references: [id])
+
+  decidedById     String?
+  decidedBy       User?     @relation("UnitPriceDecidedBy", fields: [decidedById], references: [id])
+  decidedAt       DateTime?
+  rejectionReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId, status])
+  @@index([unitId, status])
+  @@unique([unitId], map: "UnitPriceRequest_one_pending_per_unit", where: raw("(status = 'PENDING'::\"UnitPriceRequestStatus\")"))
+}

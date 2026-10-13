@@ -42,6 +42,7 @@ export const paths = {
         byStatus: (status: string) => `/deals?status=${status}`,
     },
     payments: "/payments",
+    priceChanges: "/price-changes",
     tasks: {
         root: "/tasks",
     },

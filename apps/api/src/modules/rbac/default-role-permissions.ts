@@ -41,7 +41,7 @@ export const DEFAULT_ROLES: DefaultRoleSeed[] = [
             "deals.view", "deals.create", "deals.manage", "deals.cancel", "deals.reassign", "deals.approve_discount", "deals.manage_payments", "deals.void_payments",
             "projects.view", "projects.create", "projects.edit", "projects.delete",
             "inventory.view", "inventory.manage",
-            "units.edit",
+            "units.edit", "units.edit_price", "units.approve_price",
             "chessboard.view",
             "tasks.view", "tasks.create", "tasks.edit", "tasks.delete",
             "documents.view", "documents.upload", "documents.delete", "documents.generate", "documents.manage_templates",
@@ -65,7 +65,8 @@ export const DEFAULT_ROLES: DefaultRoleSeed[] = [
             "deals.view", "deals.create", "deals.manage", "deals.cancel", "deals.reassign", "deals.approve_discount", "deals.manage_payments",
             "projects.view",
             "inventory.view",
-            "units.edit",
+            // SH-2: may ask for a list-price change; a Company Admin approves it.
+            "units.edit", "units.edit_price",
             "chessboard.view",
             "tasks.view", "tasks.create", "tasks.edit", "tasks.delete",
             "documents.view", "documents.upload", "documents.delete", "documents.generate",
