@@ -435,6 +435,52 @@ describe('TasksService', () => {
         });
     });
 
+    describe('cancelOpenTasksForDeal (SH-3)', () => {
+        function db(tasks: {id: string; title: string; status: string}[]) {
+            return {
+                task: {findMany: jest.fn().mockResolvedValue(tasks), updateMany: jest.fn().mockResolvedValue({count: tasks.length})},
+                activity: {createMany: jest.fn().mockResolvedValue({count: tasks.length})},
+            };
+        }
+
+        it('cancels every open task on the deal, whoever holds it, and logs each one', async () => {
+            const {service} = build();
+            const tx = db([{id: 't1', title: 'Confirm documents', status: 'TODO'}, {id: 't2', title: 'Call', status: 'IN_PROGRESS'}]);
+
+            const count = await service.cancelOpenTasksForDeal(tx as any, {companyId: 'company-1', dealId: 'deal-1', actorId: 'head-1'});
+
+            expect(tx.task.findMany).toHaveBeenCalledWith(expect.objectContaining({
+                where: {companyId: 'company-1', dealId: 'deal-1', deletedAt: null, status: {in: ['TODO', 'IN_PROGRESS']}},
+            }));
+            expect(tx.task.updateMany).toHaveBeenCalledWith({where: {id: {in: ['t1', 't2']}}, data: {status: 'CANCELLED'}});
+            const logged = tx.activity.createMany.mock.calls[0][0].data;
+            expect(logged).toHaveLength(2);
+            expect(logged[0]).toEqual(expect.objectContaining({
+                userId: 'head-1', taskId: 't1', dealId: 'deal-1',
+                templateKey: 'taskCancelledWithDeal', templateParams: {task: 'Confirm documents'},
+            }));
+            expect(count).toBe(2);
+        });
+
+        it('cancels but logs nothing when no one can be named as the actor', async () => {
+            const {service} = build();
+            const tx = db([{id: 't1', title: 'Confirm documents', status: 'TODO'}]);
+
+            await service.cancelOpenTasksForDeal(tx as any, {companyId: 'company-1', dealId: 'deal-1', actorId: null});
+
+            expect(tx.task.updateMany).toHaveBeenCalled();
+            expect(tx.activity.createMany).not.toHaveBeenCalled();
+        });
+
+        it('writes nothing when the deal has no open tasks', async () => {
+            const {service} = build();
+            const tx = db([]);
+
+            await expect(service.cancelOpenTasksForDeal(tx as any, {companyId: 'company-1', dealId: 'deal-1', actorId: 'head-1'})).resolves.toBe(0);
+            expect(tx.task.updateMany).not.toHaveBeenCalled();
+        });
+    });
+
     describe('handOverOpenTasks', () => {
         function db(tasks: {id: string; title: string}[]) {
             return {

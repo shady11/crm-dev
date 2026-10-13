@@ -41,8 +41,10 @@ describe('DealExpiryService.expireOverdueReservations', () => {
 
         const moneyHeld = {notifyIfHeld: jest.fn().mockResolvedValue(undefined)};
 
-        const service = new DealExpiryService(prisma as any, notifications as any, activityService as any, moneyHeld as any);
-        return {service, prisma, notifications, activityService, moneyHeld};
+        const tasksService = {cancelOpenTasksForDeal: jest.fn().mockResolvedValue(0)};
+
+        const service = new DealExpiryService(prisma as any, notifications as any, activityService as any, moneyHeld as any, tasksService as any);
+        return {service, prisma, notifications, activityService, moneyHeld, tasksService};
     }
 
     it('does nothing when there are no overdue reservations', async () => {
@@ -74,6 +76,23 @@ describe('DealExpiryService.expireOverdueReservations', () => {
             where: {id: 'unit-1', status: UnitStatus.RESERVED},
             data: {status: UnitStatus.AVAILABLE},
         });
+    });
+
+    it('cancels the expired deal\'s open tasks, logged as its manager (SH-3)', async () => {
+        const {service, prisma, tasksService, activityService} = build([candidate()]);
+        tasksService.cancelOpenTasksForDeal.mockResolvedValue(1);
+        await service.expireOverdueReservations();
+
+        expect(tasksService.cancelOpenTasksForDeal).toHaveBeenCalledWith(prisma, {companyId: 'company-1', dealId: 'deal-1', actorId: 'manager-1'});
+        expect(activityService.expireReservation).toHaveBeenCalledWith(expect.objectContaining({
+            metadata: {reason: 'reservation_expiry_cron', tasksCancelled: 1},
+        }));
+    });
+
+    it('leaves tasks alone on a deal that lost the race', async () => {
+        const {service, tasksService} = build([candidate()], 0);
+        await service.expireOverdueReservations();
+        expect(tasksService.cancelOpenTasksForDeal).not.toHaveBeenCalled();
     });
 
     it('asks Finance to refund whatever the expired reservation still holds', async () => {

@@ -7,6 +7,7 @@ import {DealActivityService} from "./deal-activity.service";
 import {resolveDiscountRequestNotifications} from "./discount-approval";
 import {MoneyHeldNotifier} from "./money-held-notifier.service";
 import {activityText} from "@/modules/activities/activity-templates";
+import {TasksService} from "@/modules/tasks/tasks.service";
 
 @Injectable()
 export class DealExpiryService {
@@ -17,6 +18,7 @@ export class DealExpiryService {
         private readonly notifications: NotificationsService,
         private readonly activityService: DealActivityService,
         private readonly moneyHeld: MoneyHeldNotifier,
+        private readonly tasksService: TasksService,
     ) {}
 
     @Cron(CronExpression.EVERY_10_MINUTES)
@@ -60,6 +62,10 @@ export class DealExpiryService {
                     data: { status: UnitStatus.AVAILABLE },
                 });
 
+                const tasksCancelled = await this.tasksService.cancelOpenTasksForDeal(db, {
+                    companyId: deal.companyId, dealId: deal.id, actorId: deal.managerId,
+                });
+
                 if (deal.managerId) {
                     await this.activityService.expireReservation({
                         db,
@@ -67,7 +73,7 @@ export class DealExpiryService {
                         userId: deal.managerId,
                         dealId: deal.id,
                         clientId: deal.clientId,
-                        metadata: { reason: 'reservation_expiry_cron' },
+                        metadata: { reason: 'reservation_expiry_cron', tasksCancelled },
                     });
 
                     // The unit's own activity trail, distinct from the deal's
