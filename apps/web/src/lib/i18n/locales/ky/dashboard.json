@@ -57,7 +57,8 @@
     "overdueSince": "мөөнөтү {{date}} бүткөн",
     "reservationsHeading": "Мөөнөтү бүтүп жаткан брондор",
     "tasksHeading": "Мөөнөтү жеткен тапшырмалар",
-    "viewAll": "Баары"
+    "viewAll": "Баары",
+    "aboveYourLimit": "лимитиңизден жогору"
   },
   "recentActivity": {
     "title": "Акыркы активдүүлүк",

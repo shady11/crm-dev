@@ -216,7 +216,9 @@
     "discountDecisionError": "Could not save the decision",
     "reservationReissued": "The reservation agreement was reissued at the approved price.",
     "paymentVoided": "Payment voided",
-    "voidError": "Could not void the payment"
+    "voidError": "Could not void the payment",
+    "discountAboveLimit": "This discount is above your approval limit",
+    "discountAboveLimitHint": "It stays with an approver whose limit covers it."
   },
   "booking": {
     "rooms": "{{count}} rooms",
@@ -273,7 +275,10 @@
     "signBlocked": "Waiting for the discount decision",
     "rejectDialogTitle": "Reject discount",
     "rejectDialogDescription": "The deal stays at the list price. The manager sees your reason.",
-    "rejectReason": "Reason"
+    "rejectReason": "Reason",
+    "aboveYourLimit": "This is above your approval limit, so {{approvers}} decides it.",
+    "aboveYourLimitUnknown": "This is above your approval limit, so someone with a higher limit decides it.",
+    "pendingRequesterWith": "The contract can be signed once {{approvers}} decides. The sale price stays at the list price until then."
   },
   "stage": {
     "label": "Deal stage",

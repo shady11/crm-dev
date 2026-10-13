@@ -1,6 +1,6 @@
 import {ForbiddenException} from '@nestjs/common';
 import * as XLSX from 'xlsx';
-import {DealStatus, LeadStatus, UnitStatus} from '@/generated/prisma/client';
+import {DealStatus, LeadStatus, Prisma, UnitStatus} from '@/generated/prisma/client';
 import {AuthUser} from '@/common/types/auth-user.type';
 import {DashboardService} from './dashboard.service';
 
@@ -175,6 +175,34 @@ describe('DashboardService', () => {
             expect(prisma.deal.groupBy).toHaveBeenCalledWith(
                 expect.objectContaining({where: expect.objectContaining({managerId: 'self-1'})}),
             );
+        });
+    });
+
+    describe('getAttentionItems pending discounts (SH-1)', () => {
+        const head: AuthUser = {...salesHeadUser, discountLimit: 15, permissions: ['deals.approve_discount']};
+        const pending = (id: string, percent: number) => ({
+            id, dealNumber: id, reservedAt: new Date(),
+            requestedDiscountPercent: new Prisma.Decimal(percent), requestedDiscountAmount: new Prisma.Decimal(100),
+            client: {fullName: 'Client'}, manager: null,
+        });
+
+        it('marks requests above the viewer\'s own limit, and only those', async () => {
+            const {service, prisma} = build();
+            // expiring deals first, then pending approvals
+            prisma.deal.findMany.mockResolvedValueOnce([]).mockResolvedValueOnce([pending('d-10', 10), pending('d-20', 20)]);
+
+            const result = await service.getAttentionItems(head);
+
+            expect(result.pendingApprovals.deals.map((d) => [d.id, d.aboveYourLimit])).toEqual([['d-10', false], ['d-20', true]]);
+        });
+
+        it('never marks them for someone who doesn\'t approve discounts', async () => {
+            const {service, prisma} = build();
+            prisma.deal.findMany.mockResolvedValueOnce([]).mockResolvedValueOnce([pending('d-20', 20)]);
+
+            const result = await service.getAttentionItems(selfScopedUser);
+
+            expect(result.pendingApprovals.deals[0].aboveYourLimit).toBe(false);
         });
     });
 

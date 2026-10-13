@@ -7,6 +7,7 @@ import {hasPermission} from "@/common/utils/permissions.util";
 import {ACTIVE_DEAL_STATUSES, dealAttentionWhere, OVERDUE_INSTALLMENT_WHERE, WON_DEAL_STATUSES} from "@/modules/deals/deal.constants";
 import {OPEN_LEAD_STATUSES} from "@/modules/leads/lead.constants";
 import {RbacService} from "@/modules/rbac/rbac.service";
+import {canDecideDiscount} from "@/modules/deals/services/discount-approval";
 
 @Injectable()
 export class DashboardService {
@@ -158,6 +159,7 @@ export class DashboardService {
         const companyId = user.companyId;
         const effectiveBranchId = this.resolveBranchId(user, branchId);
         const selfScoped = this.isSelfScoped(user);
+        const canApprove = hasPermission(user, "deals.approve_discount");
         const in3Days = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
         const dealScope: Prisma.DealWhereInput = {
             companyId,
@@ -275,6 +277,11 @@ export class DashboardService {
                     ...deal,
                     requestedDiscountPercent: deal.requestedDiscountPercent == null ? null : Number(deal.requestedDiscountPercent),
                     requestedDiscountAmount: deal.requestedDiscountAmount == null ? null : Number(deal.requestedDiscountAmount),
+                    // SH-1: an approver sees requests above their own band
+                    // too (they're in the branch's queue), but marked as
+                    // someone else's to decide.
+                    aboveYourLimit: canApprove && deal.requestedDiscountPercent != null
+                        && !canDecideDiscount(deal.requestedDiscountPercent, {canApprove, discountLimit: user.discountLimit}),
                 })),
             },
             overduePayments,

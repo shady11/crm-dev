@@ -29,6 +29,7 @@ import {
     UnitNotAvailableException,
 } from '../exceptions';
 import {BOOKABLE_PROJECT_STATUSES} from '../deal.constants';
+import {canDecideDiscount} from './discount-approval';
 
 export type ReservationPolicy = Pick<
     Company,
@@ -186,12 +187,7 @@ export class DealDomainService {
         deciderCanApprove: boolean,
         deciderDiscountLimit: number | null | undefined,
     ): boolean {
-        if (!deciderCanApprove) return false;
-
-        const limit = deciderDiscountLimit === undefined ? 0 : deciderDiscountLimit;
-        if (limit === null) return true;
-
-        return requestedPercent.lessThanOrEqualTo(new Prisma.Decimal(limit));
+        return canDecideDiscount(requestedPercent, {canApprove: deciderCanApprove, discountLimit: deciderDiscountLimit});
     }
 
     ensureCanActivate(deal: Deal): void {

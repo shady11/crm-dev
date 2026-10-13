@@ -57,7 +57,8 @@
     "overdueSince": "due since {{date}}",
     "reservationsHeading": "Reservations expiring",
     "tasksHeading": "Tasks due",
-    "viewAll": "View all"
+    "viewAll": "View all",
+    "aboveYourLimit": "above your limit"
   },
   "recentActivity": {
     "title": "Recent activity",

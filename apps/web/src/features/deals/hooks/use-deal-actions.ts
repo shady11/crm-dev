@@ -151,13 +151,25 @@ export function useDealActions(dealId: string) {
         onError: () => toast.error({ title: t("toasts.documentError"), description: t("toasts.tryAgain") }),
     });
 
+    // A 403 here means the request is above the viewer's own limit (it can
+    // change while the page is open); a retry wouldn't help, so say so.
+    const discountDecisionError = (error: unknown) => {
+        const status = isAxiosError(error) ? error.response?.status : undefined;
+        if (status === 403) {
+            void invalidate();
+            toast.error({ title: t("toasts.discountAboveLimit"), description: t("toasts.discountAboveLimitHint") });
+            return;
+        }
+        toast.error({ title: t("toasts.discountDecisionError"), description: t("toasts.tryAgain") });
+    };
+
     const approveDiscountRequest = useMutation({
         mutationFn: () => approveDiscount(dealId),
         onSuccess: async () => {
             await invalidate();
             toast.success({ title: t("toasts.discountApproved"), description: t("toasts.reservationReissued") });
         },
-        onError: () => toast.error({ title: t("toasts.discountDecisionError"), description: t("toasts.tryAgain") }),
+        onError: (error) => discountDecisionError(error),
     });
 
     const rejectDiscountRequest = useMutation({
@@ -166,7 +178,7 @@ export function useDealActions(dealId: string) {
             await invalidate();
             toast.success({ title: t("toasts.discountRejected") });
         },
-        onError: () => toast.error({ title: t("toasts.discountDecisionError"), description: t("toasts.tryAgain") }),
+        onError: (error) => discountDecisionError(error),
     });
 
     return {
