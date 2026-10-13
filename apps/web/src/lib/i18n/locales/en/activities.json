@@ -8,6 +8,8 @@
       "allBranches": "All branches",
       "dateFrom": "From",
       "dateTo": "To",
+      "user": "User",
+      "everyone": "Everyone",
       "subject": "Related to",
       "anything": "Anything",
       "mineOnly": "My actions",

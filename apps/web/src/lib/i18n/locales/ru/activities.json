@@ -8,6 +8,8 @@
       "allBranches": "Все филиалы",
       "dateFrom": "С",
       "dateTo": "По",
+      "user": "Пользователь",
+      "everyone": "Все",
       "subject": "Связано с",
       "anything": "Всё",
       "mineOnly": "Мои действия",
