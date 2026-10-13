@@ -38,7 +38,8 @@ export type GetLeadsParams = {
     page?: number;
     limit?: number;
     search?: string;
-    status?: LeadStatus;
+    /** OPEN: every status but Converted and Lost, as "Open leads" counts them. */
+    status?: LeadStatus | "OPEN";
     source?: string;
     managerId?: string;
     projectId?: string;

@@ -21,23 +21,32 @@ import {
     updateLead,
     type UpdateLeadPayload,
 } from "@/features/leads/api/leads.api.ts";
-import type {LeadStatus} from "@/features/leads/types/lead.types.ts";
+import {LeadStatus} from "@/features/leads/types/lead.types.ts";
 import {useSort} from "@/hooks/use-sort.ts";
 import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
 import {toastWithUndo} from "@/lib/undo-toast.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 
-export type LeadStatusFilterValue = LeadStatus | "all";
+export type LeadStatusFilterValue = LeadStatus | "OPEN" | "all";
+
+const STATUS_FILTERS: LeadStatusFilterValue[] = ["OPEN", ...Object.values(LeadStatus)];
 
 export function useLeadsList() {
     const { t } = useTranslation("leads");
     const queryClient = useQueryClient();
     const { user } = useAuth();
 
+    // ?managerId=…&status=… seed the filters, so My team can open one
+    // manager's open leads (SH-4); the toolbar takes over from there.
+    const [searchParams, setSearchParams] = useSearchParams();
     const [search, setSearchState] = useState("");
-    const [statusFilter, setStatusFilterState] = useState<LeadStatusFilterValue>("all");
+    const [statusFilter, setStatusFilterState] = useState<LeadStatusFilterValue>(
+        () => STATUS_FILTERS.find((s) => s === searchParams.get("status")) ?? "all",
+    );
     const [branchFilter, setBranchFilterState] = useState<string | "all">("all");
     const [sourceFilter, setSourceFilterState] = useState<string | "all">("all");
+    // "My leads" is the manager filter set to yourself; the two are one filter.
+    const [managerFilter, setManagerFilterState] = useState<string | "all">(() => searchParams.get("managerId") ?? "all");
     const [mineOnly, setMineOnlyState] = useState(false);
     const [page, setPage] = useState(1);
     const [limit, setLimitState] = useState(10);
@@ -61,7 +70,6 @@ export function useLeadsList() {
 
     // ?lead=<id> opens that lead's details sheet: where a "lead reassigned
     // to you" notification points, since a lead has no page of its own.
-    const [searchParams, setSearchParams] = useSearchParams();
     const linkedLeadId = searchParams.get("lead");
     const linkedLeadQuery = useQuery({
         queryKey: ["leads", "detail", linkedLeadId],
@@ -70,7 +78,7 @@ export function useLeadsList() {
     });
 
     const tableQuery = useQuery({
-        queryKey: ["leads", { search: debouncedSearch, statusFilter, branchFilter, sourceFilter, mineOnly, page, limit, sortBy, sortOrder }],
+        queryKey: ["leads", { search: debouncedSearch, statusFilter, branchFilter, sourceFilter, managerFilter, mineOnly, page, limit, sortBy, sortOrder }],
         queryFn: () =>
             getLeads({
                 page,
@@ -79,7 +87,7 @@ export function useLeadsList() {
                 status: statusFilter === "all" ? undefined : statusFilter,
                 branchId: branchFilter === "all" ? undefined : branchFilter,
                 source: sourceFilter === "all" ? undefined : sourceFilter,
-                managerId: mineOnly ? user?.id : undefined,
+                managerId: mineOnly ? user?.id : managerFilter === "all" ? undefined : managerFilter,
                 sortBy,
                 sortOrder,
             }),
@@ -315,6 +323,18 @@ export function useLeadsList() {
     const detailsSource = detailsTarget ?? (linkedLeadId ? linkedLeadQuery.data ?? null : null);
     const detailsLead = detailsSource ? (leads.find((l) => l.id === detailsSource.id) ?? detailsSource) : null;
 
+    // Once the toolbar changes a filter, the link's seed no longer describes
+    // the list; drop it so a reload doesn't bring it back.
+    const dropLinkSeed = () => {
+        if (!searchParams.has("managerId") && !searchParams.has("status")) return;
+        setSearchParams((prev) => {
+            const params = new URLSearchParams(prev);
+            params.delete("managerId");
+            params.delete("status");
+            return params;
+        }, { replace: true });
+    };
+
     const openDetails = (lead: Lead) => setDetailsTarget(lead);
     const closeDetails = () => {
         setDetailsTarget(null);
@@ -338,6 +358,7 @@ export function useLeadsList() {
             setStatusFilter: (value: LeadStatusFilterValue) => {
                 setStatusFilterState(value);
                 setPage(1);
+                dropLinkSeed();
             },
             branchFilter,
             setBranchFilter: (value: string | "all") => {
@@ -349,10 +370,19 @@ export function useLeadsList() {
                 setSourceFilterState(value);
                 setPage(1);
             },
+            managerFilter,
+            setManagerFilter: (value: string | "all") => {
+                setManagerFilterState(value);
+                setMineOnlyState(false);
+                setPage(1);
+                dropLinkSeed();
+            },
             mineOnly,
             setMineOnly: (value: boolean) => {
                 setMineOnlyState(value);
+                if (value) setManagerFilterState("all");
                 setPage(1);
+                dropLinkSeed();
             },
         },
 

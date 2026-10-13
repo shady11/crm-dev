@@ -17,7 +17,9 @@
     "searchPlaceholder": "Search for leads...",
     "addLead": "Add New Lead",
     "mineOnly": "My leads",
-    "allSources": "All sources"
+    "allSources": "All sources",
+    "allManagers": "All managers",
+    "openStatuses": "Open leads"
   },
   "table": {
     "lead": "Lead",

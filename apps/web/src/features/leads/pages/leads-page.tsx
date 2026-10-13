@@ -44,6 +44,8 @@ export function LeadsPage() {
                     onBranchFilterChange={filters.setBranchFilter}
                     sourceFilter={filters.sourceFilter}
                     onSourceFilterChange={filters.setSourceFilter}
+                    managerFilter={filters.managerFilter}
+                    onManagerFilterChange={filters.setManagerFilter}
                     mineOnly={filters.mineOnly}
                     onMineOnlyChange={filters.setMineOnly}
                     onAddLead={form.openCreateForm}

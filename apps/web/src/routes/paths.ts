@@ -5,6 +5,8 @@ export const paths = {
     leads: "/leads",
     // Opens the leads page with that lead's details sheet open.
     leadDetail: (leadId: string) => `/leads?lead=${leadId}`,
+    // One manager's open leads: what "Open leads" counts on My team.
+    openLeadsByManager: (managerId: string) => `/leads?managerId=${managerId}&status=OPEN`,
     clients: {
         root: "/clients",
         detail: (clientId: string) => `/clients/${clientId}`,

@@ -67,6 +67,12 @@ export function TeamPage() {
         items: PERIODS.map((value) => ({label: t("team.period", {count: value}), value: String(value)})),
     });
 
+    const openLeadsCell = (row: Row) => row.snapshot ? (
+        <Link to={paths.openLeadsByManager(row.manager.id)} className="hover:underline">
+            {row.snapshot.openLeads}
+        </Link>
+    ) : "—";
+
     const overdueCell = (row: Row) => row.overduePayments.installments > 0 ? (
         <Link to={paths.deals.attention("overdue_payments", row.manager.id)} className="font-medium text-destructive hover:underline">
             {formatCurrency(row.overduePayments.amount)}
@@ -112,7 +118,7 @@ export function TeamPage() {
                                         {row.manager.fullName}
                                     </Link>
                                     <dl className="grid grid-cols-2 gap-x-4 gap-y-1">
-                                        <dt className="text-muted-foreground">{t("team.columns.openLeads")}</dt><dd>{row.snapshot?.openLeads ?? "—"}</dd>
+                                        <dt className="text-muted-foreground">{t("team.columns.openLeads")}</dt><dd>{openLeadsCell(row)}</dd>
                                         <dt className="text-muted-foreground">{t("team.columns.activeDeals")}</dt><dd>{row.snapshot?.activeDeals ?? "—"}</dd>
                                         <dt className="text-muted-foreground">{t("team.columns.tasksOverdue")}</dt><dd>{row.snapshot?.tasksDue ?? "—"}</dd>
                                         <dt className="text-muted-foreground">{t("team.columns.overduePayments")}</dt><dd>{overdueCell(row)}</dd>
@@ -155,7 +161,7 @@ export function TeamPage() {
                                                 </div>
                                             </Link>
                                         </TableCell>
-                                        <TableCell className="text-right tabular-nums">{row.snapshot?.openLeads ?? "—"}</TableCell>
+                                        <TableCell className="text-right tabular-nums">{openLeadsCell(row)}</TableCell>
                                         <TableCell className="text-right tabular-nums">{row.snapshot?.activeDeals ?? "—"}</TableCell>
                                         <TableCell className={`text-right tabular-nums ${row.snapshot?.tasksDue ? "text-destructive" : ""}`}>
                                             {row.snapshot?.tasksDue ?? "—"}

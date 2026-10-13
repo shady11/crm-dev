@@ -17,7 +17,9 @@
     "searchPlaceholder": "Лиддерди издөө...",
     "addLead": "Лид кошуу",
     "mineOnly": "Менин лиддерим",
-    "allSources": "Бардык булактар"
+    "allSources": "Бардык булактар",
+    "allManagers": "Бардык менеджерлер",
+    "openStatuses": "Ачыктар"
   },
   "table": {
     "lead": "Лид",

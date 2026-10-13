@@ -10,7 +10,8 @@ import {hasPermission} from "@/common/utils/permissions.util";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {TransferBranchDto} from "@/common/dto/transfer-branch.dto";
 import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
-import {LEAD_SORTABLE_FIELDS, QueryLeadsDto} from "@/modules/leads/dto/query-leads.dto";
+import {LEAD_SORTABLE_FIELDS, LEAD_STATUS_OPEN, QueryLeadsDto} from "@/modules/leads/dto/query-leads.dto";
+import {OPEN_LEAD_STATUSES} from "@/modules/leads/lead.constants";
 import {resolveOrderBy} from "@/common/utils/sort.util";
 import {CreateLeadDto} from "@/modules/leads/dto/create-lead.dto";
 import {UpdateLeadDto} from "@/modules/leads/dto/update-lead.dto";
@@ -72,7 +73,9 @@ export class LeadsService {
             where.branchId = query.branchId;
         }
 
-        if (query.status) {
+        if (query.status === LEAD_STATUS_OPEN) {
+            where.status = {in: OPEN_LEAD_STATUSES};
+        } else if (query.status) {
             where.status = query.status;
         }
 

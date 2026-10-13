@@ -126,6 +126,15 @@ describe('LeadsService', () => {
             );
         });
 
+        it('reads status OPEN as every status but Converted and Lost, alongside a manager (SH-4)', async () => {
+            const {service, prisma} = build();
+            await service.findAll(branchUser, {status: 'OPEN', managerId: 'manager-2'} as any);
+
+            const where = (prisma.lead.findMany as jest.Mock).mock.calls[0][0].where;
+            expect(where.status).toEqual({in: ['NEW', 'CONTACTED', 'QUALIFIED', 'MEETING', 'NEGOTIATION']});
+            expect(where.managerId).toBe('manager-2');
+        });
+
         it('builds a case-insensitive OR search across name/phone/email', async () => {
             const {service, prisma} = build();
             await service.findAll(adminUser, {search: 'jane'} as any);
