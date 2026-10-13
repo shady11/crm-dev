@@ -955,6 +955,51 @@ describe('DealsService', () => {
             ]);
         });
 
+        describe('findOne discountDecision (SH-1)', () => {
+            const pendingDeal = (percent: number) => ({
+                id: 'deal-1', companyId: 'company-1', branchId: 'branch-1',
+                discountApprovalStatus: DiscountApprovalStatus.PENDING,
+                requestedDiscountPercent: new Prisma.Decimal(percent),
+            });
+
+            function withPending(percent: number) {
+                const base = buildBase();
+                base.prisma.deal.findFirst.mockResolvedValue(pendingDeal(percent));
+                base.prisma.payment.findMany = jest.fn().mockResolvedValue([]);
+                base.prisma.user.findMany.mockImplementation(({where}: any) => Promise.resolve(
+                    where.roleId.in.includes('role-sales-head')
+                        ? [{id: 'head-1', fullName: 'Nurlan Asanova'}]
+                        : [{id: 'admin-1', fullName: 'Admin User'}],
+                ));
+                return base;
+            }
+
+            it('lets a Sales Head decide a request within their own limit, and names them as the approver', async () => {
+                const {service} = withPending(10);
+                const result = await service.findOne(salesHeadUser, 'deal-1');
+                expect(result.discountDecision).toEqual({canDecide: true, approvers: [{id: 'head-1', fullName: 'Nurlan Asanova'}]});
+            });
+
+            it('tells a Sales Head a request above their limit is with the Company Admin', async () => {
+                const {service} = withPending(20);
+                const result = await service.findOne(salesHeadUser, 'deal-1');
+                expect(result.discountDecision).toEqual({canDecide: false, approvers: [{id: 'admin-1', fullName: 'Admin User'}]});
+            });
+
+            it('never lets the requester decide, whatever the percent', async () => {
+                const {service} = withPending(3);
+                const result = await service.findOne(managerUser, 'deal-1');
+                expect(result.discountDecision?.canDecide).toBe(false);
+            });
+
+            it('is null when nothing is pending', async () => {
+                const {service, prisma} = withPending(10);
+                prisma.deal.findFirst.mockResolvedValue({...pendingDeal(10), discountApprovalStatus: DiscountApprovalStatus.APPROVED});
+                const result = await service.findOne(salesHeadUser, 'deal-1');
+                expect(result.discountDecision).toBeNull();
+            });
+        });
+
         it('findOne throws DealNotFoundException outside caller scope', async () => {
             const {service, prisma} = buildBase();
             prisma.deal.findFirst.mockResolvedValue(null);

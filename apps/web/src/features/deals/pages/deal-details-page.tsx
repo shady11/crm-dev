@@ -318,7 +318,8 @@ export function DealDetailsPage() {
 
             <DealDiscountBanner
                 deal={deal}
-                canDecide={canDecideDiscount}
+                canApprove={canDecideDiscount}
+                decision={deal.discountDecision}
                 isDeciding={actions.approveDiscount.isPending || actions.rejectDiscount.isPending}
                 onApprove={() => actions.approveDiscount.mutate()}
                 onReject={() => setRejectOpen(true)}

@@ -44,7 +44,7 @@ import {CancelDealDto} from "@/modules/deals/dto/cancel-deal.dto";
 import {RejectDiscountDto} from "@/modules/deals/dto/reject-discount.dto";
 import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
 import {DbClient} from "@/database/prisma.types";
-import {findDiscountApproverIds, resolveDiscountRequestNotifications} from "./discount-approval";
+import {findDiscountApprovers, findDiscountApproverIds, resolveDiscountRequestNotifications} from "./discount-approval";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 import {DealNumberService} from "@/modules/deals/services/deal-number.service";
 import {DocumentGenerationService} from "@/modules/document-generation/document-generation.service";
@@ -229,11 +229,35 @@ export class DealsService {
 
     return {
       ...this.mapper.toDetails(deal),
+      discountDecision: await this.discountDecisionFor(user, deal),
       voidedPayments: voided.map(({ deletedAt, ...payment }) => ({
         ...payment,
         amount: Number(payment.amount),
         voidedAt: deletedAt,
       })),
+    };
+  }
+
+  /**
+   * For a pending discount request: whether this viewer may decide it, and
+   * who is being asked (SH-1). Lets the deal page offer Approve / Reject
+   * only to someone the API will accept, and tell everyone else who the
+   * request is with, instead of a refused click.
+   */
+  private async discountDecisionFor(
+    user: AuthUser,
+    deal: { companyId: string; branchId: string | null; discountApprovalStatus: DiscountApprovalStatus; requestedDiscountPercent: Prisma.Decimal | null },
+  ) {
+    if (deal.discountApprovalStatus !== DiscountApprovalStatus.PENDING || deal.requestedDiscountPercent == null) {
+      return null;
+    }
+    const percent = deal.requestedDiscountPercent;
+    const approvers = await findDiscountApprovers(this.prisma, this.rbacService, {
+      companyId: deal.companyId, branchId: deal.branchId, percent,
+    });
+    return {
+      canDecide: this.domain.canDecideDiscount(percent, hasPermission(user, 'deals.approve_discount'), user.discountLimit),
+      approvers,
     };
   }
 

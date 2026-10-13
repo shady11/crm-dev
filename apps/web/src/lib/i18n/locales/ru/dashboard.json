@@ -57,7 +57,8 @@
     "overdueSince": "срок с {{date}}",
     "reservationsHeading": "Истекающие брони",
     "tasksHeading": "Задачи со сроком",
-    "viewAll": "Все"
+    "viewAll": "Все",
+    "aboveYourLimit": "выше вашего лимита"
   },
   "recentActivity": {
     "title": "Последняя активность",

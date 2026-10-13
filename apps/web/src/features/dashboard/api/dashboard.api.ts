@@ -27,6 +27,8 @@ export type AttentionApproval = {
     requestedDiscountPercent: number | null; requestedDiscountAmount: number | null;
     client: { fullName: string };
     manager: { id: string; fullName: string } | null;
+    /** The viewer approves discounts, but this one is above their own limit. */
+    aboveYourLimit?: boolean;
 };
 // One row per deal with at least one overdue installment, oldest first.
 export type AttentionOverdueDeal = {

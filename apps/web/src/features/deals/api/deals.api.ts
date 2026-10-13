@@ -129,6 +129,16 @@ export type DealDetails = Deal & {
     paymentSchedules: DealPaymentSchedule[];
     /** Only on GET /deals/:id; mutation responses leave it out. */
     voidedPayments?: VoidedPayment[];
+    /**
+     * Only on GET /deals/:id, and null unless a discount is pending: whether
+     * the viewer may decide it (within their own limit), and who is asked.
+     */
+    discountDecision?: DiscountDecision | null;
+};
+
+export type DiscountDecision = {
+    canDecide: boolean;
+    approvers: { id: string; fullName: string }[];
 };
 
 export type ReserveUnitPayload = {

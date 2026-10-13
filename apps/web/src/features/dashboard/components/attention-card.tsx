@@ -65,11 +65,12 @@ export function AttentionCard({data, showOwner}: {data: AttentionItems; showOwne
                                     ? {to: paths.deals.attention("discount_pending"), label: t("attention.viewAll")}
                                     : undefined}
                             >
-                                {pendingApprovals.deals.map((deal) => {
+                                {/* Ones the viewer can decide first; each group stays oldest first. */}
+                                {[...pendingApprovals.deals].sort((x, y) => Number(!!x.aboveYourLimit) - Number(!!y.aboveYourLimit)).map((deal) => {
                                     const waitingDays = deal.reservedAt ? daysSince(deal.reservedAt) : 0;
                                     return (
                                         <Link key={deal.id} to={paths.deals.detail(deal.id)} className={ROW_CLASS}>
-                                            <BadgePercentIcon size={16} className={`shrink-0 ${waitingDays >= 1 ? "text-destructive" : "text-amber-500"}`} />
+                                            <BadgePercentIcon size={16} className={`shrink-0 ${deal.aboveYourLimit ? "text-muted-foreground" : waitingDays >= 1 ? "text-destructive" : "text-amber-500"}`} />
                                             <div className="min-w-0 flex-1">
                                                 <p className="truncate font-medium">{deal.dealNumber} · {deal.client.fullName}</p>
                                                 <p className="truncate text-xs text-muted-foreground">
@@ -80,6 +81,7 @@ export function AttentionCard({data, showOwner}: {data: AttentionItems; showOwne
                                                     })}
                                                     {" · "}
                                                     {waitingDays === 0 ? t("attention.waitingToday") : t("attention.waitingDays", {count: waitingDays})}
+                                                    {deal.aboveYourLimit ? ` · ${t("attention.aboveYourLimit")}` : null}
                                                 </p>
                                             </div>
                                         </Link>

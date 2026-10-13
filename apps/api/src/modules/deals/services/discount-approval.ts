@@ -12,11 +12,11 @@ import type {NotificationsService} from "@/modules/notifications/notifications.s
  * and when it is chased (DiscountApprovalReminderService), so both reach
  * the same people.
  */
-export async function findDiscountApproverIds(
+export async function findDiscountApprovers(
     db: DbClient,
     rbacService: RbacService,
     params: {companyId: string; branchId: string | null; percent: Prisma.Decimal | number},
-): Promise<string[]> {
+): Promise<{id: string; fullName: string}[]> {
     const percent = new Prisma.Decimal(params.percent);
     const approverRoles = await rbacService.findApproverRoles(params.companyId, "deals.approve_discount");
     const qualifying = approverRoles.filter(
@@ -26,17 +26,41 @@ export async function findDiscountApproverIds(
     const companyWideRoleIds = qualifying.filter((r) => !r.isBranchScoped).map((r) => r.id);
     const targetRoleIds = branchScopedRoleIds.length > 0 ? branchScopedRoleIds : companyWideRoleIds;
 
-    const approvers = await db.user.findMany({
+    return db.user.findMany({
         where: {
             companyId: params.companyId,
             roleId: {in: targetRoleIds},
             isActive: true,
             ...(branchScopedRoleIds.length > 0 ? {branchId: params.branchId} : {}),
         },
-        select: {id: true},
+        select: {id: true, fullName: true},
+        orderBy: {fullName: "asc"},
     });
+}
 
+export async function findDiscountApproverIds(
+    db: DbClient,
+    rbacService: RbacService,
+    params: {companyId: string; branchId: string | null; percent: Prisma.Decimal | number},
+): Promise<string[]> {
+    const approvers = await findDiscountApprovers(db, rbacService, params);
     return approvers.map((a) => a.id);
+}
+
+/**
+ * Whether this viewer may decide a request of `percent`: they hold
+ * deals.approve_discount and the request is within their own Role
+ * discountLimit (null = no ceiling). The API refuses anything else, so the
+ * UI asks the same question before offering Approve / Reject (SH-1).
+ */
+export function canDecideDiscount(
+    percent: Prisma.Decimal | number,
+    viewer: {canApprove: boolean; discountLimit: number | null | undefined},
+): boolean {
+    if (!viewer.canApprove) return false;
+    const limit = viewer.discountLimit === undefined ? 0 : viewer.discountLimit;
+    if (limit === null) return true;
+    return new Prisma.Decimal(percent).lessThanOrEqualTo(new Prisma.Decimal(limit));
 }
 
 type DiscountRequestOutcome =
