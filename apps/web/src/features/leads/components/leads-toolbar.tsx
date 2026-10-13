@@ -1,6 +1,5 @@
-import {Plus, Search, UserRoundIcon} from "lucide-react";
+import {Search, UserRoundIcon} from "lucide-react";
 import {createListCollection} from "@ark-ui/react";
-import {Button} from "@/components/ui/button.tsx";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {Toggle} from "@/components/ui/toggle.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
@@ -24,7 +23,6 @@ interface LeadsToolbarProps {
     onManagerFilterChange(value: string | "all"): void;
     mineOnly: boolean;
     onMineOnlyChange(value: boolean): void;
-    onAddLead(): void;
 }
 
 export function LeadsToolbar({
@@ -40,7 +38,6 @@ export function LeadsToolbar({
                                   onManagerFilterChange,
                                   mineOnly,
                                   onMineOnlyChange,
-                                  onAddLead,
                               }: LeadsToolbarProps) {
     const { t } = useTranslation("leads");
     const managers = useManagers();
@@ -150,11 +147,6 @@ export function LeadsToolbar({
                         <Search className="size-4" />
                     </InputGroupAddon>
                 </InputGroup>
-
-                <Button onClick={onAddLead}>
-                    <Plus className="size-3" />
-                    {t("toolbar.addLead")}
-                </Button>
             </div>
         </div>
     );
