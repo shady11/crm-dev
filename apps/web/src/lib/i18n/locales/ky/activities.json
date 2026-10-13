@@ -79,6 +79,7 @@
     "taskUpdated": "«{{task}}» тапшырмасы жаңыртылды",
     "taskDeleted": "«{{task}}» тапшырмасы өчүрүлдү",
     "taskRestored": "«{{task}}» тапшырмасы калыбына келтирилди",
+    "taskCancelledWithDeal": "«{{task}}» тапшырмасы бүтүм менен кошо жокко чыгарылды",
     "documentUploaded": "«{{name}}» документи жүктөлдү",
     "documentDeleted": "«{{name}}» документи өчүрүлдү",
     "documentRestored": "«{{name}}» документи калыбына келтирилди",

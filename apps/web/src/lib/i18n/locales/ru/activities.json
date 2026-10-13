@@ -79,6 +79,7 @@
     "taskUpdated": "Задача «{{task}}» обновлена",
     "taskDeleted": "Задача «{{task}}» удалена",
     "taskRestored": "Задача «{{task}}» восстановлена",
+    "taskCancelledWithDeal": "Задача «{{task}}» отменена вместе со сделкой",
     "documentUploaded": "Загружен документ «{{name}}»",
     "documentDeleted": "Документ «{{name}}» удалён",
     "documentRestored": "Документ «{{name}}» восстановлен",

@@ -1026,10 +1026,14 @@ export class DealsService {
         data: { deletedAt: new Date() },
       });
 
+      const tasksCancelled = await this.tasksService.cancelOpenTasksForDeal(db, {
+        companyId, dealId: deal.id, actorId: user.id,
+      });
+
       await this.activityService.cancelReservation({
         db, companyId, userId: user.id,
         dealId: deal.id, clientId: deal.clientId,
-        metadata: { reason: dto.reason ?? null },
+        metadata: { reason: dto.reason ?? null, tasksCancelled },
       });
 
       if (deal.managerId) {

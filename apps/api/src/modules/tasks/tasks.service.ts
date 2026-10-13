@@ -517,6 +517,54 @@ export class TasksService {
     }
 
     /**
+     * When a deal is cancelled or its reservation lapses, the work attached
+     * to it is moot: its open tasks ("Confirm documents …" and any the team
+     * added) are cancelled rather than left to turn overdue on the team's
+     * dashboards (SH-3). Runs inside the caller's transaction. Each one is
+     * logged on the task; actorId is null only when nobody can be named
+     * (an expiry with no manager), in which case nothing is logged.
+     */
+    async cancelOpenTasksForDeal(db: DbClient, params: {
+        companyId: string;
+        dealId: string;
+        actorId: string | null;
+    }): Promise<number> {
+        const tasks = await db.task.findMany({
+            where: {
+                companyId: params.companyId,
+                dealId: params.dealId,
+                deletedAt: null,
+                status: {in: [TaskStatus.TODO, TaskStatus.IN_PROGRESS]},
+            },
+            select: {id: true, title: true, status: true},
+        });
+        if (tasks.length === 0) return 0;
+
+        await db.task.updateMany({
+            where: {id: {in: tasks.map((t) => t.id)}},
+            data: {status: TaskStatus.CANCELLED},
+        });
+
+        if (params.actorId) {
+            const actorId = params.actorId;
+            await db.activity.createMany({
+                data: tasks.map((task) => ({
+                    companyId: params.companyId,
+                    userId: actorId,
+                    taskId: task.id,
+                    dealId: params.dealId,
+                    action: ActivityAction.CHANGED_TASK_STATUS,
+                    type: ActivityType.TASK_STATUS_CHANGED,
+                    ...activityText('taskCancelledWithDeal', { task: task.title }),
+                    metadata: {fromStatus: task.status, toStatus: TaskStatus.CANCELLED, dealId: params.dealId},
+                })),
+            });
+        }
+
+        return tasks.length;
+    }
+
+    /**
      * System-triggered task creation — called by other modules (Leads,
      * Deals) as a best-effort side effect of their own events, the same way
      * DealsService.generateAndLogDocument runs document generation outside

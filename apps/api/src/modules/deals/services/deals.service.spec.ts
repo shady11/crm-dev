@@ -132,6 +132,7 @@ describe('DealsService', () => {
         const tasksService = {
             createAutomated: jest.fn().mockResolvedValue(null),
             handOverOpenTasks: jest.fn().mockResolvedValue([]),
+            cancelOpenTasksForDeal: jest.fn().mockResolvedValue(0),
         };
 
         const moneyHeld = {notifyIfHeld: jest.fn().mockResolvedValue(undefined)};
@@ -810,6 +811,19 @@ describe('DealsService', () => {
             await service.cancelDeal(managerUser, 'deal-1', {} as any);
 
             expect(notifications.resolveForEntity).not.toHaveBeenCalled();
+        });
+
+        it('cancels the deal\'s open tasks in the same transaction and records how many (SH-3)', async () => {
+            const {service, prisma, tasksService, activityService} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', companyId: 'company-1', status: DealStatus.RESERVED, unitId: 'unit-1', managerId: null, clientId: 'c1', dealNumber: '2026-0001'});
+            tasksService.cancelOpenTasksForDeal.mockResolvedValue(2);
+
+            await service.cancelDeal(salesHeadUser, 'deal-1', {reason: 'client backed out'} as any);
+
+            expect(tasksService.cancelOpenTasksForDeal).toHaveBeenCalledWith(prisma, {companyId: 'company-1', dealId: 'deal-1', actorId: 'head-1'});
+            expect(activityService.cancelReservation).toHaveBeenCalledWith(expect.objectContaining({
+                metadata: {reason: 'client backed out', tasksCancelled: 2},
+            }));
         });
 
         it('releases the unit back to AVAILABLE', async () => {

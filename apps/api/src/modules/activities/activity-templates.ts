@@ -56,6 +56,8 @@ const ACTIVITY_TEMPLATES = {
   taskUpdated: (p: { task: string }) => `Task "${p.task}" updated`,
   taskDeleted: (p: { task: string }) => `Task "${p.task}" deleted`,
   taskRestored: (p: { task: string }) => `Task "${p.task}" restored`,
+  taskCancelledWithDeal: (p: { task: string }) =>
+    `Task "${p.task}" cancelled with its deal`,
 
   // Documents
   documentUploaded: (p: { name: string }) => `Document "${p.name}" uploaded`,

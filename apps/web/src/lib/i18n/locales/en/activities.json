@@ -79,6 +79,7 @@
     "taskUpdated": "Task \"{{task}}\" updated",
     "taskDeleted": "Task \"{{task}}\" deleted",
     "taskRestored": "Task \"{{task}}\" restored",
+    "taskCancelledWithDeal": "Task \"{{task}}\" cancelled with its deal",
     "documentUploaded": "Document \"{{name}}\" uploaded",
     "documentDeleted": "Document \"{{name}}\" deleted",
     "documentRestored": "Document \"{{name}}\" restored",
