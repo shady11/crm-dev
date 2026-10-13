@@ -67,6 +67,10 @@ export function TeamPage() {
         items: PERIODS.map((value) => ({label: t("team.period", {count: value}), value: String(value)})),
     });
 
+    // The viewer's own row (SH-9): their bookings, leads and tasks count in
+    // the branch's totals too, so the totals match the dashboard's.
+    const displayName = (row: Row) => row.isViewer ? t("team.you", {name: row.manager.fullName}) : row.manager.fullName;
+
     const openLeadsCell = (row: Row) => row.snapshot ? (
         <Link to={paths.openLeadsByManager(row.manager.id)} className="hover:underline">
             {row.snapshot.openLeads}
@@ -115,7 +119,7 @@ export function TeamPage() {
                             cards={rows.map((row) => (
                                 <div key={row.manager.id} className="space-y-3 rounded-lg border border-secondary p-4 text-sm">
                                     <Link to={paths.deals.byManager(row.manager.id)} className="font-medium hover:underline">
-                                        {row.manager.fullName}
+                                        {displayName(row)}
                                     </Link>
                                     <dl className="grid grid-cols-2 gap-x-4 gap-y-1">
                                         <dt className="text-muted-foreground">{t("team.columns.openLeads")}</dt><dd>{openLeadsCell(row)}</dd>
@@ -145,14 +149,14 @@ export function TeamPage() {
                             </TableHeader>
                             <TableBody>
                                 {rows.map((row) => (
-                                    <TableRow key={row.manager.id}>
+                                    <TableRow key={row.manager.id} className={row.isViewer ? "bg-muted/30" : undefined}>
                                         <TableCell className="pl-4">
                                             <Link to={paths.deals.byManager(row.manager.id)} className="flex items-center gap-3 hover:underline">
                                                 <Avatar className="size-8 shrink-0">
                                                     <AvatarFallback>{initials(row.manager.fullName)}</AvatarFallback>
                                                 </Avatar>
                                                 <div className="min-w-0">
-                                                    <p className="font-medium">{row.manager.fullName}</p>
+                                                    <p className="font-medium">{displayName(row)}</p>
                                                     <p className="text-xs text-muted-foreground">
                                                         {row.snapshot?.lastActivityAt
                                                             ? timeAgo(t, row.snapshot.lastActivityAt)

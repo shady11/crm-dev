@@ -93,6 +93,8 @@ export async function getBranchComparison() {
 // timestamp per SALES_MANAGER on their branch, SALES_HEAD only.
 export type TeamSnapshotItem = {
     manager: { id: string; fullName: string; email: string };
+    /** The viewer's own row, after the managers' (SH-9). */
+    isViewer?: boolean;
     openLeads: number;
     activeDeals: number;
     tasksDue: number;
@@ -107,6 +109,8 @@ export async function getTeamSnapshot() {
 // A Sales Head's per-manager results over a period, for the "My team" page.
 export type TeamPerformanceItem = {
     manager: { id: string; fullName: string; email: string };
+    /** The viewer's own row, after the managers' (SH-9). */
+    isViewer?: boolean;
     leadsAssigned: number;
     dealsCreated: number;
     dealsWon: number;

@@ -316,15 +316,18 @@ describe('DashboardService', () => {
             );
         });
 
-        it('returns one row per active SALES_MANAGER on the branch, with a null lastActivityAt when none exists', async () => {
+        it('returns one row per active SALES_MANAGER on the branch, then the viewer\'s own (SH-9)', async () => {
             const {service, prisma} = build();
             prisma.user.findMany.mockResolvedValue([{id: 'm1', fullName: 'Manager One', email: 'm1@crm.dev'}]);
 
             const result = await service.getTeamSnapshot(salesHeadUser);
 
             expect(result).toEqual([
-                expect.objectContaining({manager: {id: 'm1', fullName: 'Manager One', email: 'm1@crm.dev'}, lastActivityAt: null}),
+                expect.objectContaining({manager: {id: 'm1', fullName: 'Manager One', email: 'm1@crm.dev'}, isViewer: false, lastActivityAt: null}),
+                expect.objectContaining({manager: {id: 'head-1', fullName: 'Manager', email: 'manager@crm.dev'}, isViewer: true}),
             ]);
+            // The viewer's row is counted on the same branch, by their own id.
+            expect(prisma.lead.count.mock.calls[1][0].where).toEqual(expect.objectContaining({branchId: 'branch-1', managerId: 'head-1'}));
         });
     });
 
@@ -334,12 +337,13 @@ describe('DashboardService', () => {
             await expect(service.getTeamPerformance({...salesHeadUser, branchId: null}, 30)).rejects.toThrow(ForbiddenException);
         });
 
-        it('returns an empty team without querying results when the branch has no managers', async () => {
+        it('with no managers on the branch, still returns the viewer\'s own row (SH-9)', async () => {
             const {service, prisma} = build();
             prisma.user.findMany.mockResolvedValue([]);
 
-            await expect(service.getTeamPerformance(salesHeadUser, 30)).resolves.toEqual({periodDays: 30, managers: []});
-            expect(prisma.lead.groupBy).not.toHaveBeenCalled();
+            const result = await service.getTeamPerformance(salesHeadUser, 30);
+
+            expect(result.managers).toEqual([expect.objectContaining({manager: expect.objectContaining({id: 'head-1'}), isViewer: true})]);
         });
 
         it('puts each manager\'s period results, cash collected and overdue balance side by side', async () => {
@@ -363,7 +367,7 @@ describe('DashboardService', () => {
 
             expect(result.managers).toEqual([
                 expect.objectContaining({
-                    manager: expect.objectContaining({id: 'm-1'}),
+                    manager: expect.objectContaining({id: 'm-1'}), isViewer: false,
                     leadsAssigned: 10, dealsCreated: 5, dealsWon: 2, conversionRate: 0.2, revenue: 30000,
                     overduePayments: {installments: 6, amount: 85000},
                 }),
@@ -372,6 +376,7 @@ describe('DashboardService', () => {
                     leadsAssigned: 4, dealsCreated: 0, dealsWon: 0, conversionRate: 0, revenue: 0,
                     overduePayments: {installments: 0, amount: 0},
                 }),
+                expect.objectContaining({manager: expect.objectContaining({id: 'head-1'}), isViewer: true}),
             ]);
         });
 

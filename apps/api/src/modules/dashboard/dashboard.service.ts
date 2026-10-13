@@ -385,7 +385,7 @@ export class DashboardService {
         const companyId = user.companyId;
         const branchId = user.branchId;
 
-        const managers = await this.findTeamManagers(companyId, branchId);
+        const managers = await this.findTeamPeople(companyId, branchId, user);
 
         const now = new Date();
 
@@ -425,7 +425,8 @@ export class DashboardService {
                 ]);
 
                 return {
-                    manager,
+                    manager: { id: manager.id, fullName: manager.fullName, email: manager.email },
+                    isViewer: manager.isViewer,
                     openLeads,
                     activeDeals,
                     tasksDue,
@@ -433,6 +434,21 @@ export class DashboardService {
                 };
             }),
         );
+    }
+
+    /**
+     * The team rows for one viewer: the branch's managers, then the viewer
+     * themselves (SH-9). A Sales Head also books deals, holds leads and
+     * gets tasks; without their own row, My team's totals stopped short of
+     * the branch's (6 overdue tasks on the dashboard, 4 on My team).
+     */
+    private async findTeamPeople(companyId: string, branchId: string, viewer: AuthUser) {
+        const managers = await this.findTeamManagers(companyId, branchId);
+        const people = managers.map((m) => ({ ...m, isViewer: m.id === viewer.id }));
+        if (!people.some((p) => p.isViewer)) {
+            people.push({ id: viewer.id, fullName: viewer.name, email: viewer.email, isViewer: true });
+        }
+        return people;
     }
 
     /**
@@ -476,9 +492,8 @@ export class DashboardService {
         since.setDate(since.getDate() - days);
         since.setHours(0, 0, 0, 0);
 
-        const managers = await this.findTeamManagers(companyId, branchId);
+        const managers = await this.findTeamPeople(companyId, branchId, user);
         const managerIds = managers.map((m) => m.id);
-        if (managerIds.length === 0) return { periodDays: days, managers: [] };
 
         const byManager = { companyId, branchId, managerId: { in: managerIds }, deletedAt: null };
 
@@ -523,7 +538,8 @@ export class DashboardService {
                 const leadsAssigned = countFor(leadCounts, manager.id);
                 const dealsWon = countFor(wonCounts, manager.id);
                 return {
-                    manager,
+                    manager: { id: manager.id, fullName: manager.fullName, email: manager.email },
+                    isViewer: manager.isViewer,
                     leadsAssigned,
                     dealsCreated: countFor(dealCounts, manager.id),
                     dealsWon,

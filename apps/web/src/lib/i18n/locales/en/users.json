@@ -164,6 +164,7 @@
     "legend_one": "Open leads, active deals, overdue tasks and overdue payments are as of now. New leads, contracts signed, conversion and money collected cover the last {{count}} day.",
     "legend_few": "Open leads, active deals, overdue tasks and overdue payments are as of now. New leads, contracts signed, conversion and money collected cover the last {{count}} days.",
     "legend_many": "Open leads, active deals, overdue tasks and overdue payments are as of now. New leads, contracts signed, conversion and money collected cover the last {{count}} days.",
-    "legend_other": "Open leads, active deals, overdue tasks and overdue payments are as of now. New leads, contracts signed, conversion and money collected cover the last {{count}} days."
+    "legend_other": "Open leads, active deals, overdue tasks and overdue payments are as of now. New leads, contracts signed, conversion and money collected cover the last {{count}} days.",
+    "you": "{{name}} (you)"
   }
 }
