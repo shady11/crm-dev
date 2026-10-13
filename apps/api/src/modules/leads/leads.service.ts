@@ -582,7 +582,7 @@ export class LeadsService {
      * SH-5: moves several leads to one manager at once (the leads list's
      * bulk "Reassign to…", and a manager's handover). Same rules and trail
      * as reassignManager, per lead: only leads the actor can see, a target
-     * who is an active individual contributor on the lead's branch, open
+     * who is an active member of the lead's branch's sales team, open
      * tasks moved along, one activity per lead. Leads the target already
      * holds are left alone. The new owner gets one summary notification
      * unless `notify` is false (a handover sends its own).
@@ -846,7 +846,9 @@ export class LeadsService {
             throw new BadRequestException("Lead is not assigned to a branch");
         }
 
-        const targetRoleIds = await this.rbacService.findRoleIdsWithPermission(user.companyId!, "leads.edit", "leads.assign");
+        // SH-12: anyone on the branch who works leads, team leads included,
+        // so a Sales Head can take a lead over themselves.
+        const targetRoleIds = await this.rbacService.findRoleIdsWithPermission(user.companyId!, "leads.edit");
 
         const manager = await this.prisma.user.findFirst({
             where: {
@@ -860,7 +862,7 @@ export class LeadsService {
 
         if (!manager) {
             throw new BadRequestException(
-                "Manager not assignable — must be an active individual contributor on the same branch",
+                "Manager not assignable — must be an active member of the same branch's sales team",
             );
         }
     }

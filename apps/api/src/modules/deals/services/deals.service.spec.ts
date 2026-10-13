@@ -144,7 +144,7 @@ describe('DealsService', () => {
             moneyHeld as any, receiptNumbers as any,
         );
 
-        return {service, prisma, activityService, notifications, dealNumberService, documentGeneration, tasksService, moneyHeld};
+        return {service, prisma, activityService, notifications, dealNumberService, documentGeneration, tasksService, moneyHeld, rbacService};
     }
 
     describe('reserveUnit', () => {
@@ -741,6 +741,18 @@ describe('DealsService', () => {
             await expect(service.reassignManager(salesHeadUser, 'deal-1', {managerId: 'new-manager'} as any)).rejects.toThrow(
                 BadRequestException,
             );
+        });
+
+        it('lets the Sales Head take a deal over: team leads are valid targets (SH-12)', async () => {
+            const {service, prisma, rbacService} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', branchId: 'branch-1', managerId: 'old-manager', clientId: 'c1'});
+            prisma.user.findFirst.mockResolvedValue({id: 'head-1', roleId: 'role-sales-head', isActive: true});
+
+            await service.reassignManager(salesHeadUser, 'deal-1', {managerId: 'head-1'} as any);
+
+            // Every role that works deals, with no team-lead exclusion.
+            expect(rbacService.findRoleIdsWithPermission).toHaveBeenCalledWith('company-1', 'deals.manage');
+            expect(prisma.deal.update).toHaveBeenCalledWith({where: {id: 'deal-1'}, data: {managerId: 'head-1'}});
         });
 
         it('reassigns and records the from/to manager ids', async () => {

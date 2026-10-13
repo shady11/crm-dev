@@ -28,11 +28,7 @@ export async function getUsers(params?: GetUsersParams) {
     return response.data;
 }
 
-export type SalesTeamMember = {
-    id: string; fullName: string; branchId: string | null;
-    /** Can book deals but can't be handed someone else's (a Sales Head). */
-    isTeamLead?: boolean;
-};
+export type SalesTeamMember = { id: string; fullName: string; branchId: string | null };
 
 /**
  * Who a deal or lead can be put in the name of. Readable by anyone with
