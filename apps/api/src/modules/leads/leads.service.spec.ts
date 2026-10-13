@@ -100,7 +100,7 @@ describe('LeadsService', () => {
         };
         const notifications = {create: jest.fn().mockResolvedValue({})};
         const service = new LeadsService(prisma as any, clientsService, rbacService as any, tasksService as any, notifications as any);
-        return {service, prisma, clientsService, tasksService, notifications};
+        return {service, prisma, clientsService, tasksService, notifications, rbacService};
     }
 
     const createDto = (overrides: Record<string, unknown> = {}) => ({
@@ -473,6 +473,18 @@ describe('LeadsService', () => {
             await expect(service.reassignManager(salesHeadUser, 'lead-1', {managerId: 'new-manager'} as any)).rejects.toThrow(
                 BadRequestException,
             );
+        });
+
+        it('lets the Sales Head take a lead over: team leads are valid targets (SH-12)', async () => {
+            const {service, prisma, rbacService} = build({
+                lead: {id: 'lead-1', branchId: 'branch-1', managerId: 'old-manager'},
+                manager: {id: 'head-1', roleId: 'role-sales-head', isActive: true},
+            });
+
+            await service.reassignManager(salesHeadUser, 'lead-1', {managerId: 'head-1'} as any);
+
+            expect(rbacService.findRoleIdsWithPermission).toHaveBeenCalledWith('company-1', 'leads.edit');
+            expect(prisma.lead.update).toHaveBeenCalledWith(expect.objectContaining({data: {managerId: 'head-1'}}));
         });
 
         it('reassigns the lead and records the from/to manager ids', async () => {
