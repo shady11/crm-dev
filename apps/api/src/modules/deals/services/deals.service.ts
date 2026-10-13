@@ -911,7 +911,9 @@ export class DealsService {
         throw new BadRequestException("Deal is not assigned to a branch");
       }
 
-      const targetRoleIds = await this.rbacService.findRoleIdsWithPermission(companyId, 'deals.manage', 'deals.reassign');
+      // SH-12: anyone on the branch who works deals, team leads included,
+      // so a Sales Head can take a deal over themselves.
+      const targetRoleIds = await this.rbacService.findRoleIdsWithPermission(companyId, 'deals.manage');
 
       const manager = await db.user.findFirst({
         where: {
@@ -925,7 +927,7 @@ export class DealsService {
 
       if (!manager) {
         throw new BadRequestException(
-            "Manager not assignable — must be an active individual contributor on the same branch",
+            "Manager not assignable — must be an active member of the same branch's sales team",
         );
       }
 
@@ -972,8 +974,8 @@ export class DealsService {
   /**
    * SH-5: moves several deals to one manager at once, for a manager's
    * handover. Same rules and trail as reassignManager, per deal: deals the
-   * actor can see, a target who is an active individual contributor on the
-   * deal's branch, open tasks moved along, one activity per deal. Deals the
+   * actor can see, a target who is an active member of the deal's branch's
+   * sales team, open tasks moved along, one activity per deal. Deals the
    * target already holds are left alone. One summary notification unless
    * `notify` is false (a handover sends its own).
    */
@@ -992,14 +994,14 @@ export class DealsService {
       throw new NotFoundException("Some of these deals were not found.");
     }
 
-    const targetRoleIds = await this.rbacService.findRoleIdsWithPermission(companyId, 'deals.manage', 'deals.reassign');
+    const targetRoleIds = await this.rbacService.findRoleIdsWithPermission(companyId, 'deals.manage');
     for (const branchId of new Set(deals.map((d) => d.branchId))) {
       if (!branchId) throw new BadRequestException("Deal is not assigned to a branch");
       const manager = await this.prisma.user.findFirst({
         where: { id: managerId, companyId, branchId, roleId: { in: targetRoleIds }, isActive: true },
       });
       if (!manager) {
-        throw new BadRequestException("Manager not assignable — must be an active individual contributor on the same branch");
+        throw new BadRequestException("Manager not assignable — must be an active member of the same branch's sales team");
       }
     }
 

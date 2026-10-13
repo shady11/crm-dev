@@ -160,6 +160,14 @@
     "workHandedOver": {
       "title": "{{fromName}}'s work was handed to you",
       "message": "By {{byName}} · leads: {{leads}}, deals: {{deals}}, tasks: {{tasks}}"
+    },
+    "teamReservationExpired": {
+      "title": "Reservation for deal {{dealNumber}} expired",
+      "message": "{{managerName}}'s client didn't sign in time; the unit is back on sale."
+    },
+    "teamReservationExpiredHeld": {
+      "title": "Reservation for deal {{dealNumber}} expired",
+      "message": "{{managerName}}'s deal: {{amount}} is still held on it."
     }
   }
 }

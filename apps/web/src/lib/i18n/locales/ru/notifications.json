@@ -160,6 +160,14 @@
     "workHandedOver": {
       "title": "Вам переданы дела: {{fromName}}",
       "message": "Передал(а) {{byName}} · лиды: {{leads}}, сделки: {{deals}}, задачи: {{tasks}}"
+    },
+    "teamReservationExpired": {
+      "title": "Бронь по сделке {{dealNumber}} истекла",
+      "message": "Клиент менеджера {{managerName}} не подписал договор вовремя; объект снова в продаже."
+    },
+    "teamReservationExpiredHeld": {
+      "title": "Бронь по сделке {{dealNumber}} истекла",
+      "message": "Сделка менеджера {{managerName}}: на ней остаётся {{amount}}."
     }
   }
 }

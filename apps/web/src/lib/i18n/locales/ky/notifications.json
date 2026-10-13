@@ -160,6 +160,14 @@
     "workHandedOver": {
       "title": "Сизге {{fromName}} иштери өткөрүлдү",
       "message": "Өткөргөн: {{byName}} · лиддер: {{leads}}, бүтүмдөр: {{deals}}, тапшырмалар: {{tasks}}"
+    },
+    "teamReservationExpired": {
+      "title": "{{dealNumber}} бүтүмү боюнча брондоонун мөөнөтү бүттү",
+      "message": "{{managerName}} менеджеринин кардары келишимге убагында кол койгон жок; объект кайра сатыкта."
+    },
+    "teamReservationExpiredHeld": {
+      "title": "{{dealNumber}} бүтүмү боюнча брондоонун мөөнөтү бүттү",
+      "message": "{{managerName}} менеджеринин бүтүмү: анда {{amount}} калды."
     }
   }
 }
