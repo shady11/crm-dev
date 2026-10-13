@@ -6,7 +6,7 @@ import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/componen
 import {DataTable} from "@/components/shared/data-table.tsx";
 import {SortableTableHead} from "@/components/shared/sortable-table-head.tsx";
 import type {Lead, LeadSortField} from "@/features/leads/api/leads.api.ts";
-import {LEAD_STATUS_CLASSES, LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
+import {LEAD_LOST_REASON_LABEL_KEYS, LEAD_STATUS_CLASSES, LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
 import {calendarDaysFromToday, formatCreatedAt, initials} from "@/features/leads/utils/format.ts";
 import {useLeadInterest} from "@/features/leads/components/lead-interest.tsx";
 import {cn} from "@/lib/utils";
@@ -94,6 +94,7 @@ export function LeadsTable({
                         </div>
                         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
                             <span className="truncate">{lead.manager?.fullName ?? "—"}</span>
+                            {lead.lostReason && <span className="truncate">{t(LEAD_LOST_REASON_LABEL_KEYS[lead.lostReason])}</span>}
                             {next ? (
                                 <span className={cn("ml-auto", next.overdue && "font-medium text-destructive", next.today && "font-medium text-foreground")}>
                                     {t("table.nextContactShort", { date: next.label })}
@@ -163,6 +164,9 @@ export function LeadsTable({
                                 <Badge className={`${LEAD_STATUS_CLASSES[lead.status]} text-white`}>
                                     {t(LEAD_STATUS_LABEL_KEYS[lead.status])}
                                 </Badge>
+                                {lead.lostReason && (
+                                    <p className="mt-1 text-xs text-muted-foreground">{t(LEAD_LOST_REASON_LABEL_KEYS[lead.lostReason])}</p>
+                                )}
                             </TableCell>
                             <TableCell>{lead.manager?.fullName ?? "—"}</TableCell>
                             <TableCell className={cn(next?.overdue && "font-medium text-destructive", next?.today && "font-medium")}>

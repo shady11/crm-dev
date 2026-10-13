@@ -20,7 +20,9 @@
     "allSources": "All sources",
     "allManagers": "All managers",
     "openStatuses": "Open leads",
-    "followUpOverdue": "Follow-up overdue"
+    "followUpOverdue": "Follow-up overdue",
+    "lostReason": "Lost reason",
+    "allLostReasons": "All reasons"
   },
   "table": {
     "lead": "Lead",
@@ -59,7 +61,8 @@
     "rooms": "Rooms",
     "budget": "Budget",
     "preferredProject": "Project",
-    "financingType": "Payment"
+    "financingType": "Payment",
+    "lostReason": "Lost reason"
   },
   "clientTab": {
     "notConverted": "This lead hasn't been converted to a client yet.",
@@ -131,7 +134,9 @@
       "phoneMin": "Phone must be at least 5 characters",
       "invalidEmail": "Invalid email",
       "budget": "Enter a positive amount",
-      "rooms": "Enter a whole number from 0 to 10"
+      "rooms": "Enter a whole number from 0 to 10",
+      "lostReason": "Choose why the lead was lost",
+      "lostNote": "Say why the lead was lost"
     },
     "nextContact": "Next contact",
     "notSpecified": "Not specified",
@@ -140,7 +145,12 @@
     "rooms": "Rooms",
     "budget": "Budget, up to",
     "preferredProject": "Project",
-    "financingType": "Payment"
+    "financingType": "Payment",
+    "lostReason": "Why was it lost?",
+    "lostReasonPlaceholder": "Choose a reason",
+    "lostNote": "Note (optional)",
+    "lostNoteRequired": "Note",
+    "lostNotePlaceholder": "What happened?"
   },
   "convertDialog": {
     "title": "Convert to client",
@@ -231,5 +241,16 @@
     "description_few": "Move the {{count}} selected leads to another manager on your team. Their open tasks move with them, and the new manager gets one notification.",
     "description_many": "Move the {{count}} selected leads to another manager on your team. Their open tasks move with them, and the new manager gets one notification.",
     "description_other": "Move the {{count}} selected leads to another manager on your team. Their open tasks move with them, and the new manager gets one notification."
+  },
+  "lostReason": {
+    "PRICE": "Price too high",
+    "COMPETITOR": "Bought from a competitor",
+    "LOCATION": "Location",
+    "LAYOUT": "Layout or size",
+    "FINANCING": "Financing fell through",
+    "POSTPONED": "Postponed the purchase",
+    "UNREACHABLE": "Couldn't reach them",
+    "DUPLICATE": "Duplicate lead",
+    "OTHER": "Other"
   }
 }

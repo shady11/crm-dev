@@ -3,7 +3,7 @@ import {createListCollection} from "@ark-ui/react";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {Toggle} from "@/components/ui/toggle.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
-import {LEAD_STATUS_LABEL_KEYS, LeadStatus} from "@/features/leads/types/lead.types.ts";
+import {LEAD_LOST_REASON_LABEL_KEYS, LEAD_STATUS_LABEL_KEYS, LeadLostReason, LeadStatus} from "@/features/leads/types/lead.types.ts";
 import type {LeadStatusFilterValue} from "@/features/leads/hooks/use-leads-list.ts";
 import {LEAD_SOURCES} from "@/features/leads/utils/sources.ts";
 import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
@@ -15,6 +15,8 @@ interface LeadsToolbarProps {
     onSearchChange(value: string): void;
     statusFilter: LeadStatusFilterValue;
     onStatusFilterChange(value: LeadStatusFilterValue): void;
+    lostReasonFilter: LeadLostReason | "all";
+    onLostReasonFilterChange(value: LeadLostReason | "all"): void;
     branchFilter: string | "all";
     onBranchFilterChange(value: string | "all"): void;
     sourceFilter: string | "all";
@@ -30,6 +32,8 @@ export function LeadsToolbar({
                                   onSearchChange,
                                   statusFilter,
                                   onStatusFilterChange,
+                                  lostReasonFilter,
+                                  onLostReasonFilterChange,
                                   branchFilter,
                                   onBranchFilterChange,
                                   sourceFilter,
@@ -53,6 +57,13 @@ export function LeadsToolbar({
                     value: status
                 })
             ),
+        ],
+    });
+
+    const lostReasonCollection = createListCollection({
+        items: [
+            { label: t("toolbar.allLostReasons"), value: "all" },
+            ...Object.values(LeadLostReason).map((reason) => ({ label: t(LEAD_LOST_REASON_LABEL_KEYS[reason]), value: reason as string })),
         ],
     });
 
@@ -137,6 +148,25 @@ export function LeadsToolbar({
                         ))}
                     </SelectContent>
                 </Select>
+
+                {statusFilter === LeadStatus.LOST && (
+                    <Select
+                        collection={lostReasonCollection}
+                        value={[lostReasonFilter]}
+                        onValueChange={({ value }) => onLostReasonFilterChange((value[0] ?? "all") as LeadLostReason | "all")}
+                    >
+                        <SelectTrigger className="w-48" aria-label={t("toolbar.lostReason")}>
+                            <SelectValue placeholder={t("toolbar.allLostReasons")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {lostReasonCollection.items.map((item) => (
+                                <SelectItem key={item.value} item={item}>
+                                    {item.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                )}
 
                 <InputGroup className="w-56">
                     <InputGroupInput

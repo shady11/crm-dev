@@ -1,6 +1,6 @@
 import {api} from "@/lib/api";
 import type {PaginatedResponse} from "@/lib/api-types";
-import type {LeadStatus} from "../types/lead.types";
+import type {LeadLostReason, LeadStatus} from "../types/lead.types";
 import type {FinancingType} from "@/features/deals/api/deals.api";
 
 export type LeadManager = { id: string; fullName: string; email: string } | null;
@@ -19,6 +19,10 @@ export interface Lead {
     budget: string | number | null;
     rooms: number | null;
     financingType: FinancingType | null;
+    // Set while the lead is Lost (SH-8).
+    lostReason: LeadLostReason | null;
+    lostNote: string | null;
+    lostAt: string | null;
     preferredProject: { id: string; name: string } | null;
     nextContactAt: string | null;
     lastContactAt: string | null;
@@ -46,6 +50,8 @@ export type GetLeadsParams = {
     source?: string;
     managerId?: string;
     projectId?: string;
+    // Matches Lost leads only.
+    lostReason?: LeadLostReason;
     // Admin-only cross-branch filter (BR-B3); ignored server-side for a
     // branch-scoped caller, whose own branch filter already takes precedence.
     branchId?: string;
@@ -80,6 +86,9 @@ export type CreateLeadPayload = {
     rooms?: number | null;
     preferredProjectId?: string | null;
     financingType?: FinancingType | null;
+    // Required when status is LOST; the note only for OTHER.
+    lostReason?: LeadLostReason | null;
+    lostNote?: string | null;
 };
 
 export type UpdateLeadPayload = Partial<CreateLeadPayload>;

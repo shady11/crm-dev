@@ -1,5 +1,5 @@
 import {BadRequestException, ConflictException, NotFoundException, ForbiddenException} from '@nestjs/common';
-import {LeadStatus} from '@/generated/prisma/enums';
+import {LeadLostReason, LeadStatus} from '@/generated/prisma/enums';
 import {AuthUser} from '@/common/types/auth-user.type';
 import {LeadsService} from './leads.service';
 import {ClientsService} from '@/modules/clients/clients.service';
@@ -348,6 +348,60 @@ describe('LeadsService', () => {
             (tasksService.createAutomated as jest.Mock).mockRejectedValue(new Error('boom'));
 
             await expect(service.create(adminUser, createDto({managerId: 'manager-1'}))).resolves.toBeDefined();
+        });
+    });
+
+    describe('lost reasons (SH-8)', () => {
+        const openLead = {id: 'lead-1', status: LeadStatus.CONTACTED, lostReason: null, lostNote: null, lostAt: null};
+        const lostLead = {
+            id: 'lead-1', status: LeadStatus.LOST, lostReason: LeadLostReason.PRICE, lostNote: null,
+            lostAt: new Date('2026-10-01T00:00:00Z'),
+        };
+
+        it('refuses to mark a lead lost without a reason', async () => {
+            const {service, prisma} = build({lead: openLead});
+            await expect(service.update(adminUser, 'lead-1', {status: LeadStatus.LOST})).rejects.toThrow(BadRequestException);
+            await expect(service.create(adminUser, createDto({status: LeadStatus.LOST}))).rejects.toThrow(BadRequestException);
+            expect(prisma.lead.update).not.toHaveBeenCalled();
+        });
+
+        it('needs a note only when the reason is Other', async () => {
+            const {service, prisma} = build({lead: openLead});
+            await expect(service.update(adminUser, 'lead-1', {status: LeadStatus.LOST, lostReason: LeadLostReason.OTHER, lostNote: '  '}))
+                .rejects.toThrow(BadRequestException);
+
+            await service.update(adminUser, 'lead-1', {status: LeadStatus.LOST, lostReason: LeadLostReason.COMPETITOR});
+            expect(prisma.lead.update.mock.calls[0][0].data).toEqual(expect.objectContaining({
+                lostReason: LeadLostReason.COMPETITOR, lostNote: null, lostAt: expect.any(Date),
+            }));
+        });
+
+        it('keeps the reason and the date it was lost when other fields of a lost lead change', async () => {
+            const {service, prisma} = build({lead: lostLead});
+            await service.update(adminUser, 'lead-1', {comment: 'called again'});
+            expect(prisma.lead.update.mock.calls[0][0].data).toEqual(expect.objectContaining({
+                lostReason: LeadLostReason.PRICE, lostAt: lostLead.lostAt,
+            }));
+        });
+
+        it('clears the reason when the lead is reopened', async () => {
+            const {service, prisma} = build({lead: lostLead});
+            await service.update(adminUser, 'lead-1', {status: LeadStatus.CONTACTED});
+            expect(prisma.lead.update.mock.calls[0][0].data).toEqual(expect.objectContaining({
+                lostReason: null, lostNote: null, lostAt: null,
+            }));
+        });
+
+        it('ignores a reason sent for a lead that is not lost', async () => {
+            const {service, prisma} = build();
+            await service.create(adminUser, createDto({lostReason: LeadLostReason.PRICE}));
+            expect(prisma.lead.create.mock.calls[0][0].data.lostReason).toBeUndefined();
+        });
+
+        it('filters the list by lost reason', async () => {
+            const {service, prisma} = build();
+            await service.findAll(adminUser, {lostReason: LeadLostReason.LOCATION});
+            expect(prisma.lead.findMany.mock.calls[0][0].where).toEqual(expect.objectContaining({lostReason: LeadLostReason.LOCATION}));
         });
     });
 

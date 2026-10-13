@@ -1,7 +1,7 @@
 import {useEffect, useMemo} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Loader2, TriangleAlert} from "lucide-react";
-import {Controller, useForm} from "react-hook-form";
+import {Controller, useForm, useWatch} from "react-hook-form";
 import {z} from "zod";
 import {createListCollection} from "@ark-ui/react";
 
@@ -18,7 +18,7 @@ import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {hasPermission} from "@/features/auth/access.ts";
 import {isoToDay, nextContactToIso} from "@/features/leads/utils/format.ts";
 import type {CreateLeadPayload, Lead, UpdateLeadPayload} from "@/features/leads/api/leads.api.ts";
-import {LEAD_STATUS_LABEL_KEYS, LeadStatus} from "@/features/leads/types/lead.types.ts";
+import {LEAD_LOST_REASON_LABEL_KEYS, LEAD_STATUS_LABEL_KEYS, LeadLostReason, LeadStatus} from "@/features/leads/types/lead.types.ts";
 import {LEAD_SOURCES} from "@/features/leads/utils/sources.ts";
 import {useProjectsFilter} from "@/features/projects/hooks/use-projects-filter.ts";
 import {FINANCING_TYPE_LABEL_KEYS} from "@/features/deals/types/deal.types.ts";
@@ -36,6 +36,8 @@ type LeadFormValues = {
     email?: string;
     source: string;
     status: LeadStatus;
+    lostReason: string;
+    lostNote: string;
     managerId: string;
     nextContactDay: string;
     budget: string;
@@ -60,6 +62,8 @@ const DEFAULT_VALUES: LeadFormValues = {
     email: "",
     source: NONE,
     status: LeadStatus.NEW,
+    lostReason: NONE,
+    lostNote: "",
     managerId: UNASSIGNED,
     nextContactDay: "",
     budget: "",
@@ -77,6 +81,8 @@ function toFormValues(lead?: Lead | null): LeadFormValues {
         email: lead.email ?? "",
         source: lead.source || NONE,
         status: lead.status,
+        lostReason: lead.lostReason ?? NONE,
+        lostNote: lead.lostNote ?? "",
         managerId: lead.manager?.id ?? UNASSIGNED,
         nextContactDay: isoToDay(lead.nextContactAt),
         budget: lead.budget != null ? String(Number(lead.budget)) : "",
@@ -112,6 +118,8 @@ export function LeadForm({
         email: z.string().trim().email(t("form.validation.invalidEmail")).optional().or(z.literal("")),
         source: z.string(),
         status: z.enum(LeadStatus),
+        lostReason: z.string(),
+        lostNote: z.string().trim().max(500),
         managerId: z.string(),
         nextContactDay: z.string(),
         budget: z.string().trim().refine((v) => v === "" || (Number(v) >= 0 && Number.isFinite(Number(v))), t("form.validation.budget")),
@@ -119,6 +127,14 @@ export function LeadForm({
         preferredProjectId: z.string(),
         financingType: z.string(),
         comment: z.string().trim().optional(),
+    }).superRefine((values, ctx) => {
+        // SH-8: a lost lead says why; "Other" says it in words.
+        if (values.status !== LeadStatus.LOST) return;
+        if (values.lostReason === NONE) {
+            ctx.addIssue({ code: "custom", path: ["lostReason"], message: t("form.validation.lostReason") });
+        } else if (values.lostReason === LeadLostReason.OTHER && !values.lostNote) {
+            ctx.addIssue({ code: "custom", path: ["lostNote"], message: t("form.validation.lostNote") });
+        }
     }), [t]);
 
     const form = useForm<LeadFormValues>({
@@ -169,6 +185,13 @@ export function LeadForm({
         ],
     });
 
+    const lostReasonCollection = createListCollection({
+        items: Object.values(LeadLostReason).map((reason) => ({ label: t(LEAD_LOST_REASON_LABEL_KEYS[reason]), value: reason as string })),
+    });
+
+    const status = useWatch({ control: form.control, name: "status" });
+    const lostReason = useWatch({ control: form.control, name: "lostReason" });
+
     const managerCollection = createListCollection({
         items: [
             { label: t("form.unassigned"), value: UNASSIGNED },
@@ -183,6 +206,10 @@ export function LeadForm({
             email: values.email?.trim() || undefined,
             source: values.source !== NONE ? values.source : undefined,
             status: values.status,
+            // Only sent for a lost lead; the API clears them when it is reopened.
+            ...(values.status === LeadStatus.LOST
+                ? { lostReason: values.lostReason as LeadLostReason, lostNote: values.lostNote.trim() || null }
+                : {}),
             managerId: !canAssign || values.managerId === UNASSIGNED ? undefined : values.managerId,
             // On edit an emptied field clears the date; on create it is just left out.
             nextContactAt: values.nextContactDay
@@ -289,6 +316,50 @@ export function LeadForm({
                             </Field>
                         )}
                     />
+
+                    {status === LeadStatus.LOST && (
+                        <>
+                            <Controller
+                                control={form.control}
+                                name="lostReason"
+                                render={({ field, fieldState }) => (
+                                    <Field invalid={fieldState.invalid}>
+                                        <FieldLabel>{t("form.lostReason")}</FieldLabel>
+                                        <Select
+                                            collection={lostReasonCollection}
+                                            value={field.value === NONE ? [] : [field.value]}
+                                            onValueChange={(item) => field.onChange(item.value[0] ?? NONE)}
+                                        >
+                                            <SelectTrigger className="w-full" aria-label={t("form.lostReason")}>
+                                                <SelectValue placeholder={t("form.lostReasonPlaceholder")} />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {lostReasonCollection.items.map((item) => (
+                                                    <SelectItem key={item.value} item={item}>
+                                                        {item.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FieldError>{fieldState.error?.message}</FieldError>
+                                    </Field>
+                                )}
+                            />
+                            <Controller
+                                control={form.control}
+                                name="lostNote"
+                                render={({ field, fieldState }) => (
+                                    <Field invalid={fieldState.invalid}>
+                                        <FieldLabel>
+                                            {lostReason === LeadLostReason.OTHER ? t("form.lostNoteRequired") : t("form.lostNote")}
+                                        </FieldLabel>
+                                        <Textarea {...field} rows={2} maxLength={500} placeholder={t("form.lostNotePlaceholder")} />
+                                        <FieldError>{fieldState.error?.message}</FieldError>
+                                    </Field>
+                                )}
+                            />
+                        </>
+                    )}
 
                     <fieldset className="flex flex-col gap-4 rounded-lg border border-secondary p-4">
                         <legend className="px-1 text-sm font-medium">{t("form.lookingFor")}</legend>

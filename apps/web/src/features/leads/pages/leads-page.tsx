@@ -47,6 +47,8 @@ export function LeadsPage() {
                     onSearchChange={filters.setSearch}
                     statusFilter={filters.statusFilter}
                     onStatusFilterChange={filters.setStatusFilter}
+                    lostReasonFilter={filters.lostReasonFilter}
+                    onLostReasonFilterChange={filters.setLostReasonFilter}
                     branchFilter={filters.branchFilter}
                     onBranchFilterChange={filters.setBranchFilter}
                     sourceFilter={filters.sourceFilter}
