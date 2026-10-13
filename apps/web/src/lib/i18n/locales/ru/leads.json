@@ -17,7 +17,9 @@
     "searchPlaceholder": "Поиск лидов...",
     "addLead": "Добавить лида",
     "mineOnly": "Мои лиды",
-    "allSources": "Все источники"
+    "allSources": "Все источники",
+    "allManagers": "Все менеджеры",
+    "openStatuses": "Открытые"
   },
   "table": {
     "lead": "Лид",

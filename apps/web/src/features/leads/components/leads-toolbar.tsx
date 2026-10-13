@@ -1,6 +1,5 @@
-import {Plus, Search, UserRoundIcon} from "lucide-react";
+import {Search, UserRoundIcon} from "lucide-react";
 import {createListCollection} from "@ark-ui/react";
-import {Button} from "@/components/ui/button.tsx";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {Toggle} from "@/components/ui/toggle.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
@@ -8,6 +7,7 @@ import {LEAD_STATUS_LABEL_KEYS, LeadStatus} from "@/features/leads/types/lead.ty
 import type {LeadStatusFilterValue} from "@/features/leads/hooks/use-leads-list.ts";
 import {LEAD_SOURCES} from "@/features/leads/utils/sources.ts";
 import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
+import {useManagers} from "@/features/users/hooks/use-managers.ts";
 import {useTranslation} from "react-i18next";
 
 interface LeadsToolbarProps {
@@ -19,9 +19,10 @@ interface LeadsToolbarProps {
     onBranchFilterChange(value: string | "all"): void;
     sourceFilter: string | "all";
     onSourceFilterChange(value: string | "all"): void;
+    managerFilter: string | "all";
+    onManagerFilterChange(value: string | "all"): void;
     mineOnly: boolean;
     onMineOnlyChange(value: boolean): void;
-    onAddLead(): void;
 }
 
 export function LeadsToolbar({
@@ -33,21 +34,31 @@ export function LeadsToolbar({
                                   onBranchFilterChange,
                                   sourceFilter,
                                   onSourceFilterChange,
+                                  managerFilter,
+                                  onManagerFilterChange,
                                   mineOnly,
                                   onMineOnlyChange,
-                                  onAddLead,
                               }: LeadsToolbarProps) {
     const { t } = useTranslation("leads");
+    const managers = useManagers();
 
     const statusCollection = createListCollection({
         items: [
             { label: t("toolbar.filterByStatus"), value: "all" },
+            { label: t("toolbar.openStatuses"), value: "OPEN" },
             ...Object.values(LeadStatus).map(
                 (status) => ({
                     label: t(LEAD_STATUS_LABEL_KEYS[status]),
                     value: status
                 })
             ),
+        ],
+    });
+
+    const managerCollection = createListCollection({
+        items: [
+            { label: t("toolbar.allManagers"), value: "all" },
+            ...managers.data.map((m) => ({ label: m.fullName, value: m.id })),
         ],
     });
 
@@ -74,6 +85,23 @@ export function LeadsToolbar({
                 </Toggle>
 
                 <BranchFilterSelect value={branchFilter} onChange={onBranchFilterChange} />
+
+                <Select
+                    collection={managerCollection}
+                    value={[managerFilter]}
+                    onValueChange={({ value }) => onManagerFilterChange(value[0] ?? "all")}
+                >
+                    <SelectTrigger className="w-44">
+                        <SelectValue placeholder={t("toolbar.allManagers")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        {managerCollection.items.map((item) => (
+                            <SelectItem key={item.value} item={item}>
+                                {item.label}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
 
                 <Select
                     collection={sourceCollection}
@@ -119,11 +147,6 @@ export function LeadsToolbar({
                         <Search className="size-4" />
                     </InputGroupAddon>
                 </InputGroup>
-
-                <Button onClick={onAddLead}>
-                    <Plus className="size-3" />
-                    {t("toolbar.addLead")}
-                </Button>
             </div>
         </div>
     );

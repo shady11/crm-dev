@@ -1,3 +1,5 @@
+import {Plus} from "lucide-react";
+import {Button} from "@/components/ui/button.tsx";
 import {LeadsToolbar} from "@/features/leads/components/leads-toolbar.tsx";
 import {LeadsTable} from "@/features/leads/components/leads-table.tsx";
 import {LeadsPagination} from "@/features/leads/components/leads-pagination.tsx";
@@ -32,6 +34,10 @@ export function LeadsPage() {
         <div className="space-y-6">
             <div className="flex items-start justify-between gap-4">
                 <h2 className="text-2xl font-bold tracking-tight">{t("page.title")}</h2>
+                <Button onClick={form.openCreateForm}>
+                    <Plus className="size-3" />
+                    {t("toolbar.addLead")}
+                </Button>
             </div>
 
             <div className="space-y-4">
@@ -44,9 +50,10 @@ export function LeadsPage() {
                     onBranchFilterChange={filters.setBranchFilter}
                     sourceFilter={filters.sourceFilter}
                     onSourceFilterChange={filters.setSourceFilter}
+                    managerFilter={filters.managerFilter}
+                    onManagerFilterChange={filters.setManagerFilter}
                     mineOnly={filters.mineOnly}
                     onMineOnlyChange={filters.setMineOnly}
-                    onAddLead={form.openCreateForm}
                 />
 
                 <LeadsTable
