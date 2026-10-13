@@ -108,7 +108,7 @@ export function DashboardPage() {
             {canViewMyPerformance && myPerformance.data ? <MyPerformanceCard data={myPerformance.data} /> : null}
             {canViewMyPerformance ? null : attentionCard}
             {/* A Sales Head's main block: their team, then their own day. */}
-            {canViewTeamSnapshot ? <TeamSnapshotCard data={teamSnapshot.data ?? []} /> : null}
+            {canViewTeamSnapshot ? <TeamSnapshotCard data={(teamSnapshot.data ?? []).filter((row) => !row.isViewer)} /> : null}
             {!canViewMyPerformance && canViewMyWorkToday && myWorkToday.data ? <MyWorkTodayCard data={myWorkToday.data} /> : null}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
