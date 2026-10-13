@@ -43,7 +43,9 @@
     "submitCreate": "Создать помещение",
     "errorCreate": "Не удалось создать помещение. Проверьте данные и попробуйте снова.",
     "errorSave": "Не удалось сохранить помещение. Проверьте данные и попробуйте снова.",
-    "statusManagedByDeal": "Устанавливается сделкой. Чтобы изменить статус, отмените или завершите сделку."
+    "statusManagedByDeal": "Устанавливается сделкой. Чтобы изменить статус, отмените или завершите сделку.",
+    "priceLocked": "Цену могут менять только роли с соответствующим правом.",
+    "priceNeedsApproval": "Новая цена уйдёт на согласование администратору компании. До решения у объекта остаётся текущая цена."
   },
   "bulk": {
     "unitsHeading": "Помещения",
@@ -84,7 +86,8 @@
     "createdDescription": "Помещение {{number}} создано.",
     "updatedTitle": "Успешно обновлено",
     "duplicatedTitle": "Успешно продублировано",
-    "deletedTitle": "Успешно удалено"
+    "deletedTitle": "Успешно удалено",
+    "priceSentForApproval": "Новая цена отправлена на согласование администратору компании."
   },
   "overview": {
     "numberLabel": "Номер помещения",
@@ -100,7 +103,10 @@
     "infoSheetButton": "Инфолист",
     "offerButton": "Предложение",
     "blockNotOnSale": "Пока не в продаже: блок {{block}} откроется для продаж позже{{completion}}.",
-    "blockNotOnSaleCompletion": " (сдача {{quarter}})"
+    "blockNotOnSaleCompletion": " (сдача {{quarter}})",
+    "pendingPriceTitle": "Новая цена ждёт согласования: {{price}}",
+    "pendingPriceDescription": "Запросил(а): {{name}}. До согласования цена остаётся {{price}}.",
+    "reviewPriceChange": "Рассмотреть"
   },
   "infoSheet": {
     "title": "Помещение №{{number}}",
@@ -190,5 +196,42 @@
     "lastDiffers": "Последний платёж скорректирован на округление.",
     "yourManager": "Ваш менеджер",
     "validNote": "Цена действует до {{date}} — график предварительный и фиксируется в договоре."
+  },
+  "priceChanges": {
+    "title": "Изменения цен",
+    "descriptionApprover": "Изменения цен, ожидающие вашего решения, и все изменения до этого.",
+    "descriptionRequester": "Изменения цен, которые вы запросили, и принятые решения.",
+    "tabs": {
+      "pending": "Ждут согласования",
+      "all": "Все изменения"
+    },
+    "table": {
+      "unit": "Объект",
+      "change": "Цена",
+      "requestedBy": "Запросил(а)",
+      "status": "Статус",
+      "actions": "Действия"
+    },
+    "status": {
+      "PENDING": "Ждёт",
+      "APPROVED": "Согласовано",
+      "REJECTED": "Отклонено",
+      "CANCELLED": "Заменено"
+    },
+    "decidedBy": "— {{name}}",
+    "approve": "Согласовать",
+    "reject": "Отклонить",
+    "back": "Назад",
+    "approved": "Новая цена применена",
+    "rejected": "Изменение цены отклонено",
+    "alreadyDecided": "По этому изменению уже принято решение",
+    "decisionError": "Не удалось сохранить решение",
+    "rejectDialogTitle": "Отклонить новую цену объекта {{unit}}",
+    "rejectDialogDescription": "У объекта останется текущая цена. Запросивший увидит вашу причину.",
+    "rejectReason": "Причина",
+    "emptyPendingTitle": "Ничего не ждёт",
+    "emptyPendingDescription": "Нет изменений цен, ожидающих решения.",
+    "emptyTitle": "Изменений цен нет",
+    "emptyDescription": "Здесь появятся изменения цен объектов."
   }
 }

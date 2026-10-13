@@ -125,13 +125,29 @@
       "title": "Payment of {{amount}} on deal {{dealNumber}} was voided",
       "message": "{{reason}}"
     },
-    "teamReservationExpired": {
-      "title": "Reservation for deal {{dealNumber}} expired",
-      "message": "{{managerName}}'s client didn't sign in time; the unit is back on sale."
+    "unitPriceChangeRequested": {
+      "title": "New price for unit {{unit}} ({{project}}) needs approval",
+      "message": "{{fromPrice}} → {{toPrice}}, asked by {{byName}}"
     },
-    "teamReservationExpiredHeld": {
-      "title": "Reservation for deal {{dealNumber}} expired",
-      "message": "{{managerName}}'s deal: {{amount}} is still held on it."
+    "unitPriceChangeApproved": {
+      "title": "New price for unit {{unit}} ({{project}}) approved",
+      "message": "Now {{toPrice}}, approved by {{byName}}"
+    },
+    "unitPriceChangeRejected": {
+      "title": "New price for unit {{unit}} ({{project}}) rejected",
+      "message": "{{byName}}: {{reason}}"
+    },
+    "unitPriceChanged": {
+      "title": "Price of unit {{unit}} ({{project}}) changed",
+      "message": "{{fromPrice}} → {{toPrice}}, by {{byName}}"
+    },
+    "unitPriceRequestApproved": {
+      "title": "Price change for unit {{unit}} ({{project}}) approved",
+      "message": "Approved by {{byName}}"
+    },
+    "unitPriceRequestRejected": {
+      "title": "Price change for unit {{unit}} ({{project}}) rejected",
+      "message": "Rejected by {{byName}}"
     },
     "leadsReassigned": {
       "title": "Leads reassigned to you: {{leads}}",
@@ -144,6 +160,14 @@
     "workHandedOver": {
       "title": "{{fromName}}'s work was handed to you",
       "message": "By {{byName}} · leads: {{leads}}, deals: {{deals}}, tasks: {{tasks}}"
+    },
+    "teamReservationExpired": {
+      "title": "Reservation for deal {{dealNumber}} expired",
+      "message": "{{managerName}}'s client didn't sign in time; the unit is back on sale."
+    },
+    "teamReservationExpiredHeld": {
+      "title": "Reservation for deal {{dealNumber}} expired",
+      "message": "{{managerName}}'s deal: {{amount}} is still held on it."
     }
   }
 }

@@ -58,8 +58,12 @@ describe('UnitsService', () => {
             },
         };
 
-        const service = new UnitsService(prisma as any);
-        return {service, prisma};
+        const priceRequests = {
+            handlePriceChange: jest.fn().mockResolvedValue({outcome: 'apply'}),
+            findPendingForUnit: jest.fn().mockResolvedValue(null),
+        };
+        const service = new UnitsService(prisma as any, priceRequests as any);
+        return {service, prisma, priceRequests};
     }
 
     const createDto = (overrides: Record<string, unknown> = {}) => ({
@@ -135,7 +139,7 @@ describe('UnitsService', () => {
 
         it('returns the unit with its deals when found', async () => {
             const {service} = build({unit: {id: 'unit-1'}});
-            await expect(service.findOne(adminUser, 'unit-1')).resolves.toEqual({id: 'unit-1'});
+            await expect(service.findOne(adminUser, 'unit-1')).resolves.toEqual({id: 'unit-1', pendingPriceRequest: null});
         });
     });
 
@@ -254,6 +258,50 @@ describe('UnitsService', () => {
             expect(prisma.unit.update).toHaveBeenCalledWith({
                 where: {id: 'unit-1'},
                 data: expect.objectContaining({price: 999, status: undefined}),
+            });
+        });
+
+        describe('price changes (SH-2)', () => {
+            const unit = {id: 'unit-1', number: '504', blockId: 'block-1', status: UnitStatus.AVAILABLE, price: 56000, project: {name: 'Orion'}};
+
+            it('leaves an unchanged price alone, without asking for approval', async () => {
+                const {service, prisma, priceRequests} = build({unit});
+                await service.update(adminUser, 'unit-1', {price: 56000, rooms: 3} as any);
+
+                expect(priceRequests.handlePriceChange).not.toHaveBeenCalled();
+                expect(prisma.unit.update.mock.calls[0][0].data.price).toBeUndefined();
+            });
+
+            it('writes a new price straight away when the price service says to apply it', async () => {
+                const {service, prisma, priceRequests} = build({unit});
+                const result = await service.update(adminUser, 'unit-1', {price: 52000} as any);
+
+                expect(priceRequests.handlePriceChange).toHaveBeenCalledWith(adminUser, unit, 52000);
+                expect(prisma.unit.update.mock.calls[0][0].data.price).toBe(52000);
+                expect(result.priceRequestId).toBeNull();
+            });
+
+            it('keeps the old price and saves the rest when the change has to wait for approval', async () => {
+                const {service, prisma, priceRequests} = build({unit});
+                priceRequests.handlePriceChange.mockResolvedValue({outcome: 'requested', requestId: 'req-1'});
+
+                const result = await service.update(adminUser, 'unit-1', {price: 28000, rooms: 3} as any);
+
+                const data = prisma.unit.update.mock.calls[0][0].data;
+                expect(data.price).toBeUndefined();
+                expect(data.rooms).toBe(3);
+                expect(result.priceRequestId).toBe('req-1');
+                // The activity diff doesn't claim a price change that didn't happen.
+                const logged = prisma.activity.create.mock.calls.map(([args]: any) => args.data.metadata);
+                logged.forEach((m: any) => expect(m?.price).toBeUndefined());
+            });
+
+            it('saves nothing when the price service refuses the change', async () => {
+                const {service, prisma, priceRequests} = build({unit});
+                priceRequests.handlePriceChange.mockRejectedValue(new ForbiddenException('no'));
+
+                await expect(service.update(adminUser, 'unit-1', {price: 28000} as any)).rejects.toThrow(ForbiddenException);
+                expect(prisma.unit.update).not.toHaveBeenCalled();
             });
         });
 

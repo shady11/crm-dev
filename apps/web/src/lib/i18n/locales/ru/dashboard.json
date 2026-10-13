@@ -59,6 +59,9 @@
     "tasksHeading": "Задачи со сроком",
     "viewAll": "Все",
     "aboveYourLimit": "выше вашего лимита",
+    "priceChangesHeading": "Изменения цен на согласование ({{count}})",
+    "review": "Рассмотреть",
+    "priceChangeUnit": "Объект {{unit}} · {{project}}",
     "followUpsHeading": "Пропущенные контакты ({{count}})",
     "followUpDueSince": "звонок был запланирован на {{date}}"
   },

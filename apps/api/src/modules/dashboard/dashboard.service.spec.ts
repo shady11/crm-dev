@@ -65,6 +65,7 @@ describe('DashboardService', () => {
             branch: {findMany: jest.fn().mockResolvedValue([])},
             user: {findMany: jest.fn().mockResolvedValue([])},
             lead: {count: jest.fn().mockResolvedValue(0), findMany: jest.fn().mockResolvedValue([]), groupBy: jest.fn().mockResolvedValue([])},
+            unitPriceRequest: {findMany: jest.fn().mockResolvedValue([]), count: jest.fn().mockResolvedValue(0)},
         };
 
         const rbacService = {findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-manager'])};
@@ -175,6 +176,28 @@ describe('DashboardService', () => {
             expect(prisma.deal.groupBy).toHaveBeenCalledWith(
                 expect.objectContaining({where: expect.objectContaining({managerId: 'self-1'})}),
             );
+        });
+    });
+
+    describe('getAttentionItems pending price changes (SH-2)', () => {
+        it('lists pending price changes, oldest first, for someone who approves prices', async () => {
+            const {service, prisma} = build();
+            prisma.unitPriceRequest.findMany.mockResolvedValue([{id: 'r1', currentPrice: new Prisma.Decimal(56000), requestedPrice: new Prisma.Decimal(28000)}]);
+            prisma.unitPriceRequest.count.mockResolvedValue(1);
+
+            const result = await service.getAttentionItems({...adminUser, permissions: ['units.approve_price']});
+
+            const args = prisma.unitPriceRequest.findMany.mock.calls[0][0];
+            expect(args.where).toEqual({companyId: 'company-1', status: 'PENDING'});
+            expect(args.orderBy).toEqual({createdAt: 'asc'});
+            expect(result.pendingPriceChanges).toEqual({total: 1, requests: [expect.objectContaining({id: 'r1', currentPrice: 56000, requestedPrice: 28000})]});
+        });
+
+        it('skips the query for everyone else', async () => {
+            const {service, prisma} = build();
+            const result = await service.getAttentionItems(salesHeadUser);
+            expect(prisma.unitPriceRequest.findMany).not.toHaveBeenCalled();
+            expect(result.pendingPriceChanges).toEqual({total: 0, requests: []});
         });
     });
 

@@ -26,6 +26,9 @@ import { QueryUnitsDto } from "./dto/query-units.dto";
 import {UpdateUnitStatusDto} from "@/modules/units/dto/update-unit-status.dto";
 import {CreateUnitsBulkDto} from "@/modules/units/dto/create-units-bulk.dto";
 import {unitsImportMulterOptions} from "@/modules/units/units-import.constants";
+import {UnitPriceRequestsService} from "./unit-price-requests.service";
+import {QueryUnitPriceRequestsDto} from "./dto/query-unit-price-requests.dto";
+import {RejectUnitPriceRequestDto} from "./dto/reject-unit-price-request.dto";
 
 @UseGuards(JwtAuthGuard, CompanyGuard, PermissionsGuard)
 @Controller()
@@ -33,6 +36,7 @@ export class UnitsController {
     constructor(
         private readonly unitsService: UnitsService,
         private readonly unitsImportService: UnitsImportService,
+        private readonly priceRequests: UnitPriceRequestsService,
     ) {}
 
     @RequirePermissions("inventory.view")
@@ -49,6 +53,26 @@ export class UnitsController {
         @Query() query: QueryUnitsDto,
     ) {
         return this.unitsService.findByFloor(user, floorId, query);
+    }
+
+    // SH-2: list-price changes. An approver sees every one; someone who can
+    // only ask sees their own.
+    @RequirePermissions("units.edit_price", "units.approve_price")
+    @Get("unit-price-requests")
+    findPriceRequests(@CurrentUser() user: AuthUser, @Query() query: QueryUnitPriceRequestsDto) {
+        return this.priceRequests.findAll(user, query);
+    }
+
+    @RequirePermissions("units.approve_price")
+    @Post("unit-price-requests/:id/approve")
+    approvePriceRequest(@CurrentUser() user: AuthUser, @Param("id") id: string) {
+        return this.priceRequests.approve(user, id);
+    }
+
+    @RequirePermissions("units.approve_price")
+    @Post("unit-price-requests/:id/reject")
+    rejectPriceRequest(@CurrentUser() user: AuthUser, @Param("id") id: string, @Body() dto: RejectUnitPriceRequestDto) {
+        return this.priceRequests.reject(user, id, dto.reason);
     }
 
     @RequirePermissions("inventory.view")

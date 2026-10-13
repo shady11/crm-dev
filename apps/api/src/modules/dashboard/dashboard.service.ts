@@ -1,6 +1,6 @@
 import {ForbiddenException, Injectable} from "@nestjs/common";
 import * as XLSX from "xlsx";
-import {DealStatus, LeadStatus, PaymentMethod, PaymentScheduleStatus, Prisma, TaskStatus, UnitStatus} from "@/generated/prisma/client";
+import {DealStatus, LeadStatus, PaymentMethod, PaymentScheduleStatus, Prisma, TaskStatus, UnitPriceRequestStatus, UnitStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {hasPermission} from "@/common/utils/permissions.util";
@@ -250,6 +250,25 @@ export class DashboardService {
             })
             : [];
 
+        // SH-2: list-price changes waiting on this viewer. Units are
+        // company-wide, so these aren't narrowed by branch or project.
+        const canApprovePrices = hasPermission(user, "units.approve_price");
+        const priceWhere: Prisma.UnitPriceRequestWhereInput = { companyId, status: UnitPriceRequestStatus.PENDING };
+        const [priceRequests, priceTotal] = canApprovePrices
+            ? await Promise.all([
+                this.prisma.unitPriceRequest.findMany({
+                    where: priceWhere,
+                    select: {
+                        id: true, createdAt: true, currentPrice: true, requestedPrice: true,
+                        unit: { select: { id: true, number: true, project: { select: { id: true, name: true } } } },
+                        requestedBy: { select: { id: true, fullName: true } },
+                    },
+                    orderBy: { createdAt: "asc" },
+                    take: 5,
+                }),
+                this.prisma.unitPriceRequest.count({ where: priceWhere }),
+            ])
+            : [[], 0];
         // SH-6: missed follow-ups, oldest first. Same rule as the leads
         // list's "Follow-up overdue" filter, so "View all" opens exactly these.
         const followUpWhere: Prisma.LeadWhereInput = {
@@ -308,6 +327,14 @@ export class DashboardService {
                 })),
             },
             overduePayments,
+            pendingPriceChanges: {
+                total: priceTotal,
+                requests: priceRequests.map((r) => ({
+                    ...r,
+                    currentPrice: Number(r.currentPrice),
+                    requestedPrice: Number(r.requestedPrice),
+                })),
+            },
             overdueFollowUps: { total: followUpTotal, leads: followUpLeads },
         };
     }

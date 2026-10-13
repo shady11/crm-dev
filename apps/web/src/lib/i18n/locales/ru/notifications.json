@@ -125,13 +125,29 @@
       "title": "Платёж {{amount}} по сделке {{dealNumber}} аннулирован",
       "message": "{{reason}}"
     },
-    "teamReservationExpired": {
-      "title": "Бронь по сделке {{dealNumber}} истекла",
-      "message": "Клиент менеджера {{managerName}} не подписал договор вовремя; объект снова в продаже."
+    "unitPriceChangeRequested": {
+      "title": "Новая цена объекта {{unit}} ({{project}}) ждёт согласования",
+      "message": "{{fromPrice}} → {{toPrice}}, запросил(а) {{byName}}"
     },
-    "teamReservationExpiredHeld": {
-      "title": "Бронь по сделке {{dealNumber}} истекла",
-      "message": "Сделка менеджера {{managerName}}: на ней остаётся {{amount}}."
+    "unitPriceChangeApproved": {
+      "title": "Новая цена объекта {{unit}} ({{project}}) согласована",
+      "message": "Теперь {{toPrice}}, согласовал(а) {{byName}}"
+    },
+    "unitPriceChangeRejected": {
+      "title": "Новая цена объекта {{unit}} ({{project}}) отклонена",
+      "message": "{{byName}}: {{reason}}"
+    },
+    "unitPriceChanged": {
+      "title": "Цена объекта {{unit}} ({{project}}) изменена",
+      "message": "{{fromPrice}} → {{toPrice}}, изменил(а) {{byName}}"
+    },
+    "unitPriceRequestApproved": {
+      "title": "Изменение цены объекта {{unit}} ({{project}}) согласовано",
+      "message": "Согласовал(а) {{byName}}"
+    },
+    "unitPriceRequestRejected": {
+      "title": "Изменение цены объекта {{unit}} ({{project}}) отклонено",
+      "message": "Отклонил(а) {{byName}}"
     },
     "leadsReassigned": {
       "title": "Вам переданы лиды: {{leads}}",
@@ -144,6 +160,14 @@
     "workHandedOver": {
       "title": "Вам переданы дела: {{fromName}}",
       "message": "Передал(а) {{byName}} · лиды: {{leads}}, сделки: {{deals}}, задачи: {{tasks}}"
+    },
+    "teamReservationExpired": {
+      "title": "Бронь по сделке {{dealNumber}} истекла",
+      "message": "Клиент менеджера {{managerName}} не подписал договор вовремя; объект снова в продаже."
+    },
+    "teamReservationExpiredHeld": {
+      "title": "Бронь по сделке {{dealNumber}} истекла",
+      "message": "Сделка менеджера {{managerName}}: на ней остаётся {{amount}}."
     }
   }
 }

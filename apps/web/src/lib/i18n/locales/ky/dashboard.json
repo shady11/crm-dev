@@ -59,6 +59,9 @@
     "tasksHeading": "Мөөнөтү жеткен тапшырмалар",
     "viewAll": "Баары",
     "aboveYourLimit": "лимитиңизден жогору",
+    "priceChangesHeading": "Макулдашууга баа өзгөрүүлөрү ({{count}})",
+    "review": "Карап чыгуу",
+    "priceChangeUnit": "{{unit}} объекти · {{project}}",
     "followUpsHeading": "Өткөрүлгөн байланыштар ({{count}})",
     "followUpDueSince": "чалуу {{date}} күнгө пландалган"
   },

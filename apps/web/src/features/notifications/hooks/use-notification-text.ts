@@ -22,6 +22,9 @@ export function useNotificationText() {
 
             const values: Record<string, unknown> = {...(n.params ?? {})};
             if (typeof values.amount === "number") values.amount = formatCurrency(values.amount);
+            // SH-2: list-price changes carry the old and new price.
+            if (typeof values.fromPrice === "number") values.fromPrice = formatCurrency(values.fromPrice);
+            if (typeof values.toPrice === "number") values.toPrice = formatCurrency(values.toPrice);
             if (typeof values.status === "string") {
                 values.status = t(DEAL_STATUS_LABEL_KEYS[values.status as DealStatus] ?? values.status);
             }

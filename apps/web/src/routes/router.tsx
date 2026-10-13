@@ -10,6 +10,7 @@ import {paths} from "@/routes/paths";
 import {LeadsPage} from "@/features/leads";
 import {dealsRoutes} from "@/features/deals/deals.routes.tsx";
 import {paymentsRoutes} from "@/features/payments/payments.routes.tsx";
+import {priceChangesRoutes} from "@/features/units/price-changes.routes.tsx";
 import {tasksRoutes} from "@/features/tasks/tasks.routes.tsx";
 import {clientsRoutes} from "@/features/clients/clients.routes.tsx";
 import {DashboardPage} from "@/features/dashboard/pages/dashboard-page.tsx";
@@ -65,6 +66,7 @@ export const router = createBrowserRouter([
                     projectsRoutes,
                     dealsRoutes,
                     paymentsRoutes,
+                    priceChangesRoutes,
                     usersRoutes,
                     rbacRoutes,
                     branchesRoutes,

@@ -31,7 +31,8 @@ export async function updateUnit(
     unitId: string,
     payload: UpdateUnitPayload,
 ) {
-    const response = await api.patch<Unit>(
+    // priceRequestId: the new price was sent for approval instead of applied (SH-2).
+    const response = await api.patch<Unit & { priceRequestId?: string | null }>(
         `/units/${unitId}`,
         payload,
     );

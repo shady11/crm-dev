@@ -59,6 +59,9 @@
     "tasksHeading": "Tasks due",
     "viewAll": "View all",
     "aboveYourLimit": "above your limit",
+    "priceChangesHeading": "Price changes to approve ({{count}})",
+    "review": "Review",
+    "priceChangeUnit": "Unit {{unit}} · {{project}}",
     "followUpsHeading": "Missed follow-ups ({{count}})",
     "followUpDueSince": "call due {{date}}"
   },

@@ -32,7 +32,17 @@ export type NotificationTemplate =
     | {templateKey: "discountRequestWithdrawn"; params: {dealNumber: string; percent: number}}
     | {templateKey: "leadReassigned"; params: {leadName: string; byName: string; tasks: number}}
     | {templateKey: "dealReassigned"; params: {dealNumber: string; byName: string; tasks: number}}
+    // SH-2: list-price changes. fromPrice / toPrice are raw numbers in the
+    // company currency.
+    | {templateKey: "unitPriceChangeRequested"; params: UnitPriceParams & {fromPrice: number; toPrice: number; byName: string}}
+    | {templateKey: "unitPriceChangeApproved"; params: UnitPriceParams & {toPrice: number; byName: string}}
+    | {templateKey: "unitPriceChangeRejected"; params: UnitPriceParams & {byName: string; reason: string}}
+    | {templateKey: "unitPriceChanged"; params: UnitPriceParams & {fromPrice: number; toPrice: number; byName: string}}
+    | {templateKey: "unitPriceRequestApproved"; params: UnitPriceParams & {byName: string}}
+    | {templateKey: "unitPriceRequestRejected"; params: UnitPriceParams & {byName: string}}
     // SH-5: bulk moves and a manager's handover, one notification each.
     | {templateKey: "leadsReassigned"; params: {leads: number; byName: string; tasks: number}}
     | {templateKey: "dealsReassigned"; params: {deals: number; byName: string; tasks: number}}
     | {templateKey: "workHandedOver"; params: {fromName: string; byName: string; leads: number; deals: number; tasks: number}};
+
+type UnitPriceParams = {unit: string; project: string; currency: string | null};

@@ -124,4 +124,12 @@ export type Unit = {
     };
 
     deals?: UnitDealHistoryEntry[];
+    /** On the full unit (GET /units/:id): a list-price change waiting on an approver (SH-2). */
+    pendingPriceRequest?: {
+        id: string;
+        currentPrice: number;
+        requestedPrice: number;
+        createdAt: string;
+        requestedBy: { id: string; fullName: string } | null;
+    } | null;
 };
