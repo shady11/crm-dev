@@ -44,6 +44,12 @@ export function TeamSnapshotCard({data}: {data: TeamSnapshotItem[]}) {
                                         {t("teamSnapshot.activeDeals", {count: item.activeDeals})}
                                         {" · "}
                                         {t("teamSnapshot.tasksDue", {count: item.tasksDue})}
+                                        {item.followUpsOverdue > 0 ? (
+                                            <span className="text-destructive">
+                                                {" · "}
+                                                {t("teamSnapshot.followUpsOverdue", {count: item.followUpsOverdue})}
+                                            </span>
+                                        ) : null}
                                     </p>
                                 </div>
                                 <p className="shrink-0 text-xs text-muted-foreground">

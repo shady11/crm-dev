@@ -178,6 +178,42 @@ describe('DashboardService', () => {
         });
     });
 
+    describe('missed follow-ups (SH-6)', () => {
+        it('getAttentionItems lists open leads whose next contact slipped, oldest first, with the total', async () => {
+            const {service, prisma} = build();
+            prisma.lead.findMany.mockResolvedValue([{id: 'l1', fullName: 'Dinara', nextContactAt: new Date('2026-10-10'), manager: null}]);
+            prisma.lead.count.mockResolvedValue(3);
+
+            const result = await service.getAttentionItems(salesHeadUser);
+
+            const args = prisma.lead.findMany.mock.calls[0][0];
+            expect(args.where).toEqual(expect.objectContaining({
+                companyId: 'company-1', branchId: 'branch-1', deletedAt: null,
+                status: {in: ['NEW', 'CONTACTED', 'QUALIFIED', 'MEETING', 'NEGOTIATION']},
+                nextContactAt: {lt: expect.any(Date)},
+            }));
+            expect(args.where.nextContactAt.lt.getHours()).toBe(0);
+            expect(args.orderBy).toEqual({nextContactAt: 'asc'});
+            expect(result.overdueFollowUps).toEqual({total: 3, leads: [expect.objectContaining({id: 'l1'})]});
+        });
+
+        it('getAttentionItems keeps a self-scoped viewer to their own leads', async () => {
+            const {service, prisma} = build();
+            await service.getAttentionItems(selfScopedUser);
+            expect(prisma.lead.findMany.mock.calls[0][0].where.managerId).toBe('self-1');
+        });
+
+        it('getTeamSnapshot counts each person\'s missed follow-ups', async () => {
+            const {service, prisma} = build();
+            prisma.user.findMany.mockResolvedValue([{id: 'm1', fullName: 'Manager One', email: 'm1@crm.dev'}]);
+            prisma.lead.count.mockImplementation(({where}: any) => Promise.resolve(where.nextContactAt ? 2 : 8));
+
+            const result = await service.getTeamSnapshot(salesHeadUser);
+
+            expect(result[0]).toEqual(expect.objectContaining({openLeads: 8, followUpsOverdue: 2}));
+        });
+    });
+
     describe('getAttentionItems pending discounts (SH-1)', () => {
         const head: AuthUser = {...salesHeadUser, discountLimit: 15, permissions: ['deals.approve_discount']};
         const pending = (id: string, percent: number) => ({
@@ -327,7 +363,9 @@ describe('DashboardService', () => {
                 expect.objectContaining({manager: {id: 'head-1', fullName: 'Manager', email: 'manager@crm.dev'}, isViewer: true}),
             ]);
             // The viewer's row is counted on the same branch, by their own id.
-            expect(prisma.lead.count.mock.calls[1][0].where).toEqual(expect.objectContaining({branchId: 'branch-1', managerId: 'head-1'}));
+            const headLeadCounts = prisma.lead.count.mock.calls.filter(([args]: any) => args.where.managerId === 'head-1');
+            expect(headLeadCounts.length).toBeGreaterThan(0);
+            headLeadCounts.forEach(([args]: any) => expect(args.where.branchId).toBe('branch-1'));
         });
     });
 

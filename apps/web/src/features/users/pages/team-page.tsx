@@ -55,12 +55,13 @@ export function TeamPage() {
             openLeads: sum.openLeads + (row.snapshot?.openLeads ?? 0),
             activeDeals: sum.activeDeals + (row.snapshot?.activeDeals ?? 0),
             tasksDue: sum.tasksDue + (row.snapshot?.tasksDue ?? 0),
+            followUpsOverdue: sum.followUpsOverdue + (row.snapshot?.followUpsOverdue ?? 0),
             overdueAmount: sum.overdueAmount + row.overduePayments.amount,
             leadsAssigned: sum.leadsAssigned + row.leadsAssigned,
             dealsWon: sum.dealsWon + row.dealsWon,
             revenue: sum.revenue + row.revenue,
         }),
-        {openLeads: 0, activeDeals: 0, tasksDue: 0, overdueAmount: 0, leadsAssigned: 0, dealsWon: 0, revenue: 0},
+        {openLeads: 0, activeDeals: 0, tasksDue: 0, followUpsOverdue: 0, overdueAmount: 0, leadsAssigned: 0, dealsWon: 0, revenue: 0},
     );
 
     const periodCollection = createListCollection({
@@ -76,6 +77,13 @@ export function TeamPage() {
             {row.snapshot.openLeads}
         </Link>
     ) : "—";
+
+    // Missed follow-ups (SH-6): links to exactly the leads counted.
+    const followUpsCell = (row: Row) => row.snapshot?.followUpsOverdue ? (
+        <Link to={paths.overdueFollowUps(row.manager.id)} className="font-medium text-destructive hover:underline">
+            {row.snapshot.followUpsOverdue}
+        </Link>
+    ) : row.snapshot ? "0" : "—";
 
     const overdueCell = (row: Row) => row.overduePayments.installments > 0 ? (
         <Link to={paths.deals.attention("overdue_payments", row.manager.id)} className="font-medium text-destructive hover:underline">
@@ -125,6 +133,7 @@ export function TeamPage() {
                                         <dt className="text-muted-foreground">{t("team.columns.openLeads")}</dt><dd>{openLeadsCell(row)}</dd>
                                         <dt className="text-muted-foreground">{t("team.columns.activeDeals")}</dt><dd>{row.snapshot?.activeDeals ?? "—"}</dd>
                                         <dt className="text-muted-foreground">{t("team.columns.tasksOverdue")}</dt><dd>{row.snapshot?.tasksDue ?? "—"}</dd>
+                                        <dt className="text-muted-foreground">{t("team.columns.followUpsOverdue")}</dt><dd>{followUpsCell(row)}</dd>
                                         <dt className="text-muted-foreground">{t("team.columns.overduePayments")}</dt><dd>{overdueCell(row)}</dd>
                                         <dt className="text-muted-foreground">{t("team.columns.leadsAssigned")}</dt><dd>{row.leadsAssigned}</dd>
                                         <dt className="text-muted-foreground">{t("team.columns.dealsWon")}</dt><dd>{row.dealsWon}</dd>
@@ -140,6 +149,7 @@ export function TeamPage() {
                                     <TableHead className="text-right">{t("team.columns.openLeads")}</TableHead>
                                     <TableHead className="text-right">{t("team.columns.activeDeals")}</TableHead>
                                     <TableHead className="text-right">{t("team.columns.tasksOverdue")}</TableHead>
+                                    <TableHead className="text-right">{t("team.columns.followUpsOverdue")}</TableHead>
                                     <TableHead className="text-right">{t("team.columns.overduePayments")}</TableHead>
                                     <TableHead className="border-l text-right">{t("team.columns.leadsAssigned")}</TableHead>
                                     <TableHead className="text-right">{t("team.columns.dealsWon")}</TableHead>
@@ -170,6 +180,7 @@ export function TeamPage() {
                                         <TableCell className={`text-right tabular-nums ${row.snapshot?.tasksDue ? "text-destructive" : ""}`}>
                                             {row.snapshot?.tasksDue ?? "—"}
                                         </TableCell>
+                                        <TableCell className="text-right tabular-nums">{followUpsCell(row)}</TableCell>
                                         <TableCell className="text-right tabular-nums">{overdueCell(row)}</TableCell>
                                         <TableCell className="border-l text-right tabular-nums">{formatNumber(row.leadsAssigned)}</TableCell>
                                         <TableCell className="text-right tabular-nums">{formatNumber(row.dealsWon)}</TableCell>
@@ -184,6 +195,7 @@ export function TeamPage() {
                                     <TableCell className="text-right tabular-nums">{totals.openLeads}</TableCell>
                                     <TableCell className="text-right tabular-nums">{totals.activeDeals}</TableCell>
                                     <TableCell className="text-right tabular-nums">{totals.tasksDue}</TableCell>
+                                    <TableCell className="text-right tabular-nums">{totals.followUpsOverdue}</TableCell>
                                     <TableCell className="text-right tabular-nums">{formatCurrency(totals.overdueAmount)}</TableCell>
                                     <TableCell className="border-l text-right tabular-nums">{formatNumber(totals.leadsAssigned)}</TableCell>
                                     <TableCell className="text-right tabular-nums">{formatNumber(totals.dealsWon)}</TableCell>

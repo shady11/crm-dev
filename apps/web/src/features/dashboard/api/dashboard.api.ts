@@ -44,6 +44,13 @@ export type AttentionItems = {
     urgentTasks: AttentionTask[];
     pendingApprovals: { total: number; deals: AttentionApproval[] };
     overduePayments: { installments: number; amount: number; deals: AttentionOverdueDeal[] };
+    /** Open leads whose next contact was due on an earlier day (SH-6). */
+    overdueFollowUps: { total: number; leads: AttentionFollowUp[] };
+};
+
+export type AttentionFollowUp = {
+    id: string; fullName: string; nextContactAt: string;
+    manager: { id: string; fullName: string } | null;
 };
 
 export const EMPTY_ATTENTION_ITEMS: AttentionItems = {
@@ -51,6 +58,7 @@ export const EMPTY_ATTENTION_ITEMS: AttentionItems = {
     urgentTasks: [],
     pendingApprovals: { total: 0, deals: [] },
     overduePayments: { installments: 0, amount: 0, deals: [] },
+    overdueFollowUps: { total: 0, leads: [] },
 };
 
 export type RecentActivity = {
@@ -98,6 +106,8 @@ export type TeamSnapshotItem = {
     openLeads: number;
     activeDeals: number;
     tasksDue: number;
+    /** Open leads whose next contact slipped to an earlier day (SH-6). */
+    followUpsOverdue: number;
     lastActivityAt: string | null;
 };
 

@@ -1,6 +1,6 @@
 import type {ReactNode} from "react";
 import {Link} from "react-router-dom";
-import {AlertTriangleIcon, BadgePercentIcon, ClockIcon, WalletIcon} from "lucide-react";
+import {AlertTriangleIcon, BadgePercentIcon, ClockIcon, PhoneMissedIcon, WalletIcon} from "lucide-react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {paths} from "@/routes/paths.ts";
 import type {AttentionItems} from "@/features/dashboard/api/dashboard.api.ts";
@@ -40,8 +40,9 @@ function Section({title, viewAll, children}: {title: string; viewAll?: {to: stri
 export function AttentionCard({data, showOwner}: {data: AttentionItems; showOwner: boolean}) {
     const {t} = useTranslation("dashboard");
     const {formatCurrency, formatDate} = useCompanyFormatters();
-    const {pendingApprovals, overduePayments, expiringDeals, urgentTasks} = data;
+    const {pendingApprovals, overduePayments, expiringDeals, urgentTasks, overdueFollowUps} = data;
     const hasNothing = pendingApprovals.deals.length === 0
+        && overdueFollowUps.leads.length === 0
         && overduePayments.deals.length === 0
         && expiringDeals.length === 0
         && urgentTasks.length === 0;
@@ -132,6 +133,28 @@ export function AttentionCard({data, showOwner}: {data: AttentionItems; showOwne
                                         </Link>
                                     );
                                 })}
+                            </Section>
+                        ) : null}
+
+                        {overdueFollowUps.leads.length > 0 ? (
+                            <Section
+                                title={t("attention.followUpsHeading", {count: overdueFollowUps.total})}
+                                viewAll={overdueFollowUps.total > overdueFollowUps.leads.length
+                                    ? {to: paths.overdueFollowUps(), label: t("attention.viewAll")}
+                                    : undefined}
+                            >
+                                {overdueFollowUps.leads.map((lead) => (
+                                    <Link key={lead.id} to={paths.leadDetail(lead.id)} className={ROW_CLASS}>
+                                        <PhoneMissedIcon size={16} className="shrink-0 text-destructive" />
+                                        <div className="min-w-0 flex-1">
+                                            <p className="truncate font-medium">{lead.fullName}</p>
+                                            <p className="truncate text-xs text-muted-foreground">
+                                                {owner(lead.manager?.fullName)}
+                                                {t("attention.followUpDueSince", {date: formatDate(lead.nextContactAt)})}
+                                            </p>
+                                        </div>
+                                    </Link>
+                                ))}
                             </Section>
                         ) : null}
 

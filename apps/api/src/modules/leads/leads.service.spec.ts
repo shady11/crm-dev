@@ -126,6 +126,17 @@ describe('LeadsService', () => {
             );
         });
 
+        it('reads status FOLLOW_UP_OVERDUE as open leads due on an earlier day (SH-6)', async () => {
+            const {service, prisma} = build();
+            await service.findAll(branchUser, {status: 'FOLLOW_UP_OVERDUE'} as any);
+
+            const where = (prisma.lead.findMany as jest.Mock).mock.calls[0][0].where;
+            expect(where.status).toEqual({in: ['NEW', 'CONTACTED', 'QUALIFIED', 'MEETING', 'NEGOTIATION']});
+            const startOfToday = new Date();
+            startOfToday.setHours(0, 0, 0, 0);
+            expect(where.nextContactAt).toEqual({lt: startOfToday});
+        });
+
         it('reads status OPEN as every status but Converted and Lost, alongside a manager (SH-4)', async () => {
             const {service, prisma} = build();
             await service.findAll(branchUser, {status: 'OPEN', managerId: 'manager-2'} as any);

@@ -19,7 +19,8 @@
     "mineOnly": "My leads",
     "allSources": "All sources",
     "allManagers": "All managers",
-    "openStatuses": "Open leads"
+    "openStatuses": "Open leads",
+    "followUpOverdue": "Follow-up overdue"
   },
   "table": {
     "lead": "Lead",

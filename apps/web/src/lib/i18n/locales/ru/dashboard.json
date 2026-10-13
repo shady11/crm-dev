@@ -58,7 +58,9 @@
     "reservationsHeading": "Истекающие брони",
     "tasksHeading": "Задачи со сроком",
     "viewAll": "Все",
-    "aboveYourLimit": "выше вашего лимита"
+    "aboveYourLimit": "выше вашего лимита",
+    "followUpsHeading": "Пропущенные контакты ({{count}})",
+    "followUpDueSince": "звонок был запланирован на {{date}}"
   },
   "recentActivity": {
     "title": "Последняя активность",
@@ -85,7 +87,11 @@
     "tasksDue_many": "{{count}} задач к сроку",
     "tasksDue_other": "{{count}} задачи к сроку",
     "noActivity": "Пока нет активности",
-    "openTeam": "Открыть команду"
+    "openTeam": "Открыть команду",
+    "followUpsOverdue_one": "{{count}} пропущенный контакт",
+    "followUpsOverdue_few": "{{count}} пропущенных контакта",
+    "followUpsOverdue_many": "{{count}} пропущенных контактов",
+    "followUpsOverdue_other": "{{count}} пропущенного контакта"
   },
   "myWorkToday": {
     "title": "Моя работа сегодня",

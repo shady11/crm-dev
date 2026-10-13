@@ -19,7 +19,8 @@
     "mineOnly": "Менин лиддерим",
     "allSources": "Бардык булактар",
     "allManagers": "Бардык менеджерлер",
-    "openStatuses": "Ачыктар"
+    "openStatuses": "Ачыктар",
+    "followUpOverdue": "Байланыш мөөнөтү өттү"
   },
   "table": {
     "lead": "Лид",
