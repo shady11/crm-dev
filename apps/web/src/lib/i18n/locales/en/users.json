@@ -166,5 +166,27 @@
     "legend_many": "Open leads, active deals, overdue tasks and overdue payments are as of now. New leads, contracts signed, conversion and money collected cover the last {{count}} days.",
     "legend_other": "Open leads, active deals, overdue tasks and overdue payments are as of now. New leads, contracts signed, conversion and money collected cover the last {{count}} days.",
     "you": "{{name}} (you)"
+  },
+  "handover": {
+    "action": "Hand over",
+    "title": "Hand over {{name}}'s work",
+    "description": "Move everything {{name}} holds to another manager on your team. Open tasks move too, and the new manager gets one notification.",
+    "confirm": "Hand over",
+    "leads_one": "{{count}} open lead",
+    "leads_few": "{{count}} open leads",
+    "leads_many": "{{count}} open leads",
+    "leads_other": "{{count}} open leads",
+    "deals_one": "{{count}} active deal",
+    "deals_few": "{{count}} active deals",
+    "deals_many": "{{count}} active deals",
+    "deals_other": "{{count}} active deals",
+    "tasks_one": "{{count}} open task",
+    "tasks_few": "{{count}} open tasks",
+    "tasks_many": "{{count}} open tasks",
+    "tasks_other": "{{count}} open tasks",
+    "nothing": "{{name}} has no open leads, active deals or open tasks.",
+    "successTitle": "{{name}}'s work was handed over",
+    "successDescription": "Leads: {{leads}} · deals: {{deals}} · tasks: {{tasks}}",
+    "errorTitle": "Could not hand the work over. Please try again."
   }
 }

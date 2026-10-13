@@ -579,6 +579,83 @@ export class LeadsService {
     }
 
     /**
+     * SH-5: moves several leads to one manager at once (the leads list's
+     * bulk "Reassign to…", and a manager's handover). Same rules and trail
+     * as reassignManager, per lead: only leads the actor can see, a target
+     * who is an active individual contributor on the lead's branch, open
+     * tasks moved along, one activity per lead. Leads the target already
+     * holds are left alone. The new owner gets one summary notification
+     * unless `notify` is false (a handover sends its own).
+     */
+    async bulkReassign(user: AuthUser, leadIds: string[], managerId: string, opts: {notify?: boolean} = {}) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+        const companyId = user.companyId;
+        const ids = [...new Set(leadIds)];
+
+        const leads = await this.prisma.lead.findMany({
+            where: {
+                id: {in: ids},
+                companyId,
+                deletedAt: null,
+                ...(user.isBranchScoped ? {branchId: user.branchId} : {}),
+            },
+            select: {id: true, fullName: true, managerId: true, branchId: true},
+        });
+        if (leads.length !== ids.length) {
+            throw new NotFoundException("Some of these leads were not found.");
+        }
+
+        for (const branchId of new Set(leads.map((l) => l.branchId))) {
+            await this.ensureReassignable(user, branchId, managerId);
+        }
+
+        const toMove = leads.filter((l) => l.managerId !== managerId);
+
+        const movedTaskCount = await this.prisma.$transaction(async (db) => {
+            let tasks = 0;
+            for (const lead of toMove) {
+                await db.lead.update({where: {id: lead.id}, data: {managerId}});
+                const moved = await this.tasksService.handOverOpenTasks(db, {
+                    companyId,
+                    actorId: user.id,
+                    link: {leadId: lead.id},
+                    fromUserId: lead.managerId,
+                    toUserId: managerId,
+                });
+                tasks += moved.length;
+                await db.activity.create({
+                    data: {
+                        companyId,
+                        userId: user.id,
+                        leadId: lead.id,
+                        action: ActivityAction.REASSIGNED,
+                        type: ActivityType.LEAD_REASSIGNED,
+                        ...activityText('leadReassigned'),
+                        metadata: {fromManagerId: lead.managerId, toManagerId: managerId, movedTaskCount: moved.length, bulk: true},
+                    },
+                });
+            }
+            return tasks;
+        });
+
+        if ((opts.notify ?? true) && toMove.length > 0 && managerId !== user.id) {
+            await this.notifications.create({
+                companyId,
+                userId: managerId,
+                type: NotificationType.LEAD_REASSIGNED,
+                title: `${toMove.length} lead(s) reassigned to you by ${user.name}`,
+                message: movedTaskCount > 0 ? `${movedTaskCount} open task(s) moved to you` : undefined,
+                templateKey: "leadsReassigned",
+                params: {leads: toMove.length, byName: user.name, tasks: movedTaskCount},
+            });
+        }
+
+        return {leads: toMove.length, tasks: movedTaskCount};
+    }
+
+    /**
      * SM-B1: records a contact attempt — a call, a message, or a meeting —
      * against a lead even when nothing rises to the level of a task. Before
      * this, the only record of interaction was the single freeform `comment`

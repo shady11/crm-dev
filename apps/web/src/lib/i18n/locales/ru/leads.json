@@ -39,7 +39,8 @@
   "actionBar": {
     "selected": "Выбрано: {{count}}",
     "delete": "Удалить",
-    "clearSelection": "Очистить выбор"
+    "clearSelection": "Очистить выбор",
+    "reassign": "Передать"
   },
   "overview": {
     "fullName": "ФИО",
@@ -193,7 +194,15 @@
     "bulkDeletePartialFailed": "{{failed}} из {{total}} выбранных лидов не удалось удалить.",
     "bulkDeleteSuccessTitle": "Лиды удалены",
     "bulkDeleteSuccessDescription": "Выбранные лиды удалены.",
-    "bulkDeleteIssuesTitle": "Возникли проблемы при массовом удалении"
+    "bulkDeleteIssuesTitle": "Возникли проблемы при массовом удалении",
+    "bulkReassignedTitle_one": "Передан {{count}} лид",
+    "bulkReassignedTitle_few": "Передано {{count}} лида",
+    "bulkReassignedTitle_many": "Передано {{count}} лидов",
+    "bulkReassignedTitle_other": "Передано {{count}} лида",
+    "bulkReassignedTasks_one": "Вместе с ними передана {{count}} открытая задача",
+    "bulkReassignedTasks_few": "Вместе с ними переданы {{count}} открытые задачи",
+    "bulkReassignedTasks_many": "Вместе с ними передано {{count}} открытых задач",
+    "bulkReassignedTasks_other": "Вместе с ними передано {{count}} открытой задачи"
   },
   "interest": {
     "budget": "до {{amount}}",
@@ -211,5 +220,15 @@
     "Walk-in": "Визит в офис",
     "Phone": "Звонок",
     "Other": "Другое"
+  },
+  "bulkReassign": {
+    "title_one": "Передать {{count}} лид",
+    "title_few": "Передать {{count}} лида",
+    "title_many": "Передать {{count}} лидов",
+    "title_other": "Передать {{count}} лида",
+    "description_one": "Передать выбранный лид другому менеджеру вашей команды. Их открытые задачи переходят вместе с ними, новый менеджер получит одно уведомление.",
+    "description_few": "Передать {{count}} выбранных лида другому менеджеру вашей команды. Их открытые задачи переходят вместе с ними, новый менеджер получит одно уведомление.",
+    "description_many": "Передать {{count}} выбранных лидов другому менеджеру вашей команды. Их открытые задачи переходят вместе с ними, новый менеджер получит одно уведомление.",
+    "description_other": "Передать {{count}} выбранного лида другому менеджеру вашей команды. Их открытые задачи переходят вместе с ними, новый менеджер получит одно уведомление."
   }
 }

@@ -1,4 +1,4 @@
-import {BadRequestException, ConflictException, ForbiddenException} from '@nestjs/common';
+import {BadRequestException, ConflictException, ForbiddenException, NotFoundException} from '@nestjs/common';
 import {
     DealStatus,
     DiscountApprovalStatus,
@@ -784,6 +784,48 @@ describe('DealsService', () => {
             await service.reassignManager(salesHeadUser, 'deal-1', {managerId: 'new-manager'} as any);
 
             expect(notifications.create).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('bulkReassign (SH-5)', () => {
+        const deals = [
+            {id: 'd1', dealNumber: '2026-0001', managerId: 'm-old', branchId: 'branch-1', clientId: 'c1'},
+            {id: 'd2', dealNumber: '2026-0002', managerId: 'm-new', branchId: 'branch-1', clientId: 'c2'},
+        ];
+
+        it('moves the deals the new manager doesn\'t hold yet, with their tasks, and sends one notification', async () => {
+            const {service, prisma, tasksService, activityService, notifications} = buildBase();
+            prisma.deal.findMany.mockResolvedValue(deals);
+            prisma.user.findFirst.mockResolvedValue({id: 'm-new'});
+            tasksService.handOverOpenTasks.mockResolvedValue([{id: 't1'}, {id: 't2'}]);
+
+            const result = await service.bulkReassign(salesHeadUser, ['d1', 'd2'], 'm-new');
+
+            expect(prisma.deal.findMany.mock.calls[0][0].where).toEqual(expect.objectContaining({
+                id: {in: ['d1', 'd2']}, companyId: 'company-1', branchId: 'branch-1',
+            }));
+            expect(prisma.deal.update).toHaveBeenCalledTimes(1);
+            expect(prisma.deal.update).toHaveBeenCalledWith({where: {id: 'd1'}, data: {managerId: 'm-new'}});
+            expect(activityService.reassignManager).toHaveBeenCalledTimes(1);
+            expect(result).toEqual({deals: 1, tasks: 2});
+            expect(notifications.create).toHaveBeenCalledWith(expect.objectContaining({
+                userId: 'm-new', templateKey: 'dealsReassigned', params: {deals: 1, byName: 'Manager', tasks: 2},
+            }));
+        });
+
+        it('refuses a target who isn\'t an individual contributor on the branch, and moves nothing', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findMany.mockResolvedValue(deals);
+            prisma.user.findFirst.mockResolvedValue(null);
+
+            await expect(service.bulkReassign(salesHeadUser, ['d1', 'd2'], 'finance-1')).rejects.toThrow(BadRequestException);
+            expect(prisma.deal.update).not.toHaveBeenCalled();
+        });
+
+        it('refuses when a deal is outside the caller\'s reach', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findMany.mockResolvedValue(deals.slice(0, 1));
+            await expect(service.bulkReassign(salesHeadUser, ['d1', 'other'], 'm-new')).rejects.toThrow(NotFoundException);
         });
     });
 

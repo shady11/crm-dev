@@ -514,6 +514,16 @@ describe('TasksService', () => {
             expect(moved).toHaveLength(2);
         });
 
+        it('with `standalone`, moves only the tasks tied to no lead or deal (SH-5)', async () => {
+            const {service} = build();
+            const tx = db([{id: 't1', title: 'Weekly report'}]);
+
+            await service.handOverOpenTasks(tx as any, {...params, link: {standalone: true}});
+
+            expect(tx.task.findMany.mock.calls[0][0].where).toEqual(expect.objectContaining({leadId: null, dealId: null, assignedToId: 'old'}));
+            expect(tx.activity.createMany.mock.calls[0][0].data[0].metadata).toEqual(expect.objectContaining({leadId: null, dealId: null}));
+        });
+
         it('does nothing when there was no previous manager or it is the same person', async () => {
             const {service} = build();
             const tx = db([{id: 't1', title: 'Call'}]);

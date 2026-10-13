@@ -124,6 +124,18 @@
     "paymentVoided": {
       "title": "Платёж {{amount}} по сделке {{dealNumber}} аннулирован",
       "message": "{{reason}}"
+    },
+    "leadsReassigned": {
+      "title": "Вам переданы лиды: {{leads}}",
+      "message": "Передал(а) {{byName}} · перенесено открытых задач: {{tasks}}"
+    },
+    "dealsReassigned": {
+      "title": "Вам переданы сделки: {{deals}}",
+      "message": "Передал(а) {{byName}} · перенесено открытых задач: {{tasks}}"
+    },
+    "workHandedOver": {
+      "title": "Вам переданы дела: {{fromName}}",
+      "message": "Передал(а) {{byName}} · лиды: {{leads}}, сделки: {{deals}}, задачи: {{tasks}}"
     }
   }
 }

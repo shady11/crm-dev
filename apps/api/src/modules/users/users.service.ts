@@ -88,7 +88,7 @@ export class UsersService {
             throw new ForbiddenException("User does not belong to a company");
         }
 
-        return this.prisma.user.findMany({
+        const people = await this.prisma.user.findMany({
             where: {
                 companyId: user.companyId,
                 deletedAt: null,
@@ -98,8 +98,16 @@ export class UsersService {
                 role: {permissions: {some: {permission: {key: "deals.manage"}}}},
             },
             orderBy: {fullName: "asc"},
-            select: {id: true, fullName: true, branchId: true},
+            select: {
+                id: true, fullName: true, branchId: true,
+                role: {select: {permissions: {where: {permission: {key: "deals.reassign"}}, select: {permissionId: true}}}},
+            },
         });
+
+        // isTeamLead: can book deals but not be handed someone else's, the
+        // same rule the reassign endpoints apply ("an individual
+        // contributor"), so reassign pickers can leave them out (SH-5).
+        return people.map(({role, ...person}) => ({...person, isTeamLead: role.permissions.length > 0}));
     }
 
     async findAll(user: AuthUser, query: QueryUsersDto) {
