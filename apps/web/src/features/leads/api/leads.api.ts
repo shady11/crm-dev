@@ -38,8 +38,11 @@ export type GetLeadsParams = {
     page?: number;
     limit?: number;
     search?: string;
-    /** OPEN: every status but Converted and Lost, as "Open leads" counts them. */
-    status?: LeadStatus | "OPEN";
+    /**
+     * OPEN: every status but Converted and Lost, as "Open leads" counts them.
+     * FOLLOW_UP_OVERDUE: open leads whose next contact was due on an earlier day.
+     */
+    status?: LeadStatus | "OPEN" | "FOLLOW_UP_OVERDUE";
     source?: string;
     managerId?: string;
     projectId?: string;

@@ -27,9 +27,9 @@ import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
 import {toastWithUndo} from "@/lib/undo-toast.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 
-export type LeadStatusFilterValue = LeadStatus | "OPEN" | "all";
+export type LeadStatusFilterValue = LeadStatus | "OPEN" | "FOLLOW_UP_OVERDUE" | "all";
 
-const STATUS_FILTERS: LeadStatusFilterValue[] = ["OPEN", ...Object.values(LeadStatus)];
+const STATUS_FILTERS: LeadStatusFilterValue[] = ["OPEN", "FOLLOW_UP_OVERDUE", ...Object.values(LeadStatus)];
 
 export function useLeadsList() {
     const { t } = useTranslation("leads");

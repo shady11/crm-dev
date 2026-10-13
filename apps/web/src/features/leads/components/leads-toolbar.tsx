@@ -46,6 +46,7 @@ export function LeadsToolbar({
         items: [
             { label: t("toolbar.filterByStatus"), value: "all" },
             { label: t("toolbar.openStatuses"), value: "OPEN" },
+            { label: t("toolbar.followUpOverdue"), value: "FOLLOW_UP_OVERDUE" },
             ...Object.values(LeadStatus).map(
                 (status) => ({
                     label: t(LEAD_STATUS_LABEL_KEYS[status]),

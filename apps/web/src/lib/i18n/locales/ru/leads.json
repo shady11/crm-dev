@@ -19,7 +19,8 @@
     "mineOnly": "Мои лиды",
     "allSources": "Все источники",
     "allManagers": "Все менеджеры",
-    "openStatuses": "Открытые"
+    "openStatuses": "Открытые",
+    "followUpOverdue": "Просрочен контакт"
   },
   "table": {
     "lead": "Лид",
