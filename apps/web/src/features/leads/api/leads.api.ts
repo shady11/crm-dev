@@ -137,6 +137,12 @@ export async function transferLeadBranch(id: string, branchId: string) {
 }
 
 // SH-A1: SALES_HEAD moving a lead between their own team's SALES_MANAGERs.
+/** SH-5: several leads to one manager; returns how many moved and how many tasks went with them. */
+export async function bulkReassignLeads(leadIds: string[], managerId: string) {
+    const response = await api.post<{ leads: number; tasks: number }>("/leads/bulk-reassign", { leadIds, managerId });
+    return response.data;
+}
+
 export async function reassignLeadManager(id: string, managerId: string) {
     const response = await api.post<Lead>(`/leads/${id}/reassign`, { managerId });
     return response.data;

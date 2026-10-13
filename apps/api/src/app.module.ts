@@ -21,6 +21,7 @@ import {ChessboardModule} from './modules/chessboard/chessboard.module';
 import {ReferencesModule} from './modules/references/references.module';
 import {SettingOptionsModule} from '@/modules/setting-options/setting-options.module';
 import {DealsModule} from "@/modules/deals/deals.module";
+import {TeamModule} from "@/modules/team/team.module";
 import {TasksModule} from "@/modules/tasks/tasks.module";
 import {DocumentsModule} from "@/modules/documents/documents.module";
 import {DocumentGenerationModule} from "@/modules/document-generation/document-generation.module";
@@ -74,6 +75,7 @@ import {RbacModule} from "@/modules/rbac/rbac.module";
       ReferencesModule,
       SettingOptionsModule,
       DealsModule,
+      TeamModule,
       TasksModule,
       DocumentsModule,
       DocumentGenerationModule,

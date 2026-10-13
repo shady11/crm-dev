@@ -40,7 +40,8 @@
   "actionBar": {
     "selected": "{{count}} selected",
     "delete": "Delete",
-    "clearSelection": "Clear selection"
+    "clearSelection": "Clear selection",
+    "reassign": "Reassign"
   },
   "overview": {
     "fullName": "Full name",
@@ -194,7 +195,15 @@
     "bulkDeletePartialFailed": "{{failed}} of {{total}} selected leads could not be deleted.",
     "bulkDeleteSuccessTitle": "Leads deleted",
     "bulkDeleteSuccessDescription": "Selected leads have been removed.",
-    "bulkDeleteIssuesTitle": "Bulk delete had issues"
+    "bulkDeleteIssuesTitle": "Bulk delete had issues",
+    "bulkReassignedTitle_one": "{{count}} lead reassigned",
+    "bulkReassignedTitle_few": "{{count}} leads reassigned",
+    "bulkReassignedTitle_many": "{{count}} leads reassigned",
+    "bulkReassignedTitle_other": "{{count}} leads reassigned",
+    "bulkReassignedTasks_one": "{{count}} open task moved with them",
+    "bulkReassignedTasks_few": "{{count}} open tasks moved with them",
+    "bulkReassignedTasks_many": "{{count}} open tasks moved with them",
+    "bulkReassignedTasks_other": "{{count}} open tasks moved with them"
   },
   "interest": {
     "budget": "up to {{amount}}",
@@ -212,5 +221,15 @@
     "Walk-in": "Walk-in",
     "Phone": "Phone call",
     "Other": "Other"
+  },
+  "bulkReassign": {
+    "title_one": "Reassign {{count}} lead",
+    "title_few": "Reassign {{count}} leads",
+    "title_many": "Reassign {{count}} leads",
+    "title_other": "Reassign {{count}} leads",
+    "description_one": "Move the selected lead to another manager on your team. Their open tasks move with them, and the new manager gets one notification.",
+    "description_few": "Move the {{count}} selected leads to another manager on your team. Their open tasks move with them, and the new manager gets one notification.",
+    "description_many": "Move the {{count}} selected leads to another manager on your team. Their open tasks move with them, and the new manager gets one notification.",
+    "description_other": "Move the {{count}} selected leads to another manager on your team. Their open tasks move with them, and the new manager gets one notification."
   }
 }

@@ -28,4 +28,8 @@ export type NotificationTemplate =
     | {templateKey: "discountRequestRejected"; params: {dealNumber: string; percent: number; byName: string}}
     | {templateKey: "discountRequestWithdrawn"; params: {dealNumber: string; percent: number}}
     | {templateKey: "leadReassigned"; params: {leadName: string; byName: string; tasks: number}}
-    | {templateKey: "dealReassigned"; params: {dealNumber: string; byName: string; tasks: number}};
+    | {templateKey: "dealReassigned"; params: {dealNumber: string; byName: string; tasks: number}}
+    // SH-5: bulk moves and a manager's handover, one notification each.
+    | {templateKey: "leadsReassigned"; params: {leads: number; byName: string; tasks: number}}
+    | {templateKey: "dealsReassigned"; params: {deals: number; byName: string; tasks: number}}
+    | {templateKey: "workHandedOver"; params: {fromName: string; byName: string; leads: number; deals: number; tasks: number}};

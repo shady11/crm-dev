@@ -16,6 +16,8 @@ import type {TeamPerformanceItem, TeamSnapshotItem} from "@/features/dashboard/a
 import {timeAgo} from "@/features/dashboard/utils/time-ago.ts";
 import {getUsers} from "@/features/users/api/users.api.ts";
 import {UserStatusDot} from "@/features/users/components/user-status-dot.tsx";
+import {HandOverDialog} from "@/features/users/components/hand-over-dialog.tsx";
+import {Button} from "@/components/ui/button.tsx";
 import {initials} from "@/features/deals/utils/format.ts";
 import {paths} from "@/routes/paths.ts";
 import {useTranslation} from "react-i18next";
@@ -38,6 +40,9 @@ export function TeamPage() {
     const [days, setDays] = useState<number>(30);
 
     const canViewResults = hasPermission(user, "dashboard.team_snapshot");
+    // SH-5: moving someone's leads and deals needs both reassignments.
+    const canHandOver = hasPermission(user, "leads.assign") && hasPermission(user, "deals.reassign");
+    const [handingOver, setHandingOver] = useState<{id: string; fullName: string; branchId: string | null} | null>(null);
     const performance = useTeamPerformance(canViewResults, days);
     const snapshot = useTeamSnapshot(canViewResults);
     const members = useQuery({
@@ -228,7 +233,8 @@ export function TeamPage() {
                                 <TableHead className="pl-4">{t("table.headers.name")}</TableHead>
                                 <TableHead>{t("table.headers.role")}</TableHead>
                                 <TableHead>{t("team.columns.phone")}</TableHead>
-                                <TableHead className="pr-4">{t("table.headers.status")}</TableHead>
+                                <TableHead className={canHandOver ? undefined : "pr-4"}>{t("table.headers.status")}</TableHead>
+                                {canHandOver ? <TableHead className="pr-4"><span className="sr-only">{t("handover.action")}</span></TableHead> : null}
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -244,13 +250,28 @@ export function TeamPage() {
                                             ? <a href={`tel:${member.phone}`} className="hover:underline">{member.phone}</a>
                                             : <span className="text-muted-foreground">—</span>}
                                     </TableCell>
-                                    <TableCell className="pr-4"><UserStatusDot isActive={member.isActive} /></TableCell>
+                                    <TableCell className={canHandOver ? undefined : "pr-4"}><UserStatusDot isActive={member.isActive} /></TableCell>
+                                    {canHandOver ? (
+                                        <TableCell className="pr-4 text-right">
+                                            {member.id !== user?.id ? (
+                                                <Button
+                                                    size="sm"
+                                                    variant="secondary"
+                                                    onClick={() => setHandingOver({id: member.id, fullName: member.fullName, branchId: member.branchId ?? null})}
+                                                >
+                                                    {t("handover.action")}
+                                                </Button>
+                                            ) : null}
+                                        </TableCell>
+                                    ) : null}
                                 </TableRow>
                             ))}
                         </TableBody>
                     </DataTable>
                 </CardContent>
             </Card>
+
+            <HandOverDialog person={handingOver} onClose={() => setHandingOver(null)} />
         </div>
     );
 }

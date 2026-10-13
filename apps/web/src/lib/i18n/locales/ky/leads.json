@@ -40,7 +40,8 @@
   "actionBar": {
     "selected": "Тандалды: {{count}}",
     "delete": "Өчүрүү",
-    "clearSelection": "Тандоону тазалоо"
+    "clearSelection": "Тандоону тазалоо",
+    "reassign": "Өткөрүү"
   },
   "overview": {
     "fullName": "Аты-жөнү",
@@ -194,7 +195,15 @@
     "bulkDeletePartialFailed": "Тандалган {{total}} лиддин {{failed}} өчүрүлбөй калды.",
     "bulkDeleteSuccessTitle": "Лиддер өчүрүлдү",
     "bulkDeleteSuccessDescription": "Тандалган лиддер өчүрүлдү.",
-    "bulkDeleteIssuesTitle": "Массалык өчүрүү учурунда көйгөйлөр пайда болду"
+    "bulkDeleteIssuesTitle": "Массалык өчүрүү учурунда көйгөйлөр пайда болду",
+    "bulkReassignedTitle_one": "{{count}} лид өткөрүлдү",
+    "bulkReassignedTitle_few": "{{count}} лид өткөрүлдү",
+    "bulkReassignedTitle_many": "{{count}} лид өткөрүлдү",
+    "bulkReassignedTitle_other": "{{count}} лид өткөрүлдү",
+    "bulkReassignedTasks_one": "Алар менен кошо {{count}} ачык тапшырма өткөрүлдү",
+    "bulkReassignedTasks_few": "Алар менен кошо {{count}} ачык тапшырма өткөрүлдү",
+    "bulkReassignedTasks_many": "Алар менен кошо {{count}} ачык тапшырма өткөрүлдү",
+    "bulkReassignedTasks_other": "Алар менен кошо {{count}} ачык тапшырма өткөрүлдү"
   },
   "interest": {
     "budget": "{{amount}} чейин",
@@ -212,5 +221,15 @@
     "Walk-in": "Кеңсеге келүү",
     "Phone": "Чалуу",
     "Other": "Башка"
+  },
+  "bulkReassign": {
+    "title_one": "{{count}} лидди өткөрүү",
+    "title_few": "{{count}} лидди өткөрүү",
+    "title_many": "{{count}} лидди өткөрүү",
+    "title_other": "{{count}} лидди өткөрүү",
+    "description_one": "Тандалган лидди командаңыздагы башка менеджерге өткөрүү. Алардын ачык тапшырмалары да өтөт, жаңы менеджер бир билдирүү алат.",
+    "description_few": "Тандалган {{count}} лидди командаңыздагы башка менеджерге өткөрүү. Алардын ачык тапшырмалары да өтөт, жаңы менеджер бир билдирүү алат.",
+    "description_many": "Тандалган {{count}} лидди командаңыздагы башка менеджерге өткөрүү. Алардын ачык тапшырмалары да өтөт, жаңы менеджер бир билдирүү алат.",
+    "description_other": "Тандалган {{count}} лидди командаңыздагы башка менеджерге өткөрүү. Алардын ачык тапшырмалары да өтөт, жаңы менеджер бир билдирүү алат."
   }
 }

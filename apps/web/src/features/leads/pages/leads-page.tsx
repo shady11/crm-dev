@@ -24,6 +24,7 @@ export function LeadsPage() {
         form,
         deleteDialog,
         bulkDeleteDialog,
+        bulkReassignDialog,
         convertDialog,
         detailsSheet,
         transferBranchDialog,
@@ -83,6 +84,18 @@ export function LeadsPage() {
                 isProcessing={bulkDeleteDialog.isDeleting}
                 onClear={selection.clear}
                 onRequestDelete={bulkDeleteDialog.onOpen}
+                onRequestReassign={bulkReassignDialog.onOpen}
+            />
+
+            <ReassignManagerDialog
+                open={bulkReassignDialog.open}
+                entityName=""
+                branchId={bulkReassignDialog.branchId}
+                isSubmitting={bulkReassignDialog.isSubmitting}
+                title={t("bulkReassign.title", { count: bulkReassignDialog.count })}
+                description={t("bulkReassign.description", { count: bulkReassignDialog.count })}
+                onOpenChange={bulkReassignDialog.onOpenChange}
+                onConfirm={bulkReassignDialog.onConfirm}
             />
 
             <LeadFormSheet

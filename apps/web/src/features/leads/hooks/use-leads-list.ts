@@ -16,6 +16,7 @@ import {
     type Lead,
     type LeadSortField,
     reassignLeadManager,
+    bulkReassignLeads,
     restoreLead,
     transferLeadBranch,
     updateLead,
@@ -63,6 +64,7 @@ export function useLeadsList() {
 
     const [deleteTarget, setDeleteTarget] = useState<Lead | null>(null);
     const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+    const [bulkReassignOpen, setBulkReassignOpen] = useState(false);
     const [convertTarget, setConvertTarget] = useState<Lead | null>(null);
     const [detailsTarget, setDetailsTarget] = useState<Lead | null>(null);
     const [transferTarget, setTransferTarget] = useState<Lead | null>(null);
@@ -201,6 +203,25 @@ export function useLeadsList() {
                 toast.success({ title });
             }
             setReassignTarget(null);
+        },
+        onError: () => {
+            toast.error({ title: t("reassignDialog.errorTitle", { ns: "users" }) });
+        },
+    });
+
+    // SH-5: several leads to one manager, e.g. while someone is away.
+    const bulkReassignMutation = useMutation({
+        mutationFn: ({ ids, managerId }: { ids: string[]; managerId: string }) => bulkReassignLeads(ids, managerId),
+        onSuccess: async (result) => {
+            await invalidateLeads();
+            await queryClient.invalidateQueries({ queryKey: ["tasks"] });
+            await queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+            toast.success({
+                title: t("toasts.bulkReassignedTitle", { count: result.leads }),
+                description: result.tasks > 0 ? t("toasts.bulkReassignedTasks", { count: result.tasks }) : undefined,
+            });
+            setSelectedIds(new Set());
+            setBulkReassignOpen(false);
         },
         onError: () => {
             toast.error({ title: t("reassignDialog.errorTitle", { ns: "users" }) });
@@ -441,6 +462,21 @@ export function useLeadsList() {
             isDeleting: deleteMutation.isPending,
             onCancel: cancelDelete,
             onConfirm: confirmDelete,
+        },
+
+        bulkReassignDialog: {
+            open: bulkReassignOpen,
+            count: selectedIds.size,
+            // The picker lists one branch's team; leads from several
+            // branches (a company-wide admin's selection) have no common one.
+            branchId: (() => {
+                const branches = new Set(leads.filter((l) => selectedIds.has(l.id)).map((l) => l.branchId));
+                return branches.size === 1 ? [...branches][0] ?? null : null;
+            })(),
+            isSubmitting: bulkReassignMutation.isPending,
+            onOpen: () => setBulkReassignOpen(true),
+            onOpenChange: setBulkReassignOpen,
+            onConfirm: (managerId: string) => bulkReassignMutation.mutate({ ids: Array.from(selectedIds), managerId }),
         },
 
         bulkDeleteDialog: {

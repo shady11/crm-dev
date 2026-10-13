@@ -476,16 +476,20 @@ export class TasksService {
     async handOverOpenTasks(db: DbClient, params: {
         companyId: string;
         actorId: string;
-        link: {leadId: string} | {dealId: string};
+        // `standalone`: the person's open tasks tied to no lead or deal, for
+        // a manager's handover (SH-5); the linked ones move with their
+        // lead or deal.
+        link: {leadId: string} | {dealId: string} | {standalone: true};
         fromUserId: string | null;
         toUserId: string;
     }): Promise<{id: string; title: string}[]> {
         if (!params.fromUserId || params.fromUserId === params.toUserId) return [];
 
+        const linkWhere = "standalone" in params.link ? {leadId: null, dealId: null} : params.link;
         const tasks = await db.task.findMany({
             where: {
                 companyId: params.companyId,
-                ...params.link,
+                ...linkWhere,
                 assignedToId: params.fromUserId,
                 deletedAt: null,
                 status: {in: [TaskStatus.TODO, TaskStatus.IN_PROGRESS]},
@@ -509,7 +513,7 @@ export class TasksService {
                 action: ActivityAction.REASSIGNED,
                 type: ActivityType.TASK_REASSIGNED,
                 ...activityText('taskReassigned', { task: task.title }),
-                metadata: {fromAssignedToId: params.fromUserId, toAssignedToId: params.toUserId, ...params.link},
+                metadata: {fromAssignedToId: params.fromUserId, toAssignedToId: params.toUserId, ...linkWhere},
             })),
         });
 
