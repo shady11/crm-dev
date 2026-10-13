@@ -14,6 +14,7 @@ import {formatDate} from "@/utils/date-formatter";
 import {useAuth} from "@/features/auth/hooks/use-auth";
 import {hasPermission} from "@/features/auth/access";
 import {getBranches} from "@/features/branches/api/branches.api";
+import {getUsers} from "@/features/users/api/users.api";
 import {getActivities} from "../api/activities.api";
 import {ActivitySubjects} from "../components/activity-subjects";
 import {ACTIVITY_SUBJECTS, type ActivitySubject} from "../types/activity.types";
@@ -37,6 +38,9 @@ export function ActivitiesPage() {
     const [dateFrom, setDateFrom] = useState("");
     const [dateTo, setDateTo] = useState("");
     const [mineOnly, setMineOnly] = useState(false);
+    // One person's actions (SH-7). "My actions" is this filter set to
+    // yourself, so the two clear each other.
+    const [userId, setUserId] = useState("");
     const [subject, setSubject] = useState<ActivitySubject | "">("");
     const [page, setPage] = useState(1);
     const limit = 20;
@@ -47,14 +51,24 @@ export function ActivitiesPage() {
         enabled: isCompanyWide,
     });
 
+    // The people whose actions this viewer can see: the API scopes /users
+    // to a branch-scoped caller's own branch, and an admin's branch filter
+    // narrows it the same way it narrows the feed.
+    const peopleBranchId = isCompanyWide && branchId ? branchId : undefined;
+    const peopleQuery = useQuery({
+        queryKey: ["users", "activity-filter", {branchId: peopleBranchId}],
+        queryFn: () => getUsers({limit: 100, branchId: peopleBranchId, sortBy: "fullName", sortOrder: "asc"}),
+        enabled: !ownOnly,
+    });
+
     const activitiesQuery = useQuery({
-        queryKey: ["activities", {branchId, dateFrom, dateTo, mineOnly, subject, page}],
+        queryKey: ["activities", {branchId, dateFrom, dateTo, mineOnly, userId, subject, page}],
         queryFn: () =>
             getActivities({
                 branchId: isCompanyWide && branchId ? branchId : undefined,
                 dateFrom: dateFrom || undefined,
                 dateTo: dateTo || undefined,
-                userId: mineOnly && !ownOnly ? user?.id : undefined,
+                userId: ownOnly ? undefined : mineOnly ? user?.id : userId || undefined,
                 subject: subject || undefined,
                 page,
                 limit,
@@ -65,6 +79,13 @@ export function ActivitiesPage() {
         items: [
             {label: t("page.filters.allBranches"), value: "ALL"},
             ...(branchesQuery.data?.items ?? []).map((branch) => ({label: branch.name, value: branch.id})),
+        ],
+    });
+
+    const userCollection = createListCollection({
+        items: [
+            {label: t("page.filters.everyone"), value: "ALL"},
+            ...(peopleQuery.data?.items ?? []).map((person) => ({label: person.fullName, value: person.id})),
         ],
     });
 
@@ -98,6 +119,8 @@ export function ActivitiesPage() {
                             value={[branchId || "ALL"]}
                             onValueChange={(item) => {
                                 setBranchId(item.value[0] === "ALL" ? "" : item.value[0]);
+                                // The person may not be in the new branch.
+                                setUserId("");
                                 setPage(1);
                             }}
                         >
@@ -106,6 +129,32 @@ export function ActivitiesPage() {
                             </SelectTrigger>
                             <SelectContent>
                                 {branchCollection.items.map((item) => (
+                                    <SelectItem key={item.value} item={item}>
+                                        {item.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </label>
+                ) : null}
+
+                {!ownOnly ? (
+                    <label className="block space-y-1.5">
+                        <span className="text-sm font-medium">{t("page.filters.user")}</span>
+                        <Select
+                            collection={userCollection}
+                            value={[userId || "ALL"]}
+                            onValueChange={(item) => {
+                                setUserId(item.value[0] === "ALL" ? "" : item.value[0]);
+                                setMineOnly(false);
+                                setPage(1);
+                            }}
+                        >
+                            <SelectTrigger className="w-52">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {userCollection.items.map((item) => (
                                     <SelectItem key={item.value} item={item}>
                                         {item.label}
                                     </SelectItem>
@@ -173,6 +222,7 @@ export function ActivitiesPage() {
                         pressed={mineOnly}
                         onPressedChange={(pressed) => {
                             setMineOnly(pressed);
+                            if (pressed) setUserId("");
                             setPage(1);
                         }}
                     >

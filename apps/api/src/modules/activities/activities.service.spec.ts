@@ -90,6 +90,17 @@ describe("ActivitiesService", () => {
         expect(findMany.mock.calls[0][0].where.userId).toBe("user-2");
     });
 
+    it("keeps a Sales Head's branch scope when they filter by a person (SH-7)", async () => {
+        const {service, findMany} = build();
+        const head: AuthUser = {...baseUser, id: "head-1", roleName: "Sales Head", isBranchScoped: true, branchId: "branch-1"};
+
+        await service.findAll(head, {userId: "other-branch-user"} as any);
+
+        const where = findMany.mock.calls[0][0].where;
+        expect(where.userId).toBe("other-branch-user");
+        expect(where.user).toEqual({branchId: "branch-1"});
+    });
+
     it("lets COMPANY_ADMIN narrow to one branch via the query param", async () => {
         const {service, findMany} = build();
 
