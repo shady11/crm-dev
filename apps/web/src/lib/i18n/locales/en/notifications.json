@@ -124,6 +124,14 @@
     "paymentVoided": {
       "title": "Payment of {{amount}} on deal {{dealNumber}} was voided",
       "message": "{{reason}}"
+    },
+    "teamReservationExpired": {
+      "title": "Reservation for deal {{dealNumber}} expired",
+      "message": "{{managerName}}'s client didn't sign in time; the unit is back on sale."
+    },
+    "teamReservationExpiredHeld": {
+      "title": "Reservation for deal {{dealNumber}} expired",
+      "message": "{{managerName}}'s deal: {{amount}} is still held on it."
     }
   }
 }

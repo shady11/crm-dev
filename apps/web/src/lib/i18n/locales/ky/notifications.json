@@ -124,6 +124,14 @@
     "paymentVoided": {
       "title": "{{dealNumber}} бүтүмү боюнча {{amount}} төлөм жокко чыгарылды",
       "message": "{{reason}}"
+    },
+    "teamReservationExpired": {
+      "title": "{{dealNumber}} бүтүмү боюнча брондоонун мөөнөтү бүттү",
+      "message": "{{managerName}} менеджеринин кардары келишимге убагында кол койгон жок; объект кайра сатыкта."
+    },
+    "teamReservationExpiredHeld": {
+      "title": "{{dealNumber}} бүтүмү боюнча брондоонун мөөнөтү бүттү",
+      "message": "{{managerName}} менеджеринин бүтүмү: анда {{amount}} калды."
     }
   }
 }
