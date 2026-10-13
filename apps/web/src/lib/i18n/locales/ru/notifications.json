@@ -125,6 +125,14 @@
       "title": "Платёж {{amount}} по сделке {{dealNumber}} аннулирован",
       "message": "{{reason}}"
     },
+    "teamReservationExpired": {
+      "title": "Бронь по сделке {{dealNumber}} истекла",
+      "message": "Клиент менеджера {{managerName}} не подписал договор вовремя; объект снова в продаже."
+    },
+    "teamReservationExpiredHeld": {
+      "title": "Бронь по сделке {{dealNumber}} истекла",
+      "message": "Сделка менеджера {{managerName}}: на ней остаётся {{amount}}."
+    },
     "leadsReassigned": {
       "title": "Вам переданы лиды: {{leads}}",
       "message": "Передал(а) {{byName}} · перенесено открытых задач: {{tasks}}"

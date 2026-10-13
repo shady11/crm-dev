@@ -10,6 +10,9 @@ export type NotificationTemplate =
     | {templateKey: "discountRejected"; params: {dealNumber: string; reason: string}}
     | {templateKey: "dealStatusChanged"; params: {dealNumber: string; status: string}}
     | {templateKey: "reservationExpired"; params: {dealNumber: string}}
+    // SH-10: the same lapse, told to the branch's Sales Head.
+    | {templateKey: "teamReservationExpired"; params: {dealNumber: string; managerName: string}}
+    | {templateKey: "teamReservationExpiredHeld"; params: {dealNumber: string; managerName: string; amount: number; currency: string | null}}
     | {templateKey: "reservationExpiring"; params: {dealNumber: string; date: string}}
     | {templateKey: "paymentReceived"; params: {dealNumber: string; amount: number; currency: string | null}}
     | {templateKey: "refundIssued"; params: {dealNumber: string; amount: number; currency: string | null}}

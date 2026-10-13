@@ -16,7 +16,9 @@ describe('DealExpiryService.expireOverdueReservations', () => {
             dealNumber: '2026-0001',
             unitId: 'unit-1',
             managerId: 'manager-1',
+            manager: {fullName: 'Cholpon Isaev'},
             companyId: 'company-1',
+            branchId: 'branch-1',
             clientId: 'client-1',
             ...overrides,
         };
@@ -34,6 +36,9 @@ describe('DealExpiryService.expireOverdueReservations', () => {
             activity: {
                 create: jest.fn().mockResolvedValue({id: 'activity-1'}),
             },
+            user: {findMany: jest.fn().mockResolvedValue([{id: 'head-1'}])},
+            payment: {aggregate: jest.fn().mockResolvedValue({_sum: {amount: null}})},
+            company: {findUnique: jest.fn().mockResolvedValue({currency: 'KGS'})},
             $transaction: jest.fn(async (fn: any) => fn(prisma)),
         };
         const notifications = {create: jest.fn().mockResolvedValue({}), resolveForEntity: jest.fn().mockResolvedValue(0)};
@@ -43,8 +48,10 @@ describe('DealExpiryService.expireOverdueReservations', () => {
 
         const tasksService = {cancelOpenTasksForDeal: jest.fn().mockResolvedValue(0)};
 
-        const service = new DealExpiryService(prisma as any, notifications as any, activityService as any, moneyHeld as any, tasksService as any);
-        return {service, prisma, notifications, activityService, moneyHeld, tasksService};
+        const rbacService = {findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-head'])};
+
+        const service = new DealExpiryService(prisma as any, notifications as any, activityService as any, moneyHeld as any, tasksService as any, rbacService as any);
+        return {service, prisma, notifications, activityService, moneyHeld, tasksService, rbacService};
     }
 
     it('does nothing when there are no overdue reservations', async () => {
@@ -95,6 +102,47 @@ describe('DealExpiryService.expireOverdueReservations', () => {
         expect(tasksService.cancelOpenTasksForDeal).not.toHaveBeenCalled();
     });
 
+    describe('telling the Sales Head (SH-10)', () => {
+        it('tells the branch\'s team leads whose reservation lapsed, leaving out its own manager', async () => {
+            const {service, prisma, notifications, rbacService} = build([candidate()]);
+            await service.expireOverdueReservations();
+
+            expect(rbacService.findRoleIdsWithPermission).toHaveBeenCalledWith('company-1', 'deals.reassign');
+            expect(prisma.user.findMany.mock.calls[0][0].where).toEqual(expect.objectContaining({
+                companyId: 'company-1', branchId: 'branch-1', roleId: {in: ['role-sales-head']}, isActive: true, id: {not: 'manager-1'},
+            }));
+            expect(notifications.create).toHaveBeenCalledWith(expect.objectContaining({
+                userId: 'head-1', templateKey: 'teamReservationExpired',
+                params: {dealNumber: '2026-0001', managerName: 'Cholpon Isaev'},
+                entityType: 'DEAL', entityId: 'deal-1',
+            }));
+        });
+
+        it('says how much is still held when the client had paid', async () => {
+            const {service, prisma, notifications} = build([candidate()]);
+            prisma.payment.aggregate.mockResolvedValue({_sum: {amount: 5000}});
+            await service.expireOverdueReservations();
+
+            expect(notifications.create).toHaveBeenCalledWith(expect.objectContaining({
+                userId: 'head-1', templateKey: 'teamReservationExpiredHeld',
+                params: {dealNumber: '2026-0001', managerName: 'Cholpon Isaev', amount: 5000, currency: 'KGS'},
+            }));
+        });
+
+        it('says nothing to anyone when the deal lost the race', async () => {
+            const {service, prisma} = build([candidate()], 0);
+            await service.expireOverdueReservations();
+            expect(prisma.user.findMany).not.toHaveBeenCalled();
+        });
+
+        it('still finishes the run when telling the head fails', async () => {
+            const {service, prisma, rbacService} = build([candidate(), candidate({id: 'deal-2'})]);
+            rbacService.findRoleIdsWithPermission.mockRejectedValue(new Error('db down'));
+            await expect(service.expireOverdueReservations()).resolves.toBeUndefined();
+            expect(prisma.deal.updateMany).toHaveBeenCalledTimes(2);
+        });
+    });
+
     it('asks Finance to refund whatever the expired reservation still holds', async () => {
         const {service, moneyHeld} = build([candidate()]);
         await service.expireOverdueReservations();
@@ -125,12 +173,15 @@ describe('DealExpiryService.expireOverdueReservations', () => {
         );
     });
 
-    it('skips notification and activity logging when the deal has no manager', async () => {
-        const {service, notifications, activityService} = build([candidate({managerId: null})]);
+    it('skips the manager\'s notification and activity logging when the deal has no manager, but still tells the Sales Head', async () => {
+        const {service, notifications, activityService} = build([candidate({managerId: null, manager: null})]);
         await service.expireOverdueReservations();
 
         expect(activityService.expireReservation).not.toHaveBeenCalled();
-        expect(notifications.create).not.toHaveBeenCalled();
+        expect(notifications.create).toHaveBeenCalledTimes(1);
+        expect(notifications.create).toHaveBeenCalledWith(expect.objectContaining({
+            userId: 'head-1', templateKey: 'teamReservationExpired', params: {dealNumber: '2026-0001', managerName: '—'},
+        }));
     });
 
     it('skips unit release and notification when another process already flipped the deal (race lost)', async () => {
