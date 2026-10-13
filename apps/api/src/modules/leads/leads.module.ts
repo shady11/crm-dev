@@ -9,6 +9,7 @@ import { LeadsController } from './leads.controller';
 @Module({
   imports: [ClientsModule, RbacModule, TasksModule, NotificationsModule],
   providers: [LeadsService],
-  controllers: [LeadsController]
+  controllers: [LeadsController],
+  exports: [LeadsService],
 })
 export class LeadsModule {}

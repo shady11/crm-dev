@@ -111,6 +111,54 @@ describe('LeadsService', () => {
         ...overrides,
     }) as any;
 
+    describe('bulkReassign (SH-5)', () => {
+        const leads = [
+            {id: 'l1', fullName: 'A', managerId: 'm-old', branchId: 'branch-1'},
+            {id: 'l2', fullName: 'B', managerId: 'm-new', branchId: 'branch-1'},
+            {id: 'l3', fullName: 'C', managerId: 'm-old', branchId: 'branch-1'},
+        ];
+
+        it('moves only the leads the new manager doesn\'t already hold, with their tasks, and sends one notification', async () => {
+            const {service, prisma, tasksService, notifications} = build({manager: {id: 'm-new'}});
+            prisma.lead.findMany.mockResolvedValue(leads);
+            tasksService.handOverOpenTasks.mockResolvedValueOnce([{id: 't1'}]).mockResolvedValueOnce([]);
+
+            const result = await service.bulkReassign(salesHeadUser, ['l1', 'l2', 'l3'], 'm-new');
+
+            expect(prisma.lead.findMany.mock.calls[0][0].where).toEqual(expect.objectContaining({
+                id: {in: ['l1', 'l2', 'l3']}, companyId: 'company-1', deletedAt: null, branchId: 'branch-1',
+            }));
+            expect(prisma.lead.update.mock.calls.map(([a]: any) => a.where.id)).toEqual(['l1', 'l3']);
+            expect(prisma.activity.create).toHaveBeenCalledTimes(2);
+            expect(result).toEqual({leads: 2, tasks: 1});
+            expect(notifications.create).toHaveBeenCalledTimes(1);
+            expect(notifications.create).toHaveBeenCalledWith(expect.objectContaining({
+                userId: 'm-new', templateKey: 'leadsReassigned', params: {leads: 2, byName: 'Manager', tasks: 1},
+            }));
+        });
+
+        it('stays quiet when the caller sends its own notification', async () => {
+            const {service, prisma, notifications} = build({manager: {id: 'm-new'}});
+            prisma.lead.findMany.mockResolvedValue(leads);
+            await service.bulkReassign(salesHeadUser, ['l1', 'l2', 'l3'], 'm-new', {notify: false});
+            expect(notifications.create).not.toHaveBeenCalled();
+        });
+
+        it('refuses when any lead is outside the caller\'s reach, and moves nothing', async () => {
+            const {service, prisma} = build({manager: {id: 'm-new'}});
+            prisma.lead.findMany.mockResolvedValue(leads.slice(0, 2));
+            await expect(service.bulkReassign(salesHeadUser, ['l1', 'l2', 'other-branch'], 'm-new')).rejects.toThrow(NotFoundException);
+            expect(prisma.lead.update).not.toHaveBeenCalled();
+        });
+
+        it('refuses a target who can\'t hold leads on that branch', async () => {
+            const {service, prisma} = build({manager: null});
+            prisma.lead.findMany.mockResolvedValue(leads.slice(0, 1));
+            await expect(service.bulkReassign(salesHeadUser, ['l1'], 'finance-1')).rejects.toThrow(BadRequestException);
+            expect(prisma.lead.update).not.toHaveBeenCalled();
+        });
+    });
+
     describe('findAll', () => {
         it('rejects when the user has no company', async () => {
             const {service} = build();
@@ -124,6 +172,17 @@ describe('LeadsService', () => {
             expect(prisma.lead.findMany).toHaveBeenCalledWith(
                 expect.objectContaining({where: expect.objectContaining({companyId: 'company-1', branchId: 'branch-1'})}),
             );
+        });
+
+        it('reads status FOLLOW_UP_OVERDUE as open leads due on an earlier day (SH-6)', async () => {
+            const {service, prisma} = build();
+            await service.findAll(branchUser, {status: 'FOLLOW_UP_OVERDUE'} as any);
+
+            const where = (prisma.lead.findMany as jest.Mock).mock.calls[0][0].where;
+            expect(where.status).toEqual({in: ['NEW', 'CONTACTED', 'QUALIFIED', 'MEETING', 'NEGOTIATION']});
+            const startOfToday = new Date();
+            startOfToday.setHours(0, 0, 0, 0);
+            expect(where.nextContactAt).toEqual({lt: startOfToday});
         });
 
         it('reads status OPEN as every status but Converted and Lost, alongside a manager (SH-4)', async () => {

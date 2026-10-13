@@ -5,7 +5,7 @@ import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {hasPermission} from "@/common/utils/permissions.util";
 import {ACTIVE_DEAL_STATUSES, dealAttentionWhere, OVERDUE_INSTALLMENT_WHERE, WON_DEAL_STATUSES} from "@/modules/deals/deal.constants";
-import {OPEN_LEAD_STATUSES} from "@/modules/leads/lead.constants";
+import {OPEN_LEAD_STATUSES, overdueFollowUpWhere} from "@/modules/leads/lead.constants";
 import {RbacService} from "@/modules/rbac/rbac.service";
 import {canDecideDiscount} from "@/modules/deals/services/discount-approval";
 
@@ -269,6 +269,28 @@ export class DashboardService {
                 this.prisma.unitPriceRequest.count({ where: priceWhere }),
             ])
             : [[], 0];
+        // SH-6: missed follow-ups, oldest first. Same rule as the leads
+        // list's "Follow-up overdue" filter, so "View all" opens exactly these.
+        const followUpWhere: Prisma.LeadWhereInput = {
+            companyId,
+            branchId: effectiveBranchId,
+            deletedAt: null,
+            ...(selfScoped ? { managerId: user.id } : {}),
+            ...(projectId ? { preferredProjectId: projectId } : {}),
+            ...overdueFollowUpWhere(),
+        };
+        const [followUpLeads, followUpTotal] = await Promise.all([
+            this.prisma.lead.findMany({
+                where: followUpWhere,
+                select: {
+                    id: true, fullName: true, nextContactAt: true,
+                    manager: { select: { id: true, fullName: true } },
+                },
+                orderBy: { nextContactAt: "asc" },
+                take: 5,
+            }),
+            this.prisma.lead.count({ where: followUpWhere }),
+        ]);
 
         const remaining = (sum: { amount: Prisma.Decimal | null; paidAmount: Prisma.Decimal | null }) =>
             Number(sum.amount ?? 0) - Number(sum.paidAmount ?? 0);
@@ -313,6 +335,7 @@ export class DashboardService {
                     requestedPrice: Number(r.requestedPrice),
                 })),
             },
+            overdueFollowUps: { total: followUpTotal, leads: followUpLeads },
         };
     }
 
@@ -419,7 +442,7 @@ export class DashboardService {
 
         return Promise.all(
             managers.map(async (manager) => {
-                const [openLeads, activeDeals, tasksDue, lastActivity] = await Promise.all([
+                const [openLeads, activeDeals, tasksDue, followUpsOverdue, lastActivity] = await Promise.all([
                     this.prisma.lead.count({
                         where: {
                             companyId, branchId,
@@ -445,6 +468,9 @@ export class DashboardService {
                             dueDate: { lte: now },
                         },
                     }),
+                    this.prisma.lead.count({
+                        where: { companyId, branchId, managerId: manager.id, deletedAt: null, ...overdueFollowUpWhere(now) },
+                    }),
                     this.prisma.activity.findFirst({
                         where: { companyId, userId: manager.id },
                         orderBy: { createdAt: "desc" },
@@ -458,6 +484,7 @@ export class DashboardService {
                     openLeads,
                     activeDeals,
                     tasksDue,
+                    followUpsOverdue,
                     lastActivityAt: lastActivity?.createdAt ?? null,
                 };
             }),

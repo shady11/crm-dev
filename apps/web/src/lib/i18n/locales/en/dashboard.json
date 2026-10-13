@@ -61,7 +61,9 @@
     "aboveYourLimit": "above your limit",
     "priceChangesHeading": "Price changes to approve ({{count}})",
     "review": "Review",
-    "priceChangeUnit": "Unit {{unit}} · {{project}}"
+    "priceChangeUnit": "Unit {{unit}} · {{project}}",
+    "followUpsHeading": "Missed follow-ups ({{count}})",
+    "followUpDueSince": "call due {{date}}"
   },
   "recentActivity": {
     "title": "Recent activity",
@@ -88,7 +90,11 @@
     "tasksDue_many": "{{count}} tasks due",
     "tasksDue_other": "{{count}} tasks due",
     "noActivity": "No activity yet",
-    "openTeam": "Open my team"
+    "openTeam": "Open my team",
+    "followUpsOverdue_one": "{{count}} follow-up missed",
+    "followUpsOverdue_few": "{{count}} follow-ups missed",
+    "followUpsOverdue_many": "{{count}} follow-ups missed",
+    "followUpsOverdue_other": "{{count}} follow-ups missed"
   },
   "myWorkToday": {
     "title": "My work today",

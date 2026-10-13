@@ -7,6 +7,9 @@ export const paths = {
     leadDetail: (leadId: string) => `/leads?lead=${leadId}`,
     // One manager's open leads: what "Open leads" counts on My team.
     openLeadsByManager: (managerId: string) => `/leads?managerId=${managerId}&status=OPEN`,
+    // Missed follow-ups (SH-6), for one manager or everyone visible.
+    overdueFollowUps: (managerId?: string) =>
+        `/leads?status=FOLLOW_UP_OVERDUE${managerId ? `&managerId=${managerId}` : ""}`,
     clients: {
         root: "/clients",
         detail: (clientId: string) => `/clients/${clientId}`,

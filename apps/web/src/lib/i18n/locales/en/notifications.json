@@ -148,6 +148,18 @@
     "unitPriceRequestRejected": {
       "title": "Price change for unit {{unit}} ({{project}}) rejected",
       "message": "Rejected by {{byName}}"
+    },
+    "leadsReassigned": {
+      "title": "Leads reassigned to you: {{leads}}",
+      "message": "By {{byName}} · open tasks moved: {{tasks}}"
+    },
+    "dealsReassigned": {
+      "title": "Deals reassigned to you: {{deals}}",
+      "message": "By {{byName}} · open tasks moved: {{tasks}}"
+    },
+    "workHandedOver": {
+      "title": "{{fromName}}'s work was handed to you",
+      "message": "By {{byName}} · leads: {{leads}}, deals: {{deals}}, tasks: {{tasks}}"
     }
   }
 }

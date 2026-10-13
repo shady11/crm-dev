@@ -148,6 +148,18 @@
     "unitPriceRequestRejected": {
       "title": "Изменение цены объекта {{unit}} ({{project}}) отклонено",
       "message": "Отклонил(а) {{byName}}"
+    },
+    "leadsReassigned": {
+      "title": "Вам переданы лиды: {{leads}}",
+      "message": "Передал(а) {{byName}} · перенесено открытых задач: {{tasks}}"
+    },
+    "dealsReassigned": {
+      "title": "Вам переданы сделки: {{deals}}",
+      "message": "Передал(а) {{byName}} · перенесено открытых задач: {{tasks}}"
+    },
+    "workHandedOver": {
+      "title": "Вам переданы дела: {{fromName}}",
+      "message": "Передал(а) {{byName}} · лиды: {{leads}}, сделки: {{deals}}, задачи: {{tasks}}"
     }
   }
 }

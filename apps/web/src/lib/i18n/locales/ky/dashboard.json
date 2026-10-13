@@ -61,7 +61,9 @@
     "aboveYourLimit": "лимитиңизден жогору",
     "priceChangesHeading": "Макулдашууга баа өзгөрүүлөрү ({{count}})",
     "review": "Карап чыгуу",
-    "priceChangeUnit": "{{unit}} объекти · {{project}}"
+    "priceChangeUnit": "{{unit}} объекти · {{project}}",
+    "followUpsHeading": "Өткөрүлгөн байланыштар ({{count}})",
+    "followUpDueSince": "чалуу {{date}} күнгө пландалган"
   },
   "recentActivity": {
     "title": "Акыркы активдүүлүк",
@@ -88,7 +90,11 @@
     "tasksDue_many": "{{count}} мөөнөттүү тапшырма",
     "tasksDue_other": "{{count}} мөөнөттүү тапшырма",
     "noActivity": "Азырынча активдүүлүк жок",
-    "openTeam": "Команданы ачуу"
+    "openTeam": "Команданы ачуу",
+    "followUpsOverdue_one": "{{count}} байланыш өткөрүлдү",
+    "followUpsOverdue_few": "{{count}} байланыш өткөрүлдү",
+    "followUpsOverdue_many": "{{count}} байланыш өткөрүлдү",
+    "followUpsOverdue_other": "{{count}} байланыш өткөрүлдү"
   },
   "myWorkToday": {
     "title": "Менин бүгүнкү ишим",

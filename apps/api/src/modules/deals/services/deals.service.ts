@@ -1,4 +1,4 @@
-import {BadRequestException, ConflictException, ForbiddenException, Injectable, Logger,} from '@nestjs/common';
+import {BadRequestException, ConflictException, ForbiddenException, Injectable, Logger, NotFoundException} from '@nestjs/common';
 
 import {
   ActivityAction,
@@ -967,6 +967,77 @@ export class DealsService {
     }
 
     return this.mapper.toDetails(result.deal);
+  }
+
+  /**
+   * SH-5: moves several deals to one manager at once, for a manager's
+   * handover. Same rules and trail as reassignManager, per deal: deals the
+   * actor can see, a target who is an active individual contributor on the
+   * deal's branch, open tasks moved along, one activity per deal. Deals the
+   * target already holds are left alone. One summary notification unless
+   * `notify` is false (a handover sends its own).
+   */
+  async bulkReassign(user: AuthUser, dealIds: string[], managerId: string, opts: { notify?: boolean } = {}) {
+    if (!user.companyId) {
+      throw new ForbiddenException("User does not belong to a company");
+    }
+    const companyId = user.companyId;
+    const ids = [...new Set(dealIds)];
+
+    const deals = await this.prisma.deal.findMany({
+      where: { id: { in: ids }, companyId, ...(user.isBranchScoped ? { branchId: user.branchId } : {}) },
+      select: { id: true, dealNumber: true, managerId: true, branchId: true, clientId: true },
+    });
+    if (deals.length !== ids.length) {
+      throw new NotFoundException("Some of these deals were not found.");
+    }
+
+    const targetRoleIds = await this.rbacService.findRoleIdsWithPermission(companyId, 'deals.manage', 'deals.reassign');
+    for (const branchId of new Set(deals.map((d) => d.branchId))) {
+      if (!branchId) throw new BadRequestException("Deal is not assigned to a branch");
+      const manager = await this.prisma.user.findFirst({
+        where: { id: managerId, companyId, branchId, roleId: { in: targetRoleIds }, isActive: true },
+      });
+      if (!manager) {
+        throw new BadRequestException("Manager not assignable — must be an active individual contributor on the same branch");
+      }
+    }
+
+    const toMove = deals.filter((d) => d.managerId !== managerId);
+
+    const movedTaskCount = await this.prisma.$transaction(async db => {
+      let tasks = 0;
+      for (const deal of toMove) {
+        await db.deal.update({ where: { id: deal.id }, data: { managerId } });
+        const moved = await this.tasksService.handOverOpenTasks(db, {
+          companyId, actorId: user.id,
+          link: { dealId: deal.id },
+          fromUserId: deal.managerId,
+          toUserId: managerId,
+        });
+        tasks += moved.length;
+        await this.activityService.reassignManager({
+          db, companyId, userId: user.id,
+          dealId: deal.id, clientId: deal.clientId,
+          metadata: { fromManagerId: deal.managerId, toManagerId: managerId, movedTaskCount: moved.length, bulk: true },
+        });
+      }
+      return tasks;
+    });
+
+    if ((opts.notify ?? true) && toMove.length > 0 && managerId !== user.id) {
+      await this.notifications.create({
+        companyId,
+        userId: managerId,
+        type: NotificationType.DEAL_REASSIGNED,
+        title: `${toMove.length} deal(s) reassigned to you by ${user.name}`,
+        message: movedTaskCount > 0 ? `${movedTaskCount} open task(s) moved to you` : undefined,
+        templateKey: 'dealsReassigned',
+        params: { deals: toMove.length, byName: user.name, tasks: movedTaskCount },
+      });
+    }
+
+    return { deals: toMove.length, tasks: movedTaskCount };
   }
 
   async cancelDeal(user: AuthUser, id: string, dto: CancelDealDto) {

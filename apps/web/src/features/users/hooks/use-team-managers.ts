@@ -4,6 +4,10 @@ import {useManagers} from "@/features/users/hooks/use-managers.ts";
 // given branch, matching what the backend's reassign endpoints allow.
 export function useTeamManagers(branchId?: string | null) {
     const managers = useManagers();
-    const items = branchId ? managers.data.filter((candidate) => candidate.branchId === branchId) : [];
+    // Team leads are left out: the reassign endpoints only accept an
+    // individual contributor.
+    const items = branchId
+        ? managers.data.filter((candidate) => candidate.branchId === branchId && !candidate.isTeamLead)
+        : [];
     return {...managers, data: items};
 }

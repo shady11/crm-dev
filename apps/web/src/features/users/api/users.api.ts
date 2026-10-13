@@ -28,7 +28,11 @@ export async function getUsers(params?: GetUsersParams) {
     return response.data;
 }
 
-export type SalesTeamMember = { id: string; fullName: string; branchId: string | null };
+export type SalesTeamMember = {
+    id: string; fullName: string; branchId: string | null;
+    /** Can book deals but can't be handed someone else's (a Sales Head). */
+    isTeamLead?: boolean;
+};
 
 /**
  * Who a deal or lead can be put in the name of. Readable by anyone with
@@ -36,6 +40,24 @@ export type SalesTeamMember = { id: string; fullName: string; branchId: string |
  */
 export async function getSalesTeam() {
     const response = await api.get<SalesTeamMember[]>("/users/sales-team");
+    return response.data;
+}
+
+/** SH-5: what handing someone's work over would move. */
+export type HandoverPreview = {
+    user: { id: string; fullName: string; branchId: string | null };
+    leads: number;
+    deals: number;
+    tasks: number;
+};
+
+export async function getHandoverPreview(id: string) {
+    const response = await api.get<HandoverPreview>(`/users/${id}/handover`);
+    return response.data;
+}
+
+export async function handOverWork(id: string, managerId: string) {
+    const response = await api.post<{ leads: number; deals: number; tasks: number }>(`/users/${id}/handover`, { managerId });
     return response.data;
 }
 

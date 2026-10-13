@@ -1,4 +1,4 @@
-import {Trash2, X} from "lucide-react";
+import {Trash2, UserRoundCogIcon, X} from "lucide-react";
 import {
     ActionBar,
     ActionBarBody,
@@ -17,12 +17,15 @@ interface LeadsActionBarProps {
     isProcessing: boolean;
     onClear(): void;
     onRequestDelete(): void;
+    onRequestReassign(): void;
 }
 
-export function LeadsActionBar({ selectedCount, isProcessing, onClear, onRequestDelete }: LeadsActionBarProps) {
+export function LeadsActionBar({ selectedCount, isProcessing, onClear, onRequestDelete, onRequestReassign }: LeadsActionBarProps) {
     const { t } = useTranslation("leads");
     const { user } = useAuth();
     const canDelete = hasPermission(user, "leads.delete");
+    // SH-5: the same team-lead permission as reassigning one lead.
+    const canReassign = hasPermission(user, "leads.assign");
 
     return (
         <ActionBar open={selectedCount > 0} onOpenChange={(open) => !open && onClear()}>
@@ -34,6 +37,12 @@ export function LeadsActionBar({ selectedCount, isProcessing, onClear, onRequest
                 <ActionBarSeparator />
 
                 <ActionBarBody>
+                    {canReassign && (
+                        <Button variant="ghost" size="sm" disabled={isProcessing} onClick={onRequestReassign}>
+                            <UserRoundCogIcon className="size-3.5" />
+                            {t("actionBar.reassign")}
+                        </Button>
+                    )}
                     {canDelete && (
                         <Button
                             variant="ghost"
