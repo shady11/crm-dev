@@ -173,7 +173,20 @@ describe("UsersService — role boundaries", () => {
                 role: {permissions: {some: {permission: {key: "deals.manage"}}}},
             });
             expect(args.where.branchId).toBeUndefined();
-            expect(args.select).toEqual({id: true, fullName: true, branchId: true});
+            expect(args.select).toEqual(expect.objectContaining({id: true, fullName: true, branchId: true}));
+        });
+
+        it("marks team leads, who can't be handed someone else's leads or deals (SH-5)", async () => {
+            const {service, prisma} = build();
+            prisma.user.findMany.mockResolvedValue([
+                {id: "m1", fullName: "Aidana", branchId: "b1", role: {permissions: []}},
+                {id: "h1", fullName: "Nurlan", branchId: "b1", role: {permissions: [{permissionId: "p"}]}},
+            ]);
+
+            await expect(service.findSalesTeam(admin)).resolves.toEqual([
+                {id: "m1", fullName: "Aidana", branchId: "b1", isTeamLead: false},
+                {id: "h1", fullName: "Nurlan", branchId: "b1", isTeamLead: true},
+            ]);
         });
 
         it("limits a branch-scoped actor to their own branch", async () => {

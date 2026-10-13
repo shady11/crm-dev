@@ -10,8 +10,8 @@ import {hasPermission} from "@/common/utils/permissions.util";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {TransferBranchDto} from "@/common/dto/transfer-branch.dto";
 import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
-import {LEAD_SORTABLE_FIELDS, LEAD_STATUS_OPEN, QueryLeadsDto} from "@/modules/leads/dto/query-leads.dto";
-import {OPEN_LEAD_STATUSES} from "@/modules/leads/lead.constants";
+import {LEAD_SORTABLE_FIELDS, LEAD_STATUS_FOLLOW_UP_OVERDUE, LEAD_STATUS_OPEN, QueryLeadsDto} from "@/modules/leads/dto/query-leads.dto";
+import {OPEN_LEAD_STATUSES, overdueFollowUpWhere} from "@/modules/leads/lead.constants";
 import {resolveOrderBy} from "@/common/utils/sort.util";
 import {CreateLeadDto} from "@/modules/leads/dto/create-lead.dto";
 import {UpdateLeadDto} from "@/modules/leads/dto/update-lead.dto";
@@ -75,6 +75,8 @@ export class LeadsService {
 
         if (query.status === LEAD_STATUS_OPEN) {
             where.status = {in: OPEN_LEAD_STATUSES};
+        } else if (query.status === LEAD_STATUS_FOLLOW_UP_OVERDUE) {
+            Object.assign(where, overdueFollowUpWhere());
         } else if (query.status) {
             where.status = query.status;
         }
@@ -576,6 +578,83 @@ export class LeadsService {
         }
 
         return updated;
+    }
+
+    /**
+     * SH-5: moves several leads to one manager at once (the leads list's
+     * bulk "Reassign to…", and a manager's handover). Same rules and trail
+     * as reassignManager, per lead: only leads the actor can see, a target
+     * who is an active individual contributor on the lead's branch, open
+     * tasks moved along, one activity per lead. Leads the target already
+     * holds are left alone. The new owner gets one summary notification
+     * unless `notify` is false (a handover sends its own).
+     */
+    async bulkReassign(user: AuthUser, leadIds: string[], managerId: string, opts: {notify?: boolean} = {}) {
+        if (!user.companyId) {
+            throw new ForbiddenException("User does not belong to a company");
+        }
+        const companyId = user.companyId;
+        const ids = [...new Set(leadIds)];
+
+        const leads = await this.prisma.lead.findMany({
+            where: {
+                id: {in: ids},
+                companyId,
+                deletedAt: null,
+                ...(user.isBranchScoped ? {branchId: user.branchId} : {}),
+            },
+            select: {id: true, fullName: true, managerId: true, branchId: true},
+        });
+        if (leads.length !== ids.length) {
+            throw new NotFoundException("Some of these leads were not found.");
+        }
+
+        for (const branchId of new Set(leads.map((l) => l.branchId))) {
+            await this.ensureReassignable(user, branchId, managerId);
+        }
+
+        const toMove = leads.filter((l) => l.managerId !== managerId);
+
+        const movedTaskCount = await this.prisma.$transaction(async (db) => {
+            let tasks = 0;
+            for (const lead of toMove) {
+                await db.lead.update({where: {id: lead.id}, data: {managerId}});
+                const moved = await this.tasksService.handOverOpenTasks(db, {
+                    companyId,
+                    actorId: user.id,
+                    link: {leadId: lead.id},
+                    fromUserId: lead.managerId,
+                    toUserId: managerId,
+                });
+                tasks += moved.length;
+                await db.activity.create({
+                    data: {
+                        companyId,
+                        userId: user.id,
+                        leadId: lead.id,
+                        action: ActivityAction.REASSIGNED,
+                        type: ActivityType.LEAD_REASSIGNED,
+                        ...activityText('leadReassigned'),
+                        metadata: {fromManagerId: lead.managerId, toManagerId: managerId, movedTaskCount: moved.length, bulk: true},
+                    },
+                });
+            }
+            return tasks;
+        });
+
+        if ((opts.notify ?? true) && toMove.length > 0 && managerId !== user.id) {
+            await this.notifications.create({
+                companyId,
+                userId: managerId,
+                type: NotificationType.LEAD_REASSIGNED,
+                title: `${toMove.length} lead(s) reassigned to you by ${user.name}`,
+                message: movedTaskCount > 0 ? `${movedTaskCount} open task(s) moved to you` : undefined,
+                templateKey: "leadsReassigned",
+                params: {leads: toMove.length, byName: user.name, tasks: movedTaskCount},
+            });
+        }
+
+        return {leads: toMove.length, tasks: movedTaskCount};
     }
 
     /**

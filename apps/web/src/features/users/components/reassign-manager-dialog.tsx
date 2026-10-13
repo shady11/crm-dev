@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, type ReactNode} from "react";
 import {createListCollection} from "@ark-ui/react";
 import {useTranslation} from "react-i18next";
 import {
@@ -24,6 +24,14 @@ type Props = {
     /** The record's current manager, excluded from the picker. */
     currentManagerId?: string | null;
     isSubmitting: boolean;
+    /** SH-5: a bulk move or a handover words the dialog differently. */
+    title?: string;
+    description?: string;
+    confirmLabel?: string;
+    /** Keeps Confirm disabled (e.g. nothing to move) while Cancel stays usable. */
+    confirmDisabled?: boolean;
+    /** Extra content above the picker, e.g. what a handover will move. */
+    children?: ReactNode;
     onOpenChange(open: boolean): void;
     onConfirm(managerId: string): void;
 };
@@ -38,6 +46,11 @@ export function ReassignManagerDialog({
     branchId,
     currentManagerId,
     isSubmitting,
+    title,
+    description,
+    confirmLabel,
+    confirmDisabled = false,
+    children,
     onOpenChange,
     onConfirm,
 }: Props) {
@@ -60,13 +73,14 @@ export function ReassignManagerDialog({
         <AlertDialog open={open} onOpenChange={({open: next}) => onOpenChange(next)}>
             <AlertDialogContent>
                 <AlertDialogHeader>
-                    <AlertDialogTitle>{t("reassignDialog.title")}</AlertDialogTitle>
+                    <AlertDialogTitle>{title ?? t("reassignDialog.title")}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        {t("reassignDialog.description", {name: entityName})} {t("reassignDialog.hint")}
+                        {description ?? `${t("reassignDialog.description", {name: entityName})} ${t("reassignDialog.hint")}`}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
                 <AlertDialogBody>
+                    {children}
                     <label className="block space-y-1.5">
                         <span className="text-sm font-medium">{t("reassignDialog.managerLabel")}</span>
                         <Select
@@ -90,8 +104,8 @@ export function ReassignManagerDialog({
 
                 <AlertDialogFooter>
                     <AlertDialogCancel disabled={isSubmitting}>{tCommon("actions.cancel")}</AlertDialogCancel>
-                    <AlertDialogAction disabled={isSubmitting || !managerId} onClick={() => onConfirm(managerId)}>
-                        {t("reassignDialog.confirm")}
+                    <AlertDialogAction disabled={isSubmitting || confirmDisabled || !managerId} onClick={() => onConfirm(managerId)}>
+                        {confirmLabel ?? t("reassignDialog.confirm")}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

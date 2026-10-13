@@ -132,6 +132,18 @@
     "teamReservationExpiredHeld": {
       "title": "{{dealNumber}} бүтүмү боюнча брондоонун мөөнөтү бүттү",
       "message": "{{managerName}} менеджеринин бүтүмү: анда {{amount}} калды."
+    },
+    "leadsReassigned": {
+      "title": "Сизге лиддер өткөрүлдү: {{leads}}",
+      "message": "Өткөргөн: {{byName}} · ачык тапшырмалар: {{tasks}}"
+    },
+    "dealsReassigned": {
+      "title": "Сизге бүтүмдөр өткөрүлдү: {{deals}}",
+      "message": "Өткөргөн: {{byName}} · ачык тапшырмалар: {{tasks}}"
+    },
+    "workHandedOver": {
+      "title": "Сизге {{fromName}} иштери өткөрүлдү",
+      "message": "Өткөргөн: {{byName}} · лиддер: {{leads}}, бүтүмдөр: {{deals}}, тапшырмалар: {{tasks}}"
     }
   }
 }
