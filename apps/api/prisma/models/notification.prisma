@@ -16,6 +16,10 @@ enum NotificationType {
   UNIT_PRICE_CHANGE_REQUESTED
   UNIT_PRICE_CHANGE_DECIDED
   UNIT_PRICE_CHANGED
+  // SH-11: asking a team lead to extend a reservation past the limit, and
+  // the extension itself.
+  RESERVATION_EXTENSION_REQUESTED
+  RESERVATION_EXTENDED
 }
 
 enum NotificationEntityType {

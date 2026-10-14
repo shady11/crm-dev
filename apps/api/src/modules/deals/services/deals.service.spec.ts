@@ -110,6 +110,7 @@ describe('DealsService', () => {
         const activityService = {
             reserve: jest.fn().mockResolvedValue({}),
             extendReservation: jest.fn().mockResolvedValue({}),
+            extensionRequested: jest.fn().mockResolvedValue({}),
             cancelReservation: jest.fn().mockResolvedValue({}),
             signContract: jest.fn().mockResolvedValue({}),
             dealUpdated: jest.fn().mockResolvedValue({}),
@@ -510,6 +511,135 @@ describe('DealsService', () => {
 
             await expect(service.extendReservation(managerUser, 'deal-1', extendTo(5 * DAY)))
                 .rejects.toThrow(ConflictException);
+        });
+
+        describe('past the limit (SH-11)', () => {
+            const head: AuthUser = {...salesHeadUser, permissions: ['deals.manage', 'deals.extend_beyond_limit']};
+            const atLimit = () => reservedDeal({reservationExtensionCount: 2, managerId: 'manager-1', dealNumber: '2026-0007', companyId: 'company-1'});
+            const withReason = (ms: number, reason: string) => ({...extendTo(ms), reason});
+
+            function headBuild() {
+                const built = buildBase();
+                built.prisma.deal.findFirst.mockResolvedValue(atLimit());
+                built.prisma.deal.findUniqueOrThrow.mockImplementation(({where}: any) => Promise.resolve({
+                    ...atLimit(), id: where.id, reservationExpiresAt: new Date(Date.now() + 5 * DAY),
+                }));
+                return built;
+            }
+
+            it('needs a reason', async () => {
+                const {service, prisma} = headBuild();
+                await expect(service.extendReservation(head, 'deal-1', withReason(5 * DAY, '  '))).rejects.toThrow(BadRequestException);
+                expect(prisma.deal.updateMany).not.toHaveBeenCalled();
+            });
+
+            it('extends with the permission and a reason, logged as past the limit', async () => {
+                const {service, prisma, activityService} = headBuild();
+                await service.extendReservation(head, 'deal-1', withReason(5 * DAY, 'Mortgage approval due Friday'));
+
+                expect(prisma.deal.updateMany).toHaveBeenCalledWith(expect.objectContaining({
+                    where: {id: 'deal-1', status: DealStatus.RESERVED, reservationExtensionCount: 2},
+                }));
+                expect(activityService.extendReservation).toHaveBeenCalledWith(expect.objectContaining({
+                    metadata: expect.objectContaining({extension: 3, maxExtensions: 2, pastLimit: true, reason: 'Mortgage approval due Friday'}),
+                }), true);
+            });
+
+            it('still keeps to the company maximum term', async () => {
+                const {service} = headBuild();
+                await expect(service.extendReservation(head, 'deal-1', withReason(15 * DAY, 'Mortgage')))
+                    .rejects.toThrow(ReservationDateInvalidException);
+            });
+
+            it('closes the open asks and tells the manager who extended it and why', async () => {
+                const {service, notifications} = headBuild();
+                await service.extendReservation(head, 'deal-1', withReason(5 * DAY, 'Mortgage approval due Friday'));
+
+                expect(notifications.resolveForEntity).toHaveBeenCalledWith(expect.objectContaining({
+                    type: 'RESERVATION_EXTENSION_REQUESTED', entityId: 'deal-1', resolvedType: 'RESERVATION_EXTENDED',
+                    templateKey: 'reservationExtensionGranted',
+                }));
+                expect(notifications.create).toHaveBeenCalledWith(expect.objectContaining({
+                    userId: 'manager-1', type: 'RESERVATION_EXTENDED', templateKey: 'reservationExtendedPastLimit',
+                    params: expect.objectContaining({dealNumber: '2026-0007', byName: head.name, reason: 'Mortgage approval due Friday'}),
+                }));
+            });
+
+            it('sends nothing for an extension within the limit', async () => {
+                const {service, prisma, notifications} = buildBase();
+                prisma.deal.findFirst.mockResolvedValue(reservedDeal({reservationExtensionCount: 1}));
+                await service.extendReservation(head, 'deal-1', extendTo(5 * DAY));
+                expect(notifications.resolveForEntity).not.toHaveBeenCalled();
+                expect(notifications.create).not.toHaveBeenCalled();
+            });
+
+            it('keeps the extension when notifying fails', async () => {
+                const {service, notifications} = headBuild();
+                notifications.resolveForEntity.mockRejectedValue(new Error('socket down'));
+                await expect(service.extendReservation(head, 'deal-1', withReason(5 * DAY, 'Mortgage'))).resolves.toBeDefined();
+            });
+        });
+    });
+
+    describe('requestExtension (SH-11)', () => {
+        const DAY = 24 * 60 * 60 * 1000;
+        const deal = (overrides: Record<string, unknown> = {}) => ({
+            id: 'deal-1', dealNumber: '2026-0007', status: DealStatus.RESERVED, branchId: 'branch-1', clientId: 'c1',
+            reservationExpiresAt: new Date(Date.now() + 2 * DAY), reservationExtensionCount: 2,
+            ...overrides,
+        });
+
+        function build(users: {id: string; branchId: string | null}[]) {
+            const built = buildBase();
+            built.prisma.deal.findFirst.mockResolvedValue(deal());
+            built.rbacService.findRoleIdsWithPermission.mockResolvedValue(['role-sales-head', 'role-company-admin']);
+            built.prisma.user.findMany.mockResolvedValue(users);
+            return built;
+        }
+
+        it('asks the branch\'s team leads, not company-wide ones, and logs it', async () => {
+            const {service, prisma, notifications, rbacService, activityService} = build([
+                {id: 'head-1', branchId: 'branch-1'}, {id: 'admin-1', branchId: null},
+            ]);
+
+            await expect(service.requestExtension(managerUser, 'deal-1')).resolves.toEqual({notified: 1});
+
+            expect(rbacService.findRoleIdsWithPermission).toHaveBeenCalledWith('company-1', 'deals.extend_beyond_limit');
+            expect(prisma.user.findMany.mock.calls[0][0].where).toEqual(expect.objectContaining({
+                companyId: 'company-1', isActive: true, id: {not: 'manager-1'},
+            }));
+            expect(notifications.create).toHaveBeenCalledTimes(1);
+            expect(notifications.create).toHaveBeenCalledWith(expect.objectContaining({
+                userId: 'head-1', type: 'RESERVATION_EXTENSION_REQUESTED', templateKey: 'reservationExtensionRequested',
+                params: expect.objectContaining({dealNumber: '2026-0007', byName: 'Manager'}),
+                entityType: 'DEAL', entityId: 'deal-1',
+            }));
+            expect(activityService.extensionRequested).toHaveBeenCalled();
+        });
+
+        it('falls back to company-wide people when the branch has none', async () => {
+            const {service, notifications} = build([{id: 'admin-1', branchId: null}]);
+            await service.requestExtension(managerUser, 'deal-1');
+            expect(notifications.create).toHaveBeenCalledWith(expect.objectContaining({userId: 'admin-1'}));
+        });
+
+        it('409s when nobody may go past the limit', async () => {
+            const {service} = build([]);
+            await expect(service.requestExtension(managerUser, 'deal-1')).rejects.toThrow(ConflictException);
+        });
+
+        it('refuses while the reservation can still be extended normally', async () => {
+            const {service, prisma} = build([{id: 'head-1', branchId: 'branch-1'}]);
+            prisma.deal.findFirst.mockResolvedValue(deal({reservationExtensionCount: 1}));
+            await expect(service.requestExtension(managerUser, 'deal-1')).rejects.toThrow(BadRequestException);
+        });
+
+        it('refuses for a deal that is no longer reserved, or already lapsed', async () => {
+            const {service, prisma} = build([{id: 'head-1', branchId: 'branch-1'}]);
+            prisma.deal.findFirst.mockResolvedValue(deal({status: DealStatus.ACTIVE}));
+            await expect(service.requestExtension(managerUser, 'deal-1')).rejects.toThrow(ConflictException);
+            prisma.deal.findFirst.mockResolvedValue(deal({reservationExpiresAt: new Date(Date.now() - DAY)}));
+            await expect(service.requestExtension(managerUser, 'deal-1')).rejects.toThrow(ConflictException);
         });
     });
 

@@ -103,6 +103,9 @@ export class DealDomainService {
         reservationExpiresAt: Date,
         policy: ReservationPolicy,
         now: Date = new Date(),
+        // SH-11: someone with deals.extend_beyond_limit may skip the count
+        // limit, never the term limit.
+        options: {allowPastLimit?: boolean} = {},
     ): void {
         this.ensureStatus(deal, DealStatus.RESERVED);
 
@@ -113,7 +116,7 @@ export class DealDomainService {
             throw new ReservationExpiredException();
         }
 
-        if (deal.reservationExtensionCount >= policy.reservationMaxExtensions) {
+        if (deal.reservationExtensionCount >= policy.reservationMaxExtensions && !options.allowPastLimit) {
             throw new ReservationExtensionLimitException(policy.reservationMaxExtensions);
         }
 

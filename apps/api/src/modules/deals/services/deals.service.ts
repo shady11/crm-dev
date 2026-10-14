@@ -25,6 +25,9 @@ import {
   DiscountApprovalNotAllowedException,
   PaidExceedsDiscountedPriceException,
   DiscountNotPendingException,
+  InvalidDealStateException,
+  ReservationExpiredException,
+  ReservationExtensionLimitException,
   SalePriceMismatchException,
   UnitNotAvailableException,
   UnitNotFoundException,
@@ -561,7 +564,16 @@ export class DealsService {
       });
 
       const newExpiresAt = new Date(dto.reservationExpiresAt);
-      this.domain.ensureCanExtendReservation(deal, newExpiresAt, reservationPolicy);
+      // SH-11: past the company's extension limit only with
+      // deals.extend_beyond_limit, and with a reason on record.
+      const pastLimit = deal.reservationExtensionCount >= reservationPolicy.reservationMaxExtensions;
+      const reason = dto.reason?.trim() || null;
+      this.domain.ensureCanExtendReservation(deal, newExpiresAt, reservationPolicy, new Date(), {
+        allowPastLimit: hasPermission(user, 'deals.extend_beyond_limit'),
+      });
+      if (pastLimit && !reason) {
+        throw new BadRequestException('Say why the reservation is extended past the limit.');
+      }
 
       // Conditional on the count read above, so two concurrent extensions
       // can't both pass the limit check.
@@ -583,13 +595,125 @@ export class DealsService {
           reservationExpiresAt: newExpiresAt.toISOString(),
           extension: deal.reservationExtensionCount + 1,
           maxExtensions: reservationPolicy.reservationMaxExtensions,
+          ...(pastLimit ? { pastLimit: true, reason } : {}),
         },
-      });
+      }, pastLimit);
 
-      return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
+      const updated = await db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
+      return { updated, pastLimit, reason };
     });
 
-    return this.mapper.toDetails(result);
+    if (result.pastLimit) {
+      await this.notifyExtendedPastLimit(user, result.updated, result.reason ?? '');
+    }
+
+    return this.mapper.toDetails(result.updated);
+  }
+
+  /**
+   * SH-11: a manager whose reservation is at the extension limit asks the
+   * people who may go past it (deals.extend_beyond_limit): the deal's branch
+   * first, the company-wide ones when the branch has none.
+   */
+  async requestExtension(user: AuthUser, id: string) {
+    if (!user.companyId) {
+      throw new ForbiddenException("User does not belong to a company");
+    }
+    const companyId = user.companyId;
+
+    const deal = await this.prisma.deal.findFirst({
+      where: { id, companyId, ...(user.isBranchScoped ? { branchId: user.branchId } : {}) },
+    });
+    if (!deal) throw new DealNotFoundException(id);
+    if (deal.status !== DealStatus.RESERVED) {
+      throw new InvalidDealStateException(deal.status, DealStatus.RESERVED);
+    }
+    if (deal.reservationExpiresAt && deal.reservationExpiresAt < new Date()) {
+      throw new ReservationExpiredException();
+    }
+
+    const policy = await this.prisma.company.findUniqueOrThrow({ where: { id: companyId }, select: RESERVATION_POLICY_SELECT });
+    if (deal.reservationExtensionCount < policy.reservationMaxExtensions) {
+      throw new BadRequestException('This reservation can still be extended without asking.');
+    }
+
+    const roleIds = await this.rbacService.findRoleIdsWithPermission(companyId, 'deals.extend_beyond_limit');
+    const candidates = roleIds.length === 0 ? [] : await this.prisma.user.findMany({
+      where: {
+        companyId,
+        roleId: { in: roleIds },
+        isActive: true,
+        id: { not: user.id },
+        OR: [{ branchId: deal.branchId }, { branchId: null }],
+      },
+      select: { id: true, branchId: true },
+    });
+    const inBranch = candidates.filter((c) => deal.branchId && c.branchId === deal.branchId);
+    const recipients = inBranch.length > 0 ? inBranch : candidates.filter((c) => c.branchId === null);
+    if (recipients.length === 0) {
+      throw new ConflictException('Nobody can extend this reservation past the limit. Ask an admin to grant the permission.');
+    }
+
+    const date = (deal.reservationExpiresAt ?? new Date()).toISOString();
+    for (const recipient of recipients) {
+      await this.notifications.create({
+        companyId,
+        userId: recipient.id,
+        type: NotificationType.RESERVATION_EXTENSION_REQUESTED,
+        title: `${user.name} asks to extend the reservation for deal ${deal.dealNumber}`,
+        templateKey: 'reservationExtensionRequested',
+        params: { dealNumber: deal.dealNumber, byName: user.name, date },
+        entityType: NotificationEntityType.DEAL,
+        entityId: deal.id,
+      });
+    }
+
+    await this.activityService.extensionRequested({
+      db: this.prisma, companyId, userId: user.id,
+      dealId: deal.id, clientId: deal.clientId,
+      metadata: { notified: recipients.length },
+    });
+
+    return { notified: recipients.length };
+  }
+
+  /**
+   * Closes any open "please extend" asks on the deal and tells its manager,
+   * when someone else extended it. A failure here never undoes the extension.
+   */
+  private async notifyExtendedPastLimit(
+    user: AuthUser,
+    deal: { id: string; companyId: string; dealNumber: string; managerId: string | null; reservationExpiresAt: Date | null },
+    reason: string,
+  ) {
+    const date = (deal.reservationExpiresAt ?? new Date()).toISOString();
+    try {
+      await this.notifications.resolveForEntity({
+        companyId: deal.companyId,
+        type: NotificationType.RESERVATION_EXTENSION_REQUESTED,
+        entityType: NotificationEntityType.DEAL,
+        entityId: deal.id,
+        resolvedType: NotificationType.RESERVATION_EXTENDED,
+        title: `Reservation for deal ${deal.dealNumber} extended by ${user.name}`,
+        templateKey: 'reservationExtensionGranted',
+        params: { dealNumber: deal.dealNumber, byName: user.name, date },
+      });
+      if (deal.managerId && deal.managerId !== user.id) {
+        await this.notifications.create({
+          companyId: deal.companyId,
+          userId: deal.managerId,
+          type: NotificationType.RESERVATION_EXTENDED,
+          title: `${user.name} extended the reservation for deal ${deal.dealNumber} past the limit`,
+          message: reason,
+          templateKey: 'reservationExtendedPastLimit',
+          params: { dealNumber: deal.dealNumber, byName: user.name, date, reason },
+          entityType: NotificationEntityType.DEAL,
+          entityId: deal.id,
+        });
+      }
+    } catch (error) {
+      this.logger.error(`Failed to send notifications for extended deal ${deal.id}`, error instanceof Error ? error.stack : String(error));
+    }
   }
 
   async signContract(user: AuthUser, id: string, dto: SignContractDto) {

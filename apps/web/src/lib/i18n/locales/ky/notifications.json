@@ -168,6 +168,18 @@
     "teamReservationExpiredHeld": {
       "title": "{{dealNumber}} бүтүмү боюнча брондоонун мөөнөтү бүттү",
       "message": "{{managerName}} менеджеринин бүтүмү: анда {{amount}} калды."
+    },
+    "reservationExtensionRequested": {
+      "title": "{{byName}} {{dealNumber}} бүтүмү боюнча бронду узартууну суранат",
+      "message": "Бардык узартуулар колдонулду, брондун мөөнөтү {{date}} бүтөт."
+    },
+    "reservationExtensionGranted": {
+      "title": "{{dealNumber}} бүтүмү боюнча бронду {{byName}} узартты",
+      "message": "Эми {{date}} чейин."
+    },
+    "reservationExtendedPastLimit": {
+      "title": "{{byName}} {{dealNumber}} бүтүмү боюнча бронду узартты",
+      "message": "{{date}} чейин. Себеби: {{reason}}"
     }
   }
 }

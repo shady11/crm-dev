@@ -53,6 +53,7 @@ describe('DealActivityService', () => {
     it.each([
         ['reserve', ActivityAction.RESERVED_UNIT, ActivityType.UNIT_RESERVED, 'Unit reserved'],
         ['extendReservation', ActivityAction.UPDATED, ActivityType.RESERVATION_EXTENDED, 'Reservation extended'],
+        ['extensionRequested', ActivityAction.UPDATED, ActivityType.DEAL_UPDATED, 'Asked the Sales Head to extend the reservation'],
         ['cancelReservation', ActivityAction.CANCELLED_RESERVATION, ActivityType.RESERVATION_CANCELLED, 'Reservation cancelled'],
         ['expireReservation', ActivityAction.CHANGED_DEAL_STATUS, ActivityType.RESERVATION_EXPIRED, 'Reservation expired'],
         ['signContract', ActivityAction.GENERATED_CONTRACT, ActivityType.CONTRACT_SIGNED, 'Contract signed'],

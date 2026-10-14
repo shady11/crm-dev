@@ -38,7 +38,7 @@ export const DEFAULT_ROLES: DefaultRoleSeed[] = [
         permissionKeys: [
             "leads.view", "leads.create", "leads.edit", "leads.delete", "leads.assign", "leads.transfer_branch",
             "clients.view", "clients.create", "clients.edit", "clients.delete", "clients.transfer_branch",
-            "deals.view", "deals.create", "deals.manage", "deals.cancel", "deals.reassign", "deals.approve_discount", "deals.manage_payments", "deals.void_payments",
+            "deals.view", "deals.create", "deals.manage", "deals.cancel", "deals.reassign", "deals.extend_beyond_limit", "deals.approve_discount", "deals.manage_payments", "deals.void_payments",
             "projects.view", "projects.create", "projects.edit", "projects.delete",
             "inventory.view", "inventory.manage",
             "units.edit", "units.edit_price", "units.approve_price",
@@ -62,7 +62,7 @@ export const DEFAULT_ROLES: DefaultRoleSeed[] = [
         permissionKeys: [
             "leads.view", "leads.create", "leads.edit", "leads.delete", "leads.assign",
             "clients.view", "clients.create", "clients.edit", "clients.delete",
-            "deals.view", "deals.create", "deals.manage", "deals.cancel", "deals.reassign", "deals.approve_discount", "deals.manage_payments",
+            "deals.view", "deals.create", "deals.manage", "deals.cancel", "deals.reassign", "deals.extend_beyond_limit", "deals.approve_discount", "deals.manage_payments",
             "projects.view",
             "inventory.view",
             // SH-2: may ask for a list-price change; a Company Admin approves it.
