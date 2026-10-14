@@ -1,6 +1,6 @@
-import {IsBoolean, IsDateString, IsEmail, IsEnum, IsInt, IsNumber, IsOptional, IsString, IsUUID, Max, Min, MinLength, ValidateIf} from "class-validator";
+import {IsBoolean, IsDateString, IsEmail, IsEnum, IsInt, IsNumber, IsOptional, IsString, IsUUID, Max, MaxLength, Min, MinLength, ValidateIf} from "class-validator";
 import {Type} from "class-transformer";
-import {FinancingType, LeadStatus} from "@/generated/prisma/enums";
+import {FinancingType, LeadLostReason, LeadStatus} from "@/generated/prisma/enums";
 import {NormalizePhone} from "@/common/utils/phone.util";
 
 export class CreateLeadDto {
@@ -28,6 +28,18 @@ export class CreateLeadDto {
     @IsOptional()
     @IsString()
     comment?: string;
+
+    // SH-8: required when status is LOST (checked in LeadsService, which
+    // knows the lead's current status on update). null clears it.
+    @ValidateIf((_, value) => value !== null && value !== undefined)
+    @IsEnum(LeadLostReason)
+    lostReason?: LeadLostReason | null;
+
+    // Required with lostReason OTHER.
+    @ValidateIf((_, value) => value !== null && value !== undefined)
+    @IsString()
+    @MaxLength(500)
+    lostNote?: string | null;
 
     @IsOptional()
     @IsUUID()

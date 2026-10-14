@@ -22,7 +22,7 @@ import {
     updateLead,
     type UpdateLeadPayload,
 } from "@/features/leads/api/leads.api.ts";
-import {LeadStatus} from "@/features/leads/types/lead.types.ts";
+import {type LeadLostReason, LeadStatus} from "@/features/leads/types/lead.types.ts";
 import {useSort} from "@/hooks/use-sort.ts";
 import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
 import {toastWithUndo} from "@/lib/undo-toast.ts";
@@ -46,6 +46,8 @@ export function useLeadsList() {
     );
     const [branchFilter, setBranchFilterState] = useState<string | "all">("all");
     const [sourceFilter, setSourceFilterState] = useState<string | "all">("all");
+    // Only offered while the status filter is Lost (SH-8).
+    const [lostReasonFilter, setLostReasonFilterState] = useState<LeadLostReason | "all">("all");
     // "My leads" is the manager filter set to yourself; the two are one filter.
     const [managerFilter, setManagerFilterState] = useState<string | "all">(() => searchParams.get("managerId") ?? "all");
     const [mineOnly, setMineOnlyState] = useState(false);
@@ -80,13 +82,14 @@ export function useLeadsList() {
     });
 
     const tableQuery = useQuery({
-        queryKey: ["leads", { search: debouncedSearch, statusFilter, branchFilter, sourceFilter, managerFilter, mineOnly, page, limit, sortBy, sortOrder }],
+        queryKey: ["leads", { search: debouncedSearch, statusFilter, lostReasonFilter, branchFilter, sourceFilter, managerFilter, mineOnly, page, limit, sortBy, sortOrder }],
         queryFn: () =>
             getLeads({
                 page,
                 limit,
                 search: debouncedSearch || undefined,
                 status: statusFilter === "all" ? undefined : statusFilter,
+                lostReason: statusFilter === LeadStatus.LOST && lostReasonFilter !== "all" ? lostReasonFilter : undefined,
                 branchId: branchFilter === "all" ? undefined : branchFilter,
                 source: sourceFilter === "all" ? undefined : sourceFilter,
                 managerId: mineOnly ? user?.id : managerFilter === "all" ? undefined : managerFilter,
@@ -378,8 +381,14 @@ export function useLeadsList() {
             statusFilter,
             setStatusFilter: (value: LeadStatusFilterValue) => {
                 setStatusFilterState(value);
+                if (value !== LeadStatus.LOST) setLostReasonFilterState("all");
                 setPage(1);
                 dropLinkSeed();
+            },
+            lostReasonFilter,
+            setLostReasonFilter: (value: LeadLostReason | "all") => {
+                setLostReasonFilterState(value);
+                setPage(1);
             },
             branchFilter,
             setBranchFilter: (value: string | "all") => {

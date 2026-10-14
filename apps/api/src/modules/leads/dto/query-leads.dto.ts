@@ -1,5 +1,5 @@
-import {IsIn, IsInt, IsOptional, IsString, IsUUID, Max, Min} from "class-validator";
-import {LeadStatus} from "@/generated/prisma/enums";
+import {IsEnum, IsIn, IsInt, IsOptional, IsString, IsUUID, Max, Min} from "class-validator";
+import {LeadLostReason, LeadStatus} from "@/generated/prisma/enums";
 import {Transform} from "class-transformer";
 
 export const LEAD_STATUS_OPEN = "OPEN";
@@ -24,6 +24,11 @@ export class QueryLeadsDto {
     @IsOptional()
     @IsString()
     source?: string;
+
+    // SH-8: lost leads with this reason.
+    @IsOptional()
+    @IsEnum(LeadLostReason)
+    lostReason?: LeadLostReason;
 
     @IsOptional()
     @IsUUID()

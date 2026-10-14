@@ -39,6 +39,7 @@ import {
     DealStatus,
     DiscountApprovalStatus,
     FinancingType,
+    LeadLostReason,
     LeadStatus,
     PaymentMethod,
     PaymentScheduleStatus,
@@ -415,6 +416,8 @@ async function seedDemoTenantData(args: {
 
     // --- Leads (22 per branch, every status represented) --------------
     const leadStatuses = Object.values(LeadStatus);
+    // OTHER needs a note, so the seed sticks to the named reasons.
+    const lostReasons = Object.values(LeadLostReason).filter((reason) => reason !== LeadLostReason.OTHER);
     const leadSources = ["Website", "Instagram", "Referral", "Walk-in", "Phone"];
     let leadSeed = 0;
 
@@ -440,6 +443,9 @@ async function seedDemoTenantData(args: {
                     managerId: manager.id,
                     clientId: linkedClient?.id,
                     nextContactAt: status === LeadStatus.LOST || isConverted ? undefined : daysFromNow((leadSeed % 10) - 3),
+                    ...(status === LeadStatus.LOST
+                        ? {lostReason: pick(lostReasons, leadSeed), lostAt: monthsAgo(0)}
+                        : {}),
                     lastContactAt: monthsAgo(0),
                     assignedAt: monthsAgo(1),
                     // Qualification on most leads; every fourth left blank, as

@@ -2,7 +2,7 @@ import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/co
 import {Badge} from "@/components/ui/badge.tsx";
 import {WhatsAppLink} from "@/components/shared/whatsapp-link.tsx";
 import type {Lead} from "@/features/leads/api/leads.api.ts";
-import {LEAD_STATUS_CLASSES, LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
+import {LEAD_LOST_REASON_LABEL_KEYS, LEAD_STATUS_CLASSES, LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
 import {formatCreatedAt} from "@/features/leads/utils/format.ts";
 import {leadSourceLabel} from "@/features/leads/utils/sources.ts";
 import {FINANCING_TYPE_LABEL_KEYS} from "@/features/deals/types/deal.types.ts";
@@ -45,6 +45,15 @@ export function LeadOverview({ lead }: LeadOverviewProps) {
                         </Badge>
                     </DataListItemValue>
                 </DataListItem>
+                {lead.lostReason && (
+                    <DataListItem>
+                        <DataListItemLabel>{t("overview.lostReason")}</DataListItemLabel>
+                        <DataListItemValue>
+                            <p>{t(LEAD_LOST_REASON_LABEL_KEYS[lead.lostReason])}</p>
+                            {lead.lostNote && <p className="text-sm text-muted-foreground">{lead.lostNote}</p>}
+                        </DataListItemValue>
+                    </DataListItem>
+                )}
                 <DataListItem>
                     <DataListItemLabel>{t("overview.source")}</DataListItemLabel>
                     <DataListItemValue>{leadSourceLabel(t, lead.source)}</DataListItemValue>

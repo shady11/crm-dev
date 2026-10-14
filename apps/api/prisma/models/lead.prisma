@@ -8,6 +8,20 @@ enum LeadStatus {
   LOST
 }
 
+// SH-8: why a lead was lost, picked when it's marked LOST. A fixed list
+// for every company (translated on the web); OTHER needs a note.
+enum LeadLostReason {
+  PRICE
+  COMPETITOR
+  LOCATION
+  LAYOUT
+  FINANCING
+  POSTPONED
+  UNREACHABLE
+  DUPLICATE
+  OTHER
+}
+
 model Lead {
   id String @id @default(uuid())
 
@@ -27,6 +41,12 @@ model Lead {
   financingType      FinancingType?
 
   nextContactAt DateTime?
+
+  // SH-8: set while the lead is LOST, cleared when it's reopened (the
+  // activity log keeps the history).
+  lostReason LeadLostReason?
+  lostNote   String?
+  lostAt     DateTime?
   lastContactAt DateTime?
   assignedAt    DateTime?
 

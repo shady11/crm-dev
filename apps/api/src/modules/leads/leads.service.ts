@@ -1,6 +1,6 @@
 import {BadRequestException, ConflictException, ForbiddenException, Injectable, Logger, NotFoundException} from "@nestjs/common";
 import {ActivityAction, ActivityType, NotificationEntityType, NotificationType, Prisma, TaskPriority, TaskType} from "@/generated/prisma/client";
-import {LeadStatus} from "@/generated/prisma/enums";
+import {LeadLostReason, LeadStatus} from "@/generated/prisma/enums";
 import {NotificationsService} from "@/modules/notifications/notifications.service";
 import {PrismaService} from "@/database/prisma.service";
 import {ClientsService} from "@/modules/clients/clients.service";
@@ -83,6 +83,10 @@ export class LeadsService {
 
         if (query.source) {
             where.source = query.source;
+        }
+
+        if (query.lostReason) {
+            where.lostReason = query.lostReason;
         }
 
         if (query.managerId) {
@@ -214,6 +218,7 @@ export class LeadsService {
                 email: dto.email,
                 source: dto.source,
                 status: dto.status,
+                ...this.lostFields(dto, null),
                 comment: dto.comment,
                 companyId: user.companyId,
                 branchId,
@@ -298,6 +303,7 @@ export class LeadsService {
                 email: dto.email,
                 source: dto.source,
                 status: dto.status,
+                ...this.lostFields(dto, existing),
                 comment: dto.comment,
                 managerId: dto.managerId,
                 clientId: dto.clientId,
@@ -314,7 +320,7 @@ export class LeadsService {
 
         const changes = diffChangedFields(dto, existing, [
             "fullName", "phone", "email", "source", "status", "comment", "managerId", "clientId",
-            "rooms", "preferredProjectId", "financingType",
+            "rooms", "preferredProjectId", "financingType", "lostReason", "lostNote",
             {field: "budget", normalize: (value) => (value == null ? null : Number(value))},
         ]);
 
@@ -843,6 +849,41 @@ export class LeadsService {
      * specifically "move it to a different team member", not a
      * general-purpose manager field edit.
      */
+    /**
+     * SH-8: the lost-reason fields to write. Marking a lead LOST needs a
+     * reason, and OTHER needs a note; reopening it clears them (the
+     * activity log keeps what they were). A lead that was already LOST
+     * before reasons existed can still be edited without one.
+     */
+    private lostFields(
+        dto: {status?: LeadStatus; lostReason?: LeadLostReason | null; lostNote?: string | null},
+        existing: {status: LeadStatus; lostReason: LeadLostReason | null; lostNote: string | null; lostAt: Date | null} | null,
+    ): {lostReason?: LeadLostReason | null; lostNote?: string | null; lostAt?: Date | null} {
+        const status = dto.status ?? existing?.status ?? LeadStatus.NEW;
+        const wasLost = existing?.status === LeadStatus.LOST;
+
+        if (status !== LeadStatus.LOST) {
+            return wasLost || existing?.lostReason ? {lostReason: null, lostNote: null, lostAt: null} : {};
+        }
+
+        const reason = dto.lostReason !== undefined ? dto.lostReason : existing?.lostReason ?? null;
+        const note = dto.lostNote !== undefined ? (dto.lostNote?.trim() || null) : existing?.lostNote ?? null;
+        const touchesReason = !wasLost || dto.lostReason !== undefined || dto.lostNote !== undefined;
+
+        if (touchesReason && !reason) {
+            throw new BadRequestException("Choose why the lead was lost.");
+        }
+        if (touchesReason && reason === LeadLostReason.OTHER && !note) {
+            throw new BadRequestException("Add a note saying why the lead was lost.");
+        }
+
+        return {
+            lostReason: reason,
+            lostNote: note,
+            lostAt: wasLost ? existing?.lostAt ?? new Date() : new Date(),
+        };
+    }
+
     private async ensureReassignable(user: AuthUser, leadBranchId: string | null, managerId: string) {
         if (!leadBranchId) {
             throw new BadRequestException("Lead is not assigned to a branch");
