@@ -14,6 +14,11 @@ export type NotificationTemplate =
     | {templateKey: "teamReservationExpired"; params: {dealNumber: string; managerName: string}}
     | {templateKey: "teamReservationExpiredHeld"; params: {dealNumber: string; managerName: string; amount: number; currency: string | null}}
     | {templateKey: "reservationExpiring"; params: {dealNumber: string; date: string}}
+    // SH-11: a manager at the extension limit asks; the team lead's
+    // extension resolves the ask and tells the manager.
+    | {templateKey: "reservationExtensionRequested"; params: {dealNumber: string; byName: string; date: string}}
+    | {templateKey: "reservationExtensionGranted"; params: {dealNumber: string; byName: string; date: string}}
+    | {templateKey: "reservationExtendedPastLimit"; params: {dealNumber: string; byName: string; date: string; reason: string}}
     | {templateKey: "paymentReceived"; params: {dealNumber: string; amount: number; currency: string | null}}
     | {templateKey: "refundIssued"; params: {dealNumber: string; amount: number; currency: string | null}}
     | {templateKey: "moneyHeld"; params: {dealNumber: string; amount: number; currency: string | null}}

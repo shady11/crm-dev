@@ -134,6 +134,8 @@
     "userMovedBranch": "Пользователь «{{name}}» переведён в другой филиал",
     "userPasswordReset": "Сброшен пароль пользователя «{{name}}»",
     "userSessionsRevoked": "Завершены сеансы пользователя «{{name}}»",
-    "userChangedOwnPassword": "«{{name}}» сменил(а) пароль"
+    "userChangedOwnPassword": "«{{name}}» сменил(а) пароль",
+    "reservationExtendedPastLimit": "Бронь продлена сверх лимита",
+    "reservationExtensionRequested": "Запрошено продление брони у руководителя отдела продаж"
   }
 }

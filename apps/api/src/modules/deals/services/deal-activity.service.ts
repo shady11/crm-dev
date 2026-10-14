@@ -85,12 +85,24 @@ export class DealActivityService {
 
     extendReservation(
         params: EventParams,
+        pastLimit = false,
     ) {
         return this.create({
             ...params,
             action: ActivityAction.UPDATED,
             type: ActivityType.RESERVATION_EXTENDED,
-            ...activityText('reservationExtended'),
+            ...activityText(pastLimit ? 'reservationExtendedPastLimit' : 'reservationExtended'),
+        });
+    }
+
+    extensionRequested(
+        params: EventParams,
+    ) {
+        return this.create({
+            ...params,
+            action: ActivityAction.UPDATED,
+            type: ActivityType.DEAL_UPDATED,
+            ...activityText('reservationExtensionRequested'),
         });
     }
 

@@ -234,8 +234,15 @@ export async function getReservationPolicy() {
     return response.data;
 }
 
-export async function extendReservation(id: string, reservationExpiresAt: string) {
-    const response = await api.post<DealDetails>(`/deals/${id}/extend`, { reservationExpiresAt });
+// reason is required once the reservation has used all its extensions (SH-11).
+export async function extendReservation(id: string, reservationExpiresAt: string, reason?: string) {
+    const response = await api.post<DealDetails>(`/deals/${id}/extend`, { reservationExpiresAt, reason });
+    return response.data;
+}
+
+// SH-11: at the extension limit, asks the team leads who may go past it.
+export async function requestReservationExtension(id: string) {
+    const response = await api.post<{ notified: number }>(`/deals/${id}/extension-request`);
     return response.data;
 }
 

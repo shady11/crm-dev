@@ -134,6 +134,8 @@
     "userMovedBranch": "User \"{{name}}\" moved to another branch",
     "userPasswordReset": "Password reset for \"{{name}}\"",
     "userSessionsRevoked": "Sessions revoked for \"{{name}}\"",
-    "userChangedOwnPassword": "\"{{name}}\" changed their password"
+    "userChangedOwnPassword": "\"{{name}}\" changed their password",
+    "reservationExtendedPastLimit": "Reservation extended past the limit",
+    "reservationExtensionRequested": "Asked the Sales Head to extend the reservation"
   }
 }

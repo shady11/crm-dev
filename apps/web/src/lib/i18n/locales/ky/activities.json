@@ -134,6 +134,8 @@
     "userMovedBranch": "«{{name}}» колдонуучусу башка филиалга которулду",
     "userPasswordReset": "«{{name}}» колдонуучусунун сырсөзү калыбына келтирилди",
     "userSessionsRevoked": "«{{name}}» колдонуучусунун сеанстары жабылды",
-    "userChangedOwnPassword": "«{{name}}» сырсөзүн алмаштырды"
+    "userChangedOwnPassword": "«{{name}}» сырсөзүн алмаштырды",
+    "reservationExtendedPastLimit": "Брон лимиттен ашык узартылды",
+    "reservationExtensionRequested": "Сатуу бөлүмүнүн башчысынан бронду узартуу суралды"
   }
 }

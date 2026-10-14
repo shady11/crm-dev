@@ -91,6 +91,7 @@ export function DealDetailsPage() {
     const [cancelReason, setCancelReason] = useState("");
 
     const [extendOpen, setExtendOpen] = useState(false);
+    const [extendReason, setExtendReason] = useState("");
     const [newExpiry, setNewExpiry] = useState([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
     const reservationPolicy = useReservationPolicy(hasPermission(user, "deals.manage")).data;
 
@@ -178,10 +179,18 @@ export function DealDetailsPage() {
         .sort()
         .at(-1);
     const extendMax = extendBounds?.max;
-    const canExtend = extensionsLeft !== 0 && !(extendMin && extendMax && extendMin > extendMax);
+    // The term limit binds everyone; the count limit stops at
+    // deals.extend_beyond_limit (SH-11), with a reason.
+    const termRoom = !(extendMin && extendMax && extendMin > extendMax);
+    const atLimit = extensionsLeft === 0;
+    const canExtendPastLimit = hasPermission(user, "deals.extend_beyond_limit");
+    const pastLimit = atLimit && canExtendPastLimit;
+    const canExtend = termRoom && (!atLimit || canExtendPastLimit);
+    const canAskForExtension = termRoom && atLimit && !canExtendPastLimit;
 
     const openExtendDialog = () => {
         if (extendMin) setNewExpiry([parseDate(extendMin)]);
+        setExtendReason("");
         setExtendOpen(true);
     };
 
@@ -257,14 +266,26 @@ export function DealDetailsPage() {
                     </Button>
                     {deal.status === "RESERVED" && canManage && (
                         <>
-                            <Button
-                                variant="secondary"
-                                disabled={!canExtend}
-                                title={!canExtend ? t("detailsPage.extendUnavailable") : undefined}
-                                onClick={openExtendDialog}
-                            >
-                                {t("detailsPage.extendReservation")}
-                            </Button>
+                            {canAskForExtension ? (
+                                <Button
+                                    variant="secondary"
+                                    disabled={actions.requestExtension.isPending || actions.requestExtension.isSuccess}
+                                    isLoading={actions.requestExtension.isPending}
+                                    title={t("detailsPage.askToExtendHint")}
+                                    onClick={() => actions.requestExtension.mutate()}
+                                >
+                                    {actions.requestExtension.isSuccess ? t("detailsPage.askedToExtend") : t("detailsPage.askToExtend")}
+                                </Button>
+                            ) : (
+                                <Button
+                                    variant="secondary"
+                                    disabled={!canExtend}
+                                    title={!canExtend ? t("detailsPage.extendUnavailable") : undefined}
+                                    onClick={openExtendDialog}
+                                >
+                                    {t("detailsPage.extendReservation")}
+                                </Button>
+                            )}
                             <Button
                                 onClick={() => setSignOpen(true)}
                                 disabled={deal.discountApprovalStatus === "PENDING"}
@@ -527,7 +548,15 @@ export function DealDetailsPage() {
                                             </CalendarTable>
                                         </DatePickerContent>
                                     </DatePicker>
-                                    {reservationPolicy && extensionsLeft !== null && (
+                                    {reservationPolicy && pastLimit && (
+                                        <FieldDescription>
+                                            {t("detailsPage.extendingPastLimit", {
+                                                max: reservationPolicy.reservationMaxExtensions,
+                                                maxDays: reservationPolicy.reservationMaxDays,
+                                            })}
+                                        </FieldDescription>
+                                    )}
+                                    {reservationPolicy && extensionsLeft !== null && !pastLimit && (
                                         <FieldDescription>
                                             {t("detailsPage.extensionsLeft", {
                                                 left: extensionsLeft,
@@ -537,6 +566,18 @@ export function DealDetailsPage() {
                                         </FieldDescription>
                                     )}
                                 </Field>
+                                {pastLimit && (
+                                    <Field>
+                                        <FieldLabel>{t("detailsPage.extendReason")}</FieldLabel>
+                                        <Textarea
+                                            value={extendReason}
+                                            onChange={(e) => setExtendReason(e.target.value)}
+                                            rows={2}
+                                            maxLength={500}
+                                            placeholder={t("detailsPage.extendReasonPlaceholder")}
+                                        />
+                                    </Field>
+                                )}
                             </FieldGroup>
                         </FieldSet>
                     </DialogBody>
@@ -545,10 +586,13 @@ export function DealDetailsPage() {
                             {t("detailsPage.back")}
                         </Button>
                         <Button
-                            disabled={!newExpiry || actions.extend.isPending}
+                            disabled={!newExpiry || actions.extend.isPending || (pastLimit && !extendReason.trim())}
                             isLoading={actions.extend.isPending}
                             onClick={() =>
-                                actions.extend.mutate(new Date(newExpiry[0].toString()).toISOString(), {
+                                actions.extend.mutate({
+                                    reservationExpiresAt: new Date(newExpiry[0].toString()).toISOString(),
+                                    reason: pastLimit ? extendReason.trim() : undefined,
+                                }, {
                                     onSuccess: () => {
                                         setExtendOpen(false);
                                         setNewExpiry([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);

@@ -183,7 +183,13 @@
     "voidReason": "Reason",
     "voidReasonPlaceholder": "e.g. typed 10,000 instead of 1,000",
     "voidReasonHint": "At least 5 characters. The deal manager sees it.",
-    "voidConfirm": "Void payment"
+    "voidConfirm": "Void payment",
+    "askToExtend": "Ask Sales Head to extend",
+    "askedToExtend": "Asked the Sales Head",
+    "askToExtendHint": "All extensions are used. Your Sales Head can extend it past the limit.",
+    "extendingPastLimit": "All {{max}} extensions are used, so this goes past the limit. The new date can still be at most {{maxDays}} days from today.",
+    "extendReason": "Reason",
+    "extendReasonPlaceholder": "e.g. mortgage approval due Friday"
   },
   "toasts": {
     "unitReserved": "Unit reserved",
@@ -218,7 +224,10 @@
     "paymentVoided": "Payment voided",
     "voidError": "Could not void the payment",
     "discountAboveLimit": "This discount is above your approval limit",
-    "discountAboveLimitHint": "It stays with an approver whose limit covers it."
+    "discountAboveLimitHint": "It stays with an approver whose limit covers it.",
+    "extensionRequested": "Your Sales Head has been asked to extend the reservation",
+    "extensionRequestNobody": "Nobody can extend past the limit. Ask an admin to grant the permission.",
+    "extensionRequestError": "Could not send the request"
   },
   "booking": {
     "rooms": "{{count}} rooms",

@@ -54,6 +54,9 @@ export const PERMISSIONS_CATALOG: PermissionDefinition[] = [
         manage: "Extend, sign, activate or complete a deal",
         cancel: "Cancel a deal",
         reassign: "Reassign a deal to another manager",
+        // SH-11: the company's extension limit stops at this permission; the
+        // term limit (reservationMaxDays) still applies.
+        extend_beyond_limit: "Extend a reservation past the company's extension limit, with a reason",
         approve_discount: "Approve or reject a discount above the requester's own band",
         manage_payments: "Generate payment schedules and record payments",
         void_payments: "Void a mistyped payment, with a reason",

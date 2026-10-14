@@ -81,6 +81,13 @@ export class DealsController {
     return this.dealsService.extendReservation(user, id, dto);
   }
 
+  // SH-11: a manager at the extension limit asks a team lead to go past it.
+  @RequirePermissions('deals.manage')
+  @Post(':id/extension-request')
+  requestExtension(@CurrentUser() user: AuthUser, @Param('id') id: string) {
+    return this.dealsService.requestExtension(user, id);
+  }
+
   @RequirePermissions('deals.manage')
   @Post(':id/sign-contract')
   signContract(

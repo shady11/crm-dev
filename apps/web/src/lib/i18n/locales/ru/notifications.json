@@ -168,6 +168,18 @@
     "teamReservationExpiredHeld": {
       "title": "Бронь по сделке {{dealNumber}} истекла",
       "message": "Сделка менеджера {{managerName}}: на ней остаётся {{amount}}."
+    },
+    "reservationExtensionRequested": {
+      "title": "{{byName}} просит продлить бронь по сделке {{dealNumber}}",
+      "message": "Все продления использованы, бронь истекает {{date}}."
+    },
+    "reservationExtensionGranted": {
+      "title": "Бронь по сделке {{dealNumber}} продлил(а) {{byName}}",
+      "message": "Теперь действует до {{date}}."
+    },
+    "reservationExtendedPastLimit": {
+      "title": "{{byName}} продлил(а) бронь по сделке {{dealNumber}}",
+      "message": "До {{date}}. Причина: {{reason}}"
     }
   }
 }

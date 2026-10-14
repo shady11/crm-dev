@@ -10,6 +10,7 @@ import {
     createPayment,
     type CreatePaymentPayload,
     extendReservation,
+    requestReservationExtension,
     generateDealDocument,
     type GeneratableDocumentType,
     generatePaymentSchedule,
@@ -37,12 +38,27 @@ export function useDealActions(dealId: string) {
     };
 
     const extend = useMutation({
-        mutationFn: (reservationExpiresAt: string) => extendReservation(dealId, reservationExpiresAt),
+        mutationFn: ({ reservationExpiresAt, reason }: { reservationExpiresAt: string; reason?: string }) =>
+            extendReservation(dealId, reservationExpiresAt, reason),
         onSuccess: async () => {
             await invalidate();
             toast.success({ title: t("toasts.reservationExtended") });
         },
         onError: () => toast.error({ title: t("toasts.extendError") }),
+    });
+
+    const requestExtension = useMutation({
+        mutationFn: () => requestReservationExtension(dealId),
+        onSuccess: async () => {
+            await invalidate();
+            toast.success({ title: t("toasts.extensionRequested") });
+        },
+        // 409: nobody in the company holds deals.extend_beyond_limit.
+        onError: (error) => toast.error({
+            title: isAxiosError(error) && error.response?.status === 409
+                ? t("toasts.extensionRequestNobody")
+                : t("toasts.extensionRequestError"),
+        }),
     });
 
     const sign = useMutation({
@@ -182,7 +198,7 @@ export function useDealActions(dealId: string) {
     });
 
     return {
-        extend, sign, activate, cancel, generateSchedule, recordPayment, complete, reassign, generateDocument,
+        extend, requestExtension, sign, activate, cancel, generateSchedule, recordPayment, complete, reassign, generateDocument,
         voidPayment: voidPaymentAction,
         approveDiscount: approveDiscountRequest,
         rejectDiscount: rejectDiscountRequest,

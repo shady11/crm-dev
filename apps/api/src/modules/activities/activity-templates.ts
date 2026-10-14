@@ -12,6 +12,8 @@ const ACTIVITY_TEMPLATES = {
   // Deals
   unitReserved: () => 'Unit reserved',
   reservationExtended: () => 'Reservation extended',
+  reservationExtendedPastLimit: () => 'Reservation extended past the limit',
+  reservationExtensionRequested: () => 'Asked the Sales Head to extend the reservation',
   reservationCancelled: () => 'Reservation cancelled',
   reservationExpired: () => 'Reservation expired',
   contractSigned: () => 'Contract signed',
