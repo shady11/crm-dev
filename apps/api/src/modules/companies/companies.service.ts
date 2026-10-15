@@ -36,6 +36,10 @@ const COMPANY_SELECT = {
     reservationDefaultDays: true,
     reservationMaxDays: true,
     reservationMaxExtensions: true,
+    legalName: true,
+    taxId: true,
+    signatoryName: true,
+    signatoryTitle: true,
     suspendedAt: true,
     createdAt: true,
     updatedAt: true,
@@ -301,9 +305,10 @@ export class CompaniesService {
     }
 
     /**
-     * Same scoping as findOwn(), plus the narrower UpdateOwnCompanyDto (no
-     * phone/address) so a COMPANY_ADMIN can fix their own currency/locale/
-     * timezone/name without a support ticket to the platform operator.
+     * Same scoping as findOwn(), plus the narrower UpdateOwnCompanyDto so a
+     * COMPANY_ADMIN can fix their own name, currency, locale, timezone,
+     * reservation policy and the legal details their contracts print (CA-4)
+     * without a support ticket to the platform operator.
      */
     async updateOwn(actor: AuthUser, dto: UpdateOwnCompanyDto) {
         if (!actor.companyId) {
@@ -311,6 +316,12 @@ export class CompaniesService {
         }
 
         await this.assertValidReservationPolicy(actor.companyId, dto);
+
+        // A cleared field is stored as null, so contracts fall back (legal
+        // name to the display name) instead of printing an empty string.
+        for (const field of ["legalName", "taxId", "signatoryName", "signatoryTitle", "address", "phone"] as const) {
+            if (typeof dto[field] === "string") dto[field] = dto[field].trim() || null;
+        }
 
         const updated = await this.update(actor.companyId, dto);
 

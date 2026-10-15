@@ -10,6 +10,11 @@ export type Company = {
     reservationDefaultDays?: number;
     reservationMaxDays?: number;
     reservationMaxExtensions?: number;
+    /** Legal details printed on contracts and receipts (CA-4). */
+    legalName?: string | null;
+    taxId?: string | null;
+    signatoryName?: string | null;
+    signatoryTitle?: string | null;
     /** Non-null means suspended. Reversible, unlike deletion. */
     suspendedAt: string | null;
     createdAt: string;

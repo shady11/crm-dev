@@ -2,6 +2,7 @@ import {Injectable, UnauthorizedException} from '@nestjs/common';
 import {ConfigService} from '@nestjs/config';
 import {PrismaService} from '@/database/prisma.service';
 import {AuthUser} from '@/common/types/auth-user.type';
+import {missingLegalDetails} from "@/modules/companies/legal-details";
 import {RbacService} from '@/modules/rbac/rbac.service';
 
 const DEFAULT_SUPER_ADMIN_SESSION_MAX_AGE_MINUTES = 60;
@@ -56,6 +57,10 @@ export class SessionValidationService {
                         currency: true,
                         locale: true,
                         timezone: true,
+                        legalName: true,
+                        taxId: true,
+                        address: true,
+                        signatoryName: true,
                         suspendedAt: true,
                         deletedAt: true,
                     },
@@ -175,6 +180,7 @@ export class SessionValidationService {
                       currency: user.company.currency,
                       locale: user.company.locale,
                       timezone: user.company.timezone,
+                      missingLegalDetails: missingLegalDetails(user.company),
                   }
                 : null,
             branchId: user.branchId,

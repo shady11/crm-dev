@@ -58,12 +58,18 @@ export async function updateCompany(id: string, payload: UpdateCompanyPayload) {
 }
 
 // Self-service for a COMPANY_ADMIN editing their own tenant — scoped server-side to the
-// caller's own companyId, never a client-supplied id. Deliberately narrower than
-// UpdateCompanyPayload above (no phone/address), matching CA-A1's scope.
+// caller's own companyId, never a client-supplied id.
 export type UpdateOwnCompanyPayload = Pick<CreateCompanyPayload, "name" | "currency" | "locale" | "timezone"> & {
     reservationDefaultDays?: number;
     reservationMaxDays?: number;
     reservationMaxExtensions?: number;
+    // CA-4: what contracts and receipts print. An empty string clears a field.
+    legalName?: string;
+    taxId?: string;
+    address?: string;
+    phone?: string;
+    signatoryName?: string;
+    signatoryTitle?: string;
 };
 
 export async function getOwnCompany() {

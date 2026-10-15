@@ -10,6 +10,7 @@ import {ChangePasswordDto} from "@/modules/auth/dto/change-password.dto";
 import {UpdateOwnProfileDto} from "@/modules/auth/dto/update-own-profile.dto";
 import {TotpService} from "@/modules/auth/totp.service";
 import {activityText} from "@/modules/activities/activity-templates";
+import {LegalDetail, missingLegalDetails} from "@/modules/companies/legal-details";
 
 // Failed logins before an account is locked, and how long the lock lasts.
 // Configurable per deployment since a small pilot team behind one shared
@@ -20,7 +21,9 @@ const LOCKOUT_MINUTES = Number(process.env.LOGIN_LOCKOUT_MINUTES ?? 15);
 // Shapes a full Prisma Company row down to the subset the client needs -
 // used for both the login response and (via SessionValidationService) every
 // authenticated request, so the two never quietly drift out of sync.
-function toCompanySummary(company: { id: string; name: string; currency: string | null; locale: string | null; timezone: string | null } | null): AuthCompanySummary | null {
+type CompanyForSummary = { id: string; name: string; currency: string | null; locale: string | null; timezone: string | null } & Partial<Record<LegalDetail, string | null>>;
+
+function toCompanySummary(company: CompanyForSummary | null): AuthCompanySummary | null {
     if (!company) return null;
     return {
         id: company.id,
@@ -28,6 +31,7 @@ function toCompanySummary(company: { id: string; name: string; currency: string 
         currency: company.currency,
         locale: company.locale,
         timezone: company.timezone,
+        missingLegalDetails: missingLegalDetails(company),
     };
 }
 
