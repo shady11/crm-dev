@@ -139,3 +139,21 @@ export const PERMISSIONS_CATALOG: PermissionDefinition[] = [
 ];
 
 export const PERMISSION_KEYS = PERMISSIONS_CATALOG.map((p) => p.key);
+
+/**
+ * CA-1: permissions that belong to the platform operator alone. The operator
+ * passes every check through User.isSuperAdmin (see PermissionsGuard), so no
+ * Role ever needs these; on a company's role they would open every tenant's
+ * data. RbacService refuses them on any role, leaves them out of the picker,
+ * and drops them from a user's effective permissions even if a role row
+ * still carries one.
+ */
+export const PLATFORM_ONLY_PERMISSION_KEYS: readonly string[] = [
+    "companies.manage",
+    "setting_options.manage",
+    "audit_log.view",
+];
+
+export function isPlatformOnlyPermission(key: string): boolean {
+    return PLATFORM_ONLY_PERMISSION_KEYS.includes(key);
+}
