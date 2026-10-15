@@ -57,9 +57,13 @@ describe("RbacService", () => {
                 findMany: jest.fn().mockResolvedValue([]),
                 findUnique: jest.fn(),
                 count: jest.fn().mockResolvedValue(0),
+                updateMany: jest.fn().mockResolvedValue({count: 0}),
             },
-            $transaction: jest.fn().mockImplementation((ops: unknown[]) => Promise.all(ops)),
+            $transaction: jest.fn(),
         };
+
+        // Both forms: an array of operations, or a callback given the client.
+        prisma.$transaction.mockImplementation((ops: any) => (typeof ops === "function" ? ops(prisma) : Promise.all(ops)));
 
         const auditLog = {record: jest.fn().mockResolvedValue(undefined)};
         const service = new RbacService(prisma as any, auditLog as any);
@@ -249,6 +253,32 @@ describe("RbacService", () => {
 
             await service.deleteRole(companyAdmin, "role-custom");
             expect(prisma.role.delete).toHaveBeenCalledWith({where: {id: "role-custom"}});
+        });
+
+        it("counts only users who aren't deleted, and moves deleted holders to the least-privileged built-in role (CA-9)", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue({id: "role-custom", name: "Auditor", isSystem: false, companyId: "company-1"});
+            prisma.user.count.mockResolvedValueOnce(0).mockResolvedValueOnce(1);
+            prisma.role.findFirst.mockResolvedValue({id: "role-sales-manager"});
+
+            await service.deleteRole(companyAdmin, "role-custom");
+
+            expect(prisma.user.count.mock.calls[0][0]).toEqual({where: {roleId: "role-custom", deletedAt: null}});
+            expect(prisma.role.findFirst.mock.calls[prisma.role.findFirst.mock.calls.length - 1][0]).toEqual(expect.objectContaining({
+                where: {companyId: null, isSystem: true, isPlatformRole: false},
+                orderBy: [{permissions: {_count: "asc"}}, {name: "asc"}],
+            }));
+            expect(prisma.user.updateMany).toHaveBeenCalledWith({where: {roleId: "role-custom"}, data: {roleId: "role-sales-manager"}});
+            expect(prisma.user.updateMany.mock.invocationCallOrder[0]).toBeLessThan(prisma.role.delete.mock.invocationCallOrder[0]);
+        });
+
+        it("touches no user when the role never had a deleted holder", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue({id: "role-custom", name: "Auditor", isSystem: false, companyId: "company-1"});
+
+            await service.deleteRole(companyAdmin, "role-custom");
+            expect(prisma.user.updateMany).not.toHaveBeenCalled();
+            expect(prisma.role.delete).toHaveBeenCalled();
         });
     });
 

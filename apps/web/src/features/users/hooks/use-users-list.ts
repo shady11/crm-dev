@@ -122,10 +122,10 @@ export function useUsersList() {
             });
             setPendingDeactivate(null);
         },
-        onError: () => {
+        onError: (error) => {
             toast.error({
                 title: t("toasts.deactivateErrorTitle"),
-                description: t("toasts.deactivateErrorDescription"),
+                description: apiErrorMessage(error) ?? t("toasts.deactivateErrorDescription"),
             });
         },
     });
@@ -140,8 +140,8 @@ export function useUsersList() {
             });
             setPendingTransfer(null);
         },
-        onError: () => {
-            toast.error({ title: t("card.transferBranchDialog.error") });
+        onError: (error) => {
+            toast.error({ title: t("card.transferBranchDialog.error"), description: apiErrorMessage(error) });
         },
     });
 
