@@ -60,7 +60,8 @@ export function TransferBranchDialog({user, open, isSubmitting, onOpenChange, on
 
     const openLeads = impactQuery.data?.openLeads ?? 0;
     const activeDeals = impactQuery.data?.activeDeals ?? 0;
-    const hasImpact = openLeads + activeDeals > 0;
+    const openTasks = impactQuery.data?.openTasks ?? 0;
+    const hasImpact = openLeads + activeDeals + openTasks > 0;
 
     const branchCollection = createListCollection({
         items: branches.data
@@ -68,8 +69,10 @@ export function TransferBranchDialog({user, open, isSubmitting, onOpenChange, on
             .map((branch) => ({label: branch.name, value: branch.id})),
     });
 
+    // The work stays in the current branch, handed over through SH-5, which
+    // takes only someone on that branch (CA-8); anyone else would be refused.
     const candidates = assignable.data.filter(
-        (candidate) => candidate.id !== user.id && candidate.isActive,
+        (candidate) => candidate.id !== user.id && candidate.isActive && candidate.branchId === user.branchId,
     );
     const reassignCollection = createListCollection({
         items: [
@@ -116,8 +119,9 @@ export function TransferBranchDialog({user, open, isSubmitting, onOpenChange, on
                     ) : hasImpact ? (
                         <div className="space-y-3">
                             <p className="text-sm text-muted-foreground">
-                                {t("card.transferBranchDialog.impact", {name: user.fullName, openLeads, activeDeals})}
+                                {t("card.transferBranchDialog.impact", {name: user.fullName, openLeads, activeDeals, openTasks})}
                             </p>
+                            <p className="text-sm text-muted-foreground">{t("card.handoverHint")}</p>
                             <label className="block space-y-1.5">
                                 <span className="text-sm font-medium">
                                     {t("card.transferBranchDialog.reassignLabel")}

@@ -77,7 +77,7 @@ describe("UsersService — role boundaries", () => {
                 create: jest.fn().mockResolvedValue({id: "activity-1"}),
             },
         };
-        return {service: new UsersService(prisma as unknown as PrismaService), prisma};
+        return {service: new UsersService(prisma as unknown as PrismaService, {get: jest.fn()} as any), prisma};
     };
 
     describe("create", () => {
@@ -230,7 +230,7 @@ describe("UsersService — role boundaries", () => {
     });
 });
 
-describe("UsersService — reassignment on deactivation (CA-B1)", () => {
+describe("UsersService — handing work over when a user leaves or moves (CA-B1, CA-8)", () => {
     const admin: AuthUser = {
         id: "admin-1",
         email: "admin@crm.dev",
@@ -246,109 +246,105 @@ describe("UsersService — reassignment on deactivation (CA-B1)", () => {
     const departingManager = {
         id: "manager-1",
         roleId: "role-sales-manager",
+        role: {isBranchScoped: true},
+        fullName: "Aidana Rysbekov",
         isSuperAdmin: false,
         companyId: "company-1",
+        branchId: "branch-1",
         email: "leaving@crm.dev",
         isActive: true,
         deletedAt: null,
     };
 
-    const replacementManager = {
-        id: "manager-2",
-        roleId: "role-sales-manager",
-        isSuperAdmin: false,
-        companyId: "company-1",
-        email: "staying@crm.dev",
-        isActive: true,
-        deletedAt: null,
-    };
+    const replacementManager = {...departingManager, id: "manager-2", fullName: "Cholpon Isaev", email: "staying@crm.dev"};
 
     /** findFirst is called once per lookup; responses are returned in call order. */
     const build = (findFirstResponses: unknown[]) => {
         const findFirst = jest.fn();
         findFirstResponses.forEach((response) => findFirst.mockResolvedValueOnce(response));
 
-        const leadUpdateMany = jest.fn().mockResolvedValue({count: 0});
-        const dealUpdateMany = jest.fn().mockResolvedValue({count: 0});
-        const userUpdate = jest.fn().mockResolvedValue({id: "updated"});
-
-        const tx = {
-            lead: {updateMany: leadUpdateMany},
-            deal: {updateMany: dealUpdateMany},
-            user: {update: userUpdate},
-        };
-
         const prisma = {
-            user: {findFirst},
+            user: {findFirst, update: jest.fn().mockResolvedValue({id: "updated"})},
             lead: {count: jest.fn().mockResolvedValue(2)},
             deal: {count: jest.fn().mockResolvedValue(1)},
-            $transaction: jest.fn().mockImplementation((fn: (tx: unknown) => unknown) => fn(tx)),
+            task: {count: jest.fn().mockResolvedValue(4)},
+            branch: {findFirst: jest.fn().mockResolvedValue({id: "branch-2", companyId: "company-1", deactivatedAt: null})},
             activity: {create: jest.fn().mockResolvedValue({id: "activity-1"})},
         };
+        const handover = {handOver: jest.fn().mockResolvedValue({leads: 2, deals: 1, tasks: 4})};
+        const moduleRef = {get: jest.fn().mockReturnValue(handover)};
 
-        return {service: new UsersService(prisma as unknown as PrismaService), prisma, leadUpdateMany, dealUpdateMany, userUpdate};
+        return {service: new UsersService(prisma as unknown as PrismaService, moduleRef as any), prisma, handover};
     };
 
-    it("reports open-lead and active-deal counts for the target user", async () => {
-        const {service} = build([departingManager]);
+    it("reports the open leads, active deals and open tasks that would move", async () => {
+        const {service, prisma} = build([departingManager]);
 
-        const impact = await service.getDeactivationImpact(admin, departingManager.id);
-
-        expect(impact).toEqual({openLeads: 2, activeDeals: 1});
+        await expect(service.getDeactivationImpact(admin, departingManager.id)).resolves.toEqual({openLeads: 2, activeDeals: 1, openTasks: 4});
+        expect(prisma.task.count.mock.calls[0][0].where).toEqual(expect.objectContaining({
+            assignedToId: departingManager.id, deletedAt: null, status: {in: ["TODO", "IN_PROGRESS"]},
+        }));
     });
 
-    it("reassigns leads and deals to the replacement before deactivating, in one transaction", async () => {
-        const {service, leadUpdateMany, dealUpdateMany, userUpdate, prisma} = build([
-            departingManager,
-            replacementManager,
-        ]);
+    it("hands everything to the replacement through the SH-5 handover, then deactivates", async () => {
+        const {service, prisma, handover} = build([departingManager, replacementManager]);
 
-        await service.remove(admin, departingManager.id, {reassignToId: replacementManager.id});
+        const result = await service.remove(admin, departingManager.id, {reassignToId: replacementManager.id});
 
-        expect(prisma.$transaction).toHaveBeenCalledTimes(1);
-        expect(leadUpdateMany).toHaveBeenCalledWith(
-            expect.objectContaining({
-                where: expect.objectContaining({managerId: departingManager.id}),
-                data: {managerId: replacementManager.id},
-            }),
-        );
-        expect(dealUpdateMany).toHaveBeenCalledWith(
-            expect.objectContaining({
-                where: expect.objectContaining({managerId: departingManager.id}),
-                data: {managerId: replacementManager.id},
-            }),
-        );
-        expect(userUpdate).toHaveBeenCalledWith(
-            expect.objectContaining({data: expect.objectContaining({isActive: false})}),
-        );
+        expect(handover.handOver).toHaveBeenCalledWith(admin, departingManager.id, replacementManager.id);
+        expect(handover.handOver.mock.invocationCallOrder[0]).toBeLessThan(prisma.user.update.mock.invocationCallOrder[0]);
+        expect(prisma.user.update).toHaveBeenCalledWith(expect.objectContaining({
+            where: {id: departingManager.id}, data: expect.objectContaining({isActive: false, deletedAt: expect.any(Date)}),
+        }));
+        expect(result).toEqual({success: true, handedOver: {leads: 2, deals: 1, tasks: 4}});
+        expect(prisma.activity.create.mock.calls[0][0].data.metadata).toEqual({
+            reassignToId: replacementManager.id, handedOver: {leads: 2, deals: 1, tasks: 4},
+        });
     });
 
-    it("still allows deactivating without reassignment — records keep their old manager", async () => {
-        const {service, leadUpdateMany, dealUpdateMany, userUpdate} = build([departingManager]);
+    it("leaves the user active when the handover fails", async () => {
+        const {service, prisma, handover} = build([departingManager, replacementManager]);
+        handover.handOver.mockRejectedValue(new BadRequestException("not assignable"));
+
+        await expect(service.remove(admin, departingManager.id, {reassignToId: replacementManager.id})).rejects.toThrow(BadRequestException);
+        expect(prisma.user.update).not.toHaveBeenCalled();
+    });
+
+    it("still allows deactivating without a replacement; records keep their old manager", async () => {
+        const {service, prisma, handover} = build([departingManager]);
 
         await service.remove(admin, departingManager.id);
 
-        expect(leadUpdateMany).not.toHaveBeenCalled();
-        expect(dealUpdateMany).not.toHaveBeenCalled();
-        expect(userUpdate).toHaveBeenCalled();
+        expect(handover.handOver).not.toHaveBeenCalled();
+        expect(prisma.user.update).toHaveBeenCalled();
     });
 
     it("refuses to reassign to the user being deactivated", async () => {
-        const {service, prisma} = build([departingManager]);
+        const {service, prisma, handover} = build([departingManager]);
 
         await expect(
             service.remove(admin, departingManager.id, {reassignToId: departingManager.id}),
         ).rejects.toThrow(BadRequestException);
-        expect(prisma.$transaction).not.toHaveBeenCalled();
+        expect(handover.handOver).not.toHaveBeenCalled();
+        expect(prisma.user.update).not.toHaveBeenCalled();
     });
 
     it("refuses to reassign to an inactive replacement", async () => {
-        const inactiveReplacement = {...replacementManager, isActive: false};
-        const {service, prisma} = build([departingManager, inactiveReplacement]);
+        const {service, handover} = build([departingManager, {...replacementManager, isActive: false}]);
 
         await expect(
-            service.remove(admin, departingManager.id, {reassignToId: inactiveReplacement.id}),
+            service.remove(admin, departingManager.id, {reassignToId: replacementManager.id}),
         ).rejects.toThrow(BadRequestException);
-        expect(prisma.$transaction).not.toHaveBeenCalled();
+        expect(handover.handOver).not.toHaveBeenCalled();
+    });
+
+    it("hands the work over before moving someone to another branch", async () => {
+        const {service, prisma, handover} = build([departingManager, replacementManager]);
+
+        await service.transferBranch(admin, departingManager.id, {branchId: "branch-2", reassignToId: replacementManager.id});
+
+        expect(handover.handOver).toHaveBeenCalledWith(admin, departingManager.id, replacementManager.id);
+        expect(handover.handOver.mock.invocationCallOrder[0]).toBeLessThan(prisma.user.update.mock.invocationCallOrder[0]);
+        expect(prisma.user.update).toHaveBeenCalledWith({where: {id: departingManager.id}, data: {branchId: "branch-2"}});
     });
 });

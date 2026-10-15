@@ -50,9 +50,14 @@ export function DeactivateUserDialog({user, open, isSubmitting, onOpenChange, on
 
     const openLeads = impactQuery.data?.openLeads ?? 0;
     const activeDeals = impactQuery.data?.activeDeals ?? 0;
-    const hasImpact = openLeads + activeDeals > 0;
+    const openTasks = impactQuery.data?.openTasks ?? 0;
+    const hasImpact = openLeads + activeDeals + openTasks > 0;
 
-    const candidates = assignable.data.filter((candidate) => candidate.id !== user.id && candidate.isActive);
+    // The work goes through the SH-5 handover, which takes only someone on
+    // the same branch (CA-8); anyone else would be refused.
+    const candidates = assignable.data.filter(
+        (candidate) => candidate.id !== user.id && candidate.isActive && candidate.branchId === user.branchId,
+    );
 
     const collection = createListCollection({
         items: [
@@ -79,8 +84,9 @@ export function DeactivateUserDialog({user, open, isSubmitting, onOpenChange, on
                     ) : hasImpact ? (
                         <div className="space-y-3">
                             <p className="text-sm text-muted-foreground">
-                                {t("card.deactivateDialog.impact", {name: user.fullName, openLeads, activeDeals})}
+                                {t("card.deactivateDialog.impact", {name: user.fullName, openLeads, activeDeals, openTasks})}
                             </p>
+                            <p className="text-sm text-muted-foreground">{t("card.handoverHint")}</p>
                             <label className="block space-y-1.5">
                                 <span className="text-sm font-medium">{t("card.deactivateDialog.reassignLabel")}</span>
                                 <Select

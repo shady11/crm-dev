@@ -410,15 +410,30 @@ export class RbacService implements OnModuleInit {
         // Every user has exactly one Role (User.roleId, required) — the DB's
         // own RESTRICT foreign key would refuse this anyway, but a clear
         // ConflictException beats a raw constraint-violation error reaching
-        // the client.
-        const holderCount = await this.prisma.user.count({ where: { roleId } });
+        // the client. Deleted users don't count (CA-9): nobody can see,
+        // move or bring them back.
+        const holderCount = await this.prisma.user.count({ where: { roleId, deletedAt: null } });
         if (holderCount > 0) {
             throw new ConflictException(
                 `${holderCount} user(s) still have this role — reassign them to another role first`,
             );
         }
 
-        await this.prisma.role.delete({ where: { id: roleId } });
+        await this.prisma.$transaction(async (db) => {
+            // Deleted users still need some role for the foreign key: they get
+            // the built-in role that grants the least.
+            const deletedHolders = await db.user.count({ where: { roleId } });
+            if (deletedHolders > 0) {
+                const fallback = await db.role.findFirst({
+                    where: { companyId: null, isSystem: true, isPlatformRole: false },
+                    orderBy: [{ permissions: { _count: "asc" } }, { name: "asc" }],
+                    select: { id: true },
+                });
+                if (!fallback) throw new ConflictException("No built-in role to move this role's deleted users to.");
+                await db.user.updateMany({ where: { roleId }, data: { roleId: fallback.id } });
+            }
+            await db.role.delete({ where: { id: roleId } });
+        });
 
         await this.auditLog.record({
             actorId: actor.id,

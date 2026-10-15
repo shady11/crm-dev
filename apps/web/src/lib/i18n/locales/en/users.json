@@ -25,7 +25,7 @@
       "title": "Deactivate user?",
       "description": "This will deactivate \"{{name}}\" and revoke their access. This can be reversed later by an admin.",
       "confirm": "Deactivate",
-      "impact": "{{name}} still manages {{openLeads}} open lead(s) and {{activeDeals}} active deal(s).",
+      "impact": "{{name}} still has {{openLeads}} open lead(s), {{activeDeals}} active deal(s) and {{openTasks}} open task(s).",
       "reassignLabel": "Reassign to",
       "noReassignOption": "Don't reassign — deactivate only"
     },
@@ -35,12 +35,13 @@
       "description": "Move \"{{name}}\" to another branch.",
       "branchLabel": "New branch",
       "confirm": "Transfer",
-      "impact": "{{name}} still manages {{openLeads}} open lead(s) and {{activeDeals}} active deal(s) at their current branch.",
+      "impact": "{{name}} still has {{openLeads}} open lead(s), {{activeDeals}} active deal(s) and {{openTasks}} open task(s) at their current branch.",
       "reassignLabel": "Reassign to",
       "noReassignOption": "Don't reassign — they keep their old branch's records",
       "success": "\"{{name}}\" moved to another branch.",
       "error": "Failed to transfer branch. Please try again."
-    }
+    },
+    "handoverHint": "With a replacement, all of it moves with its history and the new owner gets one notification. Only people on the same branch are listed."
   },
   "reassignDialog": {
     "title": "Reassign to another manager",

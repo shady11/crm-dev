@@ -6,7 +6,8 @@ import {
     NotFoundException,
 } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
-import {ActivityAction, ActivityType, Prisma} from "@/generated/prisma/client";
+import {ModuleRef} from "@nestjs/core";
+import {ActivityAction, ActivityType, Prisma, TaskStatus} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
@@ -21,6 +22,7 @@ import {QueryUsersDto, USER_SORTABLE_FIELDS} from "./dto/query-users.dto";
 import {resolveOrderBy} from "@/common/utils/sort.util";
 import {canActorSeeUser} from "@/modules/users/users.constants";
 import {activityText} from "@/modules/activities/activity-templates";
+import {HandoverService} from "@/modules/team/handover.service";
 
 const USER_SAFE_SELECT = {
     id: true,
@@ -42,7 +44,44 @@ const USER_SAFE_SELECT = {
 
 @Injectable()
 export class UsersService {
-    constructor(private readonly prisma: PrismaService) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly moduleRef: ModuleRef,
+    ) {}
+
+    /**
+     * CA-8: a user leaving or moving branch hands their open leads, active
+     * deals and open tasks to `toUserId` through the SH-5 handover, so the
+     * leads and deals get their history entries and the new owner one
+     * notification, same as a handover from My team. Looked up at call time:
+     * TeamModule reaches UsersModule through AuthModule, so importing it
+     * here would be a module cycle.
+     */
+    /** What a handover would move: open leads, active deals and open tasks. */
+    private async countOpenWork(companyId: string, userId: string) {
+        const [openLeads, activeDeals, openTasks] = await Promise.all([
+            this.prisma.lead.count({
+                where: { companyId, managerId: userId, deletedAt: null, status: { in: OPEN_LEAD_STATUSES } },
+            }),
+            this.prisma.deal.count({
+                where: { companyId, managerId: userId, deletedAt: null, status: { in: ACTIVE_DEAL_STATUSES } },
+            }),
+            this.prisma.task.count({
+                where: {
+                    companyId,
+                    assignedToId: userId,
+                    deletedAt: null,
+                    status: { in: [TaskStatus.TODO, TaskStatus.IN_PROGRESS] },
+                },
+            }),
+        ]);
+
+        return { openLeads, activeDeals, openTasks };
+    }
+
+    private handOverWork(actor: AuthUser, fromUserId: string, toUserId: string) {
+        return this.moduleRef.get(HandoverService, {strict: false}).handOver(actor, fromUserId, toUserId);
+    }
 
     /**
      * Records a company-scoped activity for an action taken on a user
@@ -344,26 +383,7 @@ export class UsersService {
 
         await this.getManageableTargetOrThrow(user, id);
 
-        const [openLeads, activeDeals] = await Promise.all([
-            this.prisma.lead.count({
-                where: {
-                    companyId: user.companyId,
-                    managerId: id,
-                    deletedAt: null,
-                    status: { in: OPEN_LEAD_STATUSES },
-                },
-            }),
-            this.prisma.deal.count({
-                where: {
-                    companyId: user.companyId,
-                    managerId: id,
-                    deletedAt: null,
-                    status: { in: ACTIVE_DEAL_STATUSES },
-                },
-            }),
-        ]);
-
-        return { openLeads, activeDeals };
+        return this.countOpenWork(user.companyId, id);
     }
 
     /**
@@ -409,33 +429,13 @@ export class UsersService {
             }
         }
 
-        await this.prisma.$transaction(async (db) => {
-            if (reassignToId) {
-                await db.lead.updateMany({
-                    where: {
-                        companyId,
-                        managerId: id,
-                        deletedAt: null,
-                        status: { in: OPEN_LEAD_STATUSES },
-                    },
-                    data: { managerId: reassignToId },
-                });
+        // Hand the work over first: the leads and deals stay in the old
+        // branch, with someone who still works there.
+        const handedOver = reassignToId ? await this.handOverWork(user, id, reassignToId) : undefined;
 
-                await db.deal.updateMany({
-                    where: {
-                        companyId,
-                        managerId: id,
-                        deletedAt: null,
-                        status: { in: ACTIVE_DEAL_STATUSES },
-                    },
-                    data: { managerId: reassignToId },
-                });
-            }
-
-            await db.user.update({
-                where: { id },
-                data: { branchId: dto.branchId },
-            });
+        await this.prisma.user.update({
+            where: { id },
+            data: { branchId: dto.branchId },
         });
 
         await this.logUserActivity({
@@ -445,10 +445,10 @@ export class UsersService {
             action: ActivityAction.BRANCH_TRANSFERRED,
             type: ActivityType.USER_BRANCH_TRANSFERRED,
             ...activityText('userMovedBranch', { name: target.fullName }),
-            metadata: { fromBranchId: target.branchId, toBranchId: dto.branchId, reassignToId },
+            metadata: { fromBranchId: target.branchId, toBranchId: dto.branchId, reassignToId, handedOver },
         });
 
-        return { success: true };
+        return { success: true, handedOver };
     }
 
     async updatePassword(user: AuthUser, id: string, dto: UpdateUserPasswordDto) {
@@ -517,34 +517,14 @@ export class UsersService {
 
         await this.getManageableTargetOrThrow(user, id);
 
-        const [openLeads, activeDeals] = await Promise.all([
-            this.prisma.lead.count({
-                where: {
-                    companyId: user.companyId,
-                    managerId: id,
-                    deletedAt: null,
-                    status: { in: OPEN_LEAD_STATUSES },
-                },
-            }),
-            this.prisma.deal.count({
-                where: {
-                    companyId: user.companyId,
-                    managerId: id,
-                    deletedAt: null,
-                    status: { in: ACTIVE_DEAL_STATUSES },
-                },
-            }),
-        ]);
-
-        return { openLeads, activeDeals };
+        return this.countOpenWork(user.companyId, id);
     }
 
     /**
-     * Deactivates a user (soft-delete). Optionally reassigns their open leads
-     * and in-progress deals to a replacement manager first — in the same
-     * transaction, so a mid-way failure can never leave the user deactivated
-     * with half their pipeline moved. Reassignment is opt-in: pass nothing and
-     * the records simply keep their old managerId, same as before this story.
+     * Deactivates a user (soft-delete). With a replacement, their open leads,
+     * active deals and open tasks are handed over first (CA-8, see
+     * handOverWork). Reassignment is opt-in: pass nothing and the records
+     * keep their old manager.
      */
     async remove(user: AuthUser, id: string, dto?: DeactivateUserDto) {
         if (!user.companyId) {
@@ -573,36 +553,16 @@ export class UsersService {
             }
         }
 
-        await this.prisma.$transaction(async (db) => {
-            if (reassignToId) {
-                await db.lead.updateMany({
-                    where: {
-                        companyId,
-                        managerId: id,
-                        deletedAt: null,
-                        status: { in: OPEN_LEAD_STATUSES },
-                    },
-                    data: { managerId: reassignToId },
-                });
+        // The work moves first; if that fails the user stays active with
+        // everything still theirs, and the admin can simply try again.
+        const handedOver = reassignToId ? await this.handOverWork(user, id, reassignToId) : undefined;
 
-                await db.deal.updateMany({
-                    where: {
-                        companyId,
-                        managerId: id,
-                        deletedAt: null,
-                        status: { in: ACTIVE_DEAL_STATUSES },
-                    },
-                    data: { managerId: reassignToId },
-                });
-            }
-
-            await db.user.update({
-                where: { id },
-                data: {
-                    isActive: false,
-                    deletedAt: new Date(),
-                },
-            });
+        await this.prisma.user.update({
+            where: { id },
+            data: {
+                isActive: false,
+                deletedAt: new Date(),
+            },
         });
 
         await this.logUserActivity({
@@ -612,10 +572,10 @@ export class UsersService {
             action: ActivityAction.DEACTIVATED_USER,
             type: ActivityType.USER_DEACTIVATED,
             ...activityText('userDeactivated', { name: target.fullName }),
-            metadata: { reassignToId },
+            metadata: { reassignToId, handedOver },
         });
 
-        return { success: true };
+        return { success: true, handedOver };
     }
 
     // --------------------------------------------------------------------

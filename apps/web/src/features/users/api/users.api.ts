@@ -102,6 +102,8 @@ export async function deleteUser(id: string) {
 export type DeactivationImpact = {
     openLeads: number;
     activeDeals: number;
+    // CA-8: they move with the leads and deals when a replacement is chosen.
+    openTasks: number;
 };
 
 export async function getDeactivationImpact(id: string) {
@@ -124,6 +126,7 @@ export async function getUserRoleSummary() {
 export type BranchTransferImpact = {
     openLeads: number;
     activeDeals: number;
+    openTasks: number;
 };
 
 export async function getBranchTransferImpact(id: string) {
