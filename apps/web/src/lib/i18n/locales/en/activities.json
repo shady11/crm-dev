@@ -136,6 +136,10 @@
     "userSessionsRevoked": "Sessions revoked for \"{{name}}\"",
     "userChangedOwnPassword": "\"{{name}}\" changed their password",
     "reservationExtendedPastLimit": "Reservation extended past the limit",
-    "reservationExtensionRequested": "Asked the Sales Head to extend the reservation"
+    "reservationExtensionRequested": "Asked the Sales Head to extend the reservation",
+    "roleCreated": "Role \"{{role}}\" created",
+    "roleUpdated": "Role \"{{role}}\" updated",
+    "rolePermissionsChanged": "Permissions of role \"{{role}}\" changed: {{added}} added, {{removed}} removed",
+    "roleDeleted": "Role \"{{role}}\" deleted"
   }
 }

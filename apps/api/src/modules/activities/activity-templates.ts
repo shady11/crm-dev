@@ -114,6 +114,12 @@ const ACTIVITY_TEMPLATES = {
   userCreated: (p: { name: string }) => `User "${p.name}" created`,
   userUpdated: (p: { name: string }) => `User "${p.name}" updated`,
   userRoleChanged: (p: { name: string }) => `Role changed for "${p.name}"`,
+  // CA-12: a company's own roles.
+  roleCreated: (p: { role: string }) => `Role "${p.role}" created`,
+  roleUpdated: (p: { role: string }) => `Role "${p.role}" updated`,
+  rolePermissionsChanged: (p: { role: string; added: number; removed: number }) =>
+    `Permissions of role "${p.role}" changed: ${p.added} added, ${p.removed} removed`,
+  roleDeleted: (p: { role: string }) => `Role "${p.role}" deleted`,
   userDeactivated: (p: { name: string }) => `User "${p.name}" deactivated`,
   userReactivated: (p: { name: string }) => `User "${p.name}" reactivated`,
   userMovedBranch: (p: { name: string }) =>

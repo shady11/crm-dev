@@ -217,7 +217,7 @@ async function seedDemo() {
             phone: "+996700000000",
             address: "Bishkek",
             timezone: "UTC+6",
-            locale: "ky"
+            locale: "ky-KG"
         },
     });
 

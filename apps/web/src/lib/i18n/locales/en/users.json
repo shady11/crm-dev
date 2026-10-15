@@ -11,7 +11,7 @@
     "inactive": "Inactive"
   },
   "page": {
-    "rolesHeading": "Roles"
+    "title": "Users"
   },
   "roleCard": {
     "totalUsers_one": "Total {{count}} user",

@@ -25,7 +25,12 @@ export function SettingOptionSelect({type, value, onChange, placeholder, classNa
     });
 
     const options = optionsQuery.data ?? [];
-    const items = options.map((option) => ({label: `${option.label} (${option.code})`, value: option.code}));
+    // Most labels already end in their code ("Kyrgyzstani Som (KGS)"); add it
+    // only when one doesn't, so it isn't shown twice (CA-11).
+    const items = options.map((option) => ({
+        label: option.label.includes(`(${option.code})`) ? option.label : `${option.label} (${option.code})`,
+        value: option.code,
+    }));
 
     // A company can already hold a code that's since been deactivated or
     // removed from the picker. Keep it selectable (as its raw code) rather

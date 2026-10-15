@@ -52,7 +52,9 @@ describe("RbacService", () => {
             rolePermission: {
                 deleteMany: jest.fn(),
                 createMany: jest.fn(),
+                findMany: jest.fn().mockResolvedValue([]),
             },
+            activity: {create: jest.fn().mockResolvedValue({id: "activity-1"})},
             user: {
                 findMany: jest.fn().mockResolvedValue([]),
                 findUnique: jest.fn(),
@@ -115,6 +117,66 @@ describe("RbacService", () => {
             expect(prisma.role.create).toHaveBeenCalledWith(
                 expect.objectContaining({data: expect.objectContaining({companyId: null})}),
             );
+        });
+    });
+
+    describe("company activity log (CA-12)", () => {
+        const companyRole = {id: "role-custom", name: "Night shift", isSystem: false, companyId: "company-1", discountLimit: null};
+
+        it("logs a new company role", async () => {
+            const {service, prisma} = build();
+            await service.createRole(companyAdmin, {name: "Night shift", permissionKeys: ["leads.view"]});
+
+            expect(prisma.activity.create.mock.calls[0][0].data).toEqual(expect.objectContaining({
+                companyId: "company-1", userId: "admin-1", type: "ROLE_CREATED", templateKey: "roleCreated",
+                templateParams: {role: "Night shift"},
+                metadata: {roleId: "role-new", permissionKeys: ["leads.view"]},
+            }));
+        });
+
+        it("logs which permissions were added and removed, and nothing when none changed", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue(companyRole);
+            prisma.rolePermission.findMany.mockResolvedValue([
+                {permission: {key: "leads.view"}}, {permission: {key: "leads.delete"}},
+            ]);
+
+            await service.setRolePermissions(companyAdmin, "role-custom", ["leads.view", "leads.create", "deals.view"]);
+
+            expect(prisma.activity.create.mock.calls[0][0].data).toEqual(expect.objectContaining({
+                type: "ROLE_PERMISSIONS_CHANGED", templateKey: "rolePermissionsChanged",
+                templateParams: {role: "Night shift", added: 2, removed: 1},
+                metadata: {roleId: "role-custom", added: ["deals.view", "leads.create"], removed: ["leads.delete"]},
+            }));
+
+            prisma.activity.create.mockClear();
+            prisma.rolePermission.findMany.mockResolvedValue([{permission: {key: "leads.view"}}]);
+            await service.setRolePermissions(companyAdmin, "role-custom", ["leads.view"]);
+            expect(prisma.activity.create).not.toHaveBeenCalled();
+        });
+
+        it("logs renaming, a new discount limit, and deleting", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue(companyRole);
+
+            await service.updateRole(companyAdmin, "role-custom", {name: "Evening shift", discountLimit: 7});
+            expect(prisma.activity.create.mock.calls[0][0].data).toEqual(expect.objectContaining({
+                type: "ROLE_UPDATED",
+                metadata: {roleId: "role-custom", changes: {name: {from: "Night shift", to: "Evening shift"}, discountLimit: {from: null, to: 7}}},
+            }));
+
+            await service.deleteRole(companyAdmin, "role-custom");
+            expect(prisma.activity.create.mock.calls[1][0].data).toEqual(expect.objectContaining({
+                type: "ROLE_DELETED", templateParams: {role: "Night shift"},
+            }));
+        });
+
+        it("leaves global roles out of any company's log", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue({id: "role-sales-head", name: "Sales Head", isSystem: true, companyId: null});
+
+            await service.setRolePermissions(superAdmin, "role-sales-head", ["leads.view"]);
+            expect(prisma.activity.create).not.toHaveBeenCalled();
         });
     });
 

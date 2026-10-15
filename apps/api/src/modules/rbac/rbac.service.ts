@@ -6,7 +6,8 @@ import {
     NotFoundException,
     OnModuleInit,
 } from "@nestjs/common";
-import { AuditAction } from "@/generated/prisma/client";
+import { ActivityAction, ActivityType, AuditAction, Prisma } from "@/generated/prisma/client";
+import { activityText } from "@/modules/activities/activity-templates";
 import { PrismaService } from "@/database/prisma.service";
 import { AuditLogService } from "@/modules/audit-log/audit-log.service";
 import { AuthUser } from "@/common/types/auth-user.type";
@@ -242,6 +243,32 @@ export class RbacService implements OnModuleInit {
         });
     }
 
+    /**
+     * CA-12: role changes also go to the company's activity log, so its
+     * admins can see who changed what (the audit log above is the platform
+     * operator's). Global roles belong to no company and are left out.
+     */
+    private async logRoleActivity(
+        actor: AuthUser,
+        role: { id: string; name: string; companyId: string | null },
+        action: ActivityAction,
+        type: ActivityType,
+        text: ReturnType<typeof activityText>,
+        metadata?: Prisma.InputJsonValue,
+    ) {
+        if (!role.companyId) return;
+        await this.prisma.activity.create({
+            data: {
+                companyId: role.companyId,
+                userId: actor.id,
+                action,
+                type,
+                ...text,
+                metadata: { roleId: role.id, ...(metadata as Record<string, unknown> | undefined) } as Prisma.InputJsonValue,
+            },
+        });
+    }
+
     private async getVisibleRole(actor: AuthUser, roleId: string) {
         const role = await this.prisma.role.findUnique({ where: { id: roleId } });
 
@@ -344,6 +371,9 @@ export class RbacService implements OnModuleInit {
             metadata: { name: role.name, permissionKeys: dto.permissionKeys },
         });
 
+        await this.logRoleActivity(actor, role, ActivityAction.CREATED, ActivityType.ROLE_CREATED,
+            activityText('roleCreated', { role: role.name }), { permissionKeys: dto.permissionKeys });
+
         return role;
     }
 
@@ -370,6 +400,14 @@ export class RbacService implements OnModuleInit {
             metadata: { name: updated.name, changes: {...dto} },
         });
 
+        await this.logRoleActivity(actor, { ...role, name: updated.name }, ActivityAction.UPDATED, ActivityType.ROLE_UPDATED,
+            activityText('roleUpdated', { role: updated.name }), {
+                changes: {
+                    ...(dto.name !== undefined && dto.name.trim() !== role.name ? { name: { from: role.name, to: updated.name } } : {}),
+                    ...(dto.discountLimit !== undefined ? { discountLimit: { from: role.discountLimit?.toString() ?? null, to: dto.discountLimit } } : {}),
+                },
+            });
+
         return updated;
     }
 
@@ -382,6 +420,14 @@ export class RbacService implements OnModuleInit {
             where: { key: { in: permissionKeys } },
             select: { id: true },
         });
+        const before = await this.prisma.rolePermission.findMany({
+            where: { roleId },
+            select: { permission: { select: { key: true } } },
+        });
+        const beforeKeys = new Set(before.map((rp) => rp.permission.key));
+        const afterKeys = new Set(permissionKeys);
+        const added = [...afterKeys].filter((key) => !beforeKeys.has(key)).sort();
+        const removed = [...beforeKeys].filter((key) => !afterKeys.has(key)).sort();
 
         await this.prisma.$transaction([
             this.prisma.rolePermission.deleteMany({ where: { roleId } }),
@@ -399,6 +445,12 @@ export class RbacService implements OnModuleInit {
             companyId: role.companyId ?? undefined,
             metadata: { name: role.name, permissionKeys },
         });
+
+        if (added.length || removed.length) {
+            await this.logRoleActivity(actor, role, ActivityAction.UPDATED, ActivityType.ROLE_PERMISSIONS_CHANGED,
+                activityText('rolePermissionsChanged', { role: role.name, added: added.length, removed: removed.length }),
+                { added, removed });
+        }
 
         return this.getVisibleRole(actor, roleId);
     }
@@ -444,6 +496,9 @@ export class RbacService implements OnModuleInit {
             companyId: role.companyId ?? undefined,
             metadata: { name: role.name },
         });
+
+        await this.logRoleActivity(actor, role, ActivityAction.DELETED, ActivityType.ROLE_DELETED,
+            activityText('roleDeleted', { role: role.name }));
     }
 
     /** Every user in scope for `actor` who currently holds `roleId` — backs the "who has this role" panel. */

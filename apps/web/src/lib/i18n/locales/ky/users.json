@@ -11,7 +11,7 @@
     "inactive": "Активдүү эмес"
   },
   "page": {
-    "rolesHeading": "Ролдор"
+    "title": "Колдонуучулар"
   },
   "roleCard": {
     "totalUsers_one": "Бардыгы {{count}} колдонуучу",
