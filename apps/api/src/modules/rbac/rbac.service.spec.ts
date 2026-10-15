@@ -114,6 +114,48 @@ describe("RbacService", () => {
         });
     });
 
+    describe("platform-only permissions (CA-1)", () => {
+        const platformKeys = ["companies.manage", "audit_log.view", "setting_options.manage"];
+
+        it.each(platformKeys)("refuses %s on a company's new role", async (key) => {
+            const {service, prisma} = build();
+            await expect(service.createRole(companyAdmin, {name: "Probe", permissionKeys: ["dashboard.view", key]}))
+                .rejects.toThrow(ForbiddenException);
+            expect(prisma.role.create).not.toHaveBeenCalled();
+        });
+
+        it("refuses them when setting a company role's permissions", async () => {
+            const {service, prisma} = build();
+            prisma.role.findFirst.mockResolvedValue({id: "role-1", companyId: "company-1", isPlatformRole: false});
+            prisma.role.findUnique.mockResolvedValue({id: "role-1", companyId: "company-1", isPlatformRole: false});
+
+            await expect(service.setRolePermissions(companyAdmin, "role-1", ["leads.view", "companies.manage"]))
+                .rejects.toThrow(ForbiddenException);
+            expect(prisma.rolePermission.deleteMany).not.toHaveBeenCalled();
+        });
+
+        it("refuses them on a global role too, even for the platform operator", async () => {
+            const {service, prisma} = build();
+            await expect(service.createRole(superAdmin, {name: "Ops helper", permissionKeys: ["audit_log.view"]}))
+                .rejects.toThrow(ForbiddenException);
+            expect(prisma.role.create).not.toHaveBeenCalled();
+        });
+
+        it("drops them from a user's permissions even when a role row still has one", async () => {
+            const {service, prisma} = build();
+            prisma.user.findUnique.mockResolvedValue({
+                role: {permissions: platformKeys.concat("leads.view").map((key) => ({permission: {key}}))},
+            });
+            await expect(service.getEffectivePermissions("user-1")).resolves.toEqual(["leads.view"]);
+        });
+
+        it("leaves them out of the permission picker", async () => {
+            const {service, prisma} = build();
+            await service.listPermissions();
+            expect([...prisma.permission.findMany.mock.calls[0][0].where.key.notIn].sort()).toEqual([...platformKeys].sort());
+        });
+    });
+
     describe("global role protection", () => {
         // isSystem is an informational "Built-in" label only — the actual
         // gate is companyId === null (a global role), which only a platform

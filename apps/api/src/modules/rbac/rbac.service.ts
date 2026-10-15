@@ -10,7 +10,7 @@ import { AuditAction } from "@/generated/prisma/client";
 import { PrismaService } from "@/database/prisma.service";
 import { AuditLogService } from "@/modules/audit-log/audit-log.service";
 import { AuthUser } from "@/common/types/auth-user.type";
-import { PERMISSIONS_CATALOG, PERMISSION_KEYS } from "./permissions.catalog";
+import { PERMISSIONS_CATALOG, PERMISSION_KEYS, PLATFORM_ONLY_PERMISSION_KEYS, isPlatformOnlyPermission } from "./permissions.catalog";
 import { DEFAULT_ROLES } from "./default-role-permissions";
 import { CreateRoleDto } from "./dto/create-role.dto";
 import { UpdateRoleDto } from "./dto/update-role.dto";
@@ -98,11 +98,19 @@ export class RbacService implements OnModuleInit {
 
         if (!user) return [];
 
-        return user.role.permissions.map((p) => p.permission.key);
+        // CA-1: never from a role, whatever a row still says. The platform
+        // operator gets them through isSuperAdmin instead.
+        return user.role.permissions
+            .map((p) => p.permission.key)
+            .filter((key) => !isPlatformOnlyPermission(key));
     }
 
+    /** What a role can be given: the catalog without the platform-only keys. */
     listPermissions() {
-        return this.prisma.permission.findMany({ orderBy: [{ module: "asc" }, { action: "asc" }] });
+        return this.prisma.permission.findMany({
+            where: { key: { notIn: [...PLATFORM_ONLY_PERMISSION_KEYS] } },
+            orderBy: [{ module: "asc" }, { action: "asc" }],
+        });
     }
 
     /**
@@ -283,6 +291,13 @@ export class RbacService implements OnModuleInit {
 
         if (invalid.length > 0) {
             throw new BadRequestException(`Unknown permission key(s): ${invalid.join(", ")}`);
+        }
+
+        // CA-1: refused on every role, the operator's own included; the
+        // operator doesn't need them on a role.
+        const platformOnly = permissionKeys.filter(isPlatformOnlyPermission);
+        if (platformOnly.length > 0) {
+            throw new ForbiddenException(`These permissions belong to the platform operator and can't be given to a role: ${platformOnly.join(", ")}`);
         }
     }
 
