@@ -8,12 +8,13 @@ interface UserFormSheetProps {
     open: boolean;
     user: User | null;
     isSubmitting: boolean;
-    hasError: boolean;
+    /** Why the last save failed, shown above the buttons. */
+    formError?: string;
     onClose(): void;
     onSubmit(payload: CreateUserPayload | UpdateUserPayload): void;
 }
 
-export function UserFormSheet({ open, user, isSubmitting, hasError, onClose, onSubmit }: UserFormSheetProps) {
+export function UserFormSheet({ open, user, isSubmitting, formError, onClose, onSubmit }: UserFormSheetProps) {
     const { t } = useTranslation("users");
     const { t: tCommon } = useTranslation("common");
 
@@ -29,7 +30,7 @@ export function UserFormSheet({ open, user, isSubmitting, hasError, onClose, onS
                 <UserForm
                     key={`${user?.id ?? "create-user"}-${open ? "open" : "closed"}`}
                     user={user}
-                    errorMessage={hasError ? t("formSheet.errorMessage") : undefined}
+                    errorMessage={formError}
                     isSubmitting={isSubmitting}
                     submitLabel={user ? tCommon("actions.saveChanges") : t("form.submit.createUser")}
                     onCancel={onClose}

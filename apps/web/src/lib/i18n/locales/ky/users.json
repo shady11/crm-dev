@@ -73,12 +73,18 @@
       "nameMin": "Аты кеминде 2 белгиден турушу керек",
       "invalidEmail": "Email туура эмес",
       "roleRequired": "Ролду тандаңыз",
-      "passwordMin": "Сырсөз кеминде 6 белгиден турушу керек",
       "branchRequired": "Бул ролго филиал талап кылынат",
-      "branchNotAllowed": "Бул ролго филиал дайындоого болбойт"
+      "branchNotAllowed": "Бул ролго филиал дайындоого болбойт",
+      "passwordRule": "Кеминде 8 белги, латын баш жана кичине тамгасы жана сан менен"
     },
     "submit": {
       "createUser": "Колдонуучу түзүү"
+    },
+    "hints": {
+      "password": "Кеминде 8 белги, латын баш жана кичине тамгасы жана сан менен."
+    },
+    "errors": {
+      "emailTaken": "Бул email колдонулуп жатат. Башкасын жазыңыз же ал колдонуучуну тизмеден табыңыз."
     }
   },
   "formSheet": {
@@ -122,12 +128,8 @@
   "toasts": {
     "createSuccessTitle": "Ийгиликтүү түзүлдү",
     "createSuccessDescription": "Жаңы колдонуучу кошулду.",
-    "createErrorTitle": "Колдонуучуну түзүү мүмкүн болбоду",
-    "createErrorDescription": "Дайындарды текшерип, кайра аракет кылыңыз.",
     "updateSuccessTitle": "Ийгиликтүү жаңырды",
     "updateSuccessDescription": "Колдонуучу жаңырды.",
-    "updateErrorTitle": "Колдонуучуну жаңыртуу мүмкүн болбоду",
-    "updateErrorDescription": "Кайра аракет кылыңыз.",
     "deactivateSuccessTitle": "Колдонуучу деактивдештирилди",
     "deactivateSuccessDescription": "Колдонуучунун эми кирүү мүмкүнчүлүгү жок.",
     "deactivateErrorTitle": "Колдонуучуну деактивдештирүү мүмкүн болбоду",

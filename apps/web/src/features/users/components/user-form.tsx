@@ -6,7 +6,8 @@ import {useQuery} from "@tanstack/react-query";
 import {z} from "zod";
 
 import {Button} from "@/components/ui/button.tsx";
-import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field.tsx";
+import {Field, FieldError, FieldGroup, FieldLabel, FieldDescription} from "@/components/ui/field.tsx";
+import {isStrongPassword} from "@/lib/password-policy.ts";
 import {Input} from "@/components/ui/input.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {SheetBody, SheetClose, SheetFooter} from "@/components/ui/sheet.tsx";
@@ -115,7 +116,7 @@ export function UserForm({
         return withBranchRule(
             z.object({
                 ...base,
-                password: z.string().min(6, t("form.validation.passwordMin")),
+                password: z.string().refine(isStrongPassword, t("form.validation.passwordRule")),
             }),
             t,
             branchScopedRoleIds,
@@ -127,11 +128,11 @@ export function UserForm({
         return withBranchRule(
             z.object({
                 ...base,
+                // Blank keeps the current password.
                 password: z
                     .string()
-                    .min(6, t("form.validation.passwordMin"))
-                    .optional()
-                    .or(z.literal("")),
+                    .refine((value) => value === "" || isStrongPassword(value), t("form.validation.passwordRule"))
+                    .optional(),
             }),
             t,
             branchScopedRoleIds,
@@ -168,6 +169,7 @@ export function UserForm({
                 phone: values.phone?.trim() || undefined,
                 roleId: values.roleId,
                 branchId,
+                password: values.password || undefined,
             };
             onSubmit(payload);
             return;
@@ -265,7 +267,9 @@ export function UserForm({
                                     }
                                     aria-label={t("form.fields.password")}
                                 />
-                                <FieldError>{fieldState.error?.message}</FieldError>
+                                {fieldState.error
+                                    ? <FieldError>{fieldState.error.message}</FieldError>
+                                    : <FieldDescription>{t("form.hints.password")}</FieldDescription>}
                             </Field>
                         )}
                     />
