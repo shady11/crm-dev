@@ -73,12 +73,18 @@
       "nameMin": "Имя должно содержать не менее 2 символов",
       "invalidEmail": "Некорректный email",
       "roleRequired": "Выберите роль",
-      "passwordMin": "Пароль должен содержать не менее 6 символов",
       "branchRequired": "Для этой роли требуется филиал",
-      "branchNotAllowed": "Этой роли нельзя назначить филиал"
+      "branchNotAllowed": "Этой роли нельзя назначить филиал",
+      "passwordRule": "Не менее 8 символов, с заглавной и строчной латинской буквой и цифрой"
     },
     "submit": {
       "createUser": "Создать пользователя"
+    },
+    "hints": {
+      "password": "Не менее 8 символов, с заглавной и строчной латинской буквой и цифрой."
+    },
+    "errors": {
+      "emailTaken": "Этот email уже занят. Укажите другой или найдите этого пользователя в списке."
     }
   },
   "formSheet": {
@@ -122,12 +128,8 @@
   "toasts": {
     "createSuccessTitle": "Успешно создано",
     "createSuccessDescription": "Новый пользователь добавлен.",
-    "createErrorTitle": "Не удалось создать пользователя",
-    "createErrorDescription": "Проверьте данные и попробуйте снова.",
     "updateSuccessTitle": "Успешно обновлено",
     "updateSuccessDescription": "Пользователь обновлён.",
-    "updateErrorTitle": "Не удалось обновить пользователя",
-    "updateErrorDescription": "Попробуйте снова.",
     "deactivateSuccessTitle": "Пользователь деактивирован",
     "deactivateSuccessDescription": "У пользователя больше нет доступа.",
     "deactivateErrorTitle": "Не удалось деактивировать пользователя",

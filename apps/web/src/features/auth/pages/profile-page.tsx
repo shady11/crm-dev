@@ -14,6 +14,7 @@ import {Field, FieldError, FieldGroup, FieldLabel} from "@/components/ui/field.t
 import {toast} from "@/components/ui/toast.tsx";
 import {changeOwnPassword, updateOwnProfile, type UpdateOwnProfilePayload} from "@/features/auth/api/auth.api.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {isStrongPassword} from "@/lib/password-policy.ts";
 import {authStorage} from "@/features/auth/utils/auth-storage.ts";
 
 const SECTION_IDS = ["general", "password"] as const;
@@ -135,11 +136,9 @@ function ChangePasswordPanel() {
             z
                 .object({
                     currentPassword: z.string().min(1, t("profile.password.hint")),
-                    // The strength check itself is enforced server-side (see
-                    // ChangePasswordDto) — this is just the client-side length
-                    // floor, to catch an obviously-too-short password before a
-                    // round trip.
-                    newPassword: z.string().min(8, t("profile.password.hint")),
+                    // Same rule as ChangePasswordDto, so a weak password is
+                    // caught here instead of coming back from the API.
+                    newPassword: z.string().refine(isStrongPassword, t("profile.password.hint")),
                     confirmNewPassword: z.string(),
                 })
                 .refine((values) => values.newPassword === values.confirmNewPassword, {

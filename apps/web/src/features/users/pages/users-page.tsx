@@ -82,7 +82,7 @@ export function UsersPage() {
                 open={form.open}
                 user={form.editingUser}
                 isSubmitting={form.isSubmitting}
-                hasError={form.hasError}
+                formError={form.formError}
                 onClose={form.closeForm}
                 onSubmit={form.handleSubmit}
             />

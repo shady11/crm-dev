@@ -73,12 +73,18 @@
       "nameMin": "Name must be at least 2 characters",
       "invalidEmail": "Invalid email",
       "roleRequired": "Select a role",
-      "passwordMin": "Password must be at least 6 characters",
       "branchRequired": "This role requires a branch",
-      "branchNotAllowed": "This role cannot be assigned to a branch"
+      "branchNotAllowed": "This role cannot be assigned to a branch",
+      "passwordRule": "At least 8 characters, with an uppercase letter, a lowercase letter and a number"
     },
     "submit": {
       "createUser": "Create user"
+    },
+    "hints": {
+      "password": "At least 8 characters, with an uppercase letter, a lowercase letter and a number."
+    },
+    "errors": {
+      "emailTaken": "Someone already uses this email. Use a different one, or find that user in the list."
     }
   },
   "formSheet": {
@@ -122,12 +128,8 @@
   "toasts": {
     "createSuccessTitle": "Successfully created",
     "createSuccessDescription": "The new user has been added.",
-    "createErrorTitle": "Failed to create user",
-    "createErrorDescription": "Please check the details and try again.",
     "updateSuccessTitle": "Successfully updated",
     "updateSuccessDescription": "The user has been updated.",
-    "updateErrorTitle": "Failed to update user",
-    "updateErrorDescription": "Please try again.",
     "deactivateSuccessTitle": "User deactivated",
     "deactivateSuccessDescription": "The user no longer has access.",
     "deactivateErrorTitle": "Failed to deactivate user",

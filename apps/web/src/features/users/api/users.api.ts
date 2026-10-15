@@ -80,6 +80,9 @@ export async function createUser(payload: CreateUserPayload) {
 
 export type UpdateUserPayload = Partial<Omit<CreateUserPayload, "password">> & {
     isActive?: boolean;
+    // A new password typed in the edit form. Not part of PATCH /users/:id:
+    // the users hook sends it to PATCH /users/:id/password after the update.
+    password?: string;
 };
 
 export async function updateUser(id: string, payload: UpdateUserPayload) {

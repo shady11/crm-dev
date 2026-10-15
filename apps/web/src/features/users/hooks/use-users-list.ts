@@ -1,5 +1,7 @@
 import {useMemo, useState} from "react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {isAxiosError} from "axios";
+import {apiErrorMessage} from "@/lib/api-error.ts";
 import {toast} from "@/components/ui/toast.tsx";
 import {getRoles} from "@/features/rbac/api/rbac.api.ts";
 import {
@@ -11,6 +13,7 @@ import {
     getUsers,
     transferUserBranch,
     updateUser,
+    updateUserPassword,
     type UpdateUserPayload,
     type UserSortField,
 } from "@/features/users/api/users.api.ts";
@@ -79,16 +82,17 @@ export function useUsersList() {
             });
             closeForm();
         },
-        onError: () => {
-            toast.error({
-                title: t("toasts.createErrorTitle"),
-                description: t("toasts.createErrorDescription"),
-            });
-        },
+        // The form shows why inline (formError below); a toast would cover its buttons.
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, payload }: { id: string; payload: UpdateUserPayload }) => updateUser(id, payload),
+        mutationFn: async ({ id, payload }: { id: string; payload: UpdateUserPayload }) => {
+            const { password, ...details } = payload;
+            const updated = await updateUser(id, details);
+            // A new password goes to its own endpoint; it used to be dropped (CA-6).
+            if (password) await updateUserPassword(id, password);
+            return updated;
+        },
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["users"] });
             toast.success({
@@ -97,13 +101,15 @@ export function useUsersList() {
             });
             closeForm();
         },
-        onError: () => {
-            toast.error({
-                title: t("toasts.updateErrorTitle"),
-                description: t("toasts.updateErrorDescription"),
-            });
-        },
     });
+
+    // CA-6: what the form says when saving fails, instead of a generic line.
+    const formMutationError = createMutation.error ?? updateMutation.error;
+    const formError = !formMutationError
+        ? undefined
+        : isAxiosError(formMutationError) && formMutationError.response?.status === 409
+            ? t("form.errors.emailTaken")
+            : apiErrorMessage(formMutationError) ?? t("formSheet.errorMessage");
 
     const deactivateMutation = useMutation({
         mutationFn: ({ id, reassignToId }: { id: string; reassignToId?: string }) =>
@@ -300,7 +306,7 @@ export function useUsersList() {
             open: formOpen,
             editingUser,
             isSubmitting: createMutation.isPending || updateMutation.isPending,
-            hasError: createMutation.isError || updateMutation.isError,
+            formError,
             openCreateForm,
             openEditForm,
             closeForm,
