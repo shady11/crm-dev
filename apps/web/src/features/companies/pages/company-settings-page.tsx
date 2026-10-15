@@ -1,7 +1,7 @@
 import {useEffect, useState, type ReactNode} from "react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
-import {Building2, CalendarClock} from "lucide-react";
+import {Building2, CalendarClock, ScrollText} from "lucide-react";
 import {SettingsLayout, SettingsSectionHeader} from "@/components/shared/settings-layout.tsx";
 import {useSettingsSection} from "@/components/shared/use-settings-section.ts";
 import {Button} from "@/components/ui/button.tsx";
@@ -47,7 +47,19 @@ function reservationPolicyError(policy: ReservationPolicyForm): "invalid" | "def
     return defaultDays > maxDays ? "defaultExceedsMax" : null;
 }
 
-const SECTION_IDS = ["general", "reservations"] as const;
+// CA-4: the details every contract, reservation agreement and receipt prints.
+type LegalForm = {
+    legalName: string;
+    taxId: string;
+    address: string;
+    phone: string;
+    signatoryName: string;
+    signatoryTitle: string;
+};
+
+const EMPTY_LEGAL: LegalForm = {legalName: "", taxId: "", address: "", phone: "", signatoryName: "", signatoryTitle: ""};
+
+const SECTION_IDS = ["general", "reservations", "legal"] as const;
 
 export function CompanySettingsPage() {
     const {t} = useTranslation("settings");
@@ -58,6 +70,7 @@ export function CompanySettingsPage() {
     const [form, setForm] = useState<UpdateOwnCompanyPayload>(EMPTY);
     const [policy, setPolicy] = useState<ReservationPolicyForm>(EMPTY_POLICY);
     const policyError = reservationPolicyError(policy);
+    const [legal, setLegal] = useState<LegalForm>(EMPTY_LEGAL);
     const [activeSection, selectSection] = useSettingsSection(SECTION_IDS);
 
     useEffect(() => {
@@ -73,6 +86,14 @@ export function CompanySettingsPage() {
             reservationDefaultDays: String(companyQuery.data.reservationDefaultDays ?? ""),
             reservationMaxDays: String(companyQuery.data.reservationMaxDays ?? ""),
             reservationMaxExtensions: String(companyQuery.data.reservationMaxExtensions ?? ""),
+        });
+        setLegal({
+            legalName: companyQuery.data.legalName ?? "",
+            taxId: companyQuery.data.taxId ?? "",
+            address: companyQuery.data.address ?? "",
+            phone: companyQuery.data.phone ?? "",
+            signatoryName: companyQuery.data.signatoryName ?? "",
+            signatoryTitle: companyQuery.data.signatoryTitle ?? "",
         });
     }, [companyQuery.data]);
 
@@ -102,6 +123,9 @@ export function CompanySettingsPage() {
     const setPolicyField = (key: keyof ReservationPolicyForm) => (event: React.ChangeEvent<HTMLInputElement>) =>
         setPolicy((previous) => ({...previous, [key]: event.target.value}));
 
+    const setLegalField = (key: keyof LegalForm) => (event: React.ChangeEvent<HTMLInputElement>) =>
+        setLegal((previous) => ({...previous, [key]: event.target.value}));
+
     const set = (key: keyof UpdateOwnCompanyPayload) => (event: React.ChangeEvent<HTMLInputElement>) =>
         setForm((previous) => ({...previous, [key]: event.target.value}));
 
@@ -124,6 +148,7 @@ export function CompanySettingsPage() {
                 sections={[
                     {id: "general", label: t("page.formTitle"), icon: Building2},
                     {id: "reservations", label: t("reservations.title"), icon: CalendarClock},
+                    {id: "legal", label: t("legal.title"), icon: ScrollText},
                 ]}
                 activeSection={activeSection}
                 onSelect={selectSection}
@@ -224,6 +249,45 @@ export function CompanySettingsPage() {
                         )}
 
                         <Button type="submit" disabled={updateMutation.isPending || !!policyError}>
+                            {updateMutation.isPending ? tCommon("actions.saving") : tCommon("actions.saveChanges")}
+                        </Button>
+                    </form>
+                )}
+                {activeSection === "legal" && (
+                    <form
+                        className="space-y-5"
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            updateMutation.mutate(legal);
+                        }}
+                    >
+                        <SettingsSectionHeader title={t("legal.title")} description={t("legal.description")} />
+
+                        <Field
+                            label={t("legal.legalName")}
+                            placeholder={t("legal.legalNamePlaceholder")}
+                            maxLength={200}
+                            value={legal.legalName}
+                            onChange={setLegalField("legalName")}
+                        />
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <Field label={t("legal.taxId")} maxLength={50} value={legal.taxId} onChange={setLegalField("taxId")} />
+                            <Field label={t("legal.phone")} maxLength={50} value={legal.phone} onChange={setLegalField("phone")} />
+                        </div>
+                        <Field label={t("legal.address")} maxLength={300} value={legal.address} onChange={setLegalField("address")} />
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <Field label={t("legal.signatoryName")} maxLength={200} value={legal.signatoryName} onChange={setLegalField("signatoryName")} />
+                            <Field
+                                label={t("legal.signatoryTitle")}
+                                placeholder={t("legal.signatoryTitlePlaceholder")}
+                                maxLength={200}
+                                value={legal.signatoryTitle}
+                                onChange={setLegalField("signatoryTitle")}
+                            />
+                        </div>
+                        <p className="text-sm text-muted-foreground">{t("legal.hint")}</p>
+
+                        <Button type="submit" disabled={updateMutation.isPending}>
                             {updateMutation.isPending ? tCommon("actions.saving") : tCommon("actions.saveChanges")}
                         </Button>
                     </form>

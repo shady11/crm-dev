@@ -336,5 +336,17 @@
   "moneyHeldBanner": {
     "title": "The client's money is still held: {{amount}}",
     "description": "This deal is closed. Record the refund once the money has been returned to the client."
+  },
+  "legalDetailsBanner": {
+    "title": "Contracts will print with missing company details",
+    "description": "Missing: {{fields}}. Ask your administrator to fill them in under Settings → Legal details.",
+    "descriptionAdmin": "Missing: {{fields}}. Fill them in before generating contracts and receipts.",
+    "action": "Fill in legal details",
+    "fields": {
+      "legalName": "legal name",
+      "taxId": "tax ID",
+      "address": "legal address",
+      "signatoryName": "signatory"
+    }
   }
 }

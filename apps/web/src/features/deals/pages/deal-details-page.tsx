@@ -34,6 +34,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {DealTasksCard} from "@/features/deals/components/deal-tasks-card.tsx";
 import {DealDiscountBanner} from "@/features/deals/components/deal-details/deal-discount-banner.tsx";
 import {DealMoneyHeldBanner} from "@/features/deals/components/deal-details/deal-money-held-banner.tsx";
+import {DealLegalDetailsBanner} from "@/features/deals/components/deal-details/deal-legal-details-banner.tsx";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
 import {useEntityDocuments} from "@/features/documents/hooks/use-entity-documents.ts";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
@@ -395,7 +396,8 @@ export function DealDetailsPage() {
                             />
                         </TabsContent>
 
-                        <TabsContent value="documents">
+                        <TabsContent value="documents" className="space-y-4">
+                            {generateMenu && <DealLegalDetailsBanner />}
                             <EntityDocumentsCard ownerType="DEAL" ownerId={deal.id} headerActions={generateMenu} />
                         </TabsContent>
 

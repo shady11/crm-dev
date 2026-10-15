@@ -35,22 +35,33 @@ export class UpdateOwnCompanyDto {
     @IsOptional()
     @IsString()
     @MaxLength(200)
-    legalName?: string;
+    legalName?: string | null;
 
     @IsOptional()
     @IsString()
     @MaxLength(50)
-    taxId?: string;
+    taxId?: string | null;
+
+    // The legal address and phone printed on documents (CA-4).
+    @IsOptional()
+    @IsString()
+    @MaxLength(300)
+    address?: string | null;
+
+    @IsOptional()
+    @IsString()
+    @MaxLength(50)
+    phone?: string | null;
 
     @IsOptional()
     @IsString()
     @MaxLength(200)
-    signatoryName?: string;
+    signatoryName?: string | null;
 
     @IsOptional()
     @IsString()
     @MaxLength(200)
-    signatoryTitle?: string;
+    signatoryTitle?: string | null;
 
     @IsOptional()
     @IsString()

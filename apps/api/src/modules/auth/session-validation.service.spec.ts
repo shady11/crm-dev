@@ -90,6 +90,12 @@ describe('SessionValidationService.validate', () => {
         });
     });
 
+    it('says which legal details contracts still lack (CA-4)', async () => {
+        const {service} = build(baseUser({company: {...baseUser().company, legalName: 'ОсОО Акме', taxId: null, address: 'Бишкек', signatoryName: ''}}));
+        const result = await service.validate(basePayload());
+        expect(result.company?.missingLegalDetails).toEqual(['taxId', 'signatoryName']);
+    });
+
     it('rejects when the user no longer exists', async () => {
         const {service} = build(null);
         await expect(service.validate(basePayload())).rejects.toThrow(UnauthorizedException);

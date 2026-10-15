@@ -247,6 +247,20 @@ describe("CompaniesService self-service (CA-A1)", () => {
         });
     });
 
+    it("saves the legal details contracts print, trimmed, with a cleared field stored as null (CA-4)", async () => {
+        const {service, update} = build();
+
+        await service.updateOwn(companyAdmin, {
+            legalName: "  ОсОО «Бишкек Девелопмент» ", taxId: "01234567890123", address: "Бишкек, Чуй 123",
+            signatoryName: "Асанов Нурлан", signatoryTitle: "  ", phone: "",
+        });
+
+        expect(update.mock.calls[0][0].data).toMatchObject({
+            legalName: "ОсОО «Бишкек Девелопмент»", taxId: "01234567890123", address: "Бишкек, Чуй 123",
+            signatoryName: "Асанов Нурлан", signatoryTitle: null, phone: null,
+        });
+    });
+
     it("404s rather than leaking existence of a company that is gone", async () => {
         const {service} = build(null);
 

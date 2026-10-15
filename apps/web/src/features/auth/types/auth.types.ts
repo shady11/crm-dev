@@ -4,6 +4,8 @@ export type AuthCompanySummary = {
     currency: string | null;
     locale: string | null;
     timezone: string | null;
+    /** CA-4: required legal details still blank (legalName, taxId, address, signatoryName). */
+    missingLegalDetails?: string[];
 };
 
 export type AuthBranchSummary = {

@@ -1,7 +1,7 @@
 {
   "page": {
     "heading": "Company settings",
-    "description": "Your agency's own name, currency, locale and timezone.",
+    "description": "Your company's name, currency and timezone, reservation rules, and the legal details printed on documents.",
     "formTitle": "General"
   },
   "fields": {
@@ -66,5 +66,18 @@
       "invalid": "Enter whole numbers: terms 1–365 days, extensions 0–20.",
       "defaultExceedsMax": "The default term can't be longer than the maximum term."
     }
+  },
+  "legal": {
+    "title": "Legal details",
+    "description": "What contracts, reservation agreements and receipts print about your company.",
+    "legalName": "Legal name",
+    "legalNamePlaceholder": "e.g. LLC \"Bishkek Development\"",
+    "taxId": "Tax ID (INN)",
+    "phone": "Phone",
+    "address": "Legal address",
+    "signatoryName": "Signatory",
+    "signatoryTitle": "Signatory's position",
+    "signatoryTitlePlaceholder": "e.g. Director",
+    "hint": "Leave the legal name empty to print the company name instead. Changes apply to documents generated from now on."
   }
 }

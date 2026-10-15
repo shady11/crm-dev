@@ -4,6 +4,9 @@ export type AuthCompanySummary = {
     currency: string | null;
     locale: string | null;
     timezone: string | null;
+    // CA-4: required legal details still blank, which contracts would print
+    // as the display name and an empty signature line. See legal-details.ts.
+    missingLegalDetails?: string[];
 };
 
 export type AuthBranchSummary = {
