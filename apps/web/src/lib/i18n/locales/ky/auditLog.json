@@ -28,6 +28,7 @@
       "TENANT_SUSPENDED": "Тенант токтотулду",
       "TENANT_RESUMED": "Тенант кайра иштетилди",
       "TENANT_DELETED": "Тенант өчүрүлдү",
+      "TENANT_RESTORED": "Тенант калыбына келтирилди",
       "TENANT_USER_DEACTIVATED": "Колдонуучу деактивдештирилди",
       "TENANT_USER_REACTIVATED": "Колдонуучу активдештирилди",
       "TENANT_USER_PASSWORD_RESET": "Сырсөз кайра орнотулду",
