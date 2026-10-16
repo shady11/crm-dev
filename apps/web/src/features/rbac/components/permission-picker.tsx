@@ -58,11 +58,9 @@ export function PermissionPicker({
                     className="grid gap-3 px-4 py-3.5 sm:grid-cols-[11rem_minmax(0,1fr)] sm:items-center sm:gap-4"
                 >
                     <span className="text-sm font-medium">{moduleLabel(module)}</span>
-                    {/* Three equal-width buttons per line, aligned right, so they
-                        line up in columns across rows and read like a table.
-                        The gap is a fixed 0.5rem because the button width is
-                        worked out from it. */}
-                    <div className="flex min-w-0 flex-wrap gap-[0.5rem] sm:justify-end">
+                    {/* Compact chips at their own width, aligned right next to
+                        the module column. */}
+                    <div className="flex min-w-0 flex-wrap gap-1.5 sm:justify-end">
                         {modulePermissions.map((permission) => {
                             const isSelected = selected.has(permission.key);
                             const text = permissionText(permission);
@@ -77,14 +75,14 @@ export function PermissionPicker({
                                     aria-pressed={isSelected}
                                     onClick={() => toggle(permission.key)}
                                     className={cn(
-                                        "inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border px-3 py-1.5 text-center text-xs leading-tight font-medium transition-colors sm:shrink-0 sm:grow-0 sm:basis-[calc((100%-1rem)/3-0.5px)]",
+                                        "inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs leading-5 font-medium whitespace-nowrap transition-colors",
                                         "disabled:pointer-events-none disabled:opacity-64",
                                         isSelected
                                             ? "border-primary text-primary bg-primary/5"
                                             : "border-input text-muted-foreground hover:bg-accent",
                                     )}
                                 >
-                                    {isSelected && <Check className="size-3" />}
+                                    {isSelected && <Check className="size-3 shrink-0" />}
                                     {text.label}
                                 </button>
                             );
