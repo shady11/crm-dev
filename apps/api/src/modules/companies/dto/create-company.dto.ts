@@ -1,3 +1,4 @@
+import {Transform} from "class-transformer";
 import {IsEmail, IsOptional, IsString, MaxLength, MinLength} from "class-validator";
 
 export class CreateCompanyDto {
@@ -43,6 +44,9 @@ export class CreateCompanyDto {
     @IsEmail()
     adminEmail!: string;
 
+    // SA-1: blank means "generate one", the same as leaving it out; a form
+    // sends the empty field rather than omitting it.
+    @Transform(({value}: {value: unknown}) => (typeof value === "string" && value.trim() === "" ? undefined : value))
     @IsOptional()
     @IsString()
     @MinLength(8)

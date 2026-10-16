@@ -1,5 +1,7 @@
 import {useEffect, useState, type ReactNode} from "react";
 import {useTranslation} from "react-i18next";
+import {TriangleAlert} from "lucide-react";
+import {Alert, AlertTitle} from "@/components/ui/alert.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Input, type InputProps} from "@/components/ui/input.tsx";
 import {
@@ -33,11 +35,13 @@ type Props = {
     /** null = create. A company = edit; the admin fields are hidden then. */
     company: Company | null;
     isSubmitting: boolean;
+    /** Why the last save failed, shown in the form rather than a toast (SA-4). */
+    formError?: string;
     onOpenChange(open: boolean): void;
     onSubmit(payload: CreateCompanyPayload): void;
 };
 
-export function CompanyFormSheet({open, company, isSubmitting, onOpenChange, onSubmit}: Props) {
+export function CompanyFormSheet({open, company, isSubmitting, formError, onOpenChange, onSubmit}: Props) {
     const {t} = useTranslation("companies");
     const {t: tCommon} = useTranslation("common");
     const [form, setForm] = useState<CreateCompanyPayload>(EMPTY);
@@ -81,10 +85,20 @@ export function CompanyFormSheet({open, company, isSubmitting, onOpenChange, onS
                     className="flex min-h-0 flex-1 flex-col"
                     onSubmit={(event) => {
                         event.preventDefault();
-                        onSubmit(form);
+                        // SA-1: a blank password means "generate one"; send
+                        // nothing rather than an empty string.
+                        const {adminPassword, ...rest} = form;
+                        onSubmit(adminPassword?.trim() ? {...rest, adminPassword} : rest);
                     }}
                 >
                     <SheetBody scrollFade>
+                        {/* At the top, so it is seen without scrolling down to it. */}
+                        {formError ? (
+                            <Alert variant="destructive" className="mt-4">
+                                <TriangleAlert />
+                                <AlertTitle>{formError}</AlertTitle>
+                            </Alert>
+                        ) : null}
                         <FieldGroup className="gap-5 py-4">
                             <Field
                                 label={t("form.fields.name")}
@@ -99,7 +113,7 @@ export function CompanyFormSheet({open, company, isSubmitting, onOpenChange, onS
                                 onChange={set("address")}
                             />
 
-                            <div className="grid grid-cols-3 gap-3">
+                            <div className="grid gap-4">
                                 <SelectField label={t("form.fields.currency")}>
                                     <SettingOptionSelect
                                         type="CURRENCY"
@@ -145,12 +159,15 @@ export function CompanyFormSheet({open, company, isSubmitting, onOpenChange, onS
                                             type="password"
                                             value={form.adminPassword ?? ""}
                                             onChange={set("adminPassword")}
+                                            minLength={8}
+                                            autoComplete="new-password"
                                             hint={t("form.adminPasswordHint")}
                                         />
                                     </div>
                                 </div>
                             )}
                         </FieldGroup>
+
                     </SheetBody>
 
                     <SheetFooter>

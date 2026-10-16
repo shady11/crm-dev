@@ -1,6 +1,7 @@
 import {useState} from "react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "@/components/ui/toast.tsx";
+import {apiErrorMessage} from "@/lib/api-error.ts";
 import {useTranslation} from "react-i18next";
 import {Pencil, Plus, SlidersHorizontal, Trash2} from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
@@ -89,13 +90,17 @@ function OptionsPanel({type}: {type: SettingOptionType}) {
             setEditing(null);
             toast.success({title: editing ? t("toasts.updateSuccess") : t("toasts.createSuccess")});
         },
-        onError: () => toast.error({title: editing ? t("toasts.updateError") : t("toasts.createError")}),
+        onError: (error) =>
+            toast.error({
+                title: editing ? t("toasts.updateError") : t("toasts.createError"),
+                description: apiErrorMessage(error),
+            }),
     });
 
     const toggleActive = useMutation({
         mutationFn: (option: SettingOption) => updateSettingOption(option.id, {isActive: !option.isActive}),
         onSuccess: () => void refresh(),
-        onError: () => toast.error({title: t("toasts.updateError")}),
+        onError: (error) => toast.error({title: t("toasts.updateError"), description: apiErrorMessage(error)}),
     });
 
     const remove = useMutation({
@@ -105,9 +110,10 @@ function OptionsPanel({type}: {type: SettingOptionType}) {
             setPending(null);
             toast.success({title: t("toasts.deleteSuccess")});
         },
-        onError: () => {
+        onError: (error) => {
             setPending(null);
-            toast.error({title: t("toasts.deleteError")});
+            // SA-4: e.g. "in use by a company — deactivate it instead".
+            toast.error({title: t("toasts.deleteError"), description: apiErrorMessage(error)});
         },
     });
 
