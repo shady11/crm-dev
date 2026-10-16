@@ -180,6 +180,14 @@
     "reservationExtendedPastLimit": {
       "title": "{{byName}} {{dealNumber}} бүтүмү боюнча бронду узартты",
       "message": "{{date}} чейин. Себеби: {{reason}}"
+    },
+    "unitPricesImported": {
+      "title": "{{project}} үчүн жаңы баалар импорттолду",
+      "message": "Өзгөргөнү: {{updated}}, импорттогон: {{byName}}"
+    },
+    "unitPricesImportRequested": {
+      "title": "{{project}} үчүн жаңы баалар макулдашууну күтүүдө",
+      "message": "Объект импортунан {{requested}}, жөнөткөн: {{byName}}"
     }
   }
 }

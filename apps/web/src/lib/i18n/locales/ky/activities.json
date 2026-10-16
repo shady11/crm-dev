@@ -140,6 +140,7 @@
     "roleCreated": "«{{role}}» ролу түзүлдү",
     "roleUpdated": "«{{role}}» ролу өзгөртүлдү",
     "rolePermissionsChanged": "«{{role}}» ролунун укуктары өзгөрдү: {{added}} кошулду, {{removed}} алынды",
-    "roleDeleted": "«{{role}}» ролу өчүрүлдү"
+    "roleDeleted": "«{{role}}» ролу өчүрүлдү",
+    "unitsImportedWithPrices": "Импорттолгон объекттер: {{units}}, өзгөргөн баалар: {{prices}}, макулдашууга жөнөтүлдү: {{requested}}"
   }
 }

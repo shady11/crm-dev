@@ -93,6 +93,7 @@ const MATRICES: {name: string; controller: {prototype: object}; expected: Matrix
             update: UNITS_EDIT,
             updateStatus: UNITS_EDIT,
             importUnits: MANAGE,
+            importSample: MANAGE,
             duplicate: MANAGE,
             remove: MANAGE,
             // SH-2: list-price changes. Asking needs units.edit_price (checked

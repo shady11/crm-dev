@@ -7,11 +7,14 @@ import {
     Patch,
     Post,
     Query,
+    Res,
+    StreamableFile,
     UploadedFile,
     UseGuards,
     UseInterceptors,
 } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
+import type { Response } from "express";
 import { JwtAuthGuard } from "@/modules/auth/guards/jwt-auth.guard";
 import { CompanyGuard } from "@/common/guards/company.guard";
 import { PermissionsGuard } from "@/common/guards/permissions.guard";
@@ -73,6 +76,18 @@ export class UnitsController {
     @Post("unit-price-requests/:id/reject")
     rejectPriceRequest(@CurrentUser() user: AuthUser, @Param("id") id: string, @Body() dto: RejectUnitPriceRequestDto) {
         return this.priceRequests.reject(user, id, dto.reason);
+    }
+
+    // CA-7: an example file for the import, headers in the reader's
+    // language. Declared before units/:id so "import-sample" isn't an id.
+    @RequirePermissions("inventory.manage")
+    @Get("units/import-sample")
+    importSample(@Query("lang") lang: string, @Res({ passthrough: true }) res: Response) {
+        res.set({
+            "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            "Content-Disposition": 'attachment; filename="units-import-sample.xlsx"',
+        });
+        return new StreamableFile(this.unitsImportService.buildSample(lang));
     }
 
     @RequirePermissions("inventory.view")
