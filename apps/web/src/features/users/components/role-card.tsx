@@ -27,7 +27,8 @@ export function RoleCard({ roleName, memberCount, memberInitials }: RoleCardProp
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <div className="flex -space-x-2">
+                    {/* A 4px overlap keeps both initials visible on a 24px avatar (CA-11). */}
+                    <div className="flex -space-x-1">
                         {memberInitials.map((initials, i) => (
                             <Avatar key={i} size="sm" className="border-2 border-background">
                                 <AvatarFallback className="text-[10px]">{initials}</AvatarFallback>

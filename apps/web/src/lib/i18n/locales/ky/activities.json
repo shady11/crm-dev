@@ -136,6 +136,10 @@
     "userSessionsRevoked": "«{{name}}» колдонуучусунун сеанстары жабылды",
     "userChangedOwnPassword": "«{{name}}» сырсөзүн алмаштырды",
     "reservationExtendedPastLimit": "Брон лимиттен ашык узартылды",
-    "reservationExtensionRequested": "Сатуу бөлүмүнүн башчысынан бронду узартуу суралды"
+    "reservationExtensionRequested": "Сатуу бөлүмүнүн башчысынан бронду узартуу суралды",
+    "roleCreated": "«{{role}}» ролу түзүлдү",
+    "roleUpdated": "«{{role}}» ролу өзгөртүлдү",
+    "rolePermissionsChanged": "«{{role}}» ролунун укуктары өзгөрдү: {{added}} кошулду, {{removed}} алынды",
+    "roleDeleted": "«{{role}}» ролу өчүрүлдү"
   }
 }

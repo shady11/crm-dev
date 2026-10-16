@@ -136,6 +136,10 @@
     "userSessionsRevoked": "Завершены сеансы пользователя «{{name}}»",
     "userChangedOwnPassword": "«{{name}}» сменил(а) пароль",
     "reservationExtendedPastLimit": "Бронь продлена сверх лимита",
-    "reservationExtensionRequested": "Запрошено продление брони у руководителя отдела продаж"
+    "reservationExtensionRequested": "Запрошено продление брони у руководителя отдела продаж",
+    "roleCreated": "Создана роль «{{role}}»",
+    "roleUpdated": "Изменена роль «{{role}}»",
+    "rolePermissionsChanged": "Изменены права роли «{{role}}»: добавлено {{added}}, убрано {{removed}}",
+    "roleDeleted": "Удалена роль «{{role}}»"
   }
 }

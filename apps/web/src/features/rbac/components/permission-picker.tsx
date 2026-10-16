@@ -1,4 +1,5 @@
 import {useMemo} from "react";
+import {useTranslation} from "react-i18next";
 import {Check} from "lucide-react";
 import {cn} from "@/lib/utils";
 import type {Permission} from "../types/rbac.types";
@@ -7,7 +8,9 @@ import type {Permission} from "../types/rbac.types";
  * One row per module (leads, deals, ...), a pill toggle per permission in
  * that module — mirrors the Read/Write/Delete segmented-button pattern from
  * the design reference, generalized to however many actions a module
- * actually has (not every module is a fixed three).
+ * actually has (not every module is a fixed three). Names and descriptions
+ * come from the reader's language (CA-10), falling back to the API's
+ * English description for a permission this build doesn't know yet.
  */
 export function PermissionPicker({
     permissions,
@@ -20,6 +23,14 @@ export function PermissionPicker({
     onChange: (next: Set<string>) => void;
     disabled?: boolean;
 }) {
+    const {t, i18n} = useTranslation("rbac");
+    const moduleLabel = (module: string) =>
+        t(`catalog.modules.${module}`, {defaultValue: module.replace(/_/g, " ")});
+    const permissionText = (permission: Permission) => ({
+        label: t(`catalog.permissions.${permission.module}.${permission.action}.label`, {defaultValue: permission.action.replace(/_/g, " ")}),
+        description: t(`catalog.permissions.${permission.module}.${permission.action}.description`, {defaultValue: permission.description}),
+    });
+
     const grouped = useMemo(() => {
         const byModule = new Map<string, Permission[]>();
         for (const permission of permissions) {
@@ -27,8 +38,10 @@ export function PermissionPicker({
             list.push(permission);
             byModule.set(permission.module, list);
         }
-        return Array.from(byModule.entries()).sort(([a], [b]) => a.localeCompare(b));
-    }, [permissions]);
+        return Array.from(byModule.entries())
+            .sort(([a], [b]) => moduleLabel(a).localeCompare(moduleLabel(b), i18n.language));
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- moduleLabel follows the language
+    }, [permissions, i18n.language]);
 
     const toggle = (key: string) => {
         const next = new Set(selected);
@@ -42,31 +55,35 @@ export function PermissionPicker({
             {grouped.map(([module, modulePermissions]) => (
                 <div
                     key={module}
-                    className="flex flex-col gap-2.5 p-3 sm:flex-row sm:items-center sm:justify-between"
+                    className="grid gap-3 px-4 py-3.5 sm:grid-cols-[11rem_minmax(0,1fr)] sm:items-center sm:gap-4"
                 >
-                    <span className="text-sm font-medium capitalize">{module.replace(/_/g, " ")}</span>
-                    <div className="flex flex-wrap gap-2">
+                    <span className="text-sm font-medium">{moduleLabel(module)}</span>
+                    {/* Compact chips at their own width, aligned right next to
+                        the module column. */}
+                    <div className="flex min-w-0 flex-wrap gap-1.5 sm:justify-end">
                         {modulePermissions.map((permission) => {
                             const isSelected = selected.has(permission.key);
+                            const text = permissionText(permission);
 
                             return (
                                 <button
                                     key={permission.key}
                                     type="button"
                                     disabled={disabled}
-                                    title={permission.description}
+                                    title={text.description}
+                                    aria-description={text.description}
                                     aria-pressed={isSelected}
                                     onClick={() => toggle(permission.key)}
                                     className={cn(
-                                        "inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium capitalize transition-colors",
+                                        "inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs leading-5 font-medium whitespace-nowrap transition-colors",
                                         "disabled:pointer-events-none disabled:opacity-64",
                                         isSelected
                                             ? "border-primary text-primary bg-primary/5"
                                             : "border-input text-muted-foreground hover:bg-accent",
                                     )}
                                 >
-                                    {isSelected && <Check className="size-3" />}
-                                    {permission.action.replace(/_/g, " ")}
+                                    {isSelected && <Check className="size-3 shrink-0" />}
+                                    {text.label}
                                 </button>
                             );
                         })}

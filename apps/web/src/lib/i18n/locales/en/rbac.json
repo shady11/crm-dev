@@ -73,5 +73,295 @@
     "updateError": "Could not save the role",
     "deleteSuccess": "Role deleted",
     "deleteError": "Could not delete the role"
+  },
+  "catalog": {
+    "modules": {
+      "leads": "Leads",
+      "clients": "Clients",
+      "deals": "Deals",
+      "projects": "Projects",
+      "inventory": "Inventory",
+      "units": "Units",
+      "chessboard": "Chessboard",
+      "tasks": "Tasks",
+      "documents": "Documents",
+      "users": "Users",
+      "branches": "Branches",
+      "activities": "Activity log",
+      "dashboard": "Dashboard",
+      "company_settings": "Company settings",
+      "audit_log": "Login activity",
+      "rbac": "Roles & permissions"
+    },
+    "permissions": {
+      "leads": {
+        "view": {
+          "label": "View",
+          "description": "See leads"
+        },
+        "create": {
+          "label": "Create",
+          "description": "Add new leads"
+        },
+        "edit": {
+          "label": "Edit",
+          "description": "Change leads' details and status"
+        },
+        "delete": {
+          "label": "Delete",
+          "description": "Delete leads"
+        },
+        "assign": {
+          "label": "Reassign",
+          "description": "Give a lead to another manager"
+        },
+        "transfer_branch": {
+          "label": "Move branch",
+          "description": "Move a lead to another branch"
+        }
+      },
+      "clients": {
+        "view": {
+          "label": "View",
+          "description": "See clients"
+        },
+        "create": {
+          "label": "Create",
+          "description": "Add new clients"
+        },
+        "edit": {
+          "label": "Edit",
+          "description": "Change clients' details"
+        },
+        "delete": {
+          "label": "Delete",
+          "description": "Delete clients"
+        },
+        "transfer_branch": {
+          "label": "Move branch",
+          "description": "Move a client to another branch"
+        }
+      },
+      "deals": {
+        "view": {
+          "label": "View",
+          "description": "See deals"
+        },
+        "create": {
+          "label": "Book",
+          "description": "Book a unit, which creates a deal"
+        },
+        "manage": {
+          "label": "Manage",
+          "description": "Extend, sign, activate or complete a deal"
+        },
+        "cancel": {
+          "label": "Cancel",
+          "description": "Cancel a deal"
+        },
+        "reassign": {
+          "label": "Reassign",
+          "description": "Give a deal to another manager"
+        },
+        "extend_beyond_limit": {
+          "label": "Extend past limit",
+          "description": "Extend a reservation past the company's limit, with a reason"
+        },
+        "approve_discount": {
+          "label": "Approve discounts",
+          "description": "Approve or reject a discount above the requester's own limit"
+        },
+        "manage_payments": {
+          "label": "Payments",
+          "description": "Create payment schedules and record payments"
+        },
+        "void_payments": {
+          "label": "Void payments",
+          "description": "Void a mistyped payment, with a reason"
+        }
+      },
+      "projects": {
+        "view": {
+          "label": "View",
+          "description": "See projects"
+        },
+        "create": {
+          "label": "Create",
+          "description": "Add new projects"
+        },
+        "edit": {
+          "label": "Edit",
+          "description": "Change projects' details and status"
+        },
+        "delete": {
+          "label": "Delete",
+          "description": "Delete projects"
+        }
+      },
+      "inventory": {
+        "view": {
+          "label": "View",
+          "description": "See blocks, entrances, floors and units"
+        },
+        "manage": {
+          "label": "Manage",
+          "description": "Create, edit, delete and import blocks, entrances, floors and units"
+        }
+      },
+      "units": {
+        "edit": {
+          "label": "Edit",
+          "description": "Change a unit's details and status"
+        },
+        "edit_price": {
+          "label": "Change price",
+          "description": "Change a unit's list price; it needs approval without \"Approve prices\""
+        },
+        "approve_price": {
+          "label": "Approve prices",
+          "description": "Approve or reject price changes, and change prices without approval"
+        }
+      },
+      "chessboard": {
+        "view": {
+          "label": "View",
+          "description": "See which units are free on the chessboard"
+        }
+      },
+      "tasks": {
+        "view": {
+          "label": "View",
+          "description": "See tasks"
+        },
+        "create": {
+          "label": "Create",
+          "description": "Create tasks for anyone"
+        },
+        "create_own": {
+          "label": "Create own",
+          "description": "Create tasks for yourself"
+        },
+        "edit": {
+          "label": "Edit",
+          "description": "Edit any task and its status"
+        },
+        "change_status": {
+          "label": "Change status",
+          "description": "Move your own tasks between statuses"
+        },
+        "delete": {
+          "label": "Delete",
+          "description": "Delete tasks"
+        }
+      },
+      "documents": {
+        "view": {
+          "label": "View",
+          "description": "See and download documents"
+        },
+        "upload": {
+          "label": "Upload",
+          "description": "Upload a document"
+        },
+        "delete": {
+          "label": "Delete",
+          "description": "Delete documents"
+        },
+        "generate": {
+          "label": "Generate",
+          "description": "Generate a contract or agreement for a deal"
+        },
+        "manage_templates": {
+          "label": "Templates",
+          "description": "View and edit document templates"
+        }
+      },
+      "users": {
+        "view": {
+          "label": "View",
+          "description": "See users"
+        },
+        "create": {
+          "label": "Create",
+          "description": "Add users"
+        },
+        "edit": {
+          "label": "Edit",
+          "description": "Edit, deactivate or move users to another branch"
+        },
+        "delete": {
+          "label": "Delete",
+          "description": "Deactivate or remove users"
+        }
+      },
+      "branches": {
+        "view": {
+          "label": "View",
+          "description": "See branches"
+        },
+        "create": {
+          "label": "Create",
+          "description": "Open new branches"
+        },
+        "edit": {
+          "label": "Edit",
+          "description": "Edit, deactivate or reactivate branches"
+        }
+      },
+      "activities": {
+        "view": {
+          "label": "View all",
+          "description": "See the company's activity log"
+        },
+        "view_own": {
+          "label": "Own",
+          "description": "See your own actions"
+        }
+      },
+      "dashboard": {
+        "view": {
+          "label": "View",
+          "description": "See the dashboard"
+        },
+        "branch_comparison": {
+          "label": "Branch comparison",
+          "description": "Compare branches' results"
+        },
+        "team_snapshot": {
+          "label": "Team snapshot",
+          "description": "See a Sales Head's team summary"
+        },
+        "my_performance": {
+          "label": "My performance",
+          "description": "See a manager's own results"
+        },
+        "finance_overview": {
+          "label": "Finance overview",
+          "description": "See collections and cash flow"
+        }
+      },
+      "company_settings": {
+        "view": {
+          "label": "View",
+          "description": "See the company's settings"
+        },
+        "edit": {
+          "label": "Edit",
+          "description": "Change the company's settings and legal details"
+        }
+      },
+      "audit_log": {
+        "view_own": {
+          "label": "View",
+          "description": "See this company's sign-ins"
+        }
+      },
+      "rbac": {
+        "manage": {
+          "label": "Manage",
+          "description": "Create and edit roles and their permissions"
+        }
+      }
+    }
   }
 }

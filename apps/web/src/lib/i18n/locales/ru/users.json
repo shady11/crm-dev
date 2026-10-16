@@ -11,7 +11,7 @@
     "inactive": "Неактивен"
   },
   "page": {
-    "rolesHeading": "Роли"
+    "title": "Пользователи"
   },
   "roleCard": {
     "totalUsers_one": "Всего {{count}} пользователь",
