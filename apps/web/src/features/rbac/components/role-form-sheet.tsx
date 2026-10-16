@@ -13,6 +13,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog.tsx";
 import {FieldGroup} from "@/components/ui/field.tsx";
+import {Switch} from "@/components/ui/switch.tsx";
 import {PermissionPicker} from "./permission-picker";
 import type {Permission, Role} from "../types/rbac.types";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
@@ -23,6 +24,8 @@ export type RoleFormValues = {
     permissionKeys: string[];
     /** Own discretionary discount ceiling, in percent. null = unlimited. */
     discountLimit: number | null;
+    /** CA-3: limited to the holder's own branch. */
+    isBranchScoped: boolean;
 };
 
 type Props = {
@@ -33,9 +36,12 @@ type Props = {
     isSubmitting: boolean;
     onOpenChange(open: boolean): void;
     onSubmit(values: RoleFormValues): void;
+    /** CA-2: shown on a role the viewer can't edit, to make an editable copy. */
+    onCopy?(role: Role): void;
+    isCopying?: boolean;
 };
 
-export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChange, onSubmit}: Props) {
+export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChange, onSubmit, onCopy, isCopying}: Props) {
     const {t} = useTranslation("rbac");
     const {t: tCommon} = useTranslation("common");
     const {user} = useAuth();
@@ -43,6 +49,7 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
     const [description, setDescription] = useState("");
     const [selected, setSelected] = useState<Set<string>>(new Set());
     const [discountLimit, setDiscountLimit] = useState("");
+    const [isBranchScoped, setIsBranchScoped] = useState(false);
 
     useEffect(() => {
         if (!open) return;
@@ -50,7 +57,11 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
         setDescription(role?.description ?? "");
         setSelected(new Set(role?.permissionKeys ?? []));
         setDiscountLimit(role?.discountLimit === null || role?.discountLimit === undefined ? "" : String(role.discountLimit));
+        setIsBranchScoped(role?.isBranchScoped ?? false);
     }, [open, role]);
+
+    // The API refuses to change the scope while anyone holds the role.
+    const scopeLocked = role !== null && role.userCount > 0;
 
     const isEdit = role !== null;
     // A global role (companyId null — every built-in role, plus any a
@@ -80,6 +91,7 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
                             description,
                             permissionKeys: Array.from(selected),
                             discountLimit: discountLimit.trim() === "" ? null : Number(discountLimit),
+                            isBranchScoped,
                         });
                     }}
                 >
@@ -121,15 +133,34 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
                                         {t("form.hints.discountLimit")}
                                     </span>
                                 </label>
+
+                                <div className="flex items-start gap-3">
+                                    <Switch
+                                        className="mt-0.5"
+                                        checked={isBranchScoped}
+                                        disabled={scopeLocked}
+                                        onCheckedChange={({checked}) => setIsBranchScoped(checked)}
+                                        aria-label={t("form.fields.branchScoped")}
+                                    />
+                                    <div className="space-y-0.5">
+                                        <span className="text-sm font-medium">{t("form.fields.branchScoped")}</span>
+                                        <p className="text-muted-foreground text-xs">
+                                            {scopeLocked ? t("form.hints.branchScopedLocked") : t("form.hints.branchScoped")}
+                                        </p>
+                                    </div>
+                                </div>
                             </FieldGroup>
                         )}
 
                         {readOnly && (
-                            <p className="text-muted-foreground text-sm">
-                                {role?.discountLimit === null
-                                    ? t("form.hints.discountLimitReadOnlyUnlimited")
-                                    : t("form.hints.discountLimitReadOnly", {limit: role?.discountLimit})}
-                            </p>
+                            <div className="text-muted-foreground space-y-1 text-sm">
+                                <p>
+                                    {role?.discountLimit === null
+                                        ? t("form.hints.discountLimitReadOnlyUnlimited")
+                                        : t("form.hints.discountLimitReadOnly", {limit: role?.discountLimit})}
+                                </p>
+                                <p>{role?.isBranchScoped ? t("form.hints.branchScopedReadOnly") : t("form.hints.companyWideReadOnly")}</p>
+                            </div>
                         )}
 
                         <div className="space-y-2">
@@ -147,6 +178,11 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
                         <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
                             {readOnly ? tCommon("actions.close") : tCommon("actions.cancel")}
                         </Button>
+                        {readOnly && role && onCopy && (
+                            <Button type="button" disabled={isCopying} isLoading={isCopying} onClick={() => onCopy(role)}>
+                                {t("form.copy")}
+                            </Button>
+                        )}
                         {!readOnly && (
                             <Button type="submit" disabled={isSubmitting}>
                                 {isSubmitting

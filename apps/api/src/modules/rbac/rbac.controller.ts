@@ -7,6 +7,7 @@ import { AuthUser } from "@/common/types/auth-user.type";
 import { RbacService } from "./rbac.service";
 import { CreateRoleDto } from "./dto/create-role.dto";
 import { UpdateRoleDto } from "./dto/update-role.dto";
+import { CopyRoleDto } from "./dto/copy-role.dto";
 import { SetRolePermissionsDto } from "./dto/set-role-permissions.dto";
 
 /**
@@ -35,6 +36,13 @@ export class RbacController {
     @Post("roles")
     createRole(@CurrentUser() actor: AuthUser, @Body() dto: CreateRoleDto) {
         return this.rbacService.createRole(actor, dto);
+    }
+
+    // CA-2: an editable company copy of any visible role, built-in ones
+    // included, which a company admin can't change directly.
+    @Post("roles/:id/copy")
+    copyRole(@CurrentUser() actor: AuthUser, @Param("id") id: string, @Body() dto: CopyRoleDto) {
+        return this.rbacService.copyRole(actor, id, dto);
     }
 
     @Patch("roles/:id")

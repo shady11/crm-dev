@@ -120,6 +120,89 @@ describe("RbacService", () => {
         });
     });
 
+    describe("copying roles (CA-2) and branch scope (CA-3)", () => {
+        const salesManager = {
+            id: "role-sales-manager", name: "Sales Manager", description: "Works own leads and deals", isSystem: true,
+            isBranchScoped: true, discountLimit: {toString: () => "5", valueOf: () => 5}, isPlatformRole: false, companyId: null,
+        };
+
+        it("copies a built-in role into the company with its permissions, limit and branch scope, platform-only grants dropped", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue({...salesManager, discountLimit: 5});
+            prisma.rolePermission.findMany.mockResolvedValue([
+                {permission: {key: "leads.view"}}, {permission: {key: "deals.create"}}, {permission: {key: "companies.manage"}},
+            ]);
+            prisma.permission.findMany.mockResolvedValue([{id: "p1"}, {id: "p2"}]);
+
+            await service.copyRole(companyAdmin, "role-sales-manager", {});
+
+            expect(prisma.role.create.mock.calls[0][0].data).toEqual(expect.objectContaining({
+                name: "Sales Manager (copy)", description: "Works own leads and deals", isSystem: false,
+                isBranchScoped: true, discountLimit: 5, companyId: "company-1",
+            }));
+            expect(prisma.permission.findMany.mock.calls[0][0].where).toEqual({key: {in: ["leads.view", "deals.create"]}});
+            expect(prisma.activity.create.mock.calls[0][0].data.metadata).toEqual(expect.objectContaining({
+                copiedFrom: {roleId: "role-sales-manager", name: "Sales Manager"},
+            }));
+        });
+
+        it("picks the next free copy name, or the one given", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue({...salesManager, discountLimit: null});
+            prisma.role.findMany.mockResolvedValue([{name: "Sales Manager (copy)"}, {name: "Sales Manager (copy 2)"}]);
+
+            await service.copyRole(companyAdmin, "role-sales-manager", {});
+            expect(prisma.role.create.mock.calls[0][0].data.name).toBe("Sales Manager (copy 3)");
+
+            await service.copyRole(companyAdmin, "role-sales-manager", {name: "  Senior manager "});
+            expect(prisma.role.create.mock.calls[1][0].data.name).toBe("Senior manager");
+        });
+
+        it("won't copy the platform operator's role", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue({...salesManager, isPlatformRole: true});
+            await expect(service.copyRole({...companyAdmin, isSuperAdmin: true}, "role-super-admin", {})).rejects.toThrow(ForbiddenException);
+            expect(prisma.role.create).not.toHaveBeenCalled();
+        });
+
+        it("refuses a name another role in the company already has", async () => {
+            const {service, prisma} = build();
+            prisma.role.findFirst.mockResolvedValue({id: "role-other"});
+            await expect(service.createRole(companyAdmin, {name: "Night shift", permissionKeys: []})).rejects.toThrow(ConflictException);
+            expect(prisma.role.create).not.toHaveBeenCalled();
+        });
+
+        it("creates a branch-limited role when asked", async () => {
+            const {service, prisma} = build();
+            await service.createRole(companyAdmin, {name: "Junior manager", permissionKeys: [], isBranchScoped: true});
+            expect(prisma.role.create.mock.calls[0][0].data.isBranchScoped).toBe(true);
+        });
+
+        it("changes the branch scope only while nobody holds the role", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue({id: "role-custom", name: "Night shift", isSystem: false, isBranchScoped: false, companyId: "company-1", discountLimit: null});
+
+            prisma.user.count.mockResolvedValue(2);
+            await expect(service.updateRole(companyAdmin, "role-custom", {isBranchScoped: true})).rejects.toThrow(ConflictException);
+            expect(prisma.role.update).not.toHaveBeenCalled();
+
+            prisma.user.count.mockResolvedValue(0);
+            await service.updateRole(companyAdmin, "role-custom", {isBranchScoped: true});
+            expect(prisma.role.update.mock.calls[0][0].data).toEqual({isBranchScoped: true});
+            expect(prisma.user.count.mock.calls[0][0]).toEqual({where: {roleId: "role-custom", deletedAt: null}});
+        });
+
+        it("doesn't count holders when the scope stays the same", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue({id: "role-custom", name: "Night shift", isSystem: false, isBranchScoped: true, companyId: "company-1", discountLimit: null});
+            prisma.user.count.mockResolvedValue(3);
+
+            await service.updateRole(companyAdmin, "role-custom", {isBranchScoped: true, discountLimit: 4});
+            expect(prisma.user.count).not.toHaveBeenCalled();
+            expect(prisma.role.update.mock.calls[0][0].data).toEqual({discountLimit: 4});
+        });
+    });
+
     describe("company activity log (CA-12)", () => {
         const companyRole = {id: "role-custom", name: "Night shift", isSystem: false, companyId: "company-1", discountLimit: null};
 

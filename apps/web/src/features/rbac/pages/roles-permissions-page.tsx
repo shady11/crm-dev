@@ -5,6 +5,7 @@ import {useTranslation} from "react-i18next";
 import {Plus} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
+import {apiErrorMessage} from "@/lib/api-error.ts";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -16,6 +17,7 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog.tsx";
 import {
+    copyRole,
     createRole,
     deleteRole,
     getPermissions,
@@ -51,12 +53,14 @@ export function RolesPermissionsPage() {
                 if (
                     values.name !== editing.name ||
                     values.description !== (editing.description ?? "") ||
-                    values.discountLimit !== editing.discountLimit
+                    values.discountLimit !== editing.discountLimit ||
+                    values.isBranchScoped !== editing.isBranchScoped
                 ) {
                     await updateRole(editing.id, {
                         name: values.name,
                         description: values.description,
                         discountLimit: values.discountLimit,
+                        ...(values.isBranchScoped !== editing.isBranchScoped ? {isBranchScoped: values.isBranchScoped} : {}),
                     });
                 }
                 return setRolePermissions(editing.id, values.permissionKeys);
@@ -67,6 +71,7 @@ export function RolesPermissionsPage() {
                 description: values.description || undefined,
                 permissionKeys: values.permissionKeys,
                 discountLimit: values.discountLimit,
+                isBranchScoped: values.isBranchScoped,
             });
         },
         onSuccess: () => {
@@ -75,7 +80,22 @@ export function RolesPermissionsPage() {
             setEditing(null);
             toast.success({title: editing ? t("toasts.updateSuccess") : t("toasts.createSuccess")});
         },
-        onError: () => toast.error({title: editing ? t("toasts.updateError") : t("toasts.createError")}),
+        onError: (error) => toast.error({
+            title: editing ? t("toasts.updateError") : t("toasts.createError"),
+            description: apiErrorMessage(error),
+        }),
+    });
+
+    // CA-2: copy, then open the copy in the editor so it can be adjusted.
+    const copy = useMutation({
+        mutationFn: (role: Role) => copyRole(role.id),
+        onSuccess: async (created) => {
+            const roles = await queryClient.fetchQuery({queryKey: ["rbac", "roles"], queryFn: getRoles});
+            toast.success({title: t("toasts.copySuccess", {name: created.name})});
+            setEditing(roles.find((role) => role.id === created.id) ?? null);
+            setFormOpen(true);
+        },
+        onError: (error) => toast.error({title: t("toasts.copyError"), description: apiErrorMessage(error)}),
     });
 
     const remove = useMutation({
@@ -130,6 +150,7 @@ export function RolesPermissionsPage() {
                                 setFormOpen(true);
                             }}
                             onDelete={() => setPending({action: "delete", role})}
+                            onCopy={() => copy.mutate(role)}
                         />
                     ))}
                 </div>
@@ -145,6 +166,8 @@ export function RolesPermissionsPage() {
                     if (!open) setEditing(null);
                 }}
                 onSubmit={(values) => save.mutate(values)}
+                onCopy={(role) => copy.mutate(role)}
+                isCopying={copy.isPending}
             />
 
             <RoleUsersDialog role={usersDialogRole} onOpenChange={(open) => !open && setUsersDialogRole(null)} />

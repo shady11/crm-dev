@@ -15,6 +15,7 @@ import { PERMISSIONS_CATALOG, PERMISSION_KEYS, PLATFORM_ONLY_PERMISSION_KEYS, is
 import { DEFAULT_ROLES } from "./default-role-permissions";
 import { CreateRoleDto } from "./dto/create-role.dto";
 import { UpdateRoleDto } from "./dto/update-role.dto";
+import { CopyRoleDto } from "./dto/copy-role.dto";
 
 @Injectable()
 export class RbacService implements OnModuleInit {
@@ -333,7 +334,7 @@ export class RbacService implements OnModuleInit {
      * creates a global role, offered to every tenant alongside the
      * built-in ones — the platform-level "add a new role" path.
      */
-    async createRole(actor: AuthUser, dto: CreateRoleDto) {
+    async createRole(actor: AuthUser, dto: CreateRoleDto, copiedFrom?: { id: string; name: string }) {
         this.assertPermissionKeysExist(dto.permissionKeys);
 
         const companyId = actor.isSuperAdmin ? null : actor.companyId;
@@ -341,6 +342,8 @@ export class RbacService implements OnModuleInit {
         if (companyId === undefined) {
             throw new ForbiddenException("Actor has no company to scope this role to");
         }
+
+        await this.assertRoleNameFree(companyId, dto.name.trim());
 
         const permissions = await this.prisma.permission.findMany({
             where: { key: { in: dto.permissionKeys } },
@@ -352,6 +355,7 @@ export class RbacService implements OnModuleInit {
                 name: dto.name.trim(),
                 description: dto.description?.trim() || null,
                 isSystem: false,
+                isBranchScoped: dto.isBranchScoped ?? false,
                 discountLimit: dto.discountLimit ?? null,
                 companyId,
                 permissions: {
@@ -368,18 +372,94 @@ export class RbacService implements OnModuleInit {
             targetType: "Role",
             targetId: role.id,
             companyId: role.companyId ?? undefined,
-            metadata: { name: role.name, permissionKeys: dto.permissionKeys },
+            metadata: { name: role.name, permissionKeys: dto.permissionKeys, ...(copiedFrom ? { copiedFromRoleId: copiedFrom.id } : {}) },
         });
 
         await this.logRoleActivity(actor, role, ActivityAction.CREATED, ActivityType.ROLE_CREATED,
-            activityText('roleCreated', { role: role.name }), { permissionKeys: dto.permissionKeys });
+            activityText('roleCreated', { role: role.name }), {
+                permissionKeys: dto.permissionKeys,
+                ...(copiedFrom ? { copiedFrom: { roleId: copiedFrom.id, name: copiedFrom.name } } : {}),
+            });
 
         return role;
+    }
+
+    /**
+     * CA-2: built-in roles are shared by every company and only the platform
+     * operator can change them, so a company adapts one by copying it: same
+     * permissions, discount limit and branch scope, as an editable role of
+     * its own. Any visible role can be copied, a company role included.
+     */
+    async copyRole(actor: AuthUser, roleId: string, dto: CopyRoleDto) {
+        const source = await this.getVisibleRole(actor, roleId);
+        if (source.isPlatformRole) {
+            throw new ForbiddenException("The platform operator's role can't be copied");
+        }
+
+        const grants = await this.prisma.rolePermission.findMany({
+            where: { roleId },
+            select: { permission: { select: { key: true } } },
+        });
+        // A platform-only grant on an old role row is dropped, never copied (CA-1).
+        const permissionKeys = grants.map((g) => g.permission.key).filter((key) => !isPlatformOnlyPermission(key));
+
+        const companyId = actor.isSuperAdmin ? null : actor.companyId ?? null;
+        const name = dto.name?.trim() || (await this.freeCopyName(companyId, source.name));
+
+        return this.createRole(actor, {
+            name,
+            description: source.description ?? undefined,
+            permissionKeys,
+            discountLimit: source.discountLimit === null ? null : Number(source.discountLimit),
+            isBranchScoped: source.isBranchScoped,
+        }, { id: source.id, name: source.name });
+    }
+
+    /** "Sales Manager (copy)", then "(copy 2)", "(copy 3)"… whichever is free. */
+    private async freeCopyName(companyId: string | null, sourceName: string) {
+        const taken = new Set(
+            (await this.prisma.role.findMany({
+                where: { companyId, name: { startsWith: `${sourceName} (copy` } },
+                select: { name: true },
+            })).map((r) => r.name),
+        );
+        for (let n = 1; ; n++) {
+            const candidate = n === 1 ? `${sourceName} (copy)` : `${sourceName} (copy ${n})`;
+            if (!taken.has(candidate)) return candidate;
+        }
+    }
+
+    /** Role names are unique within a company (see the Role model); say so plainly. */
+    private async assertRoleNameFree(companyId: string | null, name: string, exceptRoleId?: string) {
+        const clash = await this.prisma.role.findFirst({
+            where: { companyId, name, ...(exceptRoleId ? { id: { not: exceptRoleId } } : {}) },
+            select: { id: true },
+        });
+        if (clash) {
+            throw new ConflictException(`A role named "${name}" already exists`);
+        }
     }
 
     async updateRole(actor: AuthUser, roleId: string, dto: UpdateRoleDto) {
         const role = await this.getVisibleRole(actor, roleId);
         this.assertCanManageRole(actor, role);
+
+        if (dto.name !== undefined && dto.name.trim() !== role.name) {
+            await this.assertRoleNameFree(role.companyId, dto.name.trim(), roleId);
+        }
+
+        // CA-3: a branch-scoped role needs every holder on a branch, and a
+        // company-wide one needs none on a branch, so the scope can only
+        // change while nobody holds the role.
+        const scopeChanged = dto.isBranchScoped !== undefined && dto.isBranchScoped !== role.isBranchScoped;
+        if (scopeChanged) {
+            const holders = await this.prisma.user.count({ where: { roleId, deletedAt: null } });
+            if (holders > 0) {
+                throw new ConflictException(
+                    "Move this role's users to another role before changing whether it is limited to a branch",
+                );
+            }
+        }
 
         const updated = await this.prisma.role.update({
             where: { id: roleId },
@@ -387,6 +467,7 @@ export class RbacService implements OnModuleInit {
                 ...(dto.name !== undefined ? { name: dto.name.trim() } : {}),
                 ...(dto.description !== undefined ? { description: dto.description.trim() || null } : {}),
                 ...(dto.discountLimit !== undefined ? { discountLimit: dto.discountLimit } : {}),
+                ...(scopeChanged ? { isBranchScoped: dto.isBranchScoped } : {}),
             },
         });
 
@@ -405,6 +486,7 @@ export class RbacService implements OnModuleInit {
                 changes: {
                     ...(dto.name !== undefined && dto.name.trim() !== role.name ? { name: { from: role.name, to: updated.name } } : {}),
                     ...(dto.discountLimit !== undefined ? { discountLimit: { from: role.discountLimit?.toString() ?? null, to: dto.discountLimit } } : {}),
+                    ...(scopeChanged ? { isBranchScoped: { from: role.isBranchScoped, to: dto.isBranchScoped } } : {}),
                 },
             });
 
