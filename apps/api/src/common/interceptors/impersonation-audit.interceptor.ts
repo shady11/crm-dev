@@ -1,5 +1,6 @@
 import {CallHandler, ExecutionContext, Injectable, NestInterceptor} from "@nestjs/common";
 import {Observable, tap} from "rxjs";
+import type {Request} from "express";
 import {AuditAction} from "@/generated/prisma/client";
 import {AuditLogService} from "@/modules/audit-log/audit-log.service";
 import {AuthUser} from "@/common/types/auth-user.type";
@@ -30,15 +31,15 @@ export class ImpersonationAuditInterceptor implements NestInterceptor {
     constructor(private readonly auditLog: AuditLogService) {}
 
     intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
-        const request = context.switchToHttp().getRequest();
-        const user = request.user as AuthUser | undefined;
+        const request = context.switchToHttp().getRequest<Request & {user?: AuthUser}>();
+        const user = request.user;
 
         if (!user?.impersonation) {
             return next.handle();
         }
 
         const impersonation = user.impersonation;
-        const path: string = request.path;
+        const path = request.path;
         const audited = MUTATING_METHODS.has(request.method) && !EXCLUDED_PATH_SUFFIXES.some((suffix) => path.endsWith(suffix));
 
         // The handler runs when the observable is subscribed to, so subscribing
