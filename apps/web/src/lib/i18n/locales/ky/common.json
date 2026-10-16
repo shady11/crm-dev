@@ -81,7 +81,8 @@
     "myActivity": "Менин аракеттерим",
     "myTeam": "Менин командам",
     "payments": "Төлөмдөр",
-    "priceChanges": "Баа өзгөрүүлөрү"
+    "priceChanges": "Баа өзгөрүүлөрү",
+    "documentTemplates": "Документ шаблондору"
   },
   "language": {
     "switchLabel": "Тил",

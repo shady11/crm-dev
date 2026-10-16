@@ -11,6 +11,7 @@ import {LeadsPage} from "@/features/leads";
 import {dealsRoutes} from "@/features/deals/deals.routes.tsx";
 import {paymentsRoutes} from "@/features/payments/payments.routes.tsx";
 import {priceChangesRoutes} from "@/features/units/price-changes.routes.tsx";
+import {documentTemplatesRoutes} from "@/features/document-templates/document-templates.routes.tsx";
 import {tasksRoutes} from "@/features/tasks/tasks.routes.tsx";
 import {clientsRoutes} from "@/features/clients/clients.routes.tsx";
 import {DashboardPage} from "@/features/dashboard/pages/dashboard-page.tsx";
@@ -67,6 +68,7 @@ export const router = createBrowserRouter([
                     dealsRoutes,
                     paymentsRoutes,
                     priceChangesRoutes,
+                    documentTemplatesRoutes,
                     usersRoutes,
                     rbacRoutes,
                     branchesRoutes,

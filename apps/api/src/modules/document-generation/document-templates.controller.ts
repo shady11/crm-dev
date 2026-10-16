@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseEnumPipe,
+  Post,
   Put,
   UseGuards,
 } from '@nestjs/common';
@@ -18,6 +19,7 @@ import { DocumentType } from '@/generated/prisma/client';
 
 import { DocumentTemplatesService } from './document-templates.service';
 import { UpsertDocumentTemplateDto } from './dto/upsert-document-template.dto';
+import { PreviewDocumentTemplateDto } from './dto/preview-document-template.dto';
 
 @UseGuards(JwtAuthGuard, CompanyGuard, PermissionsGuard)
 @RequirePermissions('documents.manage_templates')
@@ -28,6 +30,32 @@ export class DocumentTemplatesController {
   @Get()
   findAll(@CurrentUser() user: AuthUser) {
     return this.templatesService.findAll(user);
+  }
+
+  // CA-5: the editor page's data for one type. Declared before ':type' so
+  // "editor" isn't read as a document type.
+  @Get('editor/:type')
+  editor(
+    @CurrentUser() user: AuthUser,
+    @Param('type', new ParseEnumPipe(DocumentType)) type: DocumentType,
+  ) {
+    return this.templatesService.editor(user, type);
+  }
+
+  @Post('preview')
+  preview(
+    @CurrentUser() user: AuthUser,
+    @Body() dto: PreviewDocumentTemplateDto,
+  ) {
+    return this.templatesService.preview(user, dto.type, dto.bodyHtml);
+  }
+
+  @Post(':type/reset')
+  reset(
+    @CurrentUser() user: AuthUser,
+    @Param('type', new ParseEnumPipe(DocumentType)) type: DocumentType,
+  ) {
+    return this.templatesService.resetToDefault(user, type);
   }
 
   @Get(':type')

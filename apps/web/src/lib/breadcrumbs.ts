@@ -16,6 +16,7 @@ const ROUTE_LABEL_KEYS: Record<string, string> = {
     deals: "nav.deals",
     payments: "nav.payments",
     "price-changes": "nav.priceChanges",
+    "document-templates": "nav.documentTemplates",
     tasks: "nav.tasks",
     users: "nav.users",
     companies: "nav.companies",
