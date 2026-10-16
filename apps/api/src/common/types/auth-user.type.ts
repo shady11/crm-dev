@@ -20,6 +20,8 @@ export type AuthImpersonationSummary = {
     superAdminId: string;
     superAdminEmail: string;
     superAdminName: string;
+    /** When the session ends on its own (SA-5: the banner counts down to it). */
+    expiresAt: string;
 };
 
 export type AuthUser = {

@@ -209,6 +209,14 @@ describe('SessionValidationService.validate', () => {
                 superAdminId: 'admin-1',
                 superAdminEmail: 'admin@crm.dev',
                 superAdminName: 'Admin',
+                expiresAt: expect.any(String),
+            });
+        });
+
+        it('says IMPERSONATION_ENDED when the session is over, so the web app can switch back (SA-5)', async () => {
+            const {service} = build(baseUser(), liveSession({endedAt: new Date()}));
+            await expect(service.validate(impersonationPayload)).rejects.toMatchObject({
+                response: expect.objectContaining({code: 'IMPERSONATION_ENDED'}),
             });
         });
 

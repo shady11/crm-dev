@@ -83,7 +83,8 @@ export function CompanyDetailPage() {
         mutationFn: (user: CompanyUser) => impersonateCompanyUser(companyId as string, user.id),
         onSuccess: (result) => {
             const currentToken = authStorage.getToken();
-            if (currentToken) authStorage.stashImpersonatorToken(currentToken);
+            // SA-5: remember this page, to come back to when it ends.
+            if (currentToken) authStorage.stashImpersonatorToken(currentToken, `/companies/${companyId}`);
 
             authStorage.setToken(result.accessToken);
             void queryClient.invalidateQueries({queryKey: ["auth", "me"]});

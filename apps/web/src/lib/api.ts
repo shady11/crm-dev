@@ -28,7 +28,23 @@ api.interceptors.response.use(
 
         if (error.response?.status === 401 && !isReauthEndpoint) {
             disconnectNotificationsSocket();
+
+            // SA-5: a "view as" session that ran out goes back to the
+            // platform admin's own session, where they were, instead of
+            // signing them out. If that session has expired too, the next
+            // 401 lands here with nothing stashed and signs out as usual.
+            const impersonatorToken = authStorage.getImpersonatorToken();
+            if (error.response?.data?.code === "IMPERSONATION_ENDED" && impersonatorToken) {
+                const returnTo = authStorage.getImpersonationReturn() ?? "/companies";
+                authStorage.setToken(impersonatorToken);
+                authStorage.clearImpersonatorToken();
+                authStorage.setFlash("impersonation.ended");
+                window.location.href = returnTo;
+                return Promise.reject(error);
+            }
+
             authStorage.clear();
+            authStorage.clearImpersonatorToken();
             window.location.href = "/login";
         }
 
