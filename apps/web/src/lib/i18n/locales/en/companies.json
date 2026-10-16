@@ -83,6 +83,10 @@
     "adminPasswordHint": "Leave blank to generate one. It is shown once.",
     "submit": {
       "create": "Create company"
+    },
+    "errors": {
+      "emailTaken": "Someone already uses this email. Pick another one for the administrator.",
+      "nameTaken": "A company with this name already exists."
     }
   },
   "detail": {

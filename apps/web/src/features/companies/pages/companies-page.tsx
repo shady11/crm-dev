@@ -1,7 +1,10 @@
 import {useState} from "react";
 import {Link} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {isAxiosError} from "axios";
+import type {TFunction} from "i18next";
 import {toast} from "@/components/ui/toast.tsx";
+import {apiErrorMessage} from "@/lib/api-error.ts";
 import {useTranslation} from "react-i18next";
 import {Building2, PauseCircle, Pencil, PlayCircle, Plus, SlidersHorizontal, Trash2} from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
@@ -69,9 +72,11 @@ export function CompaniesPage() {
                 setCreated(result as CreateCompanyResult);
             }
         },
-        onError: () =>
-            toast.error({title: editing ? t("page.toasts.updateError") : t("page.toasts.createError")}),
     });
+
+    // SA-4: the API says why (email or name taken, password too short);
+    // the form shows it next to the fields instead of a generic toast.
+    const formError = save.error ? companyFormError(save.error, t, Boolean(editing)) : undefined;
 
     const act = useMutation<unknown, Error, NonNullable<Pending>>({
         mutationFn: ({action, company}: NonNullable<Pending>) =>
@@ -91,7 +96,8 @@ export function CompaniesPage() {
                       : t("page.toasts.deleted", {name: company.name}),
             });
         },
-        onError: () => toast.error({title: t("page.toasts.actionError")}),
+        onError: (error) =>
+            toast.error({title: t("page.toasts.actionError"), description: apiErrorMessage(error)}),
     });
 
     const items = companies.data?.items ?? [];
@@ -267,9 +273,14 @@ export function CompaniesPage() {
                 open={formOpen}
                 company={editing}
                 isSubmitting={save.isPending}
+                formError={formError}
                 onOpenChange={(open) => {
                     setFormOpen(open);
-                    if (!open) setEditing(null);
+                    if (!open) {
+                        setEditing(null);
+                        // The next time the form opens, it starts without the old error.
+                        save.reset();
+                    }
                 }}
                 onSubmit={(payload) => save.mutate(payload)}
             />
@@ -346,4 +357,17 @@ function ConfirmDialog({
             </AlertDialogContent>
         </AlertDialog>
     );
+}
+
+/**
+ * SA-4: what the company form says when saving fails. The two conflicts the
+ * API can report are translated; anything else is shown as the API says it.
+ */
+function companyFormError(error: Error, t: TFunction<"companies">, isEdit: boolean): string {
+    const message = apiErrorMessage(error);
+    if (isAxiosError(error) && error.response?.status === 409) {
+        if (message?.includes("email")) return t("form.errors.emailTaken");
+        if (message?.includes("name")) return t("form.errors.nameTaken");
+    }
+    return message ?? (isEdit ? t("page.toasts.updateError") : t("page.toasts.createError"));
 }
