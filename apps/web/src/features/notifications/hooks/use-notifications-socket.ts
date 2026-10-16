@@ -5,7 +5,7 @@ import {toast} from "@/components/ui/toast.tsx";
 import type {Notification} from "@/features/notifications/api/notifications.api.ts";
 import {useNotificationText} from "@/features/notifications/hooks/use-notification-text.ts";
 
-export function useNotificationsSocket() {
+export function useNotificationsSocket(enabled = true) {
     const queryClient = useQueryClient();
     // Kept in a ref so a language switch doesn't reconnect the socket.
     const text = useNotificationText();
@@ -15,6 +15,7 @@ export function useNotificationsSocket() {
     }, [text]);
 
     useEffect(() => {
+        if (!enabled) return;
         const socket = getNotificationsSocket();
         if (!socket) return;
 
@@ -43,5 +44,5 @@ export function useNotificationsSocket() {
             socket.off("notification:updated", handleUpdated);
             socket.off("notification:unread-count", handleUnreadCount);
         };
-    }, [queryClient]);
+    }, [enabled, queryClient]);
 }
