@@ -29,12 +29,15 @@ export function RoleCard({
     onManageUsers,
     onEdit,
     onDelete,
+    onCopy,
 }: {
     role: Role;
     colorIndex: number;
     onManageUsers(): void;
     onEdit(): void;
     onDelete(): void;
+    /** CA-2: make an editable company copy. */
+    onCopy(): void;
 }) {
     const {t} = useTranslation("rbac");
     const {t: tCommon} = useTranslation("common");
@@ -76,6 +79,9 @@ export function RoleCard({
                         <MenuContent className="w-44">
                             <MenuItem value="users" onClick={onManageUsers}>
                                 {t("page.rowActions.manageUsers", {name: role.name})}
+                            </MenuItem>
+                            <MenuItem value="copy" onClick={onCopy}>
+                                {t("page.rowActions.copy")}
                             </MenuItem>
                             {canManage && (
                                 <>

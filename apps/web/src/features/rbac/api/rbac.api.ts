@@ -17,6 +17,8 @@ export type CreateRolePayload = {
     permissionKeys: string[];
     /** Own discretionary discount ceiling, in percent. Omitted/null = unlimited. */
     discountLimit?: number | null;
+    /** CA-3: limited to the holder's own branch. */
+    isBranchScoped?: boolean;
 };
 
 export async function createRole(payload: CreateRolePayload) {
@@ -24,7 +26,14 @@ export async function createRole(payload: CreateRolePayload) {
     return response.data;
 }
 
-export type UpdateRolePayload = Partial<{name: string; description: string; discountLimit: number | null}>;
+export type UpdateRolePayload = Partial<{name: string; description: string; discountLimit: number | null; isBranchScoped: boolean}>;
+
+// CA-2: an editable company copy of any role, built-in ones included.
+// The name defaults to "<original> (copy)".
+export async function copyRole(id: string, name?: string) {
+    const response = await api.post<{id: string; name: string}>(`/rbac/roles/${id}/copy`, name ? {name} : {});
+    return response.data;
+}
 
 export async function updateRole(id: string, payload: UpdateRolePayload) {
     const response = await api.patch<Role>(`/rbac/roles/${id}`, payload);

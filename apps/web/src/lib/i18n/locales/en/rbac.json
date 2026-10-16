@@ -22,7 +22,8 @@
     },
     "rowActions": {
       "manageUsers": "Manage users for {{name}}",
-      "delete": "Delete {{name}}"
+      "delete": "Delete {{name}}",
+      "copy": "Copy"
     },
     "card": {
       "view": "View permissions",
@@ -33,12 +34,13 @@
     "newTitle": "New role",
     "editTitle": "Edit role",
     "description": "Pick exactly the permissions this role should grant.",
-    "readOnlyDescription": "This is a global role, shared by every company. Only a platform administrator can edit it — clone it into a new role to start from this set.",
+    "readOnlyDescription": "A built-in role, shared by every company, so it can't be changed here. Copy it to get an editable version for your company.",
     "fields": {
       "name": "Name",
       "description": "Description",
       "permissions": "Permissions",
-      "discountLimit": "Discount limit (%)"
+      "discountLimit": "Discount limit (%)",
+      "branchScoped": "Limited to the user's branch"
     },
     "placeholders": {
       "discountLimitUnlimited": "Unlimited"
@@ -46,11 +48,16 @@
     "hints": {
       "discountLimit": "The highest discount a holder of this role can approve on their own, without sign-off. Leave blank for no limit.",
       "discountLimitReadOnly": "Own discount limit: {{limit}}%",
-      "discountLimitReadOnlyUnlimited": "Own discount limit: unlimited"
+      "discountLimitReadOnlyUnlimited": "Own discount limit: unlimited",
+      "branchScoped": "Holders see only their own branch's leads, clients and deals, and need a branch.",
+      "branchScopedLocked": "Move this role's users to another role to change this.",
+      "branchScopedReadOnly": "Limited to the user's branch.",
+      "companyWideReadOnly": "Sees every branch."
     },
     "submit": {
       "create": "Create role"
-    }
+    },
+    "copy": "Copy role"
   },
   "usersDialog": {
     "title": "Users with the \"{{name}}\" role",
@@ -72,7 +79,9 @@
     "updateSuccess": "Role updated",
     "updateError": "Could not save the role",
     "deleteSuccess": "Role deleted",
-    "deleteError": "Could not delete the role"
+    "deleteError": "Could not delete the role",
+    "copySuccess": "Copied as \"{{name}}\"",
+    "copyError": "Couldn't copy the role"
   },
   "catalog": {
     "modules": {
