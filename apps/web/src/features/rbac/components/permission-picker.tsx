@@ -55,11 +55,14 @@ export function PermissionPicker({
             {grouped.map(([module, modulePermissions]) => (
                 <div
                     key={module}
-                    className="flex flex-col gap-2.5 p-3 sm:flex-row sm:items-center sm:justify-between"
+                    className="grid gap-3 px-4 py-3.5 sm:grid-cols-[11rem_minmax(0,1fr)] sm:items-center sm:gap-4"
                 >
-                    <span className="text-sm font-medium sm:shrink-0">{moduleLabel(module)}</span>
-                    {/* Right-aligned on wider screens, wrapped lines included. */}
-                    <div className="flex min-w-0 flex-wrap gap-2 sm:flex-1 sm:justify-end">
+                    <span className="text-sm font-medium">{moduleLabel(module)}</span>
+                    {/* Three equal-width buttons per line, aligned right, so they
+                        line up in columns across rows and read like a table.
+                        The gap is a fixed 0.5rem because the button width is
+                        worked out from it. */}
+                    <div className="flex min-w-0 flex-wrap gap-[0.5rem] sm:justify-end">
                         {modulePermissions.map((permission) => {
                             const isSelected = selected.has(permission.key);
                             const text = permissionText(permission);
@@ -74,7 +77,7 @@ export function PermissionPicker({
                                     aria-pressed={isSelected}
                                     onClick={() => toggle(permission.key)}
                                     className={cn(
-                                        "inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors",
+                                        "inline-flex min-h-8 items-center justify-center gap-1.5 rounded-md border px-3 py-1.5 text-center text-xs leading-tight font-medium transition-colors sm:shrink-0 sm:grow-0 sm:basis-[calc((100%-1rem)/3-0.5px)]",
                                         "disabled:pointer-events-none disabled:opacity-64",
                                         isSelected
                                             ? "border-primary text-primary bg-primary/5"

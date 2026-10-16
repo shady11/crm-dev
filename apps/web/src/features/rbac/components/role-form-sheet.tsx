@@ -63,7 +63,7 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
 
     return (
         <Dialog open={open} onOpenChange={({open: isOpen}) => onOpenChange(isOpen)}>
-            <DialogContent className="sm:max-w-xl">
+            <DialogContent className="sm:max-w-3xl">
                 <DialogHeader>
                     <DialogTitle>{readOnly ? (role?.name ?? "") : isEdit ? t("form.editTitle") : t("form.newTitle")}</DialogTitle>
                     <DialogDescription>
