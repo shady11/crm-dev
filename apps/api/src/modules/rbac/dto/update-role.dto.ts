@@ -1,4 +1,4 @@
-import {IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength, ValidateIf} from "class-validator";
+import {IsBoolean, IsNumber, IsOptional, IsString, Max, MaxLength, Min, MinLength, ValidateIf} from "class-validator";
 import {Transform} from "class-transformer";
 
 export class UpdateRoleDto {
@@ -25,4 +25,10 @@ export class UpdateRoleDto {
     @Min(0)
     @Max(100)
     discountLimit?: number | null;
+
+    // CA-3: limited to the holder's own branch (they then need one), like
+    // the built-in Sales Manager and Sales Head.
+    @IsOptional()
+    @IsBoolean()
+    isBranchScoped?: boolean;
 }

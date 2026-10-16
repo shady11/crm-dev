@@ -23,5 +23,84 @@
     "deleted": "Document deleted",
     "deleteError": "Failed to delete document",
     "downloadError": "Failed to download document"
+  },
+  "templates": {
+    "page": {
+      "heading": "Document templates",
+      "description": "The wording of your reservation agreements, contracts and receipts. Edit the document directly — or its HTML — and check it with sample data and your company's legal details before saving."
+    },
+    "types": {
+      "RESERVATION": "Reservation agreement",
+      "CONTRACT": "Contract",
+      "PAYMENT_RECEIPT": "Payment receipt"
+    },
+    "unsaved": "Unsaved changes",
+    "status": {
+      "custom": "Your version {{version}}",
+      "savedBy": "Saved by {{name}} on {{date}}",
+      "default": "Built-in default",
+      "defaultHint": "Save a version to use your own wording."
+    },
+    "versions": {
+      "load": "Load an earlier version",
+      "item": "Version {{version}} · {{date}} · {{name}}"
+    },
+    "fields": {
+      "name": "Template name",
+      "html": "Template (HTML)"
+    },
+    "actions": {
+      "save": "Save as new version",
+      "discard": "Discard changes",
+      "startFromDefault": "Start from the default",
+      "reset": "Use the built-in default"
+    },
+    "placeholders": {
+      "title": "Placeholders",
+      "search": "Search",
+      "hint": "Click one to insert it where the cursor is in the document. Each is replaced with the deal's value when a document is generated.",
+      "hintPreview": "Switch to Document or HTML to insert placeholders."
+    },
+    "preview": {
+      "title": "Preview with sample data",
+      "error": "Preview isn't available",
+      "hint": "Scripts don't run in templates, and images must be embedded (data: URLs); links to other sites aren't loaded."
+    },
+    "toasts": {
+      "saved": "Saved as version {{version}}. New documents use it from now on.",
+      "saveError": "Couldn't save the template",
+      "reset": "Back to the built-in default. Your versions are kept.",
+      "resetError": "Couldn't switch to the default"
+    },
+    "modes": {
+      "visual": "Document",
+      "html": "HTML",
+      "preview": "Preview with sample data"
+    },
+    "font": "Font: {{font}}, the app's font — documents are printed in it",
+    "visual": {
+      "hint": "Click into the document and type. Highlighted chips are placeholders, filled in from the deal; amber chips mark conditions and repeated rows — keep a condition's start and end together."
+    },
+    "toolbar": {
+      "label": "Formatting",
+      "undo": "Undo",
+      "redo": "Redo",
+      "textStyle": "Text style",
+      "blocks": {
+        "p": "Normal text",
+        "h1": "Heading 1",
+        "h2": "Heading 2",
+        "h3": "Heading 3"
+      },
+      "bold": "Bold",
+      "italic": "Italic",
+      "underline": "Underline",
+      "bulletList": "Bulleted list",
+      "numberedList": "Numbered list",
+      "alignLeft": "Align left",
+      "alignCenter": "Center",
+      "alignRight": "Align right",
+      "clearFormatting": "Clear formatting"
+    }
   }
 }

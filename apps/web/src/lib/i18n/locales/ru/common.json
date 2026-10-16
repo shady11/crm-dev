@@ -81,7 +81,8 @@
     "myActivity": "Мои действия",
     "myTeam": "Моя команда",
     "payments": "Платежи",
-    "priceChanges": "Изменения цен"
+    "priceChanges": "Изменения цен",
+    "documentTemplates": "Шаблоны документов"
   },
   "language": {
     "switchLabel": "Язык",

@@ -141,6 +141,7 @@
     "roleUpdated": "Изменена роль «{{role}}»",
     "rolePermissionsChanged": "Изменены права роли «{{role}}»: добавлено {{added}}, убрано {{removed}}",
     "roleDeleted": "Удалена роль «{{role}}»",
-    "unitsImportedWithPrices": "Импортировано объектов: {{units}}, цен изменено: {{prices}}, отправлено на согласование: {{requested}}"
+    "unitsImportedWithPrices": "Импортировано объектов: {{units}}, цен изменено: {{prices}}, отправлено на согласование: {{requested}}",
+    "documentTemplateReset": "Шаблон документа «{{name}}» заменён стандартным"
   }
 }

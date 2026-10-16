@@ -13,5 +13,6 @@ export class UpsertDocumentTemplateDto {
 
   @IsString()
   @MinLength(20)
+  @MaxLength(200_000)
   bodyHtml: string;
 }

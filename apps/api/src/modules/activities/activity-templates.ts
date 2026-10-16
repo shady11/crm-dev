@@ -13,7 +13,8 @@ const ACTIVITY_TEMPLATES = {
   unitReserved: () => 'Unit reserved',
   reservationExtended: () => 'Reservation extended',
   reservationExtendedPastLimit: () => 'Reservation extended past the limit',
-  reservationExtensionRequested: () => 'Asked the Sales Head to extend the reservation',
+  reservationExtensionRequested: () =>
+    'Asked the Sales Head to extend the reservation',
   reservationCancelled: () => 'Reservation cancelled',
   reservationExpired: () => 'Reservation expired',
   contractSigned: () => 'Contract signed',
@@ -67,6 +68,8 @@ const ACTIVITY_TEMPLATES = {
   documentRestored: (p: { name: string }) => `Document "${p.name}" restored`,
   documentTemplateUpdated: (p: { name: string }) =>
     `Document template "${p.name}" updated`,
+  documentTemplateReset: (p: { name: string }) =>
+    `Document template "${p.name}" replaced by the built-in default`,
 
   // Inventory
   projectCreated: (p: { name: string }) => `Project "${p.name}" created`,
@@ -119,7 +122,11 @@ const ACTIVITY_TEMPLATES = {
   // CA-12: a company's own roles.
   roleCreated: (p: { role: string }) => `Role "${p.role}" created`,
   roleUpdated: (p: { role: string }) => `Role "${p.role}" updated`,
-  rolePermissionsChanged: (p: { role: string; added: number; removed: number }) =>
+  rolePermissionsChanged: (p: {
+    role: string;
+    added: number;
+    removed: number;
+  }) =>
     `Permissions of role "${p.role}" changed: ${p.added} added, ${p.removed} removed`,
   roleDeleted: (p: { role: string }) => `Role "${p.role}" deleted`,
   userDeactivated: (p: { name: string }) => `User "${p.name}" deactivated`,
