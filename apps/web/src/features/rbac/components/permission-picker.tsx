@@ -57,8 +57,9 @@ export function PermissionPicker({
                     key={module}
                     className="flex flex-col gap-2.5 p-3 sm:flex-row sm:items-center sm:justify-between"
                 >
-                    <span className="text-sm font-medium">{moduleLabel(module)}</span>
-                    <div className="flex flex-wrap gap-2">
+                    <span className="text-sm font-medium sm:shrink-0">{moduleLabel(module)}</span>
+                    {/* Right-aligned on wider screens, wrapped lines included. */}
+                    <div className="flex min-w-0 flex-wrap gap-2 sm:flex-1 sm:justify-end">
                         {modulePermissions.map((permission) => {
                             const isSelected = selected.has(permission.key);
                             const text = permissionText(permission);
