@@ -53,6 +53,8 @@ export type AuthUser = {
     branch: AuthBranchSummary | null;
     // Present only while the active session is an impersonated one.
     impersonation?: AuthImpersonationSummary | null;
+    /** SA-6: must choose their own password before anything else. */
+    mustChangePassword?: boolean;
 };
 
 export type LoginResponse = {

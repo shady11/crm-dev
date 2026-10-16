@@ -1,6 +1,7 @@
 export const paths = {
     home: "/",
     login: "/login",
+    changePassword: "/change-password",
     dashboard: "/dashboard",
     leads: "/leads",
     // Opens the leads page with that lead's details sheet open.

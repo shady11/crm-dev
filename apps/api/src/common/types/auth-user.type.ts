@@ -87,4 +87,6 @@ export type AuthUser = {
     // session — set by SessionValidationService after checking the
     // ImpersonationSession row, never trusted from the JWT payload alone.
     impersonation?: AuthImpersonationSummary | null;
+    /** SA-6: must choose their own password before doing anything else. */
+    mustChangePassword?: boolean;
 };

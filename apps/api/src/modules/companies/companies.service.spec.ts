@@ -102,6 +102,15 @@ describe("CompaniesService", () => {
         await expect(bcrypt.compare(password as string, created.user.passwordHash)).resolves.toBe(true);
     });
 
+    it("generates a password that meets the policy and makes the admin replace it (SA-6)", async () => {
+        const {service, created} = build();
+
+        const result = await service.create(actor, {...baseDto});
+
+        expect(result.admin.generatedPassword).toMatch(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/);
+        expect(created.user.mustChangePassword).toBe(true);
+    });
+
     it("does not echo a password the caller supplied", async () => {
         const {service} = build();
 

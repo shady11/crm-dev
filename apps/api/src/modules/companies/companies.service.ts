@@ -1,6 +1,6 @@
 import {BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
-import {randomBytes} from "crypto";
 import * as bcrypt from "bcrypt";
+import {generateStrongPassword} from "@/common/constants/password-policy.constants";
 import {AuditAction, Prisma} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
@@ -251,7 +251,7 @@ export class CompaniesService {
 
         await this.assertValidSettings(dto);
 
-        const password = dto.adminPassword?.trim() || randomBytes(18).toString("base64url");
+        const password = dto.adminPassword?.trim() || generateStrongPassword();
         const passwordHash = await bcrypt.hash(password, 10);
         const companyAdminRoleId = await this.rbacService.findDefaultCompanyAdminRoleId();
 
@@ -273,6 +273,8 @@ export class CompaniesService {
                     fullName: dto.adminFullName,
                     email: adminEmail,
                     passwordHash,
+                    // SA-6: whoever created the company knows this password.
+                    mustChangePassword: true,
                     roleId: companyAdminRoleId,
                     companyId: created.id,
                 },
@@ -678,12 +680,13 @@ export class CompaniesService {
     async resetUserPassword(actor: AuthUser, companyId: string, userId: string) {
         const target = await this.getTenantUserOrThrow(companyId, userId);
 
-        const password = randomBytes(18).toString("base64url");
+        const password = generateStrongPassword();
         const passwordHash = await bcrypt.hash(password, 10);
 
         await this.prisma.user.update({
             where: {id: userId},
-            data: {passwordHash, sessionsValidFrom: new Date()},
+            // SA-6: the platform admin knows it now; the user must replace it.
+            data: {passwordHash, sessionsValidFrom: new Date(), mustChangePassword: true},
         });
 
         await this.auditLog.record({

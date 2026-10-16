@@ -1,6 +1,7 @@
 import {createBrowserRouter} from "react-router-dom";
 import {AppLayout} from "@/components/layout/app-layout";
 import {LoginPage} from "@/features/auth/pages/login-page";
+import {ChangePasswordPage} from "@/features/auth/pages/change-password-page";
 import {ProtectedRoute} from "@/features/auth/pages/protected-route";
 import {NotFoundPage} from "@/components/shared/not-found-page";
 import {projectsRoutes} from "@/features/projects/projects.routes";
@@ -36,6 +37,8 @@ export const router = createBrowserRouter([
             // AppLayout — no sidebar/nav chrome to keep the printed page
             // (and its browser print-to-PDF output) to one clean sheet.
             { path: "units/:unitId/info-sheet", element: <UnitInfoSheetPage /> },
+            // SA-6: outside AppLayout, like the info sheet: nothing else works yet.
+            { path: paths.changePassword, element: <ChangePasswordPage /> },
             {
                 path: "/",
                 element: <AppLayout />,

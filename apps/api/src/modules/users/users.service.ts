@@ -256,6 +256,9 @@ export class UsersService {
                 email: dto.email,
                 phone: dto.phone,
                 passwordHash,
+                // SA-6: the admin who typed it knows it; the person chooses
+                // their own at first sign-in.
+                mustChangePassword: true,
                 roleId: dto.roleId,
                 companyId: user.companyId,
                 branchId: dto.branchId,
@@ -464,7 +467,9 @@ export class UsersService {
             where: { id },
             data: {
                 passwordHash,
-                sessionsValidFrom: new Date()
+                sessionsValidFrom: new Date(),
+                // SA-6: set by an admin, so the user must replace it.
+                mustChangePassword: true,
             },
         });
 

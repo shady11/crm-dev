@@ -48,6 +48,16 @@ api.interceptors.response.use(
             window.location.href = "/login";
         }
 
+        // SA-6: the API refuses everything until a password set by someone
+        // else is replaced; take the person to where they can do that.
+        if (
+            error.response?.status === 403 &&
+            error.response?.data?.code === "PASSWORD_CHANGE_REQUIRED" &&
+            window.location.pathname !== "/change-password"
+        ) {
+            window.location.href = "/change-password";
+        }
+
         return Promise.reject(error);
     },
 );

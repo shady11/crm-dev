@@ -97,14 +97,15 @@
       "adminPassword": "Password"
     },
     "adminSectionTitle": "First administrator",
-    "adminPasswordHint": "Leave blank to generate one. It is shown once.",
+    "adminPasswordHint": "At least 8 characters with an upper-case letter, a lower-case letter and a digit. Leave blank to generate one; it is shown once. Either way, the administrator chooses their own at first sign-in.",
     "submit": {
       "create": "Create company"
     },
     "errors": {
       "emailTaken": "Someone already uses this email. Pick another one for the administrator.",
       "nameTaken": "A company with this name already exists.",
-      "emailInDeletedCompany": "This email belongs to a user of the deleted company \"{{name}}\". Restore that company, or use another email."
+      "emailInDeletedCompany": "This email belongs to a user of the deleted company \"{{name}}\". Restore that company, or use another email.",
+      "weakPassword": "The password needs at least 8 characters, with an upper-case letter, a lower-case letter and a digit."
     }
   },
   "detail": {

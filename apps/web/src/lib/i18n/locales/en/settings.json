@@ -53,6 +53,11 @@
         "sameAsCurrentPassword": "The new password must differ from the current one",
         "updateErrorTitle": "Could not change password",
         "updateErrorDescription": "Something went wrong. Please try again."
+      },
+      "required": {
+        "title": "Choose your own password",
+        "description": "The password for {{email}} was set by an administrator. Choose a new one that only you know before you continue.",
+        "signOut": "Sign out"
       }
     }
   },

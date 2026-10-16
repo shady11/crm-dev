@@ -50,6 +50,7 @@ export class SessionValidationService {
                 branchId: true,
                 isActive: true,
                 sessionsValidFrom: true,
+                mustChangePassword: true,
                 company: {
                     select: {
                         id: true,
@@ -177,6 +178,7 @@ export class SessionValidationService {
             roleId: user.roleId,
             roleName: user.role.name,
             isSuperAdmin: user.isSuperAdmin,
+            mustChangePassword: user.mustChangePassword,
             isBranchScoped: user.role.isBranchScoped,
             discountLimit: user.role.discountLimit === null ? null : user.role.discountLimit.toNumber(),
             permissions,

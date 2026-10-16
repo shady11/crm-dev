@@ -32,6 +32,7 @@ import {DashboardModule} from "@/modules/dashboard/dashboard.module";
 import {AuditLogModule} from "@/modules/audit-log/audit-log.module";
 import {ActivitiesModule} from "@/modules/activities/activities.module";
 import {ImpersonationAuditInterceptor} from "@/common/interceptors/impersonation-audit.interceptor";
+import {PasswordChangeInterceptor} from "@/common/interceptors/password-change.interceptor";
 import {RbacModule} from "@/modules/rbac/rbac.module";
 
 @Module({
@@ -106,6 +107,10 @@ import {RbacModule} from "@/modules/rbac/rbac.module";
       {
           provide: APP_INTERCEPTOR,
           useClass: ImpersonationAuditInterceptor,
+      },
+      {
+          provide: APP_INTERCEPTOR,
+          useClass: PasswordChangeInterceptor,
       },
   ],
 })
