@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { Browser, chromium } from 'playwright';
+import { withDocumentFonts } from './document-fonts';
 import { PdfGenerationFailedException } from './exceptions';
 
 /**
@@ -30,7 +31,7 @@ export async function renderHtmlToPdf(html: string): Promise<Buffer> {
         : route.abort(),
     );
     const page = await context.newPage();
-    await page.setContent(html, { waitUntil: 'load' });
+    await page.setContent(withDocumentFonts(html), { waitUntil: 'load' });
     const pdf = await page.pdf({ format: 'A4', printBackground: true });
     return pdf;
   } catch (error) {

@@ -20,6 +20,8 @@ export type TemplateEditorData = {
     current: TemplateVersion | null;
     defaultHtml: string;
     placeholders: {token: string; example: string}[];
+    /** The font documents are printed in, as @font-face CSS with embedded files. */
+    font: {family: string; css: string};
     versions: TemplateVersion[];
 };
 

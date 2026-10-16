@@ -23,8 +23,13 @@ import {
     type TemplateEditorData,
     type TemplateType,
 } from "../api/document-templates.api";
+import {VisualTemplateEditor, type VisualTemplateEditorHandle} from "../components/visual-template-editor";
+import {withHeadMarkup} from "../lib/editable-template";
 
 type Draft = {name: string; html: string};
+
+const MODES = ["visual", "html", "preview"] as const;
+type Mode = (typeof MODES)[number];
 
 const TYPE_LABEL_KEYS: Record<TemplateType, string> = {
     RESERVATION: "documents:templates.types.RESERVATION",
@@ -34,11 +39,11 @@ const TYPE_LABEL_KEYS: Record<TemplateType, string> = {
 
 /**
  * CA-5: a company's own wording for its reservation agreements, contracts
- * and receipts. The left side is the template's HTML with the placeholders
- * it can use; the right side is the same template filled with sample data,
- * rendered in a sandboxed frame. The API checks a template against that
- * sample before saving, so a misspelt placeholder is caught here rather than
- * when someone generates a contract.
+ * and receipts, edited as the document itself (or as HTML), with a preview
+ * filled with sample data. Everything is shown in the app's font, which is
+ * the font the PDF is printed in. The API checks a template against the
+ * sample on every change and before saving, so a misspelt placeholder is
+ * caught here rather than when someone generates a contract.
  */
 export function DocumentTemplatesPage() {
     const {t, i18n} = useTranslation("documents");
@@ -47,7 +52,9 @@ export function DocumentTemplatesPage() {
     // Unsaved edits per type, so switching tabs doesn't lose them.
     const [drafts, setDrafts] = useState<Partial<Record<TemplateType, Draft>>>({});
     const [placeholderFilter, setPlaceholderFilter] = useState("");
+    const [mode, setMode] = useState<Mode>("visual");
     const editorRef = useRef<HTMLTextAreaElement>(null);
+    const visualRef = useRef<VisualTemplateEditorHandle>(null);
 
     const editorQuery = useQuery({
         queryKey: ["document-templates", "editor", type],
@@ -62,9 +69,13 @@ export function DocumentTemplatesPage() {
     const isDirty = !!draft && !!saved && (draft.name !== saved.name || draft.html !== saved.html);
 
     const setDraft = (next: Partial<Draft>) => {
-        if (!draft) return;
-        setDrafts((previous) => ({...previous, [type]: {...draft, ...next}}));
+        if (!saved) return;
+        // From the previous state, so fast edits from the visual editor can't
+        // overwrite each other with a stale draft.
+        setDrafts((previous) => ({...previous, [type]: {...(previous[type] ?? saved), ...next}}));
     };
+
+    const setHtml = (html: string) => setDraft({html});
 
     const discardDraft = () => setDrafts((previous) => ({...previous, [type]: undefined}));
 
@@ -100,11 +111,15 @@ export function DocumentTemplatesPage() {
     });
 
     const insertPlaceholder = (token: string) => {
+        if (mode === "visual") {
+            visualRef.current?.insert(token);
+            return;
+        }
         const area = editorRef.current;
         if (!draft || !area) return;
         const start = area.selectionStart ?? draft.html.length;
         const end = area.selectionEnd ?? start;
-        setDraft({html: draft.html.slice(0, start) + token + draft.html.slice(end)});
+        setHtml(draft.html.slice(0, start) + token + draft.html.slice(end));
         requestAnimationFrame(() => {
             area.focus();
             area.setSelectionRange(start + token.length, start + token.length);
@@ -117,6 +132,11 @@ export function DocumentTemplatesPage() {
             (p) => !filter || p.token.toLowerCase().includes(filter) || p.example.toLowerCase().includes(filter),
         );
     }, [data?.placeholders, placeholderFilter]);
+
+    const examples = useMemo(
+        () => new Map((data?.placeholders ?? []).map((p) => [p.token, p.example])),
+        [data?.placeholders],
+    );
 
     return (
         <div className="space-y-6">
@@ -150,7 +170,7 @@ export function DocumentTemplatesPage() {
                         isResetting={reset.isPending}
                     />
 
-                    <div className="grid gap-6 xl:grid-cols-2">
+                    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
                         <div className="flex min-w-0 flex-col gap-4">
                             <label className="block space-y-1.5">
                                 <span className="text-sm font-medium">{t("templates.fields.name")}</span>
@@ -161,16 +181,69 @@ export function DocumentTemplatesPage() {
                                 />
                             </label>
 
-                            <label className="block space-y-1.5">
-                                <span className="text-sm font-medium">{t("templates.fields.html")}</span>
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                                <Tabs value={mode} onValueChange={({value}) => setMode(value as Mode)}>
+                                    <TabsList>
+                                        {MODES.map((value) => (
+                                            <TabsTrigger key={value} value={value}>
+                                                {t(`templates.modes.${value}`)}
+                                            </TabsTrigger>
+                                        ))}
+                                    </TabsList>
+                                </Tabs>
+                                <span className="text-muted-foreground flex items-center gap-2 text-xs">
+                                    {previewQuery.isFetching && <Spinner className="size-3.5" />}
+                                    {t("templates.font", {font: data.font.family})}
+                                </span>
+                            </div>
+
+                            {previewQuery.isError && (
+                                <Alert variant="destructive">
+                                    <TriangleAlert />
+                                    <AlertTitle>{t("templates.preview.error")}</AlertTitle>
+                                    <AlertDescription>{apiErrorMessage(previewQuery.error)}</AlertDescription>
+                                </Alert>
+                            )}
+
+                            {mode === "visual" && (
+                                <>
+                                    <VisualTemplateEditor
+                                        key={type}
+                                        html={draft.html}
+                                        onChange={setHtml}
+                                        fontCss={data.font.css}
+                                        examples={examples}
+                                        handleRef={visualRef}
+                                    />
+                                    <p className="text-muted-foreground text-xs">{t("templates.visual.hint")}</p>
+                                </>
+                            )}
+
+                            {mode === "html" && (
                                 <textarea
                                     ref={editorRef}
+                                    aria-label={t("templates.fields.html")}
                                     value={draft.html}
-                                    onChange={(event) => setDraft({html: event.target.value})}
+                                    onChange={(event) => setHtml(event.target.value)}
                                     spellCheck={false}
-                                    className="border-input bg-background focus-visible:ring-ring/32 h-[28rem] w-full resize-y rounded-lg border p-3 font-mono text-xs leading-5 outline-none focus-visible:ring-[3px]"
+                                    className="border-input bg-background focus-visible:ring-ring/32 h-[46rem] w-full resize-y rounded-lg border p-3 font-mono text-xs leading-5 outline-none focus-visible:ring-[3px]"
                                 />
-                            </label>
+                            )}
+
+                            {mode === "preview" && (
+                                <>
+                                    <div className="bg-muted/50 max-h-[52rem] overflow-auto rounded-lg border p-4 sm:p-6">
+                                        {/* sandbox="" : no scripts, no forms, no navigation. */}
+                                        <iframe
+                                            title={t("templates.preview.title")}
+                                            sandbox=""
+                                            srcDoc={previewQuery.data ? withHeadMarkup(previewQuery.data, `<style>${data.font.css}</style>`) : ""}
+                                            className="mx-auto block h-[60rem] w-full max-w-[794px] bg-white shadow-sm"
+                                        />
+                                    </div>
+                                    <p className="text-muted-foreground text-xs">{t("templates.preview.hint")}</p>
+                                </>
+                            )}
 
                             <div className="flex flex-wrap items-center gap-2">
                                 <Button
@@ -185,62 +258,43 @@ export function DocumentTemplatesPage() {
                                 </Button>
                                 <Button
                                     variant="ghost"
-                                    onClick={() => setDraft({html: data.defaultHtml})}
+                                    onClick={() => setHtml(data.defaultHtml)}
                                     disabled={draft.html === data.defaultHtml}
                                 >
                                     {t("templates.actions.startFromDefault")}
                                 </Button>
                             </div>
-
-                            <div className="space-y-2 rounded-lg border p-3">
-                                <div className="flex flex-wrap items-center justify-between gap-2">
-                                    <span className="text-sm font-medium">{t("templates.placeholders.title")}</span>
-                                    <Input
-                                        className="h-8 w-48"
-                                        placeholder={t("templates.placeholders.search")}
-                                        value={placeholderFilter}
-                                        onChange={(event) => setPlaceholderFilter(event.target.value)}
-                                    />
-                                </div>
-                                <p className="text-muted-foreground text-xs">{t("templates.placeholders.hint")}</p>
-                                <ul className="max-h-64 divide-y overflow-y-auto">
-                                    {placeholders.map((placeholder) => (
-                                        <li key={placeholder.token}>
-                                            <button
-                                                type="button"
-                                                onClick={() => insertPlaceholder(placeholder.token)}
-                                                className="hover:bg-accent flex w-full items-baseline justify-between gap-3 px-2 py-1.5 text-left"
-                                            >
-                                                <code className="text-primary text-xs break-all">{placeholder.token}</code>
-                                                <span className="text-muted-foreground shrink-0 text-xs">{placeholder.example || "—"}</span>
-                                            </button>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
                         </div>
 
-                        <div className="flex min-w-0 flex-col gap-2">
-                            <div className="flex items-center justify-between">
-                                <span className="text-sm font-medium">{t("templates.preview.title")}</span>
-                                {previewQuery.isFetching && <Spinner className="size-4" />}
-                            </div>
-                            {previewQuery.isError && (
-                                <Alert variant="destructive">
-                                    <TriangleAlert />
-                                    <AlertTitle>{t("templates.preview.error")}</AlertTitle>
-                                    <AlertDescription>{apiErrorMessage(previewQuery.error)}</AlertDescription>
-                                </Alert>
-                            )}
-                            {/* sandbox="" : no scripts, no forms, no navigation. */}
-                            <iframe
-                                title={t("templates.preview.title")}
-                                sandbox=""
-                                srcDoc={previewQuery.data ?? ""}
-                                className="h-[46rem] w-full rounded-lg border bg-white"
+                        <aside className="space-y-2 self-start rounded-lg border p-3 xl:sticky xl:top-4">
+                            <span className="text-sm font-medium">{t("templates.placeholders.title")}</span>
+                            <Input
+                                className="h-8"
+                                placeholder={t("templates.placeholders.search")}
+                                value={placeholderFilter}
+                                onChange={(event) => setPlaceholderFilter(event.target.value)}
                             />
-                            <p className="text-muted-foreground text-xs">{t("templates.preview.hint")}</p>
-                        </div>
+                            <p className="text-muted-foreground text-xs">
+                                {mode === "preview" ? t("templates.placeholders.hintPreview") : t("templates.placeholders.hint")}
+                            </p>
+                            <ul className="max-h-[36rem] divide-y overflow-y-auto">
+                                {placeholders.map((placeholder) => (
+                                    <li key={placeholder.token}>
+                                        <button
+                                            type="button"
+                                            disabled={mode === "preview"}
+                                            // Keep the cursor where it is in the document.
+                                            onMouseDown={(event) => event.preventDefault()}
+                                            onClick={() => insertPlaceholder(placeholder.token)}
+                                            className="hover:bg-accent flex w-full flex-col gap-0.5 px-2 py-1.5 text-left disabled:pointer-events-none disabled:opacity-60"
+                                        >
+                                            <code className="text-primary text-xs break-all">{placeholder.token}</code>
+                                            <span className="text-muted-foreground text-xs">{placeholder.example || "—"}</span>
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </aside>
                     </div>
                 </>
             )}

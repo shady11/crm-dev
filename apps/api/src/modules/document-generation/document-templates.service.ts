@@ -16,6 +16,7 @@ import { AuthUser } from '@/common/types/auth-user.type';
 import { UpsertDocumentTemplateDto } from './dto/upsert-document-template.dto';
 import { activityText } from '@/modules/activities/activity-templates';
 import { DEFAULT_TEMPLATES } from './templates/default-templates';
+import { DOCUMENT_FONT_FAMILY, documentFontCss } from './document-fonts';
 import { TEMPLATABLE_DOCUMENT_TYPES } from './document-generation.constants';
 import {
   sampleTemplateContext,
@@ -159,6 +160,8 @@ export class DocumentTemplatesService {
       current: versions.find((v) => v.isActive) ?? null,
       defaultHtml: DEFAULT_TEMPLATES[type] ?? '',
       placeholders: templatePlaceholders(type, sampleTemplateContext(company)),
+      // The font the PDF is printed in, for the editor and preview frames.
+      font: { family: DOCUMENT_FONT_FAMILY, css: documentFontCss() },
       versions,
     };
   }

@@ -15,7 +15,7 @@ import { DocumentType } from '@/generated/prisma/client';
 const SHARED_STYLE = `
   * { box-sizing: border-box; }
   body {
-    font-family: 'DejaVu Sans', Arial, sans-serif;
+    font-family: 'Onest', 'DejaVu Sans', Arial, sans-serif;
     font-size: 12px;
     color: #1a1a1a;
     line-height: 1.5;
