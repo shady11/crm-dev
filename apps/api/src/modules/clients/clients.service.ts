@@ -101,6 +101,7 @@ export class ClientsService {
             take: CLIENT_ACTIVITY_LIMIT,
             include: {
                 user: { select: { id: true, fullName: true } },
+                impersonatedBy: { select: { id: true, fullName: true } },
                 lead: { select: { id: true, fullName: true } },
                 deal: { select: { id: true, dealNumber: true } },
             },

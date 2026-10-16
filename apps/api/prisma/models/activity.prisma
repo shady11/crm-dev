@@ -245,6 +245,12 @@ model Activity {
   targetUserId String?
   targetUser   User?   @relation("ActivityTargetUser", fields: [targetUserId], references: [id])
 
+  // SA-2: the platform admin who did this while viewing the app as userId
+  // (impersonation). Null for everything people did themselves. Set for
+  // every activity written during an impersonated request (PrismaService).
+  impersonatedById String?
+  impersonatedBy   User?   @relation("ActivityImpersonator", fields: [impersonatedById], references: [id])
+
   createdAt DateTime @default(now())
 
   @@index([companyId])
@@ -255,6 +261,7 @@ model Activity {
   @@index([clientId])
   @@index([leadId])
   @@index([targetUserId])
+  @@index([impersonatedById])
   @@index([unitId])
   @@index([projectId])
   @@index([targetBranchId])

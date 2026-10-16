@@ -4,10 +4,12 @@ import type {DealActivity} from "@/features/deals/api/deals.api.ts";
 import {formatDate} from "@/utils/date-formatter.ts";
 import {useTranslation} from "react-i18next";
 import {useActivityTitle} from "@/features/activities/hooks/use-activity-title.ts";
+import {useImpersonationNote} from "@/features/activities/hooks/use-activity-actor.ts";
 
 export function DealHistoryCard({ activities }: { activities: DealActivity[] }) {
     const { t, i18n } = useTranslation("deals");
     const activityTitle = useActivityTitle();
+    const impersonationNote = useImpersonationNote();
     const sorted = [...activities].sort(
         (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
@@ -35,7 +37,7 @@ export function DealHistoryCard({ activities }: { activities: DealActivity[] }) 
                                             <p className="text-sm text-muted-foreground">{activity.description}</p>
                                         )}
                                         <p className="mt-0.5 text-xs text-muted-foreground">
-                                            {date} · {time}
+                                            {[`${date} · ${time}`, impersonationNote(activity)].filter(Boolean).join(" · ")}
                                         </p>
                                     </div>
                                 </div>

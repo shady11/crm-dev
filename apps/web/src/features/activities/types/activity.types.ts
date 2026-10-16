@@ -14,6 +14,8 @@ export type Activity = {
     description: string | null;
     createdAt: string;
     user: ActivityUser;
+    // SA-2: the platform admin, when done while viewing the app as `user`.
+    impersonatedBy?: { id: string; fullName: string } | null;
     // The records the row is about; null when it isn't about one.
     lead: { id: string; fullName: string } | null;
     client: { id: string; fullName: string } | null;
