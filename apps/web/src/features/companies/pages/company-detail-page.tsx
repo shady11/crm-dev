@@ -34,6 +34,7 @@ import {
 } from "../api/companies.api";
 import {isSuspended} from "../types/company.types";
 import type {CompanyUser} from "../types/company.types";
+import {GeneratedPassword} from "../components/generated-password";
 
 type PendingUserAction = {action: "deactivate" | "reactivate" | "resetPassword"; user: CompanyUser} | null;
 
@@ -406,9 +407,7 @@ function ResetPasswordResultDialog({
                     </p>
                     <div className="space-y-1">
                         <p className="text-muted-foreground">{t("detail.usersCard.resetResult.passwordLabel")}</p>
-                        <code className="bg-muted block rounded px-3 py-2 font-mono text-base">
-                            {result?.generatedPassword}
-                        </code>
+                        {result ? <GeneratedPassword value={result.generatedPassword} /> : null}
                         <p className="text-muted-foreground">{t("detail.usersCard.resetResult.passwordHint")}</p>
                     </div>
                 </DialogBody>

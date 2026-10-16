@@ -24,7 +24,9 @@
     "moreActions": "More actions",
     "download": "Download",
     "close": "Close",
-    "clear": "Clear"
+    "clear": "Clear",
+    "copy": "Copy",
+    "copied": "Copied"
   },
   "labels": {
     "status": "Status",

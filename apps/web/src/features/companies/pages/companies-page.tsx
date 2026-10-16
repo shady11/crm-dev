@@ -37,6 +37,7 @@ import {
 import type {Company} from "../types/company.types";
 import {isSuspended} from "../types/company.types";
 import {CompanyFormSheet} from "../components/company-form-sheet";
+import {GeneratedPassword} from "../components/generated-password";
 
 type Pending = {action: "suspend" | "resume" | "delete"; company: Company} | null;
 
@@ -142,9 +143,7 @@ export function CompaniesPage() {
                                 <p className="text-muted-foreground">
                                     {t("page.created.generatedPasswordLabel")}
                                 </p>
-                                <code className="bg-muted block rounded px-3 py-2 font-mono text-base">
-                                    {created.admin.generatedPassword}
-                                </code>
+                                <GeneratedPassword value={created.admin.generatedPassword} />
                                 <p className="text-muted-foreground">
                                     {t("page.created.generatedPasswordHint")}
                                 </p>
