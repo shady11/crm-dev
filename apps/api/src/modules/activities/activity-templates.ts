@@ -97,6 +97,8 @@ const ACTIVITY_TEMPLATES = {
   unitCreated: (p: { unit: string }) => `Unit "${p.unit}" created`,
   unitsCreated: (p: { count: number }) => `${p.count} units created on floor`,
   unitsImported: (p: { count: number }) => `${p.count} units imported`,
+  unitsImportedWithPrices: (p: { units: number; prices: number; requested: number }) =>
+    `${p.units} units imported, ${p.prices} prices changed, ${p.requested} sent for approval`,
   unitStatusChanged: (p: { unit: string }) => `Unit "${p.unit}" status changed`,
   unitUpdated: (p: { unit: string }) => `Unit "${p.unit}" updated`,
   unitDuplicated: (p: { unit: string; source: string }) =>

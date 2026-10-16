@@ -35,7 +35,7 @@ const REQUEST_INCLUDE = {
     decidedBy: {select: {id: true, fullName: true}},
 } satisfies Prisma.UnitPriceRequestInclude;
 
-type UnitForPricing = {id: string; number: string; price: Prisma.Decimal; project: {name: string}};
+type UnitForPricing = {id: string; number: string; price: Prisma.Decimal | number; project: {name: string}};
 
 /**
  * SH-2: a unit's list price is what discount approval compares a booking
@@ -60,8 +60,10 @@ export class UnitPriceRequestsService {
      * Returns "apply" when the caller should write the new price now (the
      * actor approves prices), or the pending request when it must wait.
      */
-    async handlePriceChange(user: AuthUser, unit: UnitForPricing, newPrice: number):
+    async handlePriceChange(user: AuthUser, unit: UnitForPricing, newPrice: number, options: {notify?: boolean} = {}):
         Promise<{outcome: "apply"} | {outcome: "requested"; requestId: string}> {
+        // A unit import (CA-7) sends one summary instead of a notice per unit.
+        const notify = options.notify ?? true;
         const companyId = this.companyOf(user);
 
         if (!hasPermission(user, "units.edit_price")) {
@@ -84,7 +86,7 @@ export class UnitPriceRequestsService {
                     },
                 });
             });
-            await this.notifyApprovers(user, {
+            if (notify) await this.notifyApprovers(user, {
                 exclude: user.id,
                 type: NotificationType.UNIT_PRICE_CHANGED,
                 entityType: NotificationEntityType.UNIT,
@@ -117,7 +119,7 @@ export class UnitPriceRequestsService {
             return created;
         });
 
-        await this.notifyApprovers(user, {
+        if (notify) await this.notifyApprovers(user, {
             type: NotificationType.UNIT_PRICE_CHANGE_REQUESTED,
             entityType: NotificationEntityType.UNIT_PRICE_REQUEST,
             entityId: request.id,
@@ -127,6 +129,36 @@ export class UnitPriceRequestsService {
         });
 
         return {outcome: "requested", requestId: request.id};
+    }
+
+    /**
+     * CA-7: one notice to approvers for all the price changes a unit import
+     * made or asked for. It opens the Price changes page, where each
+     * request is approved or rejected as usual.
+     */
+    async notifyImportedPrices(
+        user: AuthUser,
+        summary: {projectId: string; project: string; updated: number; requested: number},
+    ) {
+        const params = {project: summary.project, updated: summary.updated, requested: summary.requested, byName: user.name};
+        await this.notifyApprovers(user, {
+            exclude: user.id,
+            ...(summary.requested > 0
+                ? {
+                    type: NotificationType.UNIT_PRICE_CHANGE_REQUESTED,
+                    title: `${user.name} imported new prices for ${summary.project}: ${summary.requested} need approval`,
+                    templateKey: "unitPricesImportRequested" as const,
+                }
+                : {
+                    type: NotificationType.UNIT_PRICE_CHANGED,
+                    title: `${user.name} imported new prices for ${summary.project}: ${summary.updated} changed`,
+                    templateKey: "unitPricesImported" as const,
+                }),
+            // Any unit entity opens the Price changes page.
+            entityType: NotificationEntityType.UNIT,
+            entityId: summary.projectId,
+            params,
+        });
     }
 
     async findAll(user: AuthUser, query: QueryUnitPriceRequestsDto) {

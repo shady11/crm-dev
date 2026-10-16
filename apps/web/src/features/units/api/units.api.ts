@@ -54,6 +54,19 @@ export async function deleteUnit(unitId: string) {
     await api.delete(`/units/${unitId}`);
 }
 
+/** CA-7: an example import file, headers in the given language. */
+export async function downloadImportSample(lang: string) {
+    const response = await api.get<Blob>("/units/import-sample", {params: {lang}, responseType: "blob"});
+    const url = URL.createObjectURL(response.data);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "units-import-sample.xlsx";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+}
+
 export async function importUnits(projectId: string, file: File) {
     const formData = new FormData();
     formData.append("file", file);

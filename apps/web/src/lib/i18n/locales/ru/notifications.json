@@ -180,6 +180,14 @@
     "reservationExtendedPastLimit": {
       "title": "{{byName}} продлил(а) бронь по сделке {{dealNumber}}",
       "message": "До {{date}}. Причина: {{reason}}"
+    },
+    "unitPricesImported": {
+      "title": "Импортированы новые цены: {{project}}",
+      "message": "Изменено: {{updated}}, импортировал(а) {{byName}}"
+    },
+    "unitPricesImportRequested": {
+      "title": "Новые цены для {{project}} ждут согласования",
+      "message": "{{requested}} из импорта объектов, отправил(а) {{byName}}"
     }
   }
 }

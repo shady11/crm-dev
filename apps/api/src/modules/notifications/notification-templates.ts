@@ -45,6 +45,9 @@ export type NotificationTemplate =
     | {templateKey: "unitPriceChanged"; params: UnitPriceParams & {fromPrice: number; toPrice: number; byName: string}}
     | {templateKey: "unitPriceRequestApproved"; params: UnitPriceParams & {byName: string}}
     | {templateKey: "unitPriceRequestRejected"; params: UnitPriceParams & {byName: string}}
+    // CA-7: a unit import's price changes, one notice per file.
+    | {templateKey: "unitPricesImported"; params: {project: string; updated: number; requested: number; byName: string}}
+    | {templateKey: "unitPricesImportRequested"; params: {project: string; updated: number; requested: number; byName: string}}
     // SH-5: bulk moves and a manager's handover, one notification each.
     | {templateKey: "leadsReassigned"; params: {leads: number; byName: string; tasks: number}}
     | {templateKey: "dealsReassigned"; params: {deals: number; byName: string; tasks: number}}

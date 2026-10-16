@@ -41,6 +41,29 @@ describe('UnitPriceRequestsService (SH-2)', () => {
         return {service, prisma, notifications, rbac};
     }
 
+    describe('unit import (CA-7)', () => {
+        it('records the change but sends no per-unit notice when the import asks it not to', async () => {
+            const {service, prisma, notifications} = build();
+            const result = await service.handlePriceChange(admin, unit, 28000, {notify: false});
+
+            expect(result).toEqual({outcome: 'apply'});
+            expect(prisma.unitPriceRequest.create).toHaveBeenCalled();
+            expect(notifications.create).not.toHaveBeenCalled();
+        });
+
+        it('sends approvers one summary for the file, and says when prices wait for approval', async () => {
+            const {service, notifications} = build();
+            await service.notifyImportedPrices(base, {projectId: 'project-1', project: 'Orion', updated: 0, requested: 12});
+
+            expect(notifications.create).toHaveBeenCalledTimes(2);
+            expect(notifications.create.mock.calls[0][0]).toEqual(expect.objectContaining({
+                type: 'UNIT_PRICE_CHANGE_REQUESTED',
+                templateKey: 'unitPricesImportRequested',
+                params: {project: 'Orion', updated: 0, requested: 12, byName: base.name},
+            }));
+        });
+    });
+
     describe('handlePriceChange', () => {
         it('refuses someone without units.edit_price', async () => {
             const {service, prisma} = build();

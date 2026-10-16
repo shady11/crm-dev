@@ -141,6 +141,7 @@
     "roleUpdated": "«{{role}}» ролу өзгөртүлдү",
     "rolePermissionsChanged": "«{{role}}» ролунун укуктары өзгөрдү: {{added}} кошулду, {{removed}} алынды",
     "roleDeleted": "«{{role}}» ролу өчүрүлдү",
+    "unitsImportedWithPrices": "Импорттолгон объекттер: {{units}}, өзгөргөн баалар: {{prices}}, макулдашууга жөнөтүлдү: {{requested}}",
     "documentTemplateReset": "«{{name}}» документ шаблону стандарттуу шаблон менен алмаштырылды"
   }
 }

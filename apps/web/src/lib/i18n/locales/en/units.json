@@ -18,16 +18,106 @@
   "import": {
     "trigger": "Import units",
     "toastSuccessTitle": "Units imported",
-    "toastSuccessDescription": "{{count}} unit(s) created.",
     "toastErrorTitle": "Import failed",
     "toastErrorDescription": "The file could not be processed. Please check it and try again.",
     "resultTitle": "Import results",
-    "resultSummary": "{{created}} unit(s) created, {{failed}} row(s) failed.",
     "errorsTable": {
       "row": "Row",
       "messages": "Issue"
     },
-    "close": "Close"
+    "close": "Close",
+    "guide": {
+      "title": "Import units from a spreadsheet",
+      "description": "One row per unit, in an .xlsx or .csv file. Column names can be in English, Russian or Kyrgyz; blocks, entrances and floors that don't exist yet are created.",
+      "column": "Column",
+      "names": "Header names",
+      "example": "What goes in it",
+      "optional": "optional"
+    },
+    "columns": {
+      "block": {
+        "label": "Block",
+        "hint": "Block or building name, e.g. A"
+      },
+      "entrance": {
+        "label": "Entrance",
+        "hint": "Entrance or section, e.g. 1"
+      },
+      "floor": {
+        "label": "Floor",
+        "hint": "Whole number, e.g. 5"
+      },
+      "number": {
+        "label": "Unit number",
+        "hint": "Unique within the block, e.g. 501"
+      },
+      "area": {
+        "label": "Area",
+        "hint": "m², e.g. 45.5 or 45,5"
+      },
+      "price": {
+        "label": "Price",
+        "hint": "Full price, e.g. 5200000 or 5 200 000"
+      },
+      "type": {
+        "label": "Type",
+        "hint": "Apartment, commercial, parking or storage (apartment if empty)"
+      },
+      "rooms": {
+        "label": "Rooms",
+        "hint": "Whole number"
+      }
+    },
+    "reimport": {
+      "title": "Importing the same project again",
+      "body": "Units already in the project (same block and number) aren't created twice. A new price is taken for available units only; reserved, sold and withdrawn units keep theirs, and you'll see which.",
+      "applied": "New prices apply straight away.",
+      "needsApproval": "New prices are sent for approval first, like editing a price by hand.",
+      "noEditPrice": "You can't change prices, so rows with a new price are listed as problems."
+    },
+    "sample": "Download a sample file",
+    "sampleError": "Couldn't download the sample file",
+    "chooseFile": "Choose a file",
+    "importing": "Importing…",
+    "another": "Import another file",
+    "fileErrors": {
+      "title": "The file's columns weren't recognised",
+      "unrecognised": "None of its columns match. The file has: {{found}}. Rename them as in the table below, or start from the sample file.",
+      "missing": "These columns are missing: {{missing}}. Add them, named as in the table below."
+    },
+    "result": {
+      "created": "New units: {{count}}",
+      "pricesUpdated": "Prices updated: {{count}}",
+      "pricesRequested": "Prices sent for approval: {{count}}",
+      "unchanged": "Already up to date: {{count}}",
+      "kept": "Prices kept, unit not on sale: {{count}}",
+      "failed": "Rows with problems: {{count}}",
+      "requestedHint": "The new prices apply once someone who approves prices accepts them.",
+      "reviewPriceChanges": "Open Price changes"
+    },
+    "kept": {
+      "title": "Prices kept",
+      "hint": "These units are reserved, sold or withdrawn, so a deal or a decision depends on their price. Change it on the unit itself if you need to.",
+      "unit": "Unit",
+      "status": "Status",
+      "prices": "Price",
+      "unitLabel": "Block {{block}}, № {{number}}",
+      "fileSays": "(file: {{price}})"
+    },
+    "errorsTitle": "Rows with problems",
+    "rowErrors": {
+      "blockRequired": "Block is empty",
+      "entranceRequired": "Entrance is empty",
+      "floorInvalid": "Floor must be a whole number",
+      "numberRequired": "Unit number is empty",
+      "areaInvalid": "Area must be a number above zero",
+      "priceInvalid": "Price must be a number above zero",
+      "typeInvalid": "Unknown type \"{{value}}\": use apartment, commercial, parking or storage",
+      "roomsInvalid": "Rooms must be a whole number",
+      "priceNotAllowed": "Unit {{number}} exists and its price differs, but you can't change prices",
+      "duplicateInFile": "Unit {{number}} in block {{block}} is already on row {{row}}",
+      "rowFailed": "This row couldn't be saved; check it and try again"
+    }
   },
   "sheets": {
     "addTitle": "Add Unit to Floor {{number}}",

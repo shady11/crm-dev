@@ -180,6 +180,14 @@
     "reservationExtendedPastLimit": {
       "title": "{{byName}} extended the reservation for deal {{dealNumber}}",
       "message": "Held until {{date}}. Reason: {{reason}}"
+    },
+    "unitPricesImported": {
+      "title": "New prices imported for {{project}}",
+      "message": "{{updated}} changed by {{byName}}"
+    },
+    "unitPricesImportRequested": {
+      "title": "New prices for {{project}} need approval",
+      "message": "{{requested}} sent by {{byName}} from a unit import"
     }
   }
 }
