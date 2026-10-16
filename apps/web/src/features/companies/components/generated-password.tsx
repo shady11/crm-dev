@@ -1,4 +1,5 @@
 import {useTranslation} from "react-i18next";
+import {Check, Copy} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {Clipboard, ClipboardIndicator, ClipboardTrigger, useClipboard} from "@/components/ui/clipboard.tsx";
 
@@ -23,7 +24,9 @@ function CopyButton() {
     return (
         <ClipboardTrigger asChild>
             <Button type="button" variant="outline" size="icon-lg" aria-label={label} title={label}>
-                <ClipboardIndicator className="[&_svg]:size-4" />
+                <ClipboardIndicator className="[&_svg]:size-4" copied={<Check />}>
+                    <Copy />
+                </ClipboardIndicator>
             </Button>
         </ClipboardTrigger>
     );
