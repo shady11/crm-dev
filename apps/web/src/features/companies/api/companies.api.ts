@@ -78,6 +78,14 @@ export async function getOwnCompany() {
     return response.data;
 }
 
+/** SA-8: which first steps the caller's company has done. */
+export type CompanySetupProgress = {branch: boolean; legalDetails: boolean; project: boolean; team: boolean};
+
+export async function getCompanySetupProgress() {
+    const response = await api.get<CompanySetupProgress>("/companies/me/setup");
+    return response.data;
+}
+
 export async function updateOwnCompany(payload: Partial<UpdateOwnCompanyPayload>) {
     const response = await api.patch<Company>("/companies/me", payload);
     return response.data;

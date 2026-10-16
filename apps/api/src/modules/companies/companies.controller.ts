@@ -53,6 +53,12 @@ export class CompaniesController {
         return this.companiesService.findOwn(actor);
     }
 
+    @RequirePermissions("company_settings.view")
+    @Get("me/setup")
+    setupProgress(@CurrentUser() actor: AuthUser) {
+        return this.companiesService.setupProgress(actor);
+    }
+
     @RequirePermissions("company_settings.edit")
     @Patch("me")
     updateOwn(@CurrentUser() actor: AuthUser, @Body() dto: UpdateOwnCompanyDto) {

@@ -45,9 +45,15 @@ describe("CompaniesService", () => {
     };
 
     const build = (over: {existingUser?: unknown; existingCompany?: unknown} = {}) => {
-        const created: {company?: unknown; user?: any} = {};
+        const created: {company?: unknown; user?: any; branch?: unknown} = {};
 
         const tx = {
+            branch: {
+                create: jest.fn().mockImplementation(({data}) => {
+                    created.branch = data;
+                    return Promise.resolve({id: "branch-1", ...data});
+                }),
+            },
             company: {
                 create: jest.fn().mockImplementation(({data}) => {
                     created.company = data;
@@ -78,6 +84,14 @@ describe("CompaniesService", () => {
 
         expect(created.company).toMatchObject({name: "Bishkek Dev"});
         expect(created.user).toMatchObject({roleId: "role-company-admin", companyId: "company-1"});
+    });
+
+    it("SA-8: starts the company with a first branch, so its sales team can be added straight away", async () => {
+        const {service, created} = build();
+
+        await service.create(actor, {...baseDto});
+
+        expect(created.branch).toEqual({companyId: "company-1", name: "Bishkek Dev"});
     });
 
     it("normalises the admin email so a differently-cased duplicate cannot slip through", async () => {
@@ -417,6 +431,53 @@ describe("CompaniesService self-service (CA-A1)", () => {
                 companyId: "company-1",
             }),
         );
+    });
+});
+
+describe("CompaniesService.setupProgress (SA-8)", () => {
+    const admin = {id: "admin-1", companyId: "company-1"} as AuthUser;
+    const legal = {legalName: "ОсОО Бишкек Дев", taxId: "01234567890123", address: "Бишкек", signatoryName: "Айбек"};
+
+    const build = (counts: {branches: number; projects: number; users: number}, company: object = {}) => {
+        const prisma = {
+            company: {findFirst: jest.fn().mockResolvedValue({id: "company-1", name: "Bishkek Dev", ...company})},
+            branch: {count: jest.fn().mockResolvedValue(counts.branches)},
+            project: {count: jest.fn().mockResolvedValue(counts.projects)},
+            user: {count: jest.fn().mockResolvedValue(counts.users)},
+        } as unknown as PrismaService;
+        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions, rbacService, moduleRef), prisma};
+    };
+
+    it("a brand-new company has only its branch done", async () => {
+        const {service} = build({branches: 1, projects: 0, users: 1});
+
+        await expect(service.setupProgress(admin)).resolves.toEqual({
+            branch: true,
+            legalDetails: false,
+            project: false,
+            team: false,
+        });
+    });
+
+    it("everything is done once the company has legal details, a project and a second user", async () => {
+        const {service} = build({branches: 2, projects: 1, users: 5}, legal);
+
+        await expect(service.setupProgress(admin)).resolves.toEqual({
+            branch: true,
+            legalDetails: true,
+            project: true,
+            team: true,
+        });
+    });
+
+    it("counts only the caller's company, and only live branches and projects", async () => {
+        const {service, prisma} = build({branches: 0, projects: 0, users: 1});
+
+        await service.setupProgress(admin);
+
+        expect(prisma.branch.count).toHaveBeenCalledWith({where: {companyId: "company-1", deactivatedAt: null}});
+        expect(prisma.project.count).toHaveBeenCalledWith({where: {companyId: "company-1", deletedAt: null}});
+        expect(prisma.user.count).toHaveBeenCalledWith({where: {companyId: "company-1", isActive: true}});
     });
 });
 

@@ -14,6 +14,7 @@ import {MyPerformanceCard} from "@/features/dashboard/components/my-performance-
 import {DealStatusCardsGrid} from "@/features/deals/components/deal-status-cards-grid.tsx";
 import {FunnelCard} from "@/features/dashboard/components/funnel-card.tsx";
 import {FinanceOverviewCard} from "@/features/dashboard/components/finance-overview-card.tsx";
+import {GettingStartedCard} from "@/features/dashboard/components/getting-started-card.tsx";
 import {
     useBranchComparison,
     useDashboard,
@@ -99,6 +100,11 @@ export function DashboardPage() {
                     </Select>
                 </div>
             </div>
+
+            {/* SA-8: what a new company still has to set up, for whoever sets it up. */}
+            {user?.companyId && hasPermission(user, "company_settings.edit") ? (
+                <GettingStartedCard companyId={user.companyId} />
+            ) : null}
 
             {/* Finance starts from the money: collected, owed, overdue. */}
             {canViewFinanceOverview && financeOverview.data ? <FinanceOverviewCard data={financeOverview.data} /> : null}

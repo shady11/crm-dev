@@ -16,6 +16,7 @@ import {CreateCompanyDto} from "./dto/create-company.dto";
 import {UpdateCompanyDto} from "./dto/update-company.dto";
 import {UpdateOwnCompanyDto} from "./dto/update-own-company.dto";
 import {QueryCompaniesDto} from "./dto/query-companies.dto";
+import {missingLegalDetails} from "./legal-details";
 
 /**
  * Defaults for the pilot market. Applied here rather than in the DTO so a
@@ -274,6 +275,11 @@ export class CompaniesService {
                 select: COMPANY_SELECT,
             });
 
+            // SA-8: a first branch, so the admin can add their sales team
+            // straight away instead of meeting "This role requires a branch".
+            // Named after the company; they can rename it.
+            await db.branch.create({data: {companyId: created.id, name: dto.name}});
+
             await db.user.create({
                 data: {
                     fullName: dto.adminFullName,
@@ -331,6 +337,30 @@ export class CompaniesService {
         }
 
         return company;
+    }
+
+    /**
+     * SA-8: what a new company still has to set up, for the "Getting
+     * started" card on its admin's dashboard. Each step is done once the
+     * company has it; the card goes away when all are.
+     */
+    async setupProgress(actor: AuthUser) {
+        const company = await this.findOwn(actor);
+        const companyId = company.id;
+
+        const [branches, projects, activeUsers] = await Promise.all([
+            this.prisma.branch.count({where: {companyId, deactivatedAt: null}}),
+            this.prisma.project.count({where: {companyId, deletedAt: null}}),
+            this.prisma.user.count({where: {companyId, isActive: true}}),
+        ]);
+
+        return {
+            branch: branches > 0,
+            legalDetails: missingLegalDetails(company).length === 0,
+            project: projects > 0,
+            // Someone besides the admin who set the company up.
+            team: activeUsers > 1,
+        };
     }
 
     /**
