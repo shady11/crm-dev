@@ -140,6 +140,7 @@
     "roleCreated": "Создана роль «{{role}}»",
     "roleUpdated": "Изменена роль «{{role}}»",
     "rolePermissionsChanged": "Изменены права роли «{{role}}»: добавлено {{added}}, убрано {{removed}}",
-    "roleDeleted": "Удалена роль «{{role}}»"
+    "roleDeleted": "Удалена роль «{{role}}»",
+    "documentTemplateReset": "Шаблон документа «{{name}}» заменён стандартным"
   }
 }

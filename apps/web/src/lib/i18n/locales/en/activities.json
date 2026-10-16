@@ -140,6 +140,7 @@
     "roleCreated": "Role \"{{role}}\" created",
     "roleUpdated": "Role \"{{role}}\" updated",
     "rolePermissionsChanged": "Permissions of role \"{{role}}\" changed: {{added}} added, {{removed}} removed",
-    "roleDeleted": "Role \"{{role}}\" deleted"
+    "roleDeleted": "Role \"{{role}}\" deleted",
+    "documentTemplateReset": "Document template \"{{name}}\" replaced by the built-in default"
   }
 }

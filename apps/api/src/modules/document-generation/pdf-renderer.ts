@@ -20,7 +20,16 @@ export async function renderHtmlToPdf(html: string): Promise<Buffer> {
     browser = await chromium.launch({
       executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
     });
-    const page = await browser.newPage();
+    // CA-5: company admins write these templates, so the page gets no
+    // JavaScript and no network: anything but inline data: content is
+    // refused, so a template can't make the server fetch internal URLs.
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    await context.route('**/*', (route) =>
+      route.request().url().startsWith('data:')
+        ? route.continue()
+        : route.abort(),
+    );
+    const page = await context.newPage();
     await page.setContent(html, { waitUntil: 'load' });
     const pdf = await page.pdf({ format: 'A4', printBackground: true });
     return pdf;

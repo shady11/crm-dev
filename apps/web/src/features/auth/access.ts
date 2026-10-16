@@ -53,6 +53,8 @@ export const FEATURE_PERMISSIONS = {
     // SH-2: list-price changes. Approvers decide them; someone who can only
     // ask follows their own requests.
     priceChanges: ["units.approve_price", "units.edit_price"],
+    // CA-5: the company's own contract, reservation and receipt templates.
+    documentTemplates: "documents.manage_templates",
 } as const satisfies Record<string, string | readonly string[]>;
 
 export type Feature = keyof typeof FEATURE_PERMISSIONS;

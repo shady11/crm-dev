@@ -81,7 +81,8 @@
     "myActivity": "My activity",
     "myTeam": "My team",
     "payments": "Payments",
-    "priceChanges": "Price changes"
+    "priceChanges": "Price changes",
+    "documentTemplates": "Document templates"
   },
   "language": {
     "switchLabel": "Language",
