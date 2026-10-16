@@ -50,6 +50,7 @@ export class SessionValidationService {
                 branchId: true,
                 isActive: true,
                 sessionsValidFrom: true,
+                mustChangePassword: true,
                 company: {
                     select: {
                         id: true,
@@ -140,7 +141,14 @@ export class SessionValidationService {
                 session.endedAt ||
                 session.expiresAt.getTime() < Date.now()
             ) {
-                throw new UnauthorizedException('Impersonation session has ended. Please log in again.');
+                // SA-5: the code tells the web app to switch back to the
+                // platform admin's own session instead of signing them out.
+                throw new UnauthorizedException({
+                    statusCode: 401,
+                    error: 'Unauthorized',
+                    code: 'IMPERSONATION_ENDED',
+                    message: 'Impersonation session has ended. Please log in again.',
+                });
             }
 
             impersonation = {
@@ -148,6 +156,7 @@ export class SessionValidationService {
                 superAdminId: session.superAdminId,
                 superAdminEmail: session.superAdmin.email,
                 superAdminName: session.superAdmin.fullName,
+                expiresAt: session.expiresAt.toISOString(),
             };
         }
 
@@ -169,6 +178,7 @@ export class SessionValidationService {
             roleId: user.roleId,
             roleName: user.role.name,
             isSuperAdmin: user.isSuperAdmin,
+            mustChangePassword: user.mustChangePassword,
             isBranchScoped: user.role.isBranchScoped,
             discountLimit: user.role.discountLimit === null ? null : user.role.discountLimit.toNumber(),
             permissions,

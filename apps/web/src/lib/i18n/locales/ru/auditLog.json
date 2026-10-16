@@ -28,6 +28,7 @@
       "TENANT_SUSPENDED": "Тенант приостановлен",
       "TENANT_RESUMED": "Тенант возобновлён",
       "TENANT_DELETED": "Тенант удалён",
+      "TENANT_RESTORED": "Тенант восстановлен",
       "TENANT_USER_DEACTIVATED": "Пользователь деактивирован",
       "TENANT_USER_REACTIVATED": "Пользователь активирован",
       "TENANT_USER_PASSWORD_RESET": "Пароль сброшен",

@@ -1,7 +1,8 @@
 {
   "status": {
     "active": "Active",
-    "suspended": "Suspended"
+    "suspended": "Suspended",
+    "deletedOn": "Deleted {{date}}"
   },
   "page": {
     "heading": "Companies",
@@ -20,13 +21,17 @@
     },
     "empty": {
       "title": "No companies yet",
-      "description": "Create one to onboard a developer onto this installation."
+      "description": "Create one to onboard a developer onto this installation.",
+      "deletedTitle": "No deleted companies",
+      "deletedDescription": "Deleted companies appear here and can be restored."
     },
     "rowActions": {
       "edit": "Edit {{name}}",
       "resume": "Resume {{name}}",
       "suspend": "Suspend {{name}}",
-      "delete": "Delete {{name}}"
+      "delete": "Delete {{name}}",
+      "restore": "Restore",
+      "deleteNeedsSuspend": "Suspend {{name}} before deleting it"
     },
     "created": {
       "title": "{{name}} is ready",
@@ -42,7 +47,12 @@
       "actionError": "That did not work",
       "suspended": "{{name}} suspended",
       "resumed": "{{name}} resumed",
-      "deleted": "{{name}} deleted"
+      "deleted": "{{name}} deleted",
+      "restored": "{{name}} is back, suspended. Resume it when its users should sign in again."
+    },
+    "views": {
+      "current": "Companies",
+      "deleted": "Deleted"
     }
   },
   "confirmDialog": {
@@ -58,10 +68,17 @@
     },
     "delete": {
       "title": "Delete this company?",
-      "body": "It disappears from this list and its users can no longer log in. Their projects, deals and payment history are kept, but there is no way to undo this from the interface.",
-      "confirm": "Delete"
+      "body": "It disappears from the list and its users can no longer sign in. Everything it holds is kept, and it can be restored from \"Deleted\".",
+      "confirm": "Delete",
+      "holds": "It holds:",
+      "typeName": "Type \"{{name}}\" to confirm"
     },
-    "working": "Working..."
+    "working": "Working...",
+    "restore": {
+      "title": "Restore this company?",
+      "body": "It comes back suspended, with everything it had. Resume it when its users should sign in again.",
+      "confirm": "Restore"
+    }
   },
   "form": {
     "editTitle": "Edit {{name}}",
@@ -80,13 +97,15 @@
       "adminPassword": "Password"
     },
     "adminSectionTitle": "First administrator",
-    "adminPasswordHint": "Leave blank to generate one. It is shown once.",
+    "adminPasswordHint": "At least 8 characters with an upper-case letter, a lower-case letter and a digit. Leave blank to generate one; it is shown once. Either way, the administrator chooses their own at first sign-in.",
     "submit": {
       "create": "Create company"
     },
     "errors": {
       "emailTaken": "Someone already uses this email. Pick another one for the administrator.",
-      "nameTaken": "A company with this name already exists."
+      "nameTaken": "A company with this name already exists.",
+      "emailInDeletedCompany": "This email belongs to a user of the deleted company \"{{name}}\". Restore that company, or use another email.",
+      "weakPassword": "The password needs at least 8 characters, with an upper-case letter, a lower-case letter and a digit."
     }
   },
   "detail": {
@@ -148,6 +167,17 @@
           "body": "You will see exactly what they see, for a limited time. Actions you take are performed as them, and are logged against your account.",
           "confirm": "View as this user"
         }
+      },
+      "deactivate": {
+        "noHandover": "Nobody — leave it unassigned",
+        "noHandoverHint": "Their open leads and deals stay with them, and their tasks stay assigned to them, until a company admin reassigns them.",
+        "openWork": "They have open work: leads {{leads}}, deals {{deals}}, tasks {{tasks}}.",
+        "noOpenWork": "They have no open leads, deals or tasks.",
+        "handTo": "Hand their open work to",
+        "lastAdminTitle": "This is the last person who can manage users",
+        "lastAdminBody": "Nobody in this company will be able to add or edit users afterwards. Only a platform admin can fix that.",
+        "lastAdminConfirm": "I understand, deactivate anyway",
+        "confirmWithHandover": "Hand over and deactivate"
       },
       "resetResult": {
         "title": "Password reset",

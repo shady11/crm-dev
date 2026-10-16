@@ -25,7 +25,6 @@ import {formatDate} from "@/utils/date-formatter";
 import {authStorage} from "@/features/auth/utils/auth-storage";
 import {landingPathFor} from "@/features/auth/access";
 import {
-    deactivateCompanyUser,
     getCompany,
     impersonateCompanyUser,
     reactivateCompanyUser,
@@ -34,8 +33,10 @@ import {
 } from "../api/companies.api";
 import {isSuspended} from "../types/company.types";
 import type {CompanyUser} from "../types/company.types";
+import {GeneratedPassword} from "../components/generated-password";
+import {DeactivateCompanyUserDialog} from "../components/deactivate-company-user-dialog";
 
-type PendingUserAction = {action: "deactivate" | "reactivate" | "resetPassword"; user: CompanyUser} | null;
+type PendingUserAction = {action: "reactivate" | "resetPassword"; user: CompanyUser} | null;
 
 export function CompanyDetailPage() {
     const {companyId} = useParams<{companyId: string}>();
@@ -43,6 +44,7 @@ export function CompanyDetailPage() {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
     const [pending, setPending] = useState<PendingUserAction>(null);
+    const [pendingDeactivate, setPendingDeactivate] = useState<CompanyUser | null>(null);
     const [resetResult, setResetResult] = useState<ResetCompanyUserPasswordResult | null>(null);
     const [pendingImpersonate, setPendingImpersonate] = useState<CompanyUser | null>(null);
 
@@ -54,11 +56,9 @@ export function CompanyDetailPage() {
 
     const userAction = useMutation<unknown, Error, NonNullable<PendingUserAction>>({
         mutationFn: ({action, user}: NonNullable<PendingUserAction>) =>
-            action === "deactivate"
-                ? deactivateCompanyUser(companyId as string, user.id)
-                : action === "reactivate"
-                  ? reactivateCompanyUser(companyId as string, user.id)
-                  : resetCompanyUserPassword(companyId as string, user.id),
+            action === "reactivate"
+                ? reactivateCompanyUser(companyId as string, user.id)
+                : resetCompanyUserPassword(companyId as string, user.id),
         onSuccess: (result, {action, user}) => {
             void queryClient.invalidateQueries({queryKey: ["companies", companyId]});
             setPending(null);
@@ -69,9 +69,7 @@ export function CompanyDetailPage() {
                 setResetResult(result as ResetCompanyUserPasswordResult);
             } else {
                 toast.success({
-                    title: action === "deactivate"
-                        ? t("detail.usersCard.toasts.deactivated", {ns: "companies", name: user.fullName})
-                        : t("detail.usersCard.toasts.reactivated", {ns: "companies", name: user.fullName}),
+                    title: t("detail.usersCard.toasts.reactivated", {ns: "companies", name: user.fullName}),
                 });
             }
         },
@@ -82,7 +80,8 @@ export function CompanyDetailPage() {
         mutationFn: (user: CompanyUser) => impersonateCompanyUser(companyId as string, user.id),
         onSuccess: (result) => {
             const currentToken = authStorage.getToken();
-            if (currentToken) authStorage.stashImpersonatorToken(currentToken);
+            // SA-5: remember this page, to come back to when it ends.
+            if (currentToken) authStorage.stashImpersonatorToken(currentToken, `/companies/${companyId}`);
 
             authStorage.setToken(result.accessToken);
             void queryClient.invalidateQueries({queryKey: ["auth", "me"]});
@@ -249,10 +248,9 @@ export function CompanyDetailPage() {
                                                                   })
                                                         }
                                                         onClick={() =>
-                                                            setPending({
-                                                                action: user.isActive ? "deactivate" : "reactivate",
-                                                                user,
-                                                            })
+                                                            user.isActive
+                                                                ? setPendingDeactivate(user)
+                                                                : setPending({action: "reactivate", user})
                                                         }
                                                     >
                                                         {user.isActive ? (
@@ -288,6 +286,20 @@ export function CompanyDetailPage() {
                 isPending={userAction.isPending}
                 onCancel={() => setPending(null)}
                 onConfirm={() => pending && userAction.mutate(pending)}
+            />
+
+            <DeactivateCompanyUserDialog
+                companyId={companyId as string}
+                user={pendingDeactivate}
+                users={company.data?.users ?? []}
+                onClose={() => setPendingDeactivate(null)}
+                onDone={(user) => {
+                    void queryClient.invalidateQueries({queryKey: ["companies", companyId]});
+                    setPendingDeactivate(null);
+                    toast.success({
+                        title: t("detail.usersCard.toasts.deactivated", {ns: "companies", name: user.fullName}),
+                    });
+                }}
             />
 
             <ResetPasswordResultDialog result={resetResult} onClose={() => setResetResult(null)} />
@@ -326,11 +338,6 @@ function Row({label, value}: {label: string; value: string | null}) {
 function useUserActionCopy() {
     const {t} = useTranslation("companies");
     return {
-        deactivate: {
-            title: t("detail.usersCard.confirmDialog.deactivate.title"),
-            body: t("detail.usersCard.confirmDialog.deactivate.body"),
-            confirm: t("detail.usersCard.confirmDialog.deactivate.confirm"),
-        },
         reactivate: {
             title: t("detail.usersCard.confirmDialog.reactivate.title"),
             body: t("detail.usersCard.confirmDialog.reactivate.body"),
@@ -406,9 +413,7 @@ function ResetPasswordResultDialog({
                     </p>
                     <div className="space-y-1">
                         <p className="text-muted-foreground">{t("detail.usersCard.resetResult.passwordLabel")}</p>
-                        <code className="bg-muted block rounded px-3 py-2 font-mono text-base">
-                            {result?.generatedPassword}
-                        </code>
+                        {result ? <GeneratedPassword value={result.generatedPassword} /> : null}
                         <p className="text-muted-foreground">{t("detail.usersCard.resetResult.passwordHint")}</p>
                     </div>
                 </DialogBody>

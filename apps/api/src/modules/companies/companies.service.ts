@@ -1,6 +1,9 @@
 import {BadRequestException, ConflictException, ForbiddenException, Injectable, NotFoundException} from "@nestjs/common";
-import {randomBytes} from "crypto";
 import * as bcrypt from "bcrypt";
+import {generateStrongPassword} from "@/common/constants/password-policy.constants";
+import {ModuleRef} from "@nestjs/core";
+import {HandoverService} from "@/modules/team/handover.service";
+import {DeactivateCompanyUserDto} from "./dto/deactivate-company-user.dto";
 import {AuditAction, Prisma} from "@/generated/prisma/client";
 import {PrismaService} from "@/database/prisma.service";
 import {ACTIVE_DEAL_STATUSES} from "@/modules/deals/deal.constants";
@@ -41,6 +44,7 @@ const COMPANY_SELECT = {
     signatoryName: true,
     signatoryTitle: true,
     suspendedAt: true,
+    deletedAt: true,
     createdAt: true,
     updatedAt: true,
 } satisfies Prisma.CompanySelect;
@@ -53,6 +57,7 @@ export class CompaniesService {
         private readonly impersonation: ImpersonationService,
         private readonly settingOptions: SettingOptionsService,
         private readonly rbacService: RbacService,
+        private readonly moduleRef: ModuleRef,
     ) {}
 
     /**
@@ -103,9 +108,11 @@ export class CompaniesService {
         const page = query.page ?? 1;
         const limit = query.limit ?? 20;
 
-        // Deleted tenants never appear. Suspended ones do — they are the rows
-        // an operator most needs to see.
-        const where: Prisma.CompanyWhereInput = {deletedAt: null};
+        // Deleted tenants appear only when asked for (SA-3: to restore one).
+        // Suspended ones always do — they are the rows an operator most needs
+        // to see.
+        const where: Prisma.CompanyWhereInput =
+            query.status === "deleted" ? {deletedAt: {not: null}} : {deletedAt: null};
 
         if (query.search) {
             where.name = {contains: query.search, mode: "insensitive"};
@@ -158,6 +165,8 @@ export class CompaniesService {
                         phone: true,
                         roleId: true,
                         role: {select: {id: true, name: true}},
+                        // SA-7: who can take over someone's work (same branch).
+                        branch: {select: {id: true, name: true}},
                         isActive: true,
                         createdAt: true,
                     },
@@ -217,6 +226,24 @@ export class CompaniesService {
         const existingUser = await this.prisma.user.findUnique({where: {email: adminEmail}});
 
         if (existingUser) {
+            // SA-3: a deleted company's users keep their emails, which is
+            // what makes restoring it possible; say so rather than leave the
+            // email mysteriously "taken".
+            const deletedCompany = existingUser.companyId
+                ? await this.prisma.company.findFirst({
+                    where: {id: existingUser.companyId, deletedAt: {not: null}},
+                    select: {name: true},
+                })
+                : null;
+            if (deletedCompany) {
+                throw new ConflictException({
+                    statusCode: 409,
+                    error: "Conflict",
+                    code: "EMAIL_IN_DELETED_COMPANY",
+                    companyName: deletedCompany.name,
+                    message: `This email belongs to a user of the deleted company "${deletedCompany.name}". Restore that company, or use another email.`,
+                });
+            }
             throw new ConflictException("A user with this email already exists");
         }
 
@@ -230,7 +257,7 @@ export class CompaniesService {
 
         await this.assertValidSettings(dto);
 
-        const password = dto.adminPassword?.trim() || randomBytes(18).toString("base64url");
+        const password = dto.adminPassword?.trim() || generateStrongPassword();
         const passwordHash = await bcrypt.hash(password, 10);
         const companyAdminRoleId = await this.rbacService.findDefaultCompanyAdminRoleId();
 
@@ -252,6 +279,8 @@ export class CompaniesService {
                     fullName: dto.adminFullName,
                     email: adminEmail,
                     passwordHash,
+                    // SA-6: whoever created the company knows this password.
+                    mustChangePassword: true,
                     roleId: companyAdminRoleId,
                     companyId: created.id,
                 },
@@ -495,8 +524,18 @@ export class CompaniesService {
      * back or disputed something, and destroying them on one click is not a
      * decision this endpoint should be able to make.
      */
+    /**
+     * SA-3: only a suspended company can be deleted, so a live tenant can't
+     * disappear in one click: suspending first signs everyone out and gives
+     * a moment to notice the wrong row. Deletion hides the company and
+     * keeps all its data, so restore() can bring it back.
+     */
     async remove(actor: AuthUser, id: string) {
-        await this.findOne(id);
+        const company = await this.findOne(id);
+
+        if (!company.suspendedAt) {
+            throw new ConflictException("Suspend the company before deleting it.");
+        }
 
         await this.prisma.company.update({
             where: {id},
@@ -510,9 +549,55 @@ export class CompaniesService {
             targetType: "Company",
             targetId: id,
             companyId: id,
+            // What was hidden, for whoever reads the log later.
+            metadata: {name: company.name, ...company.stats},
         });
 
         return {success: true};
+    }
+
+    /**
+     * SA-3: brings a deleted company back, still suspended, so its users can
+     * sign in only once someone resumes it on purpose.
+     */
+    async restore(actor: AuthUser, id: string) {
+        const company = await this.prisma.company.findFirst({
+            where: {id, deletedAt: {not: null}},
+            select: {id: true, name: true},
+        });
+
+        if (!company) {
+            throw new NotFoundException("Deleted company not found");
+        }
+
+        const nameTaken = await this.prisma.company.findFirst({
+            where: {name: company.name, deletedAt: null},
+            select: {id: true},
+        });
+
+        if (nameTaken) {
+            throw new ConflictException(
+                `Another company is now called "${company.name}". Rename it before restoring this one.`,
+            );
+        }
+
+        const restored = await this.prisma.company.update({
+            where: {id},
+            data: {deletedAt: null, suspendedAt: new Date()},
+            select: COMPANY_SELECT,
+        });
+
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.TENANT_RESTORED,
+            targetType: "Company",
+            targetId: id,
+            companyId: id,
+            metadata: {name: company.name},
+        });
+
+        return restored;
     }
 
     /**
@@ -535,15 +620,59 @@ export class CompaniesService {
     }
 
     /**
+     * SA-7: what deactivating a company's user would leave behind: their
+     * open leads, active deals and open tasks, and whether they are the last
+     * active person in the company who can manage users.
+     */
+    async deactivationPreview(actor: AuthUser, companyId: string, userId: string) {
+        const target = await this.getTenantUserOrThrow(companyId, userId);
+        const work = await this.handover().preview(this.asCompanyActor(actor, companyId), userId);
+
+        return {
+            user: {id: target.id, fullName: target.fullName, branchId: target.branchId},
+            leads: work.leads,
+            deals: work.deals,
+            tasks: work.tasks,
+            isLastAdmin: await this.isLastActiveAdmin(companyId, target),
+        };
+    }
+
+    /**
      * Deactivates a tenant's user. For when the tenant's own COMPANY_ADMIN is
      * unreachable, or is the person locked out. Bumps sessionsValidFrom so any
      * session the user already holds stops on its next request.
+     *
+     * SA-7: like a company admin deactivating someone (CA-8), the person's
+     * open work can be handed to `reassignToId` first; and deactivating the
+     * last active user who can manage users needs `confirmLastAdmin`, since
+     * nobody inside the company could manage it afterwards.
      */
-    async deactivateUser(actor: AuthUser, companyId: string, userId: string) {
+    async deactivateUser(actor: AuthUser, companyId: string, userId: string, dto: DeactivateCompanyUserDto = {}) {
         const target = await this.getTenantUserOrThrow(companyId, userId);
 
         if (!target.isActive) {
             throw new ConflictException("This user is already deactivated");
+        }
+
+        if (!dto.confirmLastAdmin && (await this.isLastActiveAdmin(companyId, target))) {
+            throw new ConflictException({
+                statusCode: 409,
+                error: "Conflict",
+                code: "LAST_ACTIVE_ADMIN",
+                message: "This is the company's last active user who can manage users. Confirm to deactivate them anyway.",
+            });
+        }
+
+        let handedOver: {leads: number; deals: number; tasks: number} | undefined;
+        if (dto.reassignToId) {
+            if (dto.reassignToId === userId) {
+                throw new BadRequestException("Choose someone else to take the work over.");
+            }
+            const replacement = await this.getTenantUserOrThrow(companyId, dto.reassignToId);
+            if (!replacement.isActive) {
+                throw new BadRequestException("The person taking over must be active.");
+            }
+            handedOver = await this.handover().handOver(this.asCompanyActor(actor, companyId), userId, dto.reassignToId);
         }
 
         await this.prisma.user.update({
@@ -558,10 +687,38 @@ export class CompaniesService {
             targetType: "User",
             targetId: userId,
             companyId,
-            metadata: {email: target.email},
+            metadata: {
+                email: target.email,
+                ...(dto.reassignToId ? {reassignToId: dto.reassignToId, handedOver} : {}),
+                ...(dto.confirmLastAdmin ? {lastAdmin: true} : {}),
+            },
         });
 
-        return {success: true};
+        return {success: true, handedOver};
+    }
+
+    /** Whether `target` is the only active user left who can manage users. */
+    private async isLastActiveAdmin(companyId: string, target: {id: string; roleId: string; isActive: boolean}) {
+        const adminRoleIds = await this.rbacService.findRoleIdsWithPermission(companyId, "users.edit");
+        if (!target.isActive || !adminRoleIds.includes(target.roleId)) return false;
+        const others = await this.prisma.user.count({
+            where: {companyId, id: {not: target.id}, isActive: true, deletedAt: null, roleId: {in: adminRoleIds}},
+        });
+        return others === 0;
+    }
+
+    /**
+     * The SH-5 handover runs as someone in the company; the platform admin
+     * acts in it as a company-wide member of that company, still under their
+     * own id, so the records show it was them.
+     */
+    private asCompanyActor(actor: AuthUser, companyId: string): AuthUser {
+        return {...actor, companyId, isBranchScoped: false, branchId: null};
+    }
+
+    /** Looked up at call time, as UsersService does: TeamModule depends on far more than this module should. */
+    private handover() {
+        return this.moduleRef.get(HandoverService, {strict: false});
     }
 
     // Reverses deactivateUser, kept as a separate endpoint for the same reason
@@ -601,12 +758,13 @@ export class CompaniesService {
     async resetUserPassword(actor: AuthUser, companyId: string, userId: string) {
         const target = await this.getTenantUserOrThrow(companyId, userId);
 
-        const password = randomBytes(18).toString("base64url");
+        const password = generateStrongPassword();
         const passwordHash = await bcrypt.hash(password, 10);
 
         await this.prisma.user.update({
             where: {id: userId},
-            data: {passwordHash, sessionsValidFrom: new Date()},
+            // SA-6: the platform admin knows it now; the user must replace it.
+            data: {passwordHash, sessionsValidFrom: new Date(), mustChangePassword: true},
         });
 
         await this.auditLog.record({

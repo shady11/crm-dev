@@ -94,6 +94,14 @@ describe("AuthService.changeOwnPassword", () => {
         await expect(bcrypt.compare("a-new-password", written)).resolves.toBe(true);
     });
 
+    it("clears the 'must change password' flag (SA-6)", async () => {
+        const {service, update} = build();
+
+        await service.changeOwnPassword(caller, {currentPassword: CURRENT, newPassword: "a-new-password"});
+
+        expect(update.mock.calls[0][0].data.mustChangePassword).toBe(false);
+    });
+
     it("invalidates every existing session", async () => {
         const {service, update} = build();
 

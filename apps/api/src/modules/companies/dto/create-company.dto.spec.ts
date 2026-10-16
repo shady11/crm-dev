@@ -21,6 +21,11 @@ describe("CreateCompanyDto (SA-1)", () => {
         expect(errors.map((e) => e.property)).toEqual(["adminPassword"]);
     });
 
+    it("holds a typed password to the same rule as everyone else's (SA-6)", async () => {
+        const {errors} = await check({adminPassword: "password123"});
+        expect(errors.map((e) => e.property)).toEqual(["adminPassword"]);
+    });
+
     it("keeps a typed password as it is", async () => {
         const {dto, errors} = await check({adminPassword: "Password123"});
         expect(errors).toEqual([]);

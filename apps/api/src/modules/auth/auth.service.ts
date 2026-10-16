@@ -190,7 +190,7 @@ export class AuthService {
 
         await this.prisma.user.update({
             where: { id: record.id },
-            data: { passwordHash, sessionsValidFrom: new Date() },
+            data: { passwordHash, sessionsValidFrom: new Date(), mustChangePassword: false },
         });
 
         // Distinct from UsersService.updatePassword's admin-reset logging —

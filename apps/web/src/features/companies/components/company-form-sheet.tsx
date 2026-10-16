@@ -17,6 +17,7 @@ import type {CreateCompanyPayload} from "../api/companies.api";
 import type {Company} from "../types/company.types";
 import {FieldGroup} from "@/components/ui/field.tsx";
 import {SettingOptionSelect} from "@/features/setting-options/components/setting-option-select.tsx";
+import {isStrongPassword} from "@/lib/password-policy.ts";
 
 const EMPTY: CreateCompanyPayload = {
     name: "",
@@ -45,9 +46,12 @@ export function CompanyFormSheet({open, company, isSubmitting, formError, onOpen
     const {t} = useTranslation("companies");
     const {t: tCommon} = useTranslation("common");
     const [form, setForm] = useState<CreateCompanyPayload>(EMPTY);
+    const [localError, setLocalError] = useState<string | undefined>();
+    const shownError = localError ?? formError;
 
     useEffect(() => {
         if (!open) return;
+        setLocalError(undefined);
 
         setForm(
             company
@@ -88,15 +92,21 @@ export function CompanyFormSheet({open, company, isSubmitting, formError, onOpen
                         // SA-1: a blank password means "generate one"; send
                         // nothing rather than an empty string.
                         const {adminPassword, ...rest} = form;
+                        // SA-6: the same rule as every other password.
+                        if (adminPassword?.trim() && !isStrongPassword(adminPassword)) {
+                            setLocalError(t("form.errors.weakPassword"));
+                            return;
+                        }
+                        setLocalError(undefined);
                         onSubmit(adminPassword?.trim() ? {...rest, adminPassword} : rest);
                     }}
                 >
                     <SheetBody scrollFade>
                         {/* At the top, so it is seen without scrolling down to it. */}
-                        {formError ? (
+                        {shownError ? (
                             <Alert variant="destructive" className="mt-4">
                                 <TriangleAlert />
-                                <AlertTitle>{formError}</AlertTitle>
+                                <AlertTitle>{shownError}</AlertTitle>
                             </Alert>
                         ) : null}
                         <FieldGroup className="gap-5 py-4">

@@ -6,13 +6,15 @@ import type {TFunction} from "i18next";
 import {toast} from "@/components/ui/toast.tsx";
 import {apiErrorMessage} from "@/lib/api-error.ts";
 import {useTranslation} from "react-i18next";
-import {Building2, PauseCircle, Pencil, PlayCircle, Plus, SlidersHorizontal, Trash2} from "lucide-react";
+import {Building2, PauseCircle, Pencil, PlayCircle, Plus, RotateCcw, SlidersHorizontal, Trash2} from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
+import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
+import {formatDate} from "@/utils/date-formatter.ts";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {
     AlertDialog,
@@ -30,6 +32,7 @@ import {
     type CreateCompanyResult,
     deleteCompany,
     getCompanies,
+    restoreCompany,
     resumeCompany,
     suspendCompany,
     updateCompany,
@@ -37,12 +40,18 @@ import {
 import type {Company} from "../types/company.types";
 import {isSuspended} from "../types/company.types";
 import {CompanyFormSheet} from "../components/company-form-sheet";
+import {GeneratedPassword} from "../components/generated-password";
+import {DeleteCompanyDialog} from "../components/delete-company-dialog";
 
-type Pending = {action: "suspend" | "resume" | "delete"; company: Company} | null;
+type Pending = {action: "suspend" | "resume" | "delete" | "restore"; company: Company} | null;
+
+/** SA-3: the live companies, or the deleted ones (to restore). */
+type View = "current" | "deleted";
 
 export function CompaniesPage() {
-    const {t} = useTranslation("companies");
+    const {t, i18n} = useTranslation("companies");
     const queryClient = useQueryClient();
+    const [view, setView] = useState<View>("current");
     const [search, setSearch] = useState("");
     const [formOpen, setFormOpen] = useState(false);
     const [editing, setEditing] = useState<Company | null>(null);
@@ -50,8 +59,12 @@ export function CompaniesPage() {
     const [pending, setPending] = useState<Pending>(null);
 
     const companies = useQuery({
-        queryKey: ["companies", search],
-        queryFn: () => getCompanies(search ? {search} : undefined),
+        queryKey: ["companies", search, view],
+        queryFn: () =>
+            getCompanies({
+                ...(search ? {search} : {}),
+                ...(view === "deleted" ? {status: "deleted" as const} : {}),
+            }),
     });
 
     const refresh = () => queryClient.invalidateQueries({queryKey: ["companies"]});
@@ -84,7 +97,9 @@ export function CompaniesPage() {
                 ? suspendCompany(company.id)
                 : action === "resume"
                   ? resumeCompany(company.id)
-                  : deleteCompany(company.id),
+                  : action === "restore"
+                    ? restoreCompany(company.id)
+                    : deleteCompany(company.id),
         onSuccess: (_result, {action, company}) => {
             void refresh();
             setPending(null);
@@ -93,7 +108,9 @@ export function CompaniesPage() {
                     ? t("page.toasts.suspended", {name: company.name})
                     : action === "resume"
                       ? t("page.toasts.resumed", {name: company.name})
-                      : t("page.toasts.deleted", {name: company.name}),
+                      : action === "restore"
+                        ? t("page.toasts.restored", {name: company.name})
+                        : t("page.toasts.deleted", {name: company.name}),
             });
         },
         onError: (error) =>
@@ -142,9 +159,7 @@ export function CompaniesPage() {
                                 <p className="text-muted-foreground">
                                     {t("page.created.generatedPasswordLabel")}
                                 </p>
-                                <code className="bg-muted block rounded px-3 py-2 font-mono text-base">
-                                    {created.admin.generatedPassword}
-                                </code>
+                                <GeneratedPassword value={created.admin.generatedPassword} />
                                 <p className="text-muted-foreground">
                                     {t("page.created.generatedPasswordHint")}
                                 </p>
@@ -156,6 +171,13 @@ export function CompaniesPage() {
                     </CardContent>
                 </Card>
             ) : null}
+
+            <Tabs value={view} onValueChange={({value}) => setView(value as View)}>
+                <TabsList>
+                    <TabsTrigger value="current">{t("page.views.current")}</TabsTrigger>
+                    <TabsTrigger value="deleted">{t("page.views.deleted")}</TabsTrigger>
+                </TabsList>
+            </Tabs>
 
             <Input
                 placeholder={t("page.searchPlaceholder")}
@@ -175,8 +197,10 @@ export function CompaniesPage() {
                         <EmptyMedia variant="icon">
                             <Building2 />
                         </EmptyMedia>
-                        <EmptyTitle>{t("page.empty.title")}</EmptyTitle>
-                        <EmptyDescription>{t("page.empty.description")}</EmptyDescription>
+                        <EmptyTitle>{view === "deleted" ? t("page.empty.deletedTitle") : t("page.empty.title")}</EmptyTitle>
+                        <EmptyDescription>
+                            {view === "deleted" ? t("page.empty.deletedDescription") : t("page.empty.description")}
+                        </EmptyDescription>
                     </EmptyHeader>
                 </Empty>
             ) : (
@@ -197,18 +221,31 @@ export function CompaniesPage() {
                         <TableBody>
                             {items.map((company) => {
                                 const suspended = isSuspended(company);
+                                const deleted = Boolean(company.deletedAt);
 
                                 return (
                                     <TableRow key={company.id} className={suspended ? "opacity-60" : undefined}>
                                         <TableCell className="font-medium">
-                                            <Link className="hover:underline" to={`/companies/${company.id}`}>
-                                                {company.name}
-                                            </Link>
+                                            {deleted ? (
+                                                company.name
+                                            ) : (
+                                                <Link className="hover:underline" to={`/companies/${company.id}`}>
+                                                    {company.name}
+                                                </Link>
+                                            )}
                                         </TableCell>
                                         <TableCell>
-                                            <Badge variant={suspended ? "destructive" : "secondary"}>
-                                                {suspended ? t("status.suspended") : t("status.active")}
-                                            </Badge>
+                                            {deleted ? (
+                                                <Badge variant="outline">
+                                                    {t("status.deletedOn", {
+                                                        date: formatDate(company.deletedAt!, i18n.language).date,
+                                                    })}
+                                                </Badge>
+                                            ) : (
+                                                <Badge variant={suspended ? "destructive" : "secondary"}>
+                                                    {suspended ? t("status.suspended") : t("status.active")}
+                                                </Badge>
+                                            )}
                                         </TableCell>
                                         <TableCell>{company.currency ?? "—"}</TableCell>
                                         <TableCell className="text-right tabular-nums">
@@ -219,6 +256,17 @@ export function CompaniesPage() {
                                         </TableCell>
                                         <TableCell>
                                             <div className="flex justify-end gap-1">
+                                                {deleted ? (
+                                                    <Button
+                                                        size="sm"
+                                                        variant="outline"
+                                                        onClick={() => setPending({action: "restore", company})}
+                                                    >
+                                                        <RotateCcw className="size-3.5" />
+                                                        {t("page.rowActions.restore")}
+                                                    </Button>
+                                                ) : (
+                                                    <>
                                                 <Button
                                                     size="icon-sm"
                                                     variant="ghost"
@@ -254,11 +302,20 @@ export function CompaniesPage() {
                                                 <Button
                                                     size="icon-sm"
                                                     variant="ghost"
-                                                    aria-label={t("page.rowActions.delete", {name: company.name})}
+                                                    // SA-3: only a suspended company can be deleted.
+                                                    disabled={!suspended}
+                                                    aria-label={
+                                                        suspended
+                                                            ? t("page.rowActions.delete", {name: company.name})
+                                                            : t("page.rowActions.deleteNeedsSuspend", {name: company.name})
+                                                    }
+                                                    title={suspended ? undefined : t("page.rowActions.deleteNeedsSuspend", {name: company.name})}
                                                     onClick={() => setPending({action: "delete", company})}
                                                 >
                                                     <Trash2 className="text-destructive size-3.5" />
                                                 </Button>
+                                                    </>
+                                                )}
                                             </div>
                                         </TableCell>
                                     </TableRow>
@@ -285,8 +342,15 @@ export function CompaniesPage() {
                 onSubmit={(payload) => save.mutate(payload)}
             />
 
+            <DeleteCompanyDialog
+                company={pending?.action === "delete" ? pending.company : null}
+                isPending={act.isPending}
+                onCancel={() => setPending(null)}
+                onConfirm={() => pending && act.mutate(pending)}
+            />
+
             <ConfirmDialog
-                pending={pending}
+                pending={pending?.action === "delete" ? null : pending}
                 isPending={act.isPending}
                 onCancel={() => setPending(null)}
                 onConfirm={() => pending && act.mutate(pending)}
@@ -315,6 +379,11 @@ function useConfirmCopy() {
             title: t("confirmDialog.delete.title"),
             body: t("confirmDialog.delete.body"),
             confirm: t("confirmDialog.delete.confirm"),
+        },
+        restore: {
+            title: t("confirmDialog.restore.title"),
+            body: t("confirmDialog.restore.body"),
+            confirm: t("confirmDialog.restore.confirm"),
         },
     } as const;
 }
@@ -365,6 +434,9 @@ function ConfirmDialog({
  */
 function companyFormError(error: Error, t: TFunction<"companies">, isEdit: boolean): string {
     const message = apiErrorMessage(error);
+    if (isAxiosError<{code?: string; companyName?: string}>(error) && error.response?.data?.code === "EMAIL_IN_DELETED_COMPANY") {
+        return t("form.errors.emailInDeletedCompany", {name: error.response.data.companyName ?? ""});
+    }
     if (isAxiosError(error) && error.response?.status === 409) {
         if (message?.includes("email")) return t("form.errors.emailTaken");
         if (message?.includes("name")) return t("form.errors.nameTaken");

@@ -1,5 +1,6 @@
 import {Transform} from "class-transformer";
-import {IsEmail, IsOptional, IsString, MaxLength, MinLength} from "class-validator";
+import {IsEmail, IsOptional, IsString, IsStrongPassword, MaxLength, MinLength} from "class-validator";
+import {STRONG_PASSWORD_OPTIONS} from "@/common/constants/password-policy.constants";
 
 export class CreateCompanyDto {
     @IsString()
@@ -49,6 +50,9 @@ export class CreateCompanyDto {
     @Transform(({value}: {value: unknown}) => (typeof value === "string" && value.trim() === "" ? undefined : value))
     @IsOptional()
     @IsString()
-    @MinLength(8)
+    // SA-6: the same rule as every other password, not just 8 characters.
+    @IsStrongPassword(STRONG_PASSWORD_OPTIONS, {
+        message: "adminPassword must be at least 8 characters with an upper-case letter, a lower-case letter and a digit",
+    })
     adminPassword?: string;
 }

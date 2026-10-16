@@ -31,7 +31,6 @@
  * second run.
  */
 import "dotenv/config";
-import {randomBytes} from "crypto";
 import * as bcrypt from "bcrypt";
 import {
     ActivityAction,
@@ -55,6 +54,7 @@ import {RbacService} from "@/modules/rbac/rbac.service";
 import {DEFAULT_ROLES} from "@/modules/rbac/default-role-permissions";
 import {numberUnnumberedPayments} from "@/modules/deals/services/payments/receipt-number.service";
 import {activityText} from "@/modules/activities/activity-templates";
+import {generateStrongPassword, isStrongPassword} from "@/common/constants/password-policy.constants";
 
 const prisma = new PrismaClient({
     adapter: new PrismaPg({connectionString: process.env.DATABASE_URL!}),
@@ -127,9 +127,9 @@ function parseFlags(argv: string[]): Map<string, string> {
 }
 
 /** 18 bytes of base64url — ~24 characters, no ambiguity about shell escaping. */
-function generatePassword(): string {
-    return randomBytes(18).toString("base64url");
-}
+// SA-6: the same rule and generator as the app, so the first admin's
+// password is never weaker than their staff's.
+const generatePassword = generateStrongPassword;
 
 function assertEmailLike(email: string, flagName: string): void {
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
@@ -811,8 +811,8 @@ async function provisionTenant(flags: Map<string, string>) {
     const password = process.env.ADMIN_PASSWORD?.trim() || generatePassword();
     const generated = !process.env.ADMIN_PASSWORD?.trim();
 
-    if (password.length < 8) {
-        fail("ADMIN_PASSWORD must be at least 8 characters");
+    if (!isStrongPassword(password)) {
+        fail("ADMIN_PASSWORD must be at least 8 characters with an upper-case letter, a lower-case letter and a digit");
     }
 
     // The "Company Admin" role may not exist yet — this can run against a
@@ -831,6 +831,8 @@ async function provisionTenant(flags: Map<string, string>) {
             fullName: args.adminName,
             email: args.adminEmail,
             passwordHash: await bcrypt.hash(password, 10),
+            // SA-6: a generated password is replaced at first sign-in.
+            mustChangePassword: generated,
             roleId: companyAdminRole.id,
             companyId: company.id,
         },
@@ -873,7 +875,9 @@ async function provisionSuperAdmin(flags: Map<string, string>) {
     const password = process.env.ADMIN_PASSWORD?.trim() || generatePassword();
     const generated = !process.env.ADMIN_PASSWORD?.trim();
 
-    if (password.length < 8) fail("ADMIN_PASSWORD must be at least 8 characters");
+    if (!isStrongPassword(password)) {
+        fail("ADMIN_PASSWORD must be at least 8 characters with an upper-case letter, a lower-case letter and a digit");
+    }
 
     // The "Super Admin" role may not exist yet — this can run against a
     // database that has never booted the app (and so never seeded it). Run
@@ -891,6 +895,8 @@ async function provisionSuperAdmin(flags: Map<string, string>) {
             fullName: name,
             email,
             passwordHash: await bcrypt.hash(password, 10),
+            // SA-6: a generated password is replaced at first sign-in.
+            mustChangePassword: generated,
             roleId: superAdminRole.id,
             isSuperAdmin: true,
             // No company, deliberately. CompanyGuard rejects a user without

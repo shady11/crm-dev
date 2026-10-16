@@ -8,6 +8,11 @@ model User {
   isActive          Boolean  @default(true)
   sessionsValidFrom DateTime @default(now())
 
+  // SA-6: the password was set by someone else (a reset, a new company's
+  // first admin, an admin editing the user), who therefore knows it. The
+  // API refuses everything but choosing a new one until it is changed.
+  mustChangePassword Boolean @default(false)
+
   // The platform operator flag. Independent of the Role/permission system
   // entirely (see PermissionsGuard's unconditional bypass) rather than a
   // seeded "Super Admin" Role being special-cased by name — SUPER_ADMIN

@@ -20,6 +20,8 @@ export type AuthImpersonationSummary = {
     superAdminId: string;
     superAdminEmail: string;
     superAdminName: string;
+    /** When the session ends on its own (SA-5: the banner counts down to it). */
+    expiresAt: string;
 };
 
 export type AuthUser = {
@@ -85,4 +87,6 @@ export type AuthUser = {
     // session — set by SessionValidationService after checking the
     // ImpersonationSession row, never trusted from the JWT payload alone.
     impersonation?: AuthImpersonationSummary | null;
+    /** SA-6: must choose their own password before doing anything else. */
+    mustChangePassword?: boolean;
 };

@@ -28,6 +28,7 @@
       "TENANT_SUSPENDED": "Tenant suspended",
       "TENANT_RESUMED": "Tenant resumed",
       "TENANT_DELETED": "Tenant deleted",
+      "TENANT_RESTORED": "Tenant restored",
       "TENANT_USER_DEACTIVATED": "User deactivated",
       "TENANT_USER_REACTIVATED": "User reactivated",
       "TENANT_USER_PASSWORD_RESET": "Password reset",

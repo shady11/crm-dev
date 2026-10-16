@@ -7,8 +7,9 @@ export class QueryCompaniesDto {
     search?: string;
 
     @IsOptional()
-    @IsIn(["active", "suspended"])
-    status?: "active" | "suspended";
+    // "deleted" lists the deleted companies instead (SA-3: restore).
+    @IsIn(["active", "suspended", "deleted"])
+    status?: "active" | "suspended" | "deleted";
 
     @IsOptional()
     @Transform(({value}) => Number(value))

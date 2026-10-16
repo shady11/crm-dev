@@ -24,7 +24,9 @@
     "moreActions": "More actions",
     "download": "Download",
     "close": "Close",
-    "clear": "Clear"
+    "clear": "Clear",
+    "copy": "Copy",
+    "copied": "Copied"
   },
   "labels": {
     "status": "Status",
@@ -111,7 +113,12 @@
     "banner": "Viewing as {{name}} — {{company}}",
     "exit": "Exit",
     "exiting": "Exiting...",
-    "exitError": "Could not exit. Try again."
+    "exitError": "Could not exit. Try again.",
+    "ended": "The \"view as\" session ended. You are back in your own account.",
+    "minutesLeft_one": "Ends in {{count}} minute",
+    "minutesLeft_few": "Ends in {{count}} minutes",
+    "minutesLeft_many": "Ends in {{count}} minutes",
+    "minutesLeft_other": "Ends in {{count}} minutes"
   },
   "undo": {
     "action": "Undo",

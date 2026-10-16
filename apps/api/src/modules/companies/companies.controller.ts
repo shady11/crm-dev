@@ -6,6 +6,7 @@ import {CurrentUser} from "@/common/decorators/current-user.decorator";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {CompaniesService} from "./companies.service";
 import {CreateCompanyDto} from "./dto/create-company.dto";
+import {DeactivateCompanyUserDto} from "./dto/deactivate-company-user.dto";
 import {UpdateCompanyDto} from "./dto/update-company.dto";
 import {UpdateOwnCompanyDto} from "./dto/update-own-company.dto";
 import {QueryCompaniesDto} from "./dto/query-companies.dto";
@@ -85,6 +86,12 @@ export class CompaniesController {
         return this.companiesService.resume(actor, id);
     }
 
+    // SA-3: undoes a deletion; the company comes back suspended.
+    @Post(":id/restore")
+    restore(@CurrentUser() actor: AuthUser, @Param("id") id: string) {
+        return this.companiesService.restore(actor, id);
+    }
+
     @Delete(":id")
     remove(@CurrentUser() actor: AuthUser, @Param("id") id: string) {
         return this.companiesService.remove(actor, id);
@@ -94,13 +101,24 @@ export class CompaniesController {
     // unreachable or is the person locked out. Deactivate/reactivate are kept
     // as separate endpoints for the same reason suspend/resume are: a mistyped
     // payload cannot turn one into the other.
+    // SA-7: what deactivating them would leave behind, before confirming.
+    @Get(":id/users/:userId/deactivation-preview")
+    deactivationPreview(
+        @CurrentUser() actor: AuthUser,
+        @Param("id") id: string,
+        @Param("userId") userId: string,
+    ) {
+        return this.companiesService.deactivationPreview(actor, id, userId);
+    }
+
     @Post(":id/users/:userId/deactivate")
     deactivateUser(
         @CurrentUser() actor: AuthUser,
         @Param("id") id: string,
         @Param("userId") userId: string,
+        @Body() dto: DeactivateCompanyUserDto,
     ) {
-        return this.companiesService.deactivateUser(actor, id, userId);
+        return this.companiesService.deactivateUser(actor, id, userId, dto);
     }
 
     @Post(":id/users/:userId/reactivate")
