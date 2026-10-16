@@ -721,6 +721,7 @@ export class LeadsService {
             orderBy: {createdAt: "desc"},
             include: {
                 user: {select: {id: true, fullName: true}},
+                impersonatedBy: {select: {id: true, fullName: true}},
             },
         });
     }

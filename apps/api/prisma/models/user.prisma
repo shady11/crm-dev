@@ -50,6 +50,8 @@ model User {
   voidedPayments Payment[] @relation("PaymentVoidedBy")
   activities    Activity[]
   targetOfActivities Activity[] @relation("ActivityTargetUser")
+  // SA-2: what this platform admin did while viewing the app as someone else.
+  impersonatedActivities Activity[] @relation("ActivityImpersonator")
   tasks         Task[]
   documents     Document[]
   documentTemplates DocumentTemplate[]

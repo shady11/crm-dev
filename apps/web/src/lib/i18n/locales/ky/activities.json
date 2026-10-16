@@ -143,5 +143,9 @@
     "roleDeleted": "«{{role}}» ролу өчүрүлдү",
     "unitsImportedWithPrices": "Импорттолгон объекттер: {{units}}, өзгөргөн баалар: {{prices}}, макулдашууга жөнөтүлдү: {{requested}}",
     "documentTemplateReset": "«{{name}}» документ шаблону стандарттуу шаблон менен алмаштырылды"
+  },
+  "actor": {
+    "impersonated": "{{admin}} (платформанын колдоосу) {{user}} атынан",
+    "doneBy": "Аткарган: {{admin}} (платформанын колдоосу)"
   }
 }

@@ -84,6 +84,7 @@ export type DealActivity = {
     templateParams?: Record<string, unknown> | null;
     description: string | null;
     createdAt: string;
+    impersonatedBy?: { id: string; fullName: string } | null;
 };
 
 type DealPayment = {

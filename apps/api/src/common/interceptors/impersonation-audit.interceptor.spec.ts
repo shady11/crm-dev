@@ -1,4 +1,5 @@
-import {of} from "rxjs";
+import {defer, of} from "rxjs";
+import {currentImpersonatorId} from "@/common/context/impersonation-context";
 import {AuditAction} from "@/generated/prisma/client";
 import {ImpersonationAuditInterceptor} from "./impersonation-audit.interceptor";
 
@@ -113,6 +114,69 @@ describe("ImpersonationAuditInterceptor", () => {
         interceptor.intercept(context, handler({id: "created-1"})).subscribe((result) => {
             expect(result).toEqual({id: "created-1"});
             done();
+        });
+    });
+
+    describe("SA-2", () => {
+        it("skips end-impersonation under the global /api prefix too", (done) => {
+            const {interceptor, auditLog} = build();
+            const context = contextWith({user: impersonatedUser, method: "POST", path: "/api/auth/end-impersonation"});
+
+            interceptor.intercept(context, handler()).subscribe(() => {
+                expect(auditLog.record).not.toHaveBeenCalled();
+                done();
+            });
+        });
+
+        it("runs the handler with the platform admin in context, through awaits", (done) => {
+            const {interceptor} = build();
+            const context = contextWith({user: impersonatedUser, method: "POST", path: "/api/tasks", params: {}});
+            const seen: (string | undefined)[] = [];
+            const asyncHandler = {
+                handle: () =>
+                    defer(async () => {
+                        seen.push(currentImpersonatorId());
+                        await new Promise((resolve) => setTimeout(resolve, 5));
+                        seen.push(currentImpersonatorId());
+                        return {id: "task-1"};
+                    }),
+            };
+
+            interceptor.intercept(context, asyncHandler).subscribe({
+                complete: () => {
+                    expect(seen).toEqual(["admin-1", "admin-1"]);
+                    done();
+                },
+            });
+        });
+
+        it("leaves the context empty for an ordinary request", (done) => {
+            const {interceptor} = build();
+            const context = contextWith({user: {id: "user-1", companyId: "company-1"}, method: "POST", path: "/api/tasks"});
+            let seen: string | undefined = "unset";
+            const probe = {handle: () => defer(async () => (seen = currentImpersonatorId()))};
+
+            interceptor.intercept(context, probe).subscribe({
+                complete: () => {
+                    expect(seen).toBeUndefined();
+                    done();
+                },
+            });
+        });
+
+        it("records which record the request touched", (done) => {
+            const {interceptor, auditLog} = build();
+            const context = contextWith({
+                user: impersonatedUser, method: "PATCH", path: "/api/leads/lead-9", params: {id: "lead-9"},
+            });
+
+            interceptor.intercept(context, handler({id: "lead-9", status: "CONTACTED"})).subscribe(() => {
+                expect(auditLog.record).toHaveBeenCalledWith(expect.objectContaining({
+                    action: AuditAction.IMPERSONATED_ACTION,
+                    metadata: {method: "PATCH", path: "/api/leads/lead-9", params: {id: "lead-9"}, resultId: "lead-9"},
+                }));
+                done();
+            });
         });
     });
 });

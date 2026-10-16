@@ -373,6 +373,7 @@ export class DashboardService {
             select: {
                 id: true, title: true, templateKey: true, templateParams: true, description: true, type: true, createdAt: true,
                 user: { select: { id: true, fullName: true } },
+                impersonatedBy: { select: { id: true, fullName: true } },
                 deal: { select: { id: true, dealNumber: true } },
             },
         });
