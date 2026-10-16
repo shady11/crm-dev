@@ -137,5 +137,28 @@
       "ELKART": "Elkart",
       "OTHER": "Other"
     }
+  },
+  "gettingStarted": {
+    "title": "Getting started",
+    "progress": "{{done}} of {{total}} done",
+    "hide": "Hide getting started",
+    "steps": {
+      "branch": {
+        "title": "Add a branch",
+        "body": "Sales managers and heads work in a branch."
+      },
+      "legalDetails": {
+        "title": "Fill in the legal details",
+        "body": "Contracts and receipts print them."
+      },
+      "project": {
+        "title": "Create your first project",
+        "body": "Its blocks, floors and units are what you sell."
+      },
+      "team": {
+        "title": "Invite your team",
+        "body": "Add the people who sell, manage and collect payments."
+      }
+    }
   }
 }
