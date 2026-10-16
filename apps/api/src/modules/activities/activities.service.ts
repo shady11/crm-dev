@@ -21,6 +21,8 @@ import {ActivitySubject, QueryActivitiesDto} from "./dto/query-activities.dto";
 // Kydyrov" rather than a bare "Unit reserved".
 const ACTIVITY_INCLUDE = {
     user: {select: {id: true, fullName: true, branchId: true}},
+    // SA-2: the platform admin, when it was done while viewing as `user`.
+    impersonatedBy: {select: {id: true, fullName: true}},
     lead: {select: {id: true, fullName: true}},
     client: {select: {id: true, fullName: true}},
     // Some deal rows (e.g. payments) don't carry clientId; the deal's client fills in.

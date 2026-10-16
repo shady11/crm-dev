@@ -108,6 +108,8 @@ export const DEAL_DETAILS_INCLUDE = {
 
     activities: {
         orderBy: { createdAt: 'desc' },
+        // SA-2: done by a platform admin while viewing as the user.
+        include: { impersonatedBy: { select: { id: true, fullName: true } } },
     },
 
     tasks: true,

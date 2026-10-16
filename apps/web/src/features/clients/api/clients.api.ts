@@ -124,6 +124,7 @@ export type ClientActivity = {
     description: string | null;
     createdAt: string;
     user: { id: string; fullName: string } | null;
+    impersonatedBy?: { id: string; fullName: string } | null;
     // Which record the entry came from; both null for the client itself.
     lead: { id: string; fullName: string } | null;
     deal: { id: string; dealNumber: string } | null;

@@ -143,5 +143,9 @@
     "roleDeleted": "Role \"{{role}}\" deleted",
     "unitsImportedWithPrices": "{{units}} units imported, prices changed: {{prices}}, sent for approval: {{requested}}",
     "documentTemplateReset": "Document template \"{{name}}\" replaced by the built-in default"
+  },
+  "actor": {
+    "impersonated": "{{admin}} (platform support) as {{user}}",
+    "doneBy": "Done by {{admin}} (platform support)"
   }
 }

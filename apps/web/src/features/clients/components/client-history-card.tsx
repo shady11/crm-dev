@@ -11,6 +11,7 @@ import {getClientActivities} from "@/features/clients/api/clients.api.ts";
 import {formatDate} from "@/utils/date-formatter.ts";
 import {paths} from "@/routes/paths.ts";
 import {useActivityTitle} from "@/features/activities/hooks/use-activity-title.ts";
+import {useActivityActor} from "@/features/activities/hooks/use-activity-actor.ts";
 
 // Activity types that are a conversation with the client, as logged from a lead.
 const CONTACT_ICONS: Record<string, typeof PhoneCallIcon> = {
@@ -30,6 +31,7 @@ const PAGE = 15;
 export function ClientHistoryCard({ clientId }: { clientId: string }) {
     const { t, i18n } = useTranslation("clients");
     const activityTitle = useActivityTitle();
+    const activityActor = useActivityActor();
     const [contactsOnly, setContactsOnly] = useState(false);
     const [shown, setShown] = useState(PAGE);
 
@@ -92,7 +94,7 @@ export function ClientHistoryCard({ clientId }: { clientId: string }) {
                                                 <span className="font-medium text-foreground">{t("history.client")}</span>
                                             )}
                                             {" · "}
-                                            {activity.user?.fullName ?? t("history.system")} · {date} {time}
+                                            {activityActor(activity, t("history.system"))} · {date} {time}
                                         </p>
                                     </div>
                                 </div>

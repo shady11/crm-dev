@@ -17,6 +17,7 @@ import {
 } from "@/features/leads/api/leads.api.ts";
 import {formatCreatedAt, nextContactToIso} from "@/features/leads/utils/format.ts";
 import {useActivityTitle} from "@/features/activities/hooks/use-activity-title.ts";
+import {useActivityActor} from "@/features/activities/hooks/use-activity-actor.ts";
 
 const CONTACT_TYPE_ICON: Record<ContactAttemptType, typeof PhoneCall> = {
     [ContactAttemptType.CALL]: PhoneCall,
@@ -35,6 +36,7 @@ interface LeadActivityTabProps {
 export function LeadActivityTab({lead}: LeadActivityTabProps) {
     const {t, i18n} = useTranslation("leads");
     const activityTitle = useActivityTitle();
+    const activityActor = useActivityActor();
     const queryClient = useQueryClient();
     const [type, setType] = useState<ContactAttemptType>(ContactAttemptType.CALL);
     const [note, setNote] = useState("");
@@ -140,7 +142,7 @@ export function LeadActivityTab({lead}: LeadActivityTabProps) {
                                         <p className="text-muted-foreground">{activity.description}</p>
                                     )}
                                     <p className="text-xs text-muted-foreground">
-                                        {activity.user?.fullName ?? t("activityTab.system")} ·{" "}
+                                        {activityActor(activity, t("activityTab.system"))} ·{" "}
                                         {t("overview.createdAt", {date: created.date, time: created.time})}
                                     </p>
                                 </div>

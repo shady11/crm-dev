@@ -19,6 +19,7 @@ import {getActivities} from "../api/activities.api";
 import {ActivitySubjects} from "../components/activity-subjects";
 import {ACTIVITY_SUBJECTS, type ActivitySubject} from "../types/activity.types";
 import {useActivityTitle} from "@/features/activities/hooks/use-activity-title.ts";
+import {useActivityActor, useImpersonationNote} from "@/features/activities/hooks/use-activity-actor.ts";
 
 // Company-wide activity feed. A company-wide (non-branch-scoped) role sees
 // every company user's activity; a branch-scoped role only sees their own
@@ -28,6 +29,8 @@ import {useActivityTitle} from "@/features/activities/hooks/use-activity-title.t
 export function ActivitiesPage() {
     const {t, i18n} = useTranslation("activities");
     const activityTitle = useActivityTitle();
+    const activityActor = useActivityActor();
+    const impersonationNote = useImpersonationNote();
     const {user} = useAuth();
     const isCompanyWide = !!user && !user.isBranchScoped;
     // activities.view_own only: the API returns just this user's actions,
@@ -260,7 +263,9 @@ export function ActivitiesPage() {
                                     ) : null}
                                     <ActivitySubjects activity={activity} />
                                     <p className="text-muted-foreground mt-1.5 text-xs">
-                                        {ownOnly ? `${date} ${time}` : `${activity.user?.fullName ?? t("page.system")} · ${date} ${time}`}
+                                        {ownOnly
+                                            ? [date + " " + time, impersonationNote(activity)].filter(Boolean).join(" · ")
+                                            : `${activityActor(activity, t("page.system"))} · ${date} ${time}`}
                                     </p>
                                 </div>
                             );
@@ -285,9 +290,12 @@ export function ActivitiesPage() {
                                             <TableCell className="text-muted-foreground whitespace-nowrap text-xs">
                                                 {date} {time}
                                             </TableCell>
-                                            {!ownOnly && <TableCell>{activity.user?.fullName ?? t("page.system")}</TableCell>}
+                                            {!ownOnly && <TableCell>{activityActor(activity, t("page.system"))}</TableCell>}
                                             <TableCell>
                                                 <p className="font-medium">{activityTitle(activity)}</p>
+                                                {ownOnly && activity.impersonatedBy ? (
+                                                    <p className="text-muted-foreground text-xs">{impersonationNote(activity)}</p>
+                                                ) : null}
                                                 {activity.description ? (
                                                     <p className="text-muted-foreground text-xs">
                                                         {activity.description}

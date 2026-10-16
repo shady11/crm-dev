@@ -143,5 +143,9 @@
     "roleDeleted": "Удалена роль «{{role}}»",
     "unitsImportedWithPrices": "Импортировано объектов: {{units}}, цен изменено: {{prices}}, отправлено на согласование: {{requested}}",
     "documentTemplateReset": "Шаблон документа «{{name}}» заменён стандартным"
+  },
+  "actor": {
+    "impersonated": "{{admin}} (поддержка платформы) от имени {{user}}",
+    "doneBy": "Сделано: {{admin}} (поддержка платформы)"
   }
 }

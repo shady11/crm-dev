@@ -184,6 +184,7 @@ export type LeadActivity = {
     description: string | null;
     createdAt: string;
     user: { id: string; fullName: string } | null;
+    impersonatedBy?: { id: string; fullName: string } | null;
 };
 
 export type LogContactAttemptPayload = {

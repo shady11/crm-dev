@@ -5,10 +5,12 @@ import {paths} from "@/routes/paths.ts";
 import type {RecentActivity} from "@/features/dashboard/api/dashboard.api.ts";
 import {useTranslation} from "react-i18next";
 import {useActivityTitle} from "@/features/activities/hooks/use-activity-title.ts";
+import {useActivityActor} from "@/features/activities/hooks/use-activity-actor.ts";
 
 export function RecentActivityCard({ activities }: { activities: RecentActivity[] }) {
     const { t, i18n } = useTranslation("dashboard");
     const activityTitle = useActivityTitle();
+    const activityActor = useActivityActor();
     // Reads as a sentence after the actor's name ("Aibek unit reserved");
     // only the first letter is lowered so names and numbers keep their case.
     const asPredicate = (title: string) => title.charAt(0).toLocaleLowerCase(i18n.language) + title.slice(1);
@@ -39,7 +41,7 @@ export function RecentActivityCard({ activities }: { activities: RecentActivity[
                                     <ActivityIcon size={15} className="mt-0.5 shrink-0 text-muted-foreground" />
                                     <div className="min-w-0 flex-1">
                                         <p className="truncate">
-                                            <span className="font-medium">{a.user?.fullName ?? t("recentActivity.system")}</span> {asPredicate(activityTitle(a))}
+                                            <span className="font-medium">{activityActor(a, t("recentActivity.system"))}</span> {asPredicate(activityTitle(a))}
                                             {a.deal && ` · ${a.deal.dealNumber}`}
                                         </p>
                                         <p className="text-xs text-muted-foreground">{timeAgo(a.createdAt)}</p>
