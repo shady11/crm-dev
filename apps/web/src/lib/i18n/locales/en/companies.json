@@ -168,6 +168,17 @@
           "confirm": "View as this user"
         }
       },
+      "deactivate": {
+        "noHandover": "Nobody — leave it unassigned",
+        "noHandoverHint": "Their open leads and deals stay with them, and their tasks stay assigned to them, until a company admin reassigns them.",
+        "openWork": "They have open work: leads {{leads}}, deals {{deals}}, tasks {{tasks}}.",
+        "noOpenWork": "They have no open leads, deals or tasks.",
+        "handTo": "Hand their open work to",
+        "lastAdminTitle": "This is the last person who can manage users",
+        "lastAdminBody": "Nobody in this company will be able to add or edit users afterwards. Only a platform admin can fix that.",
+        "lastAdminConfirm": "I understand, deactivate anyway",
+        "confirmWithHandover": "Hand over and deactivate"
+      },
       "resetResult": {
         "title": "Password reset",
         "email": "User:",

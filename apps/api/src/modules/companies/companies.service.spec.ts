@@ -1,6 +1,7 @@
 import {BadRequestException, ConflictException, ForbiddenException, NotFoundException} from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import {PrismaService} from "@/database/prisma.service";
+import type {ModuleRef} from "@nestjs/core";
 import {AuditLogService} from "@/modules/audit-log/audit-log.service";
 import {ImpersonationService} from "@/modules/impersonation/impersonation.service";
 import {SettingOptionsService} from "@/modules/setting-options/setting-options.service";
@@ -28,7 +29,13 @@ const settingOptions = {
 } as unknown as SettingOptionsService;
 const rbacService = {
     findDefaultCompanyAdminRoleId: jest.fn().mockResolvedValue("role-company-admin"),
+    findRoleIdsWithPermission: jest.fn().mockResolvedValue(["role-company-admin"]),
 } as unknown as RbacService;
+const handover = {
+    preview: jest.fn().mockResolvedValue({leads: 3, deals: 2, tasks: 5}),
+    handOver: jest.fn().mockResolvedValue({leads: 3, deals: 2, tasks: 5}),
+};
+const moduleRef = {get: jest.fn().mockReturnValue(handover)} as unknown as ModuleRef;
 
 describe("CompaniesService", () => {
     const baseDto = {
@@ -61,7 +68,7 @@ describe("CompaniesService", () => {
             $transaction: jest.fn().mockImplementation((fn) => fn(tx)),
         } as unknown as PrismaService;
 
-        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions, rbacService), created};
+        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions, rbacService, moduleRef), created};
     };
 
     it("creates the company and its first admin together", async () => {
@@ -156,7 +163,7 @@ describe("CompaniesService suspension", () => {
             deal: {count: jest.fn().mockResolvedValue(0)},
         } as unknown as PrismaService;
 
-        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions, rbacService), update};
+        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions, rbacService, moduleRef), update};
     };
 
     const active = {id: "c1", name: "X", suspendedAt: null, users: []};
@@ -230,7 +237,7 @@ describe("CompaniesService suspension", () => {
             const update = jest.fn().mockImplementation(({data}) => Promise.resolve({id: "c1", ...data}));
             const findFirst = jest.fn().mockResolvedValueOnce(deleted).mockResolvedValueOnce(nameTaken);
             const prisma = {company: {findFirst, update}} as unknown as PrismaService;
-            return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions, rbacService), update};
+            return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions, rbacService, moduleRef), update};
         };
 
         it("restores a deleted company, still suspended", async () => {
@@ -286,7 +293,7 @@ describe("CompaniesService self-service (CA-A1)", () => {
             deal: {count: jest.fn().mockResolvedValue(0)},
         } as unknown as PrismaService;
 
-        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions, rbacService), update, findFirst};
+        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions, rbacService, moduleRef), update, findFirst};
     };
 
     it("reads only the caller's own company, never one supplied by the client", async () => {
@@ -434,6 +441,7 @@ describe("CompaniesService.getDashboardStats", () => {
             impersonationWithActive,
             settingOptions,
             rbacService,
+            moduleRef,
         );
 
         const stats = await service.getDashboardStats();
@@ -445,6 +453,71 @@ describe("CompaniesService.getDashboardStats", () => {
         });
         expect((prisma.user.count as jest.Mock).mock.calls[0][0]).toEqual({
             where: {deletedAt: null, companyId: {not: null}},
+        });
+    });
+});
+
+describe("CompaniesService: deactivating a company's user from the platform (SA-7)", () => {
+    const target = {id: "u1", email: "head@x.kg", fullName: "Head", roleId: "role-company-admin", branchId: "b1", isActive: true};
+
+    const build = (opts: {users?: Record<string, unknown>; otherAdmins?: number} = {}) => {
+        const users: Record<string, unknown> = {u1: target, u2: {...target, id: "u2", roleId: "role-manager"}, ...opts.users};
+        const prisma = {
+            user: {
+                findFirst: jest.fn().mockImplementation(({where}) => Promise.resolve(users[where.id] ?? null)),
+                update: jest.fn().mockResolvedValue({}),
+                count: jest.fn().mockResolvedValue(opts.otherAdmins ?? 1),
+            },
+        } as unknown as PrismaService;
+        (handover.handOver as jest.Mock).mockClear();
+        return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions, rbacService, moduleRef), prisma};
+    };
+
+    it("hands their open work to the replacement before deactivating, acting inside the company", async () => {
+        const {service, prisma} = build();
+
+        const result = await service.deactivateUser(actor, "c1", "u1", {reassignToId: "u2"});
+
+        expect(handover.handOver).toHaveBeenCalledWith(
+            expect.objectContaining({id: actor.id, companyId: "c1", isBranchScoped: false}), "u1", "u2",
+        );
+        expect((prisma.user.update as jest.Mock).mock.calls[0][0].data).toMatchObject({isActive: false});
+        expect(result).toEqual({success: true, handedOver: {leads: 3, deals: 2, tasks: 5}});
+    });
+
+    it("deactivates without a handover when no replacement is given", async () => {
+        const {service} = build();
+
+        await service.deactivateUser(actor, "c1", "u1");
+
+        expect(handover.handOver).not.toHaveBeenCalled();
+    });
+
+    it("asks for confirmation before deactivating the last active user who can manage users", async () => {
+        const {service, prisma} = build({otherAdmins: 0});
+
+        await expect(service.deactivateUser(actor, "c1", "u1")).rejects.toMatchObject({
+            response: expect.objectContaining({code: "LAST_ACTIVE_ADMIN"}),
+        });
+        expect(prisma.user.update).not.toHaveBeenCalled();
+
+        await service.deactivateUser(actor, "c1", "u1", {confirmLastAdmin: true});
+        expect(prisma.user.update).toHaveBeenCalled();
+    });
+
+    it("refuses to hand the work to the same person or an inactive one", async () => {
+        const {service} = build({users: {u3: {...target, id: "u3", isActive: false}}});
+
+        await expect(service.deactivateUser(actor, "c1", "u1", {reassignToId: "u1"})).rejects.toThrow(BadRequestException);
+        await expect(service.deactivateUser(actor, "c1", "u1", {reassignToId: "u3"})).rejects.toThrow(BadRequestException);
+    });
+
+    it("previews the open work and whether they are the last admin", async () => {
+        const {service} = build({otherAdmins: 0});
+
+        await expect(service.deactivationPreview(actor, "c1", "u1")).resolves.toEqual({
+            user: {id: "u1", fullName: "Head", branchId: "b1"},
+            leads: 3, deals: 2, tasks: 5, isLastAdmin: true,
         });
     });
 });

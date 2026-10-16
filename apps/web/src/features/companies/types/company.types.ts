@@ -34,6 +34,7 @@ export type CompanyUser = {
     phone: string | null;
     roleId: string;
     role: {id: string; name: string};
+    branch?: {id: string; name: string} | null;
     isActive: boolean;
     createdAt: string;
 };

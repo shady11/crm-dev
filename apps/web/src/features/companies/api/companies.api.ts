@@ -108,9 +108,29 @@ export async function deleteCompany(id: string) {
 
 // Deactivate/reactivate are separate endpoints rather than an isActive field,
 // for the same reason suspend/resume are.
-export async function deactivateCompanyUser(companyId: string, userId: string) {
-    const response = await api.post<{success: boolean}>(
+export type DeactivationPreview = {
+    user: {id: string; fullName: string; branchId: string | null};
+    leads: number;
+    deals: number;
+    tasks: number;
+    /** The last active user in the company who can manage users. */
+    isLastAdmin: boolean;
+};
+
+/** SA-7: what deactivating them would leave behind. */
+export async function getDeactivationPreview(companyId: string, userId: string) {
+    const response = await api.get<DeactivationPreview>(`/companies/${companyId}/users/${userId}/deactivation-preview`);
+    return response.data;
+}
+
+export async function deactivateCompanyUser(
+    companyId: string,
+    userId: string,
+    options: {reassignToId?: string; confirmLastAdmin?: boolean} = {},
+) {
+    const response = await api.post<{success: boolean; handedOver?: {leads: number; deals: number; tasks: number}}>(
         `/companies/${companyId}/users/${userId}/deactivate`,
+        options,
     );
     return response.data;
 }
