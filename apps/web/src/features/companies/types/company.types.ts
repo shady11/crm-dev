@@ -17,6 +17,8 @@ export type Company = {
     signatoryTitle?: string | null;
     /** Non-null means suspended. Reversible, unlike deletion. */
     suspendedAt: string | null;
+    /** Set on deleted companies, which only the "Deleted" list shows (SA-3). */
+    deletedAt?: string | null;
     createdAt: string;
     updatedAt: string;
     _count?: {

@@ -85,6 +85,12 @@ export class CompaniesController {
         return this.companiesService.resume(actor, id);
     }
 
+    // SA-3: undoes a deletion; the company comes back suspended.
+    @Post(":id/restore")
+    restore(@CurrentUser() actor: AuthUser, @Param("id") id: string) {
+        return this.companiesService.restore(actor, id);
+    }
+
     @Delete(":id")
     remove(@CurrentUser() actor: AuthUser, @Param("id") id: string) {
         return this.companiesService.remove(actor, id);

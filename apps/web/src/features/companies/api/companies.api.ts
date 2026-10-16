@@ -3,7 +3,8 @@ import type {PaginatedResponse} from "@/lib/api-types";
 import type {ImpersonateResponse} from "@/features/auth/types/auth.types";
 import type {Company, CompanyDetails} from "../types/company.types";
 
-export type CompanyStatusFilter = "all" | "active" | "suspended";
+// "deleted" lists deleted companies instead, to restore one (SA-3).
+export type CompanyStatusFilter = "all" | "active" | "suspended" | "deleted";
 
 export type GetCompaniesParams = {
     page?: number;
@@ -91,6 +92,12 @@ export async function suspendCompany(id: string) {
 
 export async function resumeCompany(id: string) {
     const response = await api.post<Company>(`/companies/${id}/resume`);
+    return response.data;
+}
+
+/** SA-3: undoes a deletion; the company comes back suspended. */
+export async function restoreCompany(id: string) {
+    const response = await api.post<Company>(`/companies/${id}/restore`);
     return response.data;
 }
 
