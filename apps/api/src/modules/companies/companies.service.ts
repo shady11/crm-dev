@@ -41,6 +41,7 @@ const COMPANY_SELECT = {
     signatoryName: true,
     signatoryTitle: true,
     suspendedAt: true,
+    deletedAt: true,
     createdAt: true,
     updatedAt: true,
 } satisfies Prisma.CompanySelect;
@@ -103,9 +104,11 @@ export class CompaniesService {
         const page = query.page ?? 1;
         const limit = query.limit ?? 20;
 
-        // Deleted tenants never appear. Suspended ones do — they are the rows
-        // an operator most needs to see.
-        const where: Prisma.CompanyWhereInput = {deletedAt: null};
+        // Deleted tenants appear only when asked for (SA-3: to restore one).
+        // Suspended ones always do — they are the rows an operator most needs
+        // to see.
+        const where: Prisma.CompanyWhereInput =
+            query.status === "deleted" ? {deletedAt: {not: null}} : {deletedAt: null};
 
         if (query.search) {
             where.name = {contains: query.search, mode: "insensitive"};
@@ -217,6 +220,24 @@ export class CompaniesService {
         const existingUser = await this.prisma.user.findUnique({where: {email: adminEmail}});
 
         if (existingUser) {
+            // SA-3: a deleted company's users keep their emails, which is
+            // what makes restoring it possible; say so rather than leave the
+            // email mysteriously "taken".
+            const deletedCompany = existingUser.companyId
+                ? await this.prisma.company.findFirst({
+                    where: {id: existingUser.companyId, deletedAt: {not: null}},
+                    select: {name: true},
+                })
+                : null;
+            if (deletedCompany) {
+                throw new ConflictException({
+                    statusCode: 409,
+                    error: "Conflict",
+                    code: "EMAIL_IN_DELETED_COMPANY",
+                    companyName: deletedCompany.name,
+                    message: `This email belongs to a user of the deleted company "${deletedCompany.name}". Restore that company, or use another email.`,
+                });
+            }
             throw new ConflictException("A user with this email already exists");
         }
 
@@ -495,8 +516,18 @@ export class CompaniesService {
      * back or disputed something, and destroying them on one click is not a
      * decision this endpoint should be able to make.
      */
+    /**
+     * SA-3: only a suspended company can be deleted, so a live tenant can't
+     * disappear in one click: suspending first signs everyone out and gives
+     * a moment to notice the wrong row. Deletion hides the company and
+     * keeps all its data, so restore() can bring it back.
+     */
     async remove(actor: AuthUser, id: string) {
-        await this.findOne(id);
+        const company = await this.findOne(id);
+
+        if (!company.suspendedAt) {
+            throw new ConflictException("Suspend the company before deleting it.");
+        }
 
         await this.prisma.company.update({
             where: {id},
@@ -510,9 +541,55 @@ export class CompaniesService {
             targetType: "Company",
             targetId: id,
             companyId: id,
+            // What was hidden, for whoever reads the log later.
+            metadata: {name: company.name, ...company.stats},
         });
 
         return {success: true};
+    }
+
+    /**
+     * SA-3: brings a deleted company back, still suspended, so its users can
+     * sign in only once someone resumes it on purpose.
+     */
+    async restore(actor: AuthUser, id: string) {
+        const company = await this.prisma.company.findFirst({
+            where: {id, deletedAt: {not: null}},
+            select: {id: true, name: true},
+        });
+
+        if (!company) {
+            throw new NotFoundException("Deleted company not found");
+        }
+
+        const nameTaken = await this.prisma.company.findFirst({
+            where: {name: company.name, deletedAt: null},
+            select: {id: true},
+        });
+
+        if (nameTaken) {
+            throw new ConflictException(
+                `Another company is now called "${company.name}". Rename it before restoring this one.`,
+            );
+        }
+
+        const restored = await this.prisma.company.update({
+            where: {id},
+            data: {deletedAt: null, suspendedAt: new Date()},
+            select: COMPANY_SELECT,
+        });
+
+        await this.auditLog.record({
+            actorId: actor.id,
+            actorEmail: actor.email,
+            action: AuditAction.TENANT_RESTORED,
+            targetType: "Company",
+            targetId: id,
+            companyId: id,
+            metadata: {name: company.name},
+        });
+
+        return restored;
     }
 
     /**

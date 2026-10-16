@@ -118,6 +118,16 @@ describe("CompaniesService", () => {
         await expect(service.create(actor, {...baseDto})).rejects.toThrow(ConflictException);
     });
 
+    it("says when the admin email belongs to a deleted company's user (SA-3)", async () => {
+        const {service} = build({existingUser: {id: "u9", companyId: "gone"}});
+        const prisma = (service as unknown as {prisma: {company: {findFirst: jest.Mock}}}).prisma;
+        prisma.company.findFirst.mockResolvedValueOnce({name: "Ош Курулуш"});
+
+        await expect(service.create(actor, {...baseDto})).rejects.toMatchObject({
+            response: expect.objectContaining({code: "EMAIL_IN_DELETED_COMPANY", companyName: "Ош Курулуш"}),
+        });
+    });
+
     it("refuses a duplicate company name", async () => {
         const {service} = build({existingCompany: {id: "company-9"}});
 
@@ -180,11 +190,61 @@ describe("CompaniesService suspension", () => {
         // A developer's deals and payment history are exactly what they would
         // need if they came back or disputed something — one click should not
         // be able to destroy them.
-        const {service, update} = build(active);
+        const {service, update} = build(suspended);
 
         await service.remove(actor, "c1");
 
         expect(update.mock.calls[0][0].data).toEqual({deletedAt: expect.any(Date)});
+    });
+
+    describe("SA-3: deleting is guarded and can be undone", () => {
+        it("refuses to delete a company that is still active", async () => {
+            const {service, update} = build(active);
+
+            await expect(service.remove(actor, "c1")).rejects.toThrow("Suspend the company before deleting it.");
+            expect(update).not.toHaveBeenCalled();
+        });
+
+        it("records what was hidden in the audit log", async () => {
+            const {service} = build(suspended);
+            (auditLog.record as jest.Mock).mockClear();
+
+            await service.remove(actor, "c1");
+
+            expect(auditLog.record).toHaveBeenCalledWith(expect.objectContaining({
+                action: "TENANT_DELETED",
+                metadata: expect.objectContaining({name: "X", deals: 0, users: 0}),
+            }));
+        });
+
+        const restoreBuild = (deleted: unknown, nameTaken: unknown = null) => {
+            const update = jest.fn().mockImplementation(({data}) => Promise.resolve({id: "c1", ...data}));
+            const findFirst = jest.fn().mockResolvedValueOnce(deleted).mockResolvedValueOnce(nameTaken);
+            const prisma = {company: {findFirst, update}} as unknown as PrismaService;
+            return {service: new CompaniesService(prisma, auditLog, impersonation, settingOptions, rbacService), update};
+        };
+
+        it("restores a deleted company, still suspended", async () => {
+            const {service, update} = restoreBuild({id: "c1", name: "X"});
+
+            await service.restore(actor, "c1");
+
+            expect(update.mock.calls[0][0].data).toEqual({deletedAt: null, suspendedAt: expect.any(Date)});
+            expect(auditLog.record).toHaveBeenCalledWith(expect.objectContaining({action: "TENANT_RESTORED", targetId: "c1"}));
+        });
+
+        it("refuses to restore when another company now has its name", async () => {
+            const {service, update} = restoreBuild({id: "c1", name: "X"}, {id: "c2"});
+
+            await expect(service.restore(actor, "c1")).rejects.toThrow(ConflictException);
+            expect(update).not.toHaveBeenCalled();
+        });
+
+        it("refuses to 'restore' a company that isn't deleted", async () => {
+            const {service} = restoreBuild(null);
+
+            await expect(service.restore(actor, "c1")).rejects.toThrow(NotFoundException);
+        });
     });
 });
 
