@@ -5,6 +5,8 @@ import {AuthUser} from "@/common/types/auth-user.type";
 import {QueryAuditLogsDto} from "./dto/query-audit-logs.dto";
 import {QueryOwnLoginsDto} from "./dto/query-own-logins.dto";
 
+const LOGIN_ACTIONS: AuditAction[] = [AuditAction.LOGIN_SUCCEEDED, AuditAction.LOGIN_FAILED];
+
 export type RecordAuditLogInput = {
     actorId: string;
     actorEmail: string;
@@ -57,6 +59,7 @@ export class AuditLogService {
         if (query.companyId) where.companyId = query.companyId;
         if (query.actorId) where.actorId = query.actorId;
         if (query.action) where.action = query.action;
+        else if (query.hideLogins) where.action = {notIn: LOGIN_ACTIONS};
 
         if (query.dateFrom || query.dateTo) {
             where.createdAt = {
@@ -78,10 +81,51 @@ export class AuditLogService {
             this.prisma.auditLog.count({where}),
         ]);
 
+        const names = await this.targetNames(items);
+
         return {
-            items,
+            items: items.map((item) => ({
+                ...item,
+                targetName: item.targetId ? (names.get(`${item.targetType}:${item.targetId}`) ?? null) : null,
+            })),
             meta: {page, limit, total, pages: Math.ceil(total / limit)},
         };
+    }
+
+    /**
+     * SA-11: what each row is about, by name rather than by id: a user's
+     * name, a company's, a role's, a setting option's code. One query per
+     * kind of target on the page. Deleted users and companies keep their
+     * rows, so their names still resolve.
+     */
+    private async targetNames(items: {targetType: string; targetId: string | null}[]) {
+        const idsOf = (type: string) => [
+            ...new Set(items.filter((item) => item.targetType === type && item.targetId).map((item) => item.targetId!)),
+        ];
+        const userIds = idsOf("User");
+        const companyIds = idsOf("Company");
+        const roleIds = idsOf("Role");
+        const optionIds = idsOf("SettingOption");
+
+        const [users, companies, roles, options] = await Promise.all([
+            userIds.length
+                ? this.prisma.user.findMany({where: {id: {in: userIds}}, select: {id: true, fullName: true}})
+                : [],
+            companyIds.length
+                ? this.prisma.company.findMany({where: {id: {in: companyIds}}, select: {id: true, name: true}})
+                : [],
+            roleIds.length ? this.prisma.role.findMany({where: {id: {in: roleIds}}, select: {id: true, name: true}}) : [],
+            optionIds.length
+                ? this.prisma.settingOption.findMany({where: {id: {in: optionIds}}, select: {id: true, code: true}})
+                : [],
+        ]);
+
+        return new Map<string, string>([
+            ...users.map((u) => [`User:${u.id}`, u.fullName] as [string, string]),
+            ...companies.map((c) => [`Company:${c.id}`, c.name] as [string, string]),
+            ...roles.map((r) => [`Role:${r.id}`, r.name] as [string, string]),
+            ...options.map((o) => [`SettingOption:${o.id}`, o.code] as [string, string]),
+        ]);
     }
 
     /**

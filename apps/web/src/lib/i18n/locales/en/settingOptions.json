@@ -10,7 +10,7 @@
   },
   "page": {
     "heading": "Currency, locale & timezone",
-    "description": "The currency, locale and timezone options tenants can choose from. Deactivate an option to hide it from new selections without breaking companies already using it.",
+    "description": "The currency, locale and timezone options companies can choose from. Deactivate an option to hide it from new selections without breaking companies already using it.",
     "newOption": "New option",
     "table": {
       "headers": {

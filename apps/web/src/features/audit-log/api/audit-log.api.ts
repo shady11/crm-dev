@@ -8,6 +8,8 @@ export type GetAuditLogsParams = {
     companyId?: string;
     actorId?: string;
     action?: AuditAction;
+    /** SA-11: leave out sign-ins. */
+    hideLogins?: boolean;
     dateFrom?: string;
     dateTo?: string;
 };

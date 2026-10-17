@@ -22,8 +22,9 @@ export function SuperAdminDashboardPage() {
     });
 
     const recentActivity = useQuery({
-        queryKey: ["audit-logs", {page: 1, limit: 5}],
-        queryFn: () => getAuditLogs({page: 1, limit: 5}),
+        // SA-11: sign-ins would otherwise fill all five rows.
+        queryKey: ["audit-logs", {page: 1, limit: 5, hideLogins: true}],
+        queryFn: () => getAuditLogs({page: 1, limit: 5, hideLogins: true}),
     });
 
     const activeImpersonations = stats.data?.activeImpersonations ?? [];
@@ -152,6 +153,7 @@ export function SuperAdminDashboardPage() {
                                                 <p className="truncate">
                                                     <span className="font-medium">{entry.actorEmail}</span>{" "}
                                                     {tAuditLog(`page.actions.${entry.action}`)}
+                                                    {entry.targetName && entry.targetType !== "Company" ? ` · ${entry.targetName}` : ""}
                                                     {entry.company ? ` · ${entry.company.name}` : ""}
                                                 </p>
                                                 <p className="text-muted-foreground text-xs">
