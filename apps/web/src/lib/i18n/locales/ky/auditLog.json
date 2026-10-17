@@ -1,10 +1,12 @@
 {
   "page": {
     "heading": "Аудит журналы",
-    "description": "Платформадагы бардык тенанттар боюнча артыкчылыктуу аракеттер — бир гана кошуу, өчүрүү жок.",
+    "description": "Платформадагы бардык компаниялар боюнча артыкчылыктуу аракеттер — бир гана кошуу, өчүрүү жок.",
     "filters": {
-      "companyId": "Тенант ID",
-      "companyIdPlaceholder": "Тенант ID боюнча чыпка",
+      "company": "Компания",
+      "allCompanies": "Бардык компаниялар",
+      "deletedCompany": "{{name}} (өчүрүлгөн)",
+      "hideLogins": "Кирүүлөрдү жашыруу",
       "action": "Аракет",
       "allActions": "Бардык аракеттер",
       "dateFrom": "Баштап",
@@ -16,7 +18,7 @@
         "actor": "Ким",
         "action": "Аракет",
         "target": "Объект",
-        "tenant": "Тенант"
+        "company": "Компания"
       }
     },
     "empty": {
@@ -24,11 +26,11 @@
       "description": "Бул чыпкаларга эч нерсе туура келбейт."
     },
     "actions": {
-      "TENANT_CREATED": "Тенант түзүлдү",
-      "TENANT_SUSPENDED": "Тенант токтотулду",
-      "TENANT_RESUMED": "Тенант кайра иштетилди",
-      "TENANT_DELETED": "Тенант өчүрүлдү",
-      "TENANT_RESTORED": "Тенант калыбына келтирилди",
+      "TENANT_CREATED": "Компания түзүлдү",
+      "TENANT_SUSPENDED": "Компания токтотулду",
+      "TENANT_RESUMED": "Компания кайра иштетилди",
+      "TENANT_DELETED": "Компания өчүрүлдү",
+      "TENANT_RESTORED": "Компания калыбына келтирилди",
       "TENANT_USER_DEACTIVATED": "Колдонуучу деактивдештирилди",
       "TENANT_USER_REACTIVATED": "Колдонуучу активдештирилди",
       "TENANT_USER_PASSWORD_RESET": "Сырсөз кайра орнотулду",

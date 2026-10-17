@@ -3,7 +3,7 @@ import {useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {createListCollection} from "@ark-ui/react";
 import {ScrollText} from "lucide-react";
-import {Input} from "@/components/ui/input.tsx";
+import {Switch} from "@/components/ui/switch.tsx";
 import {DateField} from "@/components/shared/date-field.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
@@ -11,12 +11,15 @@ import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/co
 import {Pagination, PaginationItems, PaginationNext, PaginationPrevious} from "@/components/ui/pagination.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {formatDate} from "@/utils/date-formatter";
+import {getCompanies} from "@/features/companies/api/companies.api";
 import {getAuditLogs} from "../api/audit-log.api";
 import {AUDIT_ACTIONS, type AuditAction} from "../types/audit-log.types";
 
 export function AuditLogPage() {
     const {t, i18n} = useTranslation("auditLog");
     const [companyId, setCompanyId] = useState("");
+    // SA-11: sign-ins are most of the log; hidden by default.
+    const [hideLogins, setHideLogins] = useState(true);
     const [action, setAction] = useState<AuditAction | undefined>(undefined);
     const [dateFrom, setDateFrom] = useState("");
     const [dateTo, setDateTo] = useState("");
@@ -24,16 +27,43 @@ export function AuditLogPage() {
     const limit = 20;
 
     const logs = useQuery({
-        queryKey: ["audit-logs", {companyId, action, dateFrom, dateTo, page}],
+        queryKey: ["audit-logs", {companyId, action, hideLogins, dateFrom, dateTo, page}],
         queryFn: () =>
             getAuditLogs({
                 companyId: companyId || undefined,
                 action,
+                hideLogins,
                 dateFrom: dateFrom || undefined,
                 dateTo: dateTo || undefined,
                 page,
                 limit,
             }),
+    });
+
+    // SA-11: pick a company by name. Deleted companies keep their history,
+    // so they are offered too, marked as deleted.
+    const companies = useQuery({
+        queryKey: ["companies", "audit-log-filter"],
+        queryFn: async () => {
+            const [live, deleted] = await Promise.all([
+                getCompanies({limit: 100}),
+                getCompanies({status: "deleted", limit: 100}),
+            ]);
+            return [
+                ...live.items.map((company) => ({id: company.id, name: company.name})),
+                ...deleted.items.map((company) => ({
+                    id: company.id,
+                    name: t("page.filters.deletedCompany", {name: company.name}),
+                })),
+            ];
+        },
+    });
+
+    const companyCollection = createListCollection({
+        items: [
+            {label: t("page.filters.allCompanies"), value: "ALL"},
+            ...(companies.data ?? []).map((company) => ({label: company.name, value: company.id})),
+        ],
     });
 
     const actionCollection = createListCollection({
@@ -55,16 +85,26 @@ export function AuditLogPage() {
 
             <div className="flex flex-wrap items-end gap-3">
                 <label className="block space-y-1.5">
-                    <span className="text-sm font-medium">{t("page.filters.companyId")}</span>
-                    <Input
-                        placeholder={t("page.filters.companyIdPlaceholder")}
-                        value={companyId}
-                        onChange={(event) => {
-                            setCompanyId(event.target.value);
+                    <span className="text-sm font-medium">{t("page.filters.company")}</span>
+                    <Select
+                        collection={companyCollection}
+                        value={[companyId || "ALL"]}
+                        onValueChange={(item) => {
+                            setCompanyId(item.value[0] === "ALL" ? "" : (item.value[0] ?? ""));
                             setPage(1);
                         }}
-                        className="w-64"
-                    />
+                    >
+                        <SelectTrigger className="w-64" aria-label={t("page.filters.company")}>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {companyCollection.items.map((item) => (
+                                <SelectItem key={item.value} item={item}>
+                                    {item.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
                 </label>
 
                 <label className="block space-y-1.5">
@@ -77,7 +117,7 @@ export function AuditLogPage() {
                             setPage(1);
                         }}
                     >
-                        <SelectTrigger className="w-64">
+                        <SelectTrigger className="w-64" aria-label={t("page.filters.action")}>
                             <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -117,6 +157,20 @@ export function AuditLogPage() {
                         }}
                     />
                 </div>
+
+                <label className="flex h-9 items-center gap-2 text-sm">
+                    <Switch
+                        checked={hideLogins}
+                        // Picking a sign-in action shows sign-ins whatever this says.
+                        disabled={action === "LOGIN_SUCCEEDED" || action === "LOGIN_FAILED"}
+                        onCheckedChange={({checked}) => {
+                            setHideLogins(checked);
+                            setPage(1);
+                        }}
+                        aria-label={t("page.filters.hideLogins")}
+                    />
+                    {t("page.filters.hideLogins")}
+                </label>
             </div>
 
             {logs.isLoading ? (
@@ -142,7 +196,7 @@ export function AuditLogPage() {
                                 <TableHead>{t("page.table.headers.actor")}</TableHead>
                                 <TableHead>{t("page.table.headers.action")}</TableHead>
                                 <TableHead>{t("page.table.headers.target")}</TableHead>
-                                <TableHead>{t("page.table.headers.tenant")}</TableHead>
+                                <TableHead>{t("page.table.headers.company")}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -156,9 +210,14 @@ export function AuditLogPage() {
                                         </TableCell>
                                         <TableCell>{entry.actorEmail}</TableCell>
                                         <TableCell>{t(`page.actions.${entry.action}`)}</TableCell>
-                                        <TableCell className="text-muted-foreground text-xs">
-                                            {entry.targetType}
-                                            {entry.targetId ? ` #${entry.targetId.slice(0, 8)}` : ""}
+                                        <TableCell>
+                                            {entry.targetName ?? (
+                                                // A target that no longer resolves keeps its short id.
+                                                <span className="text-muted-foreground text-xs">
+                                                    {entry.targetType}
+                                                    {entry.targetId ? ` #${entry.targetId.slice(0, 8)}` : ""}
+                                                </span>
+                                            )}
                                         </TableCell>
                                         <TableCell>{entry.company?.name ?? "—"}</TableCell>
                                     </TableRow>
