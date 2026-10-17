@@ -8,9 +8,12 @@ import {ScrollArea} from "@/components/ui/scroll-area.tsx";
 import {SkipNavContent, SkipNavLink} from "@/components/ui/skip-nav.tsx";
 import {useNotificationsSocket} from "@/features/notifications/hooks/use-notifications-socket.ts";
 import {ImpersonationBanner} from "@/features/auth/components/impersonation-banner.tsx";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 
 export function AppLayout() {
-    useNotificationsSocket();
+    const { user } = useAuth();
+    // SA-9: only a company's users have notifications to receive.
+    useNotificationsSocket(Boolean(user?.companyId));
     const { t } = useTranslation("common");
 
     return (

@@ -130,7 +130,9 @@ export function AppHeader() {
             </div>
 
             <div className="flex items-center gap-2">
-                <NotificationBell />
+                {/* SA-9: notifications belong to a company; the platform
+                    admin has none, and the API refuses them its endpoints. */}
+                {user?.companyId ? <NotificationBell /> : null}
                 <LanguageDropdown
                     trigger={
                         <Button variant="ghost" size="icon-md" title={t("language.switchLabel")}>
