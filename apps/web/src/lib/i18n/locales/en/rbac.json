@@ -18,7 +18,11 @@
       "permissionCount": "{{count}} permission",
       "permissionCount_other": "{{count}} permissions",
       "userCount": "{{count}} user",
-      "userCount_other": "{{count}} users"
+      "userCount_other": "{{count}} users",
+      "userCountAllCompanies_one": "{{count}} user across all companies",
+      "userCountAllCompanies_few": "{{count}} users across all companies",
+      "userCountAllCompanies_many": "{{count}} users across all companies",
+      "userCountAllCompanies_other": "{{count}} users across all companies"
     },
     "rowActions": {
       "manageUsers": "Manage users for {{name}}",
@@ -57,7 +61,18 @@
     "submit": {
       "create": "Create role"
     },
-    "copy": "Copy role"
+    "copy": "Copy role",
+    "platformRoleDescription": "The platform administrator's role. Its access comes from the account itself: it can do everything on the platform and nothing inside a company, whatever this role lists. It can't be changed.",
+    "globalWarningTitle": "Changes apply to every company",
+    "globalWarningBody_one": "This built-in role is shared by all companies. {{count}} user across all companies holds it.",
+    "globalWarningBody_few": "This built-in role is shared by all companies. {{count}} users across all companies hold it.",
+    "globalWarningBody_many": "This built-in role is shared by all companies. {{count}} users across all companies hold it.",
+    "globalWarningBody_other": "This built-in role is shared by all companies. {{count}} users across all companies hold it.",
+    "confirmGlobal": {
+      "title": "Change this role for every company?",
+      "body": "\"{{name}}\" changes at once for everyone who holds it, in every company.",
+      "confirm": "Change for every company"
+    }
   },
   "usersDialog": {
     "title": "Users with the \"{{name}}\" role",

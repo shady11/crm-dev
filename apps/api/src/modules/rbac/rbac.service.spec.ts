@@ -342,6 +342,18 @@ describe("RbacService", () => {
             await expect(service.deleteRole(companyAdmin, "role-global")).rejects.toThrow(ForbiddenException);
         });
 
+        it("SA-10: refuses any change to the platform administrator's role, which grants nothing by itself", async () => {
+            const {service, prisma} = build();
+            const platformRole = {...globalRole, id: "role-super", name: "Super Admin", isPlatformRole: true};
+            prisma.role.findUnique.mockResolvedValue(platformRole);
+
+            await expect(service.updateRole(superAdmin, "role-super", {name: "Renamed"})).rejects.toThrow(ForbiddenException);
+            await expect(service.setRolePermissions(superAdmin, "role-super", ["leads.view"])).rejects.toThrow(
+                ForbiddenException,
+            );
+            await expect(service.deleteRole(superAdmin, "role-super")).rejects.toThrow(ForbiddenException);
+        });
+
         it("lets a SUPER_ADMIN rename a global (built-in) role", async () => {
             const {service, prisma} = build();
             prisma.role.findUnique.mockResolvedValue(globalRole);

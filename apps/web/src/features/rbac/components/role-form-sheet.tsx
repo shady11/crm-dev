@@ -14,6 +14,18 @@ import {
 } from "@/components/ui/dialog.tsx";
 import {FieldGroup} from "@/components/ui/field.tsx";
 import {Switch} from "@/components/ui/switch.tsx";
+import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog.tsx";
+import {TriangleAlert} from "lucide-react";
 import {PermissionPicker} from "./permission-picker";
 import type {Permission, Role} from "../types/rbac.types";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
@@ -50,6 +62,7 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
     const [selected, setSelected] = useState<Set<string>>(new Set());
     const [discountLimit, setDiscountLimit] = useState("");
     const [isBranchScoped, setIsBranchScoped] = useState(false);
+    const [confirming, setConfirming] = useState(false);
 
     useEffect(() => {
         if (!open) return;
@@ -70,7 +83,22 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
     // still opens for a role the viewer can't edit, but read-only, so its
     // permission set stays inspectable without implying it can be changed
     // here. See RbacService.assertCanManageRole.
-    const readOnly = role !== null && role.companyId === null && !user?.isSuperAdmin;
+    // SA-10: the platform administrator's role is read-only for everyone;
+    // its access comes from the account, so its permission list means
+    // nothing and isn't shown.
+    const isPlatformRole = role?.isPlatformRole === true;
+    const readOnly = isPlatformRole || (role !== null && role.companyId === null && !user?.isSuperAdmin);
+    // SA-10: a built-in role edited by the platform admin changes it for
+    // every company at once; say so, and confirm before saving.
+    const editsEveryCompany = !readOnly && role !== null && role.companyId === null;
+
+    const values = (): RoleFormValues => ({
+        name,
+        description,
+        permissionKeys: Array.from(selected),
+        discountLimit: discountLimit.trim() === "" ? null : Number(discountLimit),
+        isBranchScoped,
+    });
 
     return (
         <Dialog open={open} onOpenChange={({open: isOpen}) => onOpenChange(isOpen)}>
@@ -78,7 +106,11 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
                 <DialogHeader>
                     <DialogTitle>{readOnly ? (role?.name ?? "") : isEdit ? t("form.editTitle") : t("form.newTitle")}</DialogTitle>
                     <DialogDescription>
-                        {readOnly ? t("form.readOnlyDescription") : t("form.description")}
+                        {isPlatformRole
+                            ? t("form.platformRoleDescription")
+                            : readOnly
+                              ? t("form.readOnlyDescription")
+                              : t("form.description")}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -86,16 +118,22 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
                     className="flex min-h-0 flex-1 flex-col"
                     onSubmit={(event) => {
                         event.preventDefault();
-                        onSubmit({
-                            name,
-                            description,
-                            permissionKeys: Array.from(selected),
-                            discountLimit: discountLimit.trim() === "" ? null : Number(discountLimit),
-                            isBranchScoped,
-                        });
+                        if (editsEveryCompany) {
+                            setConfirming(true);
+                            return;
+                        }
+                        onSubmit(values());
                     }}
                 >
                     <DialogBody className="space-y-5">
+                        {editsEveryCompany && role && (
+                            <Alert variant="warning">
+                                <TriangleAlert />
+                                <AlertTitle>{t("form.globalWarningTitle")}</AlertTitle>
+                                <AlertDescription>{t("form.globalWarningBody", {count: role.userCount})}</AlertDescription>
+                            </Alert>
+                        )}
+
                         {!readOnly && (
                             <FieldGroup className="gap-4">
                                 <label className="block space-y-1.5">
@@ -152,7 +190,7 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
                             </FieldGroup>
                         )}
 
-                        {readOnly && (
+                        {readOnly && !isPlatformRole && (
                             <div className="text-muted-foreground space-y-1 text-sm">
                                 <p>
                                     {role?.discountLimit === null
@@ -163,22 +201,24 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
                             </div>
                         )}
 
-                        <div className="space-y-2">
-                            <span className="text-sm font-semibold">{t("form.fields.permissions")}</span>
-                            <PermissionPicker
-                                permissions={permissions}
-                                selected={selected}
-                                onChange={setSelected}
-                                disabled={readOnly}
-                            />
-                        </div>
+                        {!isPlatformRole && (
+                            <div className="space-y-2">
+                                <span className="text-sm font-semibold">{t("form.fields.permissions")}</span>
+                                <PermissionPicker
+                                    permissions={permissions}
+                                    selected={selected}
+                                    onChange={setSelected}
+                                    disabled={readOnly}
+                                />
+                            </div>
+                        )}
                     </DialogBody>
 
                     <DialogFooter>
                         <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
                             {readOnly ? tCommon("actions.close") : tCommon("actions.cancel")}
                         </Button>
-                        {readOnly && role && onCopy && (
+                        {readOnly && !isPlatformRole && role && onCopy && (
                             <Button type="button" disabled={isCopying} isLoading={isCopying} onClick={() => onCopy(role)}>
                                 {t("form.copy")}
                             </Button>
@@ -195,6 +235,26 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
                     </DialogFooter>
                 </form>
             </DialogContent>
+
+            <AlertDialog open={confirming} onOpenChange={({open: isOpen}) => !isOpen && setConfirming(false)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t("form.confirmGlobal.title")}</AlertDialogTitle>
+                        <AlertDialogDescription>{t("form.confirmGlobal.body", {name})}</AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{tCommon("actions.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={() => {
+                                setConfirming(false);
+                                onSubmit(values());
+                            }}
+                        >
+                            {t("form.confirmGlobal.confirm")}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </Dialog>
     );
 }
