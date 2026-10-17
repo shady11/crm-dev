@@ -46,7 +46,12 @@ export function RoleCard({
     // A global role (companyId null) can only be managed by a platform
     // administrator — see RbacService.assertCanManageRole and
     // RoleFormSheet's matching `readOnly` check.
-    const canManage = role.companyId !== null || Boolean(user?.isSuperAdmin);
+    // SA-10: nobody manages the platform administrator's own role; its
+    // access comes from the account.
+    const canManage = !role.isPlatformRole && (role.companyId !== null || Boolean(user?.isSuperAdmin));
+    // A built-in role's holders, seen by the platform admin, are every
+    // company's users together.
+    const countsAllCompanies = role.companyId === null && !role.isPlatformRole && Boolean(user?.isSuperAdmin);
 
     const shown = role.sample.slice(0, 4);
     const extra = role.userCount - shown.length;
@@ -80,9 +85,11 @@ export function RoleCard({
                             <MenuItem value="users" onClick={onManageUsers}>
                                 {t("page.rowActions.manageUsers", {name: role.name})}
                             </MenuItem>
-                            <MenuItem value="copy" onClick={onCopy}>
-                                {t("page.rowActions.copy")}
-                            </MenuItem>
+                            {!role.isPlatformRole && (
+                                <MenuItem value="copy" onClick={onCopy}>
+                                    {t("page.rowActions.copy")}
+                                </MenuItem>
+                            )}
                             {canManage && (
                                 <>
                                     <MenuItem value="edit" onClick={onEdit}>
@@ -112,7 +119,9 @@ export function RoleCard({
                         )}
                     </div>
                     <span className="text-sm text-muted-foreground">
-                        {t("page.table.userCount", {count: role.userCount})}
+                        {countsAllCompanies
+                            ? t("page.table.userCountAllCompanies", {count: role.userCount})
+                            : t("page.table.userCount", {count: role.userCount})}
                     </span>
                 </div>
 

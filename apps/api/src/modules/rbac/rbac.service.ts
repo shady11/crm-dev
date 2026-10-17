@@ -301,7 +301,16 @@ export class RbacService implements OnModuleInit {
      * is otherwise exactly as editable as a custom one, just scoped to
      * whoever may touch the global namespace.
      */
-    private assertCanManageRole(actor: AuthUser, role: { companyId: string | null }) {
+    private assertCanManageRole(actor: AuthUser, role: { companyId: string | null; isPlatformRole: boolean }) {
+        // SA-10: the platform administrator's access comes from the account
+        // (isSuperAdmin), not from this role's permissions, so editing it
+        // would change nothing; refuse rather than pretend.
+        if (role.isPlatformRole) {
+            throw new ForbiddenException(
+                "The platform administrator role can't be changed: its access comes from the account, not the role.",
+            );
+        }
+
         if (role.companyId === null) {
             if (!actor.isSuperAdmin) {
                 throw new ForbiddenException("Only a platform administrator can manage a global role");
