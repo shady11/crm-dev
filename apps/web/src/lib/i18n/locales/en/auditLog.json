@@ -1,10 +1,12 @@
 {
   "page": {
     "heading": "Audit log",
-    "description": "Privileged platform actions across every tenant — append-only, never deleted.",
+    "description": "Privileged platform actions across every company — append-only, never deleted.",
     "filters": {
-      "companyId": "Tenant ID",
-      "companyIdPlaceholder": "Filter by tenant ID",
+      "company": "Company",
+      "allCompanies": "All companies",
+      "deletedCompany": "{{name}} (deleted)",
+      "hideLogins": "Hide sign-ins",
       "action": "Action",
       "allActions": "All actions",
       "dateFrom": "From",
@@ -16,7 +18,7 @@
         "actor": "Actor",
         "action": "Action",
         "target": "Target",
-        "tenant": "Tenant"
+        "company": "Company"
       }
     },
     "empty": {
@@ -24,11 +26,11 @@
       "description": "Nothing matches these filters."
     },
     "actions": {
-      "TENANT_CREATED": "Tenant created",
-      "TENANT_SUSPENDED": "Tenant suspended",
-      "TENANT_RESUMED": "Tenant resumed",
-      "TENANT_DELETED": "Tenant deleted",
-      "TENANT_RESTORED": "Tenant restored",
+      "TENANT_CREATED": "Company created",
+      "TENANT_SUSPENDED": "Company suspended",
+      "TENANT_RESUMED": "Company resumed",
+      "TENANT_DELETED": "Company deleted",
+      "TENANT_RESTORED": "Company restored",
       "TENANT_USER_DEACTIVATED": "User deactivated",
       "TENANT_USER_REACTIVATED": "User reactivated",
       "TENANT_USER_PASSWORD_RESET": "Password reset",

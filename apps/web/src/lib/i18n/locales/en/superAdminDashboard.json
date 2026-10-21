@@ -1,7 +1,7 @@
 {
   "page": {
     "heading": "Platform overview",
-    "description": "Tenants, users and impersonation activity across this installation.",
+    "description": "Companies, users and impersonation activity across this installation.",
     "manageCompanies": "Manage companies"
   },
   "kpi": {
@@ -16,7 +16,7 @@
     "table": {
       "superAdmin": "Super admin",
       "target": "Impersonating",
-      "company": "Tenant",
+      "company": "Company",
       "expiresAt": "Expires"
     }
   },

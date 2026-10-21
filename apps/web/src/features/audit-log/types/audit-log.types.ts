@@ -52,6 +52,8 @@ export type AuditLogEntry = {
     action: AuditAction;
     targetType: string;
     targetId: string | null;
+    /** SA-11: the target's name (user, company, role, setting option), when it still resolves. */
+    targetName?: string | null;
     companyId: string | null;
     company: {id: string; name: string} | null;
     metadata: Record<string, unknown> | null;

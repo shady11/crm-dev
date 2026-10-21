@@ -18,6 +18,10 @@ describe('AuditLogService', () => {
                 findMany: jest.fn().mockResolvedValue([]),
                 count: jest.fn().mockResolvedValue(0),
             },
+            user: {findMany: jest.fn().mockResolvedValue([])},
+            company: {findMany: jest.fn().mockResolvedValue([])},
+            role: {findMany: jest.fn().mockResolvedValue([])},
+            settingOption: {findMany: jest.fn().mockResolvedValue([])},
         };
         const service = new AuditLogService(prisma as any);
         return {service, prisma};
@@ -101,6 +105,59 @@ describe('AuditLogService', () => {
             const result = await service.findAll({page: 1, limit: 50} as any);
 
             expect(result.meta).toEqual({page: 1, limit: 50, total: 101, pages: 3});
+        });
+
+        it('SA-11: hides sign-ins when asked, unless a specific action is picked', async () => {
+            const {service, prisma} = build();
+
+            await service.findAll({hideLogins: true} as any);
+            await service.findAll({hideLogins: true, action: AuditAction.LOGIN_FAILED} as any);
+
+            const calls = (prisma.auditLog.findMany as jest.Mock).mock.calls;
+            expect(calls[0][0].where.action).toEqual({
+                notIn: [AuditAction.LOGIN_SUCCEEDED, AuditAction.LOGIN_FAILED],
+            });
+            expect(calls[1][0].where.action).toBe(AuditAction.LOGIN_FAILED);
+        });
+
+        it('SA-11: names each row\'s target, one lookup per kind of target', async () => {
+            const {service, prisma} = build();
+            prisma.auditLog.findMany.mockResolvedValue([
+                {id: 'a1', targetType: 'User', targetId: 'u1'},
+                {id: 'a2', targetType: 'Company', targetId: 'c1'},
+                {id: 'a3', targetType: 'Role', targetId: 'r1'},
+                {id: 'a4', targetType: 'SettingOption', targetId: 'o1'},
+                {id: 'a5', targetType: 'User', targetId: 'u1'},
+                {id: 'a6', targetType: 'User', targetId: 'gone'},
+                {id: 'a7', targetType: 'User', targetId: null},
+            ]);
+            prisma.user.findMany.mockResolvedValue([{id: 'u1', fullName: 'Aibek Manager'}]);
+            prisma.company.findMany.mockResolvedValue([{id: 'c1', name: 'Bishkek Dev'}]);
+            prisma.role.findMany.mockResolvedValue([{id: 'r1', name: 'Sales Head'}]);
+            prisma.settingOption.findMany.mockResolvedValue([{id: 'o1', code: 'KGS'}]);
+
+            const {items} = await service.findAll({} as any);
+
+            expect(items.map((item) => item.targetName)).toEqual([
+                'Aibek Manager',
+                'Bishkek Dev',
+                'Sales Head',
+                'KGS',
+                'Aibek Manager',
+                null,
+                null,
+            ]);
+            expect(prisma.user.findMany).toHaveBeenCalledTimes(1);
+            expect(prisma.user.findMany.mock.calls[0][0].where).toEqual({id: {in: ['u1', 'gone']}});
+        });
+
+        it('SA-11: looks nothing up when the page has no targets', async () => {
+            const {service, prisma} = build();
+
+            await service.findAll({} as any);
+
+            expect(prisma.user.findMany).not.toHaveBeenCalled();
+            expect(prisma.company.findMany).not.toHaveBeenCalled();
         });
     });
 
