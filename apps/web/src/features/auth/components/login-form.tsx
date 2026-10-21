@@ -16,6 +16,7 @@ import {authStorage} from "@/features/auth/utils/auth-storage.ts";
 import {Loader2, TriangleAlert} from "lucide-react";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {toast} from "@/components/ui/toast.tsx";
+import {isAxiosError} from "axios";
 import {useTranslation} from "react-i18next";
 
 type LoginFormValues = {
@@ -65,6 +66,8 @@ export function LoginForm({
     };
 
     const errors = form.formState.errors;
+    const companyInactive =
+        isAxiosError<{code?: string}>(mutation.error) && mutation.error.response?.data?.code === "COMPANY_INACTIVE";
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -111,9 +114,14 @@ export function LoginForm({
                             {mutation.isError && (
                                 <Alert variant="destructive">
                                     <TriangleAlert />
-                                    <AlertTitle>{t("login.failedTitle")}</AlertTitle>
+                                    {/* SA-12: a suspended company's users are told so, not "wrong password". */}
+                                    <AlertTitle>
+                                        {companyInactive ? t("login.companyInactiveTitle") : t("login.failedTitle")}
+                                    </AlertTitle>
                                     <AlertDescription>
-                                        {t("login.failedDescription")}
+                                        {companyInactive
+                                            ? t("login.companyInactiveDescription")
+                                            : t("login.failedDescription")}
                                     </AlertDescription>
                                 </Alert>
                             )}

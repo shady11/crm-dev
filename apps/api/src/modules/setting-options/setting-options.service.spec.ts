@@ -54,6 +54,19 @@ describe("SettingOptionsService", () => {
         ).rejects.toThrow(BadRequestException);
     });
 
+    it("SA-12: stores codes in canonical form, so \"kgs\" is the existing KGS", async () => {
+        const {service, create, prisma} = build();
+
+        await service.create(actor, {type: "CURRENCY", code: " kgs ", label: "Som"});
+        await service.create(actor, {type: "LOCALE", code: "ru-ru", label: "Русский"});
+        await service.create(actor, {type: "TIMEZONE", code: "asia/bishkek", label: "Bishkek"});
+
+        expect(create.mock.calls.map(([args]) => args.data.code)).toEqual(["KGS", "ru-RU", "Asia/Bishkek"]);
+        expect((prisma.settingOption.findUnique as jest.Mock).mock.calls[0][0]).toEqual({
+            where: {type_code: {type: "CURRENCY", code: "KGS"}},
+        });
+    });
+
     it("creates a valid option", async () => {
         const {service, create} = build();
 

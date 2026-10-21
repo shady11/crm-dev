@@ -494,7 +494,7 @@ export class CompaniesService {
      * resuming does not have to reconstruct which accounts were already
      * inactive before the suspension.
      */
-    async suspend(actor: AuthUser, id: string) {
+    async suspend(actor: AuthUser, id: string, reason?: string) {
         const company = await this.findOne(id);
 
         if (company.suspendedAt) {
@@ -514,6 +514,7 @@ export class CompaniesService {
             targetType: "Company",
             targetId: id,
             companyId: id,
+            ...(reason?.trim() ? {metadata: {reason: reason.trim()}} : {}),
         });
 
         return updated;

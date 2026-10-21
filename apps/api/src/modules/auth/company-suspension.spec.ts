@@ -115,9 +115,10 @@ describe("company suspension is enforced at auth", () => {
         };
 
         it("refuses a suspended tenant and says why", async () => {
+            // SA-12: with a code the web app shows in the user's language.
             await expect(
                 loginFor({suspendedAt: new Date(), deletedAt: null}).login("manager@crm.dev", PASSWORD),
-            ).rejects.toThrow(/not active/);
+            ).rejects.toMatchObject({response: expect.objectContaining({code: "COMPANY_INACTIVE"})});
         });
 
         it("does not leak the tenant's state to a wrong password", async () => {

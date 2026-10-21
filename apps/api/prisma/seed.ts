@@ -105,6 +105,23 @@ async function ensureDefaultRolePermissions(prisma: PrismaClient): Promise<void>
     }
 }
 
+// SA-12: what `--help` prints (`npm run provision -- --help`).
+const USAGE = `Usage:
+  npx tsx prisma/seed.ts
+      Local demo data (admin@crm.dev / password123). Development only.
+
+  npx tsx prisma/seed.ts --mode provision-tenant \\
+      --company "Bishkek Dev" --admin-email admin@bishkekdev.kg --admin-name "Aibek Kendirbaev" \\
+      [--currency KGS] [--locale ru-RU] [--timezone Asia/Bishkek]
+      Creates one company and its first administrator.
+
+  npx tsx prisma/seed.ts --mode provision-super-admin --email ops@yourdomain.kg --name "Aibek Kendirbaev"
+      Creates the platform's first administrator.
+
+The new user's password comes from ADMIN_PASSWORD, or is generated and printed once.
+They are asked to change it when they first sign in.
+`;
+
 function parseFlags(argv: string[]): Map<string, string> {
     const flags = new Map<string, string>();
 
@@ -919,9 +936,15 @@ async function provisionSuperAdmin(flags: Map<string, string>) {
 }
 
 async function main() {
+    const args = process.argv.slice(2);
+    if (args.includes("--help") || args.includes("-h")) {
+        console.log(USAGE);
+        return;
+    }
+
     if (!process.env.DATABASE_URL) fail("DATABASE_URL is not set");
 
-    const flags = parseFlags(process.argv.slice(2));
+    const flags = parseFlags(args);
     const mode = flags.get("mode") ?? "demo";
 
     switch (mode) {

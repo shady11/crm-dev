@@ -38,7 +38,8 @@
       "administrator": "Administrator:",
       "generatedPasswordLabel": "Generated password — shown once, and not recoverable afterwards:",
       "generatedPasswordHint": "Give it to them directly and have them change it at first login.",
-      "confirm": "I have saved it"
+      "confirm": "I have saved it",
+      "dismiss": "Done"
     },
     "toasts": {
       "updateSuccess": "Company updated",
@@ -59,7 +60,9 @@
     "suspend": {
       "title": "Suspend this company?",
       "body": "Everyone in this tenant is signed out and cannot log in until it is resumed. Their data is untouched.",
-      "confirm": "Suspend"
+      "confirm": "Suspend",
+      "reasonLabel": "Reason (optional)",
+      "reasonPlaceholder": "For example: unpaid invoice. Kept in the audit log."
     },
     "resume": {
       "title": "Resume this company?",
@@ -191,6 +194,9 @@
         "reactivated": "{{name}} reactivated",
         "actionError": "That did not work"
       }
+    },
+    "actions": {
+      "edit": "Edit"
     }
   }
 }
