@@ -2,7 +2,7 @@ import {useState} from "react";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "@/components/ui/toast.tsx";
-import {ArrowLeft, Eye, KeyRound, PauseCircle, PlayCircle} from "lucide-react";
+import {ArrowLeft, Eye, KeyRound, PauseCircle, Pencil, PlayCircle, Trash2} from "lucide-react";
 import {useTranslation} from "react-i18next";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
@@ -32,6 +32,7 @@ import {
     type ResetCompanyUserPasswordResult,
 } from "../api/companies.api";
 import {isSuspended} from "../types/company.types";
+import {useCompanyActions} from "../hooks/use-company-actions";
 import type {CompanyUser} from "../types/company.types";
 import {GeneratedPassword} from "../components/generated-password";
 import {DeactivateCompanyUserDialog} from "../components/deactivate-company-user-dialog";
@@ -47,6 +48,8 @@ export function CompanyDetailPage() {
     const [pendingDeactivate, setPendingDeactivate] = useState<CompanyUser | null>(null);
     const [resetResult, setResetResult] = useState<ResetCompanyUserPasswordResult | null>(null);
     const [pendingImpersonate, setPendingImpersonate] = useState<CompanyUser | null>(null);
+    // SA-12: the same actions as on the list, on the company's own page.
+    const actions = useCompanyActions({onDeleted: () => navigate("/companies")});
 
     const company = useQuery({
         queryKey: ["companies", companyId],
@@ -125,7 +128,37 @@ export function CompanyDetailPage() {
                         </Badge>
                     </div>
                 </div>
+
+                <div className="flex flex-wrap justify-end gap-2 pt-9">
+                    <Button variant="outline" size="sm" onClick={() => actions.request("edit", data)}>
+                        <Pencil className="size-3.5" />
+                        {t("detail.actions.edit", {ns: "companies"})}
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => actions.request(suspended ? "resume" : "suspend", data)}
+                    >
+                        {suspended ? <PlayCircle className="size-3.5" /> : <PauseCircle className="size-3.5" />}
+                        {suspended
+                            ? t("confirmDialog.resume.confirm", {ns: "companies"})
+                            : t("confirmDialog.suspend.confirm", {ns: "companies"})}
+                    </Button>
+                    {/* SA-3: only a suspended company can be deleted. */}
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={!suspended}
+                        title={suspended ? undefined : t("page.rowActions.deleteNeedsSuspend", {ns: "companies", name: data.name})}
+                        onClick={() => actions.request("delete", data)}
+                    >
+                        <Trash2 className="text-destructive size-3.5" />
+                        {t("confirmDialog.delete.confirm", {ns: "companies"})}
+                    </Button>
+                </div>
             </div>
+
+            {actions.dialogs}
 
             {suspended ? (
                 <Card className="border-destructive/40">

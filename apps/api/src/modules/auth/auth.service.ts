@@ -106,7 +106,13 @@ export class AuthService {
         // SUPER_ADMIN has no company, so this never applies to them.
         if (user.company && (user.company.suspendedAt || user.company.deletedAt)) {
             await this.recordLoginFailure(user, "company_inactive");
-            throw new UnauthorizedException("This company is not active. Contact your administrator.");
+            throw new UnauthorizedException({
+                statusCode: 401,
+                error: "Unauthorized",
+                // SA-12: the web app says this in the user's language.
+                code: "COMPANY_INACTIVE",
+                message: "Your company's access to the CRM is suspended. Contact the CRM provider's support to restore it.",
+            });
         }
 
         if (user.failedLoginAttempts > 0 || user.lockedUntil) {

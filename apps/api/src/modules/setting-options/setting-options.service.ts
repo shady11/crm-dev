@@ -32,8 +32,9 @@ export class SettingOptionsService {
     }
 
     async create(actor: AuthUser, dto: CreateSettingOptionDto) {
-        const code = dto.code.trim();
-        assertValidCode(dto.type, code);
+        // SA-12: stored in canonical form, so "kgs" and "KGS" are the same
+        // option rather than two.
+        const code = canonicalCode(dto.type, dto.code.trim());
 
         const existing = await this.prisma.settingOption.findUnique({
             where: {type_code: {type: dto.type, code}},
@@ -152,18 +153,25 @@ const FIELD_BY_TYPE: Record<SettingOptionType, "currency" | "locale" | "timezone
  * locale/timezone feed straight into Intl.NumberFormat/DateTimeFormat
  * elsewhere in the app (see lib/i18n/formatters.ts), so a code that throws
  * there would silently break every page rendering that tenant's data.
+ * Returns the code in its canonical spelling (SA-12).
  */
-function assertValidCode(type: SettingOptionType, code: string): void {
+export function canonicalCode(type: SettingOptionType, code: string): string {
     try {
         if (type === "CURRENCY") {
-            new Intl.NumberFormat("en-US", {style: "currency", currency: code});
-        } else if (type === "LOCALE") {
-            if (!Intl.getCanonicalLocales(code).length) {
+            // ISO 4217 codes are upper-case; Intl accepts either.
+            const upper = code.toUpperCase();
+            new Intl.NumberFormat("en-US", {style: "currency", currency: upper});
+            return upper;
+        }
+        if (type === "LOCALE") {
+            const [canonical] = Intl.getCanonicalLocales(code);
+            if (!canonical) {
                 throw new Error("empty");
             }
-        } else {
-            new Intl.DateTimeFormat("en-US", {timeZone: code});
+            return canonical;
         }
+        // "asia/bishkek" → "Asia/Bishkek".
+        return new Intl.DateTimeFormat("en-US", {timeZone: code}).resolvedOptions().timeZone;
     } catch {
         throw new BadRequestException(`"${code}" is not a valid ${type.toLowerCase()} code`);
     }

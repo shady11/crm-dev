@@ -89,7 +89,13 @@ export class SessionValidationService {
         // SUPER_ADMIN has no company, so `company` is null and this never
         // applies to them.
         if (user.company && (user.company.suspendedAt || user.company.deletedAt)) {
-            throw new UnauthorizedException('This company is not active. Contact your administrator.');
+            throw new UnauthorizedException({
+                statusCode: 401,
+                error: 'Unauthorized',
+                // SA-12: the web app says this in the user's language.
+                code: 'COMPANY_INACTIVE',
+                message: "Your company's access to the CRM is suspended. Contact the CRM provider's support to restore it.",
+            });
         }
 
         const CLOCK_SKEW_TOLERANCE_MS = 2000;

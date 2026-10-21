@@ -93,8 +93,9 @@ export async function updateOwnCompany(payload: Partial<UpdateOwnCompanyPayload>
 
 // Suspend and resume are separate endpoints rather than a status field, so a
 // mistyped payload cannot turn one into the other.
-export async function suspendCompany(id: string) {
-    const response = await api.post<Company>(`/companies/${id}/suspend`);
+/** SA-12: the optional reason is kept in the audit log. */
+export async function suspendCompany(id: string, reason?: string) {
+    const response = await api.post<Company>(`/companies/${id}/suspend`, reason ? {reason} : {});
     return response.data;
 }
 

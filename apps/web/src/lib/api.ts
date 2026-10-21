@@ -19,7 +19,9 @@ api.interceptors.request.use((config) => {
 // Endpoints where a 401 means "the password you typed into this form was
 // wrong" rather than "your session has expired" — the global logout below
 // would otherwise force-log-out a fully signed-in user for a simple typo.
-const REAUTH_ENDPOINTS = ["/auth/me/password", "/auth/2fa/disable"];
+// The sign-in form itself is one too (SA-12): reloading the page would
+// lose the reason it shows.
+const REAUTH_ENDPOINTS = ["/auth/login", "/auth/me/password", "/auth/2fa/disable"];
 
 api.interceptors.response.use(
     (response) => response,

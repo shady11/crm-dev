@@ -7,6 +7,7 @@ import {AuthUser} from "@/common/types/auth-user.type";
 import {CompaniesService} from "./companies.service";
 import {CreateCompanyDto} from "./dto/create-company.dto";
 import {DeactivateCompanyUserDto} from "./dto/deactivate-company-user.dto";
+import {SuspendCompanyDto} from "./dto/suspend-company.dto";
 import {UpdateCompanyDto} from "./dto/update-company.dto";
 import {UpdateOwnCompanyDto} from "./dto/update-own-company.dto";
 import {QueryCompaniesDto} from "./dto/query-companies.dto";
@@ -83,8 +84,8 @@ export class CompaniesController {
     // Suspension is reversible; deletion is not. Kept as separate endpoints so
     // a client cannot turn one into the other by changing a payload field.
     @Post(":id/suspend")
-    suspend(@CurrentUser() actor: AuthUser, @Param("id") id: string) {
-        return this.companiesService.suspend(actor, id);
+    suspend(@CurrentUser() actor: AuthUser, @Param("id") id: string, @Body() dto: SuspendCompanyDto) {
+        return this.companiesService.suspend(actor, id, dto.reason);
     }
 
     @Post(":id/resume")

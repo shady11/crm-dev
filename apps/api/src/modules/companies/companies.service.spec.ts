@@ -195,6 +195,18 @@ describe("CompaniesService suspension", () => {
         expect(update.mock.calls[0][0].data).toEqual({suspendedAt: expect.any(Date)});
     });
 
+    it("SA-12: keeps the reason for a suspension in the audit log", async () => {
+        const {service} = build(active);
+        const record = auditLog.record as jest.Mock;
+        record.mockClear();
+
+        await service.suspend(actor, "c1", "  Unpaid invoice for October ");
+        await service.suspend(actor, "c1", "   ");
+
+        expect(record.mock.calls[0][0]).toMatchObject({action: "TENANT_SUSPENDED", metadata: {reason: "Unpaid invoice for October"}});
+        expect(record.mock.calls[1][0].metadata).toBeUndefined();
+    });
+
     it("refuses to suspend an already-suspended company", async () => {
         const {service, update} = build(suspended);
 
