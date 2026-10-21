@@ -56,6 +56,7 @@ import {TasksService} from "@/modules/tasks/tasks.service";
 import {MoneyHeldNotifier} from "./money-held-notifier.service";
 import {ReceiptNumberService} from "./payments/receipt-number.service";
 import { activityText } from '@/modules/activities/activity-templates';
+import { todayAsDate } from '@/common/utils/day-bounds.util';
 
 @Injectable()
 export class DealsService {
@@ -441,7 +442,9 @@ export class DealsService {
             amount: dto.deposit,
             paymentMethod: dto.depositPaymentMethod ?? PaymentMethod.CASH,
             paymentType: PaymentType.DEPOSIT,
-            paidAt: new Date(),
+            // E2E-2: dated like a payment entered in the form (that day's
+            // UTC midnight), not stamped with the time of day.
+            paidAt: todayAsDate(user.company?.timezone),
             receiptNumber: await this.receiptNumbers.next(db, companyId),
           },
         });

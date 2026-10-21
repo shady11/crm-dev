@@ -309,4 +309,23 @@ describe('buildReceiptContext', () => {
         expect(context.totals).toEqual({paidToDate: '5,000.00 KGS', remaining: '5,000.00 KGS'});
         expect(context.deal.contractNumber).toBe('CN-1');
     });
+
+    it('E2E-2: counts a deposit taken earlier the same day, stamped with its time of day', () => {
+        // The deposit was stored at 07:23 (time of reservation); the form's
+        // payments later that day are stored at midnight.
+        const deposit = {id: 'd', amount: new Prisma.Decimal(3000), paidAt: new Date('2026-10-21T07:23:15.787Z'), createdAt: new Date('2026-10-21T07:23:15.791Z')};
+        const first = {...pay('p1', 2000, '2026-10-21', '2026-10-21T07:32:47.551Z')};
+        const last = {...pay('p2', 5000, '2026-10-21', '2026-10-21T07:40:00.000Z')};
+        const sameDay = {...deal, payments: [deposit, first, last]};
+        const asReceipt = (p: object, n: string) => ({...p, receiptNumber: n, paymentMethod: 'CASH', paymentType: 'INSTALLMENT', reference: null, note: null, user: null});
+
+        expect(buildReceiptContext(sameDay as any, company as any, asReceipt(first, 'R-2') as any).totals).toEqual({
+            paidToDate: '5,000.00 KGS',
+            remaining: '5,000.00 KGS',
+        });
+        expect(buildReceiptContext(sameDay as any, company as any, asReceipt(last, 'R-3') as any).totals).toEqual({
+            paidToDate: '10,000.00 KGS',
+            remaining: '0.00 KGS',
+        });
+    });
 });

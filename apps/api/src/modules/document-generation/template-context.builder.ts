@@ -208,11 +208,15 @@ export function buildReceiptContext(
 
   // Paid up to and including this payment, net of refunds before it, so a
   // receipt reprinted later still shows the balance as it was that day.
+  // E2E-2: by calendar day, then by when each was recorded: a deposit taken
+  // at reservation used to carry its time of day while form payments sit at
+  // midnight, so a same-day deposit sorted after them and was left out.
+  const day = (value: Date) => value.toISOString().slice(0, 10);
   const paidToDate = deal.payments
     .filter(
       (p) =>
-        p.paidAt < payment.paidAt ||
-        (p.paidAt.getTime() === payment.paidAt.getTime() &&
+        day(p.paidAt) < day(payment.paidAt) ||
+        (day(p.paidAt) === day(payment.paidAt) &&
           p.createdAt <= payment.createdAt),
     )
     .reduce((sum, p) => sum + Number(p.amount), 0);

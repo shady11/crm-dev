@@ -32,6 +32,16 @@ export async function renderHtmlToPdf(html: string): Promise<Buffer> {
     );
     const page = await context.newPage();
     await page.setContent(withDocumentFonts(html), { waitUntil: 'load' });
+    // E2E-1: the document font is embedded with font-display: block, so
+    // text stays invisible until it has loaded, and "load" doesn't wait for
+    // that: printing straight away stored about one document in four with
+    // no text. Reading layout first makes the page ask for the faces it
+    // uses; then wait until they are ready. (Evaluate still runs with page
+    // scripts disabled.)
+    await page.evaluate(async () => {
+      void document.body.offsetHeight;
+      await document.fonts.ready;
+    });
     const pdf = await page.pdf({ format: 'A4', printBackground: true });
     return pdf;
   } catch (error) {
