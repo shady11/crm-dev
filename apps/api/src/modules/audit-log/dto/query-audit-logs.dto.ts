@@ -1,4 +1,4 @@
-import {IsDateString, IsEnum, IsInt, IsOptional, IsString, Max, Min} from "class-validator";
+import {IsBoolean, IsDateString, IsEnum, IsInt, IsOptional, IsString, Max, Min} from "class-validator";
 import {Transform} from "class-transformer";
 import {AuditAction} from "@/generated/prisma/enums";
 
@@ -14,6 +14,12 @@ export class QueryAuditLogsDto {
     @IsOptional()
     @IsEnum(AuditAction)
     action?: AuditAction;
+
+    /** SA-11: leave out sign-ins, which otherwise make up most rows. */
+    @IsOptional()
+    @Transform(({value}) => value === true || value === "true")
+    @IsBoolean()
+    hideLogins?: boolean;
 
     @IsOptional()
     @IsDateString()

@@ -6,7 +6,7 @@
   },
   "page": {
     "heading": "Companies",
-    "description": "Tenants on this installation. Each has its own users, projects and deals.",
+    "description": "Companies on this installation. Each has its own users, projects and deals.",
     "newCompany": "New company",
     "manageSettingOptions": "Currency, locale & timezone",
     "searchPlaceholder": "Search companies",
@@ -59,7 +59,7 @@
   "confirmDialog": {
     "suspend": {
       "title": "Suspend this company?",
-      "body": "Everyone in this tenant is signed out and cannot log in until it is resumed. Their data is untouched.",
+      "body": "Everyone in this company is signed out and cannot log in until it is resumed. Their data is untouched.",
       "confirm": "Suspend",
       "reasonLabel": "Reason (optional)",
       "reasonPlaceholder": "For example: unpaid invoice. Kept in the audit log."
@@ -86,8 +86,8 @@
   "form": {
     "editTitle": "Edit {{name}}",
     "newTitle": "New company",
-    "editDescription": "Company settings. Currency and locale drive how money and dates appear for everyone in this tenant.",
-    "newDescription": "The first administrator is created with the company — a tenant with no way in cannot create one for itself.",
+    "editDescription": "Company settings. Currency and locale drive how money and dates appear for everyone in this company.",
+    "newDescription": "The first administrator is created with the company — a company with no way in cannot create one for itself.",
     "fields": {
       "name": "Company name",
       "phone": "Phone",
@@ -114,7 +114,7 @@
   "detail": {
     "backToCompanies": "Companies",
     "notFound": "Company not found.",
-    "suspendedBanner": "Suspended on {{date}}. Nobody in this tenant can log in until it is resumed. Their data is untouched.",
+    "suspendedBanner": "Suspended on {{date}}. Nobody in this company can log in until it is resumed. Their data is untouched.",
     "stats": {
       "projects": "Projects",
       "units": "Units",
@@ -137,7 +137,7 @@
     },
     "usersCard": {
       "title": "Users",
-      "empty": "No users. This tenant cannot be logged into.",
+      "empty": "No users. Nobody can log in to this company.",
       "headers": {
         "name": "Name",
         "role": "Role",

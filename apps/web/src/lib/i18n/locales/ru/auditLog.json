@@ -1,10 +1,12 @@
 {
   "page": {
     "heading": "Журнал аудита",
-    "description": "Привилегированные действия на платформе по всем тенантам — только добавление, без удаления.",
+    "description": "Привилегированные действия на платформе по всем компаниям — только добавление, без удаления.",
     "filters": {
-      "companyId": "ID тенанта",
-      "companyIdPlaceholder": "Фильтр по ID тенанта",
+      "company": "Компания",
+      "allCompanies": "Все компании",
+      "deletedCompany": "{{name}} (удалена)",
+      "hideLogins": "Скрыть входы",
       "action": "Действие",
       "allActions": "Все действия",
       "dateFrom": "С",
@@ -16,7 +18,7 @@
         "actor": "Кто",
         "action": "Действие",
         "target": "Объект",
-        "tenant": "Тенант"
+        "company": "Компания"
       }
     },
     "empty": {
@@ -24,11 +26,11 @@
       "description": "Ничего не соответствует этим фильтрам."
     },
     "actions": {
-      "TENANT_CREATED": "Тенант создан",
-      "TENANT_SUSPENDED": "Тенант приостановлен",
-      "TENANT_RESUMED": "Тенант возобновлён",
-      "TENANT_DELETED": "Тенант удалён",
-      "TENANT_RESTORED": "Тенант восстановлен",
+      "TENANT_CREATED": "Компания создана",
+      "TENANT_SUSPENDED": "Компания приостановлена",
+      "TENANT_RESUMED": "Компания возобновлена",
+      "TENANT_DELETED": "Компания удалена",
+      "TENANT_RESTORED": "Компания восстановлена",
       "TENANT_USER_DEACTIVATED": "Пользователь деактивирован",
       "TENANT_USER_REACTIVATED": "Пользователь активирован",
       "TENANT_USER_PASSWORD_RESET": "Пароль сброшен",
