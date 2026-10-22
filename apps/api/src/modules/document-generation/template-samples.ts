@@ -1,5 +1,6 @@
 import { DocumentType } from '@/generated/prisma/client';
 import { ReceiptTemplateContext } from './template-context.builder';
+import { documentFormatter, documentLanguage } from './document-language';
 
 /**
  * CA-5: what the template editor previews with and checks a template
@@ -18,12 +19,16 @@ type CompanyDetails = {
   signatoryName: string | null;
   signatoryTitle: string | null;
   currency: string | null;
+  locale?: string | null;
 };
 
 export function sampleTemplateContext(
   company: CompanyDetails,
 ): ReceiptTemplateContext {
   const currency = company.currency ?? 'KGS';
+  // E2E-3: printed the way the company's documents print them.
+  const f = documentFormatter(documentLanguage(company.locale));
+  const money = (value: number) => f.money(value, currency);
   return {
     company: {
       name: company.name,
@@ -38,16 +43,16 @@ export function sampleTemplateContext(
     deal: {
       dealNumber: 'D-2026-0042',
       status: 'CONTRACT_SIGNED',
-      financingType: 'INSTALLMENT',
-      listPrice: `62,000.00 ${currency}`,
-      salePrice: `58,900.00 ${currency}`,
-      discountAmount: `3,100.00 ${currency}`,
+      financingType: f.financing('INSTALLMENT'),
+      listPrice: money(62000),
+      salePrice: money(58900),
+      discountAmount: money(3100),
       discountPercent: '5',
-      deposit: `5,000.00 ${currency}`,
-      reservedAt: '2026-10-01',
-      reservationExpiresAt: '2026-10-08',
+      deposit: money(5000),
+      reservedAt: f.date('2026-10-01'),
+      reservationExpiresAt: f.date('2026-10-08'),
       contractNumber: 'C-2026-0042',
-      contractDate: '2026-10-05',
+      contractDate: f.date('2026-10-05'),
       note: '',
     },
     client: {
@@ -60,9 +65,9 @@ export function sampleTemplateContext(
     },
     unit: {
       number: '504',
-      type: 'APARTMENT',
+      type: f.unitType('APARTMENT'),
       rooms: '2',
-      area: '62.00',
+      area: f.number(62),
       projectName: 'ЖК Орион',
       blockName: 'A',
       entranceName: '1',
@@ -75,24 +80,24 @@ export function sampleTemplateContext(
     },
     schedule: {
       rows: [
-        { order: 1, dueDate: '2026-11-05', amount: `5,390.00 ${currency}` },
-        { order: 2, dueDate: '2026-12-05', amount: `5,390.00 ${currency}` },
+        { order: 1, dueDate: f.date('2026-11-05'), amount: money(5390) },
+        { order: 2, dueDate: f.date('2026-12-05'), amount: money(5390) },
       ],
     },
-    today: '2026-10-16',
+    today: f.date('2026-10-16'),
     payment: {
       receiptNumber: 'R-2026-0042',
-      date: '2026-10-05',
-      amount: `5,000.00 ${currency}`,
-      method: 'Cash',
-      type: 'Down payment',
+      date: f.date('2026-10-05'),
+      amount: money(5000),
+      method: f.paymentMethod('CASH'),
+      type: f.paymentType('DEPOSIT'),
       reference: '',
       note: '',
       receivedBy: 'Nurgul Baktybekova',
     },
     totals: {
-      paidToDate: `5,000.00 ${currency}`,
-      remaining: `53,900.00 ${currency}`,
+      paidToDate: money(5000),
+      remaining: money(53900),
     },
   };
 }

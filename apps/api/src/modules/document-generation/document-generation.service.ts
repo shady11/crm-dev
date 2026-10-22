@@ -10,7 +10,8 @@ import {
   FileStorageProvider,
 } from '@/modules/documents/storage/file-storage.interface';
 
-import { DEFAULT_TEMPLATES } from './templates/default-templates';
+import { defaultTemplate } from './templates/default-templates';
+import { documentLanguage } from './document-language';
 import {
   buildReceiptContext,
   buildTemplateContext,
@@ -73,6 +74,7 @@ export class DocumentGenerationService {
       type,
       userId,
       context,
+      locale: company.locale,
       originalName: `${type.toLowerCase()}-${deal.dealNumber}.pdf`,
     });
   }
@@ -103,6 +105,7 @@ export class DocumentGenerationService {
       type: DocumentType.PAYMENT_RECEIPT,
       userId,
       context: buildReceiptContext(deal, company, payment),
+      locale: company.locale,
       originalName: `receipt-${payment.receiptNumber ?? payment.id}.pdf`,
     });
   }
@@ -113,16 +116,20 @@ export class DocumentGenerationService {
     type: DocumentType;
     userId: string;
     context: object;
+    /** E2E-3: picks the built-in template's language. */
+    locale: string | null;
     originalName: string;
   }) {
-    const { companyId, dealId, type, userId, context, originalName } = params;
+    const { companyId, dealId, type, userId, context, locale, originalName } =
+      params;
 
     const template = await this.prisma.documentTemplate.findFirst({
       where: { companyId, type, isActive: true, deletedAt: null },
       orderBy: { version: 'desc' },
     });
 
-    const bodyHtml = template?.bodyHtml ?? DEFAULT_TEMPLATES[type];
+    const bodyHtml =
+      template?.bodyHtml ?? defaultTemplate(type, documentLanguage(locale));
     if (!bodyHtml) {
       throw new UnsupportedDocumentTypeException(type);
     }
