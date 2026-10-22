@@ -1,4 +1,4 @@
-import { endOfToday } from './day-bounds.util';
+import { endOfToday, todayAsDate } from './day-bounds.util';
 
 describe('endOfToday', () => {
   it("ends the company's day in its own zone, not the server's", () => {
@@ -32,5 +32,23 @@ describe('endOfToday', () => {
 
     expect(endOfToday(null, now)).toEqual(serverEnd);
     expect(endOfToday('UTC+6', now)).toEqual(serverEnd);
+  });
+});
+
+describe('todayAsDate (E2E-2)', () => {
+  it("gives the company's calendar day as that day's UTC midnight", () => {
+    // 03:00 on 13 Oct in Bishkek is still 12 Oct in UTC.
+    expect(todayAsDate('Asia/Bishkek', new Date('2026-10-12T21:00:00Z')).toISOString()).toBe(
+      '2026-10-13T00:00:00.000Z',
+    );
+    expect(todayAsDate('Asia/Bishkek', new Date('2026-10-13T07:23:00Z')).toISOString()).toBe(
+      '2026-10-13T00:00:00.000Z',
+    );
+  });
+
+  it("falls back to the server's day for a missing or non-IANA zone", () => {
+    const now = new Date(2026, 9, 13, 15, 0);
+    expect(todayAsDate(null, now).toISOString()).toBe('2026-10-13T00:00:00.000Z');
+    expect(todayAsDate('UTC+6', now).toISOString()).toBe('2026-10-13T00:00:00.000Z');
   });
 });
