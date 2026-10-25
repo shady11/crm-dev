@@ -1,5 +1,6 @@
 import { Company, Prisma } from '@/generated/prisma/client';
 import { DEAL_DETAILS_INCLUDE } from '@/modules/deals/deal.constants';
+import { documentFormatter, documentLanguage } from './document-language';
 
 type DealWithDetails = Prisma.DealGetPayload<{
   include: typeof DEAL_DETAILS_INCLUDE;
@@ -67,30 +68,15 @@ export interface TemplateContext {
   today: string;
 }
 
-function money(
-  value: Prisma.Decimal | number | null | undefined,
-  currency?: string | null,
-): string {
-  if (value === null || value === undefined) return '';
-  const amount = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(Number(value));
-  return currency ? `${amount} ${currency}` : amount;
-}
-
-function date(value: Date | string | null | undefined): string {
-  if (!value) return '';
-  const d = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(d.getTime())) return '';
-  return d.toISOString().slice(0, 10);
-}
-
 export function buildTemplateContext(
   deal: DealWithDetails,
   company: Company,
 ): TemplateContext {
   const currency = company.currency ?? undefined;
+  // E2E-3: values print in the company's document language.
+  const f = documentFormatter(documentLanguage(company.locale));
+  const money = f.money;
+  const date = f.date;
 
   return {
     company: {
@@ -106,15 +92,19 @@ export function buildTemplateContext(
     deal: {
       dealNumber: deal.dealNumber,
       status: deal.status,
-      financingType: deal.financingType ?? '',
+      financingType: f.financing(deal.financingType),
       listPrice: money(deal.listPrice, currency),
       salePrice: money(deal.salePrice, currency),
-      discountAmount: deal.discountAmount
-        ? money(deal.discountAmount, currency)
-        : '',
-      discountPercent: deal.discountPercent
-        ? deal.discountPercent.toString()
-        : '',
+      // A Decimal zero is still an object, so test the number: no discount
+      // leaves the line out instead of printing "-0.00".
+      discountAmount:
+        Number(deal.discountAmount ?? 0) > 0
+          ? money(deal.discountAmount, currency)
+          : '',
+      discountPercent:
+        Number(deal.discountPercent ?? 0) > 0
+          ? f.number(deal.discountPercent)
+          : '',
       deposit: deal.deposit ? money(deal.deposit, currency) : '',
       reservedAt: date(deal.reservedAt),
       reservationExpiresAt: date(deal.reservationExpiresAt),
@@ -132,9 +122,9 @@ export function buildTemplateContext(
     },
     unit: {
       number: deal.unit.number,
-      type: deal.unit.type,
+      type: f.unitType(deal.unit.type),
       rooms: deal.unit.rooms != null ? String(deal.unit.rooms) : '',
-      area: deal.unit.area.toString(),
+      area: f.number(deal.unit.area),
       projectName: deal.project.name,
       blockName: deal.unit.block.name,
       entranceName: deal.unit.entrance.name,
@@ -155,23 +145,6 @@ export function buildTemplateContext(
     today: date(new Date()),
   };
 }
-
-// English labels, matching the English default templates. A company that
-// wants its own language replaces the template, not these values.
-const PAYMENT_METHOD_LABELS: Record<string, string> = {
-  CASH: 'Cash',
-  BANK_TRANSFER: 'Bank transfer',
-  MBANK: 'MBank',
-  OPTIMA: 'Optima',
-  ELKART: 'Elkart',
-  OTHER: 'Other',
-};
-const PAYMENT_TYPE_LABELS: Record<string, string> = {
-  DEPOSIT: 'Deposit',
-  INSTALLMENT: 'Installment',
-  FINAL: 'Final payment',
-  REFUND: 'Refund',
-};
 
 type ReceiptPayment = Prisma.PaymentGetPayload<{
   include: { user: { select: { fullName: true } } };
@@ -205,6 +178,7 @@ export function buildReceiptContext(
 ): ReceiptTemplateContext {
   const base = buildTemplateContext(deal, company);
   const currency = company.currency ?? undefined;
+  const f = documentFormatter(documentLanguage(company.locale));
 
   // Paid up to and including this payment, net of refunds before it, so a
   // receipt reprinted later still shows the balance as it was that day.
@@ -225,18 +199,17 @@ export function buildReceiptContext(
     ...base,
     payment: {
       receiptNumber: payment.receiptNumber ?? '',
-      date: date(payment.paidAt),
-      amount: money(payment.amount, currency),
-      method:
-        PAYMENT_METHOD_LABELS[payment.paymentMethod] ?? payment.paymentMethod,
-      type: PAYMENT_TYPE_LABELS[payment.paymentType] ?? payment.paymentType,
+      date: f.date(payment.paidAt),
+      amount: f.money(payment.amount, currency),
+      method: f.paymentMethod(payment.paymentMethod),
+      type: f.paymentType(payment.paymentType),
       reference: payment.reference ?? '',
       note: payment.note ?? '',
       receivedBy: payment.user?.fullName ?? '',
     },
     totals: {
-      paidToDate: money(paidToDate, currency),
-      remaining: money(
+      paidToDate: f.money(paidToDate, currency),
+      remaining: f.money(
         Math.max(Number(deal.salePrice) - paidToDate, 0),
         currency,
       ),
