@@ -188,6 +188,13 @@
     "unitPricesImportRequested": {
       "title": "Новые цены для {{project}} ждут согласования",
       "message": "{{requested}} из импорта объектов, отправил(а) {{byName}}"
+    },
+    "paymentScheduleNeeded": {
+      "title": "Сделка {{dealNumber}} активна, нужен график платежей",
+      "message": "Осталось оплатить {{amount}}."
+    },
+    "paymentScheduleCreated": {
+      "title": "График платежей по сделке {{dealNumber}} создал(а) {{byName}}"
     }
   }
 }

@@ -9,6 +9,7 @@ import {GeneratePaymentScheduleDto} from '../../dto/payments/generate-payment-sc
 import {DealMapper} from "@/modules/deals/mappers/deal.mapper";
 import {DEAL_DETAILS_INCLUDE} from "../../deal.constants";
 import { activityText } from '@/modules/activities/activity-templates';
+import {ScheduleNeededNotifier} from '../schedule-needed-notifier.service';
 
 @Injectable()
 export class PaymentScheduleService {
@@ -17,6 +18,7 @@ export class PaymentScheduleService {
         private readonly mapper: DealMapper,
         private readonly domain: DealDomainService,
         private readonly activityService: DealActivityService,
+        private readonly scheduleNeeded: ScheduleNeededNotifier,
     ) {}
 
     async generate(user: AuthUser, dealId: string, dto: GeneratePaymentScheduleDto) {
@@ -96,6 +98,8 @@ export class PaymentScheduleService {
 
             return db.deal.findUniqueOrThrow({ where: { id: dealId }, include: DEAL_DETAILS_INCLUDE });
         });
+
+        await this.scheduleNeeded.resolveScheduled(result, user.name);
 
         return this.mapper.toDetails(result);
     }

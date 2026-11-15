@@ -20,6 +20,10 @@ enum NotificationType {
   // the extension itself.
   RESERVATION_EXTENSION_REQUESTED
   RESERVATION_EXTENDED
+  // E2E-4: Finance is asked for a schedule when a deal is activated; making
+  // the schedule resolves the ask.
+  PAYMENT_SCHEDULE_NEEDED
+  PAYMENT_SCHEDULE_CREATED
 }
 
 enum NotificationEntityType {

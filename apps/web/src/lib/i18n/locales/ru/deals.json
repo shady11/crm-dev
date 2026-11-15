@@ -40,7 +40,8 @@
     "allDeals": "Все сделки",
     "attention": {
       "discount_pending": "Скидка на согласовании",
-      "overdue_payments": "Просроченные платежи"
+      "overdue_payments": "Просроченные платежи",
+      "schedule_needed": "Нужен график платежей"
     }
   },
   "table": {

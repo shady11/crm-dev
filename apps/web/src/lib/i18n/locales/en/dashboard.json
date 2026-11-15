@@ -63,7 +63,10 @@
     "review": "Review",
     "priceChangeUnit": "Unit {{unit}} · {{project}}",
     "followUpsHeading": "Missed follow-ups ({{count}})",
-    "followUpDueSince": "call due {{date}}"
+    "followUpDueSince": "call due {{date}}",
+    "scheduleNeededHeading": "Payment schedules to make ({{count}})",
+    "scheduleNeededLeft": "{{amount}} left to pay",
+    "scheduleNeededSigned": "signed {{date}}"
   },
   "recentActivity": {
     "title": "Recent activity",
@@ -136,7 +139,11 @@
       "OPTIMA": "Optima",
       "ELKART": "Elkart",
       "OTHER": "Other"
-    }
+    },
+    "outstandingUnscheduled_one": "incl. {{amount}} on {{count}} deal with no schedule",
+    "outstandingUnscheduled_few": "incl. {{amount}} on {{count}} deals with no schedule",
+    "outstandingUnscheduled_many": "incl. {{amount}} on {{count}} deals with no schedule",
+    "outstandingUnscheduled_other": "incl. {{amount}} on {{count}} deals with no schedule"
   },
   "gettingStarted": {
     "title": "Getting started",

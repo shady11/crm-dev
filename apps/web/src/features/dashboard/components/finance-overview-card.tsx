@@ -37,6 +37,11 @@ export function FinanceOverviewCard({data}: {data: FinanceOverview}) {
                     <div>
                         <p className="text-xs text-muted-foreground">{t("financeOverview.outstandingBalance")}</p>
                         <p className="text-xl font-semibold">{formatCurrency(data.outstandingBalance)}</p>
+                        {data.unscheduled && data.unscheduled.count > 0 ? (
+                            <p className="text-xs text-muted-foreground">
+                                {t("financeOverview.outstandingUnscheduled", {count: data.unscheduled.count, amount: formatCurrency(data.unscheduled.amount)})}
+                            </p>
+                        ) : null}
                     </div>
                     <div>
                         <p className="text-xs text-muted-foreground">{t("financeOverview.overdue")}</p>

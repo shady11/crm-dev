@@ -54,6 +54,7 @@ import {DocumentGenerationService} from "@/modules/document-generation/document-
 import {GENERATABLE_DOCUMENT_TYPES} from "@/modules/document-generation/document-generation.constants";
 import {TasksService} from "@/modules/tasks/tasks.service";
 import {MoneyHeldNotifier} from "./money-held-notifier.service";
+import {ScheduleNeededNotifier} from "./schedule-needed-notifier.service";
 import {ReceiptNumberService} from "./payments/receipt-number.service";
 import { activityText } from '@/modules/activities/activity-templates';
 import { todayAsDate } from '@/common/utils/day-bounds.util';
@@ -73,6 +74,7 @@ export class DealsService {
       private readonly rbacService: RbacService,
       private readonly tasksService: TasksService,
       private readonly moneyHeld: MoneyHeldNotifier,
+      private readonly scheduleNeeded: ScheduleNeededNotifier,
       private readonly receiptNumbers: ReceiptNumberService,
   ) {}
 
@@ -835,6 +837,11 @@ export class DealsService {
 
       return db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
     });
+
+    // E2E-4: still owing money, so Finance's turn: make the schedule.
+    if (result.status === DealStatus.ACTIVE) {
+      await this.scheduleNeeded.notifyActivated(result, user.id);
+    }
 
     return this.mapper.toDetails(result);
   }

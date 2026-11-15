@@ -188,6 +188,13 @@
     "unitPricesImportRequested": {
       "title": "New prices for {{project}} need approval",
       "message": "{{requested}} sent by {{byName}} from a unit import"
+    },
+    "paymentScheduleNeeded": {
+      "title": "Deal {{dealNumber}} is active and needs a payment schedule",
+      "message": "{{amount}} left to pay."
+    },
+    "paymentScheduleCreated": {
+      "title": "Payment schedule for deal {{dealNumber}} made by {{byName}}"
     }
   }
 }

@@ -1,6 +1,6 @@
 import type {ReactNode} from "react";
 import {Link} from "react-router-dom";
-import {AlertTriangleIcon, BadgePercentIcon, ClockIcon, PhoneMissedIcon, TagIcon, WalletIcon} from "lucide-react";
+import {AlertTriangleIcon, BadgePercentIcon, CalendarRangeIcon, ClockIcon, PhoneMissedIcon, TagIcon, WalletIcon} from "lucide-react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {paths} from "@/routes/paths.ts";
 import type {AttentionItems} from "@/features/dashboard/api/dashboard.api.ts";
@@ -43,7 +43,9 @@ export function AttentionCard({data, showOwner}: {data: AttentionItems; showOwne
     const {formatCurrency, formatDate} = useCompanyFormatters();
     const {pendingApprovals, overduePayments, expiringDeals, urgentTasks, overdueFollowUps} = data;
     const priceChanges = data.pendingPriceChanges ?? {total: 0, requests: []};
+    const scheduleNeeded = data.scheduleNeeded ?? {total: 0, deals: []};
     const hasNothing = pendingApprovals.deals.length === 0
+        && scheduleNeeded.deals.length === 0
         && priceChanges.requests.length === 0
         && overdueFollowUps.leads.length === 0
         && overduePayments.deals.length === 0
@@ -138,6 +140,29 @@ export function AttentionCard({data, showOwner}: {data: AttentionItems; showOwne
                                             </p>
                                         </div>
                                         <p className="shrink-0 text-sm font-medium tabular-nums">{formatCurrency(deal.amount)}</p>
+                                    </Link>
+                                ))}
+                            </Section>
+                        ) : null}
+
+                        {scheduleNeeded.deals.length > 0 ? (
+                            <Section
+                                title={t("attention.scheduleNeededHeading", {count: scheduleNeeded.total})}
+                                viewAll={scheduleNeeded.total > scheduleNeeded.deals.length
+                                    ? {to: paths.deals.attention("schedule_needed"), label: t("attention.viewAll")}
+                                    : undefined}
+                            >
+                                {scheduleNeeded.deals.map((deal) => (
+                                    <Link key={deal.id} to={paths.deals.payments(deal.id)} className={ROW_CLASS}>
+                                        <CalendarRangeIcon size={16} className="shrink-0 text-amber-500" />
+                                        <div className="min-w-0 flex-1">
+                                            <p className="truncate font-medium">{deal.dealNumber} · {deal.client.fullName}</p>
+                                            <p className="truncate text-xs text-muted-foreground">
+                                                {owner(deal.manager?.fullName)}
+                                                {t("attention.scheduleNeededLeft", {amount: formatCurrency(deal.remaining)})}
+                                                {deal.contractDate ? ` · ${t("attention.scheduleNeededSigned", {date: formatDate(deal.contractDate)})}` : null}
+                                            </p>
+                                        </div>
                                     </Link>
                                 ))}
                             </Section>
