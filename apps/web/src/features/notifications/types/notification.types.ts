@@ -3,6 +3,7 @@ import {
     BanknoteArrowDown,
     BellIcon,
     CalendarPlusIcon,
+    CalendarRangeIcon,
     CalendarClockIcon,
     CalendarX2Icon,
     CheckCircle2Icon,
@@ -34,6 +35,8 @@ export const NotificationType = {
     UNIT_PRICE_CHANGED: "UNIT_PRICE_CHANGED",
     RESERVATION_EXTENSION_REQUESTED: "RESERVATION_EXTENSION_REQUESTED",
     RESERVATION_EXTENDED: "RESERVATION_EXTENDED",
+    PAYMENT_SCHEDULE_NEEDED: "PAYMENT_SCHEDULE_NEEDED",
+    PAYMENT_SCHEDULE_CREATED: "PAYMENT_SCHEDULE_CREATED",
 } as const;
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
 
@@ -63,6 +66,8 @@ export const NOTIFICATION_VISUALS: Record<NotificationType, { icon: typeof BellI
     UNIT_PRICE_CHANGED: { icon: TagIcon, bg: "bg-gray-400" },
     RESERVATION_EXTENSION_REQUESTED: { icon: CalendarPlusIcon, bg: "bg-amber-500" },
     RESERVATION_EXTENDED: { icon: CalendarPlusIcon, bg: "bg-blue-500" },
+    PAYMENT_SCHEDULE_NEEDED: { icon: CalendarRangeIcon, bg: "bg-amber-500" },
+    PAYMENT_SCHEDULE_CREATED: { icon: CalendarRangeIcon, bg: "bg-blue-500" },
 };
 
 /**

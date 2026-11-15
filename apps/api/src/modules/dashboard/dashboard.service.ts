@@ -292,6 +292,12 @@ export class DashboardService {
             this.prisma.lead.count({ where: followUpWhere }),
         ]);
 
+        // E2E-4: activated deals waiting for a payment schedule, oldest
+        // first, for whoever can make one.
+        const scheduleNeeded = hasPermission(user, "deals.manage_payments")
+            ? await this.findScheduleNeeded(dealScope)
+            : { total: 0, deals: [] };
+
         const remaining = (sum: { amount: Prisma.Decimal | null; paidAmount: Prisma.Decimal | null }) =>
             Number(sum.amount ?? 0) - Number(sum.paidAmount ?? 0);
 
@@ -327,6 +333,7 @@ export class DashboardService {
                 })),
             },
             overduePayments,
+            scheduleNeeded,
             pendingPriceChanges: {
                 total: priceTotal,
                 requests: priceRequests.map((r) => ({
@@ -336,6 +343,37 @@ export class DashboardService {
                 })),
             },
             overdueFollowUps: { total: followUpTotal, leads: followUpLeads },
+        };
+    }
+
+    private async findScheduleNeeded(dealScope: Prisma.DealWhereInput) {
+        const where: Prisma.DealWhereInput = { ...dealScope, ...dealAttentionWhere("schedule_needed") };
+        const [deals, total] = await Promise.all([
+            this.prisma.deal.findMany({
+                where,
+                select: {
+                    id: true, dealNumber: true, salePrice: true, contractDate: true,
+                    client: { select: { fullName: true } },
+                    manager: { select: { id: true, fullName: true } },
+                },
+                orderBy: [{ contractDate: "asc" }, { createdAt: "asc" }],
+                take: 5,
+            }),
+            this.prisma.deal.count({ where }),
+        ]);
+        const paid = deals.length > 0
+            ? await this.prisma.payment.groupBy({
+                by: ["dealId"],
+                where: { dealId: { in: deals.map((d) => d.id) }, deletedAt: null },
+                _sum: { amount: true },
+            })
+            : [];
+        return {
+            total,
+            deals: deals.map(({ salePrice, ...deal }) => ({
+                ...deal,
+                remaining: Number(salePrice) - Number(paid.find((p) => p.dealId === deal.id)?._sum.amount ?? 0),
+            })),
         };
     }
 
@@ -735,7 +773,10 @@ export class DashboardService {
 
         const dealScope: Prisma.DealWhereInput = { companyId, branchId: effectiveBranchId, projectId };
 
-        const [collectedThisMonth, overdue, upcoming, outstanding, cashFlowByMethod] = await Promise.all([
+        // E2E-4: an active deal with no schedule yet still owes its balance.
+        const unscheduledWhere: Prisma.DealWhereInput = { ...dealScope, ...dealAttentionWhere("schedule_needed") };
+
+        const [collectedThisMonth, overdue, upcoming, outstanding, cashFlowByMethod, unscheduledPrice, unscheduledPaid] = await Promise.all([
             this.prisma.payment.aggregate({
                 where: { deal: dealScope, paidAt: { gte: startOfMonth, lt: startOfNextMonth }, deletedAt: null },
                 _sum: { amount: true },
@@ -770,14 +811,22 @@ export class DashboardService {
                 where: { deal: dealScope, paidAt: { gte: startOfMonth, lt: startOfNextMonth }, deletedAt: null },
                 _sum: { amount: true },
             }),
+            this.prisma.deal.aggregate({ where: unscheduledWhere, _sum: { salePrice: true }, _count: { _all: true } }),
+            this.prisma.payment.aggregate({ where: { deal: unscheduledWhere, deletedAt: null }, _sum: { amount: true } }),
         ]);
 
         const remaining = (agg: { _sum: { amount: unknown; paidAmount: unknown } }) =>
             Number(agg._sum.amount ?? 0) - Number(agg._sum.paidAmount ?? 0);
 
+        const unscheduled = {
+            amount: Math.max(0, Number(unscheduledPrice._sum.salePrice ?? 0) - Number(unscheduledPaid._sum.amount ?? 0)),
+            count: unscheduledPrice._count._all,
+        };
+
         return {
             collectedThisMonth: collectedThisMonth._sum.amount ?? 0,
-            outstandingBalance: remaining(outstanding),
+            outstandingBalance: remaining(outstanding) + unscheduled.amount,
+            unscheduled,
             overdue: { amount: remaining(overdue), count: overdue._count._all },
             upcoming: { amount: remaining(upcoming), count: upcoming._count._all },
             cashFlowByMethod: Object.values(PaymentMethod).map((method) => ({

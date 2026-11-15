@@ -48,6 +48,14 @@ export type AttentionItems = {
     pendingPriceChanges?: { total: number; requests: AttentionPriceChange[] };
     /** Open leads whose next contact was due on an earlier day (SH-6). */
     overdueFollowUps: { total: number; leads: AttentionFollowUp[] };
+    /** E2E-4: active deals with no payment schedule yet (deals.manage_payments only). */
+    scheduleNeeded?: { total: number; deals: AttentionScheduleNeeded[] };
+};
+
+export type AttentionScheduleNeeded = {
+    id: string; dealNumber: string; contractDate: string | null; remaining: number;
+    client: { fullName: string };
+    manager: { id: string; fullName: string } | null;
 };
 
 export type AttentionPriceChange = {
@@ -68,6 +76,7 @@ export const EMPTY_ATTENTION_ITEMS: AttentionItems = {
     overduePayments: { installments: 0, amount: 0, deals: [] },
     pendingPriceChanges: { total: 0, requests: [] },
     overdueFollowUps: { total: 0, leads: [] },
+    scheduleNeeded: { total: 0, deals: [] },
 };
 
 export type RecentActivity = {
@@ -205,7 +214,9 @@ export type FinanceBucket = { amount: number; count: number };
 export type CashFlowByMethod = { method: string; amount: number };
 export type FinanceOverview = {
     collectedThisMonth: number;
+    /** Includes `unscheduled`: active deals' balances before they have a schedule (E2E-4). */
     outstandingBalance: number;
+    unscheduled?: FinanceBucket;
     overdue: FinanceBucket;
     upcoming: FinanceBucket;
     cashFlowByMethod: CashFlowByMethod[];

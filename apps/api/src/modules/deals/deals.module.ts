@@ -10,6 +10,7 @@ import {PaymentService} from './services/payments/payment.service';
 import {PaymentScheduleService} from './services/payments/payment-schedule.service';
 import {PaymentRegisterService} from './services/payments/payment-register.service';
 import {MoneyHeldNotifier} from './services/money-held-notifier.service';
+import {ScheduleNeededNotifier} from './services/schedule-needed-notifier.service';
 import {ReceiptNumberService} from './services/payments/receipt-number.service';
 import {PaymentReceiptService} from './services/payments/payment-receipt.service';
 import {PaymentVoidService} from './services/payments/payment-void.service';
@@ -34,6 +35,7 @@ import {TasksModule} from "@/modules/tasks/tasks.module";
     PaymentScheduleService,
     PaymentRegisterService,
     MoneyHeldNotifier,
+    ScheduleNeededNotifier,
     ReceiptNumberService,
     PaymentReceiptService,
     PaymentVoidService,

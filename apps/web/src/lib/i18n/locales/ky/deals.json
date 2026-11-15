@@ -40,7 +40,8 @@
     "allDeals": "Бардык бүтүмдөр",
     "attention": {
       "discount_pending": "Арзандатуу макулдатууда",
-      "overdue_payments": "Мөөнөтү өткөн төлөмдөр"
+      "overdue_payments": "Мөөнөтү өткөн төлөмдөр",
+      "schedule_needed": "Төлөм графиги керек"
     }
   },
   "table": {

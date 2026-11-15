@@ -54,6 +54,7 @@ describe('DashboardService', () => {
                 count: jest.fn().mockResolvedValue(0),
                 findMany: jest.fn().mockResolvedValue([]),
                 groupBy: jest.fn().mockResolvedValue([]),
+                aggregate: jest.fn().mockResolvedValue({_sum: {salePrice: null}, _count: {_all: 0}}),
             },
             unit: {groupBy: jest.fn().mockResolvedValue([])},
             paymentSchedule: {
@@ -611,6 +612,34 @@ describe('DashboardService', () => {
         });
     });
 
+    describe('getAttentionItems schedule needed (E2E-4)', () => {
+        it('lists active deals with no schedule, with what is left to pay, for someone who can make one', async () => {
+            const {service, prisma} = build();
+            prisma.deal.findMany.mockImplementation(({where}: any) => Promise.resolve(
+                where.paymentSchedules?.none
+                    ? [{id: 'deal-1', dealNumber: 'D-2026-0001', salePrice: new Prisma.Decimal(5022000), contractDate: null, client: {fullName: 'Нурлан Асанов'}, manager: null}]
+                    : [],
+            ));
+            prisma.deal.count.mockImplementation(({where}: any) => Promise.resolve(where.paymentSchedules?.none ? 1 : 0));
+            prisma.payment.groupBy.mockResolvedValue([{dealId: 'deal-1', _sum: {amount: new Prisma.Decimal(300000)}}]);
+
+            const result = await service.getAttentionItems({...branchUser, permissions: ['deals.manage_payments']});
+
+            expect(result.scheduleNeeded).toEqual({
+                total: 1,
+                deals: [expect.objectContaining({id: 'deal-1', remaining: 4722000})],
+            });
+            const where = prisma.deal.findMany.mock.calls.find(([arg]: any) => arg.where.paymentSchedules?.none)[0].where;
+            expect(where).toEqual(expect.objectContaining({branchId: 'branch-1', status: DealStatus.ACTIVE}));
+        });
+
+        it('leaves the queue empty for someone who cannot make a schedule', async () => {
+            const {service} = build();
+            const result = await service.getAttentionItems(salesHeadUser);
+            expect(result.scheduleNeeded).toEqual({total: 0, deals: []});
+        });
+    });
+
     describe('getFinanceOverview', () => {
         it('rejects when the user has no company', async () => {
             const {service} = build();
@@ -631,6 +660,30 @@ describe('DashboardService', () => {
             expect(result.overdue).toEqual({amount: 3000, count: 3});
             expect(result.upcoming).toEqual({amount: 1200, count: 1});
             expect(result.outstandingBalance).toBe(6000);
+        });
+
+        // E2E-4: an activated deal with no schedule yet used to count as 0.
+        it("counts an active deal's unpaid balance as outstanding before it has a schedule", async () => {
+            const {service, prisma} = build();
+            (prisma.paymentSchedule.aggregate as jest.Mock)
+                .mockResolvedValueOnce({_sum: {amount: null, paidAmount: null}, _count: {_all: 0}}) // overdue
+                .mockResolvedValueOnce({_sum: {amount: null, paidAmount: null}, _count: {_all: 0}}) // upcoming
+                .mockResolvedValueOnce({_sum: {amount: 9000, paidAmount: 3000}, _count: {_all: 0}}); // outstanding
+            prisma.deal.aggregate.mockResolvedValue({_sum: {salePrice: new Prisma.Decimal(5022000)}, _count: {_all: 1}});
+            prisma.payment.aggregate
+                .mockResolvedValueOnce({_sum: {amount: null}}) // collected this month
+                .mockResolvedValueOnce({_sum: {amount: new Prisma.Decimal(300000)}}); // paid on unscheduled deals
+
+            const result = await service.getFinanceOverview(adminUser);
+
+            expect(result.unscheduled).toEqual({amount: 4722000, count: 1});
+            expect(result.outstandingBalance).toBe(6000 + 4722000);
+            const unscheduledWhere = prisma.deal.aggregate.mock.calls[0][0].where;
+            expect(unscheduledWhere).toEqual(expect.objectContaining({
+                companyId: 'company-1',
+                status: DealStatus.ACTIVE,
+                paymentSchedules: {none: {deletedAt: null}},
+            }));
         });
 
         it('fills every PaymentMethod with a zero amount when absent from the groupBy', async () => {

@@ -40,7 +40,7 @@ export const paths = {
         root: "/deals",
         detail: (dealId: string) => `/deals/${dealId}`,
         payments: (dealId: string) => `/deals/${dealId}?tab=payments`,
-        attention: (filter: "discount_pending" | "overdue_payments", managerId?: string) =>
+        attention: (filter: "discount_pending" | "overdue_payments" | "schedule_needed", managerId?: string) =>
             `/deals?attention=${filter}${managerId ? `&managerId=${managerId}` : ""}`,
         byManager: (managerId: string) => `/deals?managerId=${managerId}`,
         byStatus: (status: string) => `/deals?status=${status}`,

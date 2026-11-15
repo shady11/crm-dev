@@ -21,6 +21,9 @@ export type NotificationTemplate =
     | {templateKey: "reservationExtendedPastLimit"; params: {dealNumber: string; byName: string; date: string; reason: string}}
     | {templateKey: "paymentReceived"; params: {dealNumber: string; amount: number; currency: string | null}}
     | {templateKey: "refundIssued"; params: {dealNumber: string; amount: number; currency: string | null}}
+    // E2E-4: an activated deal waits on Finance for its schedule.
+    | {templateKey: "paymentScheduleNeeded"; params: {dealNumber: string; amount: number; currency: string | null}}
+    | {templateKey: "paymentScheduleCreated"; params: {dealNumber: string; byName: string}}
     | {templateKey: "moneyHeld"; params: {dealNumber: string; amount: number; currency: string | null}}
     | {templateKey: "paymentVoided"; params: {dealNumber: string; amount: number; currency: string | null; reason: string}}
     | {templateKey: "paymentDueSoon"; params: {dealNumber: string}}

@@ -63,7 +63,10 @@
     "review": "Карап чыгуу",
     "priceChangeUnit": "{{unit}} объекти · {{project}}",
     "followUpsHeading": "Өткөрүлгөн байланыштар ({{count}})",
-    "followUpDueSince": "чалуу {{date}} күнгө пландалган"
+    "followUpDueSince": "чалуу {{date}} күнгө пландалган",
+    "scheduleNeededHeading": "Төлөм графиги керек ({{count}})",
+    "scheduleNeededLeft": "төлөнө турган калдык {{amount}}",
+    "scheduleNeededSigned": "келишим {{date}}"
   },
   "recentActivity": {
     "title": "Акыркы активдүүлүк",
@@ -136,7 +139,11 @@
       "OPTIMA": "Optima",
       "ELKART": "Элкарт",
       "OTHER": "Башка"
-    }
+    },
+    "outstandingUnscheduled_one": "анын ичинде графиги жок {{count}} бүтүм боюнча {{amount}}",
+    "outstandingUnscheduled_few": "анын ичинде графиги жок {{count}} бүтүм боюнча {{amount}}",
+    "outstandingUnscheduled_many": "анын ичинде графиги жок {{count}} бүтүм боюнча {{amount}}",
+    "outstandingUnscheduled_other": "анын ичинде графиги жок {{count}} бүтүм боюнча {{amount}}"
   },
   "gettingStarted": {
     "title": "Эмнеден баштоо керек",

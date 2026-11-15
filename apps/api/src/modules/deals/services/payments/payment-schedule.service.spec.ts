@@ -41,8 +41,10 @@ describe('PaymentScheduleService.generate', () => {
         const activityService = {create: jest.fn().mockResolvedValue({})};
         const domain = new DealDomainService();
 
-        const service = new PaymentScheduleService(prisma as any, mapper as any, domain, activityService as any);
-        return {service, prisma};
+        const scheduleNeeded = {resolveScheduled: jest.fn().mockResolvedValue(undefined)};
+
+        const service = new PaymentScheduleService(prisma as any, mapper as any, domain, activityService as any, scheduleNeeded as any);
+        return {service, prisma, scheduleNeeded};
     }
 
     const dto = (overrides: Record<string, unknown> = {}) => ({
@@ -69,6 +71,13 @@ describe('PaymentScheduleService.generate', () => {
     it('rejects when the deal is already fully paid', async () => {
         const {service} = build({status: DealStatus.ACTIVE, salePrice: new Prisma.Decimal(1000)}, 1000);
         await expect(service.generate(user, 'deal-1', dto())).rejects.toThrow(BadRequestException);
+    });
+
+    // E2E-4
+    it("resolves Finance's schedule-needed notifications once the schedule is made", async () => {
+        const {service, scheduleNeeded} = build({status: DealStatus.ACTIVE, salePrice: new Prisma.Decimal(900), dealNumber: 'D-2026-0001', companyId: 'company-1'}, 0);
+        await service.generate({...user, name: 'Aida'}, 'deal-1', dto());
+        expect(scheduleNeeded.resolveScheduled).toHaveBeenCalledWith(expect.objectContaining({id: 'deal-1', dealNumber: 'D-2026-0001'}), 'Aida');
     });
 
     it('splits the remaining balance evenly when it divides cleanly', async () => {

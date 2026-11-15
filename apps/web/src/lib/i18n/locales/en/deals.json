@@ -40,7 +40,8 @@
     "allDeals": "All deals",
     "attention": {
       "discount_pending": "Discount awaiting approval",
-      "overdue_payments": "Overdue payments"
+      "overdue_payments": "Overdue payments",
+      "schedule_needed": "Needs a payment schedule"
     }
   },
   "table": {

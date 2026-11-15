@@ -188,6 +188,13 @@
     "unitPricesImportRequested": {
       "title": "{{project}} үчүн жаңы баалар макулдашууну күтүүдө",
       "message": "Объект импортунан {{requested}}, жөнөткөн: {{byName}}"
+    },
+    "paymentScheduleNeeded": {
+      "title": "{{dealNumber}} бүтүмү активдүү, төлөм графиги керек",
+      "message": "Төлөнө турган калдык: {{amount}}."
+    },
+    "paymentScheduleCreated": {
+      "title": "{{dealNumber}} бүтүмү боюнча төлөм графигин {{byName}} түздү"
     }
   }
 }

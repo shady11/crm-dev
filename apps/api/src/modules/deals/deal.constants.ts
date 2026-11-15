@@ -26,9 +26,14 @@ export const OVERDUE_INSTALLMENT_WHERE: Prisma.PaymentScheduleWhereInput = {
     status: PaymentScheduleStatus.OVERDUE,
 };
 
-export function dealAttentionWhere(filter: "discount_pending" | "overdue_payments"): Prisma.DealWhereInput {
+export function dealAttentionWhere(filter: "discount_pending" | "overdue_payments" | "schedule_needed"): Prisma.DealWhereInput {
     if (filter === "discount_pending") {
         return { deletedAt: null, status: DealStatus.RESERVED, discountApprovalStatus: DiscountApprovalStatus.PENDING };
+    }
+    // E2E-4: activated but no schedule yet. A deal paid in full completes on
+    // activation, so an ACTIVE one always has money left to schedule.
+    if (filter === "schedule_needed") {
+        return { deletedAt: null, status: DealStatus.ACTIVE, paymentSchedules: { none: { deletedAt: null } } };
     }
 
     return {

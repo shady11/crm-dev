@@ -137,15 +137,16 @@ describe('DealsService', () => {
         };
 
         const moneyHeld = {notifyIfHeld: jest.fn().mockResolvedValue(undefined)};
+        const scheduleNeeded = {notifyActivated: jest.fn().mockResolvedValue(undefined), resolveScheduled: jest.fn().mockResolvedValue(undefined)};
         const receiptNumbers = {next: jest.fn().mockResolvedValue('R-2026-0001')};
 
         const service = new DealsService(
             prisma, mapper, domain, activityService as any, notifications as any,
             dealNumberService as any, documentGeneration as any, rbacService as any, tasksService as any,
-            moneyHeld as any, receiptNumbers as any,
+            moneyHeld as any, scheduleNeeded as any, receiptNumbers as any,
         );
 
-        return {service, prisma, activityService, notifications, dealNumberService, documentGeneration, tasksService, moneyHeld, rbacService};
+        return {service, prisma, activityService, notifications, dealNumberService, documentGeneration, tasksService, moneyHeld, scheduleNeeded, rbacService};
     }
 
     describe('reserveUnit', () => {
@@ -708,6 +709,29 @@ describe('DealsService', () => {
             await service.activate(managerUser, 'deal-1');
 
             expect(tryComplete).toHaveBeenCalledWith(prisma, managerUser, 'deal-1');
+        });
+
+        // E2E-4
+        it('asks Finance for a payment schedule when the deal is left ACTIVE', async () => {
+            const {service, prisma, scheduleNeeded} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', status: DealStatus.CONTRACT_SIGNED, managerId: null, clientId: 'c1', dealNumber: '2026-0001'});
+            prisma.deal.findUniqueOrThrow.mockResolvedValue({id: 'deal-1', status: DealStatus.ACTIVE});
+            jest.spyOn(service, 'tryCompleteWithinTransaction').mockResolvedValue(false);
+
+            await service.activate(managerUser, 'deal-1');
+
+            expect(scheduleNeeded.notifyActivated).toHaveBeenCalledWith(expect.objectContaining({id: 'deal-1'}), managerUser.id);
+        });
+
+        it('does not ask for a schedule when activation completed the deal', async () => {
+            const {service, prisma, scheduleNeeded} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', status: DealStatus.CONTRACT_SIGNED, managerId: null, clientId: 'c1', dealNumber: '2026-0001'});
+            prisma.deal.findUniqueOrThrow.mockResolvedValue({id: 'deal-1', status: DealStatus.COMPLETED});
+            jest.spyOn(service, 'tryCompleteWithinTransaction').mockResolvedValue(true);
+
+            await service.activate(managerUser, 'deal-1');
+
+            expect(scheduleNeeded.notifyActivated).not.toHaveBeenCalled();
         });
     });
 
