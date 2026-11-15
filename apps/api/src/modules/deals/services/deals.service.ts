@@ -1450,6 +1450,14 @@ export class DealsService {
     const companyId = user.companyId;
     const deal = await this.getDealOrThrow(user, id);
 
+    // E2E-5: the annex prints the schedule, so there has to be one.
+    if (type === DocumentType.PAYMENT_SCHEDULE) {
+      const rows = await this.prisma.paymentSchedule.count({where: {dealId: deal.id, deletedAt: null}});
+      if (rows === 0) {
+        throw new BadRequestException("This deal has no payment schedule yet.");
+      }
+    }
+
     const document = await this.documentGeneration.generateForDeal({
       companyId,
       dealId: deal.id,

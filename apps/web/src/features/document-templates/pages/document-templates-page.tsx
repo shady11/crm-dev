@@ -34,6 +34,7 @@ type Mode = (typeof MODES)[number];
 const TYPE_LABEL_KEYS: Record<TemplateType, string> = {
     RESERVATION: "documents:templates.types.RESERVATION",
     CONTRACT: "documents:templates.types.CONTRACT",
+    PAYMENT_SCHEDULE: "documents:templates.types.PAYMENT_SCHEDULE",
     PAYMENT_RECEIPT: "documents:templates.types.PAYMENT_RECEIPT",
 };
 

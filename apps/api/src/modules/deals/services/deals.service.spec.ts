@@ -2,6 +2,7 @@ import {BadRequestException, ConflictException, ForbiddenException, NotFoundExce
 import {
     DealStatus,
     DiscountApprovalStatus,
+    DocumentType,
     PaymentScheduleStatus,
     Prisma,
     UnitStatus,
@@ -1235,6 +1236,27 @@ describe('DealsService', () => {
             prisma.deal.findFirst.mockResolvedValue({id: 'deal-1'});
             await expect(service.generateDocument(managerUser, 'deal-1', 'INVOICE' as any)).rejects.toThrow(
                 BadRequestException,
+            );
+        });
+
+        // E2E-5
+        it('refuses the schedule annex until the deal has a schedule', async () => {
+            const {service, prisma, documentGeneration} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', clientId: 'c1'});
+            prisma.paymentSchedule.count = jest.fn().mockResolvedValue(0);
+            await expect(service.generateDocument(managerUser, 'deal-1', DocumentType.PAYMENT_SCHEDULE)).rejects.toThrow(
+                BadRequestException,
+            );
+            expect(documentGeneration.generateForDeal).not.toHaveBeenCalled();
+        });
+
+        it('generates the schedule annex once the deal has a schedule', async () => {
+            const {service, prisma, documentGeneration} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', clientId: 'c1'});
+            prisma.paymentSchedule.count = jest.fn().mockResolvedValue(6);
+            await service.generateDocument(managerUser, 'deal-1', DocumentType.PAYMENT_SCHEDULE);
+            expect(documentGeneration.generateForDeal).toHaveBeenCalledWith(
+                expect.objectContaining({dealId: 'deal-1', type: DocumentType.PAYMENT_SCHEDULE}),
             );
         });
     });

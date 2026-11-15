@@ -104,6 +104,16 @@ type Words = {
     receivedFor: string;
     paidBy: string;
   };
+  // E2E-5: the schedule can only be made after the contract is signed, so
+  // it goes to the client as an annex to the contract.
+  schedule: {
+    title: string;
+    annexTo: string;
+    paidBefore: string;
+    toPay: string;
+    total: string;
+    termsText: string;
+  };
 };
 
 const WORDS: Record<DocumentLanguage, Words> = {
@@ -159,12 +169,23 @@ const WORDS: Record<DocumentLanguage, Words> = {
       amount: 'Amount',
       paymentFor: 'Payment for unit No. {{unit.number}}, {{unit.projectName}}',
       dealLine: 'Deal {{deal.dealNumber}}',
-      contractLine: ', contract No. {{deal.contractNumber}} of {{deal.contractDate}}',
+      contractLine:
+        ', contract No. {{deal.contractNumber}} of {{deal.contractDate}}',
       reference: 'Reference',
       paidToDate: 'Paid to date, including this payment',
       remaining: 'Remaining',
       receivedFor: 'Received by, for {{company.legalName}}',
       paidBy: 'Paid by',
+    },
+    schedule: {
+      title: 'Payment Schedule',
+      annexTo:
+        'Annex to contract No. {{deal.contractNumber}} of {{deal.contractDate}}',
+      paidBefore: 'Paid before this schedule',
+      toPay: 'To be paid by this schedule',
+      total: 'Total',
+      termsText:
+        'The Buyer pays the amounts above by the dates shown. This schedule forms part of the contract named above.',
     },
   },
   ru: {
@@ -219,12 +240,23 @@ const WORDS: Record<DocumentLanguage, Words> = {
       amount: 'Сумма',
       paymentFor: 'Оплата за помещение № {{unit.number}}, {{unit.projectName}}',
       dealLine: 'Сделка {{deal.dealNumber}}',
-      contractLine: ', договор № {{deal.contractNumber}} от {{deal.contractDate}}',
+      contractLine:
+        ', договор № {{deal.contractNumber}} от {{deal.contractDate}}',
       reference: 'Референс',
       paidToDate: 'Оплачено, включая этот платёж',
       remaining: 'Остаток к оплате',
       receivedFor: 'принял(а) от имени {{company.legalName}}',
       paidBy: 'плательщик',
+    },
+    schedule: {
+      title: 'График платежей',
+      annexTo:
+        'Приложение к договору № {{deal.contractNumber}} от {{deal.contractDate}}',
+      paidBefore: 'Оплачено до составления графика',
+      toPay: 'К оплате по графику',
+      total: 'Итого',
+      termsText:
+        'Покупатель вносит указанные выше суммы в указанные сроки. Настоящий график является неотъемлемой частью названного выше договора.',
     },
   },
   ky: {
@@ -279,12 +311,23 @@ const WORDS: Record<DocumentLanguage, Words> = {
       amount: 'Сумма',
       paymentFor: '№ {{unit.number}} жай үчүн төлөм, {{unit.projectName}}',
       dealLine: 'Бүтүм {{deal.dealNumber}}',
-      contractLine: ', келишим № {{deal.contractNumber}}, {{deal.contractDate}}',
+      contractLine:
+        ', келишим № {{deal.contractNumber}}, {{deal.contractDate}}',
       reference: 'Шилтеме',
       paidToDate: 'Ушул төлөмдү кошо алганда төлөндү',
       remaining: 'Калдыгы',
       receivedFor: '{{company.legalName}} атынан кабыл алды',
       paidBy: 'Төлөөчү',
+    },
+    schedule: {
+      title: 'Төлөм графиги',
+      annexTo:
+        '{{deal.contractDate}} күнкү № {{deal.contractNumber}} келишимге тиркеме',
+      paidBefore: 'График түзүлгөнгө чейин төлөндү',
+      toPay: 'График боюнча төлөнөт',
+      total: 'Бардыгы',
+      termsText:
+        'Сатып алуучу жогорудагы суммаларды көрсөтүлгөн мөөнөттөрдө төлөйт. Бул график жогоруда аталган келишимдин ажырагыс бөлүгү болуп саналат.',
     },
   },
 };
@@ -476,6 +519,57 @@ function receiptTemplate(w: Words): string {
   </div>`);
 }
 
+function scheduleTemplate(w: Words): string {
+  const c = w.contract;
+  const sc = w.schedule;
+  return page(`  <h1>${sc.title}</h1>
+  <p class="subtitle">${sc.annexTo}</p>
+
+  <div class="parties">
+    <div class="party">
+      <div class="label">${c.seller}</div>
+      <div>{{company.legalName}}</div>
+      {{#if company.address}}<div>{{company.address}}</div>{{/if}}
+      {{#if company.taxId}}<div>${w.taxId}: {{company.taxId}}</div>{{/if}}
+    </div>
+    <div class="party">
+      <div class="label">${c.buyer}</div>
+      <div>{{client.fullName}}</div>
+      <div>{{client.phone}}</div>
+      {{#if client.passport}}<div>${w.passport}: {{client.passport}}</div>{{/if}}
+      {{#if client.pin}}<div>${w.pin}: {{client.pin}}</div>{{/if}}
+    </div>
+  </div>
+
+  <p>${w.project}: {{unit.projectName}} &middot; ${w.unit}: {{unit.blockName}} / {{unit.number}} &middot; {{unit.area}} m&sup2;</p>
+
+  <div class="totals">
+    <div class="row"><span>${w.salePrice}</span><span>{{deal.salePrice}}</span></div>
+    {{#if schedule.paidBefore}}<div class="row"><span>${sc.paidBefore}</span><span>{{schedule.paidBefore}}</span></div>{{/if}}
+    <div class="row grand"><span>${sc.toPay}</span><span>{{schedule.total}}</span></div>
+  </div>
+
+  <h2>${sc.title}</h2>
+  <table>
+    <tr><th>#</th><th>${c.dueDate}</th><th style="text-align:right">${c.amount}</th></tr>
+    {{#each schedule.rows}}
+    <tr><td>{{order}}</td><td>{{dueDate}}</td><td style="text-align:right">{{amount}}</td></tr>
+    {{/each}}
+    <tr><td></td><td><strong>${sc.total}</strong></td><td style="text-align:right"><strong>{{schedule.total}}</strong></td></tr>
+  </table>
+
+  <p>${sc.termsText}</p>
+
+  <div class="signatures">
+    <div class="signature-block">
+      <div class="signature-line">${signatory} — ${c.forSeller}</div>
+    </div>
+    <div class="signature-block">
+      <div class="signature-line">{{client.fullName}} — ${c.asBuyer}</div>
+    </div>
+  </div>`);
+}
+
 function templatesFor(
   language: DocumentLanguage,
 ): Partial<Record<DocumentType, string>> {
@@ -484,6 +578,7 @@ function templatesFor(
     [DocumentType.RESERVATION]: reservationTemplate(w),
     [DocumentType.CONTRACT]: contractTemplate(w),
     [DocumentType.PAYMENT_RECEIPT]: receiptTemplate(w),
+    [DocumentType.PAYMENT_SCHEDULE]: scheduleTemplate(w),
   };
 }
 

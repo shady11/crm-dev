@@ -32,6 +32,7 @@
     "types": {
       "RESERVATION": "Reservation agreement",
       "CONTRACT": "Contract",
+      "PAYMENT_SCHEDULE": "Payment schedule",
       "PAYMENT_RECEIPT": "Payment receipt"
     },
     "unsaved": "Unsaved changes",

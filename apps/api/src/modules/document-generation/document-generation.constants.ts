@@ -11,6 +11,8 @@ import { DocumentType } from '@/generated/prisma/client';
 export const GENERATABLE_DOCUMENT_TYPES: DocumentType[] = [
   DocumentType.RESERVATION,
   DocumentType.CONTRACT,
+  // E2E-5: the contract's annex, once the deal has a schedule.
+  DocumentType.PAYMENT_SCHEDULE,
 ];
 
 /**

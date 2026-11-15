@@ -60,6 +60,7 @@
     "documentRegenerated": "Документ кайра түзүлдү: {{documentType}}",
     "receiptIssued": "{{receipt}} квитанциясы берилди",
     "paymentScheduleGenerated": "Төлөм графиги түзүлдү",
+    "paymentScheduleAnnexGenerated": "«Төлөм графиги» тиркемеси түзүлдү",
     "paymentVoided": "{{payment}} төлөмү жокко чыгарылды",
     "unitRelistedAfterCancellation": "Бүтүм жокко чыгарылгандан кийин объект кайра сатыкка чыкты",
     "unitRelistedAfterExpiry": "Брондоонун мөөнөтү бүткөндөн кийин объект кайра сатыкка чыкты",

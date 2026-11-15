@@ -238,6 +238,12 @@ export function DealDetailsPage() {
                         {t("detailsPage.generateContract")}
                     </MenuItem>
                 )}
+                {/* E2E-5: the contract's annex, printed from the schedule. */}
+                {deal.paymentSchedules.length > 0 && (
+                    <MenuItem value="schedule" onSelect={() => actions.generateDocument.mutate("PAYMENT_SCHEDULE")}>
+                        {t("detailsPage.generateSchedule")}
+                    </MenuItem>
+                )}
             </MenuContent>
         </Menu>
     );

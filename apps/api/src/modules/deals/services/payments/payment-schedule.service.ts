@@ -1,5 +1,5 @@
-import {BadRequestException, ForbiddenException, Injectable} from '@nestjs/common';
-import {ActivityAction, ActivityType, DealStatus, PaymentScheduleStatus, Prisma} from '@/generated/prisma/client';
+import {BadRequestException, ForbiddenException, Injectable, Logger} from '@nestjs/common';
+import {ActivityAction, ActivityType, DealStatus, DocumentType, PaymentScheduleStatus, Prisma} from '@/generated/prisma/client';
 import {PrismaService} from '@/database/prisma.service';
 import {AuthUser} from '@/common/types/auth-user.type';
 import {DealDomainService} from '../deal-domain.service';
@@ -10,15 +10,19 @@ import {DealMapper} from "@/modules/deals/mappers/deal.mapper";
 import {DEAL_DETAILS_INCLUDE} from "../../deal.constants";
 import { activityText } from '@/modules/activities/activity-templates';
 import {ScheduleNeededNotifier} from '../schedule-needed-notifier.service';
+import {DocumentGenerationService} from '@/modules/document-generation/document-generation.service';
 
 @Injectable()
 export class PaymentScheduleService {
+    private readonly logger = new Logger(PaymentScheduleService.name);
+
     constructor(
         private readonly prisma: PrismaService,
         private readonly mapper: DealMapper,
         private readonly domain: DealDomainService,
         private readonly activityService: DealActivityService,
         private readonly scheduleNeeded: ScheduleNeededNotifier,
+        private readonly documentGeneration: DocumentGenerationService,
     ) {}
 
     async generate(user: AuthUser, dealId: string, dto: GeneratePaymentScheduleDto) {
@@ -100,7 +104,41 @@ export class PaymentScheduleService {
         });
 
         await this.scheduleNeeded.resolveScheduled(result, user.name);
+        await this.generateAnnex(user, result);
 
         return this.mapper.toDetails(result);
+    }
+
+    /**
+     * E2E-5: the schedule is made after the contract is signed, so the client
+     * gets it as an annex to the contract. Best-effort, like the contract at
+     * signing: the schedule already exists, and the annex can be generated
+     * again from the deal.
+     */
+    private async generateAnnex(user: AuthUser, deal: { id: string; companyId: string; clientId: string }) {
+        try {
+            const document = await this.documentGeneration.generateForDeal({
+                companyId: deal.companyId,
+                dealId: deal.id,
+                type: DocumentType.PAYMENT_SCHEDULE,
+                userId: user.id,
+            });
+            await this.activityService.documentGenerated(
+                {
+                    db: this.prisma,
+                    companyId: deal.companyId,
+                    userId: user.id,
+                    dealId: deal.id,
+                    clientId: deal.clientId,
+                    metadata: {documentId: document.id, documentType: DocumentType.PAYMENT_SCHEDULE},
+                },
+                activityText('paymentScheduleAnnexGenerated'),
+            );
+        } catch (error) {
+            this.logger.error(
+                `Failed to generate the payment schedule annex for deal ${deal.id}`,
+                error instanceof Error ? error.stack : String(error),
+            );
+        }
     }
 }

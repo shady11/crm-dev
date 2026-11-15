@@ -257,7 +257,7 @@ export async function rejectDiscount(dealId: string, reason: string) {
     return response.data;
 }
 
-export type GeneratableDocumentType = "RESERVATION" | "CONTRACT";
+export type GeneratableDocumentType = "RESERVATION" | "CONTRACT" | "PAYMENT_SCHEDULE";
 
 /** Re-renders a deal's reservation agreement or contract PDF from its current data. */
 export async function generateDealDocument(dealId: string, type: GeneratableDocumentType) {
