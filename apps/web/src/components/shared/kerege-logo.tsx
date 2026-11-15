@@ -6,7 +6,10 @@ import {cn} from "@/lib/utils";
 
 // Full wordmark. Paper is always white, so print uses the light-theme logo
 // even when the screen is in dark mode.
-export function KeregeLogo({className}: {className?: string}) {
+// `inverted` always uses the white artwork, for brand-coloured surfaces
+// such as the sidebar.
+export function KeregeLogo({className, inverted}: {className?: string; inverted?: boolean}) {
+    if (inverted) return <img src={keregeLogoDark} alt="Kerege" className={cn("w-auto", className)} />;
     return (
         <>
             <img src={keregeLogoLight} alt="Kerege" className={cn("w-auto dark:hidden print:block", className)} />
@@ -17,7 +20,8 @@ export function KeregeLogo({className}: {className?: string}) {
 
 // The lattice symbol alone, for spots too small for the wordmark (e.g. the
 // collapsed sidebar). Blue on light backgrounds, white on dark.
-export function KeregeMark({className}: {className?: string}) {
+export function KeregeMark({className, inverted}: {className?: string; inverted?: boolean}) {
+    if (inverted) return <img src={keregeMarkDark} alt="Kerege" className={className} />;
     return (
         <>
             <img src={keregeMarkLight} alt="Kerege" className={cn("dark:hidden print:block", className)} />
