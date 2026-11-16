@@ -271,6 +271,36 @@ export class DealsService {
   // Reservation
   // --------------------------------------------------------------------------
 
+  /**
+   * E2E-7: before booking, whether a discount of `percent` would wait for
+   * approval for this user, and who would decide it: the same rule and the
+   * same people reserveUnit uses (the client's branch decides the branch).
+   */
+  async discountApproversFor(user: AuthUser, percent: number, clientId?: string) {
+    if (!user.companyId) {
+      throw new ForbiddenException("User does not belong to a company");
+    }
+    const requested = new Prisma.Decimal(percent);
+    const requiresApproval = requested.greaterThan(0) &&
+        this.domain.requiresDiscountApproval(requested, user.discountLimit);
+    if (!requiresApproval) {
+      return { requiresApproval: false, limit: user.discountLimit ?? 0, approvers: [] };
+    }
+
+    const client = clientId
+        ? await this.prisma.client.findFirst({
+          where: { id: clientId, companyId: user.companyId, deletedAt: null },
+          select: { branchId: true },
+        })
+        : null;
+    const approvers = await findDiscountApprovers(this.prisma, this.rbacService, {
+      companyId: user.companyId,
+      branchId: client?.branchId ?? user.branchId ?? null,
+      percent: requested,
+    });
+    return { requiresApproval: true, limit: user.discountLimit ?? 0, approvers };
+  }
+
   async reserveUnit(user: AuthUser, dto: ReserveUnitDto) {
     if (!user.companyId) {
       throw new ForbiddenException("User does not belong to a company");

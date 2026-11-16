@@ -196,6 +196,7 @@
   "toasts": {
     "unitReserved": "Жай бронделди",
     "unitReservedDescription": "№{{number}} жай бронделди.",
+    "unitReservedDiscountPending": "№{{number}} жай бронделди. {{percent}}% арзандатуу макулдашууга жиберилди; чечимге чейин баа прайс боюнча калат.",
     "reserveError": "Жайды брондоо мүмкүн болбоду",
     "tryAgain": "Кайра аракет кылыңыз.",
     "reservationExtended": "Брон узартылды",
@@ -270,10 +271,20 @@
       "selectClient": "Клиентти тандаңыз.",
       "fullNameRequired": "Аты-жөнү милдеттүү.",
       "phoneRequired": "Телефон номери милдеттүү.",
-      "invalidEmail": "Email туура эмес"
+      "invalidEmail": "Email туура эмес",
+      "depositMethodRequired": "Депозит кантип төлөнгөнүн тандаңыз."
     },
     "depositPlain": "Депозит",
-    "reservationExpiresHint": "Демейки {{defaultDays}} күн; бүгүндөн тартып {{maxDays}} күндөн ашпайт."
+    "reservationExpiresHint": "Демейки {{defaultDays}} күн; бүгүндөн тартып {{maxDays}} күндөн ашпайт.",
+    "financingType": "Төлөө түрү",
+    "selectFinancing": "Кардар кантип төлөйт",
+    "financingHint": "Келишимге басылат. Лидде көрсөтүлсө, ошол жерден толтурулат.",
+    "discountNeedsApproval": "Сиздин {{limit}}% лимиттен ашат, ошондуктан макулдашуу керек. Чечимге чейин жай прайс баасы менен бронделет.",
+    "discountNeedsApprovalBy": "Сиздин {{limit}}% лимиттен ашат, ошондуктан арзандатууну {{approvers}} макулдашы керек. Чечимге чейин жай прайс баасы менен бронделет.",
+    "finalPriceIfApproved": "Макулдашкандан кийинки акыркы баа",
+    "depositMethod": "Депозиттин төлөө ыкмасы",
+    "selectDepositMethod": "Депозит кантип төлөндү",
+    "summaryApprovalNote": "{{percent}}% арзандатуу макулдашууга жиберилет. Чечимге чейин бүтүм {{listPrice}} прайс баасында калат жана келишимге кол коюуга болбойт."
   },
   "discountBanner": {
     "pendingTitle": "{{percent}}% ({{amount}}) арзандатуу макулдашууну күтүүдө",

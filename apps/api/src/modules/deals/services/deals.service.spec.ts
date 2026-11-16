@@ -1267,6 +1267,29 @@ describe('DealsService', () => {
         });
     });
 
+    // E2E-7
+    describe('discountApproversFor', () => {
+        it('says a discount within the user\'s own limit needs no approval', async () => {
+            const {service, prisma} = buildBase();
+            const result = await service.discountApproversFor(managerUser, 5, 'client-1');
+            expect(result).toEqual({requiresApproval: false, limit: 5, approvers: []});
+            expect(prisma.user.findMany).not.toHaveBeenCalled();
+        });
+
+        it('names who decides a discount above it, for the client\'s branch', async () => {
+            const {service, prisma} = buildBase();
+            prisma.client.findFirst.mockResolvedValue({branchId: 'branch-2'});
+            prisma.user.findMany.mockResolvedValue([{id: 'head-2', fullName: 'Aibek Head'}]);
+
+            const result = await service.discountApproversFor(managerUser, 7, 'client-1');
+
+            expect(result).toEqual({requiresApproval: true, limit: 5, approvers: [{id: 'head-2', fullName: 'Aibek Head'}]});
+            expect(prisma.user.findMany).toHaveBeenCalledWith(expect.objectContaining({
+                where: expect.objectContaining({branchId: 'branch-2'}),
+            }));
+        });
+    });
+
     describe('generateDocument', () => {
         it('rejects a document type that cannot be generated on demand', async () => {
             const {service, prisma} = buildBase();

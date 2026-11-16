@@ -1,12 +1,15 @@
 import {SheetBody} from "@/components/ui/sheet";
 import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/components/ui/data-list";
 import {ApartmentCard} from "./apartment-card";
-import {calculateBooking} from "../../utils/booking-calculator";
+import {calculateBooking, discountNeedsApproval} from "../../utils/booking-calculator";
 import type {BookingFormInput} from "@/features/deals/schemas/booking.schema.ts";
 import type {ApartmentSummary} from "@/features/deals/types/booking.types.ts";
 import type {Client} from "@/features/clients/types/client.types.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useTranslation} from "react-i18next";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {FINANCING_TYPE_LABEL_KEYS} from "@/features/deals/types/deal.types.ts";
+import {PAYMENT_METHOD_LABEL_KEYS} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
 
 interface SummaryStepProps {
     values: BookingFormInput;
@@ -16,7 +19,11 @@ interface SummaryStepProps {
 }
 
 export function SummaryStep({ values, apartment, selectedClient, managerName }: SummaryStepProps) {
-    const { t, i18n } = useTranslation("deals");
+    const { t, i18n } = useTranslation(["deals", "payments"]);
+    const { user } = useAuth();
+    const needsApproval = discountNeedsApproval(values.reservation.discountPercent, user?.discountLimit);
+    const method = values.reservation.depositPaymentMethod;
+    const financing = values.reservation.financingType;
     const { formatCurrency } = useCompanyFormatters();
     const calculation = calculateBooking({
         price: apartment.price,
@@ -45,18 +52,31 @@ export function SummaryStep({ values, apartment, selectedClient, managerName }: 
                         <DataListItemValue>{values.reservation.expiresAt?.toLocaleDateString(i18n.language) ?? "—"}</DataListItemValue>
                     </DataListItem>
                     <DataListItem>
-                        <DataListItemLabel>{t("booking.finalPrice")}</DataListItemLabel>
+                        <DataListItemLabel>{t("booking.financingType")}</DataListItemLabel>
+                        <DataListItemValue>{financing ? t(FINANCING_TYPE_LABEL_KEYS[financing]) : "—"}</DataListItemValue>
+                    </DataListItem>
+                    <DataListItem>
+                        <DataListItemLabel>{needsApproval ? t("booking.finalPriceIfApproved") : t("booking.finalPrice")}</DataListItemLabel>
                         <DataListItemValue>{formatCurrency(calculation.finalPrice)}</DataListItemValue>
                     </DataListItem>
                     <DataListItem>
                         <DataListItemLabel>{t("booking.depositPlain")}</DataListItemLabel>
-                        <DataListItemValue>{formatCurrency(calculation.deposit)}</DataListItemValue>
+                        <DataListItemValue>
+                            {formatCurrency(calculation.deposit)}
+                            {calculation.deposit > 0 && method ? ` · ${t(PAYMENT_METHOD_LABEL_KEYS[method])}` : null}
+                        </DataListItemValue>
                     </DataListItem>
                     <DataListItem>
                         <DataListItemLabel>{t("booking.remaining")}</DataListItemLabel>
                         <DataListItemValue>{formatCurrency(calculation.remaining)}</DataListItemValue>
                     </DataListItem>
                 </DataList>
+
+                {needsApproval && (
+                    <p role="status" className="rounded-md bg-amber-50 p-3 text-sm text-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+                        {t("booking.summaryApprovalNote", { percent: values.reservation.discountPercent, listPrice: formatCurrency(apartment.price) })}
+                    </p>
+                )}
 
                 {values.reservation.note && (
                     <div className="text-sm text-muted-foreground">

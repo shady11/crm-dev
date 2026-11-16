@@ -36,10 +36,23 @@ export function buildBookingSchema(t: TFunc) {
 
                 deposit: z.number().min(0),
 
+                // E2E-7: asked, never assumed. Required once there is a deposit.
+                depositPaymentMethod: z.enum(["CASH", "BANK_TRANSFER", "MBANK", "OPTIMA", "ELKART", "OTHER"]).optional(),
+
+                financingType: z.enum(["CASH", "INSTALLMENT", "MORTGAGE"]).optional(),
+
                 note: z.string().optional(),
             }),
         })
         .superRefine((data, ctx) => {
+            if (data.reservation.deposit > 0 && !data.reservation.depositPaymentMethod) {
+                ctx.addIssue({
+                    code: z.ZodIssueCode.custom,
+                    path: ["reservation", "depositPaymentMethod"],
+                    message: t("booking.validation.depositMethodRequired"),
+                });
+            }
+
             if (data.clientMode === "existing") {
                 if (!data.existingClientId) {
                     ctx.addIssue({

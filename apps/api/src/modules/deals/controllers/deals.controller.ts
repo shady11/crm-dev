@@ -11,6 +11,7 @@ import {AuthUser} from '@/common/types/auth-user.type';
 import {DealsService} from '../services/deals.service';
 import {DealQueryDto} from '../dto/deal-query.dto';
 import {ReserveUnitDto} from '../dto/reserve-unit.dto';
+import {DiscountApproversQueryDto} from '../dto/discount-approvers-query.dto';
 import {ExtendReservationDto} from "@/modules/deals/dto/extend-reservation.dto";
 import {SignContractDto} from "@/modules/deals/dto/sign-contract.dto";
 import {CancelDealDto} from "@/modules/deals/dto/cancel-deal.dto";
@@ -56,6 +57,14 @@ export class DealsController {
       @Query('mine') mine?: string,
   ) {
     return this.dealsService.getStatusSummary(user, projectId, branchId, mine === 'true');
+  }
+
+  // E2E-7: the reservation form says whether a discount needs approval and
+  // who decides it, before the manager books. Declared before ':id'.
+  @RequirePermissions('deals.create')
+  @Get('discount-approvers')
+  discountApprovers(@CurrentUser() user: AuthUser, @Query() query: DiscountApproversQueryDto) {
+    return this.dealsService.discountApproversFor(user, query.percent, query.clientId);
   }
 
   // Declared before ':id' so it isn't captured as a deal id.
