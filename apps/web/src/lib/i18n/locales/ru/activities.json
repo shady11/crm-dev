@@ -60,6 +60,7 @@
     "documentRegenerated": "Документ сформирован заново: {{documentType}}",
     "receiptIssued": "Выдана квитанция {{receipt}}",
     "paymentScheduleGenerated": "Сформирован график платежей",
+    "paymentScheduleAnnexGenerated": "Сформировано приложение «График платежей»",
     "paymentVoided": "Платёж {{payment}} аннулирован",
     "unitRelistedAfterCancellation": "Объект снова в продаже после отмены сделки",
     "unitRelistedAfterExpiry": "Объект снова в продаже после истечения брони",

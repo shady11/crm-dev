@@ -1,5 +1,5 @@
 import {BadRequestException} from '@nestjs/common';
-import {DealStatus, PaymentScheduleStatus, Prisma} from '@/generated/prisma/client';
+import {DealStatus, DocumentType, PaymentScheduleStatus, Prisma} from '@/generated/prisma/client';
 import {PaymentScheduleService} from './payment-schedule.service';
 import {DealDomainService} from '../deal-domain.service';
 import {DealNotFoundException, PaymentScheduleAlreadyGeneratedException} from '../../exceptions';
@@ -42,9 +42,11 @@ describe('PaymentScheduleService.generate', () => {
         const domain = new DealDomainService();
 
         const scheduleNeeded = {resolveScheduled: jest.fn().mockResolvedValue(undefined)};
+        const documentGeneration = {generateForDeal: jest.fn().mockResolvedValue({id: 'doc-1'})};
+        (activityService as any).documentGenerated = jest.fn().mockResolvedValue({});
 
-        const service = new PaymentScheduleService(prisma as any, mapper as any, domain, activityService as any, scheduleNeeded as any);
-        return {service, prisma, scheduleNeeded};
+        const service = new PaymentScheduleService(prisma as any, mapper as any, domain, activityService as any, scheduleNeeded as any, documentGeneration as any);
+        return {service, prisma, scheduleNeeded, documentGeneration, activityService: activityService as any};
     }
 
     const dto = (overrides: Record<string, unknown> = {}) => ({
@@ -78,6 +80,26 @@ describe('PaymentScheduleService.generate', () => {
         const {service, scheduleNeeded} = build({status: DealStatus.ACTIVE, salePrice: new Prisma.Decimal(900), dealNumber: 'D-2026-0001', companyId: 'company-1'}, 0);
         await service.generate({...user, name: 'Aida'}, 'deal-1', dto());
         expect(scheduleNeeded.resolveScheduled).toHaveBeenCalledWith(expect.objectContaining({id: 'deal-1', dealNumber: 'D-2026-0001'}), 'Aida');
+    });
+
+    // E2E-5
+    it('generates the schedule annex to the contract once the schedule is made', async () => {
+        const {service, documentGeneration, activityService} = build({status: DealStatus.ACTIVE, salePrice: new Prisma.Decimal(900), companyId: 'company-1', clientId: 'client-1'}, 0);
+        await service.generate(user, 'deal-1', dto());
+        expect(documentGeneration.generateForDeal).toHaveBeenCalledWith({
+            companyId: 'company-1', dealId: 'deal-1', type: DocumentType.PAYMENT_SCHEDULE, userId: 'user-1',
+        });
+        expect(activityService.documentGenerated).toHaveBeenCalledWith(
+            expect.objectContaining({metadata: {documentId: 'doc-1', documentType: DocumentType.PAYMENT_SCHEDULE}}),
+            expect.objectContaining({templateKey: 'paymentScheduleAnnexGenerated'}),
+        );
+    });
+
+    it('still returns the schedule when the annex fails to render', async () => {
+        const {service, prisma, documentGeneration} = build({status: DealStatus.ACTIVE, salePrice: new Prisma.Decimal(900), companyId: 'company-1'}, 0);
+        documentGeneration.generateForDeal.mockRejectedValue(new Error('renderer down'));
+        await expect(service.generate(user, 'deal-1', dto())).resolves.toEqual(expect.objectContaining({id: 'deal-1'}));
+        expect(prisma.paymentSchedule.createMany).toHaveBeenCalled();
     });
 
     it('splits the remaining balance evenly when it divides cleanly', async () => {

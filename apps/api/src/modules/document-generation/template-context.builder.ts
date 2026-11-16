@@ -64,6 +64,9 @@ export interface TemplateContext {
   };
   schedule: {
     rows: Array<{ order: number; dueDate: string; amount: string }>;
+    /** E2E-5: what the schedule asks for in all, and what was paid before it. */
+    total: string;
+    paidBefore: string;
   };
   today: string;
 }
@@ -135,14 +138,33 @@ export function buildTemplateContext(
       phone: deal.manager?.phone ?? '',
       email: deal.manager?.email ?? '',
     },
-    schedule: {
-      rows: deal.paymentSchedules.map((schedule) => ({
-        order: schedule.order,
-        dueDate: date(schedule.dueDate),
-        amount: money(schedule.amount, currency),
-      })),
-    },
+    schedule: scheduleContext(deal, f, currency),
     today: date(new Date()),
+  };
+}
+
+/**
+ * The schedule splits what was owed when it was made, so the sale price
+ * less its total is what had been paid by then. That stays true when the
+ * document is printed again after later payments.
+ */
+function scheduleContext(
+  deal: DealWithDetails,
+  f: ReturnType<typeof documentFormatter>,
+  currency: string | undefined,
+): TemplateContext['schedule'] {
+  const rows = deal.paymentSchedules;
+  if (rows.length === 0) return { rows: [], total: '', paidBefore: '' };
+  const total = rows.reduce((sum, row) => sum + Number(row.amount), 0);
+  const paidBefore = Number(deal.salePrice) - total;
+  return {
+    rows: rows.map((row) => ({
+      order: row.order,
+      dueDate: f.date(row.dueDate),
+      amount: f.money(row.amount, currency),
+    })),
+    total: f.money(total, currency),
+    paidBefore: paidBefore >= 0.01 ? f.money(paidBefore, currency) : '',
   };
 }
 

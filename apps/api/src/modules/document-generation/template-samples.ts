@@ -83,6 +83,8 @@ export function sampleTemplateContext(
         { order: 1, dueDate: f.date('2026-11-05'), amount: money(5390) },
         { order: 2, dueDate: f.date('2026-12-05'), amount: money(5390) },
       ],
+      total: money(10780),
+      paidBefore: money(48120),
     },
     today: f.date('2026-10-16'),
     payment: {
@@ -132,6 +134,10 @@ export function templatePlaceholders(
     }
   }
   placeholders.push({ token: '{{today}}', example: today });
+  placeholders.push(
+    { token: '{{schedule.total}}', example: schedule.total },
+    { token: '{{schedule.paidBefore}}', example: schedule.paidBefore },
+  );
   placeholders.push({
     token:
       '{{#each schedule.rows}}{{order}}. {{dueDate}} — {{amount}}{{/each}}',

@@ -1,7 +1,7 @@
 import {api} from "@/lib/api";
 
 /** The document types a company can write its own template for (CA-5). */
-export const TEMPLATE_TYPES = ["RESERVATION", "CONTRACT", "PAYMENT_RECEIPT"] as const;
+export const TEMPLATE_TYPES = ["RESERVATION", "CONTRACT", "PAYMENT_SCHEDULE", "PAYMENT_RECEIPT"] as const;
 export type TemplateType = (typeof TEMPLATE_TYPES)[number];
 
 export type TemplateVersion = {

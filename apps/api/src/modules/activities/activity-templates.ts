@@ -33,6 +33,8 @@ const ACTIVITY_TEMPLATES = {
     `${p.documentType} document regenerated`,
   receiptIssued: (p: { receipt: string }) => `Receipt ${p.receipt} issued`,
   paymentScheduleGenerated: () => 'Payment schedule generated',
+  // E2E-5: the schedule's annex to the contract, made with the schedule.
+  paymentScheduleAnnexGenerated: () => 'Payment schedule annex generated',
   paymentVoided: (p: { payment: string }) => `Payment ${p.payment} voided`,
   unitRelistedAfterCancellation: () => 'Unit relisted after deal cancellation',
   unitRelistedAfterExpiry: () => 'Unit relisted after reservation expired',
@@ -97,7 +99,11 @@ const ACTIVITY_TEMPLATES = {
   unitCreated: (p: { unit: string }) => `Unit "${p.unit}" created`,
   unitsCreated: (p: { count: number }) => `${p.count} units created on floor`,
   unitsImported: (p: { count: number }) => `${p.count} units imported`,
-  unitsImportedWithPrices: (p: { units: number; prices: number; requested: number }) =>
+  unitsImportedWithPrices: (p: {
+    units: number;
+    prices: number;
+    requested: number;
+  }) =>
     `${p.units} units imported, ${p.prices} prices changed, ${p.requested} sent for approval`,
   unitStatusChanged: (p: { unit: string }) => `Unit "${p.unit}" status changed`,
   unitUpdated: (p: { unit: string }) => `Unit "${p.unit}" updated`,

@@ -171,6 +171,7 @@
     "generateDocument": "Generate",
     "generateReservation": "Reservation agreement",
     "generateContract": "Sale contract",
+    "generateSchedule": "Payment schedule (contract annex)",
     "activateDialogTitle": "Activate this deal?",
     "activateDialogDescription": "The payment schedule starts here: it spreads whatever is still owed, after any money already paid. An active deal can't go back to \"Contract signed\".",
     "refundDialogTitle": "Record refund",

@@ -32,6 +32,7 @@
     "types": {
       "RESERVATION": "Брондоо келишими",
       "CONTRACT": "Келишим",
+      "PAYMENT_SCHEDULE": "Төлөм графиги",
       "PAYMENT_RECEIPT": "Төлөм дүмүрчөгү"
     },
     "unsaved": "Сакталбаган өзгөртүүлөр бар",

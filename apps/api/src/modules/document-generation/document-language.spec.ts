@@ -60,6 +60,7 @@ describe('built-in templates (E2E-3)', () => {
     DocumentType.RESERVATION,
     DocumentType.CONTRACT,
     DocumentType.PAYMENT_RECEIPT,
+    DocumentType.PAYMENT_SCHEDULE,
   ];
 
   it.each(['en', 'ru', 'ky'] as const)(
@@ -149,5 +150,53 @@ describe('a Russian-locale company gets Russian values (E2E-3)', () => {
     const context = buildTemplateContext(deal as never, { name: 'C', currency: 'KGS', locale: 'ru-RU' } as never);
     expect(context.deal.discountAmount).toBe('');
     expect(context.deal.discountPercent).toBe('');
+  });
+});
+
+describe('the payment schedule annex (E2E-5)', () => {
+  const day = (iso: string) => new Date(`${iso}T00:00:00.000Z`);
+  const deal = (rows: Array<[string, number]>) => ({
+    dealNumber: 'D-2026-0001', status: 'ACTIVE', financingType: 'INSTALLMENT',
+    listPrice: new Prisma.Decimal(5400000), salePrice: new Prisma.Decimal(5022000),
+    discountAmount: null, discountPercent: null, deposit: null,
+    reservedAt: null, reservationExpiresAt: null, contractNumber: 'ДКП-1',
+    contractDate: day('2026-10-21'), note: null,
+    client: { fullName: 'Нурлан Асанов', phone: '+996555123456', email: null, passport: 'ID1', pin: '2', address: null },
+    unit: { number: '201', type: 'APARTMENT', rooms: 2, area: new Prisma.Decimal('65.5'), block: { name: 'Блок А' }, entrance: { name: '1' }, floor: { number: 2 } },
+    project: { name: 'ЖК Ала-Тоо' }, manager: null, payments: [],
+    paymentSchedules: rows.map(([due, amount], i) => ({ order: i + 1, dueDate: day(due), amount: new Prisma.Decimal(amount) })),
+  });
+  const company = { name: 'Ала-Тоо', legalName: null, currency: 'KGS', locale: 'ru-RU' };
+  const plain = (value: string) => value.replace(/\s/g, ' ');
+
+  it('totals the installments and works out what was paid before the schedule', () => {
+    const context = buildTemplateContext(
+      deal([['2026-11-21', 2361000], ['2026-12-21', 2361000]]) as never,
+      company as never,
+    );
+    expect(context.schedule.rows[0].dueDate).toBe('21.11.2026');
+    expect(plain(context.schedule.total)).toBe('4 722 000,00 KGS');
+    expect(plain(context.schedule.paidBefore)).toBe('300 000,00 KGS');
+  });
+
+  it('prints as an annex to the contract, in Russian, with every installment', () => {
+    const context = buildTemplateContext(
+      deal([['2026-11-21', 2361000], ['2026-12-21', 2361000]]) as never,
+      company as never,
+    );
+    const html = plain(
+      Handlebars.compile(defaultTemplate(DocumentType.PAYMENT_SCHEDULE, 'ru')!, { strict: true })(context),
+    );
+    expect(html).toContain('Приложение к договору № ДКП-1 от 21.10.2026');
+    expect(html).toContain('21.12.2026');
+    expect(html).toContain('Оплачено до составления графика');
+    expect(html).toContain('4 722 000,00 KGS');
+  });
+
+  it('leaves out "paid before" when nothing was paid before the schedule', () => {
+    const context = buildTemplateContext(deal([['2026-11-21', 5022000]]) as never, company as never);
+    expect(context.schedule.paidBefore).toBe('');
+    const html = Handlebars.compile(defaultTemplate(DocumentType.PAYMENT_SCHEDULE, 'ru')!, { strict: true })(context);
+    expect(html).not.toContain('Оплачено до составления графика');
   });
 });
