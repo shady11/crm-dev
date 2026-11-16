@@ -41,6 +41,7 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+    --color-panel-border: var(--panel-border);
 
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
@@ -179,14 +180,17 @@
     --chart-3: #3A4CB0;
     --chart-4: #B8C0EF;
     --chart-5: #232A4D;
-    --sidebar: oklch(1 0 0);
-    --sidebar-foreground: oklch(0.21 0.03 264.67);
-    --sidebar-primary: #4A5FD4;
-    --sidebar-primary-foreground: oklch(1.00 0 0);
-    --sidebar-accent: oklch(0.95 0.02 261.78);
-    --sidebar-accent-foreground: #4A5FD4;
-    --sidebar-border: oklch(0.93 0.01 264.60);
-    --sidebar-ring: #4A5FD4;
+    /* Border of the floating main content cards (used to borrow sidebar-border). */
+    --panel-border: oklch(0.93 0.01 264.60);
+    /* Sidebar is painted in the brand primary with white content on top. */
+    --sidebar: #4A5FD4;
+    --sidebar-foreground: oklch(1 0 0 / 0.88);
+    --sidebar-primary: oklch(1 0 0);
+    --sidebar-primary-foreground: #4A5FD4;
+    --sidebar-accent: oklch(1 0 0 / 0.16);
+    --sidebar-accent-foreground: oklch(1 0 0);
+    --sidebar-border: oklch(1 0 0 / 0.14);
+    --sidebar-ring: oklch(1 0 0 / 0.7);
 
     --shadow-2xs: 0 1px 3px 0px oklch(0.00 0 0 / 0.05);
     --shadow-xs: 0 1px 3px 0px oklch(0.00 0 0 / 0.05);
@@ -231,11 +235,15 @@
     --chart-3: #B8C0EF;
     --chart-4: #3A4CB0;
     --chart-5: #DCE0F7;
+    --panel-border: oklch(0.35 0.04 262.16);
+    /* Neutral like the rest of the dark theme: a coloured sidebar pulls
+       too much attention on a dark screen. The brand shows only on the
+       active item and the logo. */
     --sidebar: oklch(0.26 0.03 262.71);
     --sidebar-foreground: oklch(0.93 0.01 264.60);
     --sidebar-primary: #7C8CE8;
     --sidebar-primary-foreground: #161A2B;
-    --sidebar-accent: oklch(0.33 0.04 264.82);
+    --sidebar-accent: rgb(124 140 232 / 0.16);
     --sidebar-accent-foreground: #7C8CE8;
     --sidebar-border: oklch(0.35 0.04 262.16);
     --sidebar-ring: #7C8CE8;
