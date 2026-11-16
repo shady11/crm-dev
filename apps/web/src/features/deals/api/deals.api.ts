@@ -151,9 +151,22 @@ export type ReserveUnitPayload = {
     discountAmount?: number;
     discountPercent?: number;
     deposit?: number;
+    depositPaymentMethod?: PaymentMethod;
     reservationExpiresAt?: string;
     note?: string;
 };
+
+/** E2E-7: whether a discount would wait for approval, and who decides it. */
+export type DiscountApprovers = {
+    requiresApproval: boolean;
+    limit: number | null;
+    approvers: { id: string; fullName: string }[];
+};
+
+export async function getDiscountApprovers(percent: number, clientId?: string) {
+    const response = await api.get<DiscountApprovers>("/deals/discount-approvers", { params: { percent, clientId } });
+    return response.data;
+}
 
 export type DealStatusSummaryItem = { status: DealStatus; count: number };
 

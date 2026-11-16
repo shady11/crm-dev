@@ -196,6 +196,7 @@
   "toasts": {
     "unitReserved": "Помещение забронировано",
     "unitReservedDescription": "Помещение №{{number}} забронировано.",
+    "unitReservedDiscountPending": "Помещение №{{number}} забронировано. Скидка {{percent}}% отправлена на согласование; до решения цена остаётся прайсовой.",
     "reserveError": "Не удалось забронировать помещение",
     "tryAgain": "Попробуйте снова.",
     "reservationExtended": "Бронь продлена",
@@ -270,10 +271,20 @@
       "selectClient": "Выберите клиента.",
       "fullNameRequired": "ФИО обязательно.",
       "phoneRequired": "Номер телефона обязателен.",
-      "invalidEmail": "Некорректный email"
+      "invalidEmail": "Некорректный email",
+      "depositMethodRequired": "Укажите, как внесён депозит."
     },
     "depositPlain": "Депозит",
-    "reservationExpiresHint": "По умолчанию {{defaultDays}} дн.; не более {{maxDays}} дн. от сегодня."
+    "reservationExpiresHint": "По умолчанию {{defaultDays}} дн.; не более {{maxDays}} дн. от сегодня.",
+    "financingType": "Форма оплаты",
+    "selectFinancing": "Как клиент будет платить",
+    "financingHint": "Печатается в договоре. Подставляется из лида, если там указана.",
+    "discountNeedsApproval": "Больше вашего лимита {{limit}}%, поэтому нужно согласование. До решения помещение бронируется по прайсовой цене.",
+    "discountNeedsApprovalBy": "Больше вашего лимита {{limit}}%, поэтому скидку должен согласовать {{approvers}}. До решения помещение бронируется по прайсовой цене.",
+    "finalPriceIfApproved": "Итоговая цена после согласования",
+    "depositMethod": "Способ оплаты депозита",
+    "selectDepositMethod": "Как внесён депозит",
+    "summaryApprovalNote": "Скидка {{percent}}% уйдёт на согласование. До решения сделка остаётся по прайсовой цене {{listPrice}}, и договор подписать нельзя."
   },
   "discountBanner": {
     "pendingTitle": "Скидка {{percent}}% ({{amount}}) ждёт согласования",

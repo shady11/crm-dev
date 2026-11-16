@@ -53,6 +53,8 @@ export type AuthUser = {
     branch: AuthBranchSummary | null;
     // Present only while the active session is an impersonated one.
     impersonation?: AuthImpersonationSummary | null;
+    /** The Role's own discount ceiling in percent; null = no ceiling (E2E-7). */
+    discountLimit?: number | null;
     /** SA-6: must choose their own password before anything else. */
     mustChangePassword?: boolean;
 };

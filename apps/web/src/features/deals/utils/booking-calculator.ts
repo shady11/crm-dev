@@ -27,3 +27,13 @@ export function calculateBooking({
         remaining,
     };
 }
+
+/**
+ * E2E-7: a discount above the user's own limit waits for someone else's
+ * decision; the API holds the deal at the list price until then. Same rule
+ * as the API (DealDomainService.requiresDiscountApproval).
+ */
+export function discountNeedsApproval(percent: number, limit: number | null | undefined) {
+    if (percent <= 0 || limit === null) return false;
+    return percent > (limit ?? 0);
+}

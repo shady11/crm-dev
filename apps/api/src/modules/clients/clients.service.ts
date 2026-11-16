@@ -124,7 +124,8 @@ export class ClientsService {
                 leads: {
                     where: { deletedAt: null },
                     orderBy: { createdAt: "desc" },
-                    select: { id: true, fullName: true, phone: true, source: true, status: true, createdAt: true },
+                    // E2E-7: financingType prefills the reservation form.
+                    select: { id: true, fullName: true, phone: true, source: true, status: true, financingType: true, createdAt: true },
                 },
                 deals: {
                     orderBy: { createdAt: "desc" },

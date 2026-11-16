@@ -26,6 +26,8 @@ export async function getClients(params?: GetClientsParams) {
 
 export type ClientLeadSummary = {
     id: string;
+    /** E2E-7: prefills the reservation form. */
+    financingType?: "CASH" | "INSTALLMENT" | "MORTGAGE" | null;
     fullName: string;
     phone: string;
     source: string | null;

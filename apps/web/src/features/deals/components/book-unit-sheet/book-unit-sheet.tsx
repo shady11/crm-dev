@@ -1,10 +1,11 @@
-import {useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
+import {useQuery} from "@tanstack/react-query";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from "@/components/ui/sheet";
 import type {Unit} from "@/features/units/types/unit.types";
 import type {Floor} from "@/features/floors/types/floor.types";
-import {createClient} from "@/features/clients/api/clients.api";
+import {createClient, getClient} from "@/features/clients/api/clients.api";
 import {ClientStep} from "./client-step";
 import {ReservationStep} from "./reservation-step";
 import {SummaryStep} from "./summary-step";
@@ -38,6 +39,8 @@ const DEFAULT_VALUES: BookingFormInput = {
         expiresAt: undefined as unknown as Date,
         discountPercent: 0,
         deposit: 0,
+        depositPaymentMethod: undefined,
+        financingType: undefined,
         note: "",
     },
 };
@@ -87,6 +90,20 @@ export function BookUnitSheet({ unit, floor, projectId, managers, open, onOpenCh
         setSelectedClient(null);
         setSubmitError(undefined);
     };
+
+    // E2E-7: the financing type the client's lead already gave, so the
+    // contract doesn't print it blank. Only fills an empty field.
+    const clientDetails = useQuery({
+        queryKey: ["client", selectedClient?.id],
+        queryFn: () => getClient(selectedClient!.id),
+        enabled: !!selectedClient?.id,
+    });
+    useEffect(() => {
+        const fromLead = clientDetails.data?.leads.find((lead) => lead.financingType)?.financingType;
+        if (fromLead && !form.getValues("reservation.financingType")) {
+            form.setValue("reservation.financingType", fromLead);
+        }
+    }, [clientDetails.data, form]);
 
     const bookMutation = useBookUnit({
         projectId,
@@ -151,6 +168,8 @@ export function BookUnitSheet({ unit, floor, projectId, managers, open, onOpenCh
                 salePrice: apartment.price - discountAmount,
                 discountPercent: values.reservation.discountPercent,
                 deposit: values.reservation.deposit,
+                depositPaymentMethod: values.reservation.deposit > 0 ? values.reservation.depositPaymentMethod : undefined,
+                financingType: values.reservation.financingType,
                 reservationExpiresAt: values.reservation.expiresAt?.toISOString(),
                 note: values.reservation.note || undefined,
             });
@@ -187,6 +206,7 @@ export function BookUnitSheet({ unit, floor, projectId, managers, open, onOpenCh
                             apartment={apartment}
                             managers={managers}
                             canChooseManager={canChooseManager}
+                            clientId={form.getValues("existingClientId")}
                         />}
                     {step === 2 && (
                         <SummaryStep

@@ -196,6 +196,7 @@
   "toasts": {
     "unitReserved": "Unit reserved",
     "unitReservedDescription": "Unit №{{number}} has been reserved.",
+    "unitReservedDiscountPending": "Unit №{{number}} reserved. The {{percent}}% discount has gone for approval; the price stays at the list price until then.",
     "reserveError": "Failed to reserve unit",
     "tryAgain": "Please try again.",
     "reservationExtended": "Reservation extended",
@@ -270,10 +271,20 @@
       "selectClient": "Please select a client.",
       "fullNameRequired": "Full name is required.",
       "phoneRequired": "Phone number is required.",
-      "invalidEmail": "Invalid email"
+      "invalidEmail": "Invalid email",
+      "depositMethodRequired": "Choose how the deposit was paid."
     },
     "depositPlain": "Deposit",
-    "reservationExpiresHint": "Defaults to {{defaultDays}} days; at most {{maxDays}} days from today."
+    "reservationExpiresHint": "Defaults to {{defaultDays}} days; at most {{maxDays}} days from today.",
+    "financingType": "Payment",
+    "selectFinancing": "How the client will pay",
+    "financingHint": "Printed on the contract. Filled in from the lead when it has one.",
+    "discountNeedsApproval": "Above your {{limit}}% limit, so it needs approval. The unit is held at the list price until it is decided.",
+    "discountNeedsApprovalBy": "Above your {{limit}}% limit, so {{approvers}} must approve it. The unit is held at the list price until then.",
+    "finalPriceIfApproved": "Final price, if approved",
+    "depositMethod": "Deposit paid by",
+    "selectDepositMethod": "How the deposit was paid",
+    "summaryApprovalNote": "The {{percent}}% discount goes for approval. Until it is approved the deal stays at the list price, {{listPrice}}, and the contract can't be signed."
   },
   "discountBanner": {
     "pendingTitle": "Discount of {{percent}}% ({{amount}}) is awaiting approval",
