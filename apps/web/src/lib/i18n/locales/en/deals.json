@@ -361,5 +361,21 @@
       "address": "legal address",
       "signatoryName": "signatory"
     }
+  },
+  "reserveUnit": "Reserve a unit",
+  "reserveFor": {
+    "title": "Reserve a unit",
+    "description": "Opens the project's chessboard for {{name}}, showing free units that match. The booking form starts with {{name}} chosen.",
+    "project": "Project",
+    "selectProject": "Choose a project",
+    "rooms": "Rooms",
+    "anyRooms": "Any",
+    "budget": "Budget up to ({{currency}})",
+    "anyBudget": "Any price",
+    "hint": "Filled in from what the lead asked for. You can change the filters on the chessboard too.",
+    "cancel": "Cancel",
+    "open": "Open chessboard",
+    "banner": "Reserving for {{name}}: pick a free unit and book it.",
+    "stop": "Stop"
   }
 }

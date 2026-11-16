@@ -9,6 +9,9 @@ interface ChessboardSheetsProps {
 
     projectId: string;
     managers: { id: string; fullName: string }[];
+    /** E2E-8: reserving for this client, chosen in the booking form already. */
+    presetClientId?: string;
+    onBooked?(): void;
 
     updateState: {
         isSubmitting: boolean;
@@ -27,6 +30,8 @@ export function ChessboardSheets({
                                      sheet,
                                      projectId,
                                      managers,
+                                     presetClientId,
+                                     onBooked,
                                      updateState,
                                      actions,
                                  }: ChessboardSheetsProps) {
@@ -69,6 +74,8 @@ export function ChessboardSheets({
                     floor={sheet.floor}
                     projectId={projectId}
                     managers={managers}
+                    presetClientId={presetClientId}
+                    onBooked={onBooked}
                     open
                     onOpenChange={handleOpenChange}
                 />

@@ -9,6 +9,7 @@ import {DeleteLeadDialog} from "@/features/leads/components/delete-lead-dialog.t
 import {DeleteLeadsDialog} from "@/features/leads/components/delete-leads-dialog.tsx";
 import {ConvertLeadDialog} from "@/features/leads/components/convert-lead-dialog.tsx";
 import {LeadDetailsSheet} from "@/features/leads/components/lead-details-sheet.tsx";
+import {ReserveForClientDialog} from "@/features/deals/components/reserve-for-client-dialog.tsx";
 import {MoveToBranchDialog} from "@/features/branches/components/move-to-branch-dialog.tsx";
 import {ReassignManagerDialog} from "@/features/users/components/reassign-manager-dialog.tsx";
 import {useLeadsList} from "@/features/leads/hooks/use-leads-list.ts";
@@ -26,6 +27,7 @@ export function LeadsPage() {
         bulkDeleteDialog,
         bulkReassignDialog,
         convertDialog,
+        reserveDialog,
         detailsSheet,
         transferBranchDialog,
         reassignDialog,
@@ -135,12 +137,23 @@ export function LeadsPage() {
                 onConfirm={convertDialog.onConfirm}
             />
 
+            <ReserveForClientDialog
+                client={reserveDialog.lead?.client ?? null}
+                prefill={reserveDialog.lead ? {
+                    projectId: reserveDialog.lead.preferredProject?.id,
+                    rooms: reserveDialog.lead.rooms,
+                    budget: reserveDialog.lead.budget,
+                } : undefined}
+                onClose={reserveDialog.onClose}
+            />
+
             <LeadDetailsSheet
                 lead={detailsSheet.lead}
                 open={detailsSheet.open}
                 onOpenChange={detailsSheet.onOpenChange}
                 onEdit={detailsSheet.onEdit}
                 onRequestConvert={detailsSheet.onRequestConvert}
+                onRequestReserve={detailsSheet.onRequestReserve}
                 onRequestDelete={detailsSheet.onRequestDelete}
                 onRequestTransferBranch={detailsSheet.onRequestTransferBranch}
                 onRequestReassign={detailsSheet.onRequestReassign}

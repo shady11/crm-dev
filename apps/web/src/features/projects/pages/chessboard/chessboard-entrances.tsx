@@ -48,7 +48,7 @@ export function ChessboardEntrances() {
 
     // A block with one entrance has nothing to pick.
     if (block.entrances?.length === 1 && !isBrowsing(location.state)) {
-        return <Navigate to={block.entrances[0].id} replace />;
+        return <Navigate to={{pathname: block.entrances[0].id, search: location.search}} replace />;
     }
 
     return (
@@ -58,7 +58,7 @@ export function ChessboardEntrances() {
                 <BreadcrumbList>
                     <BreadcrumbItem>
                         <BreadcrumbLink asChild>
-                            <Button variant="outline" size="icon-sm" onClick={() => navigate(paths.projects.chessboard.root(projectId!), {state: BROWSE_STATE})} aria-label={t("common:actions.back")}>
+                            <Button variant="outline" size="icon-sm" onClick={() => navigate({pathname: paths.projects.chessboard.root(projectId!), search: location.search}, {state: BROWSE_STATE})} aria-label={t("common:actions.back")}>
                                 <ArrowLeftIcon className="size-3" />
                             </Button>
                         </BreadcrumbLink>
@@ -74,7 +74,7 @@ export function ChessboardEntrances() {
                             <MenuContent>
                                 <MenuGroup>
                                     {blocks.map((block, index) => (
-                                        <MenuItem key={block.id} value={`block-${index}`} onClick={() => navigate(`../${block.id}`)}>{t("chessboard.blockLabel", { name: block.name })}</MenuItem>
+                                        <MenuItem key={block.id} value={`block-${index}`} onClick={() => navigate({pathname: `../${block.id}`, search: location.search})}>{t("chessboard.blockLabel", { name: block.name })}</MenuItem>
                                     ))}
                                 </MenuGroup>
                             </MenuContent>
@@ -93,7 +93,7 @@ export function ChessboardEntrances() {
                         <Card
                             key={entrance.id}
                             className="cursor-pointer border border-secondary shadow-none"
-                            onClick={() => navigate(`./${entrance.id}`)}
+                            onClick={() => navigate({pathname: `./${entrance.id}`, search: location.search})}
                         >
                             <CardContent>
                                 <div className="flex items-center gap-3">
