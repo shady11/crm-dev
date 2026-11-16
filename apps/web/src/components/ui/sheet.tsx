@@ -16,6 +16,7 @@ import {
   DialogOverlay,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useTranslation } from "react-i18next";
 
 export const useSheet = useDialogContext;
 
@@ -143,6 +144,7 @@ interface SheetContentProps
 }
 
 export const SheetContent = (props: SheetContentProps) => {
+  const { t } = useTranslation("common");
   const {
     showCloseButton = true,
     placement = "right",
@@ -170,7 +172,7 @@ export const SheetContent = (props: SheetContentProps) => {
           {!!showCloseButton && (
             <SheetClose asChild>
               <Button
-                aria-label="Close"
+                aria-label={t("actions.close")}
                 className="absolute inset-e-2 top-2 opacity-64 hover:opacity-100"
                 size="icon-sm"
                 variant="ghost"

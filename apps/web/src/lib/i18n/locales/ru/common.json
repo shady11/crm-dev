@@ -125,5 +125,16 @@
     "success": "Действие отменено",
     "errorTitle": "Не удалось отменить",
     "errorDescription": "Возможно, запись уже изменилась. Обновите страницу и попробуйте снова."
+  },
+  "ui": {
+    "previous": "Назад",
+    "next": "Вперёд",
+    "pagination": "Страницы",
+    "previousPage": "Предыдущая страница",
+    "nextPage": "Следующая страница",
+    "pageOf": "Страница {{page}} из {{totalPages}}",
+    "sidebar": "Меню",
+    "sidebarDescription": "Меню навигации",
+    "toggleSidebar": "Показать или скрыть меню"
   }
 }

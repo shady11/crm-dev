@@ -21,6 +21,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-is-mobile";
+import { useTranslation } from "react-i18next";
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -159,6 +160,7 @@ interface SidebarProps extends React.ComponentProps<typeof Sheet> {
 }
 
 export const Sidebar = (props: SidebarProps) => {
+  const { t } = useTranslation("common");
   const {
     collapsible = "offcanvas",
     placement = "left",
@@ -215,8 +217,8 @@ export const Sidebar = (props: SidebarProps) => {
         >
           <SheetHeader
             className="sr-only"
-            description="Displays the mobile sidebar."
-            title="Sidebar"
+            description={t("ui.sidebarDescription")}
+            title={t("ui.sidebar")}
           />
           <ark.div className="flex size-full flex-col">{children}</ark.div>
         </SheetContent>
@@ -285,6 +287,7 @@ export const Sidebar = (props: SidebarProps) => {
 };
 
 export const SidebarTrigger = (props: React.ComponentProps<typeof Button>) => {
+  const { t } = useTranslation("common");
   const { className, onClick, ...rest } = props;
 
   const { toggleSidebar } = useSidebar();
@@ -303,19 +306,20 @@ export const SidebarTrigger = (props: React.ComponentProps<typeof Button>) => {
       {...rest}
     >
       <PanelLeftIcon className="rtl:rotate-180" />
-      <ark.span className="sr-only">Toggle Sidebar</ark.span>
+      <ark.span className="sr-only">{t("ui.toggleSidebar")}</ark.span>
     </Button>
   );
 };
 
 export const SidebarRail = (props: React.ComponentProps<typeof ark.button>) => {
+  const { t } = useTranslation("common");
   const { className, ...rest } = props;
 
   const { toggleSidebar } = useSidebar();
 
   return (
     <ark.button
-      aria-label="Toggle Sidebar"
+      aria-label={t("ui.toggleSidebar")}
       className={cn(
         "absolute inset-y-0 z-20 -translate-x-1/2",
         "w-4",
@@ -336,7 +340,7 @@ export const SidebarRail = (props: React.ComponentProps<typeof ark.button>) => {
       data-slot="sidebar-rail"
       onClick={toggleSidebar}
       tabIndex={-1}
-      title="Toggle Sidebar"
+      title={t("ui.toggleSidebar")}
       type="button"
       {...rest}
     />
