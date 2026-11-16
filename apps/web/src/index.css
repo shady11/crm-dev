@@ -236,17 +236,17 @@
     --chart-4: #3A4CB0;
     --chart-5: #DCE0F7;
     --panel-border: oklch(0.35 0.04 262.16);
-    /* Deep brand indigo: still reads as the brand without being the
-       brightest surface on a dark screen. Active items use the light
-       brand tint (#7C8CE8) so the selection stays easy to spot. */
-    --sidebar: #262F73;
-    --sidebar-foreground: oklch(1 0 0 / 0.88);
-    --sidebar-primary: oklch(1 0 0);
-    --sidebar-primary-foreground: #262F73;
-    --sidebar-accent: rgb(124 140 232 / 0.3);
-    --sidebar-accent-foreground: oklch(1 0 0);
-    --sidebar-border: oklch(1 0 0 / 0.14);
-    --sidebar-ring: oklch(1 0 0 / 0.7);
+    /* Neutral like the rest of the dark theme: a coloured sidebar pulls
+       too much attention on a dark screen. The brand shows only on the
+       active item and the logo. */
+    --sidebar: oklch(0.26 0.03 262.71);
+    --sidebar-foreground: oklch(0.93 0.01 264.60);
+    --sidebar-primary: #7C8CE8;
+    --sidebar-primary-foreground: #161A2B;
+    --sidebar-accent: rgb(124 140 232 / 0.16);
+    --sidebar-accent-foreground: #7C8CE8;
+    --sidebar-border: oklch(0.35 0.04 262.16);
+    --sidebar-ring: #7C8CE8;
 
     --shadow-2xs: 0 1px 3px 0px oklch(0.00 0 0 / 0.05);
     --shadow-xs: 0 1px 3px 0px oklch(0.00 0 0 / 0.05);
