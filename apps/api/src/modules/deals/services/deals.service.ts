@@ -760,6 +760,10 @@ export class DealsService {
         metadata: { contractNumber: dto.contractNumber },
       });
 
+      // E2E-6: a signed contract is a sale (WON_DEAL_STATUSES), so the unit
+      // is sold from here on, not "reserved" until the last installment.
+      await this.markUnitSold(db, user.id, deal);
+
       if (deal.managerId) {
         await this.notifications.create({
           companyId,
@@ -1287,6 +1291,35 @@ export class DealsService {
     return this.mapper.toDetails(result);
   }
 
+  /**
+   * Marks the deal's unit SOLD, with a line in the unit's own history,
+   * unless it already is. A voided payment that reopens a completed deal
+   * leaves it sold: the contract still stands. Only a cancellation relists it.
+   */
+  private async markUnitSold(
+      db: DbClient,
+      userId: string,
+      deal: { id: string; companyId: string; unitId: string },
+  ) {
+    const { count } = await db.unit.updateMany({
+      where: { id: deal.unitId, status: { not: UnitStatus.SOLD } },
+      data: { status: UnitStatus.SOLD },
+    });
+    if (count === 0) return;
+
+    await db.activity.create({
+      data: {
+        companyId: deal.companyId,
+        userId,
+        unitId: deal.unitId,
+        action: ActivityAction.CHANGED_UNIT_STATUS,
+        type: ActivityType.UNIT_STATUS_CHANGED,
+        ...activityText('unitMarkedSold'),
+        metadata: { toStatus: UnitStatus.SOLD, dealId: deal.id },
+      },
+    });
+  }
+
   async tryCompleteWithinTransaction(
       db: DbClient,
       user: AuthUser,
@@ -1328,25 +1361,8 @@ export class DealsService {
       data: { status: this.domain.nextStatusAfterCompletion() },
     });
 
-    await db.unit.update({
-      where: { id: deal.unitId },
-      data: { status: UnitStatus.SOLD },
-    });
-
-    // The unit's own activity trail, distinct from the deal's dealUpdated()
-    // call below — without this, the unit's history shows no record of
-    // being marked sold.
-    await db.activity.create({
-      data: {
-        companyId: deal.companyId,
-        userId: user.id,
-        unitId: deal.unitId,
-        action: ActivityAction.CHANGED_UNIT_STATUS,
-        type: ActivityType.UNIT_STATUS_CHANGED,
-        ...activityText('unitMarkedSold'),
-        metadata: { toStatus: UnitStatus.SOLD, dealId },
-      },
-    });
+    // Normally sold since signing (E2E-6); this covers a deal signed before.
+    await this.markUnitSold(db, user.id, deal);
 
     await this.activityService.dealUpdated({
       db, companyId: deal.companyId, userId: user.id,

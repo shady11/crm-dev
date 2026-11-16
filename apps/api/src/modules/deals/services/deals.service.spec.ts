@@ -682,6 +682,25 @@ describe('DealsService', () => {
             );
             expect(notifications.create).toHaveBeenCalledWith(expect.objectContaining({userId: 'manager-1'}));
         });
+
+        // E2E-6
+        it('marks the unit sold at signing, with a line in its history', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({
+                id: 'deal-1', status: DealStatus.RESERVED, discountApprovalStatus: DiscountApprovalStatus.NONE,
+                managerId: null, clientId: 'c1', dealNumber: '2026-0001', note: null, unitId: 'unit-1', companyId: 'company-1',
+            });
+
+            await service.signContract(managerUser, 'deal-1', {contractNumber: 'C1', contractDate: new Date().toISOString()} as any);
+
+            expect(prisma.unit.updateMany).toHaveBeenCalledWith({
+                where: {id: 'unit-1', status: {not: UnitStatus.SOLD}},
+                data: {status: UnitStatus.SOLD},
+            });
+            expect(prisma.activity.create).toHaveBeenCalledWith(expect.objectContaining({
+                data: expect.objectContaining({unitId: 'unit-1', templateKey: 'unitMarkedSold', metadata: {toStatus: UnitStatus.SOLD, dealId: 'deal-1'}}),
+            }));
+        });
     });
 
     describe('activate', () => {
@@ -1119,7 +1138,25 @@ describe('DealsService', () => {
             expect(prisma.deal.update).toHaveBeenCalledWith(
                 expect.objectContaining({data: {status: DealStatus.COMPLETED}}),
             );
-            expect(prisma.unit.update).toHaveBeenCalledWith({where: {id: 'unit-1'}, data: {status: UnitStatus.SOLD}});
+            expect(prisma.unit.updateMany).toHaveBeenCalledWith({
+                where: {id: 'unit-1', status: {not: UnitStatus.SOLD}},
+                data: {status: UnitStatus.SOLD},
+            });
+        });
+
+        // E2E-6: since signing marks the unit sold, completion usually finds it sold.
+        it('does not log the unit as sold a second time on completion', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({id: 'deal-1', status: DealStatus.ACTIVE, salePrice: new Prisma.Decimal(1000), unitId: 'unit-1', managerId: null, clientId: 'c1', dealNumber: '2026-0001', companyId: 'company-1'});
+            prisma.payment.aggregate.mockResolvedValue({_sum: {amount: new Prisma.Decimal(1000)}});
+            prisma.paymentSchedule.findMany.mockResolvedValue([{status: PaymentScheduleStatus.PAID}]);
+            prisma.unit.updateMany.mockResolvedValue({count: 0});
+
+            await service.complete(managerUser, 'deal-1');
+
+            expect(prisma.activity.create).not.toHaveBeenCalledWith(
+                expect.objectContaining({data: expect.objectContaining({templateKey: 'unitMarkedSold'})}),
+            );
         });
     });
 
