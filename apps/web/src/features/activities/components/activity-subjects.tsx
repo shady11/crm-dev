@@ -4,6 +4,7 @@ import {useTranslation} from "react-i18next";
 import {Building2Icon, CheckSquareIcon, HandshakeIcon, HouseIcon, UserRoundIcon, UserRoundSearchIcon} from "lucide-react";
 import type {Activity} from "@/features/activities/types/activity.types.ts";
 import {paths} from "@/routes/paths.ts";
+import {useTaskTitle} from "@/features/tasks/hooks/use-task-title.ts";
 
 function Chip({icon, to, children}: {icon: ReactNode; to?: string; children: ReactNode}) {
     const className = "inline-flex max-w-full items-center gap-1 rounded-md bg-secondary px-1.5 py-0.5 text-xs text-secondary-foreground [&_svg]:size-3 [&_svg]:shrink-0";
@@ -19,6 +20,7 @@ function Chip({icon, to, children}: {icon: ReactNode; to?: string; children: Rea
  */
 export function ActivitySubjects({activity}: {activity: Activity}) {
     const {t} = useTranslation("activities");
+    const taskTitle = useTaskTitle();
     const {deal, lead, task, unit, project} = activity;
     const client = activity.client ?? deal?.client ?? null;
     const chips: ReactNode[] = [];
@@ -33,7 +35,7 @@ export function ActivitySubjects({activity}: {activity: Activity}) {
         chips.push(<Chip key="lead" icon={<UserRoundSearchIcon />}>{t("subjects.lead", {name: lead.fullName})}</Chip>);
     }
     if (task) {
-        chips.push(<Chip key="task" icon={<CheckSquareIcon />} to={paths.tasks.root}>{task.title}</Chip>);
+        chips.push(<Chip key="task" icon={<CheckSquareIcon />} to={paths.tasks.root}>{taskTitle(task)}</Chip>);
     }
     if (unit) {
         chips.push(

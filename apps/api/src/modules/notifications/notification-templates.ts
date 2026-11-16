@@ -29,10 +29,11 @@ export type NotificationTemplate =
     | {templateKey: "paymentDueSoon"; params: {dealNumber: string}}
     | {templateKey: "paymentDueToday"; params: {dealNumber: string}}
     | {templateKey: "paymentOverdue"; params: {dealNumber: string; days: number}}
-    | {templateKey: "taskAssigned"; params: {taskTitle: string}}
-    | {templateKey: "taskDueSoon"; params: {taskTitle: string}}
-    | {templateKey: "taskOverdue"; params: {taskTitle: string}}
-    | {templateKey: "taskEscalated"; params: {taskTitle: string; days: number}}
+    // E2E-9: a system task also carries its own template, to name it in the reader's language.
+    | {templateKey: "taskAssigned"; params: {taskTitle: string} & TaskTemplateRef}
+    | {templateKey: "taskDueSoon"; params: {taskTitle: string} & TaskTemplateRef}
+    | {templateKey: "taskOverdue"; params: {taskTitle: string} & TaskTemplateRef}
+    | {templateKey: "taskEscalated"; params: {taskTitle: string; days: number} & TaskTemplateRef}
     | {templateKey: "documentUploaded"; params: {dealNumber: string; fileName: string}}
     | {templateKey: "discountApprovalReminder"; params: {dealNumber: string; percent: number; days: number}}
     | {templateKey: "discountRequestApproved"; params: {dealNumber: string; percent: number; byName: string}}
@@ -57,3 +58,6 @@ export type NotificationTemplate =
     | {templateKey: "workHandedOver"; params: {fromName: string; byName: string; leads: number; deals: number; tasks: number}};
 
 type UnitPriceParams = {unit: string; project: string; currency: string | null};
+
+/** E2E-9: a system task's own template, to name it in the reader's language. */
+type TaskTemplateRef = {taskTemplateKey?: string; taskTemplateParams?: Record<string, string>};

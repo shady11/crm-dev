@@ -9,6 +9,7 @@ import {RbacService} from "@/modules/rbac/rbac.service";
 // Days overdue before a task escalates to the assignee's branch team
 // lead(s) — same tiering idea as payment-reminders' REMINDER_STAGES.
 const TASK_ESCALATION_DAYS = 3;
+import { taskTitleTemplate } from "@/modules/tasks/task-templates";
 
 @Injectable()
 export class NotificationsCronService {
@@ -58,7 +59,7 @@ export class NotificationsCronService {
 
         const dueSoon = await this.prisma.task.findMany({
             where: { status: { in: activeStatuses }, dueDate: { gte: now, lte: in24h }, deletedAt: null },
-            select: { id: true, title: true, assignedToId: true, companyId: true, dueDate: true },
+            select: { id: true, title: true, templateKey: true, templateParams: true, assignedToId: true, companyId: true, dueDate: true },
         });
 
         for (const task of dueSoon) {
@@ -71,13 +72,13 @@ export class NotificationsCronService {
                 title: "Task due soon",
                 message: task.title,
                 templateKey: "taskDueSoon",
-                params: {taskTitle: task.title},
+                params: {taskTitle: task.title, ...taskTitleTemplate(task)},
             });
         }
 
         const overdue = await this.prisma.task.findMany({
             where: { status: { in: activeStatuses }, dueDate: { lt: now }, deletedAt: null },
-            select: { id: true, title: true, assignedToId: true, companyId: true },
+            select: { id: true, title: true, templateKey: true, templateParams: true, assignedToId: true, companyId: true },
         });
 
         for (const task of overdue) {
@@ -90,7 +91,7 @@ export class NotificationsCronService {
                 title: "Task overdue",
                 message: task.title,
                 templateKey: "taskOverdue",
-                params: {taskTitle: task.title},
+                params: {taskTitle: task.title, ...taskTitleTemplate(task)},
             });
         }
 
@@ -102,7 +103,7 @@ export class NotificationsCronService {
                 deletedAt: null,
                 branchId: { not: null },
             },
-            select: { id: true, title: true, companyId: true, branchId: true },
+            select: { id: true, title: true, templateKey: true, templateParams: true, companyId: true, branchId: true },
         });
 
         let escalations = 0;
@@ -126,7 +127,7 @@ export class NotificationsCronService {
                     title: `Task overdue ${TASK_ESCALATION_DAYS}+ days`,
                     message: task.title,
                     templateKey: "taskEscalated",
-                    params: {taskTitle: task.title, days: TASK_ESCALATION_DAYS},
+                    params: {taskTitle: task.title, ...taskTitleTemplate(task), days: TASK_ESCALATION_DAYS},
                 });
                 escalations++;
             }

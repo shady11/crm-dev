@@ -35,6 +35,7 @@ const CONTACT_ATTEMPT_TYPE_MAP: Record<ContactAttemptType, ActivityType> = {
     MEETING: ActivityType.MEETING,
     EMAIL: ActivityType.EMAIL,
 };
+import { taskText } from '@/modules/tasks/task-templates';
 
 @Injectable()
 export class LeadsService {
@@ -254,7 +255,7 @@ export class LeadsService {
                     companyId: user.companyId,
                     assignedToId: created.managerId,
                     actorId: user.id,
-                    title: `Call ${created.fullName}`,
+                    text: taskText('firstContactCall', { name: created.fullName }),
                     type: TaskType.CALL,
                     priority: TaskPriority.HIGH,
                     dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
@@ -380,6 +381,14 @@ export class LeadsService {
                 status: LeadStatus.CONVERTED,
             },
             include: LEAD_INCLUDE,
+        });
+
+        // E2E-9: the first contact has clearly happened.
+        await this.tasksService.completeAutomatedTasks(this.prisma, {
+            companyId: user.companyId,
+            templateKey: 'firstContactCall',
+            leadId: id,
+            actorId: user.id,
         });
 
         await this.prisma.activity.create({

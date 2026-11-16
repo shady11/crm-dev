@@ -19,6 +19,7 @@ import {DeleteTaskDialog} from "@/features/tasks/components/delete-task-dialog.t
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {formatDate} from "@/utils/date-formatter.ts";
 import {useTranslation} from "react-i18next";
+import {useTaskTitle} from "@/features/tasks/hooks/use-task-title.ts";
 
 interface TaskDetailsSheetProps {
     task: Task | null;
@@ -29,6 +30,7 @@ interface TaskDetailsSheetProps {
 
 export function TaskDetailsSheet({ task, open, onOpenChange, onEdit }: TaskDetailsSheetProps) {
     const { t, i18n } = useTranslation("tasks");
+    const taskTitle = useTaskTitle();
     const { user } = useAuth();
     const { remove } = useTaskActions();
     const [pendingDelete, setPendingDelete] = useState<Task | null>(null);
@@ -54,7 +56,7 @@ export function TaskDetailsSheet({ task, open, onOpenChange, onEdit }: TaskDetai
             <Sheet open={open} onOpenChange={({ open: isOpen }) => onOpenChange(isOpen)}>
                 <SheetContent className="sm:max-w-md" variant="inset">
                     <SheetHeader>
-                        <SheetTitle>{task.title}</SheetTitle>
+                        <SheetTitle>{taskTitle(task)}</SheetTitle>
                     </SheetHeader>
 
                     <SheetBody scrollFade>

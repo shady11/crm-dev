@@ -6,6 +6,7 @@ import {formatDate} from "@/utils/date-formatter.ts";
 import {Badge} from "@/components/ui/badge.tsx";
 import {TASK_PRIORITY_CLASSES, TASK_PRIORITY_LABEL_KEYS} from "@/features/tasks/types/task.types.ts";
 import {useTranslation} from "react-i18next";
+import {useTaskTitle} from "@/features/tasks/hooks/use-task-title.ts";
 
 function isOverdue(task: Task) {
     return !!task.dueDate && new Date(task.dueDate) < new Date() && task.status !== "DONE" && task.status !== "CANCELLED";
@@ -13,6 +14,7 @@ function isOverdue(task: Task) {
 
 export function TaskKanbanCardContent({ task }: { task: Task }) {
     const { t, i18n } = useTranslation("tasks");
+    const taskTitle = useTaskTitle();
     const related = task.deal ? t("related.deal", { number: task.deal.dealNumber }) : task.client?.fullName ?? task.lead?.fullName;
 
     return (
@@ -28,7 +30,7 @@ export function TaskKanbanCardContent({ task }: { task: Task }) {
                         {t(TASK_PRIORITY_LABEL_KEYS[task.priority])}
                     </Badge>
                 </div>
-                <CardTitle>{task.title}</CardTitle>
+                <CardTitle>{taskTitle(task)}</CardTitle>
                 <CardDescription className="row-start-auto text-xs">
                     {task.description}
                 </CardDescription>

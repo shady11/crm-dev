@@ -96,6 +96,7 @@ describe('LeadsService', () => {
         const rbacService = {findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-manager'])};
         const tasksService = {
             createAutomated: jest.fn().mockResolvedValue(null),
+            completeAutomatedTasks: jest.fn().mockResolvedValue(0),
             handOverOpenTasks: jest.fn().mockResolvedValue([]),
         };
         const notifications = {create: jest.fn().mockResolvedValue({})};
@@ -425,6 +426,19 @@ describe('LeadsService', () => {
             expect(prisma.lead.update).toHaveBeenCalledWith(
                 expect.objectContaining({data: expect.objectContaining({clientId: 'client-created', status: LeadStatus.CONVERTED})}),
             );
+        });
+
+        // E2E-9
+        it('closes the lead\'s first-contact task once it converts', async () => {
+            const {service, prisma, tasksService} = build({
+                lead: {id: 'lead-1', clientId: null, fullName: 'John Lead', phone: '+1'},
+            });
+
+            await service.convert(adminUser, 'lead-1', {} as any);
+
+            expect(tasksService.completeAutomatedTasks).toHaveBeenCalledWith(prisma, expect.objectContaining({
+                templateKey: 'firstContactCall', leadId: 'lead-1', actorId: adminUser.id,
+            }));
         });
 
         it('links to an existing client when clientId is provided, without creating a new one', async () => {

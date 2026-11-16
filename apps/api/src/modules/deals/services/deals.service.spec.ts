@@ -135,6 +135,7 @@ describe('DealsService', () => {
             createAutomated: jest.fn().mockResolvedValue(null),
             handOverOpenTasks: jest.fn().mockResolvedValue([]),
             cancelOpenTasksForDeal: jest.fn().mockResolvedValue(0),
+            completeAutomatedTasks: jest.fn().mockResolvedValue(0),
         };
 
         const moneyHeld = {notifyIfHeld: jest.fn().mockResolvedValue(undefined)};
@@ -699,6 +700,21 @@ describe('DealsService', () => {
             });
             expect(prisma.activity.create).toHaveBeenCalledWith(expect.objectContaining({
                 data: expect.objectContaining({unitId: 'unit-1', templateKey: 'unitMarkedSold', metadata: {toStatus: UnitStatus.SOLD, dealId: 'deal-1'}}),
+            }));
+        });
+
+        // E2E-9
+        it('closes the "confirm documents" task when the contract is signed', async () => {
+            const {service, prisma, tasksService} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue({
+                id: 'deal-1', status: DealStatus.RESERVED, discountApprovalStatus: DiscountApprovalStatus.NONE,
+                managerId: null, clientId: 'c1', dealNumber: '2026-0001', note: null, unitId: 'unit-1', companyId: 'company-1',
+            });
+
+            await service.signContract(managerUser, 'deal-1', {contractNumber: 'C1', contractDate: new Date().toISOString()} as any);
+
+            expect(tasksService.completeAutomatedTasks).toHaveBeenCalledWith(prisma, expect.objectContaining({
+                templateKey: 'confirmDealDocuments', dealId: 'deal-1', actorId: managerUser.id,
             }));
         });
     });

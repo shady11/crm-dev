@@ -18,6 +18,7 @@ export type AttentionDeal = {
 };
 export type AttentionTask = {
     id: string; title: string; dueDate: string;
+    templateKey?: string | null; templateParams?: Record<string, unknown> | null;
     assignedTo: { id: string; fullName: string };
 };
 // Discounts awaiting a decision, oldest request first. For a Sales Manager
@@ -160,7 +161,7 @@ export async function getTeamPerformance(days: number) {
 export type MyWorkLead = {
     id: string; fullName: string; phone: string; status: string; nextContactAt: string | null;
 };
-export type MyWorkTask = { id: string; title: string; dueDate: string | null; status: string };
+export type MyWorkTask = { id: string; title: string; templateKey?: string | null; templateParams?: Record<string, unknown> | null; dueDate: string | null; status: string };
 export type MyWorkDeal = {
     id: string; dealNumber: string; status: string; reservationExpiresAt: string | null;
     client: { id: string; fullName: string };

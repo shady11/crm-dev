@@ -4,6 +4,7 @@ import type {Notification} from "@/features/notifications/api/notifications.api.
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {DEAL_STATUS_LABEL_KEYS, type DealStatus} from "@/features/deals/types/deal.types.ts";
 import {formatDate} from "@/utils/date-formatter.ts";
+import {useTaskTitleFromValues} from "@/features/tasks/hooks/use-task-title.ts";
 
 /**
  * A notification's title and message in the reader's language. The API
@@ -14,6 +15,7 @@ import {formatDate} from "@/utils/date-formatter.ts";
 export function useNotificationText() {
     const {t, i18n} = useTranslation(["notifications", "deals"]);
     const {formatCurrency} = useCompanyFormatters();
+    const localizeTask = useTaskTitleFromValues();
 
     return useCallback(
         (n: Pick<Notification, "title" | "message" | "templateKey" | "params">) => {
@@ -29,6 +31,8 @@ export function useNotificationText() {
                 values.status = t(DEAL_STATUS_LABEL_KEYS[values.status as DealStatus] ?? values.status);
             }
             if (typeof values.date === "string") values.date = formatDate(values.date, i18n.language).date;
+            // E2E-9: a system task is named in the reader's language.
+            localizeTask(values, "taskTitle");
             // Day counts drive plural forms ("1 day" / "7 days", "день/дня/дней").
             if (typeof values.days === "number") values.count = values.days;
             // Same for the number of open tasks a reassignment handed over.
@@ -45,6 +49,6 @@ export function useNotificationText() {
                 message: i18n.exists(`${base}.message`, values) ? t(`${base}.message`, values) : n.message,
             };
         },
-        [t, i18n, formatCurrency],
+        [t, i18n, formatCurrency, localizeTask],
     );
 }

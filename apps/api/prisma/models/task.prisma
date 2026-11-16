@@ -23,6 +23,10 @@ model Task {
   id String @id @default(uuid())
 
   title       String
+  // E2E-9: set on tasks the system makes (task-templates.ts), so the title
+  // shows in the reader's language. Null once a person edits the title.
+  templateKey    String?
+  templateParams Json?
   description String?
   dueDate     DateTime?
   status      TaskStatus   @default(TODO)

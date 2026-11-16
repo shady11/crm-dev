@@ -63,6 +63,9 @@ const ACTIVITY_TEMPLATES = {
   taskRestored: (p: { task: string }) => `Task "${p.task}" restored`,
   taskCancelledWithDeal: (p: { task: string }) =>
     `Task "${p.task}" cancelled with its deal`,
+  // E2E-9: a system task closed once its step was done.
+  taskAutoCompleted: (p: { task: string }) =>
+    `Task "${p.task}" completed automatically`,
 
   // Documents
   documentUploaded: (p: { name: string }) => `Document "${p.name}" uploaded`,

@@ -13,6 +13,7 @@ import type {Task, TaskPayload} from "@/features/tasks/api/tasks.api.ts";
 import {getTasks} from "@/features/tasks/api/tasks.api.ts";
 import {useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
+import {useTaskTitle} from "@/features/tasks/hooks/use-task-title.ts";
 
 const ICONS: Record<string, typeof CircleIcon> = {
     TODO: CircleIcon, IN_PROGRESS: ClockIcon, DONE: CheckCircle2Icon, CANCELLED: XCircleIcon,
@@ -20,6 +21,7 @@ const ICONS: Record<string, typeof CircleIcon> = {
 
 export function ClientTasksCard({ clientId }: { clientId: string }) {
     const { t, i18n } = useTranslation("tasks");
+    const taskTitle = useTaskTitle();
 
     const tasksQuery = useQuery({
         queryKey: ["tasks", { clientId }],
@@ -70,7 +72,7 @@ export function ClientTasksCard({ clientId }: { clientId: string }) {
                                 <div key={task.id} className="flex cursor-pointer items-center gap-3 py-2.5 text-sm" onClick={() => openDetails(task)}>
                                     <Icon size={16} className="shrink-0 text-muted-foreground" />
                                     <div className="min-w-0 flex-1">
-                                        <p className="truncate font-medium">{task.title}</p>
+                                        <p className="truncate font-medium">{taskTitle(task)}</p>
                                         <p className="truncate text-xs text-muted-foreground">
                                             {task.assignedTo.fullName}
                                             {task.dueDate && ` · ${new Date(task.dueDate).toLocaleDateString(i18n.language)}`}

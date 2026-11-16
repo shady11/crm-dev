@@ -5,6 +5,8 @@ import type {TaskPriority, TaskStatus, TaskType} from "@/features/tasks/types/ta
 export type Task = {
     id: string;
     title: string;
+    /** E2E-9: set on tasks the system makes; see useTaskTitle. */
+    templateKey?: string | null; templateParams?: Record<string, unknown> | null;
     description: string | null;
     dueDate: string | null;
     status: TaskStatus;

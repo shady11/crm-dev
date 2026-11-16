@@ -54,6 +54,7 @@ import {DocumentGenerationService} from "@/modules/document-generation/document-
 import {GENERATABLE_DOCUMENT_TYPES} from "@/modules/document-generation/document-generation.constants";
 import {TasksService} from "@/modules/tasks/tasks.service";
 import {MoneyHeldNotifier} from "./money-held-notifier.service";
+import {taskText} from "@/modules/tasks/task-templates";
 import {ScheduleNeededNotifier} from "./schedule-needed-notifier.service";
 import {ReceiptNumberService} from "./payments/receipt-number.service";
 import { activityText } from '@/modules/activities/activity-templates';
@@ -549,7 +550,7 @@ export class DealsService {
         companyId,
         assignedToId: result.managerId,
         actorId: user.id,
-        title: `Confirm documents for deal ${result.dealNumber}`,
+        text: taskText('confirmDealDocuments', { dealNumber: result.dealNumber }),
         type: TaskType.FOLLOW_UP,
         dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
         dealId: result.id,
@@ -793,6 +794,11 @@ export class DealsService {
       // E2E-6: a signed contract is a sale (WON_DEAL_STATUSES), so the unit
       // is sold from here on, not "reserved" until the last installment.
       await this.markUnitSold(db, user.id, deal);
+
+      // E2E-9: signing is what the documents were being confirmed for.
+      await this.tasksService.completeAutomatedTasks(db, {
+        companyId, templateKey: 'confirmDealDocuments', dealId: deal.id, actorId: user.id,
+      });
 
       if (deal.managerId) {
         await this.notifications.create({
