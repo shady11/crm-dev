@@ -22,6 +22,7 @@ import {
     isBlockBookable,
 } from "@/features/blocks/types/block-sales.ts";
 import {chessboardLanding, isBrowsing} from "@/features/projects/utils/chessboard-navigation.ts";
+import {namedLabel} from "@/lib/i18n/named-label.ts";
 
 export function ChessboardBlocks() {
     const { t } = useTranslation("projects");
@@ -92,7 +93,7 @@ export function ChessboardBlocks() {
                                             <BuildingIcon size={32} strokeWidth={1.25} className="text-white" />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-bold">{t("chessboard.blockLabel", { name: block.name })}</h3>
+                                            <h3 className="text-lg font-bold">{namedLabel(t, "chessboard.blockLabel", block.name)}</h3>
                                             {(block as any).code && (
                                                 <p className="text-xs text-muted-foreground">{(block as any).code}</p>
                                             )}

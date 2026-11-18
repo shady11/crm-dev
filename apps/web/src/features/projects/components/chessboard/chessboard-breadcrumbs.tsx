@@ -10,6 +10,7 @@ import {
     completionQuarter,
     isBlockBookable,
 } from "@/features/blocks/types/block-sales";
+import {namedLabel} from "@/lib/i18n/named-label.ts";
 
 interface ChessboardBreadcrumbsProps {
     block: Block;
@@ -82,7 +83,7 @@ export function ChessboardBreadcrumbs({
                     <nav className="flex gap-1.5 overflow-x-auto pb-0.5" aria-label={t("chessboard.blocksNav")}>
                         {blocks.map((item) => (
                             <Pill key={item.id} active={item.id === block.id} muted={!isBlockBookable(item.salesStatus)} onClick={() => onBlockSelect(item.id)}>
-                                {t("chessboard.blockLabel", {name: item.name})}
+                                {namedLabel(t, "chessboard.blockLabel", item.name)}
                             </Pill>
                         ))}
                     </nav>
@@ -91,14 +92,14 @@ export function ChessboardBreadcrumbs({
                     <nav className="flex gap-1.5 overflow-x-auto pb-0.5" aria-label={t("chessboard.entrancesNav")}>
                         {blockEntrances.map((item) => (
                             <Pill key={item.id} active={item.id === entrance.id} onClick={() => onEntranceSelect(item.id)}>
-                                {t("chessboard.entranceLabel", {name: item.name})}
+                                {namedLabel(t, "chessboard.entranceLabel", item.name)}
                             </Pill>
                         ))}
                     </nav>
                 ) : (
                     blocks.length <= 1 && (
                         <p className="text-sm font-medium">
-                            {t("chessboard.blockLabel", {name: block.name})} · {t("chessboard.entranceLabel", {name: entrance.name})}
+                            {namedLabel(t, "chessboard.blockLabel", block.name)} · {namedLabel(t, "chessboard.entranceLabel", entrance.name)}
                         </p>
                     )
                 )}

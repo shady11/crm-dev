@@ -1,7 +1,18 @@
+import {useState} from "react";
 import {BadgePercentIcon} from "lucide-react";
 import {useTranslation} from "react-i18next";
 import {Alert, AlertAction, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {Button} from "@/components/ui/button.tsx";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog.tsx";
 import type {Deal, DiscountDecision} from "@/features/deals/api/deals.api.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 
@@ -27,6 +38,8 @@ interface DealDiscountBannerProps {
 export function DealDiscountBanner({deal, canApprove, decision, isDeciding, onApprove, onReject}: DealDiscountBannerProps) {
     const {t, i18n} = useTranslation("deals");
     const {formatCurrency} = useCompanyFormatters();
+    // E2E-11: approving changes the price, so it's confirmed like rejecting.
+    const [confirmOpen, setConfirmOpen] = useState(false);
 
     const requested = {
         percent: deal.requestedDiscountPercent ?? 0,
@@ -59,11 +72,31 @@ export function DealDiscountBanner({deal, canApprove, decision, isDeciding, onAp
                         <Button size="sm" variant="secondary" disabled={isDeciding} onClick={onReject}>
                             {t("discountBanner.reject")}
                         </Button>
-                        <Button size="sm" disabled={isDeciding} isLoading={isDeciding} onClick={onApprove}>
+                        <Button size="sm" disabled={isDeciding} isLoading={isDeciding} onClick={() => setConfirmOpen(true)}>
                             {t("discountBanner.approve")}
                         </Button>
                     </AlertAction>
                 )}
+                <AlertDialog open={confirmOpen} onOpenChange={({open}) => setConfirmOpen(open)}>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>{t("discountBanner.approveDialogTitle", requested)}</AlertDialogTitle>
+                            <AlertDialogDescription>{t("discountBanner.approveDialogDescription")}</AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel disabled={isDeciding}>{t("common:actions.cancel")}</AlertDialogCancel>
+                            <AlertDialogAction
+                                disabled={isDeciding}
+                                onClick={() => {
+                                    setConfirmOpen(false);
+                                    onApprove();
+                                }}
+                            >
+                                {t("discountBanner.approve")}
+                            </AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
             </Alert>
         );
     }

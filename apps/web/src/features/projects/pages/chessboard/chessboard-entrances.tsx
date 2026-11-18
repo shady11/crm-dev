@@ -11,6 +11,7 @@ import {Menu, MenuContent, MenuGroup, MenuItem, MenuTrigger} from "@/components/
 import {useTranslation} from "react-i18next";
 import {paths} from "@/routes/paths.ts";
 import {BROWSE_STATE, isBrowsing} from "@/features/projects/utils/chessboard-navigation.ts";
+import {namedLabel} from "@/lib/i18n/named-label.ts";
 
 export function ChessboardEntrances() {
     const { t } = useTranslation("projects");
@@ -67,14 +68,14 @@ export function ChessboardEntrances() {
                         <Menu>
                             <MenuTrigger asChild>
                                 <Button variant="outline" size="sm" className="flex gap-3 font-medium">
-                                    {t("chessboard.blockLabel", { name: block.name })}
+                                    {namedLabel(t, "chessboard.blockLabel", block.name)}
                                     <ChevronDownIcon className="size-3" />
                                 </Button>
                             </MenuTrigger>
                             <MenuContent>
                                 <MenuGroup>
                                     {blocks.map((block, index) => (
-                                        <MenuItem key={block.id} value={`block-${index}`} onClick={() => navigate({pathname: `../${block.id}`, search: location.search})}>{t("chessboard.blockLabel", { name: block.name })}</MenuItem>
+                                        <MenuItem key={block.id} value={`block-${index}`} onClick={() => navigate({pathname: `../${block.id}`, search: location.search})}>{namedLabel(t, "chessboard.blockLabel", block.name)}</MenuItem>
                                     ))}
                                 </MenuGroup>
                             </MenuContent>
@@ -101,7 +102,7 @@ export function ChessboardEntrances() {
                                         <DoorOpenIcon size={32} strokeWidth={1.25} className="text-primary"/>
                                     </div>
                                     <div>
-                                        <h3 className="font-medium">{t("chessboard.entranceLabel", { name: entrance.name })}</h3>
+                                        <h3 className="font-medium">{namedLabel(t, "chessboard.entranceLabel", entrance.name)}</h3>
                                         <p className="text-sm text-muted-foreground">
                                             {t("chessboard.floors", { count: totalFloors })} • {t("chessboard.units", { count: totalUnits })}
                                         </p>

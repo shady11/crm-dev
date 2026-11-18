@@ -5,7 +5,7 @@ import {Controller, useForm} from "react-hook-form";
 import {z} from "zod";
 
 import {Button} from "@/components/ui/button.tsx";
-import {Field, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field.tsx";
+import {Field, FieldDescription, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select.tsx";
 import type {ProjectPayload} from "@/features/projects/api/projects.api";
@@ -162,6 +162,8 @@ export function ProjectForm({
                                         ))}
                                     </SelectContent>
                                 </Select>
+                                {/* E2E-11: a new project starts as Draft, closed for sales. */}
+                                <FieldDescription>{t("form.statusHint")}</FieldDescription>
                                 <FieldError>{fieldState.error?.message}</FieldError>
                             </Field>
                         )}

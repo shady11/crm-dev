@@ -243,8 +243,8 @@
     "phonePlaceholder": "+996 XXX XXX XXX",
     "whatsapp": "WhatsApp (optional)",
     "email": "Email (optional)",
-    "passport": "Passport (optional)",
-    "pin": "PIN (optional)",
+    "passport": "Passport (needed to sign the contract)",
+    "pin": "PIN (needed to sign the contract)",
     "pinPlaceholder": "14-digit PIN",
     "manager": "Manager",
     "selectManager": "Select manager",
@@ -300,7 +300,9 @@
     "rejectReason": "Reason",
     "aboveYourLimit": "This is above your approval limit, so {{approvers}} decides it.",
     "aboveYourLimitUnknown": "This is above your approval limit, so someone with a higher limit decides it.",
-    "pendingRequesterWith": "The contract can be signed once {{approvers}} decides. The sale price stays at the list price until then."
+    "pendingRequesterWith": "The contract can be signed once {{approvers}} decides. The sale price stays at the list price until then.",
+    "approveDialogTitle": "Approve a {{percent}}% discount ({{amount}})?",
+    "approveDialogDescription": "The sale price drops by this amount, the reservation agreement is issued again at the new price, and the manager is told."
   },
   "stage": {
     "label": "Deal stage",

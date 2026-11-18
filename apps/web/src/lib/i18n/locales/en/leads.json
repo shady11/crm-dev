@@ -150,11 +150,12 @@
     "lostReasonPlaceholder": "Choose a reason",
     "lostNote": "Note (optional)",
     "lostNoteRequired": "Note",
-    "lostNotePlaceholder": "What happened?"
+    "lostNotePlaceholder": "What happened?",
+    "budgetPlaceholder": "e.g. 6,500,000"
   },
   "convertDialog": {
     "title": "Convert to client",
-    "descriptionNamed": "Turn {{name}} into a client record.",
+    "descriptionNamed": "A client record will be created from the lead {{name}}.",
     "descriptionGeneric": "Turn this lead into a client record.",
     "createNew": "Create new client",
     "linkExisting": "Link existing client",

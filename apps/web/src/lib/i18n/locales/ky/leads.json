@@ -150,11 +150,12 @@
     "lostReasonPlaceholder": "Себебин тандаңыз",
     "lostNote": "Эскертүү (милдеттүү эмес)",
     "lostNoteRequired": "Эскертүү",
-    "lostNotePlaceholder": "Эмне болду?"
+    "lostNotePlaceholder": "Эмне болду?",
+    "budgetPlaceholder": "мисалы, 6 500 000"
   },
   "convertDialog": {
     "title": "Клиентке конверттөө",
-    "descriptionNamed": "{{name}} клиент жазуусуна айландырылат.",
+    "descriptionNamed": "Лидден кардар түзүлөт: {{name}}.",
     "descriptionGeneric": "Бул лид клиент жазуусуна айландырылат.",
     "createNew": "Жаңы клиент түзүү",
     "linkExisting": "Учурдагы клиентти байланыштыруу",
