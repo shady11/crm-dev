@@ -150,11 +150,12 @@
     "lostReasonPlaceholder": "Выберите причину",
     "lostNote": "Комментарий (необязательно)",
     "lostNoteRequired": "Комментарий",
-    "lostNotePlaceholder": "Что случилось?"
+    "lostNotePlaceholder": "Что случилось?",
+    "budgetPlaceholder": "например, 6 500 000"
   },
   "convertDialog": {
     "title": "Конвертировать в клиента",
-    "descriptionNamed": "Превратить {{name}} в запись клиента.",
+    "descriptionNamed": "Из лида будет создан клиент: {{name}}.",
     "descriptionGeneric": "Превратить этого лида в запись клиента.",
     "createNew": "Создать нового клиента",
     "linkExisting": "Привязать существующего клиента",

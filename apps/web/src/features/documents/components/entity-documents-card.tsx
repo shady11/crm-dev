@@ -18,6 +18,7 @@ import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {hasPermission} from "@/features/auth/access.ts";
 import {paths} from "@/routes/paths.ts";
+import {formatDate} from "@/utils/date-formatter.ts";
 
 interface EntityDocumentsCardProps {
     ownerType: DocumentOwnerType;
@@ -32,12 +33,22 @@ interface EntityDocumentsCardProps {
 }
 
 export function EntityDocumentsCard({ ownerType, ownerId, headerActions, clientDeals }: EntityDocumentsCardProps) {
-    const { t } = useTranslation("documents");
+    const { t, i18n } = useTranslation("documents");
     const { user } = useAuth();
     const canUpload = hasPermission(user, "documents.upload");
     const canDelete = hasPermission(user, "documents.delete");
 
     const { documents, isLoading } = useEntityDocuments(ownerType, ownerId, !!clientDeals);
+    // E2E-11: a regenerated document (the reservation reissued at the
+    // approved price) keeps its file name. The list is newest first, so the
+    // first of a name on a record is current and the rest are replaced.
+    const seen = new Set<string>();
+    const replaced = new Set<string>();
+    for (const doc of documents) {
+        const key = `${doc.ownerType}:${doc.ownerId}:${doc.type}:${doc.originalName}`;
+        if (seen.has(key)) replaced.add(doc.id);
+        else seen.add(key);
+    }
     const dealNumbers = new Map(clientDeals?.map((deal) => [deal.id, deal.dealNumber]));
     const actions = useDocumentActions();
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -97,7 +108,7 @@ export function EntityDocumentsCard({ ownerType, ownerId, headerActions, clientD
                             <div key={doc.id} className="flex items-center gap-3 py-2.5 text-sm">
                                 <FileIcon size={18} className="shrink-0 text-muted-foreground" />
                                 <div className="min-w-0 flex-1">
-                                    <p className="truncate font-medium">{doc.originalName}</p>
+                                    <p className={`truncate font-medium ${replaced.has(doc.id) ? "text-muted-foreground" : ""}`}>{doc.originalName}</p>
                                     <p className="text-xs text-muted-foreground">
                                         {doc.ownerType === "DEAL" && dealNumbers.has(doc.ownerId) && (
                                             <>
@@ -107,7 +118,8 @@ export function EntityDocumentsCard({ ownerType, ownerId, headerActions, clientD
                                                 {" · "}
                                             </>
                                         )}
-                                        {t(DOCUMENT_TYPE_LABEL_KEYS[doc.type])} · {formatFileSize(doc.size)} · {doc.uploadedBy.fullName}
+                                        {t(DOCUMENT_TYPE_LABEL_KEYS[doc.type])} · {formatFileSize(doc.size)} · {doc.uploadedBy.fullName} · {formatDate(doc.createdAt, i18n.language).date}
+                                        {replaced.has(doc.id) && <> · <span className="font-medium">{t("card.replaced")}</span></>}
                                     </p>
                                 </div>
                                 <Button variant="ghost" size="icon-sm" onClick={() => actions.download.mutate(doc)} aria-label={t("common:actions.download")}>

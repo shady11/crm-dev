@@ -31,7 +31,8 @@
     "validation": {
       "nameMin": "Project name must be at least 2 characters",
       "statusRequired": "Select a status"
-    }
+    },
+    "statusHint": "Units can be reserved while the project is Planning, Active or Completed. Draft, Paused, Sold out and Archived are closed for sales."
   },
   "counts": {
     "blocksLabel": "Blocks",

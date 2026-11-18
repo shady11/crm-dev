@@ -381,7 +381,7 @@ export function LeadForm({
                                 render={({ field, fieldState }) => (
                                     <Field invalid={fieldState.invalid}>
                                         <FieldLabel>{t("form.budget")}</FieldLabel>
-                                        <Input {...field} type="number" inputMode="decimal" min={0} step="any" placeholder="50000" />
+                                        <Input {...field} type="number" inputMode="decimal" min={0} step="any" placeholder={t("form.budgetPlaceholder")} />
                                         <FieldError>{fieldState.error?.message}</FieldError>
                                     </Field>
                                 )}

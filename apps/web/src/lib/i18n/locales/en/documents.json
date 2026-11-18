@@ -15,7 +15,8 @@
     "title": "Documents",
     "upload": "Upload",
     "empty": "No documents uploaded yet.",
-    "fromDeal": "From deal {{number}}"
+    "fromDeal": "From deal {{number}}",
+    "replaced": "Replaced by a newer version"
   },
   "toast": {
     "uploaded": "Document uploaded",

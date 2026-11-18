@@ -13,6 +13,7 @@ import {
     UNIT_STATUS_VALUES,
 } from "@/features/units/types/unit.types";
 import {useTranslation} from "react-i18next";
+import {namedLabel} from "@/lib/i18n/named-label.ts";
 
 interface ChessboardCardProps {
     entranceName: string;
@@ -48,7 +49,7 @@ export function ChessboardCard({
         <Card className="border border-secondary p-0 gap-0">
             <CardHeader className="gap-0 border-b py-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                    <h3 className="font-medium">{t("chessboard.entranceLabel", { name: entranceName })}</h3>
+                    <h3 className="font-medium">{namedLabel(t, "chessboard.entranceLabel", entranceName)}</h3>
 
                     <div className="flex flex-wrap items-center gap-4">
                         {statusCollection.items.map((status) => (

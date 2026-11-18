@@ -39,9 +39,9 @@
     "phone": "Phone",
     "whatsapp": "WhatsApp (optional)",
     "email": "Email (optional)",
-    "passport": "Passport (optional)",
+    "passport": "Passport (needed to sign the contract)",
     "passportPlaceholder": "Passport number",
-    "pin": "PIN (optional)",
+    "pin": "PIN (needed to sign the contract)",
     "validation": {
       "nameMin": "Name must be at least 2 characters",
       "phoneMin": "Phone must be at least 5 characters",
