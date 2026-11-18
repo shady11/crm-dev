@@ -125,5 +125,16 @@
     "success": "Action undone",
     "errorTitle": "Couldn't undo",
     "errorDescription": "The record may have changed in the meantime. Refresh and try again."
+  },
+  "ui": {
+    "previous": "Previous",
+    "next": "Next",
+    "pagination": "Pagination",
+    "previousPage": "Previous page",
+    "nextPage": "Next page",
+    "pageOf": "Page {{page}} of {{totalPages}}",
+    "sidebar": "Sidebar",
+    "sidebarDescription": "Navigation menu",
+    "toggleSidebar": "Show or hide the menu"
   }
 }

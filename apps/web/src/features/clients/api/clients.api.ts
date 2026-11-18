@@ -28,6 +28,10 @@ export type ClientLeadSummary = {
     id: string;
     /** E2E-7: prefills the reservation form. */
     financingType?: "CASH" | "INSTALLMENT" | "MORTGAGE" | null;
+    /** E2E-8: what the lead asked for, to prefill "Reserve a unit". */
+    rooms?: number | null;
+    budget?: string | number | null;
+    preferredProject?: { id: string; name: string } | null;
     fullName: string;
     phone: string;
     source: string | null;

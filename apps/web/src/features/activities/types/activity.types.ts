@@ -20,7 +20,7 @@ export type Activity = {
     lead: { id: string; fullName: string } | null;
     client: { id: string; fullName: string } | null;
     deal: { id: string; dealNumber: string; client: { id: string; fullName: string } | null } | null;
-    task: { id: string; title: string } | null;
+    task: { id: string; title: string; templateKey?: string | null; templateParams?: Record<string, unknown> | null; } | null;
     unit: { id: string; number: string; project: { id: string; name: string } | null } | null;
     project: { id: string; name: string } | null;
 };

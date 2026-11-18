@@ -18,6 +18,7 @@ import type React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { useTranslation } from "react-i18next";
 
 export const useToast = useToastContext;
 
@@ -76,6 +77,7 @@ interface ToastItemProps extends React.ComponentProps<typeof ArkToast.Root> {
 }
 
 export const ToastItem = (props: ToastItemProps) => {
+  const { t } = useTranslation("common");
   const { toast: toastData, className, ...rest } = props;
 
   const ToastIcon = toastData.type
@@ -156,7 +158,7 @@ export const ToastItem = (props: ToastItemProps) => {
         {!isExplicitClosable && (
           <ArkToast.CloseTrigger asChild data-slot="toast-close-trigger">
             <Button
-              aria-label="Close"
+              aria-label={t("actions.close")}
               className="opacity-64 hover:opacity-100"
               size="icon-xs"
               variant="ghost"

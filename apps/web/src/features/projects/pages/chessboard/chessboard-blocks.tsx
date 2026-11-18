@@ -48,7 +48,7 @@ export function ChessboardBlocks() {
     // Opening the chessboard goes straight to the grid where possible; the
     // list only shows when there's a real choice, or the user came back to it.
     const landing = !isBrowsing(location.state) && chessboardLanding(projectId!, blocks);
-    if (landing) return <Navigate to={landing} replace />;
+    if (landing) return <Navigate to={{pathname: landing, search: location.search}} replace />;
 
     if (blocks.length === 0) {
         return (
@@ -83,7 +83,7 @@ export function ChessboardBlocks() {
                         <Card
                             key={block.id}
                             className={cn("cursor-pointer border border-secondary shadow-none", !isBlockBookable(block.salesStatus) && "border-dashed")}
-                            onClick={() => navigate(`./${block.id}`)}
+                            onClick={() => navigate({pathname: `./${block.id}`, search: location.search})}
                         >
                             <CardContent>
                                 <div className="flex items-center justify-between">

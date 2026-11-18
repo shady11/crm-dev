@@ -200,7 +200,7 @@ export class DashboardService {
                     ...(projectId ? { deal: { projectId } } : {}),
                 },
                 select: {
-                    id: true, title: true, dueDate: true,
+                    id: true, title: true, templateKey: true, templateParams: true, dueDate: true,
                     assignedTo: { select: { id: true, fullName: true } },
                 },
                 orderBy: { dueDate: "asc" },
@@ -685,7 +685,7 @@ export class DashboardService {
                     status: { in: [TaskStatus.TODO, TaskStatus.IN_PROGRESS] },
                     dueDate: { lte: endOfToday },
                 },
-                select: { id: true, title: true, dueDate: true, status: true },
+                select: { id: true, title: true, templateKey: true, templateParams: true, dueDate: true, status: true },
                 orderBy: { dueDate: "asc" },
                 take: 10,
             }),

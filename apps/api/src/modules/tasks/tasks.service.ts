@@ -22,6 +22,7 @@ import {NotificationsService} from "@/modules/notifications/notifications.servic
 import {diffChangedFields} from "@/common/utils/activity-diff.util";
 import {hasPermission} from "@/common/utils/permissions.util";
 import {activityText} from "@/modules/activities/activity-templates";
+import {TaskTemplateKey, TaskTitle, taskActivityText, taskTitleTemplate} from "./task-templates";
 
 const TERMINAL_STATUSES: TaskStatus[] = [TaskStatus.DONE, TaskStatus.CANCELLED];
 
@@ -31,6 +32,8 @@ const TASK_INCLUDE = {
     client: { select: { id: true, fullName: true } },
     deal: { select: { id: true, dealNumber: true } },
 } satisfies Prisma.TaskInclude;
+
+
 
 @Injectable()
 export class TasksService {
@@ -203,7 +206,7 @@ export class TasksService {
             taskId: task.id,
             action: ActivityAction.CREATED_TASK,
             type: ActivityType.TASK_CREATED,
-            ...activityText('taskCreated', { task: task.title }),
+            ...taskActivityText('taskCreated', task),
         });
 
         return task;
@@ -236,6 +239,10 @@ export class TasksService {
             where: { id },
             data: {
                 title: dto.title,
+                // E2E-9: a person rewording a system task takes it over.
+                ...(dto.title !== undefined && dto.title !== existing.title
+                    ? { templateKey: null, templateParams: Prisma.DbNull }
+                    : {}),
                 description: dto.description,
                 dueDate: dto.dueDate !== undefined ? (dto.dueDate ? new Date(dto.dueDate) : null) : undefined,
                 status: dto.status,
@@ -279,7 +286,7 @@ export class TasksService {
                 taskId: id,
                 action: ActivityAction.REASSIGNED,
                 type: ActivityType.TASK_REASSIGNED,
-                ...activityText('taskReassigned', { task: task.title }),
+                ...taskActivityText('taskReassigned', task),
                 metadata: {fromAssignedToId: existing.assignedToId, toAssignedToId: task.assignedToId},
             });
         }
@@ -291,7 +298,7 @@ export class TasksService {
                 taskId: id,
                 action: task.status === TaskStatus.DONE ? ActivityAction.COMPLETED_TASK : ActivityAction.CHANGED_TASK_STATUS,
                 type: task.status === TaskStatus.DONE ? ActivityType.TASK_COMPLETED : ActivityType.TASK_STATUS_CHANGED,
-                ...activityText(task.status === TaskStatus.DONE ? 'taskCompleted' : 'taskStatusChanged', { task: task.title }),
+                ...taskActivityText(task.status === TaskStatus.DONE ? 'taskCompleted' : 'taskStatusChanged', task),
                 metadata: {fromStatus: existing.status, toStatus: task.status},
             });
         }
@@ -303,7 +310,7 @@ export class TasksService {
                 taskId: id,
                 action: ActivityAction.UPDATED_TASK,
                 type: ActivityType.TASK_UPDATED,
-                ...activityText('taskUpdated', { task: task.title }),
+                ...taskActivityText('taskUpdated', task),
                 metadata: changes,
             });
         }
@@ -333,7 +340,7 @@ export class TasksService {
                 taskId: id,
                 action: task.status === TaskStatus.DONE ? ActivityAction.COMPLETED_TASK : ActivityAction.CHANGED_TASK_STATUS,
                 type: task.status === TaskStatus.DONE ? ActivityType.TASK_COMPLETED : ActivityType.TASK_STATUS_CHANGED,
-                ...activityText(task.status === TaskStatus.DONE ? 'taskCompleted' : 'taskStatusChanged', { task: task.title }),
+                ...taskActivityText(task.status === TaskStatus.DONE ? 'taskCompleted' : 'taskStatusChanged', task),
                 metadata: {fromStatus: existing.status, toStatus: task.status},
             });
         }
@@ -397,7 +404,7 @@ export class TasksService {
             taskId: id,
             action: ActivityAction.RESTORED_TASK,
             type: ActivityType.TASK_RESTORED,
-            ...activityText('taskRestored', { task: task.title }),
+            ...taskActivityText('taskRestored', task),
         });
 
         return task;
@@ -494,7 +501,7 @@ export class TasksService {
                 deletedAt: null,
                 status: {in: [TaskStatus.TODO, TaskStatus.IN_PROGRESS]},
             },
-            select: {id: true, title: true},
+            select: {id: true, title: true, templateKey: true, templateParams: true},
         });
         if (tasks.length === 0) return [];
 
@@ -512,7 +519,7 @@ export class TasksService {
                 taskId: task.id,
                 action: ActivityAction.REASSIGNED,
                 type: ActivityType.TASK_REASSIGNED,
-                ...activityText('taskReassigned', { task: task.title }),
+                ...taskActivityText('taskReassigned', task),
                 metadata: {fromAssignedToId: params.fromUserId, toAssignedToId: params.toUserId, ...linkWhere},
             })),
         });
@@ -540,7 +547,7 @@ export class TasksService {
                 deletedAt: null,
                 status: {in: [TaskStatus.TODO, TaskStatus.IN_PROGRESS]},
             },
-            select: {id: true, title: true, status: true},
+            select: {id: true, title: true, status: true, templateKey: true, templateParams: true},
         });
         if (tasks.length === 0) return 0;
 
@@ -559,11 +566,62 @@ export class TasksService {
                     dealId: params.dealId,
                     action: ActivityAction.CHANGED_TASK_STATUS,
                     type: ActivityType.TASK_STATUS_CHANGED,
-                    ...activityText('taskCancelledWithDeal', { task: task.title }),
+                    ...taskActivityText('taskCancelledWithDeal', task),
                     metadata: {fromStatus: task.status, toStatus: TaskStatus.CANCELLED, dealId: params.dealId},
                 })),
             });
         }
+
+        return tasks.length;
+    }
+
+    /**
+     * E2E-9: closes the open system task of `templateKey` on a lead or deal
+     * once its step is done (the lead converted, the contract signed), so it
+     * stops showing under Needs attention. A task a person has reworded has
+     * no key any more and is left to them.
+     */
+    async completeAutomatedTasks(db: DbClient, params: {
+        companyId: string;
+        templateKey: TaskTemplateKey;
+        leadId?: string;
+        dealId?: string;
+        actorId: string;
+    }): Promise<number> {
+        const tasks = await db.task.findMany({
+            where: {
+                companyId: params.companyId,
+                templateKey: params.templateKey,
+                ...(params.leadId ? {leadId: params.leadId} : {}),
+                ...(params.dealId ? {dealId: params.dealId} : {}),
+                deletedAt: null,
+                status: {in: [TaskStatus.TODO, TaskStatus.IN_PROGRESS]},
+            },
+            select: {id: true, title: true, status: true, templateKey: true, templateParams: true},
+        });
+        if (tasks.length === 0) return 0;
+
+        await db.task.updateMany({
+            where: {id: {in: tasks.map((t) => t.id)}},
+            data: {status: TaskStatus.DONE},
+        });
+
+        await db.activity.createMany({
+            data: tasks.map((task) => {
+                const text = taskActivityText('taskAutoCompleted', task);
+                return {
+                    companyId: params.companyId,
+                    userId: params.actorId,
+                    taskId: task.id,
+                    leadId: params.leadId,
+                    dealId: params.dealId,
+                    action: ActivityAction.CHANGED_TASK_STATUS,
+                    type: ActivityType.TASK_STATUS_CHANGED,
+                    ...taskActivityText('taskAutoCompleted', task),
+                    metadata: {fromStatus: task.status, toStatus: TaskStatus.DONE},
+                };
+            }),
+        });
 
         return tasks.length;
     }
@@ -587,7 +645,8 @@ export class TasksService {
         companyId: string;
         assignedToId: string;
         actorId: string;
-        title: string;
+        /** E2E-9: from taskText(), so the title shows in the reader's language. */
+        text: TaskTitle;
         description?: string;
         type: TaskType;
         priority?: TaskPriority;
@@ -605,7 +664,9 @@ export class TasksService {
 
         const task = await this.prisma.task.create({
             data: {
-                title: params.title,
+                title: params.text.title,
+                templateKey: params.text.templateKey,
+                templateParams: params.text.templateParams,
                 description: params.description,
                 dueDate: params.dueDate,
                 priority: params.priority ?? TaskPriority.MEDIUM,
@@ -628,7 +689,7 @@ export class TasksService {
                 title: "New task assigned to you",
                 message: task.title,
                 templateKey: "taskAssigned",
-                params: {taskTitle: task.title},
+                params: {taskTitle: task.title, ...taskTitleTemplate(params.text)},
                 entityType: NotificationEntityType.TASK,
                 entityId: task.id,
             });
@@ -640,7 +701,7 @@ export class TasksService {
             taskId: task.id,
             action: ActivityAction.CREATED_TASK,
             type: ActivityType.TASK_CREATED,
-            ...activityText('taskAutoCreated', { task: task.title }),
+            ...taskActivityText('taskAutoCreated', task),
         });
 
         return task;

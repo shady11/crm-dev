@@ -12,6 +12,7 @@ import {
 import type {Task, TaskSortField} from "@/features/tasks/api/tasks.api.ts";
 import {useTranslation} from "react-i18next";
 import type {SortOrder} from "@/hooks/use-sort.ts";
+import {useTaskTitle} from "@/features/tasks/hooks/use-task-title.ts";
 
 interface TasksTableProps {
     tasks: Task[];
@@ -28,6 +29,7 @@ function isOverdue(task: Task) {
 
 export function TasksTable({ tasks, isLoading, sortBy, sortOrder, onSort, onRowClick }: TasksTableProps) {
     const { t, i18n } = useTranslation("tasks");
+    const taskTitle = useTaskTitle();
 
     return (
         <DataTable
@@ -43,7 +45,7 @@ export function TasksTable({ tasks, isLoading, sortBy, sortOrder, onSort, onRowC
                     onClick={() => onRowClick(task)}
                 >
                     <div className="flex items-start justify-between gap-3">
-                        <p className="min-w-0 truncate font-medium">{task.title}</p>
+                        <p className="min-w-0 truncate font-medium">{taskTitle(task)}</p>
                         <div className="flex shrink-0 items-center gap-1.5">
                             <Badge variant="secondary" className={`${TASK_PRIORITY_CLASSES[task.priority]} text-white`}>
                                 {t(TASK_PRIORITY_LABEL_KEYS[task.priority])}
@@ -89,7 +91,7 @@ export function TasksTable({ tasks, isLoading, sortBy, sortOrder, onSort, onRowC
             <TableBody>
                 {tasks.map((task) => (
                     <TableRow key={task.id} className="cursor-pointer" onClick={() => onRowClick(task)}>
-                        <TableCell className="font-medium">{task.title}</TableCell>
+                        <TableCell className="font-medium">{taskTitle(task)}</TableCell>
                         <TableCell className="text-muted-foreground">
                             {task.deal ? t("related.deal", { number: task.deal.dealNumber }) : task.client ? task.client.fullName : task.lead ? task.lead.fullName : "—"}
                         </TableCell>

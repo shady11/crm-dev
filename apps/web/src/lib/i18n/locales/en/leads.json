@@ -252,5 +252,6 @@
     "UNREACHABLE": "Couldn't reach them",
     "DUPLICATE": "Duplicate lead",
     "OTHER": "Other"
-  }
+  },
+  "reserveUnit": "Reserve a unit"
 }

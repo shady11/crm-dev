@@ -83,6 +83,7 @@
     "taskDeleted": "Task \"{{task}}\" deleted",
     "taskRestored": "Task \"{{task}}\" restored",
     "taskCancelledWithDeal": "Task \"{{task}}\" cancelled with its deal",
+    "taskAutoCompleted": "Task \"{{task}}\" completed automatically",
     "documentUploaded": "Document \"{{name}}\" uploaded",
     "documentDeleted": "Document \"{{name}}\" deleted",
     "documentRestored": "Document \"{{name}}\" restored",

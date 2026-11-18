@@ -131,5 +131,9 @@
     "titleWithCount": "Задачи ({{count}})",
     "addTask": "Добавить задачу",
     "empty": "Нет задач, связанных с этой сделкой."
+  },
+  "autoTitles": {
+    "firstContactCall": "Позвонить: {{name}}",
+    "confirmDealDocuments": "Проверить документы по сделке {{dealNumber}}"
   }
 }

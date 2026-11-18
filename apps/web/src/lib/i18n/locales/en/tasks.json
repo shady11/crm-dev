@@ -131,5 +131,9 @@
     "titleWithCount": "Tasks ({{count}})",
     "addTask": "Add task",
     "empty": "No tasks linked to this deal."
+  },
+  "autoTitles": {
+    "firstContactCall": "Call {{name}}",
+    "confirmDealDocuments": "Confirm documents for deal {{dealNumber}}"
   }
 }

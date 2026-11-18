@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {useTranslation} from "react-i18next";
 import {Link, useNavigate, useParams} from "react-router-dom";
-import {ArrowLeft, ArrowLeftRight, MailIcon, Pen, PhoneIcon} from "lucide-react";
+import {ArrowLeft, ArrowLeftRight, LayoutGridIcon, MailIcon, Pen, PhoneIcon} from "lucide-react";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {toast} from "@/components/ui/toast.tsx";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
@@ -27,6 +27,7 @@ import {WhatsAppLink} from "@/components/shared/whatsapp-link.tsx";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {hasPermission} from "@/features/auth/access";
+import {ReserveForClientDialog} from "@/features/deals/components/reserve-for-client-dialog.tsx";
 import {MoveToBranchDialog} from "@/features/branches/components/move-to-branch-dialog.tsx";
 import {PageError, PageSkeleton} from "@/components/shared/page-query-state.tsx";
 import {toastWithUndo} from "@/lib/undo-toast.ts";
@@ -37,6 +38,9 @@ export function ClientDetailsPage() {
     const { user } = useAuth();
     const canTransferBranch = hasPermission(user, "clients.transfer_branch");
     const canEdit = hasPermission(user, "clients.edit");
+    // E2E-8: a client's next step is usually a reservation.
+    const canReserve = hasPermission(user, "deals.create");
+    const [reserveOpen, setReserveOpen] = useState(false);
     const { clientId } = useParams<{ clientId: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -122,6 +126,12 @@ export function ClientDetailsPage() {
                             <Button variant="secondary" onClick={() => setTransferOpen(true)}>
                                 <ArrowLeftRight className="size-3" />
                                 {t("moveDialog.title", { ns: "branches" })}
+                            </Button>
+                        )}
+                        {canReserve && (
+                            <Button variant="secondary" onClick={() => setReserveOpen(true)}>
+                                <LayoutGridIcon className="size-3" />
+                                {t("reserveUnit", { ns: "deals" })}
                             </Button>
                         )}
                         {canEdit && (
@@ -276,6 +286,16 @@ export function ClientDetailsPage() {
                     <ClientTasksCard clientId={client.id} />
                 </div>
             </div>
+
+            <ReserveForClientDialog
+                client={reserveOpen ? client : null}
+                // What the client's most recent lead asked for, if any.
+                prefill={(() => {
+                    const lead = client.leads.find((l) => l.preferredProject || l.rooms || l.budget);
+                    return lead ? {projectId: lead.preferredProject?.id, rooms: lead.rooms, budget: lead.budget} : undefined;
+                })()}
+                onClose={() => setReserveOpen(false)}
+            />
 
             <ClientFormSheet
                 open={editOpen}

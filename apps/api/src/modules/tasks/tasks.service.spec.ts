@@ -1,3 +1,4 @@
+import {taskText} from './task-templates';
 import {BadRequestException, ForbiddenException} from '@nestjs/common';
 import {TaskPriority, TaskStatus, TaskType} from '@/generated/prisma/client';
 import {AuthUser} from '@/common/types/auth-user.type';
@@ -370,7 +371,7 @@ describe('TasksService', () => {
                 companyId: 'company-1',
                 assignedToId: 'gone',
                 actorId: 'system',
-                title: 'Call John',
+                text: taskText('firstContactCall', {name: 'John'}),
                 type: TaskType.CALL,
                 dueDate: new Date(),
             });
@@ -386,7 +387,7 @@ describe('TasksService', () => {
                 companyId: 'company-1',
                 assignedToId: 'assignee-1',
                 actorId: 'system',
-                title: 'Call John',
+                text: taskText('firstContactCall', {name: 'John'}),
                 type: TaskType.CALL,
                 dueDate: new Date(),
             });
@@ -409,7 +410,7 @@ describe('TasksService', () => {
                 companyId: 'company-1',
                 assignedToId: 'assignee-1',
                 actorId: 'assignee-1',
-                title: 'Call John',
+                text: taskText('firstContactCall', {name: 'John'}),
                 type: TaskType.CALL,
                 dueDate: new Date(),
             });
@@ -424,7 +425,7 @@ describe('TasksService', () => {
                 companyId: 'company-1',
                 assignedToId: 'assignee-1',
                 actorId: 'lead-creator-1',
-                title: 'Call John',
+                text: taskText('firstContactCall', {name: 'John'}),
                 type: TaskType.CALL,
                 dueDate: new Date(),
             });
@@ -432,6 +433,72 @@ describe('TasksService', () => {
             expect(prisma.activity.create).toHaveBeenCalledWith(
                 expect.objectContaining({data: expect.objectContaining({userId: 'lead-creator-1'})}),
             );
+        });
+
+        // E2E-9
+        it('stores the template with the English title, and passes it on to the notification and activity', async () => {
+            const {service, prisma, notifications} = build({assignee: {id: 'assignee-1', branchId: 'branch-9'}});
+
+            await service.createAutomated({
+                companyId: 'company-1',
+                assignedToId: 'assignee-1',
+                actorId: 'lead-creator-1',
+                text: taskText('firstContactCall', {name: 'Нурлан Асанов'}),
+                type: TaskType.CALL,
+                dueDate: new Date(),
+            });
+
+            expect(prisma.task.create).toHaveBeenCalledWith(expect.objectContaining({
+                data: expect.objectContaining({
+                    title: 'Call Нурлан Асанов',
+                    templateKey: 'firstContactCall',
+                    templateParams: {name: 'Нурлан Асанов'},
+                }),
+            }));
+            expect(notifications.create).toHaveBeenCalledWith(expect.objectContaining({
+                params: expect.objectContaining({taskTemplateKey: 'firstContactCall', taskTemplateParams: {name: 'Нурлан Асанов'}}),
+            }));
+            expect(prisma.activity.create).toHaveBeenCalledWith(expect.objectContaining({
+                data: expect.objectContaining({
+                    templateParams: expect.objectContaining({taskTemplateKey: 'firstContactCall'}),
+                }),
+            }));
+        });
+    });
+
+    describe('completeAutomatedTasks (E2E-9)', () => {
+        function db(tasks: {id: string; title: string; status: string; templateKey: string; templateParams: unknown}[]) {
+            return {
+                task: {findMany: jest.fn().mockResolvedValue(tasks), updateMany: jest.fn().mockResolvedValue({count: tasks.length})},
+                activity: {createMany: jest.fn().mockResolvedValue({count: tasks.length})},
+            };
+        }
+
+        it('marks the open system task done, with a line in its history', async () => {
+            const {service} = build();
+            const fake = db([{id: 't1', title: 'Call A', status: 'TODO', templateKey: 'firstContactCall', templateParams: {name: 'A'}}]);
+
+            const count = await service.completeAutomatedTasks(fake as any, {
+                companyId: 'company-1', templateKey: 'firstContactCall', leadId: 'lead-1', actorId: 'user-1',
+            });
+
+            expect(count).toBe(1);
+            expect(fake.task.findMany).toHaveBeenCalledWith(expect.objectContaining({
+                where: expect.objectContaining({templateKey: 'firstContactCall', leadId: 'lead-1', status: {in: ['TODO', 'IN_PROGRESS']}}),
+            }));
+            expect(fake.task.updateMany).toHaveBeenCalledWith({where: {id: {in: ['t1']}}, data: {status: 'DONE'}});
+            expect(fake.activity.createMany).toHaveBeenCalledWith({
+                data: [expect.objectContaining({taskId: 't1', templateKey: 'taskAutoCompleted', metadata: {fromStatus: 'TODO', toStatus: 'DONE'}})],
+            });
+        });
+
+        it('does nothing when there is no open system task', async () => {
+            const {service} = build();
+            const fake = db([]);
+            expect(await service.completeAutomatedTasks(fake as any, {
+                companyId: 'company-1', templateKey: 'confirmDealDocuments', dealId: 'deal-1', actorId: 'user-1',
+            })).toBe(0);
+            expect(fake.task.updateMany).not.toHaveBeenCalled();
         });
     });
 

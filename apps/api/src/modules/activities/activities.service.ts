@@ -27,7 +27,7 @@ const ACTIVITY_INCLUDE = {
     client: {select: {id: true, fullName: true}},
     // Some deal rows (e.g. payments) don't carry clientId; the deal's client fills in.
     deal: {select: {id: true, dealNumber: true, client: {select: {id: true, fullName: true}}}},
-    task: {select: {id: true, title: true}},
+    task: {select: {id: true, title: true, templateKey: true, templateParams: true}},
     unit: {select: {id: true, number: true, project: {select: {id: true, name: true}}}},
     project: {select: {id: true, name: true}},
 } satisfies Prisma.ActivityInclude;

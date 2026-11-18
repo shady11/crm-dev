@@ -27,6 +27,7 @@ import {useSort} from "@/hooks/use-sort.ts";
 import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
 import {toastWithUndo} from "@/lib/undo-toast.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {hasPermission} from "@/features/auth/access.ts";
 
 export type LeadStatusFilterValue = LeadStatus | "OPEN" | "FOLLOW_UP_OVERDUE" | "all";
 
@@ -68,6 +69,9 @@ export function useLeadsList() {
     const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
     const [bulkReassignOpen, setBulkReassignOpen] = useState(false);
     const [convertTarget, setConvertTarget] = useState<Lead | null>(null);
+    // E2E-8: "Reserve a unit" for a converted lead's client.
+    const [reserveTarget, setReserveTarget] = useState<Lead | null>(null);
+    const canReserve = hasPermission(user, "deals.create");
     const [detailsTarget, setDetailsTarget] = useState<Lead | null>(null);
     const [transferTarget, setTransferTarget] = useState<Lead | null>(null);
     const [reassignTarget, setReassignTarget] = useState<Lead | null>(null);
@@ -129,10 +133,16 @@ export function useLeadsList() {
 
     const convertMutation = useMutation({
         mutationFn: ({ id, payload }: { id: string; payload: ConvertLeadPayload }) => convertLead(id, payload),
-        onSuccess: async () => {
+        onSuccess: async (converted) => {
             await queryClient.invalidateQueries({ queryKey: ["leads"] });
             await queryClient.invalidateQueries({ queryKey: ["clients"] });
-            toast.success({ title: t("toasts.convertSuccessTitle"), description: t("toasts.convertSuccessDescription") });
+            // E2E-8: the next step is a reservation, so offer it right here.
+            const offerReserve = canReserve && !!converted?.client;
+            toast.success({
+                title: t("toasts.convertSuccessTitle"),
+                description: t("toasts.convertSuccessDescription"),
+                ...(offerReserve ? { action: { label: t("reserveUnit"), onClick: () => setReserveTarget(converted) } } : {}),
+            });
             setConvertTarget(null);
         },
         onError: () => {
@@ -497,6 +507,11 @@ export function useLeadsList() {
             onConfirm: confirmBulkDelete,
         },
 
+        reserveDialog: {
+            lead: reserveTarget,
+            onClose: () => setReserveTarget(null),
+        },
+
         convertDialog: {
             lead: convertTarget,
             isConverting: convertMutation.isPending,
@@ -521,6 +536,11 @@ export function useLeadsList() {
             onRequestConvert: () => {
                 if (detailsLead) requestConvert(detailsLead);
             },
+            onRequestReserve: canReserve
+                ? () => {
+                    if (detailsLead) setReserveTarget(detailsLead);
+                }
+                : undefined,
             onRequestDelete: () => {
                 if (detailsLead) requestDelete(detailsLead);
             },

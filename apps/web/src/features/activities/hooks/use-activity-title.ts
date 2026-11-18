@@ -1,6 +1,7 @@
 import {useCallback} from "react";
 import {useTranslation} from "react-i18next";
 import {DOCUMENT_TYPE_LABEL_KEYS, type DocumentType} from "@/features/documents/types/document.types.ts";
+import {useTaskTitleFromValues} from "@/features/tasks/hooks/use-task-title.ts";
 
 export type ActivityTitleSource = {
     title: string;
@@ -15,6 +16,7 @@ export type ActivityTitleSource = {
  */
 export function useActivityTitle() {
     const {t, i18n} = useTranslation(["activities", "documents"]);
+    const localizeTask = useTaskTitleFromValues();
 
     return useCallback(
         (a: ActivityTitleSource) => {
@@ -22,6 +24,8 @@ export function useActivityTitle() {
             const key = `activities:templates.${a.templateKey}`;
 
             const values: Record<string, unknown> = {...(a.templateParams ?? {})};
+            // E2E-9: a system task is named in the reader's language.
+            localizeTask(values, "task");
             if (typeof values.documentType === "string") {
                 values.documentType = t(DOCUMENT_TYPE_LABEL_KEYS[values.documentType as DocumentType] ?? values.documentType);
             }
@@ -30,6 +34,6 @@ export function useActivityTitle() {
             // (unitsImported_one, unitsImported_other…) is found too.
             return i18n.exists(key, values) ? t(key, values) : a.title;
         },
-        [t, i18n],
+        [t, i18n, localizeTask],
     );
 }

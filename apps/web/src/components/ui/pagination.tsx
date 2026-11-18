@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight, Ellipsis } from "lucide-react";
 import type React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 export const usePagination = usePaginationContext;
 
@@ -16,9 +17,17 @@ interface PaginationProps
 
 export const Pagination = (props: PaginationProps) => {
   const { className, ...rest } = props;
+  const { t } = useTranslation("common");
 
   return (
     <ArkPagination.Root
+      // E2E-10: what screen readers hear, in the reader's language.
+      translations={{
+        rootLabel: t("ui.pagination"),
+        prevTriggerLabel: t("ui.previousPage"),
+        nextTriggerLabel: t("ui.nextPage"),
+        itemLabel: ({ page, totalPages }) => t("ui.pageOf", { page, totalPages }),
+      }}
       className={cn(
         "mx-auto",
         "w-full",
@@ -33,25 +42,31 @@ export const Pagination = (props: PaginationProps) => {
 
 export const PaginationPrevious = (
   props: React.ComponentProps<typeof ArkPagination.PrevTrigger>
-) => (
-  <ArkPagination.PrevTrigger asChild data-slot="pagination-previous" {...props}>
-    <Button variant="ghost">
-      <ChevronLeft />
-      Previous
-    </Button>
-  </ArkPagination.PrevTrigger>
-);
+) => {
+  const { t } = useTranslation("common");
+  return (
+    <ArkPagination.PrevTrigger asChild data-slot="pagination-previous" {...props}>
+      <Button variant="ghost">
+        <ChevronLeft />
+        {t("ui.previous")}
+      </Button>
+    </ArkPagination.PrevTrigger>
+  );
+};
 
 export const PaginationNext = (
   props: React.ComponentProps<typeof ArkPagination.NextTrigger>
-) => (
-  <ArkPagination.NextTrigger asChild data-slot="pagination-next" {...props}>
-    <Button variant="ghost">
-      Next
-      <ChevronRight />
-    </Button>
-  </ArkPagination.NextTrigger>
-);
+) => {
+  const { t } = useTranslation("common");
+  return (
+    <ArkPagination.NextTrigger asChild data-slot="pagination-next" {...props}>
+      <Button variant="ghost">
+        {t("ui.next")}
+        <ChevronRight />
+      </Button>
+    </ArkPagination.NextTrigger>
+  );
+};
 
 export const PaginationItem = (
   props: React.ComponentProps<typeof ArkPagination.Item>

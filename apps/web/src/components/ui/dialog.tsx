@@ -9,6 +9,7 @@ import {tv, type VariantProps} from "tailwind-variants";
 import {cn} from "@/lib/utils";
 import {Button} from "@/components/ui/button";
 import {ScrollArea} from "@/components/ui/scroll-area";
+import { useTranslation } from "react-i18next";
 
 export const useDialog = useDialogContext;
 
@@ -166,6 +167,7 @@ interface DialogContentProps
 }
 
 export const DialogContent = (props: DialogContentProps) => {
+  const { t } = useTranslation("common");
   const {
     showCloseButton = true,
     bottomStickOnMobile = true,
@@ -198,7 +200,7 @@ export const DialogContent = (props: DialogContentProps) => {
           {!!showCloseButton && (
             <DialogClose asChild>
               <Button
-                aria-label="Close"
+                aria-label={t("actions.close")}
                 className="absolute inset-e-2 top-2 opacity-64 hover:opacity-100"
                 size="icon-sm"
                 variant="ghost"

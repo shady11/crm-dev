@@ -13,6 +13,7 @@ import {TASK_STATUS_CLASSES, TASK_STATUS_LABEL_KEYS} from "@/features/tasks/type
 import type {Task, TaskPayload} from "@/features/tasks/api/tasks.api.ts";
 import {formatDate} from "@/utils/date-formatter.ts";
 import {useTranslation} from "react-i18next";
+import {useTaskTitle} from "@/features/tasks/hooks/use-task-title.ts";
 
 const ICONS: Record<string, typeof CircleIcon> = {
     TODO: CircleIcon,
@@ -23,6 +24,7 @@ const ICONS: Record<string, typeof CircleIcon> = {
 
 export function DealTasksCard({ dealId }: { dealId: string }) {
     const { t, i18n } = useTranslation("tasks");
+    const taskTitle = useTaskTitle();
 
     const { tasks, isLoading } = useDealTasks(dealId);
     const actions = useTaskActions();
@@ -74,7 +76,7 @@ export function DealTasksCard({ dealId }: { dealId: string }) {
                                 >
                                     <Icon size={16} className="shrink-0 text-muted-foreground" />
                                     <div className="min-w-0 flex-1">
-                                        <p className="truncate font-medium">{task.title}</p>
+                                        <p className="truncate font-medium">{taskTitle(task)}</p>
                                         <p className="truncate text-xs text-muted-foreground">
                                             {task.assignedTo.fullName}
                                             {task.dueDate && ` · ${formatDate(task.dueDate, i18n.language).date}`}

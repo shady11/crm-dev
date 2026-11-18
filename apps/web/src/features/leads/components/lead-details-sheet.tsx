@@ -1,4 +1,4 @@
-import {ArrowLeftRight, Pen, Repeat, Trash2, UserPlusIcon} from "lucide-react";
+import {ArrowLeftRight, LayoutGridIcon, Pen, Repeat, Trash2, UserPlusIcon} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {IconTooltipButton} from "@/components/shared/icon-tooltip-button.tsx";
 import {Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
@@ -17,6 +17,8 @@ interface LeadDetailsSheetProps {
     onOpenChange(open: boolean): void;
     onEdit(): void;
     onRequestConvert(): void;
+    /** E2E-8: offered once the lead has a client, to whoever can reserve. */
+    onRequestReserve?(): void;
     onRequestDelete(): void;
     onRequestTransferBranch(): void;
     onRequestReassign(): void;
@@ -28,6 +30,7 @@ export function LeadDetailsSheet({
                                       onOpenChange,
                                       onEdit,
                                       onRequestConvert,
+                                      onRequestReserve,
                                       onRequestDelete,
                                       onRequestTransferBranch,
                                       onRequestReassign,
@@ -109,6 +112,12 @@ export function LeadDetailsSheet({
                         <Button className="flex-1" onClick={onRequestConvert}>
                             <UserPlusIcon className="size-4" />
                             {t("detailsSheet.convert")}
+                        </Button>
+                    )}
+                    {lead.client && onRequestReserve && (
+                        <Button className="flex-1" onClick={onRequestReserve}>
+                            <LayoutGridIcon className="size-4" />
+                            {t("reserveUnit")}
                         </Button>
                     )}
                 </SheetFooter>

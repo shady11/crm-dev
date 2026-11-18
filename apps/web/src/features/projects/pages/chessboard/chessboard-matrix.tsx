@@ -1,5 +1,5 @@
 import {useEffect, useMemo, useState} from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import {useNavigate, useParams, useSearchParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {getProjectChessboard} from "@/features/projects/api/projects.api";
 import {DoorOpen, Loader2Icon,} from "lucide-react";
@@ -17,6 +17,8 @@ import {useManagers} from "@/features/users/hooks/use-managers.ts";
 import {useTranslation} from "react-i18next";
 import {paths} from "@/routes/paths.ts";
 import {BROWSE_STATE, saveLastView} from "@/features/projects/utils/chessboard-navigation.ts";
+import {readReserveFor} from "@/features/deals/utils/reserve-for.ts";
+import {ReservingForBanner} from "@/features/deals/components/reserving-for-banner.tsx";
 
 interface Filters {
     status: UnitStatus | "all";
@@ -46,8 +48,21 @@ export function ChessboardMatrix() {
         entranceId: string;
     }>();
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const search = searchParams.size > 0 ? `?${searchParams.toString()}` : "";
 
-    const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+    // E2E-8: reserving for a client opens on what they asked for: free
+    // units, their rooms, up to their budget. The filters stay editable.
+    const reserveFor = readReserveFor(searchParams);
+    const [filters, setFilters] = useState<Filters>(() => reserveFor
+        ? {
+            ...DEFAULT_FILTERS,
+            status: "AVAILABLE",
+            rooms: reserveFor.rooms ? String(reserveFor.rooms) : "",
+            priceMax: reserveFor.priceMax ? String(reserveFor.priceMax) : "",
+        }
+        : DEFAULT_FILTERS);
+    const stopReserving = () => setSearchParams({}, {replace: true});
 
     const {
         sheet,
@@ -199,19 +214,21 @@ export function ChessboardMatrix() {
                 // Back to the entrance list, or to the block list when this
                 // block has only the one entrance.
                 onBack={() => navigate(
-                    blockEntrances.length > 1
+                    (blockEntrances.length > 1
                         ? paths.projects.chessboard.block(projectId!, block.id)
-                        : paths.projects.chessboard.root(projectId!),
+                        : paths.projects.chessboard.root(projectId!)) + search,
                     {state: BROWSE_STATE},
                 )}
                 onBlockSelect={(id) => {
                     const first = blocks.find((b) => b.id === id)?.entrances?.[0];
-                    navigate(first
+                    navigate((first
                         ? paths.projects.chessboard.entrance(projectId!, id, first.id)
-                        : paths.projects.chessboard.block(projectId!, id));
+                        : paths.projects.chessboard.block(projectId!, id)) + search);
                 }}
-                onEntranceSelect={(id) => navigate(paths.projects.chessboard.entrance(projectId!, block.id, id))}
+                onEntranceSelect={(id) => navigate(paths.projects.chessboard.entrance(projectId!, block.id, id) + search)}
             />
+
+            {reserveFor && <ReservingForBanner clientId={reserveFor.clientId} onStop={stopReserving} />}
 
             <ChessboardFilters
                 filters={filters}
@@ -248,6 +265,8 @@ export function ChessboardMatrix() {
                 sheet={sheet}
                 projectId={projectId!}
                 managers={managers}
+                presetClientId={reserveFor?.clientId}
+                onBooked={reserveFor ? stopReserving : undefined}
                 updateState={{
                     isSubmitting: updateUnitMutation.isPending,
                     errorMessage: updateUnitMutation.isError

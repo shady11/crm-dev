@@ -7,6 +7,7 @@ import type {AttentionItems} from "@/features/dashboard/api/dashboard.api.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useTranslation} from "react-i18next";
 import {priceChangePercent} from "@/features/units/api/unit-price-requests.api.ts";
+import {useTaskTitle} from "@/features/tasks/hooks/use-task-title.ts";
 
 function daysUntil(iso: string) {
     return Math.ceil((new Date(iso).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
@@ -40,6 +41,7 @@ function Section({title, viewAll, children}: {title: string; viewAll?: {to: stri
  */
 export function AttentionCard({data, showOwner}: {data: AttentionItems; showOwner: boolean}) {
     const {t} = useTranslation("dashboard");
+    const taskTitle = useTaskTitle();
     const {formatCurrency, formatDate} = useCompanyFormatters();
     const {pendingApprovals, overduePayments, expiringDeals, urgentTasks, overdueFollowUps} = data;
     const priceChanges = data.pendingPriceChanges ?? {total: 0, requests: []};
@@ -217,7 +219,7 @@ export function AttentionCard({data, showOwner}: {data: AttentionItems; showOwne
                                         <Link key={task.id} to={paths.tasks.root} className={ROW_CLASS}>
                                             <AlertTriangleIcon size={16} className={`shrink-0 ${days < 0 ? "text-destructive" : "text-amber-500"}`} />
                                             <div className="min-w-0 flex-1">
-                                                <p className="truncate font-medium">{task.title}</p>
+                                                <p className="truncate font-medium">{taskTitle(task)}</p>
                                                 <p className="text-xs text-muted-foreground">
                                                     {owner(task.assignedTo.fullName)}
                                                     {days < 0 ? t("attention.taskOverdue") : days === 0 ? t("attention.taskDueToday") : t("attention.taskDueIn", {days})}

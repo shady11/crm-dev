@@ -24,6 +24,9 @@ interface BookUnitSheetProps {
     floor: Floor;
     projectId: string;
     managers: { id: string; fullName: string }[];
+    /** E2E-8: start with this client chosen ("Reserve a unit" for a client). */
+    presetClientId?: string;
+    onBooked?(): void;
     open: boolean;
     onOpenChange(open: boolean): void;
 }
@@ -45,7 +48,7 @@ const DEFAULT_VALUES: BookingFormInput = {
     },
 };
 
-export function BookUnitSheet({ unit, floor, projectId, managers, open, onOpenChange }: BookUnitSheetProps) {
+export function BookUnitSheet({ unit, floor, projectId, managers, presetClientId, onBooked, open, onOpenChange }: BookUnitSheetProps) {
     const { t } = useTranslation("deals");
     const { user } = useAuth();
     // Booking in someone else's name needs deals.reassign on the API too;
@@ -91,6 +94,20 @@ export function BookUnitSheet({ unit, floor, projectId, managers, open, onOpenCh
         setSubmitError(undefined);
     };
 
+    // E2E-8: the client this reservation is for, chosen already.
+    const presetClient = useQuery({
+        queryKey: ["client", presetClientId],
+        queryFn: () => getClient(presetClientId!),
+        enabled: open && !!presetClientId,
+    });
+    useEffect(() => {
+        const client = presetClient.data;
+        if (!client || form.getValues("existingClientId")) return;
+        form.setValue("clientMode", "existing");
+        form.setValue("existingClientId", client.id);
+        setSelectedClient({ ...client, _count: { leads: client.leads.length, deals: client.deals.length } });
+    }, [presetClient.data, form]);
+
     // E2E-7: the financing type the client's lead already gave, so the
     // contract doesn't print it blank. Only fills an empty field.
     const clientDetails = useQuery({
@@ -110,6 +127,7 @@ export function BookUnitSheet({ unit, floor, projectId, managers, open, onOpenCh
         onSuccess: () => {
             reset();
             onOpenChange(false);
+            onBooked?.();
         },
     });
 

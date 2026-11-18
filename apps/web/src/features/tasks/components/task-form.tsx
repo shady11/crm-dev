@@ -39,6 +39,7 @@ import {
     CalendarYearSelect
 } from "@/components/ui/calendar.tsx";
 import {useTranslation} from "react-i18next";
+import {useTaskTitle} from "@/features/tasks/hooks/use-task-title.ts";
 
 type TaskFormValues = {
     title: string;
@@ -65,10 +66,10 @@ const DEFAULT_VALUES: TaskFormValues = {
     priority: TaskPriority.MEDIUM, type: TaskType.OTHER, outcome: "", assignedToId: "",
 };
 
-function toFormValues(task?: Task | null, defaultAssigneeId = ""): TaskFormValues {
+function toFormValues(task?: Task | null, defaultAssigneeId = "", shownTitle?: string): TaskFormValues {
     if (!task) return { ...DEFAULT_VALUES, assignedToId: defaultAssigneeId };
     return {
-        title: task.title,
+        title: shownTitle ?? task.title,
         description: task.description ?? "",
         dueDate: task.dueDate ? task.dueDate.slice(0, 10) : "",
         status: task.status,
@@ -88,6 +89,7 @@ function outcomeRequired(status: TaskStatus, previousStatus?: TaskStatus) {
 
 export function TaskForm({ task, errorMessage, isSubmitting, submitLabel, onCancel, onSubmit }: TaskFormProps) {
     const { t, i18n } = useTranslation("tasks");
+    const taskTitle = useTaskTitle();
 
     const assignableUsers = useTaskAssignees();
     const { user } = useAuth();
@@ -113,10 +115,10 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel, onCanc
 
     const form = useForm<TaskFormValues>({
         resolver: zodResolver(taskSchema),
-        defaultValues: toFormValues(task, user?.id),
+        defaultValues: toFormValues(task, user?.id, task ? taskTitle(task) : undefined),
     });
 
-    useEffect(() => { form.reset(toFormValues(task, user?.id)); }, [task, user?.id]);
+    useEffect(() => { form.reset(toFormValues(task, user?.id, task ? taskTitle(task) : undefined)); }, [task, user?.id, taskTitle]);
 
     const watchedStatus = form.watch("status");
     const showOutcome = !!task && outcomeRequired(watchedStatus, task.status);
@@ -141,7 +143,9 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel, onCanc
 
     const handleSubmit = form.handleSubmit((values) => {
         onSubmit({
-            title: values.title,
+            // E2E-9: a system task's title is shown in the reader's language;
+            // left as it was, send the stored one so the task keeps its template.
+            title: task && values.title === taskTitle(task) ? task.title : values.title,
             description: values.description || undefined,
             dueDate: values.dueDate ? new Date(values.dueDate).toISOString() : undefined,
             status: values.status,
