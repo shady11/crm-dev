@@ -1,3 +1,5 @@
+import {useTranslation} from "react-i18next";
+import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import {RoleCard} from "@/features/users/components/role-card.tsx";
 
 type RoleSummary = {id: string; name: string};
@@ -8,6 +10,7 @@ interface RoleCardsGridProps {
 }
 
 export function RoleCardsGrid({ roles, membersByRole }: RoleCardsGridProps) {
+    const {t} = useTranslation();
     return (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {roles.map((role) => {
@@ -15,7 +18,7 @@ export function RoleCardsGrid({ roles, membersByRole }: RoleCardsGridProps) {
                 return (
                     <RoleCard
                         key={role.id}
-                        roleName={role.name}
+                        roleName={roleLabel(t, role.name)}
                         memberCount={bucket.count}
                         memberInitials={bucket.initials}
                     />

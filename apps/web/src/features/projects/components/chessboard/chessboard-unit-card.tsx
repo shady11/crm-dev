@@ -17,7 +17,7 @@ export function ChessboardUnitCard({
                                        onClick,
                                    }: MatrixUnitCardProps) {
     const { t } = useTranslation("units");
-    const { formatCurrency, formatPricePerSqm } = useCompanyFormatters();
+    const { formatCurrency, formatPricePerSqm, formatArea } = useCompanyFormatters();
     const price = Number(unit.price);
     const area = Number(unit.area);
 
@@ -59,7 +59,7 @@ export function ChessboardUnitCard({
                     {t(UNIT_TYPE_LABEL_KEYS[unit.type])}
                 </span>
                 <span>
-                    {parseFloat(unit.area).toFixed(0)} m²
+                    {formatArea(unit.area)}
                 </span>
             </div>
         </button>

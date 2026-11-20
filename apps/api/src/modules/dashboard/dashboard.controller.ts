@@ -1,5 +1,6 @@
-import {Controller, Get, Query, Res, UseGuards, StreamableFile} from "@nestjs/common";
+import {Controller, Get, Headers, Query, Res, UseGuards, StreamableFile} from "@nestjs/common";
 import type {Response} from "express";
+import {exportLanguage} from "@/common/i18n/export-labels";
 import {JwtAuthGuard} from "@/modules/auth/guards/jwt-auth.guard";
 import {CompanyGuard} from "@/common/guards/company.guard";
 import {PermissionsGuard} from "@/common/guards/permissions.guard";
@@ -80,8 +81,11 @@ export class DashboardController {
         @Query("projectId") projectId?: string,
         @Query("branchId") branchId?: string,
         @Query("managerId") managerId?: string,
+        @Headers("accept-language") acceptLanguage?: string,
     ) {
-        const buffer = await this.dashboardService.exportFunnelXlsx(user, projectId, branchId, managerId || undefined);
+        const buffer = await this.dashboardService.exportFunnelXlsx(
+            user, projectId, branchId, managerId || undefined, exportLanguage(acceptLanguage, user.company?.locale),
+        );
 
         res.set({
             "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",

@@ -101,8 +101,10 @@ export class PaymentScheduleService {
                 dealId,
                 action: ActivityAction.UPDATED_DEAL,
                 type: ActivityType.DEAL_UPDATED,
-                ...activityText('paymentScheduleGenerated'),
-                description: `${installments} installments starting ${firstDate.toLocaleDateString()}`,
+                ...activityText('paymentScheduleGeneratedTerms', {
+                    installments,
+                    firstDate: firstDate.toISOString().slice(0, 10),
+                }),
             });
 
             return db.deal.findUniqueOrThrow({ where: { id: dealId }, include: DEAL_DETAILS_INCLUDE });

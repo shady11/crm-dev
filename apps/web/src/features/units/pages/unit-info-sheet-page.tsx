@@ -41,7 +41,7 @@ const isDay = (value: string | null): value is string => !!value && /^\d{4}-\d{2
 export function UnitInfoSheetPage() {
     const {unitId} = useParams<{unitId: string}>();
     const {t, i18n} = useTranslation(["units", "common"]);
-    const {formatCurrency, formatPricePerSqm} = useCompanyFormatters();
+    const {formatCurrency, formatPricePerSqm, formatArea} = useCompanyFormatters();
     const {user} = useAuth();
     const unitQuery = useUnit(unitId);
     const unit = unitQuery.data;
@@ -238,7 +238,7 @@ export function UnitInfoSheetPage() {
                     </div>
                     <div>
                         <dt className="text-muted-foreground">{t("infoSheet.area")}</dt>
-                        <dd className="font-medium">{parseFloat(unit.area).toFixed(1)} m²</dd>
+                        <dd className="font-medium">{formatArea(unit.area)}</dd>
                     </div>
                     <div>
                         <dt className="text-muted-foreground">{t("infoSheet.status")}</dt>

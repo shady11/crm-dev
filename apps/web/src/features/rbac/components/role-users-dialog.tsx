@@ -1,3 +1,4 @@
+import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import {useMemo, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
@@ -44,7 +45,7 @@ export function RoleUsersDialog({role, onOpenChange}: {role: Role | null; onOpen
         <Dialog open={role !== null} onOpenChange={({open}) => onOpenChange(open)}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>{t("usersDialog.title", {name: role?.name})}</DialogTitle>
+                    <DialogTitle>{t("usersDialog.title", {name: roleLabel(t, role?.name)})}</DialogTitle>
                     <DialogDescription>{t("usersDialog.description")}</DialogDescription>
                 </DialogHeader>
 

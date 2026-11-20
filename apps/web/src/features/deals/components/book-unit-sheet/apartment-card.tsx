@@ -6,7 +6,7 @@ import {useTranslation} from "react-i18next";
 
 export function ApartmentCard({ apartment }: { apartment: ApartmentSummary }) {
     const { t } = useTranslation("deals");
-    const { formatCurrency } = useCompanyFormatters();
+    const { formatCurrency, formatArea } = useCompanyFormatters();
 
     return (
         <div className="flex items-center gap-3 rounded-lg border border-secondary p-3">
@@ -22,7 +22,7 @@ export function ApartmentCard({ apartment }: { apartment: ApartmentSummary }) {
                     <Separator className="h-2.5 bg-muted-foreground/50" orientation="vertical" />
                     {t("booking.rooms", { count: apartment.rooms })}
                     <Separator className="h-2.5 bg-muted-foreground/50" orientation="vertical" />
-                    {apartment.area.toFixed(1)} m²
+                    {formatArea(apartment.area)}
                     <Separator className="h-2.5 bg-muted-foreground/50" orientation="vertical" />
                     {formatCurrency(apartment.price)}
                 </div>

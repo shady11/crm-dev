@@ -2,7 +2,9 @@ import { PaymentScheduleStatus, Prisma } from '@/generated/prisma/client';
 
 type ScheduleUpdater = {
   paymentSchedule: {
-    updateMany(args: Prisma.PaymentScheduleUpdateManyArgs): Promise<{ count: number }>;
+    updateMany(
+      args: Prisma.PaymentScheduleUpdateManyArgs,
+    ): Promise<{ count: number }>;
   };
 };
 
@@ -30,7 +32,9 @@ export async function markOverdueInstallments(
   const { count } = await db.paymentSchedule.updateMany({
     where: {
       deletedAt: null,
-      status: { in: [PaymentScheduleStatus.PENDING, PaymentScheduleStatus.PARTIAL] },
+      status: {
+        in: [PaymentScheduleStatus.PENDING, PaymentScheduleStatus.PARTIAL],
+      },
       dueDate: { lt: startOfToday(now) },
       deal: { deletedAt: null },
     },

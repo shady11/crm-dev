@@ -33,6 +33,11 @@ const ACTIVITY_TEMPLATES = {
     `${p.documentType} document regenerated`,
   receiptIssued: (p: { receipt: string }) => `Receipt ${p.receipt} issued`,
   paymentScheduleGenerated: () => 'Payment schedule generated',
+  // E2E-18: the terms in the title, in the reader's language. The English
+  // description that used to carry them ("12 installments starting
+  // 10/1/2026") showed as it was in the Russian and Kyrgyz activity log.
+  paymentScheduleGeneratedTerms: (p: { installments: number; firstDate: string }) =>
+    `Payment schedule generated: ${p.installments} installments from ${p.firstDate}`,
   // E2E-5: the schedule's annex to the contract, made with the schedule.
   paymentScheduleAnnexGenerated: () => 'Payment schedule annex generated',
   paymentVoided: (p: { payment: string }) => `Payment ${p.payment} voided`,

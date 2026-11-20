@@ -1,6 +1,7 @@
 import axios from "axios";
 import {authStorage} from "@/features/auth/utils/auth-storage.ts";
 import {disconnectNotificationsSocket} from "@/lib/socket.ts";
+import i18n from "@/lib/i18n";
 
 export const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
@@ -11,6 +12,12 @@ api.interceptors.request.use((config) => {
 
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // The app's own language, not the browser's: the Excel exports are
+    // written in it.
+    if (i18n.language) {
+        config.headers["Accept-Language"] = i18n.language;
     }
 
     return config;

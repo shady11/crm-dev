@@ -3,6 +3,8 @@ import {useQuery} from "@tanstack/react-query";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {getSettingOptions} from "../api/setting-options.api";
 import type {SettingOptionType} from "../types/setting-option.types";
+import {localizedOptionLabel} from "../utils/localized-option-label";
+import {useTranslation} from "react-i18next";
 
 type Props = {
     type: SettingOptionType;
@@ -19,18 +21,24 @@ type Props = {
  * drift out of sync with what's actually offered.
  */
 export function SettingOptionSelect({type, value, onChange, placeholder, className}: Props) {
+    const {i18n} = useTranslation();
     const optionsQuery = useQuery({
         queryKey: ["setting-options", type],
         queryFn: () => getSettingOptions({type}),
     });
 
     const options = optionsQuery.data ?? [];
-    // Most labels already end in their code ("Kyrgyzstani Som (KGS)"); add it
-    // only when one doesn't, so it isn't shown twice (CA-11).
-    const items = options.map((option) => ({
-        label: option.label.includes(`(${option.code})`) ? option.label : `${option.label} (${option.code})`,
-        value: option.code,
-    }));
+    // Named in the reader's language where the browser can, with the code
+    // after it ("Киргизский сом (KGS)"). The stored label is the fallback;
+    // most already end in their code, so it isn't shown twice (CA-11).
+    const items = options.map((option) => {
+        const localized = localizedOptionLabel(option.type ?? type, option.code, i18n.language);
+        const label = localized ?? option.label;
+        return {
+            label: label === option.code || label.includes(`(${option.code})`) ? label : `${label} (${option.code})`,
+            value: option.code,
+        };
+    });
 
     // A company can already hold a code that's since been deactivated or
     // removed from the picker. Keep it selectable (as its raw code) rather

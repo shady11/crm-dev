@@ -1,3 +1,5 @@
+import {exportLabels} from "@/common/i18n/export-labels";
+import type {DocumentLanguage} from "@/modules/document-generation/document-language";
 import {ForbiddenException, Injectable} from "@nestjs/common";
 import * as XLSX from "xlsx";
 import {DealStatus, LeadStatus, PaymentMethod, PaymentScheduleStatus, Prisma, TaskStatus, UnitPriceRequestStatus, UnitStatus} from "@/generated/prisma/client";
@@ -924,29 +926,31 @@ export class DashboardService {
      * (see units-import.service.ts) rather than adding a CSV library for
      * the same job.
      */
-    async exportFunnelXlsx(user: AuthUser, projectId?: string, branchId?: string, managerId?: string): Promise<Buffer> {
+    async exportFunnelXlsx(user: AuthUser, projectId?: string, branchId?: string, managerId?: string, language: DocumentLanguage = "en"): Promise<Buffer> {
         const funnel = await this.getFunnel(user, projectId, branchId, managerId);
+        const labels = exportLabels(language);
+        const L = labels.funnel;
 
         const workbook = XLSX.utils.book_new();
 
         const leadsSheet = XLSX.utils.json_to_sheet(
-            funnel.leadsByStatus.map((row) => ({ Status: row.status, Leads: row.count })),
+            funnel.leadsByStatus.map((row) => ({ [L.status]: labels.leadStatus[row.status] ?? row.status, [L.leads]: row.count })),
         );
-        XLSX.utils.book_append_sheet(workbook, leadsSheet, "Leads by status");
+        XLSX.utils.book_append_sheet(workbook, leadsSheet, L.leadsSheet);
 
         const dealsSheet = XLSX.utils.json_to_sheet(
-            funnel.dealsByStatus.map((row) => ({ Status: row.status, Deals: row.count })),
+            funnel.dealsByStatus.map((row) => ({ [L.status]: labels.dealStatus[row.status] ?? row.status, [L.deals]: row.count })),
         );
-        XLSX.utils.book_append_sheet(workbook, dealsSheet, "Deals by status");
+        XLSX.utils.book_append_sheet(workbook, dealsSheet, L.dealsSheet);
 
         const summarySheet = XLSX.utils.json_to_sheet([
-            { Metric: "Total leads", Value: funnel.totalLeads },
-            { Metric: "Total deals", Value: funnel.totalDeals },
-            { Metric: "Deals won", Value: funnel.dealsWon },
-            { Metric: "Lead → deal conversion rate", Value: funnel.leadToDealConversionRate },
-            { Metric: "Lead → won conversion rate", Value: funnel.leadToWonConversionRate },
+            { [L.metric]: L.totalLeads, [L.value]: funnel.totalLeads },
+            { [L.metric]: L.totalDeals, [L.value]: funnel.totalDeals },
+            { [L.metric]: L.dealsWon, [L.value]: funnel.dealsWon },
+            { [L.metric]: L.leadToDeal, [L.value]: funnel.leadToDealConversionRate },
+            { [L.metric]: L.leadToWon, [L.value]: funnel.leadToWonConversionRate },
         ]);
-        XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary");
+        XLSX.utils.book_append_sheet(workbook, summarySheet, L.summarySheet);
 
         return XLSX.write(workbook, { type: "buffer", bookType: "xlsx" }) as Buffer;
     }

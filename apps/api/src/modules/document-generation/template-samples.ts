@@ -42,7 +42,7 @@ export function sampleTemplateContext(
     },
     deal: {
       dealNumber: 'D-2026-0042',
-      status: 'CONTRACT_SIGNED',
+      status: f.dealStatus('CONTRACT_SIGNED'),
       financingType: f.financing('INSTALLMENT'),
       listPrice: money(62000),
       salePrice: money(58900),

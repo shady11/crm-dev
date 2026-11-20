@@ -1,3 +1,4 @@
+import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {Button} from "@/components/ui/button.tsx";
@@ -104,7 +105,7 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
         <Dialog open={open} onOpenChange={({open: isOpen}) => onOpenChange(isOpen)}>
             <DialogContent className="sm:max-w-3xl">
                 <DialogHeader>
-                    <DialogTitle>{readOnly ? (role?.name ?? "") : isEdit ? t("form.editTitle") : t("form.newTitle")}</DialogTitle>
+                    <DialogTitle>{readOnly ? roleLabel(t, role?.name) : isEdit ? t("form.editTitle") : t("form.newTitle")}</DialogTitle>
                     <DialogDescription>
                         {isPlatformRole
                             ? t("form.platformRoleDescription")

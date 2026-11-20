@@ -1,3 +1,4 @@
+import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import type {ReactNode} from "react";
 import {Link} from "react-router-dom";
 import {CircleAlertIcon, CircleCheckIcon, ExternalLinkIcon, MailIcon, PhoneIcon, RepeatIcon, UserRoundXIcon} from "lucide-react";
@@ -52,7 +53,7 @@ function Row({label, children}: {label: string; children: ReactNode}) {
  */
 export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsSidebarProps) {
     const {t, i18n} = useTranslation(["deals", "common", "units"]);
-    const {formatCurrency} = useCompanyFormatters();
+    const {formatCurrency, formatPricePerSqm, formatArea} = useCompanyFormatters();
     const {user} = useAuth();
     const date = (iso: string | null | undefined) => (iso ? formatDate(iso, i18n.language).date : "—");
 
@@ -68,7 +69,7 @@ export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsS
     const shape = [
         t(UNIT_TYPE_LABEL_KEYS[unit.type]),
         unit.rooms != null && t("sidebar.rooms", {count: unit.rooms}),
-        `${unit.area.toFixed(1)} ${t("units.sqm", {ns: "common"})}`,
+        formatArea(unit.area),
     ].filter(Boolean).join(" · ");
 
     return (
@@ -121,7 +122,7 @@ export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsS
                                     <p className="font-semibold">{manager.fullName}</p>
                                     {manager.id === user?.id && <Badge variant="secondary">{t("sidebar.you")}</Badge>}
                                 </div>
-                                <p className="text-sm text-muted-foreground">{manager.role.name}</p>
+                                <p className="text-sm text-muted-foreground">{roleLabel(t, manager.role.name)}</p>
                                 {/* Your own number isn't much use to you; colleagues and heads need it. */}
                                 {manager.id !== user?.id && (
                                     <div className="flex flex-col gap-1 text-sm">
@@ -171,7 +172,7 @@ export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsS
                     </div>
                     <dl className="flex flex-col gap-1.5">
                         <Row label={t("financials.listPrice")}>{formatCurrency(deal.listPrice)}</Row>
-                        {pricePerSqm != null && <Row label={t("financials.pricePerMeter")}>{formatCurrency(pricePerSqm)}/m²</Row>}
+                        {pricePerSqm != null && <Row label={t("financials.pricePerMeter")}>{formatPricePerSqm(pricePerSqm)}</Row>}
                     </dl>
                 </Section>
 

@@ -60,6 +60,7 @@
     "documentRegenerated": "Document regenerated: {{documentType}}",
     "receiptIssued": "Receipt {{receipt}} issued",
     "paymentScheduleGenerated": "Payment schedule generated",
+    "paymentScheduleGeneratedTerms": "Payment schedule generated: installments {{installments}}, first on {{firstDate}}",
     "paymentScheduleAnnexGenerated": "Payment schedule annex generated",
     "paymentVoided": "Payment {{payment}} voided",
     "unitRelistedAfterCancellation": "Unit relisted after deal cancellation",

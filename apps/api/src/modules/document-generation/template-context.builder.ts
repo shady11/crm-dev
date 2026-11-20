@@ -94,7 +94,7 @@ export function buildTemplateContext(
     },
     deal: {
       dealNumber: deal.dealNumber,
-      status: deal.status,
+      status: f.dealStatus(deal.status),
       financingType: f.financing(deal.financingType),
       listPrice: money(deal.listPrice, currency),
       salePrice: money(deal.salePrice, currency),

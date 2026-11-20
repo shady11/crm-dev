@@ -1,3 +1,4 @@
+import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import {useState} from "react";
 import {Link} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
@@ -244,7 +245,7 @@ export function TeamPage() {
                                         <p className="font-medium">{member.fullName}</p>
                                         <a href={`mailto:${member.email}`} className="text-xs text-muted-foreground hover:underline">{member.email}</a>
                                     </TableCell>
-                                    <TableCell>{member.role.name}</TableCell>
+                                    <TableCell>{roleLabel(t, member.role.name)}</TableCell>
                                     <TableCell>
                                         {member.phone
                                             ? <a href={`tel:${member.phone}`} className="hover:underline">{member.phone}</a>

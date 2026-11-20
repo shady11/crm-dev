@@ -14,6 +14,8 @@ import {
   ReceivablesQueryDto,
 } from '../../dto/payments/payment-register-query.dto';
 import { unitLabel } from '@/common/utils/unit-label.util';
+import { exportLabels } from '@/common/i18n/export-labels';
+import { documentFormatter, type DocumentLanguage } from '@/modules/document-generation/document-language';
 
 const PAYMENT_INCLUDE = {
   user: { select: { id: true, fullName: true } },
@@ -33,20 +35,6 @@ const PAYMENT_INCLUDE = {
 type PaymentRow = Prisma.PaymentGetPayload<{ include: typeof PAYMENT_INCLUDE }>;
 
 // English labels for the Excel files, like the funnel export's sheets.
-const METHOD_LABELS: Record<PaymentMethod, string> = {
-  CASH: 'Cash',
-  BANK_TRANSFER: 'Bank transfer',
-  MBANK: 'MBank',
-  OPTIMA: 'Optima',
-  ELKART: 'Elkart',
-  OTHER: 'Other',
-};
-const TYPE_LABELS: Record<PaymentType, string> = {
-  DEPOSIT: 'Deposit',
-  INSTALLMENT: 'Installment',
-  FINAL: 'Final payment',
-  REFUND: 'Refund',
-};
 
 // Deals the client still owes on: the contract is signed and the sale isn't
 // finished. A reservation can still fall through, so it isn't owed yet.
@@ -120,7 +108,10 @@ export class PaymentRegisterService {
   async exportXlsx(
     user: AuthUser,
     query: PaymentRegisterQueryDto,
+    language: DocumentLanguage = 'en',
   ): Promise<Buffer> {
+    const L = exportLabels(language).payments;
+    const f = documentFormatter(language);
     const where = this.buildWhere(user, query);
     const rows = await this.prisma.payment.findMany({
       where,
@@ -131,19 +122,19 @@ export class PaymentRegisterService {
 
     const sheet = XLSX.utils.json_to_sheet(
       rows.map((row) => ({
-        Date: dayOf(row.paidAt),
-        Receipt: row.receiptNumber ?? '',
-        Deal: row.deal.dealNumber,
-        Client: row.deal.client.fullName,
-        Project: row.deal.project.name,
-        Unit: unitLabel(row.deal.unit),
-        Branch: row.deal.branch?.name ?? '',
-        Type: TYPE_LABELS[row.paymentType],
-        Method: METHOD_LABELS[row.paymentMethod],
-        Reference: row.reference ?? '',
-        Note: row.note ?? '',
-        'Recorded by': row.user?.fullName ?? '',
-        Amount: Number(row.amount),
+        [L.date]: dayOf(row.paidAt),
+        [L.receipt]: row.receiptNumber ?? '',
+        [L.deal]: row.deal.dealNumber,
+        [L.client]: row.deal.client.fullName,
+        [L.project]: row.deal.project.name,
+        [L.unit]: unitLabel(row.deal.unit),
+        [L.branch]: row.deal.branch?.name ?? '',
+        [L.type]: f.paymentType(row.paymentType),
+        [L.method]: f.paymentMethod(row.paymentMethod),
+        [L.reference]: row.reference ?? '',
+        [L.note]: row.note ?? '',
+        [L.recordedBy]: row.user?.fullName ?? '',
+        [L.amount]: Number(row.amount),
       })),
     );
 
@@ -155,24 +146,24 @@ export class PaymentRegisterService {
       .reduce((sum, r) => sum + Number(r.amount), 0);
     const summary = XLSX.utils.json_to_sheet([
       {
-        Item: 'Period',
-        Value: `${query.from ?? 'start'} to ${query.to ?? 'today'}`,
+        [L.item]: L.period,
+        [L.value]: L.periodRange(query.from ?? L.start, query.to ?? L.today),
       },
-      { Item: 'Payments', Value: rows.length },
-      { Item: 'Received', Value: received },
-      { Item: 'Refunded', Value: refunded },
-      { Item: 'Net', Value: received - refunded },
+      { [L.item]: L.count, [L.value]: rows.length },
+      { [L.item]: L.received, [L.value]: received },
+      { [L.item]: L.refunded, [L.value]: refunded },
+      { [L.item]: L.net, [L.value]: received - refunded },
       ...Object.values(PaymentMethod).map((method) => ({
-        Item: `Net, ${METHOD_LABELS[method]}`,
-        Value: rows
+        [L.item]: L.netBy(f.paymentMethod(method)),
+        [L.value]: rows
           .filter((r) => r.paymentMethod === method)
           .reduce((sum, r) => sum + Number(r.amount), 0),
       })),
     ]);
 
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, sheet, 'Payments');
-    XLSX.utils.book_append_sheet(workbook, summary, 'Summary');
+    XLSX.utils.book_append_sheet(workbook, sheet, L.sheet);
+    XLSX.utils.book_append_sheet(workbook, summary, L.summarySheet);
     return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }) as Buffer;
   }
 
@@ -183,7 +174,10 @@ export class PaymentRegisterService {
   async exportReceivablesXlsx(
     user: AuthUser,
     query: ReceivablesQueryDto,
+    language: DocumentLanguage = 'en',
   ): Promise<Buffer> {
+    const labels = exportLabels(language);
+    const L = labels.receivables;
     const companyId = this.companyIdOf(user);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -236,23 +230,22 @@ export class PaymentRegisterService {
         const next = open.find((s) => !s.overdue && s.dueDate >= today);
 
         return {
-          Deal: deal.dealNumber,
-          Status:
-            deal.status === DealStatus.ACTIVE ? 'Active' : 'Contract signed',
-          Client: deal.client.fullName,
-          Phone: deal.client.phone ?? '',
-          Project: deal.project.name,
-          Unit: unitLabel(deal.unit),
-          Branch: deal.branch?.name ?? '',
-          Manager: deal.manager?.fullName ?? '',
-          'Sale price': salePrice,
-          Paid: round2(paid),
-          Remaining: round2(salePrice - paid),
-          Overdue: round2(overdue.reduce((sum, s) => sum + s.left, 0)),
-          'Overdue installments': overdue.length,
-          'Overdue since': overdue[0] ? dayOf(overdue[0].dueDate) : '',
-          'Next due date': next ? dayOf(next.dueDate) : '',
-          'Next due amount': next ? round2(next.left) : '',
+          [L.deal]: deal.dealNumber,
+          [L.status]: labels.dealStatus[deal.status] ?? deal.status,
+          [L.client]: deal.client.fullName,
+          [L.phone]: deal.client.phone ?? '',
+          [L.project]: deal.project.name,
+          [L.unit]: unitLabel(deal.unit),
+          [L.branch]: deal.branch?.name ?? '',
+          [L.manager]: deal.manager?.fullName ?? '',
+          [L.salePrice]: salePrice,
+          [L.paid]: round2(paid),
+          [L.remaining]: round2(salePrice - paid),
+          [L.overdue]: round2(overdue.reduce((sum, s) => sum + s.left, 0)),
+          [L.overdueInstallments]: overdue.length,
+          [L.overdueSince]: overdue[0] ? dayOf(overdue[0].dueDate) : '',
+          [L.nextDueDate]: next ? dayOf(next.dueDate) : '',
+          [L.nextDueAmount]: next ? round2(next.left) : '',
         };
       }),
     );
@@ -261,7 +254,7 @@ export class PaymentRegisterService {
     XLSX.utils.book_append_sheet(
       workbook,
       sheet,
-      `Receivables ${dayOf(today)}`,
+      L.sheet(dayOf(today)),
     );
     return XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }) as Buffer;
   }

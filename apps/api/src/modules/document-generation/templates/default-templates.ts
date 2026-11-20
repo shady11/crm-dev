@@ -52,6 +52,8 @@ type Words = {
   pin: string;
   note: string;
   project: string;
+  // The square-metre sign in the language's own script.
+  sqm: string;
   unit: string;
   type: string;
   rooms: string;
@@ -123,6 +125,7 @@ const WORDS: Record<DocumentLanguage, Words> = {
     pin: 'PIN',
     note: 'Note',
     project: 'Project',
+    sqm: 'm&sup2;',
     unit: 'Unit',
     type: 'Type',
     rooms: 'Rooms',
@@ -194,6 +197,7 @@ const WORDS: Record<DocumentLanguage, Words> = {
     pin: 'ПИН',
     note: 'Примечание',
     project: 'Проект',
+    sqm: 'м&sup2;',
     unit: 'Помещение',
     type: 'Тип',
     rooms: 'Комнат',
@@ -265,6 +269,7 @@ const WORDS: Record<DocumentLanguage, Words> = {
     pin: 'ПИН',
     note: 'Эскертүү',
     project: 'Долбоор',
+    sqm: 'м&sup2;',
     unit: 'Жай',
     type: 'Түрү',
     rooms: 'Бөлмөлөр',
@@ -371,7 +376,7 @@ function reservationTemplate(w: Words): string {
       <td>{{unit.projectName}}</td>
       <td>{{unit.blockName}} / {{unit.number}}</td>
       <td>{{unit.type}}</td>
-      <td>{{unit.area}} m&sup2;</td>
+      <td>{{unit.area}} ${w.sqm}</td>
       <td>{{deal.listPrice}}</td>
     </tr>
   </table>
@@ -427,7 +432,7 @@ function contractTemplate(w: Words): string {
       <td>{{unit.blockName}} / {{unit.number}}</td>
       <td>{{unit.type}}</td>
       <td>{{unit.rooms}}</td>
-      <td>{{unit.area}} m&sup2;</td>
+      <td>{{unit.area}} ${w.sqm}</td>
     </tr>
   </table>
 
@@ -541,7 +546,7 @@ function scheduleTemplate(w: Words): string {
     </div>
   </div>
 
-  <p>${w.project}: {{unit.projectName}} &middot; ${w.unit}: {{unit.blockName}} / {{unit.number}} &middot; {{unit.area}} m&sup2;</p>
+  <p>${w.project}: {{unit.projectName}} &middot; ${w.unit}: {{unit.blockName}} / {{unit.number}} &middot; {{unit.area}} ${w.sqm}</p>
 
   <div class="totals">
     <div class="row"><span>${w.salePrice}</span><span>{{deal.salePrice}}</span></div>

@@ -1,12 +1,14 @@
 import {
   Controller,
   Get,
+  Headers,
   Query,
   Res,
   StreamableFile,
   UseGuards,
 } from '@nestjs/common';
 import type { Response } from 'express';
+import { exportLanguage } from '@/common/i18n/export-labels';
 import { JwtAuthGuard } from '@/modules/auth/guards/jwt-auth.guard';
 import { CompanyGuard } from '@/common/guards/company.guard';
 import { BranchGuard } from '@/common/guards/branch.guard';
@@ -44,8 +46,9 @@ export class PaymentsController {
     @CurrentUser() user: AuthUser,
     @Query() query: PaymentRegisterQueryDto,
     @Res({ passthrough: true }) res: Response,
+    @Headers('accept-language') acceptLanguage?: string,
   ) {
-    const buffer = await this.register.exportXlsx(user, query);
+    const buffer = await this.register.exportXlsx(user, query, exportLanguage(acceptLanguage, user.company?.locale));
     const period =
       [query.from, query.to].filter(Boolean).join('_') ||
       new Date().toISOString().slice(0, 10);
@@ -61,8 +64,9 @@ export class PaymentsController {
     @CurrentUser() user: AuthUser,
     @Query() query: ReceivablesQueryDto,
     @Res({ passthrough: true }) res: Response,
+    @Headers('accept-language') acceptLanguage?: string,
   ) {
-    const buffer = await this.register.exportReceivablesXlsx(user, query);
+    const buffer = await this.register.exportReceivablesXlsx(user, query, exportLanguage(acceptLanguage, user.company?.locale));
     res.set({
       'Content-Type': XLSX_CONTENT_TYPE,
       'Content-Disposition': `attachment; filename="receivables-${new Date().toISOString().slice(0, 10)}.xlsx"`,

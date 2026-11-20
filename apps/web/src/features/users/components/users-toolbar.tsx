@@ -1,3 +1,4 @@
+import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import {Plus, Search} from "lucide-react";
 import {createListCollection} from "@ark-ui/react";
 import {Button} from "@/components/ui/button.tsx";
@@ -49,7 +50,7 @@ export function UsersToolbar({
             { label: t("toolbar.placeholders.filterByRole"), value: "all" },
             ...visibleRoles.map(
                 (role) => ({
-                    label: role.name,
+                    label: roleLabel(t, role.name),
                     value: role.id
                 })
             ),
