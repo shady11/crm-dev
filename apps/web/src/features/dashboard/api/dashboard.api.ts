@@ -121,6 +121,8 @@ export async function getBranchComparison() {
 // timestamp per SALES_MANAGER on their branch, SALES_HEAD only.
 export type TeamSnapshotItem = {
     manager: { id: string; fullName: string; email: string };
+    /** The manager's branch, on the owner's company-wide snapshot only. */
+    branch?: { id: string; name: string } | null;
     /** The viewer's own row, after the managers' (SH-9). */
     isViewer?: boolean;
     openLeads: number;
@@ -131,14 +133,16 @@ export type TeamSnapshotItem = {
     lastActivityAt: string | null;
 };
 
-export async function getTeamSnapshot() {
-    const response = await api.get<TeamSnapshotItem[]>("/dashboard/team-snapshot");
+export async function getTeamSnapshot(branchId?: string) {
+    const response = await api.get<TeamSnapshotItem[]>("/dashboard/team-snapshot", { params: { branchId } });
     return response.data;
 }
 
 // A Sales Head's per-manager results over a period, for the "My team" page.
 export type TeamPerformanceItem = {
     manager: { id: string; fullName: string; email: string };
+    /** The manager's branch, on the owner's company-wide snapshot only. */
+    branch?: { id: string; name: string } | null;
     /** The viewer's own row, after the managers' (SH-9). */
     isViewer?: boolean;
     leadsAssigned: number;

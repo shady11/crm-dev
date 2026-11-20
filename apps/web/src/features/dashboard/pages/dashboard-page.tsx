@@ -49,7 +49,13 @@ export function DashboardPage() {
     const canViewBranchComparison = hasPermission(user, "dashboard.branch_comparison");
     const branchComparison = useBranchComparison(canViewBranchComparison);
     const canViewTeamSnapshot = hasPermission(user, "dashboard.team_snapshot");
-    const teamSnapshot = useTeamSnapshot(canViewTeamSnapshot);
+    // The owner sees every branch's managers, by the company-wide
+    // permission, without the team lead's own "My work today".
+    const canViewCompanyTeam = !canViewTeamSnapshot && canViewBranchComparison;
+    const teamSnapshot = useTeamSnapshot(
+        canViewTeamSnapshot || canViewCompanyTeam,
+        canViewCompanyTeam && branchId !== "all" ? branchId : undefined,
+    );
     const canViewMyPerformance = hasPermission(user, "dashboard.my_performance");
     // A Sales Head has leads and tasks of their own too.
     const canViewMyWorkToday = canViewMyPerformance || canViewTeamSnapshot;
@@ -62,7 +68,9 @@ export function DashboardPage() {
         ? undefined
         : managers.data.filter((m) => branchId === "all" || m.branchId === branchId);
     const myPerformance = useMyPerformance(canViewMyPerformance);
-    const canViewFinanceOverview = hasPermission(user, "dashboard.finance_overview");
+    // Finance's own view, and the owner's: collected, owed, overdue.
+    const canViewFinanceOverview =
+        hasPermission(user, "dashboard.finance_overview") || canViewBranchComparison;
     const financeOverview = useFinanceOverview(canViewFinanceOverview, branchId === "all" ? undefined : branchId, projectId);
     // The lead funnel is the sales team's view; Finance has no leads to read.
     const canViewFunnel = hasPermission(user, "leads.view");
@@ -114,7 +122,9 @@ export function DashboardPage() {
             {canViewMyPerformance && myPerformance.data ? <MyPerformanceCard data={myPerformance.data} /> : null}
             {canViewMyPerformance ? null : attentionCard}
             {/* A Sales Head's main block: their team, then their own day. */}
-            {canViewTeamSnapshot ? <TeamSnapshotCard data={(teamSnapshot.data ?? []).filter((row) => !row.isViewer)} /> : null}
+            {canViewTeamSnapshot || canViewCompanyTeam ? (
+                <TeamSnapshotCard data={(teamSnapshot.data ?? []).filter((row) => !row.isViewer)} />
+            ) : null}
             {!canViewMyPerformance && canViewMyWorkToday && myWorkToday.data ? <MyWorkTodayCard data={myWorkToday.data} /> : null}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">

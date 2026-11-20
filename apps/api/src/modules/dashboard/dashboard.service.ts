@@ -468,14 +468,21 @@ export class DashboardService {
      * branch-scoped (BranchGuard), so there's no optional branchId param
      * here the way the company-wide dashboard queries above take one.
      */
-    async getTeamSnapshot(user: AuthUser) {
+    async getTeamSnapshot(user: AuthUser, requestedBranchId?: string) {
         if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
-        if (!user.branchId) throw new ForbiddenException("User is not assigned to a branch");
 
         const companyId = user.companyId;
-        const branchId = user.branchId;
+        // A branch-scoped team lead sees their own branch, themselves
+        // included (SH-9). A company-wide viewer (the owner) sees every
+        // branch's managers, or one branch's when the dashboard is filtered
+        // to it, with each row naming its branch.
+        const companyWide = !user.isBranchScoped;
+        if (!companyWide && !user.branchId) throw new ForbiddenException("User is not assigned to a branch");
+        const branchId = companyWide ? requestedBranchId : user.branchId!;
 
-        const managers = await this.findTeamPeople(companyId, branchId, user);
+        const managers = companyWide
+            ? (await this.findTeamManagers(companyId, branchId)).map((m) => ({ ...m, isViewer: false }))
+            : await this.findTeamPeople(companyId, branchId!, user);
 
         const now = new Date();
 
@@ -519,6 +526,7 @@ export class DashboardService {
 
                 return {
                     manager: { id: manager.id, fullName: manager.fullName, email: manager.email },
+                    branch: companyWide ? manager.branch : null,
                     isViewer: manager.isViewer,
                     openLeads,
                     activeDeals,
@@ -540,7 +548,7 @@ export class DashboardService {
         const managers = await this.findTeamManagers(companyId, branchId);
         const people = managers.map((m) => ({ ...m, isViewer: m.id === viewer.id }));
         if (!people.some((p) => p.isViewer)) {
-            people.push({ id: viewer.id, fullName: viewer.name, email: viewer.email, isViewer: true });
+            people.push({ id: viewer.id, fullName: viewer.name, email: viewer.email, branch: null, isViewer: true });
         }
         return people;
     }
@@ -551,7 +559,7 @@ export class DashboardService {
      * active, not deleted. Shared by the team snapshot and team performance
      * so both list the same people.
      */
-    private async findTeamManagers(companyId: string, branchId: string) {
+    private async findTeamManagers(companyId: string, branchId: string | undefined) {
         const targetRoleIds = await this.rbacService.findRoleIdsWithPermission(companyId, "deals.manage", "deals.reassign");
 
         return this.prisma.user.findMany({
@@ -562,7 +570,7 @@ export class DashboardService {
                 isActive: true,
                 deletedAt: null,
             },
-            select: { id: true, fullName: true, email: true },
+            select: { id: true, fullName: true, email: true, branch: { select: { id: true, name: true } } },
             orderBy: { fullName: "asc" },
         });
     }

@@ -102,14 +102,14 @@ export class DashboardController {
         return this.dashboardService.getBranchComparison(user);
     }
 
-    // SH-A2: a SALES_HEAD's own-team snapshot. dashboard.team_snapshot is
-    // only in SALES_HEAD's default bundle — this is the team-lead's standup
-    // view, not a company-wide report (COMPANY_ADMIN has branch-comparison
-    // above instead).
-    @RequirePermissions("dashboard.team_snapshot")
+    // SH-A2: a SALES_HEAD's own-team snapshot (dashboard.team_snapshot).
+    // The owner reads the same rows company-wide, by branch_comparison,
+    // without taking on the team lead's own "My work today" and "My team"
+    // page that team_snapshot also opens.
+    @RequirePermissions("dashboard.team_snapshot", "dashboard.branch_comparison")
     @Get("team-snapshot")
-    getTeamSnapshot(@CurrentUser() user: AuthUser) {
-        return this.dashboardService.getTeamSnapshot(user);
+    getTeamSnapshot(@CurrentUser() user: AuthUser, @Query("branchId") branchId?: string) {
+        return this.dashboardService.getTeamSnapshot(user, branchId);
     }
 
     // Per-manager results over a period, for the Sales Head's "My team"
@@ -141,9 +141,11 @@ export class DashboardController {
         return this.dashboardService.getMyPerformance(user, Number.isFinite(parsed) && parsed > 0 ? parsed : 30);
     }
 
-    // FIN-A1: a FINANCE user's collections/cash-flow overview.
-    // dashboard.finance_overview is only in FINANCE's default bundle.
-    @RequirePermissions("dashboard.finance_overview")
+    // FIN-A1: a FINANCE user's collections/cash-flow overview. The owner
+    // reads it too, by branch_comparison: finance_overview also marks its
+    // holder as the finance desk (refund and schedule to-dos), which is
+    // Finance's work, not the owner's.
+    @RequirePermissions("dashboard.finance_overview", "dashboard.branch_comparison")
     @Get("finance-overview")
     getFinanceOverview(
         @CurrentUser() user: AuthUser,
