@@ -24,7 +24,6 @@ import {
     CalendarYearSelect
 } from "@/components/ui/calendar.tsx";
 import {createListCollection, parseDate} from "@ark-ui/react";
-import {format} from "date-fns";
 import {Field, FieldDescription, FieldGroup, FieldLabel, FieldSet} from "@/components/ui/field.tsx";
 import {DealPaymentScheduleCard} from "@/features/deals/components/deal-details/deal-payment-schedule-card.tsx";
 import {DealPaymentsHistoryCard} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
@@ -44,6 +43,7 @@ import {DealDetailsSidebar} from "@/features/deals/components/deal-details/deal-
 import {useTranslation} from "react-i18next";
 import {blockLabel} from "@/features/units/utils/block-label.ts";
 import {PAYMENT_METHOD_LABEL_KEYS, PAYMENT_TYPE_LABEL_KEYS} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
+import {companyToday} from "@/lib/company-day.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useReservationPolicy} from "@/features/deals/hooks/use-reservation-policy.ts";
@@ -94,23 +94,23 @@ export function DealDetailsPage() {
 
     const [extendOpen, setExtendOpen] = useState(false);
     const [extendReason, setExtendReason] = useState("");
-    const [newExpiry, setNewExpiry] = useState([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+    const [newExpiry, setNewExpiry] = useState([parseDate(companyToday(user?.company?.timezone))]);
     const reservationPolicy = useReservationPolicy(hasPermission(user, "deals.manage")).data;
 
     const [signOpen, setSignOpen] = useState(false);
     const [contractNumber, setContractNumber] = useState("");
-    const [contractDate, setContractDate] = useState([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+    const [contractDate, setContractDate] = useState([parseDate(companyToday(user?.company?.timezone))]);
 
     const [scheduleOpen, setScheduleOpen] = useState(false);
     const [installments, setInstallments] = useState(1);
-    const [firstPaymentDate, setFirstPaymentDate] = useState([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+    const [firstPaymentDate, setFirstPaymentDate] = useState([parseDate(companyToday(user?.company?.timezone))]);
     const [intervalMonths, setIntervalMonths] = useState(1);
 
     const [paymentOpen, setPaymentOpen] = useState(false);
     const [paymentAmount, setPaymentAmount] = useState(0);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | "">("");
     const [paymentType, setPaymentType] = useState<PaymentType | "">("");
-    const [paidAt, setPaidAt] = useState([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+    const [paidAt, setPaidAt] = useState([parseDate(companyToday(user?.company?.timezone))]);
     const [reference, setReference] = useState("");
     const [paymentNote, setPaymentNote] = useState("");
     const [voidTarget, setVoidTarget] = useState<DealDetails["payments"][number] | null>(null);
@@ -605,7 +605,7 @@ export function DealDetailsPage() {
                                 }, {
                                     onSuccess: () => {
                                         setExtendOpen(false);
-                                        setNewExpiry([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+                                        setNewExpiry([parseDate(companyToday(user?.company?.timezone))]);
                                     },
                                 })
                             }
@@ -637,7 +637,7 @@ export function DealDetailsPage() {
                                     <DatePicker
                                         onValueChange={({ value }) => setContractDate(value)}
                                         value={contractDate}
-                                        max={parseDate(format(new Date(), 'yyyy-MM-dd'))}
+                                        max={parseDate(companyToday(user?.company?.timezone))}
                                     >
                                         <DatePickerTrigger asChild>
                                             <Button className="w-full flex justify-between" variant="outline">
@@ -677,7 +677,7 @@ export function DealDetailsPage() {
                                         onSuccess: () => {
                                             setSignOpen(false);
                                             setContractNumber("");
-                                            setContractDate([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+                                            setContractDate([parseDate(companyToday(user?.company?.timezone))]);
                                         }
                                     },
                                 )
@@ -857,7 +857,7 @@ export function DealDetailsPage() {
                             <DatePicker
                                 onValueChange={({ value }) => setPaidAt(value)}
                                 value={paidAt ?? []}
-                                max={parseDate(format(new Date(), 'yyyy-MM-dd'))}
+                                max={parseDate(companyToday(user?.company?.timezone))}
                             >
                                 <DatePickerTrigger asChild>
                                     <Button className="w-full flex justify-between" variant="outline">
@@ -917,7 +917,7 @@ export function DealDetailsPage() {
                                             setPaymentType("");
                                             setReference("");
                                             setPaymentNote("");
-                                            setPaidAt([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+                                            setPaidAt([parseDate(companyToday(user?.company?.timezone))]);
                                         }
                                     },
                                 )
