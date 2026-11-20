@@ -633,7 +633,12 @@ export function DealDetailsPage() {
                                 </Field>
                                 <Field>
                                     <FieldLabel>{t("detailsPage.contractDateLabel")}</FieldLabel>
-                                    <DatePicker onValueChange={({ value }) => setContractDate(value)} value={contractDate}>
+                                    {/* Signed already: the API refuses later dates. */}
+                                    <DatePicker
+                                        onValueChange={({ value }) => setContractDate(value)}
+                                        value={contractDate}
+                                        max={parseDate(format(new Date(), 'yyyy-MM-dd'))}
+                                    >
                                         <DatePickerTrigger asChild>
                                             <Button className="w-full flex justify-between" variant="outline">
                                                 {formatDate(contractDate[0].toString(), i18n.language).date}

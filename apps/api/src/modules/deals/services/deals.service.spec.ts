@@ -24,6 +24,7 @@ import {
     SalePriceMismatchException,
     UnitNotAvailableException,
     UnitNotFoundException,
+    ContractDateInFutureException,
 } from '../exceptions';
 import {DealMapper} from '../mappers/deal.mapper';
 
@@ -647,6 +648,23 @@ describe('DealsService', () => {
     });
 
     describe('signContract', () => {
+        it('refuses a contract dated after today, before touching the deal', async () => {
+            const {service, prisma} = buildBase();
+            const tomorrow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
+            await expect(
+                service.signContract(managerUser, 'deal-1', {contractNumber: 'C1', contractDate: tomorrow} as any),
+            ).rejects.toThrow(ContractDateInFutureException);
+            expect(prisma.deal.findFirst).not.toHaveBeenCalled();
+        });
+
+        it('keeps a contract signed before the deal was entered (an existing sale brought in late)', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(null);
+            await expect(
+                service.signContract(managerUser, 'deal-1', {contractNumber: 'C1', contractDate: '2025-03-01T00:00:00.000Z'} as any),
+            ).rejects.toThrow(DealNotFoundException);
+        });
+
         it('throws DealNotFoundException outside caller scope', async () => {
             const {service, prisma} = buildBase();
             prisma.deal.findFirst.mockResolvedValue(null);

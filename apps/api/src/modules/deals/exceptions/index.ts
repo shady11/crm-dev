@@ -21,3 +21,4 @@ export * from './payments/refund-exceeds-paid.exception';
 export * from './payments/payment-date-in-future.exception';
 export * from './payments/paid-exceeds-discounted-price.exception';
 export * from './block-not-on-sale.exception';
+export * from './contract-date-in-future.exception';

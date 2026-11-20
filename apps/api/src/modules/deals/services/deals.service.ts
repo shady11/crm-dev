@@ -21,6 +21,7 @@ import {hasPermission} from '@/common/utils/permissions.util';
 
 import {
   ClientNotFoundException,
+  ContractDateInFutureException,
   DealNotFoundException,
   DiscountApprovalNotAllowedException,
   PaidExceedsDiscountedPriceException,
@@ -58,7 +59,7 @@ import {taskText} from "@/modules/tasks/task-templates";
 import {ScheduleNeededNotifier} from "./schedule-needed-notifier.service";
 import {ReceiptNumberService} from "./payments/receipt-number.service";
 import { activityText } from '@/modules/activities/activity-templates';
-import { todayAsDate } from '@/common/utils/day-bounds.util';
+import { endOfToday, todayAsDate } from '@/common/utils/day-bounds.util';
 
 @Injectable()
 export class DealsService {
@@ -758,6 +759,13 @@ export class DealsService {
     }
 
     const companyId = user.companyId;
+
+    // A contract dated ahead would count as a sale won on a day that hasn't
+    // come. Earlier dates stay allowed: a sale signed before it was entered
+    // into the CRM keeps its real date.
+    if (new Date(dto.contractDate) > endOfToday(user.company?.timezone)) {
+      throw new ContractDateInFutureException();
+    }
 
     const result = await this.prisma.$transaction(async db => {
       const deal = await db.deal.findFirst({
