@@ -138,8 +138,9 @@ export function BranchesPage() {
                         <EmptyMedia variant="icon">
                             <Building2 />
                         </EmptyMedia>
-                        <EmptyTitle>{t("page.empty.title")}</EmptyTitle>
-                        <EmptyDescription>{t("page.empty.description")}</EmptyDescription>
+                        {/* "Change your search" only when there is a search to change. */}
+                        <EmptyTitle>{t(search ? "page.empty.title" : "page.emptyNone.title")}</EmptyTitle>
+                        <EmptyDescription>{t(search ? "page.empty.description" : "page.emptyNone.description")}</EmptyDescription>
                     </EmptyHeader>
                 </Empty>
             ) : (

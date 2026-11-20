@@ -25,7 +25,8 @@ export function useDealsList() {
     const [page, setPage] = useState(1);
     const [limit, setLimitState] = useState(10);
 
-    const [projectId, setProjectIdState] = useState<string | undefined>();
+    // ?projectId= opens the list on one project (from its overview).
+    const [projectId, setProjectIdState] = useState<string | undefined>(() => searchParams.get("projectId") ?? undefined);
     // Seeded from the URL so a link (the "My team" page) can open one
     // manager's deals; the toolbar's picker takes over from there.
     const [managerId, setManagerIdState] = useState<string | undefined>(() => searchParams.get("managerId") ?? undefined);
