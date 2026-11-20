@@ -94,6 +94,20 @@ describe('ChessboardService.getProjectChessboard', () => {
         expect(result.blocks[0].entrances[0].floors.find((f: any) => f.id === 'floor-1').units).toHaveLength(2);
     });
 
+    it('puts a floor\'s units in number order, 110 after 102', async () => {
+        const {service} = build({
+            units: [
+                unitRow({id: 'u1', number: '110'}),
+                unitRow({id: 'u2', number: '102'}),
+                unitRow({id: 'u3', number: '101'}),
+            ],
+        });
+
+        const result = await service.getProjectChessboard(user, 'project-1', {});
+
+        expect(result.blocks[0].entrances[0].floors[0].units.map((u: any) => u.number)).toEqual(['101', '102', '110']);
+    });
+
     it('sorts blocks and entrances ascending by order, but floors within an entrance descending', async () => {
         const {service} = build({
             units: [

@@ -228,7 +228,9 @@
     "units_one": "{{count}} unit",
     "units_few": "{{count}} units",
     "units_many": "{{count}} units",
-    "units_other": "{{count}} units"
+    "units_other": "{{count}} units",
+    "scrollLeft": "Earlier units",
+    "scrollRight": "More units"
   },
   "filters": {
     "roomsSummary_one": "{{count}} room",

@@ -20,8 +20,9 @@ export function ChessboardFloorRow({
                                        onUnitClick,
                                    }: Props) {
     return (
-        <div className="flex min-h-15 gap-3 rounded-md">
-            <div className="flex flex-col justify-center py-2 min-w-8">
+        <div className="flex min-h-15 rounded-md">
+            {/* Pinned, so the floor stays named while the row scrolls sideways. */}
+            <div className="sticky left-0 z-10 flex flex-col justify-center py-2 min-w-11 pr-3 bg-card">
                 <span className="font-medium text-muted-foreground">{floor.number}</span>
             </div>
 

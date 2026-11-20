@@ -39,8 +39,10 @@ export function ChessboardUnitCard({
             )}
         >
             <div className="flex items-center justify-between w-full gap-8 text-xs">
+                {/* Commercial space, parking and storage have no rooms:
+                    the label read "комнат" with no number. */}
                 <span>
-                    {t("chessboard.rooms", { count: unit.rooms })}
+                    {unit.rooms != null ? t("chessboard.rooms", { count: unit.rooms }) : null}
                 </span>
                 <span>
                     №{unit.number}

@@ -228,7 +228,9 @@
     "units_one": "{{count}} жай",
     "units_few": "{{count}} жай",
     "units_many": "{{count}} жай",
-    "units_other": "{{count}} жай"
+    "units_other": "{{count}} жай",
+    "scrollLeft": "Мурунку жайлар",
+    "scrollRight": "Дагы жайлар"
   },
   "filters": {
     "roomsSummary_one": "{{count}} бөлмө",
