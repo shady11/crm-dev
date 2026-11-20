@@ -59,7 +59,10 @@ export function ProjectForm({
         status: z.enum(PROJECT_STATUS_VALUES, t("form.validation.statusRequired")),
     }), [t]);
 
-    const initialStatus = normalizeProjectStatus(project?.status);
+    // E2E-11: a new project starts as Draft, closed to sales while its
+    // blocks and units are set up. normalizeProjectStatus falls back to
+    // Active for an unknown status, so it is only for an existing project.
+    const initialStatus = project ? normalizeProjectStatus(project.status) : DEFAULT_VALUES.status;
     const [, setSelectedStatus] =
         useState<ProjectStatus>(initialStatus);
 
