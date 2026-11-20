@@ -29,6 +29,7 @@ export type PaymentRegisterItem = {
     deal: {id: string; dealNumber: string; status: DealStatus};
     client: {id: string; fullName: string};
     unitNumber: string;
+    blockName: string | null;
     projectName: string;
     branchName: string | null;
 };

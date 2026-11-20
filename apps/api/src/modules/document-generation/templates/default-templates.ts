@@ -167,7 +167,7 @@ const WORDS: Record<DocumentLanguage, Words> = {
       paymentType: 'Type',
       method: 'Method',
       amount: 'Amount',
-      paymentFor: 'Payment for unit No. {{unit.number}}, {{unit.projectName}}',
+      paymentFor: 'Payment for unit {{unit.blockName}} / {{unit.number}}, {{unit.projectName}}',
       dealLine: 'Deal {{deal.dealNumber}}',
       contractLine:
         ', contract No. {{deal.contractNumber}} of {{deal.contractDate}}',
@@ -238,7 +238,7 @@ const WORDS: Record<DocumentLanguage, Words> = {
       paymentType: 'Вид',
       method: 'Способ',
       amount: 'Сумма',
-      paymentFor: 'Оплата за помещение № {{unit.number}}, {{unit.projectName}}',
+      paymentFor: 'Оплата за помещение {{unit.blockName}} / {{unit.number}}, {{unit.projectName}}',
       dealLine: 'Сделка {{deal.dealNumber}}',
       contractLine:
         ', договор № {{deal.contractNumber}} от {{deal.contractDate}}',
@@ -309,7 +309,7 @@ const WORDS: Record<DocumentLanguage, Words> = {
       paymentType: 'Түрү',
       method: 'Ыкмасы',
       amount: 'Сумма',
-      paymentFor: '№ {{unit.number}} жай үчүн төлөм, {{unit.projectName}}',
+      paymentFor: '{{unit.blockName}} / {{unit.number}} жай үчүн төлөм, {{unit.projectName}}',
       dealLine: 'Бүтүм {{deal.dealNumber}}',
       contractLine:
         ', келишим № {{deal.contractNumber}}, {{deal.contractDate}}',
@@ -369,7 +369,7 @@ function reservationTemplate(w: Words): string {
     <tr><th>${w.project}</th><th>${w.unit}</th><th>${w.type}</th><th>${w.area}</th><th>${w.listPrice}</th></tr>
     <tr>
       <td>{{unit.projectName}}</td>
-      <td>{{unit.number}}</td>
+      <td>{{unit.blockName}} / {{unit.number}}</td>
       <td>{{unit.type}}</td>
       <td>{{unit.area}} m&sup2;</td>
       <td>{{deal.listPrice}}</td>

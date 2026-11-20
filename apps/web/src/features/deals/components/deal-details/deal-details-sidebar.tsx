@@ -15,6 +15,7 @@ import {formatDate} from "@/utils/date-formatter.ts";
 import {paths} from "@/routes/paths.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {initials} from "@/features/deals/utils/format.ts";
+import {blockLabel} from "@/features/units/utils/block-label.ts";
 
 interface DealDetailsSidebarProps {
     deal: DealDetails;
@@ -60,7 +61,7 @@ export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsS
     const pricePerSqm = unit.area > 0 ? Math.round(deal.listPrice / unit.area) : null;
     const location = [
         project.name,
-        unit.block && `${t("labels.block", {ns: "common"})} ${unit.block.name}`,
+        blockLabel(t, unit.block),
         unit.entrance && `${t("labels.entrance", {ns: "common"})} ${unit.entrance.name}`,
         unit.floor && t("unitCard.floor", {floor: unit.floor.number}),
     ].filter(Boolean).join(" · ");

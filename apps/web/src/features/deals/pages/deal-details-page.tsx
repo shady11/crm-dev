@@ -42,6 +42,7 @@ import {DealStageTracker} from "@/features/deals/components/deal-details/deal-st
 import {DealKeyFigures} from "@/features/deals/components/deal-details/deal-key-figures.tsx";
 import {DealDetailsSidebar} from "@/features/deals/components/deal-details/deal-details-sidebar.tsx";
 import {useTranslation} from "react-i18next";
+import {blockLabel} from "@/features/units/utils/block-label.ts";
 import {PAYMENT_METHOD_LABEL_KEYS, PAYMENT_TYPE_LABEL_KEYS} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
@@ -260,9 +261,10 @@ export function DealDetailsPage() {
                     <p className="truncate text-sm text-muted-foreground">
                         {[
                             t("unitCard.unitNumber", { number: deal.unit.number }),
+                            blockLabel(t, deal.unit.block),
                             deal.project.name,
                             deal.client.fullName,
-                        ].join(" · ")}
+                        ].filter(Boolean).join(" · ")}
                     </p>
                 </div>
 

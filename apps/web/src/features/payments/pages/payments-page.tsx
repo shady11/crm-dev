@@ -4,6 +4,7 @@ import {keepPreviousData, useQuery} from "@tanstack/react-query";
 import {createListCollection} from "@ark-ui/react";
 import {Download, FileSpreadsheet, Loader2, Search, WalletIcon} from "lucide-react";
 import {useTranslation} from "react-i18next";
+import {blockLabel} from "@/features/units/utils/block-label.ts";
 import {Button} from "@/components/ui/button.tsx";
 import {Card, CardContent} from "@/components/ui/card.tsx";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
@@ -255,7 +256,9 @@ export function PaymentsPage() {
                             </TableCell>
                             <TableCell>
                                 <p>№{p.unitNumber}</p>
-                                <p className="text-xs text-muted-foreground">{[p.projectName, p.branchName].filter(Boolean).join(" · ")}</p>
+                                <p className="text-xs text-muted-foreground">
+                                    {[blockLabel(t, p.blockName ? {name: p.blockName} : null), p.projectName, p.branchName].filter(Boolean).join(" · ")}
+                                </p>
                             </TableCell>
                             <TableCell>{t(PAYMENT_TYPE_LABEL_KEYS[p.paymentType])}</TableCell>
                             <TableCell>

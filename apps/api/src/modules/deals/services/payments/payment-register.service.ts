@@ -13,6 +13,7 @@ import {
   PaymentRegisterQueryDto,
   ReceivablesQueryDto,
 } from '../../dto/payments/payment-register-query.dto';
+import { unitLabel } from '@/common/utils/unit-label.util';
 
 const PAYMENT_INCLUDE = {
   user: { select: { id: true, fullName: true } },
@@ -22,7 +23,7 @@ const PAYMENT_INCLUDE = {
       dealNumber: true,
       status: true,
       client: { select: { id: true, fullName: true } },
-      unit: { select: { number: true } },
+      unit: { select: { number: true, block: { select: { name: true } } } },
       project: { select: { name: true } },
       branch: { select: { name: true } },
     },
@@ -135,7 +136,7 @@ export class PaymentRegisterService {
         Deal: row.deal.dealNumber,
         Client: row.deal.client.fullName,
         Project: row.deal.project.name,
-        Unit: row.deal.unit.number,
+        Unit: unitLabel(row.deal.unit),
         Branch: row.deal.branch?.name ?? '',
         Type: TYPE_LABELS[row.paymentType],
         Method: METHOD_LABELS[row.paymentMethod],
@@ -200,7 +201,7 @@ export class PaymentRegisterService {
         client: { select: { fullName: true, phone: true } },
         manager: { select: { fullName: true } },
         project: { select: { name: true } },
-        unit: { select: { number: true } },
+        unit: { select: { number: true, block: { select: { name: true } } } },
         branch: { select: { name: true } },
         payments: { where: { deletedAt: null }, select: { amount: true } },
         paymentSchedules: {
@@ -241,7 +242,7 @@ export class PaymentRegisterService {
           Client: deal.client.fullName,
           Phone: deal.client.phone ?? '',
           Project: deal.project.name,
-          Unit: deal.unit.number,
+          Unit: unitLabel(deal.unit),
           Branch: deal.branch?.name ?? '',
           Manager: deal.manager?.fullName ?? '',
           'Sale price': salePrice,
@@ -323,6 +324,7 @@ export class PaymentRegisterService {
       },
       client: row.deal.client,
       unitNumber: row.deal.unit.number,
+      blockName: row.deal.unit.block?.name ?? null,
       projectName: row.deal.project.name,
       branchName: row.deal.branch?.name ?? null,
     };

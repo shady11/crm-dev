@@ -8,6 +8,7 @@ import {SortableTableHead} from "@/components/shared/sortable-table-head.tsx";
 import {DEAL_STATUS_LABEL_KEYS, DEAL_STATUS_VISUALS} from "@/features/deals/types/deal.types";
 import type {Deal, DealSortField} from "@/features/deals/api/deals.api";
 import {formatCreatedAt, initials} from "@/features/deals/utils/format.ts";
+import {blockLabel} from "@/features/units/utils/block-label.ts";
 import {useTranslation} from "react-i18next";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import type {SortOrder} from "@/hooks/use-sort.ts";
@@ -75,7 +76,9 @@ export function DealsTable({ deals, isLoading, sortBy, sortOrder, onSort }: Deal
                         <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
                                 <p className="truncate font-medium">{deal.dealNumber}</p>
-                                <p className="truncate text-xs text-muted-foreground">№{deal.unit.number} · {deal.project.name}</p>
+                                <p className="truncate text-xs text-muted-foreground">
+                                    {[`№${deal.unit.number}`, blockLabel(t, deal.unit.block), deal.project.name].filter(Boolean).join(" · ")}
+                                </p>
                             </div>
                             <div className="flex shrink-0 flex-col items-end gap-1">
                                 <Badge className={`${visual?.bg} text-white`}>
@@ -134,7 +137,9 @@ export function DealsTable({ deals, isLoading, sortBy, sortOrder, onSort }: Deal
                             <TableCell className="font-medium pl-4">{deal.dealNumber}</TableCell>
                             <TableCell>
                                 <p className="font-medium">№{deal.unit.number}</p>
-                                <p className="text-xs text-muted-foreground">{deal.project.name}</p>
+                                <p className="text-xs text-muted-foreground">
+                                    {[blockLabel(t, deal.unit.block), deal.project.name].filter(Boolean).join(" · ")}
+                                </p>
                             </TableCell>
                             <TableCell>
                                 <div className="flex items-center gap-3">
