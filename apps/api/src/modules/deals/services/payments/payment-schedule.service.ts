@@ -11,6 +11,7 @@ import {DEAL_DETAILS_INCLUDE} from "../../deal.constants";
 import { activityText } from '@/modules/activities/activity-templates';
 import {ScheduleNeededNotifier} from '../schedule-needed-notifier.service';
 import {DocumentGenerationService} from '@/modules/document-generation/document-generation.service';
+import {startOfToday} from './overdue-installments';
 
 @Injectable()
 export class PaymentScheduleService {
@@ -63,6 +64,7 @@ export class PaymentScheduleService {
             const installments = dto.installments;
             const intervalMonths = dto.intervalMonths ?? 1;
             const firstDate = new Date(dto.firstPaymentDate);
+            const today = startOfToday();
 
             const baseAmount = new Prisma.Decimal(
                 Math.floor((remaining.toNumber() / installments) * 100) / 100,
@@ -84,7 +86,10 @@ export class PaymentScheduleService {
                     dueDate,
                     amount,
                     paidAmount: 0,
-                    status: PaymentScheduleStatus.PENDING,
+                    // A schedule entered with past dates (an existing
+                    // contract brought into the CRM) is overdue at once,
+                    // not from the next reminder run.
+                    status: dueDate < today ? PaymentScheduleStatus.OVERDUE : PaymentScheduleStatus.PENDING,
                     order: i + 1,
                 });
             }
