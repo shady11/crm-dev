@@ -1,6 +1,5 @@
 import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import {ArrowLeftRight, Pen, Trash2, UsersRoundIcon} from "lucide-react";
-import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {DataTable} from "@/components/shared/data-table.tsx";
@@ -9,7 +8,7 @@ import {SortableTableHead} from "@/components/shared/sortable-table-head.tsx";
 import {UserStatusDot} from "@/features/users/components/user-status-dot.tsx";
 import type {User} from "@/features/users/types/user.types";
 import type {UserSortField} from "@/features/users/api/users.api.ts";
-import {formatCreatedAt, initials} from "@/features/users/utils/format.ts";
+import {formatCreatedAt} from "@/features/users/utils/format.ts";
 import {useTranslation} from "react-i18next";
 import type {SortOrder} from "@/hooks/use-sort.ts";
 
@@ -64,9 +63,6 @@ export function UsersTable({
                                     checked={selectedIds.has(user.id)}
                                     onCheckedChange={(details) => onToggleOne(user.id, details.checked === true)}
                                 />
-                                <Avatar className="size-9 shrink-0">
-                                    <AvatarFallback>{initials(user.fullName)}</AvatarFallback>
-                                </Avatar>
                                 <div className="min-w-0">
                                     <p className="truncate font-medium">{user.fullName}</p>
                                     <p className="truncate text-xs text-muted-foreground">{user.email}</p>
@@ -147,9 +143,6 @@ export function UsersTable({
                             </TableCell>
                             <TableCell>
                                 <div className="flex items-center gap-3">
-                                    <Avatar className="size-9">
-                                        <AvatarFallback>{initials(user.fullName)}</AvatarFallback>
-                                    </Avatar>
                                     <div>
                                         <p className="font-medium">{user.fullName}</p>
                                         <p className="text-xs text-muted-foreground">{user.email}</p>
