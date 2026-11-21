@@ -76,11 +76,35 @@ export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsS
         formatArea(unit.area),
     ].filter(Boolean).join(" · ");
 
-    // Two columns of cards: people on the left, the unit and the deal's
-    // terms on the right; stacked on a phone.
+    // Two columns of cards: the unit and its client on the left, the
+    // manager and the deal's terms on the right; stacked on a phone.
     return (
         <div className="grid items-start gap-4 md:grid-cols-2">
             <div className="flex min-w-0 flex-col gap-4">
+                <InfoCard
+                    icon={Building2Icon}
+                    title={t("sidebar.unit")}
+                    action={
+                        <Button variant="ghost" size="xs" asChild>
+                            <a href={paths.units.infoSheet(unit.id)} target="_blank" rel="noopener noreferrer">
+                                {t("sidebar.unitSheet")}
+                                <ExternalLinkIcon className="size-3" />
+                            </a>
+                        </Button>
+                    }
+                >
+                    <div className="flex flex-col gap-0.5">
+                        <p className="text-base font-semibold">{t("unitCard.unitNumber", {number: unit.number})}</p>
+                        <p className="text-sm text-muted-foreground">{project.name}</p>
+                        <p className="text-sm text-muted-foreground">{location}</p>
+                        <p className="text-sm text-muted-foreground">{shape}</p>
+                    </div>
+                    <dl className="flex flex-col divide-y border-t pt-2.5">
+                        <Row label={t("financials.listPrice")}>{formatCurrency(deal.listPrice)}</Row>
+                        {pricePerSqm != null && <Row label={t("financials.pricePerMeter")}>{formatPricePerSqm(pricePerSqm)}</Row>}
+                    </dl>
+                </InfoCard>
+
                 <InfoCard icon={UserRoundIcon} title={t("sidebar.client")}>
                     <div className="flex flex-col gap-1.5">
                         <Link to={paths.clients.detail(client.id)} className="text-base font-semibold hover:underline">
@@ -108,7 +132,9 @@ export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsS
                         </p>
                     )}
                 </InfoCard>
+            </div>
 
+            <div className="flex min-w-0 flex-col gap-4">
                 <InfoCard
                     icon={BriefcaseBusinessIcon}
                     title={t("managerCard.title")}
@@ -145,32 +171,6 @@ export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsS
                             {t("sidebar.noManager")}
                         </p>
                     )}
-                </InfoCard>
-            </div>
-
-            <div className="flex min-w-0 flex-col gap-4">
-                <InfoCard
-                    icon={Building2Icon}
-                    title={t("sidebar.unit")}
-                    action={
-                        <Button variant="ghost" size="xs" asChild>
-                            <a href={paths.units.infoSheet(unit.id)} target="_blank" rel="noopener noreferrer">
-                                {t("sidebar.unitSheet")}
-                                <ExternalLinkIcon className="size-3" />
-                            </a>
-                        </Button>
-                    }
-                >
-                    <div className="flex flex-col gap-0.5">
-                        <p className="text-base font-semibold">{t("unitCard.unitNumber", {number: unit.number})}</p>
-                        <p className="text-sm text-muted-foreground">{project.name}</p>
-                        <p className="text-sm text-muted-foreground">{location}</p>
-                        <p className="text-sm text-muted-foreground">{shape}</p>
-                    </div>
-                    <dl className="flex flex-col divide-y border-t pt-2.5">
-                        <Row label={t("financials.listPrice")}>{formatCurrency(deal.listPrice)}</Row>
-                        {pricePerSqm != null && <Row label={t("financials.pricePerMeter")}>{formatPricePerSqm(pricePerSqm)}</Row>}
-                    </dl>
                 </InfoCard>
 
                 <InfoCard icon={FileTextIcon} title={t("sidebar.deal")}>
