@@ -6,6 +6,24 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Yellow: the reference design's honey amber (#E3962A, text #855600),
+   as a full ramp so tiles, badges, warnings and banners all follow.
+   The dark theme lightens 300-500 below.
+   Not inline, so utilities read the variable and .dark can change it. */
+@theme {
+    --color-amber-50: #FDF6E8;
+    --color-amber-100: #FBEACB;
+    --color-amber-200: #F6D69A;
+    --color-amber-300: #F0BD62;
+    --color-amber-400: #E3962A;
+    --color-amber-500: #D69616;
+    --color-amber-600: #B37712;
+    --color-amber-700: #8A5200;
+    --color-amber-800: #6F4400;
+    --color-amber-900: #573500;
+    --color-amber-950: #2E1C00;
+}
+
 @theme inline {
     --font-heading: var(--font-sans);
     --font-sans: 'Onest', sans-serif;
@@ -321,6 +339,9 @@
     --success-foreground: var(--color-emerald-400);
     --warning: var(--color-amber-500);
     --warning-foreground: var(--color-amber-400);
+    --color-amber-300: #F6C57A;
+    --color-amber-400: #F2B04E;
+    --color-amber-500: #ECBB62;
 }
 
 @layer base {

@@ -92,7 +92,7 @@ export const badgeVariants = tv({
 // pill in the same hue: tinted fill, deeper text, and a leading dot.
 // Neutral greys get the plain pill without a dot.
 const TONES: Record<string, string> = {
-  amber: "bg-amber-500/18 text-amber-800 dark:bg-amber-400/15 dark:text-amber-300",
+  amber: "bg-amber-500/18 text-amber-700 dark:bg-amber-400/15 dark:text-amber-300",
   orange: "bg-orange-500/15 text-orange-700 dark:bg-orange-400/15 dark:text-orange-300",
   rose: "bg-rose-500/12 text-rose-700 dark:bg-rose-400/15 dark:text-rose-300",
   emerald: "bg-emerald-600/13 text-emerald-700 dark:bg-emerald-400/14 dark:text-emerald-300",
