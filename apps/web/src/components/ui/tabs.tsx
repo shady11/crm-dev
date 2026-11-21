@@ -44,8 +44,8 @@ const tabsListVariants = tv({
   variants: {
     variant: {
       default: {
-        base: ["rounded-lg"],
-        indicator: ["-z-1 rounded-lg bg-accent"],
+        base: ["seg-surface rounded-[13px] p-[3px]"],
+        indicator: ["-z-1 bottom-[3px] rounded-[10px] seg-thumb"],
       },
       underline: {
         base: [

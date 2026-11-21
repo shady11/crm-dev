@@ -33,11 +33,10 @@ export const buttonVariants = tv({
       outline: [
         "bg-transparent",
         "text-foreground",
-        "border border-input shadow-sm/5",
-        "bg-control backdrop-blur-md",
+        "border field-surface",
         "hover:bg-accent hover:text-accent-foreground",
         "dark:hover:bg-white/10",
-        "focus-visible:border-primary",
+        "focus-visible:field-focus focus-visible:ring-0",
       ],
       destructive: [
         "bg-destructive",
