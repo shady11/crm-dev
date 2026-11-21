@@ -147,7 +147,7 @@ export function DocumentTemplatesPage() {
             </div>
 
             <Tabs value={type} onValueChange={({value}) => setType(value as TemplateType)}>
-                <TabsList variant="underline" className="w-full justify-start overflow-x-auto">
+                <TabsList variant="page" className="max-w-full justify-start overflow-x-auto">
                     {TEMPLATE_TYPES.map((value) => (
                         <TabsTrigger key={value} value={value} className="grow-0 px-3">
                             {t(TYPE_LABEL_KEYS[value])}

@@ -391,7 +391,7 @@ export function DealDetailsPage() {
             <div className="grid gap-6 lg:grid-cols-3">
                 <div className="min-w-0 lg:col-span-2">
                     <Tabs value={tab} onValueChange={({ value }) => setTab(value)} className="gap-4">
-                        <TabsList variant="underline" className="w-full justify-start overflow-x-auto">
+                        <TabsList variant="page" className="max-w-full justify-start overflow-x-auto">
                             <TabsTrigger value="payments" className="grow-0 px-3">
                                 {t("tabs.payments")}
                                 <TabCount count={deal.payments.length} />

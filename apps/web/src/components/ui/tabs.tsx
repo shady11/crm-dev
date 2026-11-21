@@ -47,6 +47,15 @@ const tabsListVariants = tv({
         base: ["seg-surface rounded-[13px] p-[3px]"],
         indicator: ["-z-1 bottom-[3px] rounded-[10px] seg-thumb"],
       },
+      // Page-level tabs, as in the reference design: the segmented glass
+      // track at a larger size (44px tall, 15px corners, 4px inset).
+      page: {
+        base: [
+          "seg-surface rounded-[15px] p-[4px] gap-x-1",
+          "*:data-[slot=tabs-trigger]:h-9 *:data-[slot=tabs-trigger]:px-4",
+        ],
+        indicator: ["-z-1 bottom-[4px] rounded-[11px] seg-thumb"],
+      },
       underline: {
         base: [
           "data-[orientation=vertical]:px-1",
