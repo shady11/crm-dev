@@ -73,7 +73,7 @@ export function ChessboardCard({
     });
 
     return (
-        <Card className="border border-secondary p-0 gap-0">
+        <Card className="border p-0 gap-0">
             <CardHeader className="gap-0 border-b py-6">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                     <h3 className="font-medium">{namedLabel(t, "chessboard.entranceLabel", entranceName)}</h3>

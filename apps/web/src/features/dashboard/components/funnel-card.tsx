@@ -60,7 +60,7 @@ export function FunnelCard({
     });
 
     return (
-        <Card className="border border-secondary shadow-none">
+        <Card className="border">
             <CardHeader>
                 <CardTitle className="text-sm text-muted-foreground">{t("funnel.title")}</CardTitle>
                 <CardAction className="flex flex-wrap items-center justify-end gap-2">

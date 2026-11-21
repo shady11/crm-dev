@@ -141,7 +141,7 @@ export function BranchDetailPage() {
             </div>
 
             <div className="grid gap-4 lg:grid-cols-[1fr_2fr]">
-                <Card className="border-secondary shadow-none">
+                <Card>
                     <CardHeader>
                         <CardTitle>{t("detail.settings.title")}</CardTitle>
                     </CardHeader>
@@ -158,7 +158,7 @@ export function BranchDetailPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="border-secondary shadow-none">
+                <Card>
                     <CardHeader>
                         <CardTitle>{t("detail.usersCard.title")}</CardTitle>
                     </CardHeader>
@@ -247,7 +247,7 @@ export function BranchDetailPage() {
 
 function Stat({label, value}: {label: string; value: number}) {
     return (
-        <Card className="border-secondary shadow-none">
+        <Card>
             <CardContent className="py-4">
                 <div className="text-2xl font-medium tabular-nums">{value}</div>
                 <div className="text-muted-foreground mt-1 text-xs">{label}</div>

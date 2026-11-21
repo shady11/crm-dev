@@ -73,7 +73,7 @@ export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsS
     ].filter(Boolean).join(" · ");
 
     return (
-        <Card className="border border-secondary pt-0 shadow-none">
+        <Card className="border pt-0">
             <CardHeader className="border-b py-4">
                 <CardTitle>{t("sidebar.title")}</CardTitle>
             </CardHeader>

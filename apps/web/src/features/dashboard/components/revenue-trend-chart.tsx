@@ -19,7 +19,7 @@ export function RevenueTrendChart({ data }: { data: RevenueTrendPoint[] }) {
     const chartData = data.map((d) => ({ month: formatMonth(d.month, i18n.language), revenue: d.revenue }));
 
     return (
-        <Card className="border border-secondary shadow-none">
+        <Card className="border">
             <CardHeader>
                 <CardTitle className="text-sm text-muted-foreground">{t("revenueTrend.title")}</CardTitle>
             </CardHeader>

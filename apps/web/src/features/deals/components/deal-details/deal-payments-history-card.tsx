@@ -43,7 +43,7 @@ export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPa
     const { t, i18n } = useTranslation(["payments", "deals"]);
     const { formatCurrency } = useCompanyFormatters();
     return (
-        <Card className="border border-secondary shadow-none pt-0">
+        <Card className="border pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
                 <CardTitle>{t("paymentsHistory.title", { ns: "deals" })}</CardTitle>
                 {canRecordPayment && (

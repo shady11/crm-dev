@@ -45,7 +45,7 @@ export function ClientHistoryCard({ clientId }: { clientId: string }) {
     const items = contactsOnly ? all.filter((a) => a.type in CONTACT_ICONS) : all;
 
     return (
-        <Card className="border border-secondary shadow-none pt-0">
+        <Card className="border pt-0">
             <CardHeader className="flex items-center justify-between gap-2 border-b py-4">
                 <CardTitle className="text-sm text-muted-foreground">{t("history.title")}</CardTitle>
                 <Toggle

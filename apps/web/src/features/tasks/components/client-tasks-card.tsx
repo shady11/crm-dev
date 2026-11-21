@@ -50,7 +50,7 @@ export function ClientTasksCard({ clientId }: { clientId: string }) {
     };
 
     return (
-        <Card className="border border-secondary shadow-none pt-0">
+        <Card className="border pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
                 <CardTitle className="text-sm text-muted-foreground">
                     {tasks.length > 0 ? t("clientCard.titleWithCount", { count: tasks.length }) : t("clientCard.title")}

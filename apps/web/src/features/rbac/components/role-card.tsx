@@ -58,7 +58,7 @@ export function RoleCard({
     const extra = role.userCount - shown.length;
 
     return (
-        <Card className="border border-secondary shadow-none">
+        <Card className="border">
             <CardContent className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">

@@ -14,7 +14,7 @@ interface KpiCardProps {
 
 export function KpiCard({ icon: Icon, label, value, accent, subtext, to }: KpiCardProps) {
     const card = (
-        <Card className={`h-full border border-secondary shadow-none ${to ? "transition-colors hover:bg-secondary/40" : ""}`}>
+        <Card className={`h-full border ${to ? "transition-colors hover:bg-secondary/40" : ""}`}>
             <CardContent className="flex items-center gap-4">
                 <div className={`flex size-11 shrink-0 items-center justify-center rounded-lg text-white ${accent}`}>
                     <Icon size={22} strokeWidth={1.75} />

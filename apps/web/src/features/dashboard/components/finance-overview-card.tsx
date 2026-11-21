@@ -24,7 +24,7 @@ export function FinanceOverviewCard({data}: {data: FinanceOverview}) {
         .map((row) => ({name: t(`financeOverview.method.${row.method}`, {defaultValue: row.method}), amount: row.amount}));
 
     return (
-        <Card className="border border-secondary shadow-none pt-0">
+        <Card className="border pt-0">
             <CardHeader className="border-b py-4">
                 <CardTitle className="text-sm text-muted-foreground">{t("financeOverview.title")}</CardTitle>
             </CardHeader>

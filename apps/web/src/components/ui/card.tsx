@@ -12,10 +12,10 @@ export const Card = (props: React.ComponentProps<typeof ark.div>) => {
         "group/card",
         "py-(--space)",
         "flex flex-col gap-4",
-        "bg-glass-strong backdrop-blur-xl",
+        "glass-card",
         "text-foreground",
         "has-data-[variant=image]:pt-0 has-data-[slot=card-footer]:pb-0",
-        "rounded-2xl border border-glass-border shadow-[0_1px_0_0_rgb(255_255_255/0.6)_inset,0_8px_24px_-16px_rgb(35_42_77/0.18)] dark:shadow-[0_1px_0_0_rgb(255_255_255/0.05)_inset]",
+        "rounded-2xl border",
         className
       )}
       data-slot="card"

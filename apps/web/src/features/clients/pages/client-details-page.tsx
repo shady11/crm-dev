@@ -144,7 +144,7 @@ export function ClientDetailsPage() {
                 </div>
             </div>
 
-            <Card className="border border-secondary shadow-none">
+            <Card className="border">
                 <CardContent>
                     <DataList className="divide-y">
                         <DataListItem>
@@ -189,7 +189,7 @@ export function ClientDetailsPage() {
             </Card>
 
             <div className="grid gap-4 lg:grid-cols-2">
-                <Card className="border border-secondary shadow-none pt-0">
+                <Card className="border pt-0">
                     <CardHeader className="border-b py-4">
                         <CardTitle className="text-sm text-muted-foreground">
                             {client.deals.length > 0 ? t("detail.dealsWithCount", { count: client.deals.length }) : t("detail.deals")}
@@ -253,7 +253,7 @@ export function ClientDetailsPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="border border-secondary shadow-none pt-0">
+                <Card className="border pt-0">
                     <CardHeader className="border-b py-4">
                         <CardTitle className="text-sm text-muted-foreground">
                             {client.leads.length > 0 ? t("detail.leadsWithCount", { count: client.leads.length }) : t("table.leads")}

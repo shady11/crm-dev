@@ -119,7 +119,7 @@ export function TeamPage() {
             </div>
 
             {canViewResults ? (
-                <Card className="border border-secondary shadow-none pt-0">
+                <Card className="border pt-0">
                     <CardHeader className="border-b py-4">
                         <CardTitle className="text-sm text-muted-foreground">{t("team.resultsHeading")}</CardTitle>
                     </CardHeader>
@@ -217,7 +217,7 @@ export function TeamPage() {
                 </Card>
             ) : null}
 
-            <Card className="border border-secondary shadow-none pt-0">
+            <Card className="border pt-0">
                 <CardHeader className="border-b py-4">
                     <CardTitle className="text-sm text-muted-foreground">{t("team.membersHeading")}</CardTitle>
                 </CardHeader>

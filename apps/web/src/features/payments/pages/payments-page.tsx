@@ -189,7 +189,7 @@ export function PaymentsPage() {
             </div>
 
             {totals && (
-                <Card className="border border-secondary shadow-none">
+                <Card className="border">
                     <CardContent className="space-y-3">
                         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                             <Figure label={t("page.totals.received")} value={formatCurrency(totals.received)} />

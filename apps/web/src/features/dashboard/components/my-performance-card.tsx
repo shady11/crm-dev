@@ -9,7 +9,7 @@ export function MyPerformanceCard({data}: {data: MyPerformance}) {
     const {t} = useTranslation("dashboard");
 
     return (
-        <Card className="border border-secondary shadow-none pt-0">
+        <Card className="border pt-0">
             <CardHeader className="border-b py-4">
                 <CardTitle className="text-sm text-muted-foreground">
                     {t("myPerformance.title", {days: data.periodDays})}

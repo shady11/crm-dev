@@ -72,7 +72,7 @@ export function EntityDocumentsCard({ ownerType, ownerId, headerActions, clientD
     });
 
     return (
-        <Card className="border border-secondary shadow-none pt-0">
+        <Card className="border pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
                 <CardTitle className="text-sm whitespace-nowrap text-muted-foreground">
                     {t("card.title")}{documents.length > 0 && ` (${documents.length})`}

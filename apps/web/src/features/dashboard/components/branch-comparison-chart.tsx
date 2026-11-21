@@ -17,7 +17,7 @@ export function BranchComparisonChart({data}: {data: BranchComparisonItem[]}) {
     const chartData = data.map((d) => ({name: d.branchName, dealCount: d.dealCount, revenue: d.revenue}));
 
     return (
-        <Card className="border border-secondary shadow-none">
+        <Card className="border">
             <CardHeader>
                 <CardTitle className="text-sm text-muted-foreground">{t("branchComparison.title")}</CardTitle>
             </CardHeader>

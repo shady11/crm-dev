@@ -42,7 +42,7 @@ export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule 
     const currentIndex = schedules.findIndex((s) => s.status !== "PAID");
 
     return (
-        <Card className="border border-secondary shadow-none pt-0">
+        <Card className="border pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
                 <div>
                     <CardTitle>{t("paymentSchedule.title", { ns: "deals" })}</CardTitle>

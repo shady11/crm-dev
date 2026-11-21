@@ -57,7 +57,7 @@ export function AttentionCard({data, showOwner}: {data: AttentionItems; showOwne
     const owner = (name: string | undefined) => (showOwner && name ? `${name} · ` : "");
 
     return (
-        <Card className="border border-secondary shadow-none pt-0">
+        <Card className="border pt-0">
             <CardHeader className="border-b py-4">
                 <CardTitle className="text-sm text-muted-foreground">{t("attention.title")}</CardTitle>
             </CardHeader>

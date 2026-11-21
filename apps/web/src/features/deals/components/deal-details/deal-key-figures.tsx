@@ -17,7 +17,7 @@ interface DealKeyFiguresProps {
 
 function Figure({label, value, children, tone}: {label: string; value: ReactNode; children?: ReactNode; tone?: "danger"}) {
     return (
-        <Card className="border border-secondary py-4 shadow-none">
+        <Card className="border py-4">
             <CardContent className="flex min-w-0 flex-col gap-1 px-4">
                 <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">{label}</p>
                 {/* Wraps rather than truncates: a cut-off amount is worse than a taller tile. */}

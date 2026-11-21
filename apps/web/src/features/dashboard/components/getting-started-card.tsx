@@ -56,7 +56,7 @@ export function GettingStartedCard({companyId}: {companyId: string}) {
     };
 
     return (
-        <Card className="border border-secondary shadow-none">
+        <Card className="border">
             <CardHeader className="flex flex-row items-start justify-between gap-3">
                 <div className="space-y-1">
                     <CardTitle>{t("gettingStarted.title")}</CardTitle>

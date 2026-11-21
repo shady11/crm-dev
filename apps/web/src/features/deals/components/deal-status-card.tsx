@@ -25,7 +25,7 @@ export function DealStatusCard({ status, count, to, onSelect, selected }: DealSt
     // Same shape as the dashboard's KPI tiles: icon, stage name, then the
     // number large, so a row of stages reads at a glance.
     const card = (
-        <Card className={`h-full border shadow-none ${selected ? "border-primary ring-1 ring-primary" : "border-secondary"} ${interactive ? "transition-colors hover:bg-secondary/40" : ""}`}>
+        <Card className={`h-full border ${selected ? "border-primary ring-1 ring-primary" : ""} ${interactive ? "transition-colors hover:bg-secondary/40" : ""}`}>
             <CardContent className="flex min-w-0 items-center gap-4">
                 {/* Hidden on a phone, where two cards share a row and the label needs the room. */}
                 <div className={`hidden size-11 shrink-0 items-center justify-center rounded-lg text-white sm:flex ${visual?.bg}`}>

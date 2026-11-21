@@ -26,7 +26,7 @@ export function UnitsInventoryChart({ data }: { data: UnitsSummaryItem[] }) {
     );
 
     return (
-        <Card className="border border-secondary shadow-none">
+        <Card className="border">
             <CardHeader>
                 <CardTitle className="text-sm text-muted-foreground">{t("unitsInventory.title", { ns: "dashboard" })}</CardTitle>
             </CardHeader>
