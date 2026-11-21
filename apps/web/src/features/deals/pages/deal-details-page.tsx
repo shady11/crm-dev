@@ -367,6 +367,7 @@ export function DealDetailsPage() {
             />
 
             <RequestDiscountDialog
+                key={discountOpen ? "open" : "closed"}
                 open={discountOpen}
                 onOpenChange={setDiscountOpen}
                 listPrice={deal.listPrice}

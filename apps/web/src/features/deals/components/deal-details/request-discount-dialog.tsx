@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader} from "@/components/ui/dialog";
@@ -30,15 +30,9 @@ interface RequestDiscountDialogProps {
 export function RequestDiscountDialog({open, onOpenChange, listPrice, clientId, currentPercent, isPending, onSubmit}: RequestDiscountDialogProps) {
     const {t, i18n} = useTranslation("deals");
     const {formatCurrency} = useCompanyFormatters();
-    const [percentText, setPercentText] = useState("");
+    // Starts fresh each time it opens: the parent remounts it by key.
+    const [percentText, setPercentText] = useState(currentPercent > 0 ? String(currentPercent) : "");
     const [note, setNote] = useState("");
-
-    useEffect(() => {
-        if (open) {
-            setPercentText(currentPercent > 0 ? String(currentPercent) : "");
-            setNote("");
-        }
-    }, [open, currentPercent]);
 
     const percent = Number(percentText.replace(",", "."));
     const valid = percentText.trim() !== "" && Number.isFinite(percent) && percent >= 0 && percent <= 100;

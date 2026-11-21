@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {Button} from "@/components/ui/button.tsx";
@@ -20,16 +20,15 @@ export function CompanyDiscountLimit({role: opened}: {role: Role}) {
     // after a save, so the limit shown here follows it.
     const roles = useQuery({queryKey: ["rbac", "roles"], queryFn: getRoles});
     const role = roles.data?.find((r) => r.id === opened.id) ?? opened;
-    const [value, setValue] = useState("");
-
-    useEffect(() => {
-        setValue(role.discountLimit === null ? "" : String(role.discountLimit));
-    }, [role.discountLimit]);
+    // null: not edited, so the field shows the saved limit.
+    const [edited, setEdited] = useState<string | null>(null);
+    const value = edited ?? (role.discountLimit === null ? "" : String(role.discountLimit));
 
     const save = useMutation({
         mutationFn: (limit: number | null) => setCompanyDiscountLimit(role.id, limit),
         onSuccess: async () => {
             await queryClient.invalidateQueries({queryKey: ["rbac", "roles"]});
+            setEdited(null);
             toast.success({title: t("companyLimit.saved"), description: t("companyLimit.savedHint")});
         },
         onError: () => toast.error({title: t("companyLimit.error")}),
@@ -47,7 +46,7 @@ export function CompanyDiscountLimit({role: opened}: {role: Role}) {
                     inputMode="decimal"
                     className="w-28"
                     value={value}
-                    onChange={(e) => setValue(e.target.value)}
+                    onChange={(e) => setEdited(e.target.value)}
                     aria-label={t("companyLimit.label")}
                 />
                 <span className="text-sm text-muted-foreground">%</span>
