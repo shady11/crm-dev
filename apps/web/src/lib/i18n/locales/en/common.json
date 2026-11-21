@@ -86,6 +86,13 @@
     "priceChanges": "Price changes",
     "documentTemplates": "Document templates"
   },
+  "navGroup": {
+    "sales": "Sales",
+    "properties": "Properties",
+    "company": "Company",
+    "platform": "Platform",
+    "logs": "Logs"
+  },
   "language": {
     "switchLabel": "Language",
     "russian": "Русский",

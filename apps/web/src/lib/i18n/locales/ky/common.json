@@ -86,6 +86,13 @@
     "priceChanges": "Баа өзгөрүүлөрү",
     "documentTemplates": "Документ шаблондору"
   },
+  "navGroup": {
+    "sales": "Сатуулар",
+    "properties": "Объекттер",
+    "company": "Компания",
+    "platform": "Платформа",
+    "logs": "Журналдар"
+  },
   "language": {
     "switchLabel": "Тил",
     "russian": "Русский",
