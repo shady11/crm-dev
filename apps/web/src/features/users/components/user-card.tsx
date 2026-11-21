@@ -1,3 +1,4 @@
+import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import {useState} from "react";
 import {Mail, Pen, Phone, Trash2, UserRound} from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
@@ -54,7 +55,7 @@ export function UserCard({ user, onEdit, onDelete, isDeleting }: Props) {
                                 </ItemDescription>
                             )}
                         </ItemContent>
-                        <Badge variant="default">{user.role.name}</Badge>
+                        <Badge variant="default">{roleLabel(t, user.role.name)}</Badge>
                     </div>
 
                     <Separator />

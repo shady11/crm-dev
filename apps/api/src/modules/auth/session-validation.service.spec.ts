@@ -65,6 +65,7 @@ describe('SessionValidationService.validate', () => {
         const prisma = {
             user: {findUnique: jest.fn().mockResolvedValue(user)},
             impersonationSession: {findUnique: jest.fn().mockResolvedValue(impersonationSession)},
+            companyRoleDiscountLimit: {findUnique: jest.fn().mockResolvedValue(null)},
         };
         const configService = {
             get: jest.fn((key: string) => configValues[key]),
@@ -88,6 +89,17 @@ describe('SessionValidationService.validate', () => {
             companyId: 'company-1',
             impersonation: null,
         });
+    });
+
+    it("uses the company's own discount limit for a built-in role (E2E-24)", async () => {
+        const {service, prisma} = build(baseUser());
+        expect((await service.validate(basePayload())).discountLimit).toBe(5);
+
+        prisma.companyRoleDiscountLimit.findUnique.mockResolvedValue({discountLimit: {toNumber: () => 8}});
+        expect((await service.validate(basePayload())).discountLimit).toBe(8);
+        expect(prisma.companyRoleDiscountLimit.findUnique).toHaveBeenCalledWith(expect.objectContaining({
+            where: {companyId_roleId: {companyId: 'company-1', roleId: 'role-sales-manager'}},
+        }));
     });
 
     it('says which legal details contracts still lack (CA-4)', async () => {

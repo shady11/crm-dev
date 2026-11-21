@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { PrismaService } from '@/database/prisma.service';
@@ -10,6 +10,7 @@ import {
 import { NotificationsService } from '@/modules/notifications/notifications.service';
 import type { NotificationTemplate } from '@/modules/notifications/notification-templates';
 import { RbacService } from '@/modules/rbac/rbac.service';
+import { markOverdueInstallments } from '@/modules/deals/services/payments/overdue-installments';
 
 import { REMINDER_STAGES } from './payment-reminders.constants';
 import { OutboundMessageService } from './outbound-message.service';
@@ -23,7 +24,7 @@ function startOfDay(date: Date): Date {
 }
 
 @Injectable()
-export class PaymentReminderCronService {
+export class PaymentReminderCronService implements OnApplicationBootstrap {
   private readonly logger = new Logger(PaymentReminderCronService.name);
 
   constructor(
@@ -32,6 +33,25 @@ export class PaymentReminderCronService {
     private readonly notifications: NotificationsService,
     private readonly rbacService: RbacService,
   ) {}
+
+  /**
+   * Overdue status, hourly and at startup, apart from the 8 AM reminders:
+   * an installment due yesterday is overdue from just after midnight, and
+   * a server that was down at 8 AM still catches up.
+   */
+  @Cron(CronExpression.EVERY_HOUR)
+  async markOverdue() {
+    try {
+      const count = await markOverdueInstallments(this.prisma);
+      if (count > 0) this.logger.log(`${count} installment(s) marked overdue`);
+    } catch (error) {
+      this.logger.error('Marking overdue installments failed', error as Error);
+    }
+  }
+
+  async onApplicationBootstrap() {
+    await this.markOverdue();
+  }
 
   /**
    * Once daily — a due date has day granularity, so hourly resolution

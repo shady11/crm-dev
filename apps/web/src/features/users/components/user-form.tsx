@@ -1,3 +1,4 @@
+import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import {useEffect, useMemo, useState} from "react";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Loader2, TriangleAlert} from "lucide-react";
@@ -187,7 +188,7 @@ export function UserForm({
 
     const roleCollection = createListCollection({
         items: roles.map((role) => ({
-            label: role.name,
+            label: roleLabel(t, role.name),
             value: role.id,
         })),
     });

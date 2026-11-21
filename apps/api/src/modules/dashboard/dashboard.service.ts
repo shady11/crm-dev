@@ -1,3 +1,5 @@
+import {exportLabels} from "@/common/i18n/export-labels";
+import type {DocumentLanguage} from "@/modules/document-generation/document-language";
 import {ForbiddenException, Injectable} from "@nestjs/common";
 import * as XLSX from "xlsx";
 import {DealStatus, LeadStatus, PaymentMethod, PaymentScheduleStatus, Prisma, TaskStatus, UnitPriceRequestStatus, UnitStatus} from "@/generated/prisma/client";
@@ -468,14 +470,21 @@ export class DashboardService {
      * branch-scoped (BranchGuard), so there's no optional branchId param
      * here the way the company-wide dashboard queries above take one.
      */
-    async getTeamSnapshot(user: AuthUser) {
+    async getTeamSnapshot(user: AuthUser, requestedBranchId?: string) {
         if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
-        if (!user.branchId) throw new ForbiddenException("User is not assigned to a branch");
 
         const companyId = user.companyId;
-        const branchId = user.branchId;
+        // A branch-scoped team lead sees their own branch, themselves
+        // included (SH-9). A company-wide viewer (the owner) sees every
+        // branch's managers, or one branch's when the dashboard is filtered
+        // to it, with each row naming its branch.
+        const companyWide = !user.isBranchScoped;
+        if (!companyWide && !user.branchId) throw new ForbiddenException("User is not assigned to a branch");
+        const branchId = companyWide ? requestedBranchId : user.branchId!;
 
-        const managers = await this.findTeamPeople(companyId, branchId, user);
+        const managers = companyWide
+            ? (await this.findTeamManagers(companyId, branchId)).map((m) => ({ ...m, isViewer: false }))
+            : await this.findTeamPeople(companyId, branchId!, user);
 
         const now = new Date();
 
@@ -519,6 +528,7 @@ export class DashboardService {
 
                 return {
                     manager: { id: manager.id, fullName: manager.fullName, email: manager.email },
+                    branch: companyWide ? manager.branch : null,
                     isViewer: manager.isViewer,
                     openLeads,
                     activeDeals,
@@ -540,7 +550,7 @@ export class DashboardService {
         const managers = await this.findTeamManagers(companyId, branchId);
         const people = managers.map((m) => ({ ...m, isViewer: m.id === viewer.id }));
         if (!people.some((p) => p.isViewer)) {
-            people.push({ id: viewer.id, fullName: viewer.name, email: viewer.email, isViewer: true });
+            people.push({ id: viewer.id, fullName: viewer.name, email: viewer.email, branch: null, isViewer: true });
         }
         return people;
     }
@@ -551,7 +561,7 @@ export class DashboardService {
      * active, not deleted. Shared by the team snapshot and team performance
      * so both list the same people.
      */
-    private async findTeamManagers(companyId: string, branchId: string) {
+    private async findTeamManagers(companyId: string, branchId: string | undefined) {
         const targetRoleIds = await this.rbacService.findRoleIdsWithPermission(companyId, "deals.manage", "deals.reassign");
 
         return this.prisma.user.findMany({
@@ -562,7 +572,7 @@ export class DashboardService {
                 isActive: true,
                 deletedAt: null,
             },
-            select: { id: true, fullName: true, email: true },
+            select: { id: true, fullName: true, email: true, branch: { select: { id: true, name: true } } },
             orderBy: { fullName: "asc" },
         });
     }
@@ -916,29 +926,31 @@ export class DashboardService {
      * (see units-import.service.ts) rather than adding a CSV library for
      * the same job.
      */
-    async exportFunnelXlsx(user: AuthUser, projectId?: string, branchId?: string, managerId?: string): Promise<Buffer> {
+    async exportFunnelXlsx(user: AuthUser, projectId?: string, branchId?: string, managerId?: string, language: DocumentLanguage = "en"): Promise<Buffer> {
         const funnel = await this.getFunnel(user, projectId, branchId, managerId);
+        const labels = exportLabels(language);
+        const L = labels.funnel;
 
         const workbook = XLSX.utils.book_new();
 
         const leadsSheet = XLSX.utils.json_to_sheet(
-            funnel.leadsByStatus.map((row) => ({ Status: row.status, Leads: row.count })),
+            funnel.leadsByStatus.map((row) => ({ [L.status]: labels.leadStatus[row.status] ?? row.status, [L.leads]: row.count })),
         );
-        XLSX.utils.book_append_sheet(workbook, leadsSheet, "Leads by status");
+        XLSX.utils.book_append_sheet(workbook, leadsSheet, L.leadsSheet);
 
         const dealsSheet = XLSX.utils.json_to_sheet(
-            funnel.dealsByStatus.map((row) => ({ Status: row.status, Deals: row.count })),
+            funnel.dealsByStatus.map((row) => ({ [L.status]: labels.dealStatus[row.status] ?? row.status, [L.deals]: row.count })),
         );
-        XLSX.utils.book_append_sheet(workbook, dealsSheet, "Deals by status");
+        XLSX.utils.book_append_sheet(workbook, dealsSheet, L.dealsSheet);
 
         const summarySheet = XLSX.utils.json_to_sheet([
-            { Metric: "Total leads", Value: funnel.totalLeads },
-            { Metric: "Total deals", Value: funnel.totalDeals },
-            { Metric: "Deals won", Value: funnel.dealsWon },
-            { Metric: "Lead → deal conversion rate", Value: funnel.leadToDealConversionRate },
-            { Metric: "Lead → won conversion rate", Value: funnel.leadToWonConversionRate },
+            { [L.metric]: L.totalLeads, [L.value]: funnel.totalLeads },
+            { [L.metric]: L.totalDeals, [L.value]: funnel.totalDeals },
+            { [L.metric]: L.dealsWon, [L.value]: funnel.dealsWon },
+            { [L.metric]: L.leadToDeal, [L.value]: funnel.leadToDealConversionRate },
+            { [L.metric]: L.leadToWon, [L.value]: funnel.leadToWonConversionRate },
         ]);
-        XLSX.utils.book_append_sheet(workbook, summarySheet, "Summary");
+        XLSX.utils.book_append_sheet(workbook, summarySheet, L.summarySheet);
 
         return XLSX.write(workbook, { type: "buffer", bookType: "xlsx" }) as Buffer;
     }

@@ -1,3 +1,4 @@
+import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import {useState} from "react";
 import {createListCollection} from "@ark-ui/react";
 import {useMutation, useQuery} from "@tanstack/react-query";
@@ -80,7 +81,7 @@ export function DeactivateCompanyUserDialog({
     const collection = createListCollection({
         items: [
             {label: t("detail.usersCard.deactivate.noHandover"), value: NO_HANDOVER},
-            ...candidates.map((other) => ({label: `${other.fullName} · ${other.role.name}`, value: other.id})),
+            ...candidates.map((other) => ({label: `${other.fullName} · ${roleLabel(t, other.role.name)}`, value: other.id})),
         ],
     });
 

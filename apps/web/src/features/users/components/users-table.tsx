@@ -1,3 +1,4 @@
+import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import {ArrowLeftRight, Pen, Trash2, UsersRoundIcon} from "lucide-react";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
@@ -74,7 +75,7 @@ export function UsersTable({
                             <UserStatusDot isActive={user.isActive} />
                         </div>
                         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-                            <span>{user.role.name}</span>
+                            <span>{roleLabel(t, user.role.name)}</span>
                             <span>{user.branch?.name ?? "—"}</span>
                             <span className="ml-auto">{created.date}</span>
                         </div>
@@ -155,7 +156,7 @@ export function UsersTable({
                                     </div>
                                 </div>
                             </TableCell>
-                            <TableCell>{user.role.name}</TableCell>
+                            <TableCell>{roleLabel(t, user.role.name)}</TableCell>
                             <TableCell className="text-muted-foreground">{user.branch?.name ?? "—"}</TableCell>
                             <TableCell>
                                 <p>{created.date}</p>

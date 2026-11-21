@@ -7,6 +7,8 @@
 export type NotificationTemplate =
     | {templateKey: "discountApprovalRequested"; params: {dealNumber: string; percent: number}}
     | {templateKey: "discountApproved"; params: {dealNumber: string}}
+    // E2E-21: granted at less than the manager asked.
+    | {templateKey: "discountApprovedPartially"; params: {dealNumber: string; percent: number; requested: number}}
     | {templateKey: "discountRejected"; params: {dealNumber: string; reason: string}}
     | {templateKey: "dealStatusChanged"; params: {dealNumber: string; status: string}}
     | {templateKey: "reservationExpired"; params: {dealNumber: string}}

@@ -19,11 +19,13 @@ const LABELS: Record<
   {
     unitType: Record<string, string>;
     financing: Record<string, string>;
+    dealStatus: Record<string, string>;
     paymentMethod: Record<string, string>;
     paymentType: Record<string, string>;
   }
 > = {
   en: {
+    dealStatus: { RESERVED: 'Reserved', CONTRACT_SIGNED: 'Contract signed', ACTIVE: 'Active', COMPLETED: 'Completed', CANCELLED: 'Cancelled', EXPIRED: 'Expired' },
     unitType: {
       APARTMENT: 'Apartment',
       COMMERCIAL: 'Commercial',
@@ -51,6 +53,7 @@ const LABELS: Record<
     },
   },
   ru: {
+    dealStatus: { RESERVED: 'Забронировано', CONTRACT_SIGNED: 'Договор подписан', ACTIVE: 'В процессе', COMPLETED: 'Завершена', CANCELLED: 'Отменена', EXPIRED: 'Истекла' },
     unitType: {
       APARTMENT: 'Квартира',
       COMMERCIAL: 'Коммерческое помещение',
@@ -78,6 +81,7 @@ const LABELS: Record<
     },
   },
   ky: {
+    dealStatus: { RESERVED: 'Бронделген', CONTRACT_SIGNED: 'Келишим кол коюлган', ACTIVE: 'Иштеп жатат', COMPLETED: 'Аякталды', CANCELLED: 'Жокко чыгарылды', EXPIRED: 'Мөөнөтү өттү' },
     unitType: {
       APARTMENT: 'Квартира',
       COMMERCIAL: 'Коммерциялык жай',
@@ -149,6 +153,7 @@ export function documentFormatter(language: DocumentLanguage) {
     },
     unitType: (code?: string | null) => label(labels.unitType, code),
     financing: (code?: string | null) => label(labels.financing, code),
+    dealStatus: (code?: string | null) => label(labels.dealStatus, code),
     paymentMethod: (code?: string | null) => label(labels.paymentMethod, code),
     paymentType: (code?: string | null) => label(labels.paymentType, code),
   };

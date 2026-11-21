@@ -1,3 +1,4 @@
+import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import {useState} from "react";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
@@ -242,7 +243,7 @@ export function CompanyDetailPage() {
                                                 <div className="text-muted-foreground text-xs">{user.email}</div>
                                             </TableCell>
                                             <TableCell>
-                                                {user.role.name}
+                                                {roleLabel(t, user.role.name)}
                                             </TableCell>
                                             <TableCell>
                                                 <Badge variant={user.isActive ? "secondary" : "outline"}>

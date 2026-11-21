@@ -46,10 +46,12 @@ export function useBranchComparison(enabled: boolean) {
 
 // SH-A2, SALES_HEAD only — same reasoning as useBranchComparison above: a
 // separate role-gated endpoint, not part of the shared dashboard query set.
-export function useTeamSnapshot(enabled: boolean) {
+// branchId narrows the owner's company-wide snapshot; a Sales Head's is
+// always their own branch.
+export function useTeamSnapshot(enabled: boolean, branchId?: string) {
     return useQuery({
-        queryKey: ["dashboard", "team-snapshot"],
-        queryFn: getTeamSnapshot,
+        queryKey: ["dashboard", "team-snapshot", { branchId }],
+        queryFn: () => getTeamSnapshot(branchId),
         enabled,
     });
 }

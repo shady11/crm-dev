@@ -444,6 +444,36 @@ describe("UnitsImportService (CA-C1)", () => {
             expect(priceRequests.handlePriceChange).not.toHaveBeenCalled();
         });
 
+        describe("preview (E2E-23): checks the file and saves nothing", () => {
+            it("counts what would be created, names new blocks, lists price changes and catches duplicates", async () => {
+                const {service, prisma, tx, priceRequests} = build({units: [{id: "u1", number: "501", blockId: "b1", price: 50000}]});
+                prisma.block.findMany.mockResolvedValue([{id: "b1", name: "A", order: 1}]);
+                const file = csvFile([
+                    ["block", "entrance", "floor", "number", "area", "price"],
+                    ["A", "1", "5", "501", "45", "55000"],
+                    ["A", "1", "5", "502", "45", "50000"],
+                    ["B", "1", "1", "101", "45", "50000"],
+                    ["B", "1", "1", "101", "45", "50000"],
+                ]);
+
+                const result = await service.importFromFile(actor, "project-1", file, true);
+
+                expect(result.preview).toBe(true);
+                expect(result.created).toBe(2);
+                expect(result.newBlocks).toEqual(["B"]);
+                expect(result.priceChanges).toEqual([
+                    {row: 2, block: "A", number: "501", currentPrice: 50000, filePrice: 55000, needsApproval: expect.any(Boolean)},
+                ]);
+                expect(result.errors).toEqual([expect.objectContaining({row: 5, codes: [expect.objectContaining({code: "duplicateInFile"})]})]);
+                expect(tx.unit.create).not.toHaveBeenCalled();
+                expect(tx.block.create).not.toHaveBeenCalled();
+                expect(prisma.unit.update).not.toHaveBeenCalled();
+                expect(priceRequests.handlePriceChange).not.toHaveBeenCalled();
+                expect(prisma.activity.create).not.toHaveBeenCalled();
+                expect(priceRequests.notifyImportedPrices).not.toHaveBeenCalled();
+            });
+        });
+
         describe("re-importing: a new price applies to available units only", () => {
             const fileFor = (price: string) => csvFile([
                 ["block", "entrance", "floor", "number", "area", "price"],

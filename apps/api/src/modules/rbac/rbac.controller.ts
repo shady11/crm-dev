@@ -1,3 +1,4 @@
+import { SetDiscountLimitDto } from "./dto/set-discount-limit.dto";
 import { Body, Controller, Delete, Get, Param, Patch, Post, Put, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "@/modules/auth/guards/jwt-auth.guard";
 import { PermissionsGuard } from "@/common/guards/permissions.guard";
@@ -52,6 +53,17 @@ export class RbacController {
         @Body() dto: UpdateRoleDto,
     ) {
         return this.rbacService.updateRole(actor, id, dto);
+    }
+
+    // E2E-24: the company's own discount limit for a role, built-in ones
+    // included, without copying it.
+    @Put("roles/:id/discount-limit")
+    setDiscountLimit(
+        @CurrentUser() actor: AuthUser,
+        @Param("id") id: string,
+        @Body() dto: SetDiscountLimitDto,
+    ) {
+        return this.rbacService.setCompanyDiscountLimit(actor, id, dto.discountLimit);
     }
 
     @Put("roles/:id/permissions")

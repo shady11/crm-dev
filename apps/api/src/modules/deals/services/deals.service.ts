@@ -21,6 +21,7 @@ import {hasPermission} from '@/common/utils/permissions.util';
 
 import {
   ClientNotFoundException,
+  ContractDateInFutureException,
   DealNotFoundException,
   DiscountApprovalNotAllowedException,
   PaidExceedsDiscountedPriceException,
@@ -45,6 +46,8 @@ import {ExtendReservationDto} from "@/modules/deals/dto/extend-reservation.dto";
 import {SignContractDto} from "@/modules/deals/dto/sign-contract.dto";
 import {CancelDealDto} from "@/modules/deals/dto/cancel-deal.dto";
 import {RejectDiscountDto} from "@/modules/deals/dto/reject-discount.dto";
+import {ApproveDiscountDto} from "@/modules/deals/dto/approve-discount.dto";
+import {RequestDiscountDto} from "@/modules/deals/dto/request-discount.dto";
 import {ReassignManagerDto} from "@/common/dto/reassign-manager.dto";
 import {DbClient} from "@/database/prisma.types";
 import {findDiscountApprovers, findDiscountApproverIds, resolveDiscountRequestNotifications} from "./discount-approval";
@@ -58,7 +61,7 @@ import {taskText} from "@/modules/tasks/task-templates";
 import {ScheduleNeededNotifier} from "./schedule-needed-notifier.service";
 import {ReceiptNumberService} from "./payments/receipt-number.service";
 import { activityText } from '@/modules/activities/activity-templates';
-import { todayAsDate } from '@/common/utils/day-bounds.util';
+import { endOfToday, todayAsDate } from '@/common/utils/day-bounds.util';
 
 @Injectable()
 export class DealsService {
@@ -759,6 +762,13 @@ export class DealsService {
 
     const companyId = user.companyId;
 
+    // A contract dated ahead would count as a sale won on a day that hasn't
+    // come. Earlier dates stay allowed: a sale signed before it was entered
+    // into the CRM keeps its real date.
+    if (new Date(dto.contractDate) > endOfToday(user.company?.timezone)) {
+      throw new ContractDateInFutureException();
+    }
+
     const result = await this.prisma.$transaction(async db => {
       const deal = await db.deal.findFirst({
         where: {
@@ -905,7 +915,7 @@ export class DealsService {
     }
   }
 
-  async approveDiscount(user: AuthUser, id: string) {
+  async approveDiscount(user: AuthUser, id: string, dto: ApproveDiscountDto = {}) {
     if (!user.companyId) {
       throw new ForbiddenException("User does not belong to a company");
     }
@@ -929,10 +939,23 @@ export class DealsService {
         throw new DiscountApprovalNotAllowedException();
       }
 
+      // E2E-21: the approver may grant less than was asked.
+      const requestedPercent = deal.requestedDiscountPercent!;
+      const approvedPercent = dto.discountPercent != null
+          ? new Prisma.Decimal(dto.discountPercent)
+          : requestedPercent;
+      if (approvedPercent.greaterThan(requestedPercent)) {
+        throw new BadRequestException("Can't approve a larger discount than was requested.");
+      }
+      const partial = approvedPercent.lessThan(requestedPercent);
+      const approvedAmount = partial
+          ? deal.listPrice.times(approvedPercent).dividedBy(100).toDecimalPlaces(2)
+          : deal.requestedDiscountAmount!;
+
       // Payments are accepted before the decision (FIN-9), against the list
       // price; the discount can't leave the client paid beyond the new price.
       const paid = await db.payment.aggregate({ where: { dealId: deal.id, deletedAt: null }, _sum: { amount: true } });
-      if ((paid._sum.amount ?? new Prisma.Decimal(0)).greaterThan(deal.listPrice.minus(deal.requestedDiscountAmount ?? 0))) {
+      if ((paid._sum.amount ?? new Prisma.Decimal(0)).greaterThan(deal.listPrice.minus(approvedAmount))) {
         throw new PaidExceedsDiscountedPriceException();
       }
 
@@ -942,26 +965,37 @@ export class DealsService {
           discountApprovalStatus: DiscountApprovalStatus.APPROVED,
           discountApprovedById: user.id,
           discountApprovedAt: new Date(),
-          discountAmount: deal.requestedDiscountAmount,
-          discountPercent: deal.requestedDiscountPercent,
-          salePrice: deal.listPrice.minus(deal.requestedDiscountAmount),
+          discountAmount: approvedAmount,
+          discountPercent: approvedPercent,
+          salePrice: deal.listPrice.minus(approvedAmount),
         },
       });
 
       await this.activityService.discountApproved({
         db, companyId, userId: user.id,
         dealId: deal.id, clientId: deal.clientId,
-        metadata: { discountPercent: deal.requestedDiscountPercent.toNumber() },
-      });
+        metadata: {
+          discountPercent: approvedPercent.toNumber(),
+          ...(partial ? { requestedDiscountPercent: requestedPercent.toNumber() } : {}),
+        },
+      }, partial ? { percent: approvedPercent.toNumber(), requested: requestedPercent.toNumber() } : undefined);
 
       if (deal.managerId && deal.managerId !== user.id) {
         await this.notifications.create({
           companyId,
           userId: deal.managerId,
           type: NotificationType.DISCOUNT_DECIDED,
-          title: `Discount approved for deal ${deal.dealNumber}`,
-          templateKey: 'discountApproved',
-          params: { dealNumber: deal.dealNumber },
+          ...(partial
+              ? {
+                  title: `Discount for deal ${deal.dealNumber} approved at ${approvedPercent.toNumber()}% instead of ${requestedPercent.toNumber()}%`,
+                  templateKey: 'discountApprovedPartially' as const,
+                  params: { dealNumber: deal.dealNumber, percent: approvedPercent.toNumber(), requested: requestedPercent.toNumber() },
+                }
+              : {
+                  title: `Discount approved for deal ${deal.dealNumber}`,
+                  templateKey: 'discountApproved' as const,
+                  params: { dealNumber: deal.dealNumber },
+                }),
           entityType: NotificationEntityType.DEAL,
           entityId: deal.id,
         });
@@ -986,6 +1020,131 @@ export class DealsService {
     await this.resolveDiscountNotifications(result, { outcome: 'approved', byName: user.name });
 
     return this.mapper.toDetails(result);
+  }
+
+  /**
+   * E2E-21: a new discount on a reservation that has none waiting, after a
+   * rejection or when the talks move on, without cancelling and booking
+   * again. Same rule as at booking: within the asker's own limit it applies
+   * at once and the reservation agreement is reissued; above it, the deal
+   * goes back to list price while the request waits, and the same approvers
+   * are asked. 0 takes the discount off.
+   */
+  async requestDiscount(user: AuthUser, id: string, dto: RequestDiscountDto) {
+    if (!user.companyId) {
+      throw new ForbiddenException("User does not belong to a company");
+    }
+
+    const companyId = user.companyId;
+
+    const outcome = await this.prisma.$transaction(async db => {
+      const deal = await db.deal.findFirst({
+        where: {
+          id, companyId, deletedAt: null,
+          ...(user.isBranchScoped ? { branchId: user.branchId } : {}),
+        },
+      });
+      if (!deal) throw new DealNotFoundException(id);
+
+      this.domain.ensureStatus(deal, DealStatus.RESERVED);
+      if (deal.discountApprovalStatus === DiscountApprovalStatus.PENDING) {
+        throw new ConflictException('A discount request is already waiting for a decision.');
+      }
+
+      const percent = new Prisma.Decimal(dto.discountPercent);
+      const amount = deal.listPrice.times(percent).dividedBy(100).toDecimalPlaces(2);
+      const requiresApproval = percent.greaterThan(0) &&
+          this.domain.requiresDiscountApproval(percent, user.discountLimit);
+
+      if (!requiresApproval) {
+        const paid = await db.payment.aggregate({ where: { dealId: deal.id, deletedAt: null }, _sum: { amount: true } });
+        if ((paid._sum.amount ?? new Prisma.Decimal(0)).greaterThan(deal.listPrice.minus(amount))) {
+          throw new PaidExceedsDiscountedPriceException();
+        }
+      }
+
+      await db.deal.update({
+        where: { id },
+        data: requiresApproval
+            ? {
+                // Held at list price while it waits, as at booking.
+                discountApprovalStatus: DiscountApprovalStatus.PENDING,
+                requestedDiscountPercent: percent,
+                requestedDiscountAmount: amount,
+                discountAmount: 0,
+                discountPercent: 0,
+                salePrice: deal.listPrice,
+                discountApprovedById: null,
+                discountApprovedAt: null,
+                discountRejectionReason: null,
+              }
+            : {
+                discountApprovalStatus: DiscountApprovalStatus.NONE,
+                requestedDiscountPercent: null,
+                requestedDiscountAmount: null,
+                discountAmount: amount,
+                discountPercent: percent,
+                salePrice: deal.listPrice.minus(amount),
+                discountApprovedById: null,
+                discountApprovedAt: null,
+                discountRejectionReason: null,
+              },
+      });
+
+      if (requiresApproval) {
+        await this.activityService.discountRequested({
+          db, companyId, userId: user.id,
+          dealId: deal.id, clientId: deal.clientId,
+          metadata: {
+            requestedDiscountPercent: percent.toNumber(),
+            requestedDiscountAmount: amount.toNumber(),
+            ...(dto.note ? { note: dto.note } : {}),
+          },
+        });
+
+        const approverIds = await findDiscountApproverIds(db, this.rbacService, {
+          companyId, branchId: deal.branchId, percent,
+        });
+        for (const approverId of approverIds) {
+          if (approverId === user.id) continue;
+          await this.notifications.create({
+            companyId,
+            userId: approverId,
+            type: NotificationType.DISCOUNT_APPROVAL_REQUESTED,
+            title: `Discount approval needed for deal ${deal.dealNumber}`,
+            message: dto.note,
+            templateKey: 'discountApprovalRequested',
+            params: { dealNumber: deal.dealNumber, percent: percent.toNumber() },
+            entityType: NotificationEntityType.DEAL,
+            entityId: deal.id,
+          });
+        }
+      } else {
+        await this.activityService.discountChanged({
+          db, companyId, userId: user.id,
+          dealId: deal.id, clientId: deal.clientId,
+          metadata: { discountPercent: percent.toNumber(), ...(dto.note ? { note: dto.note } : {}) },
+        }, percent.toNumber());
+      }
+
+      const result = await db.deal.findUniqueOrThrow({ where: { id: deal.id }, include: DEAL_DETAILS_INCLUDE });
+      return { result, applied: !requiresApproval };
+    });
+
+    // A discount applied now changes the price the reservation agreement
+    // states, so it's reissued, as after an approval.
+    if (outcome.applied) {
+      await this.generateAndLogDocument({
+        companyId,
+        dealId: outcome.result.id,
+        clientId: outcome.result.clientId,
+        type: DocumentType.RESERVATION,
+        userId: user.id,
+        activityTitle: activityText('reservationAgreementReissued'),
+      });
+    }
+
+    return this.mapper.toDetails(outcome.result);
   }
 
   /**

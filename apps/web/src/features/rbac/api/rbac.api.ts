@@ -53,3 +53,9 @@ export async function getRoleMembers(id: string) {
 export async function deleteRole(id: string) {
     await api.delete(`/rbac/roles/${id}`);
 }
+
+/** E2E-24: the company's own discount limit for a role; null goes back to the default. */
+export async function setCompanyDiscountLimit(id: string, discountLimit: number | null) {
+    const response = await api.put<Role>(`/rbac/roles/${id}/discount-limit`, {discountLimit});
+    return response.data;
+}

@@ -41,6 +41,7 @@ function build(schedules: ReturnType<typeof scheduleRow>[]) {
     paymentSchedule: {
       findMany: jest.fn().mockResolvedValue(schedules),
       update: jest.fn().mockResolvedValue({}),
+      updateMany: jest.fn().mockResolvedValue({ count: 0 }),
     },
     user: {
       findMany: jest.fn().mockResolvedValue([]),
@@ -70,6 +71,30 @@ function build(schedules: ReturnType<typeof scheduleRow>[]) {
 }
 
 describe('PaymentReminderCronService', () => {
+  it('marks unpaid installments due before today as OVERDUE, apart from the 8 AM run', async () => {
+    jest.useFakeTimers({ now: new Date('2026-11-20T01:30:00') });
+    try {
+      const { service, prisma } = build([]);
+      await service.markOverdue();
+
+      const args = prisma.paymentSchedule.updateMany.mock.calls[0][0];
+      expect(args.data).toEqual({ status: PaymentScheduleStatus.OVERDUE });
+      expect(args.where.status).toEqual({
+        in: [PaymentScheduleStatus.PENDING, PaymentScheduleStatus.PARTIAL],
+      });
+      expect(args.where.dueDate).toEqual({ lt: new Date('2026-11-20T00:00:00') });
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  it('does not let a failed overdue sweep stop startup', async () => {
+    const { service, prisma } = build([]);
+    prisma.paymentSchedule.updateMany.mockRejectedValue(new Error('db down'));
+
+    await expect(service.onApplicationBootstrap()).resolves.toBeUndefined();
+  });
+
   it('flips a schedule to OVERDUE once its due date has passed, even off the reminder timeline', async () => {
     const { service, prisma } = build([
       scheduleRow({ dueDate: daysFromToday(-5) }),

@@ -15,6 +15,9 @@ export type Role = {
     isBranchScoped: boolean;
     /** Own discretionary discount ceiling, in percent. null means unlimited. */
     discountLimit: number | null;
+    /** E2E-24: the built-in role's own limit, and whether this company set its own. */
+    defaultDiscountLimit?: number | null;
+    discountLimitOverridden?: boolean;
     /** Read-only: the platform operator's role. Never offered as assignable on the Users page. */
     isPlatformRole: boolean;
     companyId: string | null;

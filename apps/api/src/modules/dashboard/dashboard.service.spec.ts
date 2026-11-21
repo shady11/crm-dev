@@ -391,6 +391,41 @@ describe('DashboardService', () => {
             expect(headLeadCounts.length).toBeGreaterThan(0);
             headLeadCounts.forEach(([args]: any) => expect(args.where.branchId).toBe('branch-1'));
         });
+
+        it('gives a company-wide viewer every branch\'s managers, each with its branch, and no row of their own', async () => {
+            const {service, prisma} = build();
+            prisma.user.findMany.mockResolvedValue([
+                {id: 'm1', fullName: 'Manager One', email: 'm1@crm.dev', branch: {id: 'b1', name: 'Center'}},
+                {id: 'm2', fullName: 'Manager Two', email: 'm2@crm.dev', branch: {id: 'b2', name: 'South'}},
+            ]);
+
+            const result = await service.getTeamSnapshot(adminUser);
+
+            expect(prisma.user.findMany.mock.calls[0][0].where.branchId).toBeUndefined();
+            expect(result).toEqual([
+                expect.objectContaining({manager: expect.objectContaining({id: 'm1'}), branch: {id: 'b1', name: 'Center'}, isViewer: false}),
+                expect.objectContaining({manager: expect.objectContaining({id: 'm2'}), branch: {id: 'b2', name: 'South'}, isViewer: false}),
+            ]);
+            prisma.lead.count.mock.calls.forEach(([args]: any) => expect(args.where.branchId).toBeUndefined());
+        });
+
+        it('narrows a company-wide viewer to the branch they filter to', async () => {
+            const {service, prisma} = build();
+            prisma.user.findMany.mockResolvedValue([]);
+
+            await service.getTeamSnapshot(adminUser, 'b2');
+
+            expect(prisma.user.findMany.mock.calls[0][0].where.branchId).toBe('b2');
+        });
+
+        it('keeps a branch-scoped head on their own branch whatever branch they ask for', async () => {
+            const {service, prisma} = build();
+            prisma.user.findMany.mockResolvedValue([]);
+
+            await service.getTeamSnapshot(salesHeadUser, 'other-branch');
+
+            expect(prisma.user.findMany.mock.calls[0][0].where.branchId).toBe('branch-1');
+        });
     });
 
     describe('getTeamPerformance', () => {

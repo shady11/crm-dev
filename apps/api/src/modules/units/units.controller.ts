@@ -149,8 +149,10 @@ export class UnitsController {
         @CurrentUser() user: AuthUser,
         @Param("projectId") projectId: string,
         @UploadedFile() file: Express.Multer.File,
+        // E2E-23: ?preview=true checks the file and saves nothing.
+        @Query("preview") preview?: string,
     ) {
-        return this.unitsImportService.importFromFile(user, projectId, file);
+        return this.unitsImportService.importFromFile(user, projectId, file, preview === "true");
     }
 
     @RequirePermissions("inventory.manage")

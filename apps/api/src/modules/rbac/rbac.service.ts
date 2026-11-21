@@ -149,13 +149,50 @@ export class RbacService implements OnModuleInit {
      * discount request without naming a role.
      */
     async findApproverRoles(companyId: string, permissionKey: string) {
-        return this.prisma.role.findMany({
+        const roles = await this.prisma.role.findMany({
             where: {
                 OR: [{ companyId: null }, { companyId }],
                 permissions: { some: { permission: { key: permissionKey } } },
             },
-            select: { id: true, isBranchScoped: true, discountLimit: true },
+            select: {
+                id: true, isBranchScoped: true, discountLimit: true,
+                // E2E-24: the company's own limit for a built-in role wins.
+                companyDiscountLimits: { where: { companyId }, select: { discountLimit: true } },
+            },
         });
+        return roles.map(({ companyDiscountLimits, ...role }) => ({
+            ...role,
+            discountLimit: companyDiscountLimits[0]?.discountLimit ?? role.discountLimit,
+        }));
+    }
+
+    /**
+     * E2E-24: the owner sets a built-in role's discount limit for their own
+     * company (`null` goes back to the built-in default), without copying
+     * the role and moving everyone onto the copy. A company's own role is
+     * changed in place.
+     */
+    async setCompanyDiscountLimit(actor: AuthUser, roleId: string, discountLimit: number | null) {
+        if (!actor.companyId) {
+            throw new ForbiddenException("Only a company's own administrators set its discount limits.");
+        }
+        const role = await this.getVisibleRole(actor, roleId);
+        const companyId = actor.companyId;
+
+        if (role.companyId === companyId) {
+            await this.prisma.role.update({ where: { id: role.id }, data: { discountLimit } });
+        } else if (discountLimit === null) {
+            await this.prisma.companyRoleDiscountLimit.deleteMany({ where: { companyId, roleId } });
+        } else {
+            await this.prisma.companyRoleDiscountLimit.upsert({
+                where: { companyId_roleId: { companyId, roleId } },
+                create: { companyId, roleId, discountLimit },
+                update: { discountLimit },
+            });
+        }
+
+        const roles = await this.listRoles(actor);
+        return roles.find((r) => r.id === roleId);
     }
 
     /**
@@ -193,6 +230,10 @@ export class RbacService implements OnModuleInit {
                 : { isPlatformRole: false, OR: [{ companyId: null }, { companyId: actor.companyId }] },
             include: {
                 permissions: { select: { permission: { select: { key: true } } } },
+                // E2E-24: this company's own limits for the built-in roles.
+                companyDiscountLimits: actor.companyId
+                    ? { where: { companyId: actor.companyId }, select: { discountLimit: true } }
+                    : { where: { companyId: "__none__" }, select: { discountLimit: true } },
             },
             orderBy: [{ isSystem: "desc" }, { name: "asc" }],
         });
@@ -229,7 +270,12 @@ export class RbacService implements OnModuleInit {
                 description: r.description,
                 isSystem: r.isSystem,
                 isBranchScoped: r.isBranchScoped,
-                discountLimit: r.discountLimit === null ? null : r.discountLimit.toNumber(),
+                discountLimit: r.companyDiscountLimits[0]
+                    ? r.companyDiscountLimits[0].discountLimit.toNumber()
+                    : r.discountLimit === null ? null : r.discountLimit.toNumber(),
+                // E2E-24: the built-in default, and whether this company set its own.
+                defaultDiscountLimit: r.discountLimit === null ? null : r.discountLimit.toNumber(),
+                discountLimitOverridden: r.companyDiscountLimits.length > 0,
                 // Read-only, never part of Create/UpdateRoleDto: a UI-facing
                 // marker for the one role Users pages must never offer as
                 // assignable — see UsersService.ensureCanAssignRole.

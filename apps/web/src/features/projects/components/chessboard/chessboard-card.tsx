@@ -1,8 +1,8 @@
-import {Dot} from "lucide-react";
+import {ChevronLeftIcon, ChevronRightIcon, Dot} from "lucide-react";
+import {useEffect, useRef, useState} from "react";
 import {createListCollection} from "@ark-ui/react";
 import {Badge} from "@/components/ui/badge";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
-import {ScrollArea} from "@/components/ui/scroll-area";
 import {Status} from "@/components/ui/status";
 import {ChessboardGrid} from "@/features/projects/components/chessboard/chessboard-grid.tsx";
 import type {Floor} from "@/features/floors/types/floor.types";
@@ -37,6 +37,33 @@ export function ChessboardCard({
                                    onUnitClick,
                                }: ChessboardCardProps) {
     const { t } = useTranslation("units");
+    const scroller = useRef<HTMLDivElement>(null);
+    const [more, setMore] = useState({left: false, right: false});
+
+    // Whether units are off to either side. A floor stays on one row, so a
+    // wide entrance scrolls sideways; the right-hand units were cut off with
+    // no sign that more were there (macOS and many browsers hide scrollbars
+    // until you scroll).
+    useEffect(() => {
+        const el = scroller.current;
+        if (!el) return;
+        const update = () => setMore({
+            left: el.scrollLeft > 1,
+            right: el.scrollLeft + el.clientWidth < el.scrollWidth - 1,
+        });
+        update();
+        el.addEventListener("scroll", update, {passive: true});
+        const observer = new ResizeObserver(update);
+        observer.observe(el);
+        if (el.firstElementChild) observer.observe(el.firstElementChild);
+        return () => {
+            el.removeEventListener("scroll", update);
+            observer.disconnect();
+        };
+    }, [floors]);
+
+    const scrollBy = (direction: 1 | -1) =>
+        scroller.current?.scrollBy({left: direction * scroller.current.clientWidth * 0.8, behavior: "smooth"});
 
     const statusCollection = createListCollection({
         items: UNIT_STATUS_VALUES.map((status) => ({
@@ -73,15 +100,41 @@ export function ChessboardCard({
             </CardHeader>
 
             <CardContent className="gap-0 p-6">
-                <ScrollArea className="h-auto w-full">
-                    <ChessboardGrid
-                        floors={floors}
-                        selectedUnit={selectedUnit}
-                        hasActiveFilters={hasActiveFilters}
-                        unitMatchesFilters={unitMatchesFilters}
-                        onUnitClick={onUnitClick}
-                    />
-                </ScrollArea>
+                <div className="relative">
+                    <div ref={scroller} className="w-full overflow-x-auto pb-2">
+                        <ChessboardGrid
+                            floors={floors}
+                            selectedUnit={selectedUnit}
+                            hasActiveFilters={hasActiveFilters}
+                            unitMatchesFilters={unitMatchesFilters}
+                            onUnitClick={onUnitClick}
+                        />
+                    </div>
+                    {more.left ? (
+                        <div className="pointer-events-none absolute inset-y-0 left-11 z-20 flex w-16 items-center justify-start bg-gradient-to-r from-card to-transparent">
+                            <button
+                                type="button"
+                                aria-label={t("chessboard.scrollLeft")}
+                                onClick={() => scrollBy(-1)}
+                                className="pointer-events-auto flex size-9 items-center justify-center rounded-full border bg-card shadow-sm hover:bg-secondary"
+                            >
+                                <ChevronLeftIcon className="size-4" />
+                            </button>
+                        </div>
+                    ) : null}
+                    {more.right ? (
+                        <div className="pointer-events-none absolute inset-y-0 right-0 z-20 flex w-16 items-center justify-end bg-gradient-to-l from-card to-transparent">
+                            <button
+                                type="button"
+                                aria-label={t("chessboard.scrollRight")}
+                                onClick={() => scrollBy(1)}
+                                className="pointer-events-auto flex size-9 items-center justify-center rounded-full border bg-card shadow-sm hover:bg-secondary"
+                            >
+                                <ChevronRightIcon className="size-4" />
+                            </button>
+                        </div>
+                    ) : null}
+                </div>
             </CardContent>
         </Card>
     );

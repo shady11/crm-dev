@@ -20,6 +20,9 @@ type CompanyDetails = {
   signatoryTitle: string | null;
   currency: string | null;
   locale?: string | null;
+  bankName?: string | null;
+  bankAccount?: string | null;
+  bankBic?: string | null;
 };
 
 export function sampleTemplateContext(
@@ -39,11 +42,20 @@ export function sampleTemplateContext(
       signatoryName: company.signatoryName ?? '',
       signatoryTitle: company.signatoryTitle ?? '',
       currency,
+      bankName: company.bankName ?? '',
+      bankAccount: company.bankAccount ?? '',
+      bankBic: company.bankBic ?? '',
+    },
+    project: {
+      name: 'ЖК Орион',
+      address: 'Бишкек, ул. Ахунбаева 150',
+      handoverDate: f.date('2027-12-31'),
     },
     deal: {
       dealNumber: 'D-2026-0042',
-      status: 'CONTRACT_SIGNED',
+      status: f.dealStatus('CONTRACT_SIGNED'),
       financingType: f.financing('INSTALLMENT'),
+      paysInFull: '',
       listPrice: money(62000),
       salePrice: money(58900),
       discountAmount: money(3100),

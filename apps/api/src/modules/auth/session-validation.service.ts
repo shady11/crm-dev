@@ -176,6 +176,14 @@ export class SessionValidationService {
             ? ['*']
             : await this.rbacService.getEffectivePermissions(user.id);
 
+        // E2E-24: the company's own discount limit for this role, if it set one.
+        const companyLimit = user.companyId
+            ? await this.prisma.companyRoleDiscountLimit.findUnique({
+                  where: { companyId_roleId: { companyId: user.companyId, roleId: user.roleId } },
+                  select: { discountLimit: true },
+              })
+            : null;
+
         return {
             id: user.id,
             email: user.email,
@@ -186,7 +194,9 @@ export class SessionValidationService {
             isSuperAdmin: user.isSuperAdmin,
             mustChangePassword: user.mustChangePassword,
             isBranchScoped: user.role.isBranchScoped,
-            discountLimit: user.role.discountLimit === null ? null : user.role.discountLimit.toNumber(),
+            discountLimit: companyLimit
+                ? companyLimit.discountLimit.toNumber()
+                : user.role.discountLimit === null ? null : user.role.discountLimit.toNumber(),
             permissions,
             companyId: user.companyId,
             company: user.company
@@ -211,3 +221,4 @@ export class SessionValidationService {
         };
     }
 }
+

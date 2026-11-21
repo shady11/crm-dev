@@ -149,7 +149,7 @@ export class ChessboardService {
                     },
                 },
                 {
-                    number: "desc",
+                    number: "asc",
                 },
             ],
             select: {
@@ -254,7 +254,18 @@ export class ChessboardService {
                 entrances: block.entrances
                     .map((entrance) => ({
                         ...entrance,
-                        floors: entrance.floors.sort((a, b) => b.order - a.order),
+                        // Top floor first; on a floor, units left to right
+                        // in number order (101, 102 … 110), as on a plan.
+                        // They ran 504 → 501, and a text sort put 110
+                        // before 102.
+                        floors: entrance.floors
+                            .sort((a, b) => b.order - a.order)
+                            .map((floor) => ({
+                                ...floor,
+                                units: floor.units.sort((a, b) =>
+                                    a.number.localeCompare(b.number, undefined, {numeric: true}),
+                                ),
+                            })),
                     }))
                     .sort((a, b) => a.order - b.order),
             }))

@@ -9,8 +9,8 @@ import {timeAgo} from "@/features/dashboard/utils/time-ago.ts";
 
 // SH-A2: a SALES_HEAD's daily-standup view of their own team — counts and a
 // "last activity" timestamp per SALES_MANAGER, deliberately not full
-// reporting. Same shape as CA-E1's branch comparison, scoped down to one
-// branch's managers.
+// reporting. The owner gets the same rows for every branch, each naming its
+// branch.
 export function TeamSnapshotCard({data}: {data: TeamSnapshotItem[]}) {
     const {t} = useTranslation("dashboard");
 
@@ -37,7 +37,12 @@ export function TeamSnapshotCard({data}: {data: TeamSnapshotItem[]}) {
                                     <AvatarFallback>{initials(item.manager.fullName)}</AvatarFallback>
                                 </Avatar>
                                 <div className="min-w-0 flex-1">
-                                    <p className="truncate font-medium">{item.manager.fullName}</p>
+                                    <p className="truncate font-medium">
+                                        {item.manager.fullName}
+                                        {item.branch ? (
+                                            <span className="font-normal text-muted-foreground"> · {item.branch.name}</span>
+                                        ) : null}
+                                    </p>
                                     <p className="text-xs text-muted-foreground">
                                         {t("teamSnapshot.openLeads", {count: item.openLeads})}
                                         {" · "}

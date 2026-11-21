@@ -20,6 +20,10 @@ model Project {
   address String?
   status  ProjectStatus @default(DRAFT)
 
+  // E2E-22: when the units are planned to be handed over, printed on the
+  // sale contract. A planned date; the handover itself is by act.
+  handoverDate DateTime? @db.Date
+
   companyId String
   company   Company @relation(fields: [companyId], references: [id])
 

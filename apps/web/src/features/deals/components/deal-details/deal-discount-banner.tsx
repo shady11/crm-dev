@@ -3,6 +3,9 @@ import {BadgePercentIcon} from "lucide-react";
 import {useTranslation} from "react-i18next";
 import {Alert, AlertAction, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {Button} from "@/components/ui/button.tsx";
+import {Field, FieldDescription, FieldLabel} from "@/components/ui/field.tsx";
+import {Input} from "@/components/ui/input.tsx";
+import {DialogBody} from "@/components/ui/dialog.tsx";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -19,15 +22,18 @@ import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters
 interface DealDiscountBannerProps {
     deal: Pick<
         Deal,
-        "status" | "discountApprovalStatus" | "requestedDiscountPercent" | "requestedDiscountAmount" | "discountRejectionReason"
+        "status" | "listPrice" | "discountApprovalStatus" | "requestedDiscountPercent" | "requestedDiscountAmount" | "discountRejectionReason"
     >;
     /** deals.approve_discount: the viewer approves discounts at all. */
     canApprove: boolean;
     /** From GET /deals/:id; absent until it loads, when canApprove alone decides. */
     decision?: DiscountDecision | null;
     isDeciding: boolean;
-    onApprove(): void;
+    /** E2E-21: a smaller percent than asked, or undefined for what was asked. */
+    onApprove(discountPercent?: number): void;
     onReject(): void;
+    /** deals.manage on a reservation: may ask for a new discount after a rejection. */
+    onRequestAgain?(): void;
 }
 
 /**
@@ -35,11 +41,18 @@ interface DealDiscountBannerProps {
  * contract can't be signed meanwhile, so this sits at the top of the deal
  * where both the manager and the approver will see it.
  */
-export function DealDiscountBanner({deal, canApprove, decision, isDeciding, onApprove, onReject}: DealDiscountBannerProps) {
+export function DealDiscountBanner({deal, canApprove, decision, isDeciding, onApprove, onReject, onRequestAgain}: DealDiscountBannerProps) {
     const {t, i18n} = useTranslation("deals");
     const {formatCurrency} = useCompanyFormatters();
     // E2E-11: approving changes the price, so it's confirmed like rejecting.
     const [confirmOpen, setConfirmOpen] = useState(false);
+    // E2E-21: what the approver grants, up to what was asked.
+    const [approvedText, setApprovedText] = useState("");
+    const requestedPercent = deal.requestedDiscountPercent ?? 0;
+    const approvedPercent = Number(approvedText.replace(",", "."));
+    const approvedValid = approvedText.trim() !== "" && Number.isFinite(approvedPercent)
+        && approvedPercent > 0 && approvedPercent <= requestedPercent;
+    const approvedPrice = approvedValid ? Math.round(deal.listPrice * (1 - approvedPercent / 100) * 100) / 100 : null;
 
     const requested = {
         percent: deal.requestedDiscountPercent ?? 0,
@@ -72,7 +85,7 @@ export function DealDiscountBanner({deal, canApprove, decision, isDeciding, onAp
                         <Button size="sm" variant="secondary" disabled={isDeciding} onClick={onReject}>
                             {t("discountBanner.reject")}
                         </Button>
-                        <Button size="sm" disabled={isDeciding} isLoading={isDeciding} onClick={() => setConfirmOpen(true)}>
+                        <Button size="sm" disabled={isDeciding} isLoading={isDeciding} onClick={() => { setApprovedText(String(requestedPercent)); setConfirmOpen(true); }}>
                             {t("discountBanner.approve")}
                         </Button>
                     </AlertAction>
@@ -83,16 +96,29 @@ export function DealDiscountBanner({deal, canApprove, decision, isDeciding, onAp
                             <AlertDialogTitle>{t("discountBanner.approveDialogTitle", requested)}</AlertDialogTitle>
                             <AlertDialogDescription>{t("discountBanner.approveDialogDescription")}</AlertDialogDescription>
                         </AlertDialogHeader>
+                        <DialogBody className="pb-4">
+                        <Field invalid={approvedText !== "" && !approvedValid}>
+                            <FieldLabel>{t("discountBanner.approvePercent")}</FieldLabel>
+                            <Input inputMode="decimal" value={approvedText} onChange={(e) => setApprovedText(e.target.value)} />
+                            <FieldDescription>
+                                {approvedValid
+                                    ? t("discountBanner.approvePrice", {price: formatCurrency(approvedPrice!), list: formatCurrency(deal.listPrice)})
+                                    : t("discountBanner.approvePercentHint", {percent: requestedPercent})}
+                            </FieldDescription>
+                        </Field>
+                        </DialogBody>
                         <AlertDialogFooter>
                             <AlertDialogCancel disabled={isDeciding}>{t("common:actions.cancel")}</AlertDialogCancel>
                             <AlertDialogAction
-                                disabled={isDeciding}
+                                disabled={isDeciding || !approvedValid}
                                 onClick={() => {
                                     setConfirmOpen(false);
-                                    onApprove();
+                                    onApprove(approvedPercent < requestedPercent ? approvedPercent : undefined);
                                 }}
                             >
-                                {t("discountBanner.approve")}
+                                {approvedValid && approvedPercent < requestedPercent
+                                    ? t("discountBanner.approveAt", {percent: approvedPercent})
+                                    : t("discountBanner.approve")}
                             </AlertDialogAction>
                         </AlertDialogFooter>
                     </AlertDialogContent>
@@ -109,6 +135,13 @@ export function DealDiscountBanner({deal, canApprove, decision, isDeciding, onAp
                 <AlertTitle>{t("discountBanner.rejectedTitle", requested)}</AlertTitle>
                 {deal.discountRejectionReason && (
                     <AlertDescription>{t("discountBanner.reason", {reason: deal.discountRejectionReason})}</AlertDescription>
+                )}
+                {onRequestAgain && (
+                    <AlertAction>
+                        <Button size="sm" variant="secondary" onClick={onRequestAgain}>
+                            {t("discountBanner.requestAgain")}
+                        </Button>
+                    </AlertAction>
                 )}
             </Alert>
         );

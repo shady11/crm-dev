@@ -24,7 +24,6 @@ import {
     CalendarYearSelect
 } from "@/components/ui/calendar.tsx";
 import {createListCollection, parseDate} from "@ark-ui/react";
-import {format} from "date-fns";
 import {Field, FieldDescription, FieldGroup, FieldLabel, FieldSet} from "@/components/ui/field.tsx";
 import {DealPaymentScheduleCard} from "@/features/deals/components/deal-details/deal-payment-schedule-card.tsx";
 import {DealPaymentsHistoryCard} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
@@ -33,6 +32,7 @@ import type {DealDetails, PaymentMethod, PaymentType} from "../api/deals.api";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {DealTasksCard} from "@/features/deals/components/deal-tasks-card.tsx";
 import {DealDiscountBanner} from "@/features/deals/components/deal-details/deal-discount-banner.tsx";
+import {RequestDiscountDialog} from "@/features/deals/components/deal-details/request-discount-dialog.tsx";
 import {DealMoneyHeldBanner} from "@/features/deals/components/deal-details/deal-money-held-banner.tsx";
 import {DealLegalDetailsBanner} from "@/features/deals/components/deal-details/deal-legal-details-banner.tsx";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
@@ -42,7 +42,9 @@ import {DealStageTracker} from "@/features/deals/components/deal-details/deal-st
 import {DealKeyFigures} from "@/features/deals/components/deal-details/deal-key-figures.tsx";
 import {DealDetailsSidebar} from "@/features/deals/components/deal-details/deal-details-sidebar.tsx";
 import {useTranslation} from "react-i18next";
+import {blockLabel} from "@/features/units/utils/block-label.ts";
 import {PAYMENT_METHOD_LABEL_KEYS, PAYMENT_TYPE_LABEL_KEYS} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
+import {companyToday} from "@/lib/company-day.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useReservationPolicy} from "@/features/deals/hooks/use-reservation-policy.ts";
@@ -85,6 +87,7 @@ export function DealDetailsPage() {
     // Extend, sign, activate and complete: the deal's own lifecycle.
     const canManage = hasPermission(user, "deals.manage");
     const [rejectOpen, setRejectOpen] = useState(false);
+    const [discountOpen, setDiscountOpen] = useState(false);
     const [activateOpen, setActivateOpen] = useState(false);
     const [rejectReason, setRejectReason] = useState("");
 
@@ -93,23 +96,23 @@ export function DealDetailsPage() {
 
     const [extendOpen, setExtendOpen] = useState(false);
     const [extendReason, setExtendReason] = useState("");
-    const [newExpiry, setNewExpiry] = useState([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+    const [newExpiry, setNewExpiry] = useState([parseDate(companyToday(user?.company?.timezone))]);
     const reservationPolicy = useReservationPolicy(hasPermission(user, "deals.manage")).data;
 
     const [signOpen, setSignOpen] = useState(false);
     const [contractNumber, setContractNumber] = useState("");
-    const [contractDate, setContractDate] = useState([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+    const [contractDate, setContractDate] = useState([parseDate(companyToday(user?.company?.timezone))]);
 
     const [scheduleOpen, setScheduleOpen] = useState(false);
     const [installments, setInstallments] = useState(1);
-    const [firstPaymentDate, setFirstPaymentDate] = useState([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+    const [firstPaymentDate, setFirstPaymentDate] = useState([parseDate(companyToday(user?.company?.timezone))]);
     const [intervalMonths, setIntervalMonths] = useState(1);
 
     const [paymentOpen, setPaymentOpen] = useState(false);
     const [paymentAmount, setPaymentAmount] = useState(0);
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | "">("");
     const [paymentType, setPaymentType] = useState<PaymentType | "">("");
-    const [paidAt, setPaidAt] = useState([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+    const [paidAt, setPaidAt] = useState([parseDate(companyToday(user?.company?.timezone))]);
     const [reference, setReference] = useState("");
     const [paymentNote, setPaymentNote] = useState("");
     const [voidTarget, setVoidTarget] = useState<DealDetails["payments"][number] | null>(null);
@@ -206,6 +209,8 @@ export function DealDetailsPage() {
     });
 
     const isOpen = ["RESERVED", "CONTRACT_SIGNED", "ACTIVE"].includes(deal.status);
+    // E2E-21: a new discount on a reservation with none waiting for a decision.
+    const canChangeDiscount = deal.status === "RESERVED" && canManage && deal.discountApprovalStatus !== "PENDING";
     const tab = TAB_VALUES.includes(searchParams.get("tab") as DealTab)
         ? (searchParams.get("tab") as DealTab)
         : defaultTabFor(deal.status);
@@ -260,9 +265,10 @@ export function DealDetailsPage() {
                     <p className="truncate text-sm text-muted-foreground">
                         {[
                             t("unitCard.unitNumber", { number: deal.unit.number }),
+                            blockLabel(t, deal.unit.block),
                             deal.project.name,
                             deal.client.fullName,
-                        ].join(" · ")}
+                        ].filter(Boolean).join(" · ")}
                     </p>
                 </div>
 
@@ -317,7 +323,7 @@ export function DealDetailsPage() {
                     {deal.status === "ACTIVE" && canManagePayments && (
                         <Button onClick={openPaymentDialog}>{t("paymentsHistory.record")}</Button>
                     )}
-                    {isOpen && (canCancel || (deal.status === "ACTIVE" && canManage)) && (
+                    {isOpen && (canCancel || (deal.status === "ACTIVE" && canManage) || canChangeDiscount) && (
                         <Menu>
                             <MenuTrigger asChild>
                                 <Button variant="ghost" size="icon-sm" aria-label={t("detailsPage.moreActions")}>
@@ -325,6 +331,12 @@ export function DealDetailsPage() {
                                 </Button>
                             </MenuTrigger>
                             <MenuContent>
+                                {canChangeDiscount && (
+                                    <MenuItem value="discount" onSelect={() => setDiscountOpen(true)}>
+                                        {t("requestDiscount.menuItem")}
+                                    </MenuItem>
+                                )}
+                                {canChangeDiscount && canCancel && <MenuSeparator />}
                                 {deal.status === "ACTIVE" && canManage && (
                                     <MenuItem value="complete" onSelect={() => actions.complete.mutate()}>
                                         {t("detailsPage.markCompleted")}
@@ -349,8 +361,20 @@ export function DealDetailsPage() {
                 canApprove={canDecideDiscount}
                 decision={deal.discountDecision}
                 isDeciding={actions.approveDiscount.isPending || actions.rejectDiscount.isPending}
-                onApprove={() => actions.approveDiscount.mutate()}
+                onApprove={(percent) => actions.approveDiscount.mutate(percent)}
                 onReject={() => setRejectOpen(true)}
+                onRequestAgain={deal.status === "RESERVED" && canManage ? () => setDiscountOpen(true) : undefined}
+            />
+
+            <RequestDiscountDialog
+                key={discountOpen ? "open" : "closed"}
+                open={discountOpen}
+                onOpenChange={setDiscountOpen}
+                listPrice={deal.listPrice}
+                clientId={deal.client.id}
+                currentPercent={deal.discountApprovalStatus === "REJECTED" ? 0 : (deal.discountPercent ?? 0)}
+                isPending={actions.requestDiscount.isPending}
+                onSubmit={(values) => actions.requestDiscount.mutate(values, {onSuccess: () => setDiscountOpen(false)})}
             />
 
             <DealMoneyHeldBanner
@@ -603,7 +627,7 @@ export function DealDetailsPage() {
                                 }, {
                                     onSuccess: () => {
                                         setExtendOpen(false);
-                                        setNewExpiry([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+                                        setNewExpiry([parseDate(companyToday(user?.company?.timezone))]);
                                     },
                                 })
                             }
@@ -631,7 +655,12 @@ export function DealDetailsPage() {
                                 </Field>
                                 <Field>
                                     <FieldLabel>{t("detailsPage.contractDateLabel")}</FieldLabel>
-                                    <DatePicker onValueChange={({ value }) => setContractDate(value)} value={contractDate}>
+                                    {/* Signed already: the API refuses later dates. */}
+                                    <DatePicker
+                                        onValueChange={({ value }) => setContractDate(value)}
+                                        value={contractDate}
+                                        max={parseDate(companyToday(user?.company?.timezone))}
+                                    >
                                         <DatePickerTrigger asChild>
                                             <Button className="w-full flex justify-between" variant="outline">
                                                 {formatDate(contractDate[0].toString(), i18n.language).date}
@@ -670,7 +699,7 @@ export function DealDetailsPage() {
                                         onSuccess: () => {
                                             setSignOpen(false);
                                             setContractNumber("");
-                                            setContractDate([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+                                            setContractDate([parseDate(companyToday(user?.company?.timezone))]);
                                         }
                                     },
                                 )
@@ -850,7 +879,7 @@ export function DealDetailsPage() {
                             <DatePicker
                                 onValueChange={({ value }) => setPaidAt(value)}
                                 value={paidAt ?? []}
-                                max={parseDate(format(new Date(), 'yyyy-MM-dd'))}
+                                max={parseDate(companyToday(user?.company?.timezone))}
                             >
                                 <DatePickerTrigger asChild>
                                     <Button className="w-full flex justify-between" variant="outline">
@@ -910,7 +939,7 @@ export function DealDetailsPage() {
                                             setPaymentType("");
                                             setReference("");
                                             setPaymentNote("");
-                                            setPaidAt([parseDate(format(new Date().toString(), 'yyyy-MM-dd'))]);
+                                            setPaidAt([parseDate(companyToday(user?.company?.timezone))]);
                                         }
                                     },
                                 )

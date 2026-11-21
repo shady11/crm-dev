@@ -1,3 +1,4 @@
+import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import {useState} from "react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {toast} from "@/components/ui/toast.tsx";
@@ -179,7 +180,7 @@ export function RolesPermissionsPage() {
                         <AlertDialogDescription>
                             {pending ? (
                                 <>
-                                    <span className="font-medium">{pending.role.name}</span> —{" "}
+                                    <span className="font-medium">{roleLabel(t, pending.role.name)}</span> —{" "}
                                     {t("confirmDialog.delete.body")}
                                 </>
                             ) : null}

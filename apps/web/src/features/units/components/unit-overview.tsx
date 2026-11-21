@@ -20,7 +20,7 @@ export const UnitOverview = ({
                                  floor,
                              }: UnitOverviewProps) => {
     const { t } = useTranslation("units");
-    const { formatCurrency, formatPricePerSqm } = useCompanyFormatters();
+    const { formatCurrency, formatPricePerSqm, formatArea } = useCompanyFormatters();
 
     const pricePerSqM =
         parseFloat(unit.area) > 0
@@ -56,7 +56,7 @@ export const UnitOverview = ({
                 </DataListItem>
                 <DataListItem>
                     <DataListItemLabel>{t("common:labels.area")}</DataListItemLabel>
-                    <DataListItemValue>{parseFloat(unit.area).toFixed(1)} m²</DataListItemValue>
+                    <DataListItemValue>{formatArea(unit.area)}</DataListItemValue>
                 </DataListItem>
                 <DataListItem>
                     <DataListItemLabel>{t("overview.pricePerSqmLabel")}</DataListItemLabel>

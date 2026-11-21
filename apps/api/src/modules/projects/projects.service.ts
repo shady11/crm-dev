@@ -165,6 +165,7 @@ export class ProjectsService {
                 name: dto.name,
                 address: dto.address,
                 status: dto.status ?? ProjectStatus.DRAFT,
+                handoverDate: dto.handoverDate ? new Date(dto.handoverDate) : null,
                 companyId: user.companyId,
             },
         });
@@ -207,6 +208,7 @@ export class ProjectsService {
                 name: dto.name,
                 address: dto.address,
                 status: dto.status,
+                handoverDate: dto.handoverDate === undefined ? undefined : dto.handoverDate ? new Date(dto.handoverDate) : null,
             },
         });
 

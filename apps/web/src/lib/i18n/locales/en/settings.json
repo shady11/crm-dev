@@ -83,6 +83,10 @@
     "signatoryName": "Signatory",
     "signatoryTitle": "Signatory's position",
     "signatoryTitlePlaceholder": "e.g. Director",
-    "hint": "Leave the legal name empty to print the company name instead. Changes apply to documents generated from now on."
+    "hint": "Leave the legal name empty to print the company name instead. Changes apply to documents generated from now on.",
+    "bankName": "Bank",
+    "bankNamePlaceholder": "e.g. Optima Bank OJSC",
+    "bankAccount": "Bank account",
+    "bankBic": "BIC"
   }
 }

@@ -26,6 +26,12 @@ export function useActivityTitle() {
             const values: Record<string, unknown> = {...(a.templateParams ?? {})};
             // E2E-9: a system task is named in the reader's language.
             localizeTask(values, "task");
+            // A calendar day (YYYY-MM-DD) is printed the reader's way.
+            for (const [name, value] of Object.entries(values)) {
+                if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+                    values[name] = new Date(`${value}T00:00:00Z`).toLocaleDateString(i18n.language, {timeZone: "UTC"});
+                }
+            }
             if (typeof values.documentType === "string") {
                 values.documentType = t(DOCUMENT_TYPE_LABEL_KEYS[values.documentType as DocumentType] ?? values.documentType);
             }

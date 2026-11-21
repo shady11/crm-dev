@@ -1,3 +1,4 @@
+import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import {useTranslation} from "react-i18next";
 import {EllipsisVertical, FolderCog, Lock} from "lucide-react";
 import {Card, CardContent} from "@/components/ui/card.tsx";
@@ -65,7 +66,7 @@ export function RoleCard({
                             <FolderCog size={20} strokeWidth={1.75} />
                         </div>
                         <div className="flex items-center gap-2">
-                            <h3 className="font-medium">{role.name}</h3>
+                            <h3 className="font-medium">{roleLabel(t, role.name)}</h3>
                             {role.isSystem && (
                                 <Badge variant="outline" className="gap-1 text-xs">
                                     <Lock className="size-3" />
@@ -83,7 +84,7 @@ export function RoleCard({
                         </MenuTrigger>
                         <MenuContent className="w-44">
                             <MenuItem value="users" onClick={onManageUsers}>
-                                {t("page.rowActions.manageUsers", {name: role.name})}
+                                {t("page.rowActions.manageUsers", {name: roleLabel(t, role.name)})}
                             </MenuItem>
                             {!role.isPlatformRole && (
                                 <MenuItem value="copy" onClick={onCopy}>

@@ -3,7 +3,10 @@ import {Link} from "react-router-dom";
 import {keepPreviousData, useQuery} from "@tanstack/react-query";
 import {createListCollection} from "@ark-ui/react";
 import {Download, FileSpreadsheet, Loader2, Search, WalletIcon} from "lucide-react";
+import {useAuth} from "@/features/auth/hooks/use-auth.ts";
+import {companyToday} from "@/lib/company-day.ts";
 import {useTranslation} from "react-i18next";
+import {blockLabel} from "@/features/units/utils/block-label.ts";
 import {Button} from "@/components/ui/button.tsx";
 import {Card, CardContent} from "@/components/ui/card.tsx";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
@@ -31,24 +34,23 @@ import {
 type Period = "thisMonth" | "lastMonth" | "last30Days" | "custom";
 const PERIODS: Period[] = ["thisMonth", "lastMonth", "last30Days", "custom"];
 
-/** YYYY-MM-DD of a local calendar day, the form payment dates are entered in. */
+/** YYYY-MM-DD of a calendar day held as UTC midnight. */
 function day(date: Date) {
-    const local = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
-    return local.toISOString().slice(0, 10);
+    return date.toISOString().slice(0, 10);
 }
 
-function periodRange(period: Exclude<Period, "custom">): {from: string; to: string} {
-    const now = new Date();
+/** The period's days, counted from the company's today (see companyToday). */
+function periodRange(period: Exclude<Period, "custom">, timeZone?: string | null): {from: string; to: string} {
+    const today = companyToday(timeZone);
+    const [y, m, d] = today.split("-").map(Number);
+    const utc = (year: number, month: number, date: number) => new Date(Date.UTC(year, month, date));
     if (period === "lastMonth") {
-        return {
-            from: day(new Date(now.getFullYear(), now.getMonth() - 1, 1)),
-            to: day(new Date(now.getFullYear(), now.getMonth(), 0)),
-        };
+        return {from: day(utc(y, m - 2, 1)), to: day(utc(y, m - 1, 0))};
     }
     if (period === "last30Days") {
-        return {from: day(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29)), to: day(now)};
+        return {from: day(utc(y, m - 1, d - 29)), to: today};
     }
-    return {from: day(new Date(now.getFullYear(), now.getMonth(), 1)), to: day(now)};
+    return {from: day(utc(y, m - 1, 1)), to: today};
 }
 
 /**
@@ -62,7 +64,9 @@ export function PaymentsPage() {
     const projects = useProjectsFilter();
 
     const [period, setPeriod] = useState<Period>("thisMonth");
-    const [custom, setCustom] = useState(() => periodRange("thisMonth"));
+    const {user} = useAuth();
+    const timeZone = user?.company?.timezone;
+    const [custom, setCustom] = useState(() => periodRange("thisMonth", timeZone));
     const [branchId, setBranchId] = useState<string | undefined>();
     const [projectId, setProjectId] = useState<string | undefined>();
     const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | undefined>();
@@ -73,7 +77,7 @@ export function PaymentsPage() {
     const [exporting, setExporting] = useState<"payments" | "receivables" | null>(null);
 
     const debouncedSearch = useDebouncedValue(search);
-    const range = period === "custom" ? custom : periodRange(period);
+    const range = period === "custom" ? custom : periodRange(period, timeZone);
     const filters: PaymentRegisterFilters = {
         ...range,
         branchId,
@@ -156,7 +160,7 @@ export function PaymentsPage() {
                     <>
                         <DateField className="w-40" value={custom.from} max={custom.to} onChange={(from) => update(setCustom)({...custom, from})} />
                         <span className="text-muted-foreground">–</span>
-                        <DateField className="w-40" value={custom.to} min={custom.from} max={day(new Date())} onChange={(to) => update(setCustom)({...custom, to})} />
+                        <DateField className="w-40" value={custom.to} min={custom.from} max={companyToday(timeZone)} onChange={(to) => update(setCustom)({...custom, to})} />
                     </>
                 )}
                 <BranchFilterSelect value={branchId ?? "all"} onChange={(value) => update(setBranchId)(value === "all" ? undefined : value)} />
@@ -255,7 +259,9 @@ export function PaymentsPage() {
                             </TableCell>
                             <TableCell>
                                 <p>№{p.unitNumber}</p>
-                                <p className="text-xs text-muted-foreground">{[p.projectName, p.branchName].filter(Boolean).join(" · ")}</p>
+                                <p className="text-xs text-muted-foreground">
+                                    {[blockLabel(t, p.blockName ? {name: p.blockName} : null), p.projectName, p.branchName].filter(Boolean).join(" · ")}
+                                </p>
                             </TableCell>
                             <TableCell>{t(PAYMENT_TYPE_LABEL_KEYS[p.paymentType])}</TableCell>
                             <TableCell>

@@ -38,6 +38,7 @@ describe("company suspension is enforced at auth", () => {
                     company,
                 }),
             },
+            companyRoleDiscountLimit: {findUnique: jest.fn().mockResolvedValue(null)},
         } as unknown as PrismaService;
 
         return new SessionValidationService(prisma, configService, rbacService);

@@ -41,6 +41,10 @@
       "deactivated": "\"{{name}}\" deactivated.",
       "reactivated": "\"{{name}}\" reactivated.",
       "actionError": "Something went wrong. Please try again."
+    },
+    "emptyNone": {
+      "title": "No branches yet",
+      "description": "Add a sales office: managers and sales heads work in a branch."
     }
   },
   "form": {

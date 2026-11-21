@@ -24,6 +24,7 @@ import {
     SalePriceMismatchException,
     UnitNotAvailableException,
     UnitNotFoundException,
+    ContractDateInFutureException,
 } from '../exceptions';
 import {DealMapper} from '../mappers/deal.mapper';
 
@@ -120,6 +121,7 @@ describe('DealsService', () => {
             discountRequested: jest.fn().mockResolvedValue({}),
             discountApproved: jest.fn().mockResolvedValue({}),
             discountRejected: jest.fn().mockResolvedValue({}),
+            discountChanged: jest.fn().mockResolvedValue({}),
         };
         const notifications = {create: jest.fn().mockResolvedValue({}), resolveForEntity: jest.fn().mockResolvedValue(0)};
         const dealNumberService = {generateDealNumber: jest.fn().mockResolvedValue('2026-0001')};
@@ -647,6 +649,23 @@ describe('DealsService', () => {
     });
 
     describe('signContract', () => {
+        it('refuses a contract dated after today, before touching the deal', async () => {
+            const {service, prisma} = buildBase();
+            const tomorrow = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString();
+            await expect(
+                service.signContract(managerUser, 'deal-1', {contractNumber: 'C1', contractDate: tomorrow} as any),
+            ).rejects.toThrow(ContractDateInFutureException);
+            expect(prisma.deal.findFirst).not.toHaveBeenCalled();
+        });
+
+        it('keeps a contract signed before the deal was entered (an existing sale brought in late)', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(null);
+            await expect(
+                service.signContract(managerUser, 'deal-1', {contractNumber: 'C1', contractDate: '2025-03-01T00:00:00.000Z'} as any),
+            ).rejects.toThrow(DealNotFoundException);
+        });
+
         it('throws DealNotFoundException outside caller scope', async () => {
             const {service, prisma} = buildBase();
             prisma.deal.findFirst.mockResolvedValue(null);
@@ -768,6 +787,93 @@ describe('DealsService', () => {
             await service.activate(managerUser, 'deal-1');
 
             expect(scheduleNeeded.notifyActivated).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('approveDiscount at less than asked (E2E-21)', () => {
+        const pending = {
+            id: 'deal-1', companyId: 'company-1', branchId: 'branch-1',
+            discountApprovalStatus: DiscountApprovalStatus.PENDING,
+            requestedDiscountPercent: new Prisma.Decimal(20),
+            requestedDiscountAmount: new Prisma.Decimal(20000),
+            listPrice: new Prisma.Decimal(100000),
+            managerId: 'manager-1', clientId: 'c1', dealNumber: '2026-0001',
+        };
+
+        it('applies the smaller discount and tells the manager both figures', async () => {
+            const {service, prisma, notifications, activityService} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(pending);
+
+            await service.approveDiscount(adminUser, 'deal-1', {discountPercent: 12});
+
+            const data = prisma.deal.update.mock.calls[0][0].data;
+            expect(data.discountPercent.toNumber()).toBe(12);
+            expect(data.discountAmount.toNumber()).toBe(12000);
+            expect(data.salePrice.toNumber()).toBe(88000);
+            expect(notifications.create).toHaveBeenCalledWith(expect.objectContaining({
+                templateKey: 'discountApprovedPartially',
+                params: {dealNumber: '2026-0001', percent: 12, requested: 20},
+            }));
+            expect(activityService.discountApproved).toHaveBeenCalledWith(expect.anything(), {percent: 12, requested: 20});
+        });
+
+        it('refuses to approve more than was asked', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(pending);
+            await expect(service.approveDiscount(adminUser, 'deal-1', {discountPercent: 25})).rejects.toThrow(BadRequestException);
+        });
+    });
+
+    describe('requestDiscount (E2E-21)', () => {
+        const reserved = (overrides: Record<string, unknown> = {}) => ({
+            id: 'deal-1', companyId: 'company-1', branchId: 'branch-1',
+            status: DealStatus.RESERVED,
+            discountApprovalStatus: DiscountApprovalStatus.REJECTED,
+            listPrice: new Prisma.Decimal(100000),
+            managerId: 'manager-1', clientId: 'c1', dealNumber: '2026-0001',
+            ...overrides,
+        });
+
+        it('above the asker\'s limit: waits for approval at list price and asks the approvers', async () => {
+            const {service, prisma, notifications, activityService, documentGeneration} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(reserved());
+            prisma.user.findMany.mockResolvedValue([{id: 'head-1'}]);
+
+            await service.requestDiscount(managerUser, 'deal-1', {discountPercent: 12});
+
+            const data = prisma.deal.update.mock.calls[0][0].data;
+            expect(data.discountApprovalStatus).toBe(DiscountApprovalStatus.PENDING);
+            expect(data.requestedDiscountPercent.toNumber()).toBe(12);
+            expect(data.salePrice.toNumber()).toBe(100000);
+            expect(data.discountRejectionReason).toBeNull();
+            expect(activityService.discountRequested).toHaveBeenCalled();
+            expect(notifications.create).toHaveBeenCalledWith(expect.objectContaining({templateKey: 'discountApprovalRequested'}));
+            expect(documentGeneration.generateForDeal).not.toHaveBeenCalled();
+        });
+
+        it('within the asker\'s limit: applies at once and reissues the reservation agreement', async () => {
+            const {service, prisma, activityService, documentGeneration} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(reserved());
+
+            await service.requestDiscount(managerUser, 'deal-1', {discountPercent: 4});
+
+            const data = prisma.deal.update.mock.calls[0][0].data;
+            expect(data.discountApprovalStatus).toBe(DiscountApprovalStatus.NONE);
+            expect(data.salePrice.toNumber()).toBe(96000);
+            expect(activityService.discountChanged).toHaveBeenCalledWith(expect.anything(), 4);
+            expect(documentGeneration.generateForDeal).toHaveBeenCalled();
+        });
+
+        it('refuses while another request is still waiting', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(reserved({discountApprovalStatus: DiscountApprovalStatus.PENDING}));
+            await expect(service.requestDiscount(managerUser, 'deal-1', {discountPercent: 12})).rejects.toThrow(ConflictException);
+        });
+
+        it('only on a reservation: a signed deal keeps its price', async () => {
+            const {service, prisma} = buildBase();
+            prisma.deal.findFirst.mockResolvedValue(reserved({status: DealStatus.CONTRACT_SIGNED}));
+            await expect(service.requestDiscount(managerUser, 'deal-1', {discountPercent: 3})).rejects.toThrow();
         });
     });
 

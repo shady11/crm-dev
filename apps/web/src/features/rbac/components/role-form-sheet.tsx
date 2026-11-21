@@ -1,3 +1,4 @@
+import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import {Button} from "@/components/ui/button.tsx";
@@ -27,6 +28,7 @@ import {
 } from "@/components/ui/alert-dialog.tsx";
 import {TriangleAlert} from "lucide-react";
 import {PermissionPicker} from "./permission-picker";
+import {CompanyDiscountLimit} from "./company-discount-limit";
 import type {Permission, Role} from "../types/rbac.types";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 
@@ -104,7 +106,7 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
         <Dialog open={open} onOpenChange={({open: isOpen}) => onOpenChange(isOpen)}>
             <DialogContent className="sm:max-w-3xl">
                 <DialogHeader>
-                    <DialogTitle>{readOnly ? (role?.name ?? "") : isEdit ? t("form.editTitle") : t("form.newTitle")}</DialogTitle>
+                    <DialogTitle>{readOnly ? roleLabel(t, role?.name) : isEdit ? t("form.editTitle") : t("form.newTitle")}</DialogTitle>
                     <DialogDescription>
                         {isPlatformRole
                             ? t("form.platformRoleDescription")
@@ -190,13 +192,18 @@ export function RoleFormSheet({open, role, permissions, isSubmitting, onOpenChan
                             </FieldGroup>
                         )}
 
+                        {readOnly && !isPlatformRole && role && user?.companyId && role.discountLimit !== null && (
+                            <CompanyDiscountLimit role={role} />
+                        )}
                         {readOnly && !isPlatformRole && (
                             <div className="text-muted-foreground space-y-1 text-sm">
-                                <p>
-                                    {role?.discountLimit === null
-                                        ? t("form.hints.discountLimitReadOnlyUnlimited")
-                                        : t("form.hints.discountLimitReadOnly", {limit: role?.discountLimit})}
-                                </p>
+                                {(role?.discountLimit === null || !user?.companyId) && (
+                                    <p>
+                                        {role?.discountLimit === null
+                                            ? t("form.hints.discountLimitReadOnlyUnlimited")
+                                            : t("form.hints.discountLimitReadOnly", {limit: role?.discountLimit})}
+                                    </p>
+                                )}
                                 <p>{role?.isBranchScoped ? t("form.hints.branchScopedReadOnly") : t("form.hints.companyWideReadOnly")}</p>
                             </div>
                         )}

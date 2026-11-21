@@ -44,6 +44,9 @@ const COMPANY_SELECT = {
     taxId: true,
     signatoryName: true,
     signatoryTitle: true,
+    bankName: true,
+    bankAccount: true,
+    bankBic: true,
     suspendedAt: true,
     deletedAt: true,
     createdAt: true,
@@ -378,7 +381,7 @@ export class CompaniesService {
 
         // A cleared field is stored as null, so contracts fall back (legal
         // name to the display name) instead of printing an empty string.
-        for (const field of ["legalName", "taxId", "signatoryName", "signatoryTitle", "address", "phone"] as const) {
+        for (const field of ["legalName", "taxId", "signatoryName", "signatoryTitle", "address", "phone", "bankName", "bankAccount", "bankBic"] as const) {
             if (typeof dto[field] === "string") dto[field] = dto[field].trim() || null;
         }
 

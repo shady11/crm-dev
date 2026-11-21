@@ -69,6 +69,8 @@ export type Project = {
     name: string;
     address: string | null;
     status: ProjectStatus;
+    /** E2E-22: planned handover, printed on the sale contract. */
+    handoverDate?: string | null;
     companyId: string;
     createdAt: string;
     updatedAt: string;

@@ -1,5 +1,6 @@
 "use client";
 
+import {useTranslation} from "react-i18next";
 import {DatePicker as ArkCalendar} from "@ark-ui/react/date-picker";
 import {ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon,} from "lucide-react";
 import type React from "react";
@@ -11,6 +12,10 @@ export const Calendar = (
   props: React.ComponentProps<typeof ArkCalendar.Root>
 ) => {
   const { lazyMount = true, unmountOnExit = true, className, ...rest } = props;
+  // Month and weekday names in the app's language, weeks from Monday
+  // outside English; they were English ("November", "S M T") everywhere.
+  const { i18n } = useTranslation();
+  const language = i18n.language || "ru";
 
   return (
     <ArkCalendar.Root
@@ -19,6 +24,8 @@ export const Calendar = (
       inline
       lazyMount={lazyMount}
       unmountOnExit={unmountOnExit}
+      locale={language}
+      startOfWeek={language.startsWith("en") ? 0 : 1}
       {...rest}
     />
   );

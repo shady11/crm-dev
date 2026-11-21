@@ -60,6 +60,7 @@
     "documentRegenerated": "Документ кайра түзүлдү: {{documentType}}",
     "receiptIssued": "{{receipt}} квитанциясы берилди",
     "paymentScheduleGenerated": "Төлөм графиги түзүлдү",
+    "paymentScheduleGeneratedTerms": "Төлөм графиги түзүлдү: {{installments}} төлөм, биринчиси {{firstDate}}",
     "paymentScheduleAnnexGenerated": "«Төлөм графиги» тиркемеси түзүлдү",
     "paymentVoided": "{{payment}} төлөмү жокко чыгарылды",
     "unitRelistedAfterCancellation": "Бүтүм жокко чыгарылгандан кийин объект кайра сатыкка чыкты",
@@ -144,7 +145,10 @@
     "rolePermissionsChanged": "«{{role}}» ролунун укуктары өзгөрдү: {{added}} кошулду, {{removed}} алынды",
     "roleDeleted": "«{{role}}» ролу өчүрүлдү",
     "unitsImportedWithPrices": "Импорттолгон объекттер: {{units}}, өзгөргөн баалар: {{prices}}, макулдашууга жөнөтүлдү: {{requested}}",
-    "documentTemplateReset": "«{{name}}» документ шаблону стандарттуу шаблон менен алмаштырылды"
+    "documentTemplateReset": "«{{name}}» документ шаблону стандарттуу шаблон менен алмаштырылды",
+    "discountApprovedPartially": "Арзандатуу макулдашылды: {{requested}}% ордуна {{percent}}%",
+    "discountChanged": "Арзандатуу өзгөртүлдү: {{percent}}%",
+    "discountRemoved": "Арзандатуу алынды"
   },
   "actor": {
     "impersonated": "{{admin}} (платформанын колдоосу) {{user}} атынан",

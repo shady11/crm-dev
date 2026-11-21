@@ -60,6 +60,7 @@
     "documentRegenerated": "Document regenerated: {{documentType}}",
     "receiptIssued": "Receipt {{receipt}} issued",
     "paymentScheduleGenerated": "Payment schedule generated",
+    "paymentScheduleGeneratedTerms": "Payment schedule generated: installments {{installments}}, first on {{firstDate}}",
     "paymentScheduleAnnexGenerated": "Payment schedule annex generated",
     "paymentVoided": "Payment {{payment}} voided",
     "unitRelistedAfterCancellation": "Unit relisted after deal cancellation",
@@ -144,7 +145,10 @@
     "rolePermissionsChanged": "Permissions of role \"{{role}}\" changed: {{added}} added, {{removed}} removed",
     "roleDeleted": "Role \"{{role}}\" deleted",
     "unitsImportedWithPrices": "{{units}} units imported, prices changed: {{prices}}, sent for approval: {{requested}}",
-    "documentTemplateReset": "Document template \"{{name}}\" replaced by the built-in default"
+    "documentTemplateReset": "Document template \"{{name}}\" replaced by the built-in default",
+    "discountApprovedPartially": "Discount approved at {{percent}}% instead of {{requested}}%",
+    "discountChanged": "Discount set to {{percent}}%",
+    "discountRemoved": "Discount removed"
   },
   "actor": {
     "impersonated": "{{admin}} (platform support) as {{user}}",

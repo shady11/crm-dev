@@ -1,12 +1,6 @@
 import {lazy} from "react";
 import {Navigate, type RouteObject} from "react-router-dom";
 import {RoleGuard} from "@/features/auth/pages/role-guard";
-import {useTranslation} from "react-i18next";
-
-function SalesComingSoon() {
-    const { t } = useTranslation("projects");
-    return <div>{t("salesComingSoon")}</div>;
-}
 
 const ProjectsPage = lazy(() => import("./pages/projects-page").then(m => ({ default: m.ProjectsPage })));
 const ProjectPage = lazy(() => import("./pages/project-page").then(m => ({ default: m.ProjectPage })));
@@ -46,7 +40,6 @@ export const projectsRoutes: RouteObject = {
                         },
                     ],
                 },
-                { path: "sales", element: <SalesComingSoon /> },
             ],
         },
     ],

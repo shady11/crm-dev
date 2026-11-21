@@ -80,6 +80,8 @@ model Role {
   permissions RolePermission[]
   // Every user whose primary (and only) Role this is. See User.roleId.
   users User[] @relation("UserPrimaryRole")
+  // E2E-24: companies' own discount limits for this (built-in) role.
+  companyDiscountLimits CompanyRoleDiscountLimit[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -103,3 +105,19 @@ model RolePermission {
   @@id([roleId, permissionId])
   @@index([permissionId])
 }
+
+/// E2E-24: one company's discount limit for a built-in role, set by its
+/// owner without copying the role. The built-in role is shared by every
+/// company, so its own discountLimit stays the default; where a company has
+/// one of these, it is that company's limit for everyone in the role.
+model CompanyRoleDiscountLimit {
+  companyId     String
+  company       Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  roleId        String
+  role          Role    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  discountLimit Decimal @db.Decimal(5, 2)
+  updatedAt     DateTime @updatedAt
+
+  @@id([companyId, roleId])
+}
+

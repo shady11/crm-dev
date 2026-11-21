@@ -195,6 +195,7 @@
     },
     "paymentScheduleCreated": {
       "title": "График платежей по сделке {{dealNumber}} создал(а) {{byName}}"
-    }
+    },
+    "discountApprovedPartially": "Скидка по сделке {{dealNumber}} согласована: {{percent}}% вместо {{requested}}%"
   }
 }

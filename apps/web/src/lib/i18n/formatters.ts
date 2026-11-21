@@ -1,4 +1,5 @@
 import {useMemo} from "react";
+import {useTranslation} from "react-i18next";
 
 export type CompanySettings = {
     currency?: string | null;
@@ -26,6 +27,9 @@ export function useFormatters(company?: CompanySettings) {
 
     const locale = company?.locale || DEFAULT_LOCALE;
     const currency = company?.currency || DEFAULT_CURRENCY;
+    // "м²" in Russian and Kyrgyz, "m²" in English: the reader's script.
+    const {t} = useTranslation("common");
+    const sqm = t("units.sqm");
 
     return useMemo(() => {
         const number = new Intl.NumberFormat(locale);
@@ -37,13 +41,17 @@ export function useFormatters(company?: CompanySettings) {
             maximumFractionDigits: 0,
         });
         const money = (value: number) => `${amount.format(value)} ${currency}`;
+        const area = new Intl.NumberFormat(locale, {maximumFractionDigits: 2});
         const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
         const dateTime = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
 
         return {
             formatNumber: (value: number) => number.format(value),
             formatCurrency: money,
-            formatPricePerSqm: (value: number) => `${money(value)}/m²`,
+            formatPricePerSqm: (value: number) => `${money(value)}/${sqm}`,
+            // The area as measured, to the hundredth: a sale contract
+            // states 42.5 m², so the chessboard and the deal must too.
+            formatArea: (value: number | string) => `${area.format(Number(value))} ${sqm}`,
             formatDate: (value: string | Date) => date.format(new Date(value)),
             formatDateTime: (value: string | Date) => dateTime.format(new Date(value)),
             // The bare ISO currency code (e.g. "KGS") - for labels like
@@ -51,5 +59,5 @@ export function useFormatters(company?: CompanySettings) {
             // overkill, but "$" regardless of the company's currency is wrong.
             currencyCode: currency,
         };
-    }, [locale, currency]);
+    }, [locale, currency, sqm]);
 }

@@ -18,6 +18,11 @@ model Company {
   taxId          String?
   signatoryName  String?
   signatoryTitle String?
+  // E2E-22: where the client pays, printed on the contract, the
+  // reservation agreement and receipts.
+  bankName       String?
+  bankAccount    String?
+  bankBic        String?
   letterheadUrl  String?
 
   // Reservation policy — see DealDomainService.resolveReservationExpiry /
@@ -48,6 +53,7 @@ model Company {
   tasks      Task[]
   documents  Document[]
   documentTemplates DocumentTemplate[]
+  roleDiscountLimits CompanyRoleDiscountLimit[]
   outboundMessages  OutboundMessage[]
 
   notifications      Notification[]

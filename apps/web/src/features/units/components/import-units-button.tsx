@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {toast} from "@/components/ui/toast.tsx";
-import {useImportUnits} from "@/features/units/hooks/use-import-units.ts";
+import {useImportUnits, usePreviewImportUnits} from "@/features/units/hooks/use-import-units.ts";
 import {downloadImportSample} from "@/features/units/api/units.api.ts";
 import {
     IMPORT_FIELDS,
@@ -74,6 +74,10 @@ export function ImportUnitsButton({projectId}: Props) {
     const [fileError, setFileError] = useState<ImportFileError | null>(null);
     const [downloading, setDownloading] = useState(false);
     const importMutation = useImportUnits(projectId);
+    // E2E-23: a chosen file is checked first and imported only on confirm.
+    const previewMutation = usePreviewImportUnits(projectId);
+    const [preview, setPreview] = useState<ImportUnitsResult | null>(null);
+    const [pendingFile, setPendingFile] = useState<File | null>(null);
 
     const fieldLabel = (field: string) => t(`import.columns.${field}.label`);
 
@@ -83,8 +87,31 @@ export function ImportUnitsButton({projectId}: Props) {
         if (!file) return;
 
         setFileError(null);
-        importMutation.mutate(file, {
+        previewMutation.mutate(file, {
             onSuccess: (data) => {
+                setPreview(data);
+                setPendingFile(file);
+            },
+            onError: (error) => {
+                const columns = fileErrorOf(error);
+                if (columns) {
+                    setFileError(columns);
+                    return;
+                }
+                toast.error({
+                    title: t("import.toastErrorTitle"),
+                    description: t("import.toastErrorDescription"),
+                });
+            },
+        });
+    };
+
+    const confirmImport = () => {
+        if (!pendingFile) return;
+        importMutation.mutate(pendingFile, {
+            onSuccess: (data) => {
+                setPreview(null);
+                setPendingFile(null);
                 setResult(data);
                 if (data.failed === 0 && data.keptPrices.length === 0) {
                     toast.success({
@@ -121,6 +148,8 @@ export function ImportUnitsButton({projectId}: Props) {
     const close = () => {
         setOpen(false);
         setResult(null);
+        setPreview(null);
+        setPendingFile(null);
         setFileError(null);
     };
 
@@ -145,7 +174,101 @@ export function ImportUnitsButton({projectId}: Props) {
 
             <Dialog open={open} onOpenChange={({open: next}) => !next && close()}>
                 <DialogContent className="sm:max-w-2xl">
-                    {result ? (
+                    {preview && !result ? (
+                        <>
+                            <DialogHeader>
+                                <DialogTitle>{t("import.preview.title")}</DialogTitle>
+                                <DialogDescription>{t("import.preview.description", {file: pendingFile?.name ?? ""})}</DialogDescription>
+                            </DialogHeader>
+                            <DialogBody className="space-y-4">
+                                <ul className="grid gap-1.5 text-sm sm:grid-cols-2">
+                                    <SummaryItem label={t("import.preview.willCreate", {count: preview.created})} />
+                                    <SummaryItem
+                                        label={t("import.preview.newBlocks", {blocks: (preview.newBlocks ?? []).join(", ")})}
+                                        hidden={!preview.newBlocks?.length}
+                                    />
+                                    <SummaryItem label={t("import.preview.willUpdatePrices", {count: preview.pricesUpdated})} hidden={!preview.pricesUpdated} tone="warning" />
+                                    <SummaryItem label={t("import.preview.willRequestPrices", {count: preview.pricesRequested})} hidden={!preview.pricesRequested} tone="warning" />
+                                    <SummaryItem label={t("import.result.unchanged", {count: preview.unchanged})} hidden={!preview.unchanged} />
+                                    <SummaryItem label={t("import.result.kept", {count: preview.keptPrices.length})} hidden={!preview.keptPrices.length} />
+                                    <SummaryItem label={t("import.preview.willSkip", {count: preview.failed})} hidden={!preview.failed} tone="destructive" />
+                                </ul>
+
+                                {(preview.priceChanges?.length ?? 0) > 0 && (
+                                    <section className="space-y-2">
+                                        <h3 className="text-sm font-medium">{t("import.preview.priceChangesTitle")}</h3>
+                                        <div className="max-h-56 overflow-y-auto rounded-md border">
+                                            <Table>
+                                                <TableHeader>
+                                                    <TableRow>
+                                                        <TableHead className="w-14">{t("import.errorsTable.row")}</TableHead>
+                                                        <TableHead>{t("import.kept.unit")}</TableHead>
+                                                        <TableHead className="text-right">{t("import.preview.priceNow")}</TableHead>
+                                                        <TableHead className="text-right">{t("import.preview.priceInFile")}</TableHead>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    {preview.priceChanges!.map((change) => (
+                                                        <TableRow key={change.row}>
+                                                            <TableCell>{change.row}</TableCell>
+                                                            <TableCell>
+                                                                {t("import.kept.unitLabel", {block: change.block, number: change.number})}
+                                                                {change.needsApproval && (
+                                                                    <Badge variant="outline" className="ms-2 text-[10px]">{t("import.preview.needsApproval")}</Badge>
+                                                                )}
+                                                            </TableCell>
+                                                            <TableCell className="text-right whitespace-nowrap">{formatCurrency(change.currentPrice)}</TableCell>
+                                                            <TableCell className="text-right font-medium whitespace-nowrap">{formatCurrency(change.filePrice)}</TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </div>
+                                    </section>
+                                )}
+
+                                {preview.errors.length > 0 && (
+                                    <section className="space-y-2">
+                                        <h3 className="text-sm font-medium">{t("import.preview.errorsTitle")}</h3>
+                                        <div className="max-h-56 overflow-y-auto rounded-md border">
+                                            <Table>
+                                                <TableHeader>
+                                                    <TableRow>
+                                                        <TableHead className="w-14">{t("import.errorsTable.row")}</TableHead>
+                                                        <TableHead>{t("import.errorsTable.messages")}</TableHead>
+                                                    </TableRow>
+                                                </TableHeader>
+                                                <TableBody>
+                                                    {preview.errors.map((error) => (
+                                                        <TableRow key={error.row}>
+                                                            <TableCell>{error.row}</TableCell>
+                                                            <TableCell className="text-muted-foreground text-sm whitespace-normal">
+                                                                {(error.codes ?? [])
+                                                                    .map(({code, params}) => t(`import.rowErrors.${code}`, params ?? {}))
+                                                                    .join("; ") || error.messages.join("; ")}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    ))}
+                                                </TableBody>
+                                            </Table>
+                                        </div>
+                                    </section>
+                                )}
+                            </DialogBody>
+                            <DialogFooter className="sm:justify-between">
+                                <Button variant="ghost" onClick={() => fileInputRef.current?.click()} disabled={importMutation.isPending}>
+                                    {t("import.preview.otherFile")}
+                                </Button>
+                                <Button
+                                    onClick={confirmImport}
+                                    disabled={importMutation.isPending || preview.created + (preview.priceChanges?.length ?? 0) === 0}
+                                    isLoading={importMutation.isPending}
+                                >
+                                    {t("import.preview.confirm")}
+                                </Button>
+                            </DialogFooter>
+                        </>
+                    ) : result ? (
                         <>
                             <DialogHeader>
                                 <DialogTitle>{t("import.resultTitle")}</DialogTitle>
@@ -309,11 +432,11 @@ export function ImportUnitsButton({projectId}: Props) {
                                 </Button>
                                 <Button
                                     onClick={() => fileInputRef.current?.click()}
-                                    disabled={importMutation.isPending}
-                                    isLoading={importMutation.isPending}
+                                    disabled={previewMutation.isPending}
+                                    isLoading={previewMutation.isPending}
                                 >
                                     <UploadIcon className="size-3.5" />
-                                    {importMutation.isPending ? t("import.importing") : t("import.chooseFile")}
+                                    {previewMutation.isPending ? t("import.preview.checking") : t("import.chooseFile")}
                                 </Button>
                             </DialogFooter>
                         </>

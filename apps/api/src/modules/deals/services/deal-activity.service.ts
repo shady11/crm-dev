@@ -208,12 +208,27 @@ export class DealActivityService {
 
     discountApproved(
         params: EventParams,
+        // E2E-21: granted at less than was asked.
+        partial?: { percent: number; requested: number },
     ) {
         return this.create({
             ...params,
             action: ActivityAction.DISCOUNT_APPROVED,
             type: ActivityType.DISCOUNT_APPROVED,
-            ...activityText('discountApproved'),
+            ...(partial ? activityText('discountApprovedPartially', partial) : activityText('discountApproved')),
+        });
+    }
+
+    // E2E-21: a discount set within the asker's own limit, no approval needed.
+    discountChanged(
+        params: EventParams,
+        percent: number,
+    ) {
+        return this.create({
+            ...params,
+            action: ActivityAction.UPDATED_DEAL,
+            type: ActivityType.DEAL_UPDATED,
+            ...(percent > 0 ? activityText('discountChanged', { percent }) : activityText('discountRemoved')),
         });
     }
 

@@ -34,7 +34,6 @@ export const paths = {
             entrance: (projectId: string, blockId: string, entranceId: string) =>
                 `/projects/${projectId}/chessboard/${blockId}/${entranceId}`,
         },
-        sales: (projectId: string) => `/projects/${projectId}/sales`,
     },
     deals: {
         root: "/deals",
@@ -44,6 +43,8 @@ export const paths = {
             `/deals?attention=${filter}${managerId ? `&managerId=${managerId}` : ""}`,
         byManager: (managerId: string) => `/deals?managerId=${managerId}`,
         byStatus: (status: string) => `/deals?status=${status}`,
+        // One project's deals at one stage, from the project's overview.
+        byProjectStatus: (projectId: string, status: string) => `/deals?projectId=${projectId}&status=${status}`,
     },
     payments: "/payments",
     priceChanges: "/price-changes",

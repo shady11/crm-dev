@@ -17,7 +17,7 @@ export function ChessboardUnitCard({
                                        onClick,
                                    }: MatrixUnitCardProps) {
     const { t } = useTranslation("units");
-    const { formatCurrency, formatPricePerSqm } = useCompanyFormatters();
+    const { formatCurrency, formatPricePerSqm, formatArea } = useCompanyFormatters();
     const price = Number(unit.price);
     const area = Number(unit.area);
 
@@ -39,8 +39,10 @@ export function ChessboardUnitCard({
             )}
         >
             <div className="flex items-center justify-between w-full gap-8 text-xs">
+                {/* Commercial space, parking and storage have no rooms:
+                    the label read "комнат" with no number. */}
                 <span>
-                    {t("chessboard.rooms", { count: unit.rooms })}
+                    {unit.rooms != null ? t("chessboard.rooms", { count: unit.rooms }) : null}
                 </span>
                 <span>
                     №{unit.number}
@@ -59,7 +61,7 @@ export function ChessboardUnitCard({
                     {t(UNIT_TYPE_LABEL_KEYS[unit.type])}
                 </span>
                 <span>
-                    {parseFloat(unit.area).toFixed(0)} m²
+                    {formatArea(unit.area)}
                 </span>
             </div>
         </button>

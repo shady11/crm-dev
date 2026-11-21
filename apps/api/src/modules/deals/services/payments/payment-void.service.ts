@@ -18,6 +18,7 @@ import { PrismaService } from '@/database/prisma.service';
 import { AuthUser } from '@/common/types/auth-user.type';
 import { NotificationsService } from '@/modules/notifications/notifications.service';
 import { DealActivityService } from '../deal-activity.service';
+import { startOfToday } from './overdue-installments';
 import { DealMapper } from '../../mappers/deal.mapper';
 import { DEAL_DETAILS_INCLUDE, formatMoney } from '../../deal.constants';
 import { DealNotFoundException } from '../../exceptions';
@@ -219,10 +220,4 @@ function statusFor(
   return paid.greaterThan(0)
     ? PaymentScheduleStatus.PARTIAL
     : PaymentScheduleStatus.PENDING;
-}
-
-function startOfToday(): Date {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return today;
 }

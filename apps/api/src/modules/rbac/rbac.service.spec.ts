@@ -1,3 +1,4 @@
+import {Prisma} from "@/generated/prisma/client";
 import {BadRequestException, ConflictException, ForbiddenException, NotFoundException} from "@nestjs/common";
 import {AuthUser} from "@/common/types/auth-user.type";
 import {RbacService} from "./rbac.service";
@@ -55,6 +56,10 @@ describe("RbacService", () => {
                 findMany: jest.fn().mockResolvedValue([]),
             },
             activity: {create: jest.fn().mockResolvedValue({id: "activity-1"})},
+            companyRoleDiscountLimit: {
+                upsert: jest.fn().mockResolvedValue({}),
+                deleteMany: jest.fn().mockResolvedValue({count: 1}),
+            },
             user: {
                 findMany: jest.fn().mockResolvedValue([]),
                 findUnique: jest.fn(),
@@ -463,6 +468,54 @@ describe("RbacService", () => {
             await expect(
                 service.updateRole(superAdmin, "role-other", {name: "Still theirs"}),
             ).resolves.toBeDefined();
+        });
+    });
+
+    describe("a company's own discount limits (E2E-24)", () => {
+        const builtIn = {id: "role-sales-manager", name: "Sales Manager", companyId: null, isPlatformRole: false, discountLimit: new Prisma.Decimal(5)};
+
+        it("stores the company's limit for a built-in role without touching the shared role", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue(builtIn);
+
+            await service.setCompanyDiscountLimit(companyAdmin, "role-sales-manager", 8);
+
+            expect(prisma.companyRoleDiscountLimit.upsert).toHaveBeenCalledWith({
+                where: {companyId_roleId: {companyId: "company-1", roleId: "role-sales-manager"}},
+                create: {companyId: "company-1", roleId: "role-sales-manager", discountLimit: 8},
+                update: {discountLimit: 8},
+            });
+            expect(prisma.role.update).not.toHaveBeenCalled();
+        });
+
+        it("goes back to the built-in default on null", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue(builtIn);
+
+            await service.setCompanyDiscountLimit(companyAdmin, "role-sales-manager", null);
+
+            expect(prisma.companyRoleDiscountLimit.deleteMany).toHaveBeenCalledWith({where: {companyId: "company-1", roleId: "role-sales-manager"}});
+        });
+
+        it("changes the company's own role in place", async () => {
+            const {service, prisma} = build();
+            prisma.role.findUnique.mockResolvedValue({...builtIn, id: "role-own", companyId: "company-1"});
+
+            await service.setCompanyDiscountLimit(companyAdmin, "role-own", 7);
+
+            expect(prisma.role.update).toHaveBeenCalledWith({where: {id: "role-own"}, data: {discountLimit: 7}});
+            expect(prisma.companyRoleDiscountLimit.upsert).not.toHaveBeenCalled();
+        });
+
+        it("approvers are matched against the company's limit", async () => {
+            const {service, prisma} = build();
+            prisma.role.findMany.mockResolvedValue([
+                {id: "role-sales-head", isBranchScoped: true, discountLimit: new Prisma.Decimal(15), companyDiscountLimits: [{discountLimit: new Prisma.Decimal(10)}]},
+            ]);
+
+            const roles = await service.findApproverRoles("company-1", "deals.approve_discount");
+
+            expect(Number(roles[0].discountLimit)).toBe(10);
         });
     });
 

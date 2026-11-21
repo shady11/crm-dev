@@ -14,3 +14,10 @@ export function useImportUnits(projectId: string) {
         },
     });
 }
+
+/** E2E-23: what an import would do, before anything is saved. */
+export function usePreviewImportUnits(projectId: string) {
+    return useMutation({
+        mutationFn: (file: File) => importUnits(projectId, file, true),
+    });
+}

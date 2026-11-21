@@ -195,6 +195,7 @@
     },
     "paymentScheduleCreated": {
       "title": "{{dealNumber}} бүтүмү боюнча төлөм графигин {{byName}} түздү"
-    }
+    },
+    "discountApprovedPartially": "{{dealNumber}} келишими боюнча арзандатуу макулдашылды: {{requested}}% ордуна {{percent}}%"
   }
 }

@@ -148,11 +148,28 @@ describe('PaymentScheduleService.generate', () => {
 
     it('assigns sequential order starting at 1 and initializes every row as PENDING with zero paidAmount', async () => {
         const {service, prisma} = build({status: DealStatus.ACTIVE, salePrice: new Prisma.Decimal(300)}, 0);
-        await service.generate(user, 'deal-1', dto({installments: 3}));
+        await service.generate(user, 'deal-1', dto({installments: 3, firstPaymentDate: '2999-01-01T00:00:00.000Z'}));
 
         const rows = (prisma.paymentSchedule.createMany as jest.Mock).mock.calls[0][0].data;
         expect(rows.map((r: any) => r.order)).toEqual([1, 2, 3]);
         expect(rows.every((r: any) => r.status === PaymentScheduleStatus.PENDING && r.paidAmount === 0)).toBe(true);
+    });
+
+    it('marks installments already past due as OVERDUE when the schedule is made (an existing contract entered late)', async () => {
+        jest.useFakeTimers({now: new Date('2026-11-20T12:00:00')});
+        try {
+            const {service, prisma} = build({status: DealStatus.ACTIVE, salePrice: new Prisma.Decimal(300)}, 0);
+            await service.generate(user, 'deal-1', dto({installments: 3, firstPaymentDate: '2026-10-01T00:00:00'}));
+
+            const rows = (prisma.paymentSchedule.createMany as jest.Mock).mock.calls[0][0].data;
+            expect(rows.map((r: any) => r.status)).toEqual([
+                PaymentScheduleStatus.OVERDUE,
+                PaymentScheduleStatus.OVERDUE,
+                PaymentScheduleStatus.PENDING,
+            ]);
+        } finally {
+            jest.useRealTimers();
+        }
     });
 
     it('scopes the deal lookup to the requesting branch for branch-scoped roles', async () => {

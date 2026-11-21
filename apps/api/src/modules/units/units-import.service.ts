@@ -64,7 +64,14 @@ export class UnitsImportService {
      * success or failure independent of every other row: a single bad row is
      * recorded and skipped, the other 199 are unaffected.
      */
-    async importFromFile(user: AuthUser, projectId: string, file: Express.Multer.File): Promise<ImportUnitsResult> {
+    /**
+     * E2E-23: with `preview`, the same checks without saving anything: what
+     * would be created, which prices would change (applied, or sent for
+     * approval), which stay, and which rows fail. The import itself saved at
+     * once, and a re-import applied new prices straight away, with nothing
+     * shown first.
+     */
+    async importFromFile(user: AuthUser, projectId: string, file: Express.Multer.File, preview = false): Promise<ImportUnitsResult> {
         if (!user.companyId) {
             throw new ForbiddenException("User does not belong to a company");
         }
@@ -81,7 +88,12 @@ export class UnitsImportService {
 
         const result: ImportUnitsResult = {
             created: 0, pricesUpdated: 0, pricesRequested: 0, unchanged: 0, keptPrices: [], failed: 0, errors: [],
+            ...(preview ? {preview: true, newBlocks: [], priceChanges: []} : {}),
         };
+        const canApprovePrice = hasPermission(user, "units.approve_price");
+        // A preview creates nothing, so units new in this file are tracked
+        // here to catch the same unit twice in one file.
+        const previewSeen = new Map<string, number>();
         const rowError = (row: number, problems: RowProblem[]): ImportUnitRowError => ({
             row,
             messages: problems.map((p) => p.message),
@@ -99,6 +111,24 @@ export class UnitsImportService {
             }
 
             const existing = this.findExisting(cache, row);
+            if (preview && !existing) {
+                const key = `${row.block.toLowerCase()}::${row.number}`;
+                const seenAt = previewSeen.get(key);
+                if (seenAt) {
+                    result.errors.push(rowError(rowNumber, [{
+                        code: "duplicateInFile",
+                        message: `Unit ${row.number} in block ${row.block} is already on row ${seenAt} of this file`,
+                        params: {number: row.number, block: row.block, row: seenAt},
+                    }]));
+                    continue;
+                }
+                previewSeen.set(key, rowNumber);
+                if (!cache.blocks.has(row.block.toLowerCase()) && !result.newBlocks!.some((b) => b.toLowerCase() === row.block.toLowerCase())) {
+                    result.newBlocks!.push(row.block);
+                }
+                result.created++;
+                continue;
+            }
             if (existing?.createdAtRow) {
                 result.errors.push(rowError(rowNumber, [{
                     code: "duplicateInFile",
@@ -122,6 +152,13 @@ export class UnitsImportService {
                         message: `Unit ${row.number} already exists; changing its price needs the units.edit_price permission`,
                         params: {number: row.number},
                     }]));
+                } else if (preview) {
+                    result.priceChanges!.push({
+                        row: rowNumber, block: row.block, number: row.number,
+                        currentPrice: existing.price, filePrice: row.price, needsApproval: !canApprovePrice,
+                    });
+                    if (canApprovePrice) result.pricesUpdated++;
+                    else result.pricesRequested++;
                 } else {
                     try {
                         const outcome = await this.priceRequests.handlePriceChange(
@@ -160,6 +197,7 @@ export class UnitsImportService {
         }
 
         result.failed = result.errors.length;
+        if (preview) return result;
         const priceChanges = result.pricesUpdated + result.pricesRequested;
 
         if (result.created > 0 || priceChanges > 0) {

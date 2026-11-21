@@ -117,6 +117,23 @@
       "priceNotAllowed": "{{number}} объектиси бар жана баасы башка, бирок бааны өзгөртүүгө укугуңуз жок",
       "duplicateInFile": "{{block}} блогундагы {{number}} объектиси {{row}}-сапта бар",
       "rowFailed": "Сапты сактоо мүмкүн болгон жок; текшерип, кайра аракет кылыңыз"
+    },
+    "preview": {
+      "title": "Импорттоодон мурун текшериңиз",
+      "description": "«{{file}}» файлы текшерилди, долбоорго азырынча эч нерсе жазылган жок.",
+      "willCreate": "Түзүлө турган объекттер: {{count}}",
+      "newBlocks": "Жаңы блоктор: {{blocks}}",
+      "willUpdatePrices": "Баасы өзгөрөт: {{count}}",
+      "willRequestPrices": "Макулдашууга кете турган баалар: {{count}}",
+      "willSkip": "Өткөрүп жиберилүүчү саптар: {{count}}",
+      "priceChangesTitle": "Баалардын өзгөрүшү",
+      "priceNow": "Азыр",
+      "priceInFile": "Файлда",
+      "needsApproval": "макулдашууга",
+      "errorsTitle": "Бул саптар импорттолбойт",
+      "otherFile": "Башка файл тандоо",
+      "confirm": "Импорттоо",
+      "checking": "Файл текшерилүүдө…"
     }
   },
   "sheets": {
@@ -228,7 +245,9 @@
     "units_one": "{{count}} жай",
     "units_few": "{{count}} жай",
     "units_many": "{{count}} жай",
-    "units_other": "{{count}} жай"
+    "units_other": "{{count}} жай",
+    "scrollLeft": "Мурунку жайлар",
+    "scrollRight": "Дагы жайлар"
   },
   "filters": {
     "roomsSummary_one": "{{count}} бөлмө",

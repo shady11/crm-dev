@@ -23,11 +23,23 @@ export interface TemplateContext {
     signatoryName: string;
     signatoryTitle: string;
     currency: string;
+    // E2E-22: where the client pays.
+    bankName: string;
+    bankAccount: string;
+    bankBic: string;
+  };
+  project: {
+    name: string;
+    address: string;
+    /** Planned handover, formatted; empty when not set. */
+    handoverDate: string;
   };
   deal: {
     dealNumber: string;
     status: string;
     financingType: string;
+    /** E2E-22: "yes" for cash, paid in one sum; empty: by the schedule annex. */
+    paysInFull: string;
     listPrice: string;
     salePrice: string;
     discountAmount: string;
@@ -91,11 +103,20 @@ export function buildTemplateContext(
       signatoryName: company.signatoryName ?? '',
       signatoryTitle: company.signatoryTitle ?? '',
       currency: currency ?? '',
+      bankName: company.bankName ?? '',
+      bankAccount: company.bankAccount ?? '',
+      bankBic: company.bankBic ?? '',
+    },
+    project: {
+      name: deal.project.name,
+      address: deal.project.address ?? '',
+      handoverDate: date(deal.project.handoverDate),
     },
     deal: {
       dealNumber: deal.dealNumber,
-      status: deal.status,
+      status: f.dealStatus(deal.status),
       financingType: f.financing(deal.financingType),
+      paysInFull: deal.financingType === 'CASH' ? 'yes' : '',
       listPrice: money(deal.listPrice, currency),
       salePrice: money(deal.salePrice, currency),
       // A Decimal zero is still an object, so test the number: no discount

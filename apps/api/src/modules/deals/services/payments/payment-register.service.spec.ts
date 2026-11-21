@@ -267,4 +267,38 @@ describe('PaymentRegisterService', () => {
       }),
     );
   });
+
+  it('writes the exports in the reader\'s language: Russian headers, statuses, types and methods', async () => {
+    const { service, prisma } = build();
+    prisma.payment.findMany.mockResolvedValue([
+      paymentRow({ paymentType: PaymentType.DEPOSIT, paymentMethod: PaymentMethod.CASH }),
+    ]);
+    prisma.deal.findMany.mockResolvedValue([
+      {
+        dealNumber: 'D-2026-0001',
+        status: DealStatus.ACTIVE,
+        salePrice: new Prisma.Decimal(10000),
+        client: { fullName: 'Асанов Бакыт', phone: null },
+        manager: null,
+        project: { name: 'Орион' },
+        unit: { number: '302', block: { name: 'А' } },
+        branch: null,
+        payments: [],
+        paymentSchedules: [],
+      },
+    ]);
+
+    const payments = XLSX.read(
+      await service.exportXlsx(financeUser, { from: '2026-10-01', to: '2026-10-31' }, 'ru'),
+    );
+    expect(payments.SheetNames).toEqual(['Платежи', 'Итоги']);
+    const [payment] = XLSX.utils.sheet_to_json<Record<string, unknown>>(payments.Sheets['Платежи']);
+    expect(payment).toEqual(expect.objectContaining({ Тип: 'Задаток', Способ: 'Наличные' }));
+
+    const receivables = XLSX.read(await service.exportReceivablesXlsx(headUser, {}, 'ru'));
+    const [row] = XLSX.utils.sheet_to_json<Record<string, unknown>>(
+      receivables.Sheets[receivables.SheetNames[0]],
+    );
+    expect(row).toEqual(expect.objectContaining({ Статус: 'В процессе', Помещение: 'А / 302', Остаток: 10000 }));
+  });
 });

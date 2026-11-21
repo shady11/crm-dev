@@ -31,7 +31,25 @@ export type ImportKeptPrice = {
     filePrice: number;
 };
 
+/** E2E-23: in a preview, an existing unit whose price the file changes. */
+export type ImportPriceChange = {
+    row: number;
+    block: string;
+    number: string;
+    currentPrice: number;
+    filePrice: number;
+    /** The importer can't approve prices: it would go for approval. */
+    needsApproval: boolean;
+};
+
 export type ImportUnitsResult = {
+    /** E2E-23: true when nothing was saved, only checked. */
+    preview?: boolean;
+    /** In a preview: the blocks the file would add to the project. */
+    newBlocks?: string[];
+    /** In a preview: each price the file would change. */
+    priceChanges?: ImportPriceChange[];
+    /** In a preview, the units that would be created; after an import, those created. */
     created: number;
     /** Existing units whose new price was applied (the importer approves prices). */
     pricesUpdated: number;
