@@ -1,0 +1,76 @@
+# Local development stack: PostgreSQL + NestJS API (watch mode) + Vite web app.
+#
+#   docker compose up --build        # first run
+#   docker compose up                # afterwards
+#   docker compose exec api npx prisma db seed   # demo data (admin@crm.dev / password123)
+#
+# Source is bind-mounted, so edits on the host hot-reload inside the containers.
+# node_modules live in named volumes so the host's (possibly different-OS)
+# install never shadows the container's.
+
+name: crm-dev
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: crm_dev
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d crm_dev"]
+      interval: 2s
+      timeout: 5s
+      retries: 30
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile.dev
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://postgres:password@db:5432/crm_dev
+      JWT_SECRET: ${JWT_SECRET:-dev_only_insecure_jwt_secret}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      PORT: 3000
+      ENABLE_API_DOCS: "true"
+      # Reliable file watching on Docker Desktop (macOS/Windows) bind mounts.
+      TSC_WATCHFILE: UseFsEventsWithFallbackDynamicPolling
+    ports:
+      - "${API_PORT:-3000}:3000"
+      - "9229:9229" # node --inspect, when started with start:debug
+    volumes:
+      - ./apps/api:/app
+      - api-node-modules:/app/node_modules
+      - api-uploads:/app/uploads
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - api
+    environment:
+      # Read by the browser, so it points at the host-published API port.
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api}
+      # Read by vite.config.ts: poll for file changes on the bind mount.
+      VITE_USE_POLLING: "true"
+    ports:
+      - "${WEB_PORT:-5173}:5173"
+    volumes:
+      - ./apps/web:/app
+      - web-node-modules:/app/node_modules
+
+volumes:
+  db-data:
+  api-node-modules:
+  api-uploads:
+  web-node-modules:
