@@ -59,8 +59,8 @@ export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsS
     const {client, unit, project, manager} = deal;
     const hasId = !!client.passport?.trim() && !!client.pin?.trim();
     const pricePerSqm = unit.area > 0 ? Math.round(deal.listPrice / unit.area) : null;
+    // The project gets its own line; block, entrance and floor follow it.
     const location = [
-        project.name,
         blockLabel(t, unit.block),
         unit.entrance && `${t("labels.entrance", {ns: "common"})} ${unit.entrance.name}`,
         unit.floor && t("unitCard.floor", {floor: unit.floor.number}),
@@ -150,6 +150,7 @@ export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsS
                 >
                     <div className="flex flex-col gap-0.5">
                         <p className="font-semibold">{t("unitCard.unitNumber", {number: unit.number})}</p>
+                        <p className="text-sm text-muted-foreground">{project.name}</p>
                         <p className="text-sm text-muted-foreground">{location}</p>
                         <p className="text-sm text-muted-foreground">{shape}</p>
                     </div>
