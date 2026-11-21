@@ -67,12 +67,14 @@ export async function downloadImportSample(lang: string) {
     URL.revokeObjectURL(url);
 }
 
-export async function importUnits(projectId: string, file: File) {
+/** E2E-23: preview checks the file and saves nothing. */
+export async function importUnits(projectId: string, file: File, preview = false) {
     const formData = new FormData();
     formData.append("file", file);
 
     const response = await api.post<ImportUnitsResult>(`/projects/${projectId}/units/import`, formData, {
         headers: {"Content-Type": "multipart/form-data"},
+        params: preview ? {preview: "true"} : undefined,
     });
     return response.data;
 }

@@ -117,6 +117,23 @@
       "priceNotAllowed": "Объект {{number}} уже есть и его цена отличается, но у вас нет права менять цены",
       "duplicateInFile": "Объект {{number}} в блоке {{block}} уже есть в строке {{row}}",
       "rowFailed": "Строку не удалось сохранить; проверьте её и попробуйте снова"
+    },
+    "preview": {
+      "title": "Проверьте перед импортом",
+      "description": "Файл «{{file}}» проверен, в проект ещё ничего не записано.",
+      "willCreate": "Будет создано объектов: {{count}}",
+      "newBlocks": "Новые блоки: {{blocks}}",
+      "willUpdatePrices": "Изменятся цены: {{count}}",
+      "willRequestPrices": "Цен уйдёт на согласование: {{count}}",
+      "willSkip": "Строк будет пропущено: {{count}}",
+      "priceChangesTitle": "Изменения цен",
+      "priceNow": "Сейчас",
+      "priceInFile": "В файле",
+      "needsApproval": "на согласование",
+      "errorsTitle": "Эти строки не будут импортированы",
+      "otherFile": "Выбрать другой файл",
+      "confirm": "Импортировать",
+      "checking": "Проверяем файл…"
     }
   },
   "sheets": {

@@ -117,6 +117,23 @@
       "priceNotAllowed": "Unit {{number}} exists and its price differs, but you can't change prices",
       "duplicateInFile": "Unit {{number}} in block {{block}} is already on row {{row}}",
       "rowFailed": "This row couldn't be saved; check it and try again"
+    },
+    "preview": {
+      "title": "Check before importing",
+      "description": "“{{file}}” was checked; nothing has been saved to the project yet.",
+      "willCreate": "Units to create: {{count}}",
+      "newBlocks": "New blocks: {{blocks}}",
+      "willUpdatePrices": "Prices to change: {{count}}",
+      "willRequestPrices": "Prices to send for approval: {{count}}",
+      "willSkip": "Rows to skip: {{count}}",
+      "priceChangesTitle": "Price changes",
+      "priceNow": "Now",
+      "priceInFile": "In the file",
+      "needsApproval": "for approval",
+      "errorsTitle": "These rows won’t be imported",
+      "otherFile": "Choose another file",
+      "confirm": "Import",
+      "checking": "Checking the file…"
     }
   },
   "sheets": {

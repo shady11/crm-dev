@@ -28,7 +28,21 @@ export type ImportKeptPrice = {
     filePrice: number;
 };
 
+/** E2E-23: in a preview, a price the file would change. */
+export type ImportPriceChange = {
+    row: number;
+    block: string;
+    number: string;
+    currentPrice: number;
+    filePrice: number;
+    needsApproval: boolean;
+};
+
 export type ImportUnitsResult = {
+    /** E2E-23: a preview, nothing saved. */
+    preview?: boolean;
+    newBlocks?: string[];
+    priceChanges?: ImportPriceChange[];
     created: number;
     pricesUpdated: number;
     pricesRequested: number;
