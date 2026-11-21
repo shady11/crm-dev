@@ -195,6 +195,7 @@
     },
     "paymentScheduleCreated": {
       "title": "Payment schedule for deal {{dealNumber}} made by {{byName}}"
-    }
+    },
+    "discountApprovedPartially": "Discount for deal {{dealNumber}} approved at {{percent}}% instead of {{requested}}%"
   }
 }

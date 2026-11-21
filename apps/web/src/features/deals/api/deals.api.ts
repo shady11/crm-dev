@@ -260,8 +260,15 @@ export async function requestReservationExtension(id: string) {
     return response.data;
 }
 
-export async function approveDiscount(dealId: string) {
-    const response = await api.post<DealDetails>(`/deals/${dealId}/discount/approve`);
+/** E2E-21: discountPercent approves less than was asked; left out, what was asked. */
+export async function approveDiscount(dealId: string, discountPercent?: number) {
+    const response = await api.post<DealDetails>(`/deals/${dealId}/discount/approve`, discountPercent != null ? { discountPercent } : {});
+    return response.data;
+}
+
+/** E2E-21: a new discount on a reservation; applies at once or waits for approval. */
+export async function requestDiscount(dealId: string, payload: { discountPercent: number; note?: string }) {
+    const response = await api.post<DealDetails>(`/deals/${dealId}/discount/request`, payload);
     return response.data;
 }
 

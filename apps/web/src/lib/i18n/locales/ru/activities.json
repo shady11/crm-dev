@@ -145,7 +145,10 @@
     "rolePermissionsChanged": "Изменены права роли «{{role}}»: добавлено {{added}}, убрано {{removed}}",
     "roleDeleted": "Удалена роль «{{role}}»",
     "unitsImportedWithPrices": "Импортировано объектов: {{units}}, цен изменено: {{prices}}, отправлено на согласование: {{requested}}",
-    "documentTemplateReset": "Шаблон документа «{{name}}» заменён стандартным"
+    "documentTemplateReset": "Шаблон документа «{{name}}» заменён стандартным",
+    "discountApprovedPartially": "Скидка согласована: {{percent}}% вместо {{requested}}%",
+    "discountChanged": "Скидка изменена: {{percent}}%",
+    "discountRemoved": "Скидка снята"
   },
   "actor": {
     "impersonated": "{{admin}} (поддержка платформы) от имени {{user}}",

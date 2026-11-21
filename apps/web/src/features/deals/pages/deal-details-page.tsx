@@ -32,6 +32,7 @@ import type {DealDetails, PaymentMethod, PaymentType} from "../api/deals.api";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {DealTasksCard} from "@/features/deals/components/deal-tasks-card.tsx";
 import {DealDiscountBanner} from "@/features/deals/components/deal-details/deal-discount-banner.tsx";
+import {RequestDiscountDialog} from "@/features/deals/components/deal-details/request-discount-dialog.tsx";
 import {DealMoneyHeldBanner} from "@/features/deals/components/deal-details/deal-money-held-banner.tsx";
 import {DealLegalDetailsBanner} from "@/features/deals/components/deal-details/deal-legal-details-banner.tsx";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
@@ -86,6 +87,7 @@ export function DealDetailsPage() {
     // Extend, sign, activate and complete: the deal's own lifecycle.
     const canManage = hasPermission(user, "deals.manage");
     const [rejectOpen, setRejectOpen] = useState(false);
+    const [discountOpen, setDiscountOpen] = useState(false);
     const [activateOpen, setActivateOpen] = useState(false);
     const [rejectReason, setRejectReason] = useState("");
 
@@ -207,6 +209,8 @@ export function DealDetailsPage() {
     });
 
     const isOpen = ["RESERVED", "CONTRACT_SIGNED", "ACTIVE"].includes(deal.status);
+    // E2E-21: a new discount on a reservation with none waiting for a decision.
+    const canChangeDiscount = deal.status === "RESERVED" && canManage && deal.discountApprovalStatus !== "PENDING";
     const tab = TAB_VALUES.includes(searchParams.get("tab") as DealTab)
         ? (searchParams.get("tab") as DealTab)
         : defaultTabFor(deal.status);
@@ -319,7 +323,7 @@ export function DealDetailsPage() {
                     {deal.status === "ACTIVE" && canManagePayments && (
                         <Button onClick={openPaymentDialog}>{t("paymentsHistory.record")}</Button>
                     )}
-                    {isOpen && (canCancel || (deal.status === "ACTIVE" && canManage)) && (
+                    {isOpen && (canCancel || (deal.status === "ACTIVE" && canManage) || canChangeDiscount) && (
                         <Menu>
                             <MenuTrigger asChild>
                                 <Button variant="ghost" size="icon-sm" aria-label={t("detailsPage.moreActions")}>
@@ -327,6 +331,12 @@ export function DealDetailsPage() {
                                 </Button>
                             </MenuTrigger>
                             <MenuContent>
+                                {canChangeDiscount && (
+                                    <MenuItem value="discount" onSelect={() => setDiscountOpen(true)}>
+                                        {t("requestDiscount.menuItem")}
+                                    </MenuItem>
+                                )}
+                                {canChangeDiscount && canCancel && <MenuSeparator />}
                                 {deal.status === "ACTIVE" && canManage && (
                                     <MenuItem value="complete" onSelect={() => actions.complete.mutate()}>
                                         {t("detailsPage.markCompleted")}
@@ -351,8 +361,19 @@ export function DealDetailsPage() {
                 canApprove={canDecideDiscount}
                 decision={deal.discountDecision}
                 isDeciding={actions.approveDiscount.isPending || actions.rejectDiscount.isPending}
-                onApprove={() => actions.approveDiscount.mutate()}
+                onApprove={(percent) => actions.approveDiscount.mutate(percent)}
                 onReject={() => setRejectOpen(true)}
+                onRequestAgain={deal.status === "RESERVED" && canManage ? () => setDiscountOpen(true) : undefined}
+            />
+
+            <RequestDiscountDialog
+                open={discountOpen}
+                onOpenChange={setDiscountOpen}
+                listPrice={deal.listPrice}
+                clientId={deal.client.id}
+                currentPercent={deal.discountApprovalStatus === "REJECTED" ? 0 : (deal.discountPercent ?? 0)}
+                isPending={actions.requestDiscount.isPending}
+                onSubmit={(values) => actions.requestDiscount.mutate(values, {onSuccess: () => setDiscountOpen(false)})}
             />
 
             <DealMoneyHeldBanner

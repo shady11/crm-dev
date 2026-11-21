@@ -1,3 +1,5 @@
+import {ApproveDiscountDto} from '../dto/approve-discount.dto';
+import {RequestDiscountDto} from '../dto/request-discount.dto';
 import {Body, Controller, Get, Param, ParseEnumPipe, Post, Query, UseGuards} from '@nestjs/common';
 import {DocumentType} from '@/generated/prisma/client';
 import {JwtAuthGuard} from '@/modules/auth/guards/jwt-auth.guard';
@@ -135,8 +137,25 @@ export class DealsController {
   // band on top of this.
   @RequirePermissions('deals.approve_discount')
   @Post(':id/discount/approve')
-  approveDiscount(@CurrentUser() user: AuthUser, @Param('id') id: string) {
-    return this.dealsService.approveDiscount(user, id);
+  approveDiscount(
+      @CurrentUser() user: AuthUser,
+      @Param('id') id: string,
+      @Body() dto: ApproveDiscountDto,
+  ) {
+    return this.dealsService.approveDiscount(user, id, dto);
+  }
+
+  // E2E-21: a new discount on a reservation with none pending. Within the
+  // asker's own limit it applies at once; above it, it waits for approval
+  // like one asked for at booking.
+  @RequirePermissions('deals.manage')
+  @Post(':id/discount/request')
+  requestDiscount(
+      @CurrentUser() user: AuthUser,
+      @Param('id') id: string,
+      @Body() dto: RequestDiscountDto,
+  ) {
+    return this.dealsService.requestDiscount(user, id, dto);
   }
 
   @RequirePermissions('deals.approve_discount')

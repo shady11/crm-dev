@@ -24,6 +24,11 @@ const ACTIVITY_TEMPLATES = {
   dealReassigned: () => 'Deal reassigned to another manager',
   discountRequested: () => 'Discount requested approval',
   discountApproved: () => 'Discount approved',
+  // E2E-21: approved at less than asked; set again on a reservation.
+  discountApprovedPartially: (p: { percent: number; requested: number }) =>
+    `Discount approved at ${p.percent}% instead of ${p.requested}%`,
+  discountChanged: (p: { percent: number }) => `Discount set to ${p.percent}%`,
+  discountRemoved: () => 'Discount removed',
   discountRejected: () => 'Discount rejected',
   reservationAgreementGenerated: () => 'Reservation agreement generated',
   saleContractGenerated: () => 'Sale contract generated',

@@ -230,7 +230,11 @@
     "discountAboveLimitHint": "It stays with an approver whose limit covers it.",
     "extensionRequested": "Your Sales Head has been asked to extend the reservation",
     "extensionRequestNobody": "Nobody can extend past the limit. Ask an admin to grant the permission.",
-    "extensionRequestError": "Could not send the request"
+    "extensionRequestError": "Could not send the request",
+    "discountSentForApproval": "Discount sent for approval",
+    "discountSentForApprovalHint": "The deal stays at list price until it is decided.",
+    "discountApplied": "Discount applied",
+    "discountRequestError": "Couldn't change the discount"
   },
   "booking": {
     "rooms": "{{count}} rooms",
@@ -302,7 +306,12 @@
     "aboveYourLimitUnknown": "This is above your approval limit, so someone with a higher limit decides it.",
     "pendingRequesterWith": "The contract can be signed once {{approvers}} decides. The sale price stays at the list price until then.",
     "approveDialogTitle": "Approve a {{percent}}% discount ({{amount}})?",
-    "approveDialogDescription": "The sale price drops by this amount, the reservation agreement is issued again at the new price, and the manager is told."
+    "approveDialogDescription": "The sale price drops by the discount you approve, the reservation agreement is issued again at the new price, and the manager is told.",
+    "approvePercent": "Approve discount, %",
+    "approvePercentHint": "Up to the {{percent}}% asked. You can approve less.",
+    "approvePrice": "Sale price: {{price}} (list {{list}})",
+    "approveAt": "Approve {{percent}}%",
+    "requestAgain": "Ask for another discount"
   },
   "stage": {
     "label": "Deal stage",
@@ -379,5 +388,20 @@
     "open": "Open chessboard",
     "banner": "Reserving for {{name}}: pick a free unit and book it.",
     "stop": "Stop"
+  },
+  "requestDiscount": {
+    "title": "Discount on this reservation",
+    "description": "A new discount for this reservation, without cancelling and booking again.",
+    "percent": "Discount, %",
+    "newPrice": "Sale price: {{price}} (list {{list}})",
+    "note": "Note for the approver",
+    "notePlaceholder": "E.g. the client will pay 30% up front",
+    "appliesNow": "Within your limit: applies at once and the reservation agreement is reissued.",
+    "needsApproval": "Above your limit: goes for approval ({{approvers}}). List price until then.",
+    "needsApprovalUnknown": "Above your limit: goes for approval. List price until then.",
+    "removes": "The discount is removed and the price goes back to list.",
+    "submit": "Apply",
+    "submitForApproval": "Send for approval",
+    "menuItem": "Change discount"
   }
 }

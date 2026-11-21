@@ -4,6 +4,7 @@ import {toast} from "@/components/ui/toast";
 import {
     activateDeal,
     approveDiscount,
+    requestDiscount,
     rejectDiscount,
     cancelDeal,
     completeDeal,
@@ -180,7 +181,7 @@ export function useDealActions(dealId: string) {
     };
 
     const approveDiscountRequest = useMutation({
-        mutationFn: () => approveDiscount(dealId),
+        mutationFn: (discountPercent?: number) => approveDiscount(dealId, discountPercent),
         onSuccess: async () => {
             await invalidate();
             toast.success({ title: t("toasts.discountApproved"), description: t("toasts.reservationReissued") });
@@ -197,7 +198,22 @@ export function useDealActions(dealId: string) {
         onError: (error) => discountDecisionError(error),
     });
 
+    // E2E-21: says whether the discount applied or went for approval.
+    const requestDiscountAction = useMutation({
+        mutationFn: (payload: { discountPercent: number; note?: string }) => requestDiscount(dealId, payload),
+        onSuccess: async (deal) => {
+            await invalidate();
+            if (deal.discountApprovalStatus === "PENDING") {
+                toast.success({ title: t("toasts.discountSentForApproval"), description: t("toasts.discountSentForApprovalHint") });
+            } else {
+                toast.success({ title: t("toasts.discountApplied"), description: t("toasts.reservationReissued") });
+            }
+        },
+        onError: () => toast.error({ title: t("toasts.discountRequestError"), description: t("toasts.tryAgain") }),
+    });
+
     return {
+        requestDiscount: requestDiscountAction,
         extend, requestExtension, sign, activate, cancel, generateSchedule, recordPayment, complete, reassign, generateDocument,
         voidPayment: voidPaymentAction,
         approveDiscount: approveDiscountRequest,
