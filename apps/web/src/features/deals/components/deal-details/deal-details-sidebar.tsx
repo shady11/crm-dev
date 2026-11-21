@@ -1,7 +1,6 @@
-import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import type {ReactNode} from "react";
 import {Link} from "react-router-dom";
-import {CircleAlertIcon, CircleCheckIcon, ExternalLinkIcon, MailIcon, PhoneIcon, RepeatIcon, UserRoundXIcon} from "lucide-react";
+import {CircleAlertIcon, CircleCheckIcon, ExternalLinkIcon, PhoneIcon, RepeatIcon, UserRoundXIcon} from "lucide-react";
 import {useTranslation} from "react-i18next";
 import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
@@ -113,7 +112,7 @@ export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsS
                     }
                 >
                     {manager ? (
-                        <div className="flex items-start gap-3">
+                        <div className="flex items-center gap-3">
                             <Avatar className="size-9">
                                 <AvatarFallback className="text-xs">{initials(manager.fullName)}</AvatarFallback>
                             </Avatar>
@@ -122,22 +121,6 @@ export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsS
                                     <p className="font-semibold">{manager.fullName}</p>
                                     {manager.id === user?.id && <Badge variant="secondary">{t("sidebar.you")}</Badge>}
                                 </div>
-                                <p className="text-sm text-muted-foreground">{roleLabel(t, manager.role.name)}</p>
-                                {/* Your own number isn't much use to you; colleagues and heads need it. */}
-                                {manager.id !== user?.id && (
-                                    <div className="flex flex-col gap-1 text-sm">
-                                        {manager.phone && (
-                                            <a href={`tel:${manager.phone}`} className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground">
-                                                <PhoneIcon size={14} />
-                                                {manager.phone}
-                                            </a>
-                                        )}
-                                        <a href={`mailto:${manager.email}`} className="flex min-w-0 items-center gap-1.5 text-muted-foreground hover:text-foreground">
-                                            <MailIcon size={14} className="shrink-0" />
-                                            <span className="truncate">{manager.email}</span>
-                                        </a>
-                                    </div>
-                                )}
                                 {!manager.isActive && (
                                     <p className="flex items-start gap-1.5 text-xs text-warning-foreground">
                                         <UserRoundXIcon className="mt-px size-3.5 shrink-0 text-warning" />
