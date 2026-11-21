@@ -16,7 +16,7 @@ import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {toast} from "@/components/ui/toast.tsx";
 import {isAxiosError} from "axios";
 import {useTranslation} from "react-i18next";
-import {KeregeMark} from "@/components/shared/kerege-logo.tsx";
+import {KeregeLogo} from "@/components/shared/kerege-logo.tsx";
 
 type LoginFormValues = {
     email: string;
@@ -28,7 +28,7 @@ export function LoginForm({
                               ...props
                           }: React.ComponentProps<"div">) {
 
-    const { t, i18n } = useTranslation(["auth", "common"]);
+    const { t } = useTranslation("auth");
     const navigate = useNavigate();
 
     // Rebuilt whenever the language changes, so a validation message that
@@ -68,9 +68,6 @@ export function LoginForm({
     const companyInactive =
         isAxiosError<{code?: string}>(mutation.error) && mutation.error.response?.data?.code === "COMPANY_INACTIVE";
 
-    // Today's date under the button, as in the reference design.
-    const today = new Intl.DateTimeFormat(i18n.language, {weekday: "long", day: "numeric", month: "long"}).format(new Date());
-
     return (
         <div className={cn("w-full max-w-[420px]", className)} {...props}>
             {/* One frosted card, as in the reference design's sign-in dialog. */}
@@ -85,12 +82,9 @@ export function LoginForm({
                 onSubmit={form.handleSubmit(onSubmit)}
                 noValidate
             >
-                <span className="flex size-[54px] items-center justify-center rounded-[17px] bg-linear-150 from-[#6577E0] to-[#3A4CB0] shadow-[inset_0_1px_0_0_rgb(255_255_255/0.45),0_10px_20px_-10px_#3A4CB0]">
-                    <KeregeMark inverted className="size-7" />
-                </span>
+                <KeregeLogo className="h-7 self-start" />
 
                 <h1 className="mt-6 text-[30px] leading-tight font-semibold tracking-[-0.025em]">{t("login.title")}</h1>
-                <p className="mt-2 text-sm text-muted-foreground">{t("nav.brandTagline", {ns: "common"})}</p>
 
                 <FieldGroup className="mt-7 gap-3.5">
                     <Field invalid={!!errors.email}>
@@ -145,8 +139,6 @@ export function LoginForm({
                     {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {t("login.submit")}
                 </Button>
-
-                <small className="mt-5 text-center text-xs text-muted-foreground">{today}</small>
             </form>
         </div>
     )
