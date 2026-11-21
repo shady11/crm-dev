@@ -201,7 +201,7 @@ export const Sidebar = (props: SidebarProps) => {
           className={cn(
             "w-(--sidebar-width)",
             "p-0",
-            "bg-sidebar",
+            "bg-background bg-linear-to-b from-primary/10 to-transparent",
             "text-sidebar-foreground",
             "[&>button]:hidden"
           )}
@@ -274,7 +274,7 @@ export const Sidebar = (props: SidebarProps) => {
             "size-full",
             "flex flex-col",
             "bg-sidebar",
-            "group-data-[variant=floating]:rounded-lg group-data-[variant=floating]:border group-data-[variant=floating]:border-sidebar-border group-data-[variant=floating]:shadow-sm"
+            "group-data-[variant=floating]:rounded-2xl group-data-[variant=floating]:glass-panel"
           )}
           data-sidebar="sidebar"
           data-slot="sidebar-inner"
@@ -607,7 +607,8 @@ export const SidebarMenuButton = ({
         "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         "focus-visible:sidebar-ring-[3px] outline-none focus-visible:ring-sidebar-ring/32",
         "active:bg-sidebar-accent active:text-sidebar-accent-foreground",
-        "data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground",
+        "data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[active=true]:shadow-[inset_0_0_0_1px_var(--glass-border)] data-[active=true]:[&>svg]:text-sidebar-primary",
+        "rounded-xl",
         "group-has-data-[sidebar=menu-action]/menu-item:pe-8",
         "[&>span:last-child]:truncate",
         "motion-reduce:transition-none!",

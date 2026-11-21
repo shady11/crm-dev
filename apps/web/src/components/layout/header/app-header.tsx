@@ -99,7 +99,7 @@ export function AppHeader() {
     );
 
     return (
-        <header className="h-16 px-6 shrink-0 flex items-center justify-between bg-background">
+        <header className="h-16 px-6 shrink-0 flex items-center justify-between bg-background md:bg-transparent">
             <div className="flex items-center gap-2">
 
                 <SidebarTrigger aria-label={t("nav.toggleSidebar")} />
@@ -113,7 +113,7 @@ export function AppHeader() {
                             {index > 0 && <Separator orientation="vertical" className="h-4" />}
 
                             {isLast ? (
-                                <span className="text-sm font-medium text-foreground">
+                                <span className="text-sm font-semibold text-foreground">
                                   {crumb.label}
                                 </span>
                             ) : (
@@ -135,14 +135,15 @@ export function AppHeader() {
                 {user?.companyId ? <NotificationBell /> : null}
                 <LanguageDropdown
                     trigger={
-                        <Button variant="ghost" size="icon-md" title={t("language.switchLabel")}>
+                        <Button variant="ghost" size="icon-lg" className="rounded-xl border border-glass-border bg-control backdrop-blur-md hover:bg-accent" title={t("language.switchLabel")}>
                             <Languages />
                         </Button>
                     }
                 />
                 <Button
                     variant="ghost"
-                    size="icon-md"
+                    size="icon-lg"
+                    className="rounded-xl border border-glass-border bg-control backdrop-blur-md hover:bg-accent"
                     onClick={toggleTheme}
                     title={theme === "dark" ? t("theme.switchToLight") : t("theme.switchToDark")}
                 >

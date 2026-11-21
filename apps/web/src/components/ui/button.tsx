@@ -8,8 +8,8 @@ export const buttonVariants = tv({
   base: [
     "relative",
     "inline-flex shrink-0 items-center justify-center gap-2",
-    "whitespace-nowrap font-normal text-sm",
-    "rounded-lg",
+    "whitespace-nowrap font-medium text-sm",
+    "rounded-xl",
     "transition-all",
     "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/32",
     "disabled:pointer-events-none disabled:opacity-64",
@@ -23,18 +23,20 @@ export const buttonVariants = tv({
   variants: {
     variant: {
       default: [
-        "bg-primary",
-        "border border-transparent shadow-primary/24 shadow-sm",
+        "bg-primary bg-linear-to-b from-white/18 to-transparent",
+        "border border-white/10",
+        "shadow-[0_1px_0_0_rgb(255_255_255/0.25)_inset,0_8px_20px_-8px_var(--primary)]",
         "text-primary-foreground",
-        "hover:bg-primary/90",
+        "hover:bg-primary/90 hover:shadow-[0_1px_0_0_rgb(255_255_255/0.25)_inset,0_10px_24px_-8px_var(--primary)]",
         "focus-visible:border-background",
       ],
       outline: [
         "bg-transparent",
         "text-foreground",
         "border border-input shadow-sm/5",
+        "bg-control backdrop-blur-md",
         "hover:bg-accent hover:text-accent-foreground",
-        "dark:bg-input/32 dark:hover:bg-input/64",
+        "dark:hover:bg-white/10",
         "focus-visible:border-primary",
       ],
       destructive: [

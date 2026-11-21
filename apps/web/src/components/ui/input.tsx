@@ -10,7 +10,7 @@ export const inputVariants = tv({
     "peer",
     "w-full min-w-0",
     "px-3",
-    "bg-transparent dark:bg-input/30",
+    "bg-control",
     "text-base md:text-sm",
     "rounded-lg border border-input shadow-xs/5",
     "placeholder:text-muted-foreground/64",

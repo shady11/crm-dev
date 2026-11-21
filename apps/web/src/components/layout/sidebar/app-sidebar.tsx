@@ -83,7 +83,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <Sidebar
             variant="floating"
             collapsible="icon"
-            className="[&>[data-slot=sidebar-inner]]:rounded-2xl [&>[data-slot=sidebar-inner]]:shadow-none"
+            className="[&>[data-slot=sidebar-inner]]:rounded-2xl"
             {...props}
         >
             <SidebarHeader>
@@ -95,11 +95,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenuButton size="lg" asChild className="group-data-[collapsible=icon]:justify-center">
                             <Link to="/dashboard">
                                 <span className="hidden size-5 shrink-0 group-data-[collapsible=icon]:block">
-                                    <KeregeMark inverted className="size-5" />
+                                    <KeregeMark className="size-5" />
                                 </span>
 
                                 <span className="flex-1 group-data-[collapsible=icon]:hidden">
-                                    <KeregeLogo inverted className="h-5" />
+                                    <KeregeLogo className="h-5" />
                                 </span>
                             </Link>
                         </SidebarMenuButton>

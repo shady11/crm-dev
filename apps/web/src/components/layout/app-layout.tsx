@@ -18,7 +18,7 @@ export function AppLayout() {
 
     return (
         <SidebarProvider
-            className="bg-shell"
+            className="bg-transparent"
             // Wider than the 16rem default so the floating card's padding
             // doesn't truncate the longer Kyrgyz/Russian nav labels. The
             // collapsed width is an icon button (size-8) plus p-2 on each
@@ -39,14 +39,14 @@ export function AppLayout() {
                 matching the floating sidebar: same gap on every side and
                 between them. Only the content card scrolls. */}
             <SidebarInset className="h-svh overflow-hidden md:m-2 md:ms-0 md:h-[calc(100svh-(--spacing(4)))] md:gap-2 md:bg-transparent">
-                <div className="shrink-0 overflow-hidden bg-background md:rounded-2xl md:border md:border-panel-border">
+                <div className="shrink-0 overflow-hidden bg-background md:rounded-2xl md:glass-panel">
                     <ImpersonationBanner />
                     <AppHeader />
                 </div>
 
-                <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background md:rounded-2xl md:border md:border-panel-border">
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-background md:rounded-2xl md:glass-panel">
                     <ScrollArea className="flex-1">
-                        <SkipNavContent className="flex-1 p-6">
+                        <SkipNavContent className="flex-1 p-6 md:p-7">
                             <Outlet />
                         </SkipNavContent>
                     </ScrollArea>

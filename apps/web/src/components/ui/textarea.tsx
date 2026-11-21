@@ -15,7 +15,7 @@ export const Textarea = (
         "field-sizing-content min-h-16 w-full",
         "flex",
         "px-3 py-2",
-        "bg-transparent dark:bg-input/30",
+        "bg-control",
         "text-base md:text-sm",
         "rounded-lg border border-input shadow-xs/5",
         "placeholder:text-muted-foreground/64",

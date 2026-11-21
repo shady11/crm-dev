@@ -13,7 +13,7 @@ export const nativeSelectVariants = tv({
     "w-full min-w-0",
     "ps-2.5 pe-8",
     "select-none text-sm",
-    "bg-transparent dark:bg-input/30",
+    "bg-control",
     "rounded-lg border border-input shadow-xs/5",
     "transition-colors",
     "outline-none",

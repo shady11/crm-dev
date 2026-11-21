@@ -14,7 +14,7 @@ const inpuGroupVariants = tv({
     "relative",
     "w-full min-w-0",
     "flex items-center",
-    "bg-background dark:bg-input/30",
+    "bg-control",
     "rounded-lg border border-input shadow-xs/5",
     "transition-[color,box-shadow]",
     "has-[>textarea]:h-auto",

@@ -46,7 +46,7 @@ export const NumberInputGroup = (
         "relative",
         "w-full",
         "flex justify-between",
-        "bg-transparent dark:bg-input/30",
+        "bg-control",
         "text-base",
         "rounded-lg border border-input shadow-xs/5 ring-ring/32",
         "transition-shadow",
