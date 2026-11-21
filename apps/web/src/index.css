@@ -160,15 +160,22 @@
 
     /* App backdrop behind the floating glass panels: a soft wash of the
        brand blues over a pale base (see the body rule below). */
-    --shell: #EEF1FA;
-    --backdrop-1: rgb(74 95 212 / 0.30);
-    --backdrop-2: rgb(124 140 232 / 0.34);
-    --backdrop-3: rgb(58 76 176 / 0.20);
+    --shell: #ECEFFB;
+    /* Soft colour blobs in the brand blues: strong ones in the corners,
+       two fainter ones mid-page. */
+    --backdrop-image:
+      radial-gradient(circle 34rem at 6% 12%, rgb(74 95 212 / 0.75), transparent 70%),
+      radial-gradient(circle 28rem at 98% 6%, rgb(124 140 232 / 0.95), transparent 70%),
+      radial-gradient(circle 30rem at 24% 100%, rgb(150 165 240 / 0.95), transparent 70%),
+      radial-gradient(circle 34rem at 96% 96%, rgb(58 76 176 / 0.70), transparent 70%),
+      radial-gradient(circle 20rem at 62% 28%, rgb(124 140 232 / 0.55), transparent 70%),
+      radial-gradient(circle 18rem at 38% 60%, rgb(74 95 212 / 0.28), transparent 70%),
+      linear-gradient(160deg, #E4E8FA 0%, #F1F2FB 55%, #E7EAF8 100%);
 
     /* Frosted-glass surfaces. --glass is the big layout panels (sidebar,
        header, page), --glass-strong the cards that sit on them. */
-    --glass: rgb(255 255 255 / 0.5);
-    --glass-strong: rgb(255 255 255 / 0.74);
+    --glass: rgb(255 255 255 / 0.26);
+    --glass-strong: rgb(255 255 255 / 0.5);
     --glass-border: rgb(255 255 255 / 0.85);
     --glass-shadow: 0 1px 0 0 rgb(255 255 255 / 0.9) inset, 0 12px 32px -12px rgb(35 42 77 / 0.14), 0 0 0 1px rgb(74 95 212 / 0.06);
     --control: rgb(255 255 255 / 0.7);
@@ -228,9 +235,10 @@
 
 .dark {
     --shell: #090C1A;
-    --backdrop-1: rgb(74 95 212 / 0.38);
-    --backdrop-2: rgb(124 140 232 / 0.20);
-    --backdrop-3: rgb(58 76 176 / 0.30);
+    --backdrop-image:
+      radial-gradient(60rem 40rem at 0% 0%, rgb(74 95 212 / 0.38), transparent 60%),
+      radial-gradient(50rem 36rem at 100% 10%, rgb(124 140 232 / 0.20), transparent 60%),
+      radial-gradient(56rem 40rem at 60% 110%, rgb(58 76 176 / 0.30), transparent 60%);
 
     --glass: rgb(20 25 52 / 0.55);
     --glass-strong: rgb(255 255 255 / 0.045);
@@ -295,10 +303,7 @@
   body {
     @apply text-foreground;
     background-color: var(--shell);
-    background-image:
-      radial-gradient(60rem 40rem at 0% 0%, var(--backdrop-1), transparent 60%),
-      radial-gradient(50rem 36rem at 100% 10%, var(--backdrop-2), transparent 60%),
-      radial-gradient(56rem 40rem at 60% 110%, var(--backdrop-3), transparent 60%);
+    background-image: var(--backdrop-image);
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
     }
@@ -315,8 +320,8 @@
     background-color: var(--glass);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
-    backdrop-filter: blur(24px) saturate(150%);
-    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    backdrop-filter: blur(24px) saturate(170%);
+    -webkit-backdrop-filter: blur(24px) saturate(170%);
 }
 
 /*---break---*/
