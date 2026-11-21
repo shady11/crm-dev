@@ -18,8 +18,11 @@ const scrollAreaVariants = tv({
   variants: {
     scrollFade: {
       true: [
-        "mask-t-from-[calc(100%-var(--fade-size))]",
-        "mask-b-from-[calc(100%-var(--fade-size))]",
+        // Fade only when there is something to scroll: with no overflow
+        // neither data-at-top nor data-at-bottom is set, which would leave
+        // both edges faded over content that is fully visible.
+        "data-overflow-y:mask-t-from-[calc(100%-var(--fade-size))]",
+        "data-overflow-y:mask-b-from-[calc(100%-var(--fade-size))]",
         "data-at-top:mask-t-from-100%",
         "data-at-bottom:mask-b-from-100%",
         "transition-shadow",
