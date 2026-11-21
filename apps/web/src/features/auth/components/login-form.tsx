@@ -1,9 +1,7 @@
 import * as React from "react"
 import {useMemo} from "react"
 import {cn} from "@/lib/utils"
-import placeholderImg from '@/assets/placeholder.svg'
 import {Button} from "@/components/ui/button.tsx"
-import {Card, CardContent} from "@/components/ui/card.tsx"
 import {Field, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field.tsx"
 import {Input} from "@/components/ui/input.tsx"
 import {z} from "zod";
@@ -18,7 +16,7 @@ import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {toast} from "@/components/ui/toast.tsx";
 import {isAxiosError} from "axios";
 import {useTranslation} from "react-i18next";
-import {KeregeLogo} from "@/components/shared/kerege-logo.tsx";
+import {KeregeMark} from "@/components/shared/kerege-logo.tsx";
 
 type LoginFormValues = {
     email: string;
@@ -30,7 +28,7 @@ export function LoginForm({
                               ...props
                           }: React.ComponentProps<"div">) {
 
-    const { t } = useTranslation("auth");
+    const { t, i18n } = useTranslation(["auth", "common"]);
     const navigate = useNavigate();
 
     // Rebuilt whenever the language changes, so a validation message that
@@ -43,8 +41,8 @@ export function LoginForm({
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginSchema),
         defaultValues: {
-            email: "admin@crm.dev",
-            password: "password123",
+            email: "",
+            password: "",
         },
     });
 
@@ -70,87 +68,86 @@ export function LoginForm({
     const companyInactive =
         isAxiosError<{code?: string}>(mutation.error) && mutation.error.response?.data?.code === "COMPANY_INACTIVE";
 
+    // Today's date under the button, as in the reference design.
+    const today = new Intl.DateTimeFormat(i18n.language, {weekday: "long", day: "numeric", month: "long"}).format(new Date());
+
     return (
-        <div className={cn("flex flex-col gap-6", className)} {...props}>
-            <Card className="overflow-hidden p-0">
-                <CardContent className="grid p-0 md:grid-cols-2">
-                    <form className="p-6 md:px-8 md:py-12" onSubmit={form.handleSubmit(onSubmit)}>
-                        <FieldGroup className="gap-6">
-                            <div className="flex flex-col items-center gap-2 text-center">
-                                <KeregeLogo className="mb-6 h-7" />
-                                <h1 className="text-2xl font-bold mb-6">{t("login.title")}</h1>
-                            </div>
-                            <Field invalid={!!errors.email}>
-                                <FieldLabel htmlFor="email">{t("login.emailLabel")}</FieldLabel>
+        <div className={cn("w-full max-w-[420px]", className)} {...props}>
+            {/* One frosted card, as in the reference design's sign-in dialog. */}
+            <form
+                className={cn(
+                    "flex flex-col p-8",
+                    "rounded-[28px] border border-glass-border",
+                    "bg-white/75 dark:bg-[rgb(20_25_52/0.74)] backdrop-blur-[48px] backdrop-saturate-200",
+                    "shadow-[0_2px_6px_0_rgb(35_42_77/0.06),0_30px_70px_-26px_rgb(35_42_77/0.4)]",
+                    "dark:shadow-[0_2px_6px_0_rgb(0_0_0/0.4),0_34px_80px_-26px_rgb(0_0_0/0.85)]",
+                )}
+                onSubmit={form.handleSubmit(onSubmit)}
+                noValidate
+            >
+                <span className="flex size-[54px] items-center justify-center rounded-[17px] bg-linear-150 from-[#6577E0] to-[#3A4CB0] shadow-[inset_0_1px_0_0_rgb(255_255_255/0.45),0_10px_20px_-10px_#3A4CB0]">
+                    <KeregeMark inverted className="size-7" />
+                </span>
 
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    autoComplete="email"
-                                    disabled={mutation.isPending}
-                                    aria-invalid={!!errors.email}
-                                    {...form.register("email")}
-                                />
+                <h1 className="mt-6 text-[30px] leading-tight font-semibold tracking-[-0.025em]">{t("login.title")}</h1>
+                <p className="mt-2 text-sm text-muted-foreground">{t("nav.brandTagline", {ns: "common"})}</p>
 
-                                <FieldError>
-                                    {errors.email?.message}
-                                </FieldError>
-                            </Field>
-                            <Field invalid={!!errors.password}>
-                                <FieldLabel htmlFor="password">{t("login.passwordLabel")}</FieldLabel>
-
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    autoComplete="current-password"
-                                    disabled={mutation.isPending}
-                                    aria-invalid={!!errors.password}
-                                    {...form.register("password")}
-                                />
-
-                                <FieldError>
-                                    {errors.password?.message}
-                                </FieldError>
-                            </Field>
-
-                            {mutation.isError && (
-                                <Alert variant="destructive">
-                                    <TriangleAlert />
-                                    {/* SA-12: a suspended company's users are told so, not "wrong password". */}
-                                    <AlertTitle>
-                                        {companyInactive ? t("login.companyInactiveTitle") : t("login.failedTitle")}
-                                    </AlertTitle>
-                                    <AlertDescription>
-                                        {companyInactive
-                                            ? t("login.companyInactiveDescription")
-                                            : t("login.failedDescription")}
-                                    </AlertDescription>
-                                </Alert>
-                            )}
-
-                            <Field className="mt-6">
-                                <Button
-                                    type="submit"
-                                    className="w-full"
-                                    disabled={mutation.isPending}
-                                >
-                                    {mutation.isPending && (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    )}
-                                    {t("login.submit")}
-                                </Button>
-                            </Field>
-                        </FieldGroup>
-                    </form>
-                    <div className="relative hidden bg-muted md:block">
-                        <img
-                            src={placeholderImg}
-                            alt="Image"
-                            className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+                <FieldGroup className="mt-7 gap-3.5">
+                    <Field invalid={!!errors.email}>
+                        <FieldLabel htmlFor="email" className="text-[12.5px] font-semibold">{t("login.emailLabel")}</FieldLabel>
+                        <Input
+                            id="email"
+                            type="email"
+                            autoComplete="username"
+                            autoFocus
+                            className="h-11 rounded-[13px] px-3.5"
+                            disabled={mutation.isPending}
+                            aria-invalid={!!errors.email}
+                            {...form.register("email")}
                         />
-                    </div>
-                </CardContent>
-            </Card>
+                        <FieldError>{errors.email?.message}</FieldError>
+                    </Field>
+                    <Field invalid={!!errors.password}>
+                        <FieldLabel htmlFor="password" className="text-[12.5px] font-semibold">{t("login.passwordLabel")}</FieldLabel>
+                        <Input
+                            id="password"
+                            type="password"
+                            autoComplete="current-password"
+                            className="h-11 rounded-[13px] px-3.5"
+                            disabled={mutation.isPending}
+                            aria-invalid={!!errors.password}
+                            {...form.register("password")}
+                        />
+                        <FieldError>{errors.password?.message}</FieldError>
+                    </Field>
+                </FieldGroup>
+
+                {mutation.isError && (
+                    <Alert variant="destructive" className="mt-5">
+                        <TriangleAlert />
+                        {/* SA-12: a suspended company's users are told so, not "wrong password". */}
+                        <AlertTitle>
+                            {companyInactive ? t("login.companyInactiveTitle") : t("login.failedTitle")}
+                        </AlertTitle>
+                        <AlertDescription>
+                            {companyInactive
+                                ? t("login.companyInactiveDescription")
+                                : t("login.failedDescription")}
+                        </AlertDescription>
+                    </Alert>
+                )}
+
+                <Button
+                    type="submit"
+                    className="mt-7 h-[52px] w-full rounded-2xl text-[15px] font-semibold"
+                    disabled={mutation.isPending}
+                >
+                    {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t("login.submit")}
+                </Button>
+
+                <small className="mt-5 text-center text-xs text-muted-foreground">{today}</small>
+            </form>
         </div>
     )
 }
