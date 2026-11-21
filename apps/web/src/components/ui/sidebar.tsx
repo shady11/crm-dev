@@ -607,8 +607,11 @@ export const SidebarMenuButton = ({
         "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         "focus-visible:sidebar-ring-[3px] outline-none focus-visible:ring-sidebar-ring/32",
         "active:bg-sidebar-accent active:text-sidebar-accent-foreground",
-        "data-[active=true]:bg-sidebar-accent data-[active=true]:font-medium data-[active=true]:text-sidebar-accent-foreground data-[active=true]:shadow-[inset_0_0_0_1px_var(--glass-border)] data-[active=true]:[&>svg]:text-sidebar-primary",
-        "rounded-xl",
+        // Active item: the frosted-white pill used by the segmented tabs,
+        // with dark text and a brand-coloured icon, as in the reference.
+        "data-[active=true]:seg-thumb data-[active=true]:font-semibold data-[active=true]:text-foreground data-[active=true]:[&>svg]:text-sidebar-primary",
+        "data-[active=true]:hover:text-foreground",
+        "rounded-[13px]",
         "group-has-data-[sidebar=menu-action]/menu-item:pe-8",
         "[&>span:last-child]:truncate",
         "motion-reduce:transition-none!",
