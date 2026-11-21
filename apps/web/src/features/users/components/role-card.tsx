@@ -19,7 +19,7 @@ export function RoleCard({ roleName, memberCount, memberInitials }: RoleCardProp
             <CardContent className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="rounded-lg bg-primary p-2 text-white">
+                        <div className="icon-tile rounded-xl bg-primary p-2.5">
                             <FolderCog size={20} strokeWidth={1.75} />
                         </div>
                         <h3 className="font-medium">{roleName}</h3>

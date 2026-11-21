@@ -101,8 +101,8 @@ export function NotificationBell() {
                                             }`}
                                         >
                                             <div className="relative shrink-0">
-                                                <div className={`flex size-8 items-center justify-center rounded-full text-white ${visual.bg}`}>
-                                                    <Icon size={20} />
+                                                <div className={`icon-tile flex size-9 items-center justify-center rounded-lg ${visual.bg}`}>
+                                                    <Icon size={18} />
                                                 </div>
                                                 {!n.isRead && (
                                                     <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full border-2 border-background bg-emerald-500" />

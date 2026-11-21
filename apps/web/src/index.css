@@ -42,6 +42,10 @@
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-panel-border: var(--panel-border);
+    /* Rose shades (overdue / cancelled markers) follow the same red. */
+    --color-rose-400: #D24970;
+    --color-rose-500: #B3435F;
+    --color-rose-600: #9C3651;
     --color-glass: var(--glass);
     --color-glass-strong: var(--glass-strong);
     --color-glass-border: var(--glass-border);
@@ -199,7 +203,8 @@
     --muted-foreground: #6B7194;
     --accent: rgb(74 95 212 / 0.09);
     --accent-foreground: #4A5FD4;
-    --destructive: oklch(0.58 0.22 27.33);
+    /* Red: the reference design's rose-crimson. */
+    --destructive: #B3435F;
     --border: rgb(74 95 212 / 0.13);
     --input: rgb(74 95 212 / 0.18);
     --ring: #4A5FD4;
@@ -229,7 +234,7 @@
     --shadow-xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.10), 0 8px 10px -1px oklch(0.00 0 0 / 0.10);
     --shadow-2xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.25);
     --shadow-custom: 0 1px 10px 0px oklch(0 0 0 / 0.15);
-    --destructive-foreground: var(--color-red-700);
+    --destructive-foreground: #9C3651;
     --info: var(--color-blue-500);
     --info-foreground: var(--color-blue-700);
     --success: var(--color-emerald-500);
@@ -268,7 +273,7 @@
     --muted-foreground: #9AA0C3;
     --accent: rgb(124 140 232 / 0.14);
     --accent-foreground: #E9EBF7;
-    --destructive: oklch(0.64 0.21 25.33);
+    --destructive: #F0769A;
     --border: rgb(255 255 255 / 0.09);
     --input: rgb(255 255 255 / 0.12);
     --ring: #7C8CE8;
@@ -295,7 +300,7 @@
     --shadow-lg: 0 1px 3px 0px oklch(0.00 0 0 / 0.10), 0 4px 6px -1px oklch(0.00 0 0 / 0.10);
     --shadow-xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.10), 0 8px 10px -1px oklch(0.00 0 0 / 0.10);
     --shadow-2xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.25);
-    --destructive-foreground: var(--color-red-400);
+    --destructive-foreground: #FF8DAE;
     --info: var(--color-blue-500);
     --info-foreground: var(--color-blue-400);
     --success: var(--color-emerald-500);
@@ -339,6 +344,26 @@
     box-shadow: var(--card-shadow);
     backdrop-filter: blur(16px) saturate(140%);
     -webkit-backdrop-filter: blur(16px) saturate(140%);
+}
+
+/* Coloured icon square (pair with a bg-* colour): a top-lit gradient, a
+   light inner edge and a soft glow in its own colour underneath. */
+@utility icon-tile {
+    position: relative;
+    color: white;
+    background-image: linear-gradient(180deg, rgb(255 255 255 / 0.30) 0%, rgb(255 255 255 / 0) 65%);
+    box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.45), inset 0 0 0 1px rgb(255 255 255 / 0.12);
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 30% 12% -12%;
+        z-index: -1;
+        border-radius: inherit;
+        background-color: inherit;
+        filter: blur(10px);
+        opacity: 0.55;
+        pointer-events: none;
+    }
 }
 
 /*---break---*/

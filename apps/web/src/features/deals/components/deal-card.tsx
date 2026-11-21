@@ -19,7 +19,7 @@ export function DealCard({ deal }: { deal: UnitDealHistoryEntry }) {
         <div className="flex flex-col gap-4 w-full max-w-md border rounded-lg p-4">
             <div className="flex items-center">
                 <div className="flex items-center gap-4">
-                    <div className={`rounded-lg ${visual?.bg} p-2 text-white`}>
+                    <div className={`icon-tile rounded-xl ${visual?.bg} p-2.5`}>
                         <Icon size={20}/>
                     </div>
                     <div className="flex flex-col">

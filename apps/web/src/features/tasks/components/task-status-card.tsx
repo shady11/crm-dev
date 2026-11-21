@@ -18,7 +18,7 @@ export function TaskStatusCard({ status, count }: { status: TaskStatus; count: n
     return (
         <Card className="border">
             <CardContent className="flex items-center gap-3">
-                <div className={`rounded-lg p-2 text-white ${TASK_STATUS_CLASSES[status]}`}>
+                <div className={`icon-tile rounded-xl p-2.5 ${TASK_STATUS_CLASSES[status]}`}>
                     <Icon size={20} strokeWidth={1.75} />
                 </div>
                 <div>

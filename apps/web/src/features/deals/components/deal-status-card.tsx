@@ -28,8 +28,8 @@ export function DealStatusCard({ status, count, to, onSelect, selected }: DealSt
         <Card className={`h-full border ${selected ? "border-primary ring-1 ring-primary" : ""} ${interactive ? "transition-colors hover:bg-secondary/40" : ""}`}>
             <CardContent className="flex min-w-0 items-center gap-4">
                 {/* Hidden on a phone, where two cards share a row and the label needs the room. */}
-                <div className={`hidden size-11 shrink-0 items-center justify-center rounded-lg text-white sm:flex ${visual?.bg}`}>
-                    <Icon size={22} strokeWidth={1.75} />
+                <div className={`icon-tile hidden size-10 shrink-0 items-center justify-center rounded-xl sm:flex ${visual?.bg}`}>
+                    <Icon size={20} strokeWidth={1.75} />
                 </div>
                 <div className="min-w-0">
                     <p className="line-clamp-2 text-sm text-muted-foreground" title={label}>{label}</p>
