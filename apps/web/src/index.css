@@ -42,10 +42,6 @@
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
     --color-panel-border: var(--panel-border);
-    /* Rose shades (overdue / cancelled markers) follow the same red. */
-    --color-rose-400: #D24970;
-    --color-rose-500: #B3435F;
-    --color-rose-600: #9C3651;
     --color-glass: var(--glass);
     --color-glass-strong: var(--glass-strong);
     --color-glass-border: var(--glass-border);
@@ -203,8 +199,7 @@
     --muted-foreground: #6B7194;
     --accent: rgb(74 95 212 / 0.09);
     --accent-foreground: #4A5FD4;
-    /* Red: the reference design's rose-crimson. */
-    --destructive: #B3435F;
+    --destructive: oklch(0.58 0.22 27.33);
     --border: rgb(74 95 212 / 0.13);
     --input: rgb(74 95 212 / 0.18);
     --ring: #4A5FD4;
@@ -234,7 +229,7 @@
     --shadow-xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.10), 0 8px 10px -1px oklch(0.00 0 0 / 0.10);
     --shadow-2xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.25);
     --shadow-custom: 0 1px 10px 0px oklch(0 0 0 / 0.15);
-    --destructive-foreground: #9C3651;
+    --destructive-foreground: var(--color-red-700);
     --info: var(--color-blue-500);
     --info-foreground: var(--color-blue-700);
     --success: var(--color-emerald-500);
@@ -273,10 +268,7 @@
     --muted-foreground: #9AA0C3;
     --accent: rgb(124 140 232 / 0.14);
     --accent-foreground: #E9EBF7;
-    --destructive: #F0769A;
-    --color-rose-400: #FF7BA1;
-    --color-rose-500: #F0769A;
-    --color-rose-600: #FF8DAE;
+    --destructive: oklch(0.64 0.21 25.33);
     --border: rgb(255 255 255 / 0.09);
     --input: rgb(255 255 255 / 0.12);
     --ring: #7C8CE8;
@@ -303,7 +295,7 @@
     --shadow-lg: 0 1px 3px 0px oklch(0.00 0 0 / 0.10), 0 4px 6px -1px oklch(0.00 0 0 / 0.10);
     --shadow-xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.10), 0 8px 10px -1px oklch(0.00 0 0 / 0.10);
     --shadow-2xl: 0 1px 3px 0px oklch(0.00 0 0 / 0.25);
-    --destructive-foreground: #FF8DAE;
+    --destructive-foreground: var(--color-red-400);
     --info: var(--color-blue-500);
     --info-foreground: var(--color-blue-400);
     --success: var(--color-emerald-500);
