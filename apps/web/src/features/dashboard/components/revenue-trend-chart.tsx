@@ -1,6 +1,6 @@
 import {Bar, BarChart, CartesianGrid, XAxis} from "recharts";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
-import {type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent} from "@/components/ui/chart.tsx";
+import {type ChartConfig, ChartContainer, ChartGradient, ChartTooltip, ChartTooltipContent} from "@/components/ui/chart.tsx";
 import type {RevenueTrendPoint} from "@/features/dashboard/api/dashboard.api.ts";
 import {useTranslation} from "react-i18next";
 
@@ -26,10 +26,11 @@ export function RevenueTrendChart({ data }: { data: RevenueTrendPoint[] }) {
             <CardContent>
                 <ChartContainer config={chartConfig} className="h-64 w-full">
                     <BarChart data={chartData}>
+                        <defs><ChartGradient id="fill-revenue-trend" color="var(--color-revenue)" /></defs>
                         <CartesianGrid vertical={false} />
                         <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
                         <ChartTooltip content={<ChartTooltipContent />} />
-                        <Bar dataKey="revenue" fill="var(--color-revenue)" radius={4} />
+                        <Bar dataKey="revenue" fill="url(#fill-revenue-trend)" radius={[8, 8, 3, 3]} maxBarSize={56} />
                     </BarChart>
                 </ChartContainer>
             </CardContent>

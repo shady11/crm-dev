@@ -91,14 +91,15 @@ export const ChartContainer = (props: ChartContainerProps) => {
           "flex justify-center",
           "aspect-video",
           "text-xs",
-          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground",
-          "[&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50",
+          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-axis-tick_text]:text-[11px]",
+          "[&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-foreground/10 [&_.recharts-cartesian-grid_line]:[stroke-dasharray:3_5]",
           "[&_.recharts-curve.recharts-tooltip-cursor]:stroke-border",
           "[&_.recharts-dot[stroke='#fff']]:stroke-transparent",
           "[&_.recharts-layer]:outline-hidden",
           "[&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border",
           "[&_.recharts-radial-bar-background-sector]:fill-muted",
-          "[&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted",
+          "[&_.recharts-rectangle.recharts-tooltip-cursor]:fill-foreground/5",
+          "[&_.recharts-label-list_text]:fill-muted-foreground [&_.recharts-label-list_text]:font-medium",
           className
         )}
         data-chart={chartId}
@@ -152,6 +153,18 @@ export const ChartStyle = ({
 };
 
 export const ChartTooltip = Tooltip;
+
+/**
+ * Vertical fill for a bar or area: the series colour fading from strong at
+ * the top to softer at the base. Place inside the chart's <defs> and fill
+ * the mark with url(#id).
+ */
+export const ChartGradient = ({ id, color }: { id: string; color: string }) => (
+  <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stopColor={color} stopOpacity={0.95} />
+    <stop offset="100%" stopColor={color} stopOpacity={0.55} />
+  </linearGradient>
+);
 
 export const ChartTooltipContent = (props: CustomTooltipProps) => {
   const {
@@ -224,9 +237,9 @@ export const ChartTooltipContent = (props: CustomTooltipProps) => {
         "min-w-32",
         "grid items-start gap-1.5",
         "px-2.5 py-1.5",
-        "bg-background",
+        "bg-popover/85 backdrop-blur-xl",
         "text-xs",
-        "rounded-lg border border-border/50 shadow-xl",
+        "rounded-xl border border-glass-border shadow-[0_12px_32px_-12px_rgb(0_0_0/0.25)]",
         className
       )}
     >

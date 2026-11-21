@@ -1,6 +1,6 @@
 import {Bar, BarChart, CartesianGrid, XAxis, YAxis} from "recharts";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
-import {type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent} from "@/components/ui/chart.tsx";
+import {type ChartConfig, ChartContainer, ChartGradient, ChartTooltip, ChartTooltipContent} from "@/components/ui/chart.tsx";
 import type {FinanceOverview} from "@/features/dashboard/api/dashboard.api.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useTranslation} from "react-i18next";
@@ -64,13 +64,14 @@ export function FinanceOverviewCard({data}: {data: FinanceOverview}) {
                     ) : (
                         <ChartContainer config={chartConfig} className="h-56 w-full">
                             <BarChart data={chartData}>
+                                <defs><ChartGradient id="fill-finance-amount" color="var(--color-amount)" /></defs>
                                 <CartesianGrid vertical={false} />
                                 <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} />
                                 <YAxis tickLine={false} axisLine={false} tickFormatter={(value: number) => compact.format(value)} />
                                 <ChartTooltip
                                     content={<ChartTooltipContent formatter={(value) => formatCurrency(Number(value))} />}
                                 />
-                                <Bar dataKey="amount" fill="var(--color-amount)" radius={4} />
+                                <Bar dataKey="amount" fill="url(#fill-finance-amount)" radius={[8, 8, 3, 3]} maxBarSize={56} />
                             </BarChart>
                         </ChartContainer>
                     )}

@@ -1,6 +1,6 @@
 import {Bar, BarChart, CartesianGrid, XAxis, YAxis} from "recharts";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
-import {type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent} from "@/components/ui/chart.tsx";
+import {type ChartConfig, ChartContainer, ChartGradient, ChartTooltip, ChartTooltipContent} from "@/components/ui/chart.tsx";
 import type {BranchComparisonItem} from "@/features/dashboard/api/dashboard.api.ts";
 import {useTranslation} from "react-i18next";
 
@@ -26,13 +26,17 @@ export function BranchComparisonChart({data}: {data: BranchComparisonItem[]}) {
                     <p className="py-8 text-center text-sm text-muted-foreground">{t("branchComparison.empty")}</p>
                 ) : (
                     <ChartContainer config={chartConfig} className="h-64 w-full">
-                        <BarChart data={chartData}>
+                        <BarChart data={chartData} barGap={4}>
+                            <defs>
+                                <ChartGradient id="fill-branch-deals" color="var(--color-dealCount)" />
+                                <ChartGradient id="fill-branch-revenue" color="var(--color-revenue)" />
+                            </defs>
                             <CartesianGrid vertical={false} />
                             <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} />
                             <YAxis tickLine={false} axisLine={false} />
                             <ChartTooltip content={<ChartTooltipContent />} />
-                            <Bar dataKey="dealCount" fill="var(--color-dealCount)" radius={4} />
-                            <Bar dataKey="revenue" fill="var(--color-revenue)" radius={4} />
+                            <Bar dataKey="dealCount" fill="url(#fill-branch-deals)" radius={[8, 8, 3, 3]} maxBarSize={56} />
+                            <Bar dataKey="revenue" fill="url(#fill-branch-revenue)" radius={[8, 8, 3, 3]} maxBarSize={56} />
                         </BarChart>
                     </ChartContainer>
                 )}
