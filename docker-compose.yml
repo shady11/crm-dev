@@ -43,7 +43,6 @@ services:
       PORT: 3000
       ENABLE_API_DOCS: "true"
       # Reliable file watching on Docker Desktop (macOS/Windows) bind mounts.
-      CHOKIDAR_USEPOLLING: "true"
       TSC_WATCHFILE: UseFsEventsWithFallbackDynamicPolling
     ports:
       - "${API_PORT:-3000}:3000"
@@ -62,7 +61,8 @@ services:
     environment:
       # Read by the browser, so it points at the host-published API port.
       VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api}
-      CHOKIDAR_USEPOLLING: "true"
+      # Read by vite.config.ts: poll for file changes on the bind mount.
+      VITE_USE_POLLING: "true"
     ports:
       - "${WEB_PORT:-5173}:5173"
     volumes:
