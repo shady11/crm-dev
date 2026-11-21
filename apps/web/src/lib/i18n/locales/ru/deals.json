@@ -336,8 +336,10 @@
     "fullyPaid": "Оплачено полностью"
   },
   "tabs": {
+    "overview": "Обзор",
     "payments": "Платежи",
     "documents": "Документы",
+    "tasks": "Задачи",
     "activity": "История"
   },
   "sidebar": {

@@ -25,8 +25,8 @@ interface DealDetailsSidebarProps {
 
 function Section({title, action, children}: {title: string; action?: ReactNode; children: ReactNode}) {
     return (
-        <section className="flex flex-col gap-3 py-4 first:pt-0 last:pb-0">
-            <div className="flex items-center justify-between gap-2">
+        <section className="flex flex-col gap-3 py-4 first:pt-0 last:pb-0 md:py-0">
+            <div className="flex min-h-7 items-center justify-between gap-2">
                 <h3 className="text-xs font-medium tracking-wide text-muted-foreground uppercase">{title}</h3>
                 {action}
             </div>
@@ -76,7 +76,7 @@ export function DealDetailsSidebar({deal, canReassign, onReassign}: DealDetailsS
             <CardHeader className="border-b py-4">
                 <CardTitle>{t("sidebar.title")}</CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-col divide-y">
+            <CardContent className="grid divide-y md:grid-cols-2 md:gap-x-12 md:gap-y-8 md:divide-y-0">
                 <Section title={t("sidebar.client")}>
                     <div className="flex flex-col gap-1.5">
                         <Link to={paths.clients.detail(client.id)} className="font-semibold hover:underline">

@@ -336,8 +336,10 @@
     "fullyPaid": "Fully paid"
   },
   "tabs": {
+    "overview": "Overview",
     "payments": "Payments",
     "documents": "Documents",
+    "tasks": "Tasks",
     "activity": "Activity"
   },
   "sidebar": {
