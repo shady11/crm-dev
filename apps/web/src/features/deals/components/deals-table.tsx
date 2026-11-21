@@ -1,13 +1,12 @@
 import {useNavigate} from "react-router-dom";
 import {BriefcaseIcon} from "lucide-react";
-import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
 import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {DataTable} from "@/components/shared/data-table.tsx";
 import {SortableTableHead} from "@/components/shared/sortable-table-head.tsx";
 import {DEAL_STATUS_LABEL_KEYS, DEAL_STATUS_VISUALS} from "@/features/deals/types/deal.types";
 import type {Deal, DealSortField} from "@/features/deals/api/deals.api";
-import {formatCreatedAt, initials} from "@/features/deals/utils/format.ts";
+import {formatCreatedAt} from "@/features/deals/utils/format.ts";
 import {blockLabel} from "@/features/units/utils/block-label.ts";
 import {useTranslation} from "react-i18next";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
@@ -87,14 +86,9 @@ export function DealsTable({ deals, isLoading, sortBy, sortOrder, onSort }: Deal
                                 <DiscountPendingBadge deal={deal} />
                             </div>
                         </div>
-                        <div className="mt-3 flex min-w-0 items-center gap-3">
-                            <Avatar className="size-9 shrink-0">
-                                <AvatarFallback>{initials(deal.client.fullName)}</AvatarFallback>
-                            </Avatar>
-                            <div className="min-w-0">
-                                <p className="truncate font-medium">{deal.client.fullName}</p>
-                                <p className="truncate text-xs text-muted-foreground">{deal.client.phone}</p>
-                            </div>
+                        <div className="mt-3 min-w-0">
+                            <p className="truncate font-medium">{deal.client.fullName}</p>
+                            <p className="truncate text-xs text-muted-foreground">{deal.client.phone}</p>
                         </div>
                         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
                             <span className="truncate text-muted-foreground">{deal.manager?.fullName ?? "—"}</span>
@@ -142,15 +136,8 @@ export function DealsTable({ deals, isLoading, sortBy, sortOrder, onSort }: Deal
                                 </p>
                             </TableCell>
                             <TableCell>
-                                <div className="flex items-center gap-3">
-                                    <Avatar className="size-9">
-                                        <AvatarFallback>{initials(deal.client.fullName)}</AvatarFallback>
-                                    </Avatar>
-                                    <div>
-                                        <p className="font-medium">{deal.client.fullName}</p>
-                                        <p className="text-xs text-muted-foreground">{deal.client.phone}</p>
-                                    </div>
-                                </div>
+                                <p className="font-medium">{deal.client.fullName}</p>
+                                <p className="text-xs text-muted-foreground">{deal.client.phone}</p>
                             </TableCell>
                             <TableCell>{deal.manager?.fullName ?? "—"}</TableCell>
                             <TableCell>
