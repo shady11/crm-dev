@@ -18,6 +18,7 @@ import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {toast} from "@/components/ui/toast.tsx";
 import {isAxiosError} from "axios";
 import {useTranslation} from "react-i18next";
+import {KeregeLogo} from "@/components/shared/kerege-logo.tsx";
 
 type LoginFormValues = {
     email: string;
@@ -76,6 +77,7 @@ export function LoginForm({
                     <form className="p-6 md:px-8 md:py-12" onSubmit={form.handleSubmit(onSubmit)}>
                         <FieldGroup className="gap-6">
                             <div className="flex flex-col items-center gap-2 text-center">
+                                <KeregeLogo className="mb-6 h-7" />
                                 <h1 className="text-2xl font-bold mb-6">{t("login.title")}</h1>
                             </div>
                             <Field invalid={!!errors.email}>
