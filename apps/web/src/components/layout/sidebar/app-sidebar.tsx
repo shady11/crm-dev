@@ -2,6 +2,7 @@ import * as React from "react"
 
 import {NavMain} from "@/components/layout/sidebar/nav-main.tsx"
 import {NavUser} from "@/components/layout/sidebar/nav-user.tsx"
+import {NavActivePill} from "@/components/layout/sidebar/nav-active-pill.tsx"
 import {
     Sidebar,
     SidebarContent,
@@ -149,9 +150,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarContent scrollFade className="gap-0">
                 {/* Filtered by role so nobody is offered a link that RoleGuard
                     will bounce them straight back from. */}
-                {navGroups.map((group, index) => (
-                    <NavMain key={group.label ?? index} label={group.label} items={group.items} />
-                ))}
+                <NavActivePill>
+                    {navGroups.map((group, index) => (
+                        <NavMain key={group.label ?? index} label={group.label} items={group.items} />
+                    ))}
+                </NavActivePill>
             </SidebarContent>
 
             <SidebarFooter>
