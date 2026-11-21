@@ -38,7 +38,7 @@
     "newTitle": "New role",
     "editTitle": "Edit role",
     "description": "Pick exactly the permissions this role should grant.",
-    "readOnlyDescription": "A built-in role, shared by every company, so it can't be changed here. Copy it to get an editable version for your company.",
+    "readOnlyDescription": "A built-in role, shared by every company: copy it to change its permissions. Your company's discount limit for it can be set here.",
     "fields": {
       "name": "Name",
       "description": "Description",
@@ -387,5 +387,15 @@
         }
       }
     }
+  },
+  "companyLimit": {
+    "label": "Discount limit in your company",
+    "save": "Save",
+    "reset": "Back to {{limit}}%",
+    "hint": "Discounts up to this percent apply without approval. Changes only your company; no need to copy the role.",
+    "hintOverridden": "Set by your company. The default for this role is {{limit}}%.",
+    "saved": "Discount limit saved",
+    "savedHint": "It applies to everyone with this role in your company.",
+    "error": "Couldn't save the limit"
   }
 }

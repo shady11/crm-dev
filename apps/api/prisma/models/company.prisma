@@ -53,6 +53,7 @@ model Company {
   tasks      Task[]
   documents  Document[]
   documentTemplates DocumentTemplate[]
+  roleDiscountLimits CompanyRoleDiscountLimit[]
   outboundMessages  OutboundMessage[]
 
   notifications      Notification[]
