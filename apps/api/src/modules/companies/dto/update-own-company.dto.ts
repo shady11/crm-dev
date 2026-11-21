@@ -63,6 +63,22 @@ export class UpdateOwnCompanyDto {
     @MaxLength(200)
     signatoryTitle?: string | null;
 
+    // E2E-22: where the client pays, printed on the documents.
+    @IsOptional()
+    @IsString()
+    @MaxLength(200)
+    bankName?: string | null;
+
+    @IsOptional()
+    @IsString()
+    @MaxLength(50)
+    bankAccount?: string | null;
+
+    @IsOptional()
+    @IsString()
+    @MaxLength(20)
+    bankBic?: string | null;
+
     @IsOptional()
     @IsString()
     @MaxLength(2000)

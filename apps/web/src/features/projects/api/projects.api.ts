@@ -22,6 +22,8 @@ export type ProjectPayload = {
     name: string;
     address?: string;
     status?: ProjectStatus;
+    /** E2E-22: planned handover (YYYY-MM-DD) for the sale contract; null clears it. */
+    handoverDate?: string | null;
 };
 
 export async function createProject(payload: ProjectPayload) {

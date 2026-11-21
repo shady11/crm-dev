@@ -15,6 +15,10 @@ export type Company = {
     taxId?: string | null;
     signatoryName?: string | null;
     signatoryTitle?: string | null;
+    /** E2E-22: where the client pays, printed on the documents. */
+    bankName?: string | null;
+    bankAccount?: string | null;
+    bankBic?: string | null;
     /** Non-null means suspended. Reversible, unlike deletion. */
     suspendedAt: string | null;
     /** Set on deleted companies, which only the "Deleted" list shows (SA-3). */

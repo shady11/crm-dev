@@ -44,6 +44,7 @@ const SHARED_STYLE = `
   .signature-block { width: 45%; }
   .signature-line { border-top: 1px solid #1a1a1a; margin-top: 40px; padding-top: 4px; font-size: 10px; color: #555; }
   .note { margin-top: 20px; font-size: 10px; color: #777; }
+  .clause { margin: 6px 0; text-align: justify; }
 `;
 
 type Words = {
@@ -87,6 +88,29 @@ type Words = {
     amount: string;
     forSeller: string;
     asBuyer: string;
+    // E2E-22: the clauses every sale needs; a lawyer adjusts them in the
+    // template editor.
+    subject1: string;
+    entrance: string;
+    floor: string;
+    deposit: string;
+    payInFull: string;
+    payBySchedule: string;
+    payWhere: string;
+    handover: string;
+    handover1: string;
+    handover2: string;
+    duties: string;
+    sellerDuties: string;
+    buyerDuties: string;
+    liability: string;
+    liability1: string;
+    liability2: string;
+    liability3: string;
+    details: string;
+    bank: string;
+    account: string;
+    bic: string;
   };
   receipt: {
     title: string;
@@ -160,6 +184,27 @@ const WORDS: Record<DocumentLanguage, Words> = {
       amount: 'Amount',
       forSeller: 'for the Seller',
       asBuyer: 'Buyer',
+      subject1: "The Seller undertakes to transfer the unit described below to the Buyer's ownership, and the Buyer undertakes to accept it and pay for it. The unit is in «{{unit.projectName}}»{{#if project.address}} at {{project.address}}{{/if}}.",
+      entrance: "Entrance",
+      floor: "Floor",
+      deposit: "The deposit of {{deal.deposit}} paid by the Buyer counts towards the price.",
+      payInFull: "The price is paid in one sum within 10 (ten) banking days of signing this contract.",
+      payBySchedule: "The price is paid in the amounts and on the dates set by the payment schedule, an annex to and an integral part of this contract.",
+      payWhere: "Payment is made to the Seller's bank account given in section 6 or at the Seller's cash desk. A payment counts as made on the day the money is received.",
+      handover: "Handover",
+      handover1: "The Seller hands the unit over to the Buyer by a handover act after the building is put into operation{{#if project.handoverDate}}, no later than {{project.handoverDate}}{{/if}}, once the price is paid in full.",
+      handover2: "Ownership passes to the Buyer on state registration.",
+      duties: "Obligations of the parties",
+      sellerDuties: "The Seller shall hand over the unit in the condition set by the project documents, and shall not sell or encumber it to third parties while this contract is in force.",
+      buyerDuties: "The Buyer shall pay the price as set out in section 2 and accept the unit by the handover act.",
+      liability: "Liability and termination",
+      liability1: "For late payment and late handover the parties are liable as provided by the law of the Kyrgyz Republic.",
+      liability2: "The contract may be terminated by agreement of the parties or in the cases provided by law.",
+      liability3: "Disputes are settled by negotiation, failing which in court at the Seller's location.",
+      details: "Details of the parties",
+      bank: "Bank",
+      account: "Account",
+      bic: "BIC",
     },
     receipt: {
       title: 'Payment Receipt',
@@ -232,6 +277,27 @@ const WORDS: Record<DocumentLanguage, Words> = {
       amount: 'Сумма',
       forSeller: 'от имени Продавца',
       asBuyer: 'Покупатель',
+      subject1: "Продавец обязуется передать в собственность Покупателя, а Покупатель — принять и оплатить помещение, указанное ниже, в объекте «{{unit.projectName}}»{{#if project.address}} по адресу: {{project.address}}{{/if}}.",
+      entrance: "Подъезд",
+      floor: "Этаж",
+      deposit: "Внесённый Покупателем задаток {{deal.deposit}} засчитывается в счёт цены.",
+      payInFull: "Цена оплачивается единовременно в течение 10 (десяти) банковских дней с даты подписания настоящего договора.",
+      payBySchedule: "Цена оплачивается в размерах и в сроки, установленные графиком платежей — приложением к настоящему договору, являющимся его неотъемлемой частью.",
+      payWhere: "Оплата производится на расчётный счёт Продавца, указанный в разделе 6, или в кассу Продавца. Платёж считается совершённым в день поступления денежных средств.",
+      handover: "Передача помещения",
+      handover1: "Продавец передаёт помещение Покупателю по акту приёма-передачи после ввода объекта в эксплуатацию{{#if project.handoverDate}}, не позднее {{project.handoverDate}}{{/if}}, при условии полной оплаты цены.",
+      handover2: "Право собственности переходит к Покупателю с момента государственной регистрации.",
+      duties: "Обязанности сторон",
+      sellerDuties: "Продавец обязуется передать помещение в состоянии, соответствующем проектной документации, и не отчуждать и не обременять его правами третьих лиц в период действия договора.",
+      buyerDuties: "Покупатель обязуется оплатить цену в порядке, установленном разделом 2, и принять помещение по акту приёма-передачи.",
+      liability: "Ответственность и расторжение",
+      liability1: "За просрочку оплаты и передачи помещения стороны несут ответственность в соответствии с законодательством Кыргызской Республики.",
+      liability2: "Договор может быть расторгнут по соглашению сторон или в случаях, предусмотренных законодательством.",
+      liability3: "Споры разрешаются путём переговоров, а при недостижении согласия — в суде по месту нахождения Продавца.",
+      details: "Реквизиты сторон",
+      bank: "Банк",
+      account: "Р/с",
+      bic: "БИК",
     },
     receipt: {
       title: 'Квитанция об оплате',
@@ -304,6 +370,27 @@ const WORDS: Record<DocumentLanguage, Words> = {
       amount: 'Сумма',
       forSeller: 'Сатуучунун атынан',
       asBuyer: 'Сатып алуучу',
+      subject1: "Сатуучу төмөндө көрсөтүлгөн жайды Сатып алуучунун менчигине өткөрүп берүүгө, ал эми Сатып алуучу аны кабыл алып, акысын төлөөгө милдеттенет. Жай «{{unit.projectName}}» объектисинде жайгашкан{{#if project.address}}, дареги: {{project.address}}{{/if}}.",
+      entrance: "Кире бериш",
+      floor: "Кабат",
+      deposit: "Сатып алуучу төлөгөн {{deal.deposit}} өлчөмүндөгү күрөө акы баанын эсебине кошулат.",
+      payInFull: "Баа ушул келишимге кол коюлган күндөн тартып 10 (он) банктык күндүн ичинде бир жолу төлөнөт.",
+      payBySchedule: "Баа төлөм графигинде — ушул келишимдин ажырагыс бөлүгү болгон тиркемеде белгиленген өлчөмдө жана мөөнөттө төлөнөт.",
+      payWhere: "Төлөм 6-бөлүмдө көрсөтүлгөн Сатуучунун эсебине же Сатуучунун кассасына жүргүзүлөт. Төлөм акча түшкөн күнү жүргүзүлдү деп эсептелет.",
+      handover: "Жайды өткөрүп берүү",
+      handover1: "Сатуучу объект пайдаланууга берилгенден кийин{{#if project.handoverDate}}, {{project.handoverDate}} кечиктирбестен{{/if}}, баа толук төлөнгөн шартта жайды Сатып алуучуга кабыл алуу-өткөрүп берүү акты боюнча өткөрүп берет.",
+      handover2: "Менчик укугу Сатып алуучуга мамлекеттик каттоодон өткөн учурдан тартып өтөт.",
+      duties: "Тараптардын милдеттери",
+      sellerDuties: "Сатуучу жайды долбоордук документтерге ылайык абалда өткөрүп берүүгө жана келишимдин мөөнөтүндө аны үчүнчү жактарга сатпоого жана күрөөгө койбоого милдеттенет.",
+      buyerDuties: "Сатып алуучу баасын 2-бөлүмдө белгиленген тартипте төлөөгө жана жайды акт боюнча кабыл алууга милдеттенет.",
+      liability: "Жоопкерчилик жана келишимди бузуу",
+      liability1: "Төлөмдү жана жайды өткөрүп берүүнү кечиктиргени үчүн тараптар Кыргыз Республикасынын мыйзамдарына ылайык жооп беришет.",
+      liability2: "Келишим тараптардын макулдугу менен же мыйзамда каралган учурларда бузулушу мүмкүн.",
+      liability3: "Талаштар сүйлөшүү жолу менен, макулдашууга жетишилбесе — Сатуучу жайгашкан жердеги сотто чечилет.",
+      details: "Тараптардын реквизиттери",
+      bank: "Банк",
+      account: "Эсеп",
+      bic: "БИК",
     },
     receipt: {
       title: 'Төлөм квитанциясы',
@@ -359,6 +446,9 @@ function reservationTemplate(w: Words): string {
       <div>{{company.legalName}}</div>
       {{#if company.address}}<div>{{company.address}}</div>{{/if}}
       {{#if company.taxId}}<div>${w.taxId}: {{company.taxId}}</div>{{/if}}
+      {{#if company.bankName}}<div>${w.contract.bank}: {{company.bankName}}</div>{{/if}}
+      {{#if company.bankAccount}}<div>${w.contract.account}: {{company.bankAccount}}</div>{{/if}}
+      {{#if company.bankBic}}<div>${w.contract.bic}: {{company.bankBic}}</div>{{/if}}
     </div>
     <div class="party">
       <div class="label">${r.client}</div>
@@ -424,25 +514,30 @@ function contractTemplate(w: Words): string {
     </div>
   </div>
 
-  <h2>${c.subject}</h2>
+  <h2>1. ${c.subject}</h2>
+  <p class="clause">1.1. ${c.subject1}</p>
   <table>
-    <tr><th>${w.project}</th><th>${w.unit}</th><th>${w.type}</th><th>${w.rooms}</th><th>${w.area}</th></tr>
+    <tr><th>${w.unit}</th><th>${c.entrance}</th><th>${c.floor}</th><th>${w.type}</th><th>${w.rooms}</th><th>${w.area}</th></tr>
     <tr>
-      <td>{{unit.projectName}}</td>
       <td>{{unit.blockName}} / {{unit.number}}</td>
+      <td>{{unit.entranceName}}</td>
+      <td>{{unit.floorNumber}}</td>
       <td>{{unit.type}}</td>
       <td>{{unit.rooms}}</td>
       <td>{{unit.area}} ${w.sqm}</td>
     </tr>
   </table>
 
-  <h2>${c.priceAndPayment}</h2>
+  <h2>2. ${c.priceAndPayment}</h2>
   <div class="totals">
     <div class="row"><span>${w.listPrice}</span><span>{{deal.listPrice}}</span></div>
     {{#if deal.discountAmount}}<div class="row"><span>${w.discount} ({{deal.discountPercent}}%)</span><span>-{{deal.discountAmount}}</span></div>{{/if}}
     <div class="row grand"><span>${w.salePrice}</span><span>{{deal.salePrice}}</span></div>
     {{#if deal.financingType}}<div class="row"><span>${c.financing}</span><span>{{deal.financingType}}</span></div>{{/if}}
   </div>
+  <p class="clause">2.1. {{#if deal.paysInFull}}${c.payInFull}{{else}}${c.payBySchedule}{{/if}}</p>
+  <p class="clause">2.2. ${c.payWhere}</p>
+  {{#if deal.deposit}}<p class="clause">2.3. ${c.deposit}</p>{{/if}}
 
   {{#if schedule.rows}}
   <h2>${c.schedule}</h2>
@@ -454,7 +549,41 @@ function contractTemplate(w: Words): string {
   </table>
   {{/if}}
 
+  <h2>3. ${c.handover}</h2>
+  <p class="clause">3.1. ${c.handover1}</p>
+  <p class="clause">3.2. ${c.handover2}</p>
+
+  <h2>4. ${c.duties}</h2>
+  <p class="clause">4.1. ${c.sellerDuties}</p>
+  <p class="clause">4.2. ${c.buyerDuties}</p>
+
+  <h2>5. ${c.liability}</h2>
+  <p class="clause">5.1. ${c.liability1}</p>
+  <p class="clause">5.2. ${c.liability2}</p>
+  <p class="clause">5.3. ${c.liability3}</p>
+
   {{#if deal.note}}<p class="note">${w.note}: {{deal.note}}</p>{{/if}}
+
+  <h2>6. ${c.details}</h2>
+  <div class="parties">
+    <div class="party">
+      <div class="label">${c.seller}</div>
+      <div>{{company.legalName}}</div>
+      {{#if company.address}}<div>{{company.address}}</div>{{/if}}
+      {{#if company.taxId}}<div>${w.taxId}: {{company.taxId}}</div>{{/if}}
+      {{#if company.bankName}}<div>${c.bank}: {{company.bankName}}</div>{{/if}}
+      {{#if company.bankAccount}}<div>${c.account}: {{company.bankAccount}}</div>{{/if}}
+      {{#if company.bankBic}}<div>${c.bic}: {{company.bankBic}}</div>{{/if}}
+    </div>
+    <div class="party">
+      <div class="label">${c.buyer}</div>
+      <div>{{client.fullName}}</div>
+      {{#if client.passport}}<div>${w.passport}: {{client.passport}}</div>{{/if}}
+      {{#if client.pin}}<div>${w.pin}: {{client.pin}}</div>{{/if}}
+      {{#if client.address}}<div>{{client.address}}</div>{{/if}}
+      <div>{{client.phone}}</div>
+    </div>
+  </div>
 
   <div class="signatures">
     <div class="signature-block">

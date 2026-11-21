@@ -55,9 +55,16 @@ type LegalForm = {
     phone: string;
     signatoryName: string;
     signatoryTitle: string;
+    // E2E-22: where the client pays.
+    bankName: string;
+    bankAccount: string;
+    bankBic: string;
 };
 
-const EMPTY_LEGAL: LegalForm = {legalName: "", taxId: "", address: "", phone: "", signatoryName: "", signatoryTitle: ""};
+const EMPTY_LEGAL: LegalForm = {
+    legalName: "", taxId: "", address: "", phone: "", signatoryName: "", signatoryTitle: "",
+    bankName: "", bankAccount: "", bankBic: "",
+};
 
 const SECTION_IDS = ["general", "reservations", "legal"] as const;
 
@@ -94,6 +101,9 @@ export function CompanySettingsPage() {
             phone: companyQuery.data.phone ?? "",
             signatoryName: companyQuery.data.signatoryName ?? "",
             signatoryTitle: companyQuery.data.signatoryTitle ?? "",
+            bankName: companyQuery.data.bankName ?? "",
+            bankAccount: companyQuery.data.bankAccount ?? "",
+            bankBic: companyQuery.data.bankBic ?? "",
         });
     }, [companyQuery.data]);
 
@@ -284,6 +294,11 @@ export function CompanySettingsPage() {
                                 value={legal.signatoryTitle}
                                 onChange={setLegalField("signatoryTitle")}
                             />
+                        </div>
+                        <Field label={t("legal.bankName")} placeholder={t("legal.bankNamePlaceholder")} maxLength={200} value={legal.bankName} onChange={setLegalField("bankName")} />
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <Field label={t("legal.bankAccount")} maxLength={50} value={legal.bankAccount} onChange={setLegalField("bankAccount")} />
+                            <Field label={t("legal.bankBic")} maxLength={20} value={legal.bankBic} onChange={setLegalField("bankBic")} />
                         </div>
                         <p className="text-sm text-muted-foreground">{t("legal.hint")}</p>
 

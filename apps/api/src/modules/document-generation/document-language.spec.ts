@@ -89,6 +89,33 @@ describe('built-in templates (E2E-3)', () => {
     );
   });
 
+  it('the contract states the deposit, how the rest is paid, the handover and the bank (E2E-22)', () => {
+    const contract = defaultTemplate(DocumentType.CONTRACT, 'ru')!;
+    const context = sampleTemplateContext({
+      ...company,
+      locale: 'ru-RU',
+      bankName: 'ОАО «Оптима Банк»',
+      bankAccount: '1091820000000000',
+      bankBic: '109018',
+    });
+    const render = (over: object = {}) =>
+      Handlebars.compile(contract, { strict: true })({ ...context, ...over });
+
+    const html = render();
+    expect(html).toContain('засчитывается в счёт цены');
+    expect(html).toContain('графиком платежей');
+    expect(html).toContain('не позднее 31.12.2027');
+    expect(html).toContain('ОАО «Оптима Банк»');
+    expect(html).toContain('Р/с: 1091820000000000');
+
+    const cash = render({ deal: { ...context.deal, paysInFull: 'yes' } });
+    expect(cash).toContain('единовременно');
+    expect(cash).not.toContain('графиком платежей');
+
+    const noDate = render({ project: { ...context.project, handoverDate: '' } });
+    expect(noDate).not.toContain('не позднее');
+  });
+
   it('leave out the financing line when the deal has none', () => {
     const contract = defaultTemplate(DocumentType.CONTRACT, 'ru')!;
     const context = sampleTemplateContext({ ...company, locale: 'ru-RU' });

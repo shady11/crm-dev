@@ -7,6 +7,7 @@ import {z} from "zod";
 import {Button} from "@/components/ui/button.tsx";
 import {Field, FieldDescription, FieldError, FieldGroup, FieldLabel,} from "@/components/ui/field.tsx";
 import {Input} from "@/components/ui/input.tsx";
+import {DateField} from "@/components/shared/date-field.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select.tsx";
 import type {ProjectPayload} from "@/features/projects/api/projects.api";
 import {
@@ -26,6 +27,7 @@ type ProjectFormValues = {
     name: string;
     address?: string;
     status: ProjectStatus;
+    handoverDate?: string;
 };
 
 type ProjectFormProps = {
@@ -57,6 +59,7 @@ export function ProjectForm({
         name: z.string().trim().min(2, t("form.validation.nameMin")),
         address: z.string().trim().optional(),
         status: z.enum(PROJECT_STATUS_VALUES, t("form.validation.statusRequired")),
+        handoverDate: z.string().optional(),
     }), [t]);
 
     // E2E-11: a new project starts as Draft, closed to sales while its
@@ -79,13 +82,15 @@ export function ProjectForm({
             name: project?.name ?? "",
             address: project?.address ?? "",
             status: initialStatus,
+            handoverDate: project?.handoverDate?.slice(0, 10) ?? "",
         });
-    }, [form, initialStatus, project?.address, project?.name]);
+    }, [form, initialStatus, project?.address, project?.name, project?.handoverDate]);
     const handleSubmit = (values: ProjectFormValues) => {
         onSubmit({
             name: values.name.trim(),
             address: values.address?.trim() ?? "",
             status: values.status,
+            handoverDate: values.handoverDate || null,
         });
     };
 
@@ -132,6 +137,17 @@ export function ProjectForm({
                                     aria-label={t("form.addressPlaceholder")}
                                 />
                                 <FieldError>{fieldState.error?.message}</FieldError>
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        control={form.control}
+                        name="handoverDate"
+                        render={({ field }) => (
+                            <Field>
+                                <FieldLabel>{t("form.handoverDateLabel")}</FieldLabel>
+                                <DateField value={field.value ?? ""} onChange={(value) => field.onChange(value)} clearable />
+                                <FieldDescription>{t("form.handoverDateHint")}</FieldDescription>
                             </Field>
                         )}
                     />
