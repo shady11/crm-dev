@@ -62,8 +62,8 @@ export function RoleCard({
             <CardContent className="flex flex-col gap-4">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className={`rounded-lg p-2 text-white ${ICON_COLORS[colorIndex % ICON_COLORS.length]}`}>
-                            <FolderCog size={20} strokeWidth={1.75} />
+                        <div className={`icon-tile flex size-7 shrink-0 items-center justify-center ${ICON_COLORS[colorIndex % ICON_COLORS.length]}`}>
+                            <FolderCog size={16} strokeWidth={2} />
                         </div>
                         <div className="flex items-center gap-2">
                             <h3 className="font-medium">{roleLabel(t, role.name)}</h3>

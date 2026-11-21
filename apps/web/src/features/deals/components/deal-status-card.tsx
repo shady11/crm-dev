@@ -22,24 +22,24 @@ export function DealStatusCard({ status, count, to, onSelect, selected }: DealSt
 
     const interactive = Boolean(to || onSelect);
     const label = t(DEAL_STATUS_LABEL_KEYS[status]);
-    // Same shape as the dashboard's KPI tiles: icon, stage name, then the
-    // number large, so a row of stages reads at a glance.
+    // Same shape as the dashboard's KPI tiles: stage name with its icon tile
+    // opposite, then the number large, so a row of stages reads at a glance.
     const card = (
         <Card className={`h-full border ${selected ? "border-primary ring-1 ring-primary" : ""} ${interactive ? "transition-colors hover:bg-secondary/40" : ""}`}>
-            <CardContent className="flex min-w-0 items-center gap-4">
-                {/* Hidden on a phone, where two cards share a row and the label needs the room. */}
-                <div className={`icon-tile hidden size-10 shrink-0 items-center justify-center rounded-xl sm:flex ${visual?.bg}`}>
-                    <Icon size={20} strokeWidth={1.75} />
-                </div>
+            <CardContent className="flex min-w-0 items-start justify-between gap-3">
                 <div className="min-w-0">
                     <p className="line-clamp-2 text-sm text-muted-foreground" title={label}>{label}</p>
-                    <p className="text-2xl font-semibold tabular-nums">{count}</p>
+                    <p className="mt-1.5 text-3xl font-semibold tracking-tight tabular-nums">{count}</p>
+                </div>
+                {/* Hidden on a phone, where two cards share a row and the label needs the room. */}
+                <div className={`icon-tile hidden size-7 shrink-0 items-center justify-center sm:flex ${visual?.bg}`}>
+                    <Icon size={16} strokeWidth={2} />
                 </div>
             </CardContent>
         </Card>
     );
 
-    const focusRing = "block w-full rounded-xl text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
+    const focusRing = "block w-full rounded-2xl text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none";
     if (to) return <Link to={to} className={focusRing}>{card}</Link>;
     if (onSelect) return <button type="button" aria-pressed={selected} onClick={onSelect} className={focusRing}>{card}</button>;
     return card;
