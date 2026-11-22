@@ -1,4 +1,4 @@
-import {ArrowLeftRight, EllipsisIcon, LayoutGridIcon, Pen, Repeat, Trash2, UserPlusIcon} from "lucide-react";
+import {ArrowLeftRight, EllipsisVerticalIcon, LayoutGridIcon, Pen, Repeat, Trash2, UserPlusIcon} from "lucide-react";
 import {Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger} from "@/components/ui/menu.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
@@ -83,7 +83,7 @@ export function LeadDetailsSheet({
                     <Menu positioning={{placement: "top-start"}}>
                         <MenuTrigger asChild>
                             <Button variant="outline" size="icon-md" aria-label={t("common:actions.moreActions")} title={t("common:actions.moreActions")}>
-                                <EllipsisIcon className="size-4" />
+                                <EllipsisVerticalIcon className="size-4" />
                             </Button>
                         </MenuTrigger>
                         <MenuContent className="min-w-52">
