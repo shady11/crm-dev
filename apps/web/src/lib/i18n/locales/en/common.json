@@ -143,5 +143,9 @@
     "sidebar": "Sidebar",
     "sidebarDescription": "Navigation menu",
     "toggleSidebar": "Show or hide the menu"
+  },
+  "filters": {
+    "title": "Filters",
+    "reset": "Reset"
   }
 }

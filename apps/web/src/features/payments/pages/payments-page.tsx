@@ -30,6 +30,7 @@ import {
     getPaymentRegister,
     type PaymentRegisterFilters,
 } from "@/features/payments/api/payments.api.ts";
+import {FilterPopover} from "@/components/shared/filter-popover.tsx";
 
 type Period = "thisMonth" | "lastMonth" | "last30Days" | "custom";
 const PERIODS: Period[] = ["thisMonth", "lastMonth", "last30Days", "custom"];
@@ -99,6 +100,15 @@ export function PaymentsPage() {
         setPage(1);
     };
 
+    // Dropdown filters in the panel that are set; the period stays outside it.
+    const activeFilterCount = [branchId, projectId, paymentMethod, paymentType].filter(Boolean).length;
+    const resetFilters = () => {
+        update(setBranchId)(undefined);
+        update(setProjectId)(undefined);
+        update(setPaymentMethod)(undefined);
+        update(setPaymentType)(undefined);
+    };
+
     const runExport = async (kind: "payments" | "receivables") => {
         setExporting(kind);
         try {
@@ -150,6 +160,10 @@ export function PaymentsPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+                <InputGroup className="w-64">
+                    <InputGroupInput placeholder={t("page.searchPlaceholder")} value={search} onChange={(e) => update(setSearch)(e.target.value)} />
+                    <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
+                </InputGroup>
                 <Select collection={periodCollection} value={[period]} onValueChange={({value}) => update(setPeriod)((value[0] ?? "thisMonth") as Period)}>
                     <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -163,29 +177,27 @@ export function PaymentsPage() {
                         <DateField className="w-40" value={custom.to} min={custom.from} max={companyToday(timeZone)} onChange={(to) => update(setCustom)({...custom, to})} />
                     </>
                 )}
-                <BranchFilterSelect value={branchId ?? "all"} onChange={(value) => update(setBranchId)(value === "all" ? undefined : value)} />
-                <Select collection={projectCollection} value={[projectId ?? "all"]} onValueChange={({value}) => update(setProjectId)(value[0] === "all" ? undefined : value[0])}>
-                    <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                        {projectCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-                <Select collection={methodCollection} value={[paymentMethod ?? "all"]} onValueChange={({value}) => update(setPaymentMethod)(value[0] === "all" ? undefined : (value[0] as PaymentMethod))}>
-                    <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                        {methodCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-                <Select collection={typeCollection} value={[paymentType ?? "all"]} onValueChange={({value}) => update(setPaymentType)(value[0] === "all" ? undefined : (value[0] as PaymentType))}>
-                    <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                        {typeCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-                <InputGroup className="w-64">
-                    <InputGroupInput placeholder={t("page.searchPlaceholder")} value={search} onChange={(e) => update(setSearch)(e.target.value)} />
-                    <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
-                </InputGroup>
+                <FilterPopover activeCount={activeFilterCount} onReset={resetFilters}>
+                    <BranchFilterSelect value={branchId ?? "all"} onChange={(value) => update(setBranchId)(value === "all" ? undefined : value)} />
+                    <Select collection={projectCollection} value={[projectId ?? "all"]} onValueChange={({value}) => update(setProjectId)(value[0] === "all" ? undefined : value[0])}>
+                        <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                            {projectCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <Select collection={methodCollection} value={[paymentMethod ?? "all"]} onValueChange={({value}) => update(setPaymentMethod)(value[0] === "all" ? undefined : (value[0] as PaymentMethod))}>
+                        <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                            {methodCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <Select collection={typeCollection} value={[paymentType ?? "all"]} onValueChange={({value}) => update(setPaymentType)(value[0] === "all" ? undefined : (value[0] as PaymentType))}>
+                        <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                            {typeCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                </FilterPopover>
             </div>
 
             {totals && (

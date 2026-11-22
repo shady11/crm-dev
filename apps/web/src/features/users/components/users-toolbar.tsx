@@ -7,6 +7,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import type {RoleFilterValue, StatusFilter} from "@/features/users/hooks/use-users-list.ts";
 import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
 import {useTranslation} from "react-i18next";
+import {FilterPopover} from "@/components/shared/filter-popover.tsx";
 
 interface UsersToolbarProps {
     statusFilter: StatusFilter;
@@ -57,47 +58,19 @@ export function UsersToolbar({
         ],
     });
 
+    // Dropdown filters in the panel that differ from their default.
+    const activeFilterCount = [branchFilter, statusFilter, roleFilter].filter((value) => value !== "all").length;
+    const resetFilters = () => {
+        onBranchFilterChange("all");
+        onStatusFilterChange("all");
+        onRoleFilterChange("all");
+    };
+
     return (
         <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-bold">{t("toolbar.heading")}</h2>
 
             <div className="flex flex-wrap items-center gap-2">
-                <BranchFilterSelect value={branchFilter} onChange={onBranchFilterChange} />
-
-                <Select
-                    collection={statusCollection}
-                    value={[statusFilter]}
-                    onValueChange={({ value }) => onStatusFilterChange((value[0] ?? "all") as StatusFilter)}
-                >
-                    <SelectTrigger className="w-40">
-                        <SelectValue placeholder={t("toolbar.placeholders.filterByStatus")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {statusCollection.items.map((item) => (
-                            <SelectItem key={item.value} item={item}>
-                                {item.label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-
-                <Select
-                    collection={roleCollection}
-                    value={[roleFilter]}
-                    onValueChange={({ value }) => onRoleFilterChange((value[0] ?? "all") as RoleFilterValue)}
-                >
-                    <SelectTrigger className="w-44">
-                        <SelectValue placeholder={t("toolbar.placeholders.filterByRole")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {roleCollection.items.map((item) => (
-                            <SelectItem key={item.value} item={item}>
-                                {item.label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-
                 <InputGroup className="w-56">
                     <InputGroupInput
                         placeholder={t("toolbar.placeholders.searchUsers")}
@@ -108,6 +81,44 @@ export function UsersToolbar({
                         <Search className="size-4" />
                     </InputGroupAddon>
                 </InputGroup>
+
+                <FilterPopover activeCount={activeFilterCount} onReset={resetFilters}>
+                    <BranchFilterSelect value={branchFilter} onChange={onBranchFilterChange} />
+
+                    <Select
+                        collection={statusCollection}
+                        value={[statusFilter]}
+                        onValueChange={({ value }) => onStatusFilterChange((value[0] ?? "all") as StatusFilter)}
+                    >
+                        <SelectTrigger className="w-40">
+                            <SelectValue placeholder={t("toolbar.placeholders.filterByStatus")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {statusCollection.items.map((item) => (
+                                <SelectItem key={item.value} item={item}>
+                                    {item.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    <Select
+                        collection={roleCollection}
+                        value={[roleFilter]}
+                        onValueChange={({ value }) => onRoleFilterChange((value[0] ?? "all") as RoleFilterValue)}
+                    >
+                        <SelectTrigger className="w-44">
+                            <SelectValue placeholder={t("toolbar.placeholders.filterByRole")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {roleCollection.items.map((item) => (
+                                <SelectItem key={item.value} item={item}>
+                                    {item.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </FilterPopover>
 
                 <Button onClick={onAddUser}>
                     <Plus className="size-3" />

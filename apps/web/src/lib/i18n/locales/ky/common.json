@@ -143,5 +143,9 @@
     "sidebar": "Меню",
     "sidebarDescription": "Навигация менюсу",
     "toggleSidebar": "Менюну көрсөтүү же жашыруу"
+  },
+  "filters": {
+    "title": "Чыпкалар",
+    "reset": "Тазалоо"
   }
 }

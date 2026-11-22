@@ -143,5 +143,9 @@
     "sidebar": "Меню",
     "sidebarDescription": "Меню навигации",
     "toggleSidebar": "Показать или скрыть меню"
+  },
+  "filters": {
+    "title": "Фильтры",
+    "reset": "Сбросить"
   }
 }
