@@ -21,7 +21,7 @@ const CONTACT_ICONS: Record<string, typeof PhoneCallIcon> = {
     EMAIL: MailIcon,
 };
 
-const PAGE = 15;
+const PAGE = 10;
 
 type HistoryTab = "general" | "calls" | "meetings";
 // Which activity types each tab shows; General shows everything.
@@ -118,7 +118,7 @@ export function ClientHistoryCard({ clientId }: { clientId: string }) {
                     </div>
                 )}
                 {items.length > shown && (
-                    <Button variant="ghost" size="sm" className="mt-2 w-full" onClick={() => setShown((n) => n + PAGE * 2)}>
+                    <Button variant="ghost" size="sm" className="mt-2 w-full" onClick={() => setShown((n) => n + PAGE)}>
                         {t("history.showMore", { count: items.length - shown })}
                     </Button>
                 )}
