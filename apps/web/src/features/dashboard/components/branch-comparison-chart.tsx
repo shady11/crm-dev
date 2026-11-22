@@ -43,7 +43,7 @@ export function BranchComparisonChart({data}: {data: BranchComparisonItem[]}) {
                                     <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} />
                                     <YAxis tickLine={false} axisLine={false} allowDecimals={false} width={32} />
                                     <ChartTooltip content={<ChartTooltipContent />} />
-                                    <Bar dataKey="dealCount" fill="url(#fill-branch-deals)" radius={[8, 8, 3, 3]} maxBarSize={56} />
+                                    <Bar dataKey="dealCount" fill="url(#fill-branch-deals)" radius={[5, 5, 2, 2]} maxBarSize={56} />
                                 </BarChart>
                             </ChartContainer>
                         </div>
@@ -56,7 +56,7 @@ export function BranchComparisonChart({data}: {data: BranchComparisonItem[]}) {
                                     <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} />
                                     <YAxis tickLine={false} axisLine={false} width={44} tickFormatter={(value: number) => compact.format(value)} />
                                     <ChartTooltip content={<ChartTooltipContent formatter={(value) => formatCurrency(Number(value))} />} />
-                                    <Bar dataKey="revenue" fill="url(#fill-branch-revenue)" radius={[8, 8, 3, 3]} maxBarSize={56} />
+                                    <Bar dataKey="revenue" fill="url(#fill-branch-revenue)" radius={[5, 5, 2, 2]} maxBarSize={56} />
                                 </BarChart>
                             </ChartContainer>
                         </div>

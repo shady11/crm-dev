@@ -25,7 +25,7 @@ export function SettingsLayout<T extends string>({sections, activeSection, onSel
                             onClick={() => onSelect(id)}
                             aria-current={activeSection === id ? "page" : undefined}
                             className={cn(
-                                "flex shrink-0 items-center gap-2 rounded-[13px] px-3 py-2 text-left text-sm font-medium transition-colors",
+                                "flex shrink-0 items-center gap-2 rounded-[9px] px-3 py-2 text-left text-sm font-medium transition-colors",
                                 activeSection === id
                                     ? "seg-thumb font-semibold text-foreground [&>svg]:text-primary"
                                     : "text-muted-foreground hover:bg-accent hover:text-foreground",

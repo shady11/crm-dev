@@ -107,7 +107,7 @@ export function FunnelCard({
                         <CartesianGrid vertical={false} />
                         <XAxis dataKey="status" tickLine={false} axisLine={false} tickMargin={8} />
                         <ChartTooltip content={<ChartTooltipContent />} />
-                        <Bar dataKey="count" fill="url(#fill-funnel-count)" radius={[8, 8, 3, 3]} maxBarSize={56}>
+                        <Bar dataKey="count" fill="url(#fill-funnel-count)" radius={[5, 5, 2, 2]} maxBarSize={56}>
                             <LabelList dataKey="count" position="top" offset={8} fontSize={11} />
                         </Bar>
                     </BarChart>

@@ -30,7 +30,7 @@ export function RevenueTrendChart({ data }: { data: RevenueTrendPoint[] }) {
                         <CartesianGrid vertical={false} />
                         <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
                         <ChartTooltip content={<ChartTooltipContent />} />
-                        <Bar dataKey="revenue" fill="url(#fill-revenue-trend)" radius={[8, 8, 3, 3]} maxBarSize={56} />
+                        <Bar dataKey="revenue" fill="url(#fill-revenue-trend)" radius={[5, 5, 2, 2]} maxBarSize={56} />
                     </BarChart>
                 </ChartContainer>
             </CardContent>

@@ -74,7 +74,7 @@ export function LoginForm({
             <form
                 className={cn(
                     "flex flex-col p-8",
-                    "rounded-[28px] border border-glass-border",
+                    "rounded-[18px] border border-glass-border",
                     "bg-white/75 dark:bg-[rgb(20_25_52/0.74)] backdrop-blur-[48px] backdrop-saturate-200",
                     "shadow-[0_2px_6px_0_rgb(35_42_77/0.06),0_30px_70px_-26px_rgb(35_42_77/0.4)]",
                     "dark:shadow-[0_2px_6px_0_rgb(0_0_0/0.4),0_34px_80px_-26px_rgb(0_0_0/0.85)]",
@@ -96,7 +96,7 @@ export function LoginForm({
                             type="email"
                             autoComplete="username"
                             autoFocus
-                            className="h-11 rounded-[13px] px-3.5"
+                            className="h-11 rounded-[9px] px-3.5"
                             disabled={mutation.isPending}
                             aria-invalid={!!errors.email}
                             {...form.register("email")}
@@ -109,7 +109,7 @@ export function LoginForm({
                             id="password"
                             type="password"
                             autoComplete="current-password"
-                            className="h-11 rounded-[13px] px-3.5"
+                            className="h-11 rounded-[9px] px-3.5"
                             disabled={mutation.isPending}
                             aria-invalid={!!errors.password}
                             {...form.register("password")}
