@@ -18,7 +18,9 @@ import {useTaskAssignees} from "@/features/tasks/hooks/use-task-assignees.ts";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {canAssignTasks} from "@/features/tasks/utils/task-access.ts";
 import {
+    TASK_PRIORITY_CLASSES,
     TASK_PRIORITY_LABEL_KEYS,
+    TASK_PRIORITY_TEXT_CLASSES,
     TASK_STATUS_LABEL_KEYS,
     TASK_TERMINAL_STATUSES,
     TASK_TYPE_LABEL_KEYS,
@@ -227,9 +229,17 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel, onCanc
                         <Field invalid={fieldState.invalid}>
                             <FieldLabel>{t("form.priority")}</FieldLabel>
                             <Select collection={priorityCollection} value={[field.value]} onValueChange={(item) => field.onChange(item.value[0])}>
-                                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                                <SelectTrigger className="w-full">
+                                    <SelectValue>
+                                        <PriorityOption priority={field.value} label={t(TASK_PRIORITY_LABEL_KEYS[field.value])} />
+                                    </SelectValue>
+                                </SelectTrigger>
                                 <SelectContent>
-                                    {priorityCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                                    {priorityCollection.items.map((item) => (
+                                        <SelectItem key={item.value} item={item}>
+                                            <PriorityOption priority={item.value as TaskPriority} label={item.label} />
+                                        </SelectItem>
+                                    ))}
                                 </SelectContent>
                             </Select>
                             <FieldError>{fieldState.error?.message}</FieldError>
@@ -295,5 +305,15 @@ export function TaskForm({ task, errorMessage, isSubmitting, submitLabel, onCanc
                 </Button>
             </SheetFooter>
         </form>
+    );
+}
+
+/** A priority as a coloured dot and label, matching the priority badges. */
+function PriorityOption({priority, label}: {priority: TaskPriority; label: string}) {
+    return (
+        <span className={`flex items-center gap-2 font-medium ${TASK_PRIORITY_TEXT_CLASSES[priority]}`}>
+            <span aria-hidden className={`size-2 shrink-0 rounded-full ${TASK_PRIORITY_CLASSES[priority]}`} />
+            {label}
+        </span>
     );
 }

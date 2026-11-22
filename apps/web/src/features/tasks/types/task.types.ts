@@ -43,6 +43,13 @@ export const TASK_PRIORITY_CLASSES: Record<TaskPriority, string> = {
     [TaskPriority.HIGH]: "bg-rose-400",
 };
 
+/** Text in each priority's colour, the same shades its badge uses. */
+export const TASK_PRIORITY_TEXT_CLASSES: Record<TaskPriority, string> = {
+    [TaskPriority.LOW]: "text-muted-foreground",
+    [TaskPriority.MEDIUM]: "text-amber-700 dark:text-amber-300",
+    [TaskPriority.HIGH]: "text-rose-700 dark:text-rose-300",
+};
+
 export const TaskType = {
     CALL: "CALL",
     MEETING: "MEETING",
