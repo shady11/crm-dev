@@ -241,9 +241,9 @@ export function ClientDetailsPage() {
                                                         <p className="text-base font-semibold tabular-nums">{formatCurrency(Number(deal.salePrice))}</p>
                                                     )}
                                                     <dl className="mt-1 grid grid-cols-[auto_auto] gap-x-4 gap-y-0.5 text-xs">
-                                                        <dt className="text-left text-muted-foreground">{t("detail.money.paid")}</dt>
+                                                        <dt className="text-right text-muted-foreground">{t("detail.money.paid")}</dt>
                                                         <dd className="font-medium tabular-nums">{formatCurrency(deal.paid)}</dd>
-                                                        <dt className="text-left text-muted-foreground">{t("detail.money.overdue")}</dt>
+                                                        <dt className="text-right text-muted-foreground">{t("detail.money.overdue")}</dt>
                                                         <dd className={`font-medium tabular-nums ${deal.overdue > 0 ? "text-rose-600" : ""}`}>
                                                             {formatCurrency(deal.overdue)}
                                                         </dd>
