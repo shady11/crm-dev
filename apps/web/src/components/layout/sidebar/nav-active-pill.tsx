@@ -62,7 +62,7 @@ export function NavActivePill({children}: {children: ReactNode}) {
             <span
                 aria-hidden
                 className={cn(
-                    "pointer-events-none absolute -z-1 rounded-[9px] seg-thumb",
+                    "pointer-events-none absolute -z-1 rounded-[6px] seg-thumb",
                     ready && "transition-[top,left,width,height,opacity] duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
                     "motion-reduce:transition-none",
                     box ? "opacity-100" : "opacity-0",

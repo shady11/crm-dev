@@ -611,7 +611,7 @@ export const SidebarMenuButton = ({
         // with dark text and a brand-coloured icon, as in the reference.
         "data-[active=true]:seg-thumb data-[active=true]:font-semibold data-[active=true]:text-foreground data-[active=true]:[&>svg]:text-sidebar-primary",
         "data-[active=true]:hover:text-foreground",
-        "rounded-[9px]",
+        "rounded-[6px]",
         "group-has-data-[sidebar=menu-action]/menu-item:pe-8",
         "[&>span:last-child]:truncate",
         "motion-reduce:transition-none!",

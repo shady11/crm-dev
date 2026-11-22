@@ -71,7 +71,7 @@ export function FinanceOverviewCard({data}: {data: FinanceOverview}) {
                                 <ChartTooltip
                                     content={<ChartTooltipContent formatter={(value) => formatCurrency(Number(value))} />}
                                 />
-                                <Bar dataKey="amount" fill="url(#fill-finance-amount)" radius={[5, 5, 2, 2]} maxBarSize={56} />
+                                <Bar dataKey="amount" fill="url(#fill-finance-amount)" radius={[3, 3, 1, 1]} maxBarSize={56} />
                             </BarChart>
                         </ChartContainer>
                     )}

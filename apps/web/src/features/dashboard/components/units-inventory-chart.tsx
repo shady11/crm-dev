@@ -34,7 +34,7 @@ export function UnitsInventoryChart({ data }: { data: UnitsSummaryItem[] }) {
                 <ChartContainer config={{}} className="mx-auto h-56 w-full max-w-56">
                     <PieChart>
                         <ChartTooltip content={<ChartTooltipContent />} />
-                        <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={60} outerRadius={82} paddingAngle={3} cornerRadius={4} stroke="none">
+                        <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={60} outerRadius={82} paddingAngle={3} cornerRadius={2} stroke="none">
                             {chartData.map((entry) => (
                                 <Cell key={entry.status} fill={STATUS_COLORS[entry.status] ?? "var(--muted-foreground)"} />
                             ))}

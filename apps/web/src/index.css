@@ -174,7 +174,7 @@
 
 :root {
     --spacing: 0.3rem;
-    --radius: 0.5rem;
+    --radius: 0.3rem;
 
     /* App backdrop behind the floating glass panels: a soft wash of the
        brand blues over a pale base (see the body rule below). */
@@ -414,7 +414,7 @@
     background-image: var(--card-fill);
     border: 1px solid var(--card-border);
     box-shadow: var(--card-shadow);
-    border-radius: 14px;
+    border-radius: 9px;
     overflow: hidden;
     backdrop-filter: blur(16px) saturate(140%);
     -webkit-backdrop-filter: blur(16px) saturate(140%);
@@ -427,7 +427,7 @@
 @utility icon-tile {
     position: relative;
     color: white;
-    border-radius: 8px;
+    border-radius: 6px;
     box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.4);
     &::after {
         content: "";

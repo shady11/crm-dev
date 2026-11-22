@@ -20,7 +20,7 @@ export function ProjectTabs() {
         // Same look as the page-level tabs elsewhere: a glass track with the
         // active tab on a white pill.
         <div className="max-w-full overflow-x-auto">
-            <nav className="seg-surface inline-flex gap-1 rounded-[11px] p-[4px]">
+            <nav className="seg-surface inline-flex gap-1 rounded-[8px] p-[4px]">
                 {tabs.map((tab) => (
                     <NavLink
                         key={tab.to}
@@ -29,7 +29,7 @@ export function ProjectTabs() {
                         end={tab.to !== "chessboard"}
                         className={({ isActive }) =>
                             cn(
-                                "inline-flex h-9 items-center rounded-[8px] px-4 text-sm font-medium whitespace-nowrap text-muted-foreground transition-colors",
+                                "inline-flex h-9 items-center rounded-[6px] px-4 text-sm font-medium whitespace-nowrap text-muted-foreground transition-colors",
                                 "hover:text-foreground",
                                 isActive && "seg-thumb text-foreground"
                             )
