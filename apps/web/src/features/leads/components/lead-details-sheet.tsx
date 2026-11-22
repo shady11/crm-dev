@@ -1,7 +1,6 @@
-import {ArrowLeftRight, LayoutGridIcon, Pen, Repeat, Trash2, UserPlusIcon} from "lucide-react";
-import {ButtonGroup} from "@/components/ui/button-group.tsx";
+import {ArrowLeftRight, EllipsisIcon, LayoutGridIcon, Pen, Repeat, Trash2, UserPlusIcon} from "lucide-react";
+import {Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger} from "@/components/ui/menu.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {IconTooltipButton} from "@/components/shared/icon-tooltip-button.tsx";
 import {Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
 import type {Lead} from "@/features/leads/api/leads.api.ts";
@@ -50,7 +49,7 @@ export function LeadDetailsSheet({
 
     return (
         <Sheet open={open} onOpenChange={({ open: isOpen }) => onOpenChange(isOpen)}>
-            <SheetContent className="sm:max-w-xl" variant="inset">
+            <SheetContent className="sm:max-w-lg" variant="inset">
                 <SheetHeader>
                     <SheetTitle>{lead.fullName}</SheetTitle>
                 </SheetHeader>
@@ -79,40 +78,42 @@ export function LeadDetailsSheet({
                     </div>
                 </SheetBody>
 
-                <SheetFooter className="sm:justify-between">
-                    {/* Secondary actions joined in one group; the main action stands apart. */}
-                    <ButtonGroup className="w-full sm:w-fit [&>*]:rounded-none [&>*:first-child]:rounded-s-lg [&>*:last-child]:rounded-e-lg">
-                    {canDelete && (
-                        <IconTooltipButton variant="outline" size="icon-md" className="text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={onRequestDelete} label={t("common:actions.delete")}>
-                            <Trash2 className="size-4" />
-                        </IconTooltipButton>
-                    )}
-                    {canTransferBranch && (
-                        <IconTooltipButton
-                            variant="outline"
-                            size="icon-md"
-                            label={t("detailsSheet.transferBranch.action")}
-                            onClick={onRequestTransferBranch}
-                        >
-                            <ArrowLeftRight className="size-4" />
-                        </IconTooltipButton>
-                    )}
-                    {canReassign && (
-                        <Button
-                            variant="outline"
-                            title={t("detailsSheet.reassign.action")}
-                            onClick={onRequestReassign}
-                        >
-                            <Repeat className="size-4" />
-                            {/* Icon only on a phone so the group fits; the title names it. */}
-                            <span className="hidden sm:inline">{t("detailsSheet.reassign.short")}</span>
-                        </Button>
-                    )}
-                    <Button variant="outline" onClick={onEdit}>
-                        <Pen className="size-4" />
-                        {t("detailsSheet.edit")}
-                    </Button>
-                    </ButtonGroup>
+                <SheetFooter className="flex-row justify-between">
+                    {/* Secondary actions tucked behind "⋯"; the main action stands apart. */}
+                    <Menu positioning={{placement: "top-start"}}>
+                        <MenuTrigger asChild>
+                            <Button variant="outline" size="icon-md" aria-label={t("common:actions.moreActions")} title={t("common:actions.moreActions")}>
+                                <EllipsisIcon className="size-4" />
+                            </Button>
+                        </MenuTrigger>
+                        <MenuContent className="min-w-52">
+                            <MenuItem value="edit" onClick={onEdit}>
+                                <Pen />
+                                {t("detailsSheet.edit")}
+                            </MenuItem>
+                            {canReassign && (
+                                <MenuItem value="reassign" onClick={onRequestReassign}>
+                                    <Repeat />
+                                    {t("detailsSheet.reassign.action")}
+                                </MenuItem>
+                            )}
+                            {canTransferBranch && (
+                                <MenuItem value="transfer-branch" onClick={onRequestTransferBranch}>
+                                    <ArrowLeftRight />
+                                    {t("detailsSheet.transferBranch.action")}
+                                </MenuItem>
+                            )}
+                            {canDelete && (
+                                <>
+                                    <MenuSeparator />
+                                    <MenuItem value="delete" variant="destructive" onClick={onRequestDelete}>
+                                        <Trash2 />
+                                        {t("common:actions.delete")}
+                                    </MenuItem>
+                                </>
+                            )}
+                        </MenuContent>
+                    </Menu>
                     {!lead.client && (
                         <Button onClick={onRequestConvert}>
                             <UserPlusIcon className="size-4" />
