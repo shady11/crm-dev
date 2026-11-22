@@ -137,6 +137,13 @@
       "MESSAGE_SENT": "Message",
       "MEETING": "Meeting",
       "EMAIL": "Email"
-    }
+    },
+    "tabs": {
+      "general": "General",
+      "calls": "Calls",
+      "meetings": "Meetings"
+    },
+    "noCalls": "No calls logged yet.",
+    "noMeetings": "No meetings logged yet."
   }
 }

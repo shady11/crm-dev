@@ -6,7 +6,7 @@ import {CircleDotIcon, MailIcon, MessageCircleIcon, PhoneCallIcon, UsersIcon} fr
 import {Button} from "@/components/ui/button.tsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
-import {Toggle} from "@/components/ui/toggle.tsx";
+import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
 import {getClientActivities} from "@/features/clients/api/clients.api.ts";
 import {formatDate} from "@/utils/date-formatter.ts";
 import {paths} from "@/routes/paths.ts";
@@ -23,6 +23,10 @@ const CONTACT_ICONS: Record<string, typeof PhoneCallIcon> = {
 
 const PAGE = 15;
 
+type HistoryTab = "general" | "calls" | "meetings";
+// Which activity types each tab shows; General shows everything.
+const TAB_TYPES: Record<Exclude<HistoryTab, "general">, string> = {calls: "CALL", meetings: "MEETING"};
+
 /**
  * Everything that happened with this person in one timeline: calls and
  * meetings logged while they were a lead, then their deals' history, so
@@ -32,7 +36,7 @@ export function ClientHistoryCard({ clientId }: { clientId: string }) {
     const { t, i18n } = useTranslation("clients");
     const activityTitle = useActivityTitle();
     const activityActor = useActivityActor();
-    const [contactsOnly, setContactsOnly] = useState(false);
+    const [tab, setTab] = useState<HistoryTab>("general");
     const [shown, setShown] = useState(PAGE);
 
     const query = useQuery({
@@ -41,32 +45,43 @@ export function ClientHistoryCard({ clientId }: { clientId: string }) {
     });
 
     const all = query.data ?? [];
-    const contactCount = all.filter((a) => a.type in CONTACT_ICONS).length;
-    const items = contactsOnly ? all.filter((a) => a.type in CONTACT_ICONS) : all;
+    const counts: Record<HistoryTab, number> = {
+        general: all.length,
+        calls: all.filter((a) => a.type === TAB_TYPES.calls).length,
+        meetings: all.filter((a) => a.type === TAB_TYPES.meetings).length,
+    };
+    const items = tab === "general" ? all : all.filter((a) => a.type === TAB_TYPES[tab]);
+    const emptyText = tab === "calls" ? t("history.noCalls") : tab === "meetings" ? t("history.noMeetings") : t("history.empty");
 
     return (
         <Card className="border pt-0">
-            <CardHeader className="flex items-center justify-between gap-2 border-b py-4">
+            <CardHeader className="flex flex-wrap items-center justify-between gap-2 border-b py-4">
                 <CardTitle className="text-sm text-muted-foreground">{t("history.title")}</CardTitle>
-                <Toggle
-                    variant="outline"
-                    size="sm"
-                    pressed={contactsOnly}
-                    onPressedChange={(pressed) => {
-                        setContactsOnly(pressed);
+                <Tabs
+                    value={tab}
+                    onValueChange={({ value }) => {
+                        setTab(value as HistoryTab);
                         setShown(PAGE);
                     }}
                 >
-                    <PhoneCallIcon className="size-3.5" />
-                    {t("history.contactsOnly", { count: contactCount })}
-                </Toggle>
+                    <TabsList>
+                        {(["general", "calls", "meetings"] as const).map((key) => (
+                            <TabsTrigger key={key} value={key} className="grow-0 px-3">
+                                {t(`history.tabs.${key}`)}
+                                {counts[key] > 0 && (
+                                    <span className="ml-1.5 rounded-full bg-muted px-1.5 text-xs tabular-nums text-muted-foreground">{counts[key]}</span>
+                                )}
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
+                </Tabs>
             </CardHeader>
             <CardContent>
                 {query.isLoading ? (
                     <div className="flex justify-center py-6"><Spinner className="size-5" /></div>
                 ) : items.length === 0 ? (
                     <p className="py-6 text-center text-sm text-muted-foreground">
-                        {contactsOnly ? t("history.noContacts") : t("history.empty")}
+                        {emptyText}
                     </p>
                 ) : (
                     <div className="flex flex-col divide-y">
