@@ -82,9 +82,11 @@ export function LoginForm({
                 onSubmit={form.handleSubmit(onSubmit)}
                 noValidate
             >
-                <KeregeLogo className="h-7 self-start" />
+                <div className="flex justify-center pt-4 pb-6">
+                    <KeregeLogo className="h-5" />
+                </div>
 
-                <h1 className="mt-6 text-[30px] leading-tight font-semibold tracking-[-0.025em]">{t("login.title")}</h1>
+                <h1 className="mt-4 text-center text-[30px] leading-tight font-semibold tracking-[-0.025em]">{t("login.title")}</h1>
 
                 <FieldGroup className="mt-7 gap-3.5">
                     <Field invalid={!!errors.email}>
