@@ -159,11 +159,13 @@ export function PaymentsPage() {
                 </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-                <InputGroup className="w-64">
+            {/* Search on the left; period and filters on the right, as on every list. */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <InputGroup className="w-full sm:w-80">
                     <InputGroupInput placeholder={t("page.searchPlaceholder")} value={search} onChange={(e) => update(setSearch)(e.target.value)} />
                     <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
                 </InputGroup>
+                <div className="flex flex-wrap items-center gap-2">
                 <Select collection={periodCollection} value={[period]} onValueChange={({value}) => update(setPeriod)((value[0] ?? "thisMonth") as Period)}>
                     <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -198,6 +200,7 @@ export function PaymentsPage() {
                         </SelectContent>
                     </Select>
                 </FilterPopover>
+                </div>
             </div>
 
             {totals && (

@@ -50,7 +50,7 @@ export function ClientsToolbar({
         // No heading here: the page title above already says "Clients".
         // Search on the left, filters and the add button on the right.
         <div className="flex flex-wrap items-center justify-between gap-3">
-            <InputGroup className="w-full sm:w-72">
+            <InputGroup className="w-full sm:w-80">
                 <InputGroupInput
                     placeholder={t("toolbar.searchPlaceholder")}
                     value={search}

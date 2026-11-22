@@ -67,21 +67,20 @@ export function UsersToolbar({
     };
 
     return (
+        // Search on the left, filters and actions on the right, as on every list.
         <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-bold">{t("toolbar.heading")}</h2>
+            <InputGroup className="w-full sm:w-80">
+                <InputGroupInput
+                    placeholder={t("toolbar.placeholders.searchUsers")}
+                    value={search}
+                    onChange={(e) => onSearchChange(e.target.value)}
+                />
+                <InputGroupAddon>
+                    <Search className="size-4" />
+                </InputGroupAddon>
+            </InputGroup>
 
             <div className="flex flex-wrap items-center gap-2">
-                <InputGroup className="w-56">
-                    <InputGroupInput
-                        placeholder={t("toolbar.placeholders.searchUsers")}
-                        value={search}
-                        onChange={(e) => onSearchChange(e.target.value)}
-                    />
-                    <InputGroupAddon>
-                        <Search className="size-4" />
-                    </InputGroupAddon>
-                </InputGroup>
-
                 <FilterPopover activeCount={activeFilterCount} onReset={resetFilters}>
                     <BranchFilterSelect value={branchFilter} onChange={onBranchFilterChange} />
 
