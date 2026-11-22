@@ -47,8 +47,8 @@ export function ClientsToolbar({
     };
 
     return (
-        <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-bold">{t("page.title")}</h2>
+        // No heading here: the page title above already says "Clients".
+        <div className="flex flex-wrap items-center justify-end gap-3">
 
             <div className="flex flex-wrap items-center gap-2">
                 <InputGroup className="w-56">

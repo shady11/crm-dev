@@ -113,7 +113,7 @@ export function ClientDetailsPage() {
                         <div>
                             <h1 className="text-2xl font-semibold">{client.fullName}</h1>
                             <p className="text-sm text-muted-foreground">
-                                #{client.id.slice(0, 8).toUpperCase()} · {t("detail.clientSince", { date: new Date(client.createdAt).toLocaleDateString(i18n.language) })}
+                                {t("detail.clientSince", { date: new Date(client.createdAt).toLocaleDateString(i18n.language) })}
                             </p>
                         </div>
                     </div>
@@ -144,146 +144,148 @@ export function ClientDetailsPage() {
                 </div>
             </div>
 
-            <Card className="border">
-                <CardContent>
-                    <DataList className="divide-y">
-                        <DataListItem>
-                            <DataListItemLabel>{t("detail.phone")}</DataListItemLabel>
-                            <DataListItemValue className="flex items-center gap-3">
-                                <a href={`tel:${client.phone}`} className="flex items-center gap-1.5 hover:text-foreground">
-                                    <PhoneIcon size={14} />{client.phone}
-                                </a>
-                                <WhatsAppLink phone={client.whatsapp || client.phone} />
-                            </DataListItemValue>
-                        </DataListItem>
-                        {client.whatsapp && (
-                            <DataListItem>
-                                <DataListItemLabel>{t("detail.whatsapp")}</DataListItemLabel>
-                                <DataListItemValue>{client.whatsapp}</DataListItemValue>
-                            </DataListItem>
-                        )}
-                        {client.email && (
-                            <DataListItem>
-                                <DataListItemLabel>{t("detail.email")}</DataListItemLabel>
-                                <DataListItemValue>
-                                    <a href={`mailto:${client.email}`} className="flex items-center gap-1.5 hover:text-foreground">
-                                        <MailIcon size={14} />{client.email}
-                                    </a>
-                                </DataListItemValue>
-                            </DataListItem>
-                        )}
-                        {client.passport && (
-                            <DataListItem>
-                                <DataListItemLabel>{t("detail.passport")}</DataListItemLabel>
-                                <DataListItemValue>{client.passport}</DataListItemValue>
-                            </DataListItem>
-                        )}
-                        {client.pin && (
-                            <DataListItem>
-                                <DataListItemLabel>{t("detail.pin")}</DataListItemLabel>
-                                <DataListItemValue>{client.pin}</DataListItemValue>
-                            </DataListItem>
-                        )}
-                    </DataList>
-                </CardContent>
-            </Card>
+            {/* Left: who the client is and what they're buying; right: paperwork,
+                to-dos and the timeline. */}
+            <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
+                <div className="flex min-w-0 flex-col gap-4">
+                    <Card className="border">
+                        <CardContent>
+                            <DataList className="divide-y">
+                                <DataListItem>
+                                    <DataListItemLabel>{t("detail.phone")}</DataListItemLabel>
+                                    <DataListItemValue className="flex items-center gap-3">
+                                        <a href={`tel:${client.phone}`} className="flex items-center gap-1.5 hover:text-foreground">
+                                            <PhoneIcon size={14} />{client.phone}
+                                        </a>
+                                        <WhatsAppLink phone={client.whatsapp || client.phone} />
+                                    </DataListItemValue>
+                                </DataListItem>
+                                {client.whatsapp && (
+                                    <DataListItem>
+                                        <DataListItemLabel>{t("detail.whatsapp")}</DataListItemLabel>
+                                        <DataListItemValue>{client.whatsapp}</DataListItemValue>
+                                    </DataListItem>
+                                )}
+                                {client.email && (
+                                    <DataListItem>
+                                        <DataListItemLabel>{t("detail.email")}</DataListItemLabel>
+                                        <DataListItemValue>
+                                            <a href={`mailto:${client.email}`} className="flex items-center gap-1.5 hover:text-foreground">
+                                                <MailIcon size={14} />{client.email}
+                                            </a>
+                                        </DataListItemValue>
+                                    </DataListItem>
+                                )}
+                                {client.passport && (
+                                    <DataListItem>
+                                        <DataListItemLabel>{t("detail.passport")}</DataListItemLabel>
+                                        <DataListItemValue>{client.passport}</DataListItemValue>
+                                    </DataListItem>
+                                )}
+                                {client.pin && (
+                                    <DataListItem>
+                                        <DataListItemLabel>{t("detail.pin")}</DataListItemLabel>
+                                        <DataListItemValue>{client.pin}</DataListItemValue>
+                                    </DataListItem>
+                                )}
+                            </DataList>
+                        </CardContent>
+                    </Card>
 
-            <div className="grid gap-4 lg:grid-cols-2">
-                <Card className="border pt-0">
-                    <CardHeader className="border-b py-4">
-                        <CardTitle className="text-sm text-muted-foreground">
-                            {client.deals.length > 0 ? t("detail.dealsWithCount", { count: client.deals.length }) : t("detail.deals")}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {client.deals.length === 0 ? (
-                            <p className="py-6 text-center text-sm text-muted-foreground">{t("detail.noDeals")}</p>
-                        ) : (
-                            <>
-                            {/* What the client has paid and still owes across their deals (FIN-12). */}
-                            {(totalPaid !== 0 || totalOwed > 0) && (
-                                <div className="grid grid-cols-3 gap-3 border-b pb-3 pt-1 text-sm">
-                                    <div>
-                                        <p className="text-xs text-muted-foreground">{t("detail.money.paid")}</p>
-                                        <p className="font-medium tabular-nums">{formatCurrency(totalPaid)}</p>
+                    <Card className="border pt-0">
+                        <CardHeader className="border-b py-4">
+                            <CardTitle className="text-sm text-muted-foreground">
+                                {client.deals.length > 0 ? t("detail.dealsWithCount", { count: client.deals.length }) : t("detail.deals")}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {client.deals.length === 0 ? (
+                                <p className="py-6 text-center text-sm text-muted-foreground">{t("detail.noDeals")}</p>
+                            ) : (
+                                <>
+                                {/* What the client has paid and still owes across their deals (FIN-12). */}
+                                {(totalPaid !== 0 || totalOwed > 0) && (
+                                    <div className="grid grid-cols-3 gap-3 border-b pb-3 pt-1 text-sm">
+                                        <div>
+                                            <p className="text-xs text-muted-foreground">{t("detail.money.paid")}</p>
+                                            <p className="font-medium tabular-nums">{formatCurrency(totalPaid)}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-muted-foreground">{t("detail.money.owed")}</p>
+                                            <p className="font-medium tabular-nums">{formatCurrency(totalOwed)}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-muted-foreground">{t("detail.money.overdue")}</p>
+                                            <p className={`font-medium tabular-nums ${totalOverdue > 0 ? "text-rose-600" : ""}`}>{formatCurrency(totalOverdue)}</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <p className="text-xs text-muted-foreground">{t("detail.money.owed")}</p>
-                                        <p className="font-medium tabular-nums">{formatCurrency(totalOwed)}</p>
-                                    </div>
-                                    <div>
-                                        <p className="text-xs text-muted-foreground">{t("detail.money.overdue")}</p>
-                                        <p className={`font-medium tabular-nums ${totalOverdue > 0 ? "text-rose-600" : ""}`}>{formatCurrency(totalOverdue)}</p>
-                                    </div>
+                                )}
+                                <div className="flex flex-col divide-y">
+                                    {client.deals.map((deal) => {
+                                        const visual = DEAL_STATUS_VISUALS[deal.status];
+                                        return (
+                                            <Link
+                                                key={deal.id}
+                                                to={paths.deals.detail(deal.id)}
+                                                className="flex items-center justify-between gap-3 py-2.5 text-sm hover:bg-secondary/40"
+                                            >
+                                                <div>
+                                                    <p className="font-medium">{deal.dealNumber ?? t("detail.unitFallback", { number: deal.unit.number })}</p>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {deal.unit.project?.name}
+                                                    </p>
+                                                </div>
+                                                <div className="text-right">
+                                                    {deal.salePrice != null && (
+                                                        <p className="font-medium">{formatCurrency(Number(deal.salePrice))}</p>
+                                                    )}
+                                                    <Badge className={`${visual?.bg} text-white`}>{t(DEAL_STATUS_LABEL_KEYS[deal.status])}</Badge>
+                                                    {deal.paid !== 0 && (
+                                                        <p className="mt-1 text-xs text-muted-foreground">{t("detail.money.paidOnDeal", { amount: formatCurrency(deal.paid) })}</p>
+                                                    )}
+                                                    {deal.overdue > 0 && (
+                                                        <p className="text-xs font-medium text-rose-600">{t("detail.money.overdueOnDeal", { amount: formatCurrency(deal.overdue) })}</p>
+                                                    )}
+                                                </div>
+                                            </Link>
+                                        );
+                                    })}
+                                </div>
+                                </>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    <Card className="border pt-0">
+                        <CardHeader className="border-b py-4">
+                            <CardTitle className="text-sm text-muted-foreground">
+                                {client.leads.length > 0 ? t("detail.leadsWithCount", { count: client.leads.length }) : t("table.leads")}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            {client.leads.length === 0 ? (
+                                <p className="py-6 text-center text-sm text-muted-foreground">{t("detail.noLeadsYet")}</p>
+                            ) : (
+                                <div className="flex flex-col divide-y">
+                                    {client.leads.map((lead) => (
+                                        <div key={lead.id} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+                                            <div>
+                                                <p className="font-medium">{lead.fullName}</p>
+                                                {lead.source && <p className="text-xs text-muted-foreground">{lead.source}</p>}
+                                            </div>
+                                            <Badge variant="secondary">{t(LEAD_STATUS_LABEL_KEYS[lead.status])}</Badge>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
-                            <div className="flex flex-col divide-y">
-                                {client.deals.map((deal) => {
-                                    const visual = DEAL_STATUS_VISUALS[deal.status];
-                                    return (
-                                        <Link
-                                            key={deal.id}
-                                            to={paths.deals.detail(deal.id)}
-                                            className="flex items-center justify-between gap-3 py-2.5 text-sm hover:bg-secondary/40"
-                                        >
-                                            <div>
-                                                <p className="font-medium">{deal.dealNumber ?? t("detail.unitFallback", { number: deal.unit.number })}</p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {deal.unit.project?.name}
-                                                </p>
-                                            </div>
-                                            <div className="text-right">
-                                                {deal.salePrice != null && (
-                                                    <p className="font-medium">{formatCurrency(Number(deal.salePrice))}</p>
-                                                )}
-                                                <Badge className={`${visual?.bg} text-white`}>{t(DEAL_STATUS_LABEL_KEYS[deal.status])}</Badge>
-                                                {deal.paid !== 0 && (
-                                                    <p className="mt-1 text-xs text-muted-foreground">{t("detail.money.paidOnDeal", { amount: formatCurrency(deal.paid) })}</p>
-                                                )}
-                                                {deal.overdue > 0 && (
-                                                    <p className="text-xs font-medium text-rose-600">{t("detail.money.overdueOnDeal", { amount: formatCurrency(deal.overdue) })}</p>
-                                                )}
-                                            </div>
-                                        </Link>
-                                    );
-                                })}
-                            </div>
-                            </>
-                        )}
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+                </div>
 
-                <Card className="border pt-0">
-                    <CardHeader className="border-b py-4">
-                        <CardTitle className="text-sm text-muted-foreground">
-                            {client.leads.length > 0 ? t("detail.leadsWithCount", { count: client.leads.length }) : t("table.leads")}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {client.leads.length === 0 ? (
-                            <p className="py-6 text-center text-sm text-muted-foreground">{t("detail.noLeadsYet")}</p>
-                        ) : (
-                            <div className="flex flex-col divide-y">
-                                {client.leads.map((lead) => (
-                                    <div key={lead.id} className="flex items-center justify-between gap-3 py-2.5 text-sm">
-                                        <div>
-                                            <p className="font-medium">{lead.fullName}</p>
-                                            {lead.source && <p className="text-xs text-muted-foreground">{lead.source}</p>}
-                                        </div>
-                                        <Badge variant="secondary">{t(LEAD_STATUS_LABEL_KEYS[lead.status])}</Badge>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
-
-            <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
-                <ClientHistoryCard clientId={client.id} />
-                <div className="flex flex-col gap-4">
+                <div className="flex min-w-0 flex-col gap-4">
                     <EntityDocumentsCard ownerType="CLIENT" ownerId={client.id} clientDeals={client.deals} />
                     <ClientTasksCard clientId={client.id} />
+                    <ClientHistoryCard clientId={client.id} />
                 </div>
             </div>
 
