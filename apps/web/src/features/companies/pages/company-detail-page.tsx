@@ -351,9 +351,9 @@ export function CompanyDetailPage() {
 function Stat({label, value, hint}: {label: string; value: number; hint?: string}) {
     return (
         <Card>
-            <CardContent className="py-4">
-                <div className="text-2xl font-medium tabular-nums">{value}</div>
-                <div className="text-muted-foreground mt-1 text-xs">{label}</div>
+            <CardContent>
+                <div className="text-muted-foreground text-sm">{label}</div>
+                <div className="mt-1.5 text-3xl font-semibold tracking-tight tabular-nums">{value}</div>
                 {hint ? <div className="text-muted-foreground/70 mt-0.5 text-[11px]">{hint}</div> : null}
             </CardContent>
         </Card>

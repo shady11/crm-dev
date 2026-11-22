@@ -248,9 +248,9 @@ export function BranchDetailPage() {
 function Stat({label, value}: {label: string; value: number}) {
     return (
         <Card>
-            <CardContent className="py-4">
-                <div className="text-2xl font-medium tabular-nums">{value}</div>
-                <div className="text-muted-foreground mt-1 text-xs">{label}</div>
+            <CardContent>
+                <div className="text-muted-foreground text-sm">{label}</div>
+                <div className="mt-1.5 text-3xl font-semibold tracking-tight tabular-nums">{value}</div>
             </CardContent>
         </Card>
     );

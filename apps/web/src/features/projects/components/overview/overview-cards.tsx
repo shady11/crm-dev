@@ -25,37 +25,30 @@ export function OverviewCards({project}: Props) {
             title: project._count?.blocks ?? 0,
             description: t("counts.blocksLabel"),
             icon: Building,
-            iconColor: 'text-indigo-500',
-            bgColor: 'bg-indigo-100',
+            iconColor: '',
+            bgColor: 'bg-indigo-500',
         },
         {
             title: project._count?.units ?? 0,
             description: t("counts.unitsLabel"),
             icon: DoorOpen,
-            iconColor: 'text-emerald-500',
-            bgColor: 'bg-emerald-100',
+            iconColor: '',
+            bgColor: 'bg-emerald-500',
         },
     ];
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {items.map((item, index) => (
-                <Card key={index} className="border p-4">
-                    <CardContent className="flex items-center justify-between gap-3 p-0">
-
-                        <div className="flex flex-col gap-1">
-                    <span className="text-sm font-normal text-muted-foreground">
-                        {item.description}
-                    </span>
-                            <span className="text-2xl font-semibold">
-                        {item.title}
-                    </span>
+                <Card key={index} className="h-full border">
+                    <CardContent className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                            <p className="text-sm text-muted-foreground">{item.description}</p>
+                            <p className="mt-1.5 text-3xl font-semibold tracking-tight tabular-nums">{item.title}</p>
                         </div>
-
-                        <div className='bg-primary/10 text-primary flex items-center justify-center rounded-lg p-3'>
-                            {item.icon && <item.icon size={32} strokeWidth={1.25}/>}
+                        <div className={`icon-tile flex size-7 shrink-0 items-center justify-center ${item.bgColor}`}>
+                            {item.icon && <item.icon size={16} strokeWidth={2}/>}
                         </div>
-
                     </CardContent>
                 </Card>
             ))}

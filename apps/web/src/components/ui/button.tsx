@@ -38,11 +38,13 @@ export const buttonVariants = tv({
         "dark:hover:bg-white/10",
         "focus-visible:field-focus focus-visible:ring-0",
       ],
+      // Soft red at rest (tinted fill, red text), solid red on hover, so a
+      // delete action reads clearly without shouting from every row.
       destructive: [
-        "bg-destructive",
-        "text-white",
-        "border border-transparent shadow-destructive/24 shadow-sm",
-        "hover:bg-destructive/90",
+        "bg-destructive/10 dark:bg-destructive/15",
+        "text-destructive dark:text-destructive-foreground",
+        "border border-destructive/15",
+        "hover:bg-destructive hover:text-white hover:border-transparent",
         "focus-visible:border-background focus-visible:ring-destructive-foreground/32",
       ],
       secondary: [
