@@ -95,7 +95,8 @@ export const TableRow = (props: React.ComponentProps<typeof ark.tr>) => {
         "border-b",
         "data-[state=selected]:bg-muted",
         "group-data-[variant=striped]/table:even:bg-muted/30",
-        "group-data-[hoverable=true]/table:[&:has(td):hover]:bg-muted/48",
+        "group-data-[hoverable=true]/table:[&:has(td):hover]:bg-primary/5 dark:group-data-[hoverable=true]/table:[&:has(td):hover]:bg-white/5",
+        "transition-colors",
         className
       )}
       data-slot="table-row"
@@ -110,11 +111,12 @@ export const TableHead = (props: React.ComponentProps<typeof ark.th>) => {
   return (
     <ark.th
       className={cn(
-        "h-10 px-2",
+        // Reference design: small semibold grey labels, roomier edges.
+        "h-10 px-2.5 first:ps-4 last:pe-4",
         "text-left align-middle",
-        "font-medium text-muted-foreground",
+        "text-xs font-semibold text-muted-foreground",
         "rtl:text-right",
-        "has-[[role=checkbox]]:ps-2 has-[[role=checkbox]]:pe-0",
+        "has-[[role=checkbox]]:w-px has-[[role=checkbox]]:pe-0",
         className
       )}
       data-slot="table-head"
@@ -129,8 +131,8 @@ export const TableCell = (props: React.ComponentProps<typeof ark.td>) => {
   return (
     <ark.td
       className={cn(
-        "whitespace-nowrap p-2 align-middle",
-        "has-[[role=checkbox]]:ps-2 has-[[role=checkbox]]:pe-0",
+        "whitespace-nowrap px-2.5 py-2.5 first:ps-4 last:pe-4 align-middle",
+        "has-[[role=checkbox]]:w-px has-[[role=checkbox]]:pe-0",
         className
       )}
       data-slot="table-cell"

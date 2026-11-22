@@ -271,7 +271,7 @@ export function ActivitiesPage() {
                             );
                         })}
                     </div>
-                    <div className="hidden rounded-lg border md:block">
+                    <div className="table-card hidden md:block">
                         <Table>
                             <TableHeader>
                                 <TableRow>

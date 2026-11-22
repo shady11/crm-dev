@@ -140,7 +140,7 @@ export function CompaniesPage() {
                     </EmptyHeader>
                 </Empty>
             ) : (
-                <div className="rounded-lg border">
+                <div className="table-card">
                     <Table>
                         <TableHeader>
                             <TableRow>

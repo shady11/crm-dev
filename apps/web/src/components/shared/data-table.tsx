@@ -27,7 +27,7 @@ export function DataTable({isLoading, isEmpty, emptyIcon, emptyTitle, emptyDescr
 
     if (isLoading) {
         return (
-            <div className="rounded-lg border border-secondary p-4">
+            <div className="table-card p-4">
                 <div className="flex flex-col gap-3" role="status" aria-label={t("labels.loading")}>
                     {Array.from({ length: SKELETON_ROWS }).map((_, index) => (
                         <Skeleton key={index} className="h-10 w-full" />
@@ -51,7 +51,7 @@ export function DataTable({isLoading, isEmpty, emptyIcon, emptyTitle, emptyDescr
 
     if (!cards) {
         return (
-            <div className="rounded-lg border border-secondary">
+            <div className="table-card">
                 <Table>{children}</Table>
             </div>
         );
@@ -59,7 +59,7 @@ export function DataTable({isLoading, isEmpty, emptyIcon, emptyTitle, emptyDescr
 
     return (
         <>
-            <div className="hidden rounded-lg border border-secondary md:block">
+            <div className="table-card hidden md:block">
                 <Table>{children}</Table>
             </div>
             <div className="grid grid-cols-1 gap-3 md:hidden">{cards}</div>

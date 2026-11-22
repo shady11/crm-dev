@@ -409,6 +409,17 @@
     box-shadow: var(--seg-thumb-shadow);
 }
 
+/* A table set flush in a frosted card, as in the reference design. */
+@utility table-card {
+    background-image: var(--card-fill);
+    border: 1px solid var(--card-border);
+    box-shadow: var(--card-shadow);
+    border-radius: 20px;
+    overflow: hidden;
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+}
+
 /* Coloured icon tile (pair with a bg-* colour), as in the reference
    design: flat fill, white top edge, and a glow in the tile's own colour
    underneath (the ::after copies the background). Light icon on light

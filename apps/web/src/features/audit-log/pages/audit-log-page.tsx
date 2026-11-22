@@ -188,7 +188,7 @@ export function AuditLogPage() {
                     </EmptyHeader>
                 </Empty>
             ) : (
-                <div className="rounded-lg border">
+                <div className="table-card">
                     <Table>
                         <TableHeader>
                             <TableRow>
