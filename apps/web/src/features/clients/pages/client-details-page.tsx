@@ -228,32 +228,26 @@ export function ClientDetailsPage() {
                                             <Link
                                                 key={deal.id}
                                                 to={paths.deals.detail(deal.id)}
-                                                className="-mx-2 flex flex-col gap-3 rounded-md px-2 py-3 text-sm hover:bg-secondary/40"
+                                                className="-mx-2 flex items-start justify-between gap-4 rounded-md px-2 py-3 text-sm hover:bg-secondary/40"
                                             >
                                                 <div className="min-w-0">
                                                     <p className="font-medium">{deal.dealNumber ?? t("detail.unitFallback", { number: deal.unit.number })}</p>
                                                     <p className="text-xs text-muted-foreground">{deal.unit.project?.name}</p>
                                                     <Badge className={`mt-1.5 ${visual?.bg} text-white`}>{t(DEAL_STATUS_LABEL_KEYS[deal.status])}</Badge>
                                                 </div>
-                                                {/* The deal's money in the same three columns as the totals above. */}
-                                                <div className="grid grid-cols-3 gap-3 rounded-md bg-muted/50 px-3 py-2">
-                                                    <div>
-                                                        <p className="text-xs text-muted-foreground">{t("table.salePrice", { ns: "deals" })}</p>
-                                                        <p className="font-medium tabular-nums">
-                                                            {deal.salePrice != null ? formatCurrency(Number(deal.salePrice)) : "—"}
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-xs text-muted-foreground">{t("detail.money.paid")}</p>
-                                                        <p className="font-medium tabular-nums">{formatCurrency(deal.paid)}</p>
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-xs text-muted-foreground">{t("detail.money.overdue")}</p>
-                                                        <p className={`font-medium tabular-nums ${deal.overdue > 0 ? "text-rose-600" : ""}`}>
-                                                            {formatCurrency(deal.overdue)}
-                                                        </p>
-                                                    </div>
-                                                </div>
+                                                {/* The deal's money as a small label / value list on the right. */}
+                                                <dl className="grid shrink-0 grid-cols-[auto_auto] gap-x-4 gap-y-1 text-xs">
+                                                    <dt className="text-muted-foreground">{t("table.salePrice", { ns: "deals" })}</dt>
+                                                    <dd className="text-right font-medium tabular-nums">
+                                                        {deal.salePrice != null ? formatCurrency(Number(deal.salePrice)) : "—"}
+                                                    </dd>
+                                                    <dt className="text-muted-foreground">{t("detail.money.paid")}</dt>
+                                                    <dd className="text-right font-medium tabular-nums">{formatCurrency(deal.paid)}</dd>
+                                                    <dt className="text-muted-foreground">{t("detail.money.overdue")}</dt>
+                                                    <dd className={`text-right font-medium tabular-nums ${deal.overdue > 0 ? "text-rose-600" : ""}`}>
+                                                        {formatCurrency(deal.overdue)}
+                                                    </dd>
+                                                </dl>
                                             </Link>
                                         );
                                     })}
