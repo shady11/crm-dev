@@ -78,7 +78,7 @@ export function LeadDetailsSheet({
                     </div>
                 </SheetBody>
 
-                <SheetFooter className="flex-row justify-between">
+                <SheetFooter className="flex-row justify-between sm:justify-between">
                     {/* Secondary actions tucked behind "⋯"; the main action stands apart. */}
                     <Menu positioning={{placement: "top-start"}}>
                         <MenuTrigger asChild>
