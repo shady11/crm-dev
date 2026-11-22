@@ -234,12 +234,12 @@ export function ClientDetailsPage() {
                                                     <p className="text-xs text-muted-foreground">
                                                         {deal.unit.project?.name}
                                                     </p>
+                                                    <Badge className={`mt-1.5 ${visual?.bg} text-white`}>{t(DEAL_STATUS_LABEL_KEYS[deal.status])}</Badge>
                                                 </div>
                                                 <div className="text-right">
                                                     {deal.salePrice != null && (
                                                         <p className="font-medium">{formatCurrency(Number(deal.salePrice))}</p>
                                                     )}
-                                                    <Badge className={`${visual?.bg} text-white`}>{t(DEAL_STATUS_LABEL_KEYS[deal.status])}</Badge>
                                                     {deal.paid !== 0 && (
                                                         <p className="mt-1 text-xs text-muted-foreground">{t("detail.money.paidOnDeal", { amount: formatCurrency(deal.paid) })}</p>
                                                     )}

@@ -48,20 +48,20 @@ export function ClientsToolbar({
 
     return (
         // No heading here: the page title above already says "Clients".
-        <div className="flex flex-wrap items-center justify-end gap-3">
+        // Search on the left, filters and the add button on the right.
+        <div className="flex flex-wrap items-center justify-between gap-3">
+            <InputGroup className="w-full sm:w-72">
+                <InputGroupInput
+                    placeholder={t("toolbar.searchPlaceholder")}
+                    value={search}
+                    onChange={(e) => onSearchChange(e.target.value)}
+                />
+                <InputGroupAddon>
+                    <Search className="size-4" />
+                </InputGroupAddon>
+            </InputGroup>
 
             <div className="flex flex-wrap items-center gap-2">
-                <InputGroup className="w-56">
-                    <InputGroupInput
-                        placeholder={t("toolbar.searchPlaceholder")}
-                        value={search}
-                        onChange={(e) => onSearchChange(e.target.value)}
-                    />
-                    <InputGroupAddon>
-                        <Search className="size-4" />
-                    </InputGroupAddon>
-                </InputGroup>
-
                 <FilterPopover activeCount={activeFilterCount} onReset={resetFilters}>
                     <BranchFilterSelect value={branchFilter} onChange={onBranchFilterChange} />
 
