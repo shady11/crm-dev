@@ -2,6 +2,7 @@ import {useCallback} from "react";
 import {useTranslation} from "react-i18next";
 import {DOCUMENT_TYPE_LABEL_KEYS, type DocumentType} from "@/features/documents/types/document.types.ts";
 import {useTaskTitleFromValues} from "@/features/tasks/hooks/use-task-title.ts";
+import {formatDay} from "@/utils/date-formatter.ts";
 
 export type ActivityTitleSource = {
     title: string;
@@ -29,7 +30,7 @@ export function useActivityTitle() {
             // A calendar day (YYYY-MM-DD) is printed the reader's way.
             for (const [name, value] of Object.entries(values)) {
                 if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
-                    values[name] = new Date(`${value}T00:00:00Z`).toLocaleDateString(i18n.language, {timeZone: "UTC"});
+                    values[name] = formatDay(`${value}T00:00:00Z`, {utc: true});
                 }
             }
             if (typeof values.documentType === "string") {

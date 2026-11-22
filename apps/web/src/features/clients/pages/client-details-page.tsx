@@ -31,9 +31,10 @@ import {ReserveForClientDialog} from "@/features/deals/components/reserve-for-cl
 import {MoveToBranchDialog} from "@/features/branches/components/move-to-branch-dialog.tsx";
 import {PageError, PageSkeleton} from "@/components/shared/page-query-state.tsx";
 import {toastWithUndo} from "@/lib/undo-toast.ts";
+import {formatDay} from "@/utils/date-formatter.ts";
 
 export function ClientDetailsPage() {
-    const { t, i18n } = useTranslation(["clients", "deals", "leads", "common", "branches"]);
+    const { t } = useTranslation(["clients", "deals", "leads", "common", "branches"]);
     const { formatCurrency } = useCompanyFormatters();
     const { user } = useAuth();
     const canTransferBranch = hasPermission(user, "clients.transfer_branch");
@@ -113,7 +114,7 @@ export function ClientDetailsPage() {
                         <div>
                             <h1 className="text-2xl font-semibold">{client.fullName}</h1>
                             <p className="text-sm text-muted-foreground">
-                                {t("detail.clientSince", { date: new Date(client.createdAt).toLocaleDateString(i18n.language) })}
+                                {t("detail.clientSince", { date: formatDay(client.createdAt) })}
                             </p>
                         </div>
                     </div>
@@ -227,25 +228,31 @@ export function ClientDetailsPage() {
                                             <Link
                                                 key={deal.id}
                                                 to={paths.deals.detail(deal.id)}
-                                                className="flex items-center justify-between gap-3 py-2.5 text-sm hover:bg-secondary/40"
+                                                className="-mx-2 flex flex-col gap-3 rounded-md px-2 py-3 text-sm hover:bg-secondary/40"
                                             >
-                                                <div>
+                                                <div className="min-w-0">
                                                     <p className="font-medium">{deal.dealNumber ?? t("detail.unitFallback", { number: deal.unit.number })}</p>
-                                                    <p className="text-xs text-muted-foreground">
-                                                        {deal.unit.project?.name}
-                                                    </p>
+                                                    <p className="text-xs text-muted-foreground">{deal.unit.project?.name}</p>
                                                     <Badge className={`mt-1.5 ${visual?.bg} text-white`}>{t(DEAL_STATUS_LABEL_KEYS[deal.status])}</Badge>
                                                 </div>
-                                                <div className="text-right">
-                                                    {deal.salePrice != null && (
-                                                        <p className="font-medium">{formatCurrency(Number(deal.salePrice))}</p>
-                                                    )}
-                                                    {deal.paid !== 0 && (
-                                                        <p className="mt-1 text-xs text-muted-foreground">{t("detail.money.paidOnDeal", { amount: formatCurrency(deal.paid) })}</p>
-                                                    )}
-                                                    {deal.overdue > 0 && (
-                                                        <p className="text-xs font-medium text-rose-600">{t("detail.money.overdueOnDeal", { amount: formatCurrency(deal.overdue) })}</p>
-                                                    )}
+                                                {/* The deal's money in the same three columns as the totals above. */}
+                                                <div className="grid grid-cols-3 gap-3 rounded-md bg-muted/50 px-3 py-2">
+                                                    <div>
+                                                        <p className="text-xs text-muted-foreground">{t("table.salePrice", { ns: "deals" })}</p>
+                                                        <p className="font-medium tabular-nums">
+                                                            {deal.salePrice != null ? formatCurrency(Number(deal.salePrice)) : "—"}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs text-muted-foreground">{t("detail.money.paid")}</p>
+                                                        <p className="font-medium tabular-nums">{formatCurrency(deal.paid)}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs text-muted-foreground">{t("detail.money.overdue")}</p>
+                                                        <p className={`font-medium tabular-nums ${deal.overdue > 0 ? "text-rose-600" : ""}`}>
+                                                            {formatCurrency(deal.overdue)}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </Link>
                                         );

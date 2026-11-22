@@ -11,6 +11,7 @@ import {blockLabel} from "@/features/units/utils/block-label.ts";
 import {useTranslation} from "react-i18next";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import type {SortOrder} from "@/hooks/use-sort.ts";
+import {formatDay} from "@/utils/date-formatter.ts";
 
 interface DealsTableProps {
     deals: Deal[];
@@ -36,14 +37,14 @@ function DiscountPendingBadge({ deal }: { deal: Deal }) {
 // What the client owes right now, under the sale price: the overdue list's
 // point, and a warning on any other list (FIN-12).
 function OverdueLine({ deal }: { deal: Deal }) {
-    const { t, i18n } = useTranslation("deals");
+    const { t } = useTranslation("deals");
     const { formatCurrency } = useCompanyFormatters();
     if (!deal.overdue) return null;
     return (
         <p className="text-xs font-medium text-rose-600">
             {t("table.overdue", {
                 amount: formatCurrency(deal.overdue.amount),
-                date: new Date(deal.overdue.since).toLocaleDateString(i18n.language, { day: "numeric", month: "short" }),
+                date: formatDay(deal.overdue.since),
             })}
         </p>
     );

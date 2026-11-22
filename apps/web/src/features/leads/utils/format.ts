@@ -1,3 +1,5 @@
+import {formatDay} from "@/utils/date-formatter.ts";
+
 export function initials(fullName: string) {
     return fullName
         .split(" ")
@@ -26,7 +28,7 @@ export function isoToDay(iso: string | null | undefined) {
 export function formatCreatedAt(iso: string, locale = "ru-RU") {
     const date = new Date(iso);
     return {
-        date: date.toLocaleDateString(locale, { month: "long", day: "numeric", year: "numeric" }),
+        date: formatDay(date),
         time: date.toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" }),
     };
 }

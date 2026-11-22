@@ -31,6 +31,7 @@ import {
     type PaymentRegisterFilters,
 } from "@/features/payments/api/payments.api.ts";
 import {FilterPopover} from "@/components/shared/filter-popover.tsx";
+import {formatDay} from "@/utils/date-formatter.ts";
 
 type Period = "thisMonth" | "lastMonth" | "last30Days" | "custom";
 const PERIODS: Period[] = ["thisMonth", "lastMonth", "last30Days", "custom"];
@@ -60,7 +61,7 @@ function periodRange(period: Exclude<Period, "custom">, timeZone?: string | null
  * of what clients still owe.
  */
 export function PaymentsPage() {
-    const {t, i18n} = useTranslation(["payments", "deals"]);
+    const {t} = useTranslation(["payments", "deals"]);
     const {formatCurrency} = useCompanyFormatters();
     const projects = useProjectsFilter();
 
@@ -136,8 +137,7 @@ export function PaymentsPage() {
 
     const items = register.data?.items ?? [];
     const totals = register.data?.totals;
-    const date = (iso: string) =>
-        new Date(iso).toLocaleDateString(i18n.language, {day: "numeric", month: "short", year: "numeric", timeZone: "UTC"});
+    const date = (iso: string) => formatDay(iso, {utc: true});
     const amountClass = (amount: number) => (amount < 0 ? "text-rose-600" : "");
 
     return (

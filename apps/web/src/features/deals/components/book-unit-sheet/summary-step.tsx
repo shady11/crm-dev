@@ -10,6 +10,7 @@ import {useTranslation} from "react-i18next";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {FINANCING_TYPE_LABEL_KEYS} from "@/features/deals/types/deal.types.ts";
 import {PAYMENT_METHOD_LABEL_KEYS} from "@/features/deals/components/deal-details/deal-payments-history-card.tsx";
+import {formatDay} from "@/utils/date-formatter.ts";
 
 interface SummaryStepProps {
     values: BookingFormInput;
@@ -19,7 +20,7 @@ interface SummaryStepProps {
 }
 
 export function SummaryStep({ values, apartment, selectedClient, managerName }: SummaryStepProps) {
-    const { t, i18n } = useTranslation(["deals", "payments"]);
+    const { t } = useTranslation(["deals", "payments"]);
     const { user } = useAuth();
     const needsApproval = discountNeedsApproval(values.reservation.discountPercent, user?.discountLimit);
     const method = values.reservation.depositPaymentMethod;
@@ -49,7 +50,7 @@ export function SummaryStep({ values, apartment, selectedClient, managerName }: 
                     </DataListItem>
                     <DataListItem>
                         <DataListItemLabel>{t("booking.expires")}</DataListItemLabel>
-                        <DataListItemValue>{values.reservation.expiresAt?.toLocaleDateString(i18n.language) ?? "—"}</DataListItemValue>
+                        <DataListItemValue>{(values.reservation.expiresAt ? formatDay(values.reservation.expiresAt) : "—")}</DataListItemValue>
                     </DataListItem>
                     <DataListItem>
                         <DataListItemLabel>{t("booking.financingType")}</DataListItemLabel>
