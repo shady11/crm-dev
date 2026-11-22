@@ -68,15 +68,14 @@ export function DealsToolbar({ statusFilter, onStatusFilterChange, projectId, on
     };
 
     return (
+        // Search on the left, filters on the right, as on the Clients list.
         <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-bold">{t("toolbar.heading")}</h2>
+            <InputGroup className="w-full sm:w-80">
+                <InputGroupInput placeholder={t("toolbar.searchPlaceholder")} value={search} onChange={(e) => onSearchChange(e.target.value)} />
+                <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
+            </InputGroup>
 
             <div className="flex flex-wrap items-center gap-2">
-                <InputGroup className="w-64">
-                    <InputGroupInput placeholder={t("toolbar.searchPlaceholder")} value={search} onChange={(e) => onSearchChange(e.target.value)} />
-                    <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
-                </InputGroup>
-
                 <FilterPopover activeCount={activeFilterCount} onReset={resetFilters}>
                     <BranchFilterSelect
                         value={branchId ?? "all"}
