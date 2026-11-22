@@ -205,7 +205,7 @@
     --field-invalid: inset 0 0 0 1.5px var(--destructive), 0 0 0 4px color-mix(in oklab, var(--destructive) 12%, transparent);
     --check-bg: rgb(255 255 255 / 0.58);
     --check-ring: inset 0 0 0 1.5px rgb(35 42 77 / 0.20);
-    --seg-bg: rgb(255 255 255 / 0.34);
+    --seg-bg: rgb(74 95 212 / 0.07);
     --seg-thumb-bg: rgb(255 255 255 / 0.78);
     --seg-thumb-shadow: inset 0 1px 0 0 rgb(255 255 255 / 1), 0 0 0 1px rgb(255 255 255 / 0.5), 0 6px 16px -8px rgb(35 42 77 / 0.35);
     /* Cards: a diagonal white wash, brightest top-left, letting the

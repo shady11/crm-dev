@@ -1,4 +1,5 @@
 import {ArrowLeftRight, LayoutGridIcon, Pen, Repeat, Trash2, UserPlusIcon} from "lucide-react";
+import {ButtonGroup} from "@/components/ui/button-group.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {IconTooltipButton} from "@/components/shared/icon-tooltip-button.tsx";
 import {Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
@@ -49,7 +50,7 @@ export function LeadDetailsSheet({
 
     return (
         <Sheet open={open} onOpenChange={({ open: isOpen }) => onOpenChange(isOpen)}>
-            <SheetContent className="sm:max-w-lg" variant="inset">
+            <SheetContent className="sm:max-w-xl" variant="inset">
                 <SheetHeader>
                     <SheetTitle>{lead.fullName}</SheetTitle>
                 </SheetHeader>
@@ -78,15 +79,17 @@ export function LeadDetailsSheet({
                     </div>
                 </SheetBody>
 
-                <SheetFooter>
+                <SheetFooter className="sm:justify-between">
+                    {/* Secondary actions joined in one group; the main action stands apart. */}
+                    <ButtonGroup className="w-full sm:w-fit [&>*]:rounded-none [&>*:first-child]:rounded-s-lg [&>*:last-child]:rounded-e-lg">
                     {canDelete && (
-                        <IconTooltipButton variant="destructive" size="icon-md" onClick={onRequestDelete} label={t("common:actions.delete")}>
+                        <IconTooltipButton variant="outline" size="icon-md" className="text-destructive hover:bg-destructive/10 hover:text-destructive" onClick={onRequestDelete} label={t("common:actions.delete")}>
                             <Trash2 className="size-4" />
                         </IconTooltipButton>
                     )}
                     {canTransferBranch && (
                         <IconTooltipButton
-                            variant="secondary"
+                            variant="outline"
                             size="icon-md"
                             label={t("detailsSheet.transferBranch.action")}
                             onClick={onRequestTransferBranch}
@@ -96,26 +99,28 @@ export function LeadDetailsSheet({
                     )}
                     {canReassign && (
                         <Button
-                            variant="secondary"
+                            variant="outline"
                             title={t("detailsSheet.reassign.action")}
                             onClick={onRequestReassign}
                         >
                             <Repeat className="size-4" />
-                            {t("detailsSheet.reassign.short")}
+                            {/* Icon only on a phone so the group fits; the title names it. */}
+                            <span className="hidden sm:inline">{t("detailsSheet.reassign.short")}</span>
                         </Button>
                     )}
-                    <Button variant="secondary" className="flex-1" onClick={onEdit}>
+                    <Button variant="outline" onClick={onEdit}>
                         <Pen className="size-4" />
                         {t("detailsSheet.edit")}
                     </Button>
+                    </ButtonGroup>
                     {!lead.client && (
-                        <Button className="flex-1" onClick={onRequestConvert}>
+                        <Button onClick={onRequestConvert}>
                             <UserPlusIcon className="size-4" />
                             {t("detailsSheet.convert")}
                         </Button>
                     )}
                     {lead.client && onRequestReserve && (
-                        <Button className="flex-1" onClick={onRequestReserve}>
+                        <Button onClick={onRequestReserve}>
                             <LayoutGridIcon className="size-4" />
                             {t("reserveUnit")}
                         </Button>

@@ -88,7 +88,7 @@ export function LeadsToolbar({
             <div className="flex flex-wrap items-center gap-2">
                 <Toggle
                     variant="outline"
-                    size="lg"
+                    size="md"
                     pressed={mineOnly}
                     onPressedChange={onMineOnlyChange}
                 >
