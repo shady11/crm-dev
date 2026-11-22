@@ -145,8 +145,8 @@ export function ClientDetailsPage() {
                 </div>
             </div>
 
-            {/* Left: who the client is and what they're buying; right: paperwork,
-                to-dos and the timeline. */}
+            {/* Left: who the client is, what they're buying and their paperwork;
+                right: to-dos and the timeline. */}
             <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
                 <div className="flex min-w-0 flex-col gap-4">
                     <Card className="border">
@@ -282,10 +282,11 @@ export function ClientDetailsPage() {
                             )}
                         </CardContent>
                     </Card>
+
+                    <EntityDocumentsCard ownerType="CLIENT" ownerId={client.id} clientDeals={client.deals} />
                 </div>
 
                 <div className="flex min-w-0 flex-col gap-4">
-                    <EntityDocumentsCard ownerType="CLIENT" ownerId={client.id} clientDeals={client.deals} />
                     <ClientTasksCard clientId={client.id} />
                     <ClientHistoryCard clientId={client.id} />
                 </div>
