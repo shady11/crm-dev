@@ -26,7 +26,7 @@ export function RecentActivityCard({ activities }: { activities: RecentActivity[
     }
 
     return (
-        <Card className="border border-secondary shadow-none pt-0">
+        <Card className="border pt-0">
             <CardHeader className="border-b py-4">
                 <CardTitle className="text-sm text-muted-foreground">{t("recentActivity.title")}</CardTitle>
             </CardHeader>

@@ -30,6 +30,8 @@ import {
     getPaymentRegister,
     type PaymentRegisterFilters,
 } from "@/features/payments/api/payments.api.ts";
+import {FilterPopover} from "@/components/shared/filter-popover.tsx";
+import {formatDay} from "@/utils/date-formatter.ts";
 
 type Period = "thisMonth" | "lastMonth" | "last30Days" | "custom";
 const PERIODS: Period[] = ["thisMonth", "lastMonth", "last30Days", "custom"];
@@ -59,7 +61,7 @@ function periodRange(period: Exclude<Period, "custom">, timeZone?: string | null
  * of what clients still owe.
  */
 export function PaymentsPage() {
-    const {t, i18n} = useTranslation(["payments", "deals"]);
+    const {t} = useTranslation(["payments", "deals"]);
     const {formatCurrency} = useCompanyFormatters();
     const projects = useProjectsFilter();
 
@@ -99,6 +101,15 @@ export function PaymentsPage() {
         setPage(1);
     };
 
+    // Dropdown filters in the panel that are set; the period stays outside it.
+    const activeFilterCount = [branchId, projectId, paymentMethod, paymentType].filter(Boolean).length;
+    const resetFilters = () => {
+        update(setBranchId)(undefined);
+        update(setProjectId)(undefined);
+        update(setPaymentMethod)(undefined);
+        update(setPaymentType)(undefined);
+    };
+
     const runExport = async (kind: "payments" | "receivables") => {
         setExporting(kind);
         try {
@@ -126,8 +137,7 @@ export function PaymentsPage() {
 
     const items = register.data?.items ?? [];
     const totals = register.data?.totals;
-    const date = (iso: string) =>
-        new Date(iso).toLocaleDateString(i18n.language, {day: "numeric", month: "short", year: "numeric", timeZone: "UTC"});
+    const date = (iso: string) => formatDay(iso, {utc: true});
     const amountClass = (amount: number) => (amount < 0 ? "text-rose-600" : "");
 
     return (
@@ -149,7 +159,13 @@ export function PaymentsPage() {
                 </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
+            {/* Search on the left; period and filters on the right, as on every list. */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <InputGroup className="w-full sm:w-80">
+                    <InputGroupInput placeholder={t("page.searchPlaceholder")} value={search} onChange={(e) => update(setSearch)(e.target.value)} />
+                    <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
+                </InputGroup>
+                <div className="flex flex-wrap items-center gap-2">
                 <Select collection={periodCollection} value={[period]} onValueChange={({value}) => update(setPeriod)((value[0] ?? "thisMonth") as Period)}>
                     <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
                     <SelectContent>
@@ -163,33 +179,32 @@ export function PaymentsPage() {
                         <DateField className="w-40" value={custom.to} min={custom.from} max={companyToday(timeZone)} onChange={(to) => update(setCustom)({...custom, to})} />
                     </>
                 )}
-                <BranchFilterSelect value={branchId ?? "all"} onChange={(value) => update(setBranchId)(value === "all" ? undefined : value)} />
-                <Select collection={projectCollection} value={[projectId ?? "all"]} onValueChange={({value}) => update(setProjectId)(value[0] === "all" ? undefined : value[0])}>
-                    <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                        {projectCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-                <Select collection={methodCollection} value={[paymentMethod ?? "all"]} onValueChange={({value}) => update(setPaymentMethod)(value[0] === "all" ? undefined : (value[0] as PaymentMethod))}>
-                    <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                        {methodCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-                <Select collection={typeCollection} value={[paymentType ?? "all"]} onValueChange={({value}) => update(setPaymentType)(value[0] === "all" ? undefined : (value[0] as PaymentType))}>
-                    <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                        {typeCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-                <InputGroup className="w-64">
-                    <InputGroupInput placeholder={t("page.searchPlaceholder")} value={search} onChange={(e) => update(setSearch)(e.target.value)} />
-                    <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
-                </InputGroup>
+                <FilterPopover activeCount={activeFilterCount} onReset={resetFilters}>
+                    <BranchFilterSelect value={branchId ?? "all"} onChange={(value) => update(setBranchId)(value === "all" ? undefined : value)} />
+                    <Select collection={projectCollection} value={[projectId ?? "all"]} onValueChange={({value}) => update(setProjectId)(value[0] === "all" ? undefined : value[0])}>
+                        <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                            {projectCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <Select collection={methodCollection} value={[paymentMethod ?? "all"]} onValueChange={({value}) => update(setPaymentMethod)(value[0] === "all" ? undefined : (value[0] as PaymentMethod))}>
+                        <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                            {methodCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <Select collection={typeCollection} value={[paymentType ?? "all"]} onValueChange={({value}) => update(setPaymentType)(value[0] === "all" ? undefined : (value[0] as PaymentType))}>
+                        <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                            {typeCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                </FilterPopover>
+                </div>
             </div>
 
             {totals && (
-                <Card className="border border-secondary shadow-none">
+                <Card className="border">
                     <CardContent className="space-y-3">
                         <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                             <Figure label={t("page.totals.received")} value={formatCurrency(totals.received)} />

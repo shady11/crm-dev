@@ -1,5 +1,4 @@
 import {UsersRoundIcon} from "lucide-react";
-import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
@@ -7,7 +6,7 @@ import {DataTable} from "@/components/shared/data-table.tsx";
 import {SortableTableHead} from "@/components/shared/sortable-table-head.tsx";
 import type {Lead, LeadSortField} from "@/features/leads/api/leads.api.ts";
 import {LEAD_LOST_REASON_LABEL_KEYS, LEAD_STATUS_CLASSES, LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
-import {calendarDaysFromToday, formatCreatedAt, initials} from "@/features/leads/utils/format.ts";
+import {calendarDaysFromToday, formatCreatedAt} from "@/features/leads/utils/format.ts";
 import {useLeadInterest} from "@/features/leads/components/lead-interest.tsx";
 import {cn} from "@/lib/utils";
 import {useTranslation} from "react-i18next";
@@ -79,9 +78,6 @@ export function LeadsTable({
                                     onCheckedChange={(details) => onToggleOne(lead.id, details.checked === true)}
                                     onClick={(e) => e.stopPropagation()}
                                 />
-                                <Avatar className="size-9 shrink-0">
-                                    <AvatarFallback>{initials(lead.fullName)}</AvatarFallback>
-                                </Avatar>
                                 <div className="min-w-0">
                                     <p className="truncate font-medium">{lead.fullName}</p>
                                     <p className="truncate text-xs text-muted-foreground">{lead.phone}</p>
@@ -150,9 +146,6 @@ export function LeadsTable({
                             </TableCell>
                             <TableCell>
                                 <div className="flex items-center gap-3">
-                                    <Avatar className="size-9">
-                                        <AvatarFallback>{initials(lead.fullName)}</AvatarFallback>
-                                    </Avatar>
                                     <div>
                                         <p className="font-medium">{lead.fullName}</p>
                                         <p className="text-xs text-muted-foreground">{lead.phone}</p>

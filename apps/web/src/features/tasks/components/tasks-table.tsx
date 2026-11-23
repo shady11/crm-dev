@@ -13,6 +13,7 @@ import type {Task, TaskSortField} from "@/features/tasks/api/tasks.api.ts";
 import {useTranslation} from "react-i18next";
 import type {SortOrder} from "@/hooks/use-sort.ts";
 import {useTaskTitle} from "@/features/tasks/hooks/use-task-title.ts";
+import {formatDay} from "@/utils/date-formatter.ts";
 
 interface TasksTableProps {
     tasks: Task[];
@@ -28,7 +29,7 @@ function isOverdue(task: Task) {
 }
 
 export function TasksTable({ tasks, isLoading, sortBy, sortOrder, onSort, onRowClick }: TasksTableProps) {
-    const { t, i18n } = useTranslation("tasks");
+    const { t } = useTranslation("tasks");
     const taskTitle = useTaskTitle();
 
     return (
@@ -63,7 +64,7 @@ export function TasksTable({ tasks, isLoading, sortBy, sortOrder, onSort, onRowC
                         {task.dueDate ? (
                             <span className={`ml-auto flex items-center gap-1.5 ${isOverdue(task) ? "font-medium text-destructive" : ""}`}>
                                 <CalendarIcon size={14} />
-                                {new Date(task.dueDate).toLocaleDateString(i18n.language)}
+                                {formatDay(task.dueDate)}
                             </span>
                         ) : <span className="ml-auto">—</span>}
                     </div>
@@ -100,7 +101,7 @@ export function TasksTable({ tasks, isLoading, sortBy, sortOrder, onSort, onRowC
                             {task.dueDate ? (
                                 <span className={`flex items-center gap-1.5 ${isOverdue(task) ? "font-medium text-destructive" : ""}`}>
                                     <CalendarIcon size={14} />
-                                    {new Date(task.dueDate).toLocaleDateString(i18n.language)}
+                                    {formatDay(task.dueDate)}
                                 </span>
                             ) : "—"}
                         </TableCell>

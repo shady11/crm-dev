@@ -70,7 +70,7 @@ export function SuperAdminDashboardPage() {
             </div>
 
             <div className="grid gap-4 lg:grid-cols-2">
-                <Card className="border border-secondary shadow-none pt-0">
+                <Card className="border pt-0">
                     <CardHeader className="border-b py-4">
                         <CardTitle className="text-sm text-muted-foreground">
                             {t("activeImpersonations.title")}
@@ -120,7 +120,7 @@ export function SuperAdminDashboardPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="border border-secondary shadow-none pt-0">
+                <Card className="border pt-0">
                     <CardHeader className="flex items-center justify-between border-b py-4">
                         <CardTitle className="text-sm text-muted-foreground">
                             {t("recentActivity.title")}

@@ -3,6 +3,7 @@
 import {Collapsible, CollapsibleContent, CollapsibleTrigger,} from "@/components/ui/collapsible.tsx"
 import {
     SidebarGroup,
+    SidebarGroupLabel,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
@@ -20,8 +21,10 @@ function isPathActive(pathname: string, url: string) {
 }
 
 export function NavMain({
+                            label,
                             items,
                         }: {
+    label?: string
     items: {
         title: string
         url: string
@@ -37,7 +40,12 @@ export function NavMain({
     const { pathname } = useLocation();
 
     return (
-        <SidebarGroup>
+        <SidebarGroup className="py-0.5">
+            {label && (
+                <SidebarGroupLabel className="mt-1 h-6 text-[0.68rem] font-semibold uppercase tracking-[0.08em] text-sidebar-foreground/55">
+                    {label}
+                </SidebarGroupLabel>
+            )}
             <SidebarMenu>
                 {items.map((item) =>
                     item.items?.length ? (

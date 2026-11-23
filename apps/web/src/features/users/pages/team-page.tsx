@@ -5,7 +5,6 @@ import {useQuery} from "@tanstack/react-query";
 import {createListCollection} from "@ark-ui/react";
 import {UsersIcon} from "lucide-react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
-import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {DataTable} from "@/components/shared/data-table.tsx";
@@ -19,7 +18,6 @@ import {getUsers} from "@/features/users/api/users.api.ts";
 import {UserStatusDot} from "@/features/users/components/user-status-dot.tsx";
 import {HandOverDialog} from "@/features/users/components/hand-over-dialog.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {initials} from "@/features/deals/utils/format.ts";
 import {paths} from "@/routes/paths.ts";
 import {useTranslation} from "react-i18next";
 
@@ -119,7 +117,7 @@ export function TeamPage() {
             </div>
 
             {canViewResults ? (
-                <Card className="border border-secondary shadow-none pt-0">
+                <Card className="border pt-0">
                     <CardHeader className="border-b py-4">
                         <CardTitle className="text-sm text-muted-foreground">{t("team.resultsHeading")}</CardTitle>
                     </CardHeader>
@@ -168,9 +166,6 @@ export function TeamPage() {
                                     <TableRow key={row.manager.id} className={row.isViewer ? "bg-muted/30" : undefined}>
                                         <TableCell className="pl-4">
                                             <Link to={paths.deals.byManager(row.manager.id)} className="flex items-center gap-3 hover:underline">
-                                                <Avatar className="size-8 shrink-0">
-                                                    <AvatarFallback>{initials(row.manager.fullName)}</AvatarFallback>
-                                                </Avatar>
                                                 <div className="min-w-0">
                                                     <p className="font-medium">{displayName(row)}</p>
                                                     <p className="text-xs text-muted-foreground">
@@ -217,7 +212,7 @@ export function TeamPage() {
                 </Card>
             ) : null}
 
-            <Card className="border border-secondary shadow-none pt-0">
+            <Card className="border pt-0">
                 <CardHeader className="border-b py-4">
                     <CardTitle className="text-sm text-muted-foreground">{t("team.membersHeading")}</CardTitle>
                 </CardHeader>

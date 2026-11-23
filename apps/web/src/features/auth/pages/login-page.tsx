@@ -1,8 +1,11 @@
 import {Navigate} from "react-router-dom";
 import {LoginForm} from "../components/login-form";
 import {authStorage} from "@/features/auth/utils/auth-storage.ts";
+import {useTheme} from "@/hooks/use-theme.ts";
 
 export function LoginPage() {
+    // Applies the saved light/dark choice here too; elsewhere the header does it.
+    useTheme();
     const token = authStorage.getToken();
 
     if (token) {
@@ -11,10 +14,8 @@ export function LoginPage() {
     }
 
     return (
-        <div className="flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10">
-            <div className="w-full max-w-sm md:max-w-4xl">
-                <LoginForm />
-            </div>
+        <div className="flex min-h-svh flex-col items-center justify-center p-5">
+            <LoginForm />
         </div>
     );
 }

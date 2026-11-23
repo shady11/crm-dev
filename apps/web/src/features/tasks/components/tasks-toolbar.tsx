@@ -10,6 +10,7 @@ import {BranchFilterSelect} from "@/features/branches/components/branch-filter-s
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {canCreateTask} from "@/features/tasks/utils/task-access.ts";
 import {useTranslation} from "react-i18next";
+import {FilterPopover} from "@/components/shared/filter-popover.tsx";
 
 interface TasksToolbarProps {
     statusFilter: TaskStatusFilter;
@@ -46,36 +47,46 @@ export function TasksToolbar({ statusFilter, onStatusFilterChange, assignedToId,
         ],
     });
 
+    // Dropdown filters in the panel that differ from their default.
+    const activeFilterCount = [branchId, assignedToId].filter(Boolean).length
+        + (!hideStatusFilter && statusFilter !== "all" ? 1 : 0);
+    const resetFilters = () => {
+        onBranchIdChange(undefined);
+        onAssignedToIdChange(undefined);
+        if (!hideStatusFilter) onStatusFilterChange("all");
+    };
+
     return (
+        // Search on the left, filters and actions on the right, as on every list.
         <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-bold">{t("toolbar.heading")}</h2>
+            <InputGroup className="w-full sm:w-80">
+                <InputGroupInput placeholder={t("toolbar.searchPlaceholder")} value={search} onChange={(e) => onSearchChange(e.target.value)} />
+                <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
+            </InputGroup>
 
             <div className="flex flex-wrap items-center gap-2">
-                <BranchFilterSelect
-                    value={branchId ?? "all"}
-                    onChange={(value) => onBranchIdChange(value === "all" ? undefined : value)}
-                />
+                <FilterPopover activeCount={activeFilterCount} onReset={resetFilters}>
+                    <BranchFilterSelect
+                        value={branchId ?? "all"}
+                        onChange={(value) => onBranchIdChange(value === "all" ? undefined : value)}
+                    />
 
-                <Select collection={assigneeCollection} value={[assignedToId ?? "all"]} onValueChange={({ value }) => onAssignedToIdChange(value[0] === "all" ? undefined : value[0])}>
-                    <SelectTrigger className="w-44"><SelectValue placeholder={t("toolbar.assigneePlaceholder")} /></SelectTrigger>
-                    <SelectContent>
-                        {assigneeCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-
-                {!hideStatusFilter && (
-                    <Select collection={statusCollection} value={[statusFilter]} onValueChange={({ value }) => onStatusFilterChange((value[0] ?? "all") as TaskStatusFilter)}>
-                        <SelectTrigger className="w-48"><SelectValue placeholder={t("toolbar.filterByStatus")} /></SelectTrigger>
+                    <Select collection={assigneeCollection} value={[assignedToId ?? "all"]} onValueChange={({ value }) => onAssignedToIdChange(value[0] === "all" ? undefined : value[0])}>
+                        <SelectTrigger className="w-44"><SelectValue placeholder={t("toolbar.assigneePlaceholder")} /></SelectTrigger>
                         <SelectContent>
-                            {statusCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                            {assigneeCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
                         </SelectContent>
                     </Select>
-                )}
 
-                <InputGroup className="w-64">
-                    <InputGroupInput placeholder={t("toolbar.searchPlaceholder")} value={search} onChange={(e) => onSearchChange(e.target.value)} />
-                    <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
-                </InputGroup>
+                    {!hideStatusFilter && (
+                        <Select collection={statusCollection} value={[statusFilter]} onValueChange={({ value }) => onStatusFilterChange((value[0] ?? "all") as TaskStatusFilter)}>
+                            <SelectTrigger className="w-48"><SelectValue placeholder={t("toolbar.filterByStatus")} /></SelectTrigger>
+                            <SelectContent>
+                                {statusCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                            </SelectContent>
+                        </Select>
+                    )}
+                </FilterPopover>
 
                 {canCreateTask(user) && (
                     <Button onClick={onAddTask}>

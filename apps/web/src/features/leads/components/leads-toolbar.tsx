@@ -2,6 +2,7 @@ import {Search, UserRoundIcon} from "lucide-react";
 import {createListCollection} from "@ark-ui/react";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {Toggle} from "@/components/ui/toggle.tsx";
+import {FilterPopover} from "@/components/shared/filter-popover.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {LEAD_LOST_REASON_LABEL_KEYS, LEAD_STATUS_LABEL_KEYS, LeadLostReason, LeadStatus} from "@/features/leads/types/lead.types.ts";
 import type {LeadStatusFilterValue} from "@/features/leads/hooks/use-leads-list.ts";
@@ -81,14 +82,35 @@ export function LeadsToolbar({
         ],
     });
 
+    // Dropdown filters in the panel that differ from "all"; "My leads" stays outside it.
+    const activeFilterCount = [branchFilter, managerFilter, sourceFilter, statusFilter]
+        .filter((value) => value !== "all").length + (lostReasonFilter !== "all" ? 1 : 0);
+    const resetFilters = () => {
+        onBranchFilterChange("all");
+        onManagerFilterChange("all");
+        onSourceFilterChange("all");
+        onStatusFilterChange("all");
+        onLostReasonFilterChange("all");
+    };
+
     return (
+        // Search on the left, filters and actions on the right, as on every list.
         <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-bold">{t("toolbar.heading")}</h2>
+            <InputGroup className="w-full sm:w-80">
+                <InputGroupInput
+                    placeholder={t("toolbar.searchPlaceholder")}
+                    value={search}
+                    onChange={(e) => onSearchChange(e.target.value)}
+                />
+                <InputGroupAddon>
+                    <Search className="size-4" />
+                </InputGroupAddon>
+            </InputGroup>
 
             <div className="flex flex-wrap items-center gap-2">
                 <Toggle
                     variant="outline"
-                    size="lg"
+                    size="md"
                     pressed={mineOnly}
                     onPressedChange={onMineOnlyChange}
                 >
@@ -96,88 +118,80 @@ export function LeadsToolbar({
                     {t("toolbar.mineOnly")}
                 </Toggle>
 
-                <BranchFilterSelect value={branchFilter} onChange={onBranchFilterChange} />
+                <FilterPopover activeCount={activeFilterCount} onReset={resetFilters}>
+                    <BranchFilterSelect value={branchFilter} onChange={onBranchFilterChange} />
 
-                <Select
-                    collection={managerCollection}
-                    value={[managerFilter]}
-                    onValueChange={({ value }) => onManagerFilterChange(value[0] ?? "all")}
-                >
-                    <SelectTrigger className="w-44">
-                        <SelectValue placeholder={t("toolbar.allManagers")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {managerCollection.items.map((item) => (
-                            <SelectItem key={item.value} item={item}>
-                                {item.label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-
-                <Select
-                    collection={sourceCollection}
-                    value={[sourceFilter]}
-                    onValueChange={({ value }) => onSourceFilterChange(value[0] ?? "all")}
-                >
-                    <SelectTrigger className="w-40">
-                        <SelectValue placeholder={t("toolbar.allSources")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {sourceCollection.items.map((item) => (
-                            <SelectItem key={item.value} item={item}>
-                                {item.label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-
-                <Select
-                    collection={statusCollection}
-                    value={[statusFilter]}
-                    onValueChange={({ value }) => onStatusFilterChange((value[0] ?? "all") as LeadStatusFilterValue)}
-                >
-                    <SelectTrigger className="w-48">
-                        <SelectValue placeholder={t("toolbar.filterByStatus")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {statusCollection.items.map((item) => (
-                            <SelectItem key={item.value} item={item}>
-                                {item.label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
-
-                {statusFilter === LeadStatus.LOST && (
                     <Select
-                        collection={lostReasonCollection}
-                        value={[lostReasonFilter]}
-                        onValueChange={({ value }) => onLostReasonFilterChange((value[0] ?? "all") as LeadLostReason | "all")}
+                        collection={managerCollection}
+                        value={[managerFilter]}
+                        onValueChange={({ value }) => onManagerFilterChange(value[0] ?? "all")}
                     >
-                        <SelectTrigger className="w-48" aria-label={t("toolbar.lostReason")}>
-                            <SelectValue placeholder={t("toolbar.allLostReasons")} />
+                        <SelectTrigger className="w-44">
+                            <SelectValue placeholder={t("toolbar.allManagers")} />
                         </SelectTrigger>
                         <SelectContent>
-                            {lostReasonCollection.items.map((item) => (
+                            {managerCollection.items.map((item) => (
                                 <SelectItem key={item.value} item={item}>
                                     {item.label}
                                 </SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
-                )}
 
-                <InputGroup className="w-56">
-                    <InputGroupInput
-                        placeholder={t("toolbar.searchPlaceholder")}
-                        value={search}
-                        onChange={(e) => onSearchChange(e.target.value)}
-                    />
-                    <InputGroupAddon>
-                        <Search className="size-4" />
-                    </InputGroupAddon>
-                </InputGroup>
+                    <Select
+                        collection={sourceCollection}
+                        value={[sourceFilter]}
+                        onValueChange={({ value }) => onSourceFilterChange(value[0] ?? "all")}
+                    >
+                        <SelectTrigger className="w-40">
+                            <SelectValue placeholder={t("toolbar.allSources")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {sourceCollection.items.map((item) => (
+                                <SelectItem key={item.value} item={item}>
+                                    {item.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    <Select
+                        collection={statusCollection}
+                        value={[statusFilter]}
+                        onValueChange={({ value }) => onStatusFilterChange((value[0] ?? "all") as LeadStatusFilterValue)}
+                    >
+                        <SelectTrigger className="w-48">
+                            <SelectValue placeholder={t("toolbar.filterByStatus")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {statusCollection.items.map((item) => (
+                                <SelectItem key={item.value} item={item}>
+                                    {item.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    {statusFilter === LeadStatus.LOST && (
+                        <Select
+                            collection={lostReasonCollection}
+                            value={[lostReasonFilter]}
+                            onValueChange={({ value }) => onLostReasonFilterChange((value[0] ?? "all") as LeadLostReason | "all")}
+                        >
+                            <SelectTrigger className="w-48" aria-label={t("toolbar.lostReason")}>
+                                <SelectValue placeholder={t("toolbar.allLostReasons")} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {lostReasonCollection.items.map((item) => (
+                                    <SelectItem key={item.value} item={item}>
+                                        {item.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    )}
+                </FilterPopover>
+
             </div>
         </div>
     );

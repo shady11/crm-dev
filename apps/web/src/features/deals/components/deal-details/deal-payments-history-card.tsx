@@ -6,6 +6,7 @@ import {Ban} from "lucide-react";
 import {useTranslation} from "react-i18next";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {ReceiptButton} from "@/features/payments/components/receipt-button.tsx";
+import {formatDay} from "@/utils/date-formatter.ts";
 
 export const PAYMENT_TYPE_LABEL_KEYS: Record<string, string> = {
     DEPOSIT: "payments:type.deposit",
@@ -40,10 +41,10 @@ interface DealPaymentsHistoryCardProps {
 }
 
 export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPayment, canRecordRefund, onRecordRefund, dealId, canIssueReceipts, canVoid, onVoid, voidedPayments = [] }: DealPaymentsHistoryCardProps) {
-    const { t, i18n } = useTranslation(["payments", "deals"]);
+    const { t } = useTranslation(["payments", "deals"]);
     const { formatCurrency } = useCompanyFormatters();
     return (
-        <Card className="border border-secondary shadow-none pt-0">
+        <Card className="border pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
                 <CardTitle>{t("paymentsHistory.title", { ns: "deals" })}</CardTitle>
                 {canRecordPayment && (
@@ -82,7 +83,7 @@ export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPa
                                     <div className="text-right">
                                         <p className="font-medium">{formatCurrency(p.amount)}</p>
                                         <p className="text-xs text-muted-foreground">
-                                            {new Date(p.paidAt).toLocaleDateString(i18n.language)}
+                                            {formatDay(p.paidAt)}
                                         </p>
                                     </div>
                                     {canIssueReceipts && p.receiptNumber && (
@@ -117,7 +118,7 @@ export function DealPaymentsHistoryCard({ payments, canRecordPayment, onRecordPa
                                             {t("paymentsHistory.voidedBy", {
                                                 ns: "deals",
                                                 name: p.voidedBy?.fullName ?? "—",
-                                                date: new Date(p.voidedAt).toLocaleDateString(i18n.language),
+                                                date: formatDay(p.voidedAt),
                                             })}
                                         </p>
                                         {p.voidReason && <p className="text-xs italic">{p.voidReason}</p>}

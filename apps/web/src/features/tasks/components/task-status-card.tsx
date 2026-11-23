@@ -16,10 +16,10 @@ export function TaskStatusCard({ status, count }: { status: TaskStatus; count: n
     const Icon = ICONS[status];
 
     return (
-        <Card className="border border-secondary shadow-none">
+        <Card className="border">
             <CardContent className="flex items-center gap-3">
-                <div className={`rounded-lg p-2 text-white ${TASK_STATUS_CLASSES[status]}`}>
-                    <Icon size={20} strokeWidth={1.75} />
+                <div className={`icon-tile flex size-7 shrink-0 items-center justify-center ${TASK_STATUS_CLASSES[status]}`}>
+                    <Icon size={16} strokeWidth={2} />
                 </div>
                 <div>
                     <h3 className="font-medium">{t(TASK_STATUS_LABEL_KEYS[status])}</h3>

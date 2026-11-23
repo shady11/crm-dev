@@ -1,6 +1,6 @@
-import {ArrowLeftRight, LayoutGridIcon, Pen, Repeat, Trash2, UserPlusIcon} from "lucide-react";
+import {ArrowLeftRight, EllipsisVerticalIcon, LayoutGridIcon, Pen, Repeat, Trash2, UserPlusIcon} from "lucide-react";
+import {Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger} from "@/components/ui/menu.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {IconTooltipButton} from "@/components/shared/icon-tooltip-button.tsx";
 import {Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
 import type {Lead} from "@/features/leads/api/leads.api.ts";
@@ -78,44 +78,50 @@ export function LeadDetailsSheet({
                     </div>
                 </SheetBody>
 
-                <SheetFooter>
-                    {canDelete && (
-                        <IconTooltipButton variant="destructive" size="icon-md" onClick={onRequestDelete} label={t("common:actions.delete")}>
-                            <Trash2 className="size-4" />
-                        </IconTooltipButton>
-                    )}
-                    {canTransferBranch && (
-                        <IconTooltipButton
-                            variant="secondary"
-                            size="icon-md"
-                            label={t("detailsSheet.transferBranch.action")}
-                            onClick={onRequestTransferBranch}
-                        >
-                            <ArrowLeftRight className="size-4" />
-                        </IconTooltipButton>
-                    )}
-                    {canReassign && (
-                        <Button
-                            variant="secondary"
-                            title={t("detailsSheet.reassign.action")}
-                            onClick={onRequestReassign}
-                        >
-                            <Repeat className="size-4" />
-                            {t("detailsSheet.reassign.short")}
-                        </Button>
-                    )}
-                    <Button variant="secondary" className="flex-1" onClick={onEdit}>
-                        <Pen className="size-4" />
-                        {t("detailsSheet.edit")}
-                    </Button>
+                <SheetFooter className="flex-row justify-between sm:justify-between">
+                    {/* Secondary actions tucked behind "⋯"; the main action stands apart. */}
+                    <Menu positioning={{placement: "top-start"}}>
+                        <MenuTrigger asChild>
+                            <Button variant="outline" size="icon-md" aria-label={t("common:actions.moreActions")} title={t("common:actions.moreActions")}>
+                                <EllipsisVerticalIcon className="size-4" />
+                            </Button>
+                        </MenuTrigger>
+                        <MenuContent className="min-w-52">
+                            <MenuItem value="edit" onClick={onEdit}>
+                                <Pen />
+                                {t("detailsSheet.edit")}
+                            </MenuItem>
+                            {canReassign && (
+                                <MenuItem value="reassign" onClick={onRequestReassign}>
+                                    <Repeat />
+                                    {t("detailsSheet.reassign.action")}
+                                </MenuItem>
+                            )}
+                            {canTransferBranch && (
+                                <MenuItem value="transfer-branch" onClick={onRequestTransferBranch}>
+                                    <ArrowLeftRight />
+                                    {t("detailsSheet.transferBranch.action")}
+                                </MenuItem>
+                            )}
+                            {canDelete && (
+                                <>
+                                    <MenuSeparator />
+                                    <MenuItem value="delete" variant="destructive" onClick={onRequestDelete}>
+                                        <Trash2 />
+                                        {t("common:actions.delete")}
+                                    </MenuItem>
+                                </>
+                            )}
+                        </MenuContent>
+                    </Menu>
                     {!lead.client && (
-                        <Button className="flex-1" onClick={onRequestConvert}>
+                        <Button onClick={onRequestConvert}>
                             <UserPlusIcon className="size-4" />
                             {t("detailsSheet.convert")}
                         </Button>
                     )}
                     {lead.client && onRequestReserve && (
-                        <Button className="flex-1" onClick={onRequestReserve}>
+                        <Button onClick={onRequestReserve}>
                             <LayoutGridIcon className="size-4" />
                             {t("reserveUnit")}
                         </Button>

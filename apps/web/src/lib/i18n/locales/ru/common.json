@@ -86,6 +86,13 @@
     "priceChanges": "Изменения цен",
     "documentTemplates": "Шаблоны документов"
   },
+  "navGroup": {
+    "sales": "Продажи",
+    "properties": "Объекты",
+    "company": "Компания",
+    "platform": "Платформа",
+    "logs": "Журналы"
+  },
   "language": {
     "switchLabel": "Язык",
     "russian": "Русский",
@@ -136,5 +143,9 @@
     "sidebar": "Меню",
     "sidebarDescription": "Меню навигации",
     "toggleSidebar": "Показать или скрыть меню"
+  },
+  "filters": {
+    "title": "Фильтры",
+    "reset": "Сбросить"
   }
 }

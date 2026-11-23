@@ -5,7 +5,7 @@ import {createListCollection} from "@ark-ui/react";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {Card, CardAction, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent} from "@/components/ui/chart.tsx";
+import {type ChartConfig, ChartContainer, ChartGradient, ChartTooltip, ChartTooltipContent} from "@/components/ui/chart.tsx";
 import {toast} from "@/components/ui/toast.tsx";
 import {downloadFunnelExport, type Funnel} from "@/features/dashboard/api/dashboard.api.ts";
 import {useTranslation} from "react-i18next";
@@ -60,7 +60,7 @@ export function FunnelCard({
     });
 
     return (
-        <Card className="border border-secondary shadow-none">
+        <Card className="border">
             <CardHeader>
                 <CardTitle className="text-sm text-muted-foreground">{t("funnel.title")}</CardTitle>
                 <CardAction className="flex flex-wrap items-center justify-end gap-2">
@@ -103,11 +103,12 @@ export function FunnelCard({
                 </div>
                 <ChartContainer config={chartConfig} className="h-56 w-full">
                     <BarChart data={chartData} margin={{ top: 20 }}>
+                        <defs><ChartGradient id="fill-funnel-count" color="var(--color-count)" /></defs>
                         <CartesianGrid vertical={false} />
                         <XAxis dataKey="status" tickLine={false} axisLine={false} tickMargin={8} />
                         <ChartTooltip content={<ChartTooltipContent />} />
-                        <Bar dataKey="count" fill="var(--color-count)" radius={4}>
-                            <LabelList dataKey="count" position="top" className="fill-foreground" fontSize={12} />
+                        <Bar dataKey="count" fill="url(#fill-funnel-count)" radius={[3, 3, 1, 1]} maxBarSize={56}>
+                            <LabelList dataKey="count" position="top" offset={8} fontSize={11} />
                         </Bar>
                     </BarChart>
                 </ChartContainer>

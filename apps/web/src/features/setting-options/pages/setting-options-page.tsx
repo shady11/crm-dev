@@ -148,7 +148,7 @@ function OptionsPanel({type}: {type: SettingOptionType}) {
                     </EmptyHeader>
                 </Empty>
             ) : (
-                <div className="rounded-lg border">
+                <div className="table-card">
                     <Table>
                         <TableHeader>
                             <TableRow>

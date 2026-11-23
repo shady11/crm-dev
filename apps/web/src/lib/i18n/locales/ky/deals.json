@@ -336,8 +336,10 @@
     "fullyPaid": "Толук төлөндү"
   },
   "tabs": {
+    "overview": "Жалпы көрүнүш",
     "payments": "Төлөмдөр",
     "documents": "Документтер",
+    "tasks": "Тапшырмалар",
     "activity": "Тарых"
   },
   "sidebar": {

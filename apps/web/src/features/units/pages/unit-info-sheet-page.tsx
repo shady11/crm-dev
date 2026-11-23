@@ -16,6 +16,7 @@ import {useUnit} from "@/features/units/hooks/use-unit.ts";
 import {UNIT_STATUS_LABEL_KEYS, UNIT_TYPE_LABEL_KEYS} from "@/features/units/types/unit.types.ts";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {KeregeLogo} from "@/components/shared/kerege-logo.tsx";
+import {formatDay} from "@/utils/date-formatter.ts";
 
 const INTERVALS = [1, 3, 6] as const;
 
@@ -40,7 +41,7 @@ const isDay = (value: string | null): value is string => !!value && /^\d{4}-\d{2
 // so a copied link opens the same offer.
 export function UnitInfoSheetPage() {
     const {unitId} = useParams<{unitId: string}>();
-    const {t, i18n} = useTranslation(["units", "common"]);
+    const {t} = useTranslation(["units", "common"]);
     const {formatCurrency, formatPricePerSqm, formatArea} = useCompanyFormatters();
     const {user} = useAuth();
     const unitQuery = useUnit(unitId);
@@ -96,12 +97,12 @@ export function UnitInfoSheetPage() {
 
     const price = parseFloat(unit.price);
     const pricePerSqm = parseFloat(unit.area) > 0 ? Math.round(price / parseFloat(unit.area)) : 0;
-    const longDate = (value: Date) => value.toLocaleDateString(i18n.language, {year: "numeric", month: "long", day: "numeric"});
+    const longDate = (value: Date) => formatDay(value);
     const dayToDate = (day: string) => {
         const [y, m, d] = day.split("-").map(Number);
         return new Date(y, m - 1, d);
     };
-    const shortDay = (day: string) => dayToDate(day).toLocaleDateString(i18n.language, {year: "numeric", month: "short", day: "numeric"});
+    const shortDay = (day: string) => formatDay(dayToDate(day));
     const generatedAt = longDate(today);
 
     const plan = buildPaymentPlan({

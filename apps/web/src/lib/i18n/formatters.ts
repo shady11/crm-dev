@@ -1,5 +1,6 @@
 import {useMemo} from "react";
 import {useTranslation} from "react-i18next";
+import {formatDay} from "@/utils/date-formatter.ts";
 
 export type CompanySettings = {
     currency?: string | null;
@@ -42,8 +43,7 @@ export function useFormatters(company?: CompanySettings) {
         });
         const money = (value: number) => `${amount.format(value)} ${currency}`;
         const area = new Intl.NumberFormat(locale, {maximumFractionDigits: 2});
-        const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium" });
-        const dateTime = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" });
+        const time = new Intl.DateTimeFormat(locale, { timeStyle: "short" });
 
         return {
             formatNumber: (value: number) => number.format(value),
@@ -52,8 +52,8 @@ export function useFormatters(company?: CompanySettings) {
             // The area as measured, to the hundredth: a sale contract
             // states 42.5 m², so the chessboard and the deal must too.
             formatArea: (value: number | string) => `${area.format(Number(value))} ${sqm}`,
-            formatDate: (value: string | Date) => date.format(new Date(value)),
-            formatDateTime: (value: string | Date) => dateTime.format(new Date(value)),
+            formatDate: (value: string | Date) => formatDay(value),
+            formatDateTime: (value: string | Date) => `${formatDay(value)} ${time.format(new Date(value))}`,
             // The bare ISO currency code (e.g. "KGS") - for labels like
             // "Deposit (KGS)" where a full Intl.NumberFormat call would be
             // overkill, but "$" regardless of the company's currency is wrong.

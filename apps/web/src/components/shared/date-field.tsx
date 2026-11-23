@@ -15,6 +15,7 @@ import {
     CalendarWeekDays,
     CalendarYearSelect,
 } from "@/components/ui/calendar.tsx";
+import {formatDay} from "@/utils/date-formatter.ts";
 
 interface DateFieldProps {
     /** Date as an ISO `YYYY-MM-DD` string, or empty string when unset. */
@@ -51,11 +52,7 @@ export function DateField({
     const { t, i18n } = useTranslation("common");
     const dateValue = toDateValue(value);
     const label = dateValue
-        ? dateValue.toDate(getLocalTimeZone()).toLocaleDateString(i18n.language, {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-          })
+        ? formatDay(dateValue.toDate(getLocalTimeZone()))
         : (placeholder ?? t("labels.selectDate"));
     const showClear = clearable && Boolean(dateValue) && !disabled;
 

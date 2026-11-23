@@ -15,7 +15,7 @@ export function DealHistoryCard({ activities }: { activities: DealActivity[] }) 
     );
 
     return (
-        <Card className="border border-secondary shadow-none pt-0">
+        <Card className="border pt-0">
             <CardHeader title={t("historyCard.title")} className="py-4 border-b gap-0"></CardHeader>
             <CardContent>
                 {sorted.length === 0 ? (

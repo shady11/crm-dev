@@ -1,4 +1,4 @@
-import {CalendarCheckIcon, CalendarIcon, CheckCircle2Icon, XCircleIcon} from "lucide-react";
+import {CalendarCheckIcon, CheckCircle2Icon, FileSignatureIcon, HourglassIcon, TimerOffIcon, XCircleIcon} from "lucide-react";
 
 export const DealStatus = {
     RESERVED: "RESERVED",
@@ -26,6 +26,7 @@ export const DEAL_STATUS_LABEL_KEYS: Record<DealStatus, string> = {
     [DealStatus.EXPIRED]: "deals:status.expired",
 };
 
+// Each stage its own colour and icon, so no two cards or pills look alike.
 export const DEAL_STATUS_VISUALS: Record<
     string,
     { icon: typeof CheckCircle2Icon; headingKey: string; bg: string}
@@ -36,14 +37,14 @@ export const DEAL_STATUS_VISUALS: Record<
         bg: "bg-amber-400",
     },
     CONTRACT_SIGNED: {
-        icon: CalendarIcon,
+        icon: FileSignatureIcon,
         headingKey: "deals:card.headings.contractSigned",
         bg: "bg-blue-400",
     },
     ACTIVE: {
-        icon: CheckCircle2Icon,
+        icon: HourglassIcon,
         headingKey: "deals:card.headings.active",
-        bg: "bg-emerald-400",
+        bg: "bg-violet-400",
     },
     COMPLETED: {
         icon: CheckCircle2Icon,
@@ -53,10 +54,10 @@ export const DEAL_STATUS_VISUALS: Record<
     CANCELLED: {
         icon: XCircleIcon,
         headingKey: "deals:card.headings.cancelled",
-        bg: "bg-gray-400",
+        bg: "bg-rose-400",
     },
     EXPIRED: {
-        icon: XCircleIcon,
+        icon: TimerOffIcon,
         headingKey: "deals:card.headings.expired",
         bg: "bg-gray-400",
     },

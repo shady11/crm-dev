@@ -2,6 +2,7 @@ import * as React from "react"
 
 import {NavMain} from "@/components/layout/sidebar/nav-main.tsx"
 import {NavUser} from "@/components/layout/sidebar/nav-user.tsx"
+import {NavActivePill} from "@/components/layout/sidebar/nav-active-pill.tsx"
 import {
     Sidebar,
     SidebarContent,
@@ -39,31 +40,65 @@ import {KeregeLogo, KeregeMark} from "@/components/shared/kerege-logo.tsx";
 // titleKey resolves against the "common" namespace via t() below - kept as a
 // key rather than the label itself so NavMain never renders an un-translated
 // English string regardless of which language is active.
-const NAV_ITEMS: {
+type NavItem = {
     titleKey: string;
     feature: Feature;
     url: string;
     icon: typeof LayoutDashboard;
-}[] = [
-    { titleKey: "nav.dashboard", feature: "dashboard", url: "/dashboard", icon: LayoutDashboard },
-    { titleKey: "nav.superAdminDashboard", feature: "superAdminDashboard", url: "/super-admin-dashboard", icon: LayoutDashboard },
-    { titleKey: "nav.leads", feature: "leads", url: "/leads", icon: GalleryVerticalEnd },
-    { titleKey: "nav.tasks", feature: "tasks", url: "/tasks", icon: ListTodo },
-    { titleKey: "nav.clients", feature: "clients", url: "/clients", icon: SquareUser },
-    { titleKey: "nav.deals", feature: "deals", url: "/deals", icon: Handshake },
-    { titleKey: "nav.payments", feature: "payments", url: "/payments", icon: Wallet },
-    { titleKey: "nav.projects", feature: "projects", url: "/projects", icon: Building2 },
-    { titleKey: "nav.priceChanges", feature: "priceChanges", url: "/price-changes", icon: TagIcon },
-    { titleKey: "nav.companies", feature: "companies", url: "/companies", icon: Landmark },
-    { titleKey: "nav.settingOptions", feature: "settingOptions", url: "/setting-options", icon: SlidersHorizontal },
-    { titleKey: "nav.users", feature: "users", url: "/users", icon: Users },
-    { titleKey: "nav.rolesPermissions", feature: "rolesPermissions", url: "/roles-permissions", icon: ShieldCheck },
-    { titleKey: "nav.branches", feature: "branches", url: "/branches", icon: MapPin },
-    { titleKey: "nav.activityLog", feature: "activities", url: "/activity-log", icon: History },
-    { titleKey: "nav.auditLog", feature: "auditLog", url: "/audit-log", icon: ScrollText },
-    { titleKey: "nav.loginActivity", feature: "loginActivity", url: "/login-activity", icon: ShieldCheck },
-    { titleKey: "nav.documentTemplates", feature: "documentTemplates", url: "/document-templates", icon: FileText },
-    { titleKey: "nav.settings", feature: "companySettings", url: "/settings", icon: Settings },
+};
+
+// Sidebar sections, in display order. labelKey (under "navGroup") is shown
+// as a small heading; the first section has none. A section whose items the
+// user can't access is left out entirely.
+const NAV_GROUPS: {labelKey?: string; items: NavItem[]}[] = [
+    {
+        items: [
+            { titleKey: "nav.dashboard", feature: "dashboard", url: "/dashboard", icon: LayoutDashboard },
+            { titleKey: "nav.superAdminDashboard", feature: "superAdminDashboard", url: "/super-admin-dashboard", icon: LayoutDashboard },
+        ],
+    },
+    {
+        labelKey: "navGroup.sales",
+        items: [
+            { titleKey: "nav.leads", feature: "leads", url: "/leads", icon: GalleryVerticalEnd },
+            { titleKey: "nav.tasks", feature: "tasks", url: "/tasks", icon: ListTodo },
+            { titleKey: "nav.clients", feature: "clients", url: "/clients", icon: SquareUser },
+            { titleKey: "nav.deals", feature: "deals", url: "/deals", icon: Handshake },
+            { titleKey: "nav.payments", feature: "payments", url: "/payments", icon: Wallet },
+        ],
+    },
+    {
+        labelKey: "navGroup.properties",
+        items: [
+            { titleKey: "nav.projects", feature: "projects", url: "/projects", icon: Building2 },
+            { titleKey: "nav.priceChanges", feature: "priceChanges", url: "/price-changes", icon: TagIcon },
+        ],
+    },
+    {
+        labelKey: "navGroup.company",
+        items: [
+            { titleKey: "nav.users", feature: "users", url: "/users", icon: Users },
+            { titleKey: "nav.rolesPermissions", feature: "rolesPermissions", url: "/roles-permissions", icon: ShieldCheck },
+            { titleKey: "nav.branches", feature: "branches", url: "/branches", icon: MapPin },
+            { titleKey: "nav.documentTemplates", feature: "documentTemplates", url: "/document-templates", icon: FileText },
+            { titleKey: "nav.settings", feature: "companySettings", url: "/settings", icon: Settings },
+        ],
+    },
+    {
+        labelKey: "navGroup.platform",
+        items: [
+            { titleKey: "nav.companies", feature: "companies", url: "/companies", icon: Landmark },
+            { titleKey: "nav.settingOptions", feature: "settingOptions", url: "/setting-options", icon: SlidersHorizontal },
+        ],
+    },
+    {
+        labelKey: "navGroup.logs",
+        items: [
+            { titleKey: "nav.activityLog", feature: "activities", url: "/activity-log", icon: History },
+            { titleKey: "nav.auditLog", feature: "auditLog", url: "/audit-log", icon: ScrollText },
+            { titleKey: "nav.loginActivity", feature: "loginActivity", url: "/login-activity", icon: ShieldCheck },
+        ],
+    },
 ];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -71,19 +106,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     const { t } = useTranslation("common");
     const { user } = useAuth();
 
-    const navMain = NAV_ITEMS
-        .filter((item) => canAccess(user, item.feature))
-        .map((item) => ({
-            title: t(navTitleKey(user, item.titleKey)),
-            url: item.url,
-            icon: item.icon,
-        }));
+    const navGroups = NAV_GROUPS
+        .map((group) => ({
+            label: group.labelKey ? t(group.labelKey) : undefined,
+            items: group.items
+                .filter((item) => canAccess(user, item.feature))
+                .map((item) => ({
+                    title: t(navTitleKey(user, item.titleKey)),
+                    url: item.url,
+                    icon: item.icon,
+                })),
+        }))
+        .filter((group) => group.items.length > 0);
 
     return (
         <Sidebar
             variant="floating"
             collapsible="icon"
-            className="[&>[data-slot=sidebar-inner]]:rounded-2xl [&>[data-slot=sidebar-inner]]:shadow-none"
+            className="[&>[data-slot=sidebar-inner]]:rounded-2xl"
             {...props}
         >
             <SidebarHeader>
@@ -95,11 +135,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenuButton size="lg" asChild className="group-data-[collapsible=icon]:justify-center">
                             <Link to="/dashboard">
                                 <span className="hidden size-5 shrink-0 group-data-[collapsible=icon]:block">
-                                    <KeregeMark inverted className="size-5" />
+                                    <KeregeMark className="size-5" />
                                 </span>
 
                                 <span className="flex-1 group-data-[collapsible=icon]:hidden">
-                                    <KeregeLogo inverted className="h-5" />
+                                    <KeregeLogo className="h-5" />
                                 </span>
                             </Link>
                         </SidebarMenuButton>
@@ -107,10 +147,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenu>
             </SidebarHeader>
 
-            <SidebarContent>
+            <SidebarContent scrollFade className="gap-0">
                 {/* Filtered by role so nobody is offered a link that RoleGuard
                     will bounce them straight back from. */}
-                <NavMain items={navMain} />
+                <NavActivePill>
+                    {navGroups.map((group, index) => (
+                        <NavMain key={group.label ?? index} label={group.label} items={group.items} />
+                    ))}
+                </NavActivePill>
             </SidebarContent>
 
             <SidebarFooter>

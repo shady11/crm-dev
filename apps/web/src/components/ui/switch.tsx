@@ -13,7 +13,7 @@ export const Switch = (props: React.ComponentProps<typeof ArkSwitch.Root>) => {
     <ArkSwitch.Root
       className={cn(
         "group/switch",
-        "[--thumb-size:--spacing(5)] sm:[--thumb-size:--spacing(4)]",
+        "[--thumb-size:22px]",
         "h-[calc(var(--thumb-size)+2px)] w-[calc(var(--thumb-size)*2-2px)]",
         "p-px",
         "inline-flex shrink-0 items-center",
@@ -40,14 +40,12 @@ export const Switch = (props: React.ComponentProps<typeof ArkSwitch.Root>) => {
           className={cn(
             "block",
             "aspect-square h-full w-auto",
-            "bg-background",
+            "bg-white shadow-[0_1px_3px_0_rgb(0_0_0/0.22),0_0_0_0.5px_rgb(0_0_0/0.04)]",
             "rounded-full ring-0",
             "pointer-events-none",
             "transition-transform",
             "data-[state=checked]:translate-x-[calc(var(--thumb-size)-4px)]",
-            "dark:data-[state=checked]:bg-primary-foreground",
             "data-[state=unchecked]:translate-x-0",
-            "dark:data-[state=unchecked]:bg-foreground",
             "motion-reduce:transition-none!"
           )}
           data-slot="switch-thumb"

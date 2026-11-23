@@ -6,6 +6,7 @@ import {Table, TableBody, TableCell, TableRow} from "@/components/ui/table.tsx";
 import {Progress} from "@/components/ui/progress";
 import {useTranslation} from "react-i18next";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
+import {formatDay} from "@/utils/date-formatter.ts";
 
 const SCHEDULE_STATUS_CLASSES: Record<string, string> = {
     PENDING: "bg-gray-400",
@@ -29,7 +30,7 @@ interface DealPaymentScheduleCardProps {
 }
 
 export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule }: DealPaymentScheduleCardProps) {
-    const { t, i18n } = useTranslation(["payments", "deals"]);
+    const { t } = useTranslation(["payments", "deals"]);
     const { formatCurrency } = useCompanyFormatters();
 
     const canGenerate = status === "ACTIVE";
@@ -42,7 +43,7 @@ export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule 
     const currentIndex = schedules.findIndex((s) => s.status !== "PAID");
 
     return (
-        <Card className="border border-secondary shadow-none pt-0">
+        <Card className="border pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
                 <div>
                     <CardTitle>{t("paymentSchedule.title", { ns: "deals" })}</CardTitle>
@@ -88,7 +89,7 @@ export function DealPaymentScheduleCard({ status, schedules, onGenerateSchedule 
                                             #{s.order}
                                         </TableCell>
                                         <TableCell>
-                                            {new Date(s.dueDate).toLocaleDateString(i18n.language)}
+                                            {formatDay(s.dueDate)}
                                         </TableCell>
                                         <TableCell>
                                             {formatCurrency(s.paidAmount)} / {formatCurrency(s.amount)}

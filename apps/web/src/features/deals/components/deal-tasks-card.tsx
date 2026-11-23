@@ -50,7 +50,7 @@ export function DealTasksCard({ dealId }: { dealId: string }) {
     };
 
     return (
-        <Card className="border border-secondary shadow-none pt-0">
+        <Card className="border pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
                 <CardTitle className="text-sm text-muted-foreground">
                     {tasks.length > 0 ? t("dealCard.titleWithCount", { count: tasks.length }) : t("dealCard.title")}

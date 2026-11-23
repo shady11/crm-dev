@@ -6,7 +6,6 @@ import {CircleDotIcon, MailIcon, MessageCircleIcon, PhoneCallIcon, UsersIcon} fr
 import {Button} from "@/components/ui/button.tsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
-import {Toggle} from "@/components/ui/toggle.tsx";
 import {getClientActivities} from "@/features/clients/api/clients.api.ts";
 import {formatDate} from "@/utils/date-formatter.ts";
 import {paths} from "@/routes/paths.ts";
@@ -21,7 +20,7 @@ const CONTACT_ICONS: Record<string, typeof PhoneCallIcon> = {
     EMAIL: MailIcon,
 };
 
-const PAGE = 15;
+const PAGE = 10;
 
 /**
  * Everything that happened with this person in one timeline: calls and
@@ -32,7 +31,6 @@ export function ClientHistoryCard({ clientId }: { clientId: string }) {
     const { t, i18n } = useTranslation("clients");
     const activityTitle = useActivityTitle();
     const activityActor = useActivityActor();
-    const [contactsOnly, setContactsOnly] = useState(false);
     const [shown, setShown] = useState(PAGE);
 
     const query = useQuery({
@@ -41,32 +39,19 @@ export function ClientHistoryCard({ clientId }: { clientId: string }) {
     });
 
     const all = query.data ?? [];
-    const contactCount = all.filter((a) => a.type in CONTACT_ICONS).length;
-    const items = contactsOnly ? all.filter((a) => a.type in CONTACT_ICONS) : all;
+    const items = all;
 
     return (
-        <Card className="border border-secondary shadow-none pt-0">
-            <CardHeader className="flex items-center justify-between gap-2 border-b py-4">
+        <Card className="border pt-0">
+            <CardHeader className="border-b py-4">
                 <CardTitle className="text-sm text-muted-foreground">{t("history.title")}</CardTitle>
-                <Toggle
-                    variant="outline"
-                    size="sm"
-                    pressed={contactsOnly}
-                    onPressedChange={(pressed) => {
-                        setContactsOnly(pressed);
-                        setShown(PAGE);
-                    }}
-                >
-                    <PhoneCallIcon className="size-3.5" />
-                    {t("history.contactsOnly", { count: contactCount })}
-                </Toggle>
             </CardHeader>
             <CardContent>
                 {query.isLoading ? (
                     <div className="flex justify-center py-6"><Spinner className="size-5" /></div>
                 ) : items.length === 0 ? (
                     <p className="py-6 text-center text-sm text-muted-foreground">
-                        {contactsOnly ? t("history.noContacts") : t("history.empty")}
+                        {t("history.empty")}
                     </p>
                 ) : (
                     <div className="flex flex-col divide-y">
@@ -103,7 +88,7 @@ export function ClientHistoryCard({ clientId }: { clientId: string }) {
                     </div>
                 )}
                 {items.length > shown && (
-                    <Button variant="ghost" size="sm" className="mt-2 w-full" onClick={() => setShown((n) => n + PAGE * 2)}>
+                    <Button variant="ghost" size="sm" className="mt-2 w-full" onClick={() => setShown((n) => n + PAGE)}>
                         {t("history.showMore", { count: items.length - shown })}
                     </Button>
                 )}

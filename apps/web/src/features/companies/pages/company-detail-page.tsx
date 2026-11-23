@@ -191,7 +191,7 @@ export function CompanyDetailPage() {
             </div>
 
             <div className="grid gap-4 lg:grid-cols-[1fr_2fr]">
-                <Card className="border-secondary shadow-none">
+                <Card>
                     <CardHeader>
                         <CardTitle>{t("detail.settings.title", {ns: "companies"})}</CardTitle>
                     </CardHeader>
@@ -210,7 +210,7 @@ export function CompanyDetailPage() {
                     </CardContent>
                 </Card>
 
-                <Card className="border-secondary shadow-none">
+                <Card>
                     <CardHeader>
                         <CardTitle>{t("detail.usersCard.title", {ns: "companies"})}</CardTitle>
                     </CardHeader>
@@ -350,10 +350,10 @@ export function CompanyDetailPage() {
 
 function Stat({label, value, hint}: {label: string; value: number; hint?: string}) {
     return (
-        <Card className="border-secondary shadow-none">
-            <CardContent className="py-4">
-                <div className="text-2xl font-medium tabular-nums">{value}</div>
-                <div className="text-muted-foreground mt-1 text-xs">{label}</div>
+        <Card>
+            <CardContent>
+                <div className="text-muted-foreground text-sm">{label}</div>
+                <div className="mt-1.5 text-3xl font-semibold tracking-tight tabular-nums">{value}</div>
                 {hint ? <div className="text-muted-foreground/70 mt-0.5 text-[11px]">{hint}</div> : null}
             </CardContent>
         </Card>

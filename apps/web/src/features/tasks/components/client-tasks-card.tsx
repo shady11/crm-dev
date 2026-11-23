@@ -14,13 +14,14 @@ import {getTasks} from "@/features/tasks/api/tasks.api.ts";
 import {useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {useTaskTitle} from "@/features/tasks/hooks/use-task-title.ts";
+import {formatDay} from "@/utils/date-formatter.ts";
 
 const ICONS: Record<string, typeof CircleIcon> = {
     TODO: CircleIcon, IN_PROGRESS: ClockIcon, DONE: CheckCircle2Icon, CANCELLED: XCircleIcon,
 };
 
 export function ClientTasksCard({ clientId }: { clientId: string }) {
-    const { t, i18n } = useTranslation("tasks");
+    const { t } = useTranslation("tasks");
     const taskTitle = useTaskTitle();
 
     const tasksQuery = useQuery({
@@ -50,7 +51,7 @@ export function ClientTasksCard({ clientId }: { clientId: string }) {
     };
 
     return (
-        <Card className="border border-secondary shadow-none pt-0">
+        <Card className="border pt-0">
             <CardHeader className="flex items-center justify-between border-b py-4">
                 <CardTitle className="text-sm text-muted-foreground">
                     {tasks.length > 0 ? t("clientCard.titleWithCount", { count: tasks.length }) : t("clientCard.title")}
@@ -75,7 +76,7 @@ export function ClientTasksCard({ clientId }: { clientId: string }) {
                                         <p className="truncate font-medium">{taskTitle(task)}</p>
                                         <p className="truncate text-xs text-muted-foreground">
                                             {task.assignedTo.fullName}
-                                            {task.dueDate && ` · ${new Date(task.dueDate).toLocaleDateString(i18n.language)}`}
+                                            {task.dueDate && ` · ${formatDay(task.dueDate)}`}
                                         </p>
                                     </div>
                                     <Badge className={`${TASK_STATUS_CLASSES[task.status]} shrink-0 text-white`}>

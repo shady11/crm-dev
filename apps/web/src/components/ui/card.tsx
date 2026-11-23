@@ -12,10 +12,10 @@ export const Card = (props: React.ComponentProps<typeof ark.div>) => {
         "group/card",
         "py-(--space)",
         "flex flex-col gap-4",
-        "bg-card",
+        "glass-card",
         "text-foreground",
         "has-data-[variant=image]:pt-0 has-data-[slot=card-footer]:pb-0",
-        "rounded-lg border shadow-none",
+        "rounded-2xl border",
         className
       )}
       data-slot="card"
@@ -35,7 +35,7 @@ const cardMediaVariants = tv({
       default: "bg-transparent",
       icon: "[&_svg:not([class*='size-'])]:size-4",
       image: [
-        "overflow-hidden rounded-t-sm",
+        "overflow-hidden rounded-t-2xl",
         "px-0",
         "[&_img]:size-full [&_img]:object-cover",
       ],
@@ -165,7 +165,7 @@ export const CardFooter = (props: React.ComponentProps<typeof ark.div>) => {
         "flex items-center gap-2",
         "px-(--space)",
         "bg-muted/48",
-        "rounded-b-xl border-t",
+        "rounded-b-2xl border-t",
         "py-(--space)",
         className
       )}

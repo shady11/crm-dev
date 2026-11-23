@@ -8,8 +8,8 @@ export const buttonVariants = tv({
   base: [
     "relative",
     "inline-flex shrink-0 items-center justify-center gap-2",
-    "whitespace-nowrap font-normal text-sm",
-    "rounded-lg",
+    "whitespace-nowrap font-medium text-sm",
+    "rounded-xl",
     "transition-all",
     "outline-none focus-visible:ring-[3px] focus-visible:ring-ring/32",
     "disabled:pointer-events-none disabled:opacity-64",
@@ -23,25 +23,28 @@ export const buttonVariants = tv({
   variants: {
     variant: {
       default: [
-        "bg-primary",
-        "border border-transparent shadow-primary/24 shadow-sm",
+        "bg-primary bg-linear-to-b from-white/18 to-transparent",
+        "border border-white/10",
+        "shadow-[0_1px_0_0_rgb(255_255_255/0.25)_inset,0_8px_20px_-8px_var(--primary)]",
         "text-primary-foreground",
-        "hover:bg-primary/90",
+        "hover:bg-primary/90 hover:shadow-[0_1px_0_0_rgb(255_255_255/0.25)_inset,0_10px_24px_-8px_var(--primary)]",
         "focus-visible:border-background",
       ],
       outline: [
         "bg-transparent",
         "text-foreground",
-        "border border-input shadow-sm/5",
+        "border field-surface",
         "hover:bg-accent hover:text-accent-foreground",
-        "dark:bg-input/32 dark:hover:bg-input/64",
-        "focus-visible:border-primary",
+        "dark:hover:bg-white/10",
+        "focus-visible:field-focus focus-visible:ring-0",
       ],
+      // Soft red at rest (tinted fill, red text), solid red on hover, so a
+      // delete action reads clearly without shouting from every row.
       destructive: [
-        "bg-destructive",
-        "text-white",
-        "border border-transparent shadow-destructive/24 shadow-sm",
-        "hover:bg-destructive/90",
+        "bg-destructive/10 dark:bg-destructive/15",
+        "text-destructive dark:text-destructive-foreground",
+        "border border-destructive/15",
+        "hover:bg-destructive hover:text-white hover:border-transparent",
         "focus-visible:border-background focus-visible:ring-destructive-foreground/32",
       ],
       secondary: [

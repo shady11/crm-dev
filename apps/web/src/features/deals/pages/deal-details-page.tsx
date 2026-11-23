@@ -8,7 +8,7 @@ import {Input} from "@/components/ui/input";
 import {Textarea} from "@/components/ui/textarea";
 import {useDeal} from "@/features/deals/hooks/use-deal";
 import {useDealActions} from "@/features/deals/hooks/use-deal-actions";
-import {DEAL_STATUS_VISUALS, type DealStatus} from "@/features/deals/types/deal.types";
+import {DEAL_STATUS_VISUALS} from "@/features/deals/types/deal.types";
 import {Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger} from "@/components/ui/menu.tsx";
 import {DealHistoryCard} from "@/features/deals/components/deal-details/deal-history-card.tsx";
 import {formatDate} from "@/utils/date-formatter.ts";
@@ -31,6 +31,7 @@ import {NumberInput, NumberInputGroup, NumberInputInput} from "@/components/ui/n
 import type {DealDetails, PaymentMethod, PaymentType} from "../api/deals.api";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {DealTasksCard} from "@/features/deals/components/deal-tasks-card.tsx";
+import {useDealTasks} from "@/features/tasks/hooks/use-deal-tasks.ts";
 import {DealDiscountBanner} from "@/features/deals/components/deal-details/deal-discount-banner.tsx";
 import {RequestDiscountDialog} from "@/features/deals/components/deal-details/request-discount-dialog.tsx";
 import {DealMoneyHeldBanner} from "@/features/deals/components/deal-details/deal-money-held-banner.tsx";
@@ -53,15 +54,12 @@ import {hasPermission} from "@/features/auth/access";
 import {ReassignManagerDialog} from "@/features/users/components/reassign-manager-dialog.tsx";
 import {PageError, PageSkeleton} from "@/components/shared/page-query-state.tsx";
 
-const TAB_VALUES = ["payments", "documents", "activity"] as const;
+const TAB_VALUES = ["overview", "payments", "documents", "tasks", "activity"] as const;
 type DealTab = (typeof TAB_VALUES)[number];
 
-/** Open on what this stage is about: paperwork before payments start, then payments. */
-function defaultTabFor(status: DealStatus): DealTab {
-    if (status === "ACTIVE" || status === "COMPLETED") return "payments";
-    if (status === "RESERVED" || status === "CONTRACT_SIGNED") return "documents";
-    return "activity";
-}
+/** Open on the overview: the client, manager, unit and terms used to sit
+ *  beside every tab, so they stay the first thing you see. */
+const DEFAULT_TAB: DealTab = "overview";
 
 function TabCount({ count }: { count: number }) {
     if (count === 0) return null;
@@ -74,6 +72,8 @@ export function DealDetailsPage() {
     const { dealId } = useParams<{ dealId: string }>();
     const navigate = useNavigate();
     const dealQuery = useDeal(dealId);
+    // Same query as the Tasks tab's card, so this only reads the cache for the tab count.
+    const { tasks: dealTasks } = useDealTasks(dealId!);
     const actions = useDealActions(dealId!);
     const { user } = useAuth();
     // SH-A1: reassignment is a team-lead action, gated the same way the
@@ -213,7 +213,7 @@ export function DealDetailsPage() {
     const canChangeDiscount = deal.status === "RESERVED" && canManage && deal.discountApprovalStatus !== "PENDING";
     const tab = TAB_VALUES.includes(searchParams.get("tab") as DealTab)
         ? (searchParams.get("tab") as DealTab)
-        : defaultTabFor(deal.status);
+        : DEFAULT_TAB;
     const setTab = (value: string) =>
         setSearchParams((params) => {
             params.set("tab", value);
@@ -386,12 +386,14 @@ export function DealDetailsPage() {
 
             <DealKeyFigures deal={deal} totalPaid={totalPaid} remaining={remaining} />
 
-            {/* Work area on the left, reference facts on the right; on a phone the
-                facts come first, since that's where the client's number is. */}
-            <div className="grid gap-6 lg:grid-cols-3">
-                <div className="min-w-0 lg:col-span-2">
+            {/* One full-width work area; the reference facts that used to sit in
+                a right-hand column live in the Overview tab, tasks in Tasks. */}
+            <div className="min-w-0">
                     <Tabs value={tab} onValueChange={({ value }) => setTab(value)} className="gap-4">
-                        <TabsList variant="underline" className="w-full justify-start overflow-x-auto">
+                        <TabsList variant="page" className="max-w-full justify-start overflow-x-auto">
+                            <TabsTrigger value="overview" className="grow-0 px-3">
+                                {t("tabs.overview")}
+                            </TabsTrigger>
                             <TabsTrigger value="payments" className="grow-0 px-3">
                                 {t("tabs.payments")}
                                 <TabCount count={deal.payments.length} />
@@ -400,11 +402,23 @@ export function DealDetailsPage() {
                                 {t("tabs.documents")}
                                 <TabCount count={documentsCount} />
                             </TabsTrigger>
+                            <TabsTrigger value="tasks" className="grow-0 px-3">
+                                {t("tabs.tasks")}
+                                <TabCount count={dealTasks.length} />
+                            </TabsTrigger>
                             <TabsTrigger value="activity" className="grow-0 px-3">
                                 {t("tabs.activity")}
                                 <TabCount count={deal.activities.length} />
                             </TabsTrigger>
                         </TabsList>
+
+                        <TabsContent value="overview">
+                            <DealDetailsSidebar
+                                deal={deal}
+                                canReassign={canReassign}
+                                onReassign={() => setReassignOpen(true)}
+                            />
+                        </TabsContent>
 
                         <TabsContent value="payments" className="space-y-4">
                             <DealPaymentScheduleCard
@@ -431,20 +445,14 @@ export function DealDetailsPage() {
                             <EntityDocumentsCard ownerType="DEAL" ownerId={deal.id} headerActions={generateMenu} />
                         </TabsContent>
 
+                        <TabsContent value="tasks">
+                            <DealTasksCard dealId={deal.id} />
+                        </TabsContent>
+
                         <TabsContent value="activity">
                             <DealHistoryCard activities={deal.activities} />
                         </TabsContent>
                     </Tabs>
-                </div>
-
-                <aside className="order-first min-w-0 space-y-4 lg:order-none">
-                    <DealDetailsSidebar
-                        deal={deal}
-                        canReassign={canReassign}
-                        onReassign={() => setReassignOpen(true)}
-                    />
-                    <DealTasksCard dealId={deal.id} />
-                </aside>
             </div>
 
             {/* Activate dialog: there is no way back to CONTRACT_SIGNED. */}

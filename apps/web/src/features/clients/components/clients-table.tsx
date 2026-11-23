@@ -1,5 +1,4 @@
 import {Pen, Trash2, UsersRoundIcon} from "lucide-react";
-import {Avatar, AvatarFallback} from "@/components/ui/avatar.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Checkbox} from "@/components/ui/checkbox.tsx";
 import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
@@ -8,7 +7,7 @@ import {IconTooltipButton} from "@/components/shared/icon-tooltip-button.tsx";
 import {SortableTableHead} from "@/components/shared/sortable-table-head.tsx";
 import type {ClientSortField} from "@/features/clients/api/clients.api.ts";
 import type {Client} from "@/features/clients/types/client.types";
-import {formatCreatedAt, initials} from "@/features/clients/utils/format.ts";
+import {formatCreatedAt} from "@/features/clients/utils/format.ts";
 import {useNavigate} from "react-router-dom";
 import {paths} from "@/routes/paths.ts";
 import {useTranslation} from "react-i18next";
@@ -75,12 +74,8 @@ export function ClientsTable({
                                     onCheckedChange={(details) => onToggleOne(client.id, details.checked === true)}
                                     onClick={(e) => e.stopPropagation()}
                                 />
-                                <Avatar className="size-9 shrink-0">
-                                    <AvatarFallback>{initials(client.fullName)}</AvatarFallback>
-                                </Avatar>
                                 <div className="min-w-0">
                                     <p className="truncate font-medium">{client.fullName}</p>
-                                    <p className="truncate text-xs text-muted-foreground">#{client.id.slice(0, 4).toUpperCase()}</p>
                                 </div>
                             </div>
                             <div className="flex shrink-0 items-center gap-1" onClick={(e) => e.stopPropagation()}>
@@ -123,7 +118,6 @@ export function ClientsTable({
                             onCheckedChange={(details) => onToggleAll(details.checked === true)}
                         />
                     </TableHead>
-                    <TableHead>{t("table.clientId")}</TableHead>
                     <SortableTableHead field="fullName" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
                         {t("table.name")}
                     </SortableTableHead>
@@ -153,14 +147,8 @@ export function ClientsTable({
                                     onCheckedChange={(details) => onToggleOne(client.id, details.checked === true)}
                                 />
                             </TableCell>
-                            <TableCell className="text-muted-foreground">
-                                #{client.id.slice(0, 4).toUpperCase()}
-                            </TableCell>
                             <TableCell>
                                 <div className="flex items-center gap-3">
-                                    <Avatar className="size-9">
-                                        <AvatarFallback>{initials(client.fullName)}</AvatarFallback>
-                                    </Avatar>
                                     <p className="font-medium">{client.fullName}</p>
                                 </div>
                             </TableCell>

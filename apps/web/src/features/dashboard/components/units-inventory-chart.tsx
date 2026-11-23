@@ -26,7 +26,7 @@ export function UnitsInventoryChart({ data }: { data: UnitsSummaryItem[] }) {
     );
 
     return (
-        <Card className="border border-secondary shadow-none">
+        <Card className="border">
             <CardHeader>
                 <CardTitle className="text-sm text-muted-foreground">{t("unitsInventory.title", { ns: "dashboard" })}</CardTitle>
             </CardHeader>
@@ -34,7 +34,7 @@ export function UnitsInventoryChart({ data }: { data: UnitsSummaryItem[] }) {
                 <ChartContainer config={{}} className="mx-auto h-56 w-full max-w-56">
                     <PieChart>
                         <ChartTooltip content={<ChartTooltipContent />} />
-                        <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} strokeWidth={2}>
+                        <Pie data={chartData} dataKey="value" nameKey="name" innerRadius={60} outerRadius={82} paddingAngle={3} cornerRadius={2} stroke="none">
                             {chartData.map((entry) => (
                                 <Cell key={entry.status} fill={STATUS_COLORS[entry.status] ?? "var(--muted-foreground)"} />
                             ))}
@@ -44,7 +44,7 @@ export function UnitsInventoryChart({ data }: { data: UnitsSummaryItem[] }) {
                 <div className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs">
                     {chartData.map((entry) => (
                         <div key={entry.status} className="flex items-center gap-1.5">
-                            <span className="size-2 rounded-full" style={{ backgroundColor: STATUS_COLORS[entry.status] }} />
+                            <span className="size-2.5 rounded-[3px]" style={{ backgroundColor: STATUS_COLORS[entry.status] }} />
                             {entry.name} ({entry.value})
                         </div>
                     ))}

@@ -6,21 +6,22 @@ import type {MyWorkToday} from "@/features/dashboard/api/dashboard.api.ts";
 import {useTranslation} from "react-i18next";
 import {DEAL_STATUS_LABEL_KEYS, DealStatus} from "@/features/deals/types/deal.types.ts";
 import {useTaskTitle} from "@/features/tasks/hooks/use-task-title.ts";
+import {formatDay} from "@/utils/date-formatter.ts";
 
 // SM-A2: one screen showing what a SALES_MANAGER needs to do today — leads
 // waiting on follow-up, tasks due today, and deals waiting on the client —
 // instead of checking three separate filtered list pages every morning.
 export function MyWorkTodayCard({data}: {data: MyWorkToday}) {
-    const {t, i18n} = useTranslation("dashboard");
+    const {t} = useTranslation("dashboard");
     const taskTitle = useTaskTitle();
 
     function formatDate(iso: string | null) {
         if (!iso) return t("myWorkToday.noDate");
-        return new Date(iso).toLocaleDateString(i18n.language, {month: "short", day: "numeric"});
+        return formatDay(iso);
     }
 
     return (
-        <Card className="border border-secondary shadow-none pt-0">
+        <Card className="border pt-0">
             <CardHeader className="border-b py-4">
                 <CardTitle className="text-sm text-muted-foreground">{t("myWorkToday.title")}</CardTitle>
             </CardHeader>

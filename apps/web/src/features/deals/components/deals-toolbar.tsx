@@ -9,6 +9,7 @@ import {useProjectsFilter} from "@/features/projects/hooks/use-projects-filter.t
 import {useManagers} from "@/features/users/hooks/use-managers.ts";
 import {BranchFilterSelect} from "@/features/branches/components/branch-filter-select";
 import {useTranslation} from "react-i18next";
+import {FilterPopover} from "@/components/shared/filter-popover.tsx";
 
 interface DealsToolbarProps {
     statusFilter: DealStatusFilter;
@@ -55,64 +56,76 @@ export function DealsToolbar({ statusFilter, onStatusFilterChange, projectId, on
         ],
     });
 
+    // Dropdown filters in the panel that differ from their default.
+    const activeFilterCount = [branchId, projectId, managerId, attention].filter(Boolean).length
+        + (statusFilter !== "all" ? 1 : 0);
+    const resetFilters = () => {
+        onBranchIdChange(undefined);
+        onProjectIdChange(undefined);
+        onManagerIdChange(undefined);
+        onStatusFilterChange("all");
+        onAttentionChange(undefined);
+    };
+
     return (
+        // Search on the left, filters on the right, as on the Clients list.
         <div className="flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-bold">{t("toolbar.heading")}</h2>
+            <InputGroup className="w-full sm:w-80">
+                <InputGroupInput placeholder={t("toolbar.searchPlaceholder")} value={search} onChange={(e) => onSearchChange(e.target.value)} />
+                <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
+            </InputGroup>
 
             <div className="flex flex-wrap items-center gap-2">
-                <BranchFilterSelect
-                    value={branchId ?? "all"}
-                    onChange={(value) => onBranchIdChange(value === "all" ? undefined : value)}
-                />
+                <FilterPopover activeCount={activeFilterCount} onReset={resetFilters}>
+                    <BranchFilterSelect
+                        value={branchId ?? "all"}
+                        onChange={(value) => onBranchIdChange(value === "all" ? undefined : value)}
+                    />
 
-                <Select
-                    collection={projectCollection}
-                    value={[projectId ?? "all"]}
-                    onValueChange={({ value }) => onProjectIdChange(value[0] === "all" ? undefined : value[0])}
-                >
-                    <SelectTrigger className="w-44"><SelectValue placeholder={t("toolbar.projectPlaceholder")} /></SelectTrigger>
-                    <SelectContent>
-                        {projectCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
-                    </SelectContent>
-                </Select>
+                    <Select
+                        collection={projectCollection}
+                        value={[projectId ?? "all"]}
+                        onValueChange={({ value }) => onProjectIdChange(value[0] === "all" ? undefined : value[0])}
+                    >
+                        <SelectTrigger className="w-44"><SelectValue placeholder={t("toolbar.projectPlaceholder")} /></SelectTrigger>
+                        <SelectContent>
+                            {projectCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
 
-                <Select
-                    collection={managerCollection}
-                    value={[managerId ?? "all"]}
-                    onValueChange={({ value }) => onManagerIdChange(value[0] === "all" ? undefined : value[0])}
-                >
-                    <SelectTrigger className="w-44"><SelectValue placeholder={t("toolbar.managerPlaceholder")} /></SelectTrigger>
-                    <SelectContent>
-                        {managerCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
-                    </SelectContent>
-                </Select>
+                    <Select
+                        collection={managerCollection}
+                        value={[managerId ?? "all"]}
+                        onValueChange={({ value }) => onManagerIdChange(value[0] === "all" ? undefined : value[0])}
+                    >
+                        <SelectTrigger className="w-44"><SelectValue placeholder={t("toolbar.managerPlaceholder")} /></SelectTrigger>
+                        <SelectContent>
+                            {managerCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
 
-                <Select
-                    collection={statusCollection}
-                    value={[statusFilter]}
-                    onValueChange={({ value }) => onStatusFilterChange((value[0] ?? "all") as DealStatusFilter)}
-                >
-                    <SelectTrigger className="w-48"><SelectValue placeholder={t("toolbar.filterByStatus")} /></SelectTrigger>
-                    <SelectContent>
-                        {statusCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
-                    </SelectContent>
-                </Select>
+                    <Select
+                        collection={statusCollection}
+                        value={[statusFilter]}
+                        onValueChange={({ value }) => onStatusFilterChange((value[0] ?? "all") as DealStatusFilter)}
+                    >
+                        <SelectTrigger className="w-48"><SelectValue placeholder={t("toolbar.filterByStatus")} /></SelectTrigger>
+                        <SelectContent>
+                            {statusCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
 
-                <Select
-                    collection={attentionCollection}
-                    value={[attention ?? "all"]}
-                    onValueChange={({ value }) => onAttentionChange(value[0] === "all" ? undefined : (value[0] as DealAttentionFilter))}
-                >
-                    <SelectTrigger className="w-56"><SelectValue placeholder={t("toolbar.allDeals")} /></SelectTrigger>
-                    <SelectContent>
-                        {attentionCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-
-                <InputGroup className="w-64">
-                    <InputGroupInput placeholder={t("toolbar.searchPlaceholder")} value={search} onChange={(e) => onSearchChange(e.target.value)} />
-                    <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
-                </InputGroup>
+                    <Select
+                        collection={attentionCollection}
+                        value={[attention ?? "all"]}
+                        onValueChange={({ value }) => onAttentionChange(value[0] === "all" ? undefined : (value[0] as DealAttentionFilter))}
+                    >
+                        <SelectTrigger className="w-56"><SelectValue placeholder={t("toolbar.allDeals")} /></SelectTrigger>
+                        <SelectContent>
+                            {attentionCollection.items.map((item) => <SelectItem key={item.value} item={item}>{item.label}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                </FilterPopover>
             </div>
         </div>
     );
