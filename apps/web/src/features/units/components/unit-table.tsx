@@ -96,7 +96,7 @@ export function UnitTable({ units }: UnitTableProps) {
     return (
         // Sits inside the floor row, under its header.
         <div className="border-t">
-            <div className="overflow-x-auto [&_td:first-child]:ps-4 [&_th:first-child]:ps-4 [&_td:last-child]:pe-3 [&_th:last-child]:pe-3">
+            <div className="overflow-x-auto [&_td:first-child]:ps-[var(--unit-table-inset,1rem)] [&_th:first-child]:ps-[var(--unit-table-inset,1rem)] [&_td:last-child]:pe-3 [&_th:last-child]:pe-3">
                     <Table>
                         <TableHeader>
                             <TableRow>
