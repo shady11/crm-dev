@@ -1,6 +1,8 @@
 import {ArrowLeftIcon} from "lucide-react";
+import {createListCollection} from "@ark-ui/react";
 import {useTranslation} from "react-i18next";
 import {Button} from "@/components/ui/button";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import {cn} from "@/lib/utils";
 import type {Block} from "@/features/blocks/types/block.types";
 import type {Entrance} from "@/features/entrances/types/entrance.types";
@@ -22,29 +24,11 @@ interface ChessboardBreadcrumbsProps {
     onEntranceSelect(entranceId: string): void;
 }
 
-function Pill({active, muted, onClick, children}: {active: boolean; muted?: boolean; onClick(): void; children: string}) {
-    return (
-        <button
-            type="button"
-            aria-pressed={active}
-            onClick={onClick}
-            className={cn(
-                "shrink-0 rounded-[6px] px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors",
-                active ? "seg-thumb text-foreground" : "text-muted-foreground hover:text-foreground",
-                // Not on sale yet: viewable, visibly not bookable.
-                muted && !active && "border border-dashed border-muted-foreground/40 bg-transparent text-muted-foreground",
-            )}
-        >
-            {children}
-        </button>
-    );
-}
-
 /**
- * Block and entrance switchers above the grid: every block and every
- * entrance of the current block is one click away, instead of going back to
- * the pickers. A row with a single option is left out. Under them, the
- * current block's sales status and expected completion, when it has either.
+ * Block and entrance selects above the grid: every block and every
+ * entrance of the current block is one pick away, instead of going back to
+ * the pickers. Under them, the current block's sales status and expected
+ * completion, when it has either.
  */
 export function ChessboardBreadcrumbs({
     block,
@@ -56,54 +40,85 @@ export function ChessboardBreadcrumbs({
     onEntranceSelect,
 }: ChessboardBreadcrumbsProps) {
     const {t} = useTranslation("projects");
-    // With a single row (one switcher, or just the label) the Back button
-    // centres on it; with both rows it lines up with the first.
-    const singleRow = blocks.length <= 1 || blockEntrances.length <= 1;
-
     const quarter = completionQuarter(t, block.completionDate);
     // "On sale" with no date says nothing the grid doesn't already.
     const showStatus = !!quarter || (!!block.salesStatus && block.salesStatus !== BlockSalesStatus.ON_SALE);
 
-    // Two columns: Back on the left, the tabs and the status line sharing
-    // the right one, so the status lines up with the tabs exactly. Back sits
-    // in the first row only, centred on it or level with its first tab row.
+    const blockCollection = createListCollection({
+        items: blocks.map((item) => ({
+            label: namedLabel(t, "chessboard.blockLabel", item.name),
+            value: item.id,
+            // Not on sale yet: viewable, visibly not bookable.
+            muted: !isBlockBookable(item.salesStatus),
+            status: item.salesStatus,
+        })),
+    });
+    const entranceCollection = createListCollection({
+        items: blockEntrances.map((item) => ({
+            label: namedLabel(t, "chessboard.entranceLabel", item.name),
+            value: item.id,
+        })),
+    });
+    const switchable = blocks.length > 1 || blockEntrances.length > 1;
+
+    // Back, then a select each for the block and the entrance (or, with
+    // nothing to switch to, just their names); the block's sales status and
+    // completion go underneath.
     return (
-        <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-2">
+        <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-2">
             <Button
                 variant="outline"
                 size="icon-lg"
-                className={cn("col-start-1 row-start-1", singleRow ? "self-center" : "mt-0.5 self-start")}
                 onClick={onBack}
                 aria-label={t("common:actions.back")}
             >
                 <ArrowLeftIcon />
             </Button>
-            <div className={cn("col-start-2 row-start-1 flex min-w-0 flex-col gap-2", singleRow && "self-center")}>
-                {blocks.length > 1 && (
-                    <nav className="seg-surface flex w-fit max-w-full gap-1 overflow-x-auto rounded-[8px] p-1" aria-label={t("chessboard.blocksNav")}>
-                        {blocks.map((item) => (
-                            <Pill key={item.id} active={item.id === block.id} muted={!isBlockBookable(item.salesStatus)} onClick={() => onBlockSelect(item.id)}>
-                                {namedLabel(t, "chessboard.blockLabel", item.name)}
-                            </Pill>
-                        ))}
-                    </nav>
-                )}
-                {blockEntrances.length > 1 ? (
-                    <nav className="seg-surface flex w-fit max-w-full gap-1 overflow-x-auto rounded-[8px] p-1" aria-label={t("chessboard.entrancesNav")}>
-                        {blockEntrances.map((item) => (
-                            <Pill key={item.id} active={item.id === entrance.id} onClick={() => onEntranceSelect(item.id)}>
-                                {namedLabel(t, "chessboard.entranceLabel", item.name)}
-                            </Pill>
-                        ))}
-                    </nav>
-                ) : (
-                    blocks.length <= 1 && (
-                        <p className="text-lg font-semibold">
-                            {namedLabel(t, "chessboard.blockLabel", block.name)} · {namedLabel(t, "chessboard.entranceLabel", entrance.name)}
-                        </p>
-                    )
-                )}
-            </div>
+            {switchable ? (
+                <div className="flex flex-wrap items-center gap-2">
+                    <Select
+                        collection={blockCollection}
+                        value={[block.id]}
+                        onValueChange={(details) => details.value[0] && details.value[0] !== block.id && onBlockSelect(details.value[0])}
+                    >
+                        <SelectTrigger className="w-44" aria-label={t("chessboard.blocksNav")}>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {blockCollection.items.map((item) => (
+                                <SelectItem key={item.value} item={item}>
+                                    <span className={cn(item.muted && "text-muted-foreground")}>{item.label}</span>
+                                    {item.muted && item.status && (
+                                        <span className="ms-auto ps-3 text-xs text-muted-foreground">
+                                            {t(BLOCK_SALES_STATUS_LABEL_KEYS[item.status])}
+                                        </span>
+                                    )}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <Select
+                        collection={entranceCollection}
+                        value={[entrance.id]}
+                        onValueChange={(details) => details.value[0] && details.value[0] !== entrance.id && onEntranceSelect(details.value[0])}
+                    >
+                        <SelectTrigger className="w-44" aria-label={t("chessboard.entrancesNav")}>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {entranceCollection.items.map((item) => (
+                                <SelectItem key={item.value} item={item}>
+                                    {item.label}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            ) : (
+                <p className="text-lg font-semibold">
+                    {namedLabel(t, "chessboard.blockLabel", block.name)} · {namedLabel(t, "chessboard.entranceLabel", entrance.name)}
+                </p>
+            )}
             {showStatus && (
                 <p className="col-start-2 text-sm text-muted-foreground">
                     {[
