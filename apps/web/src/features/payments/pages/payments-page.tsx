@@ -142,14 +142,27 @@ export function PaymentsPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-2xl font-bold tracking-tight">{t("page.title")}</h2>
-                <p className="text-sm text-muted-foreground">{t("page.subtitle")}</p>
+            {/* Title on the left, the two Excel exports top right. */}
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                <div className="min-w-0">
+                    <h2 className="text-2xl font-bold tracking-tight">{t("page.title")}</h2>
+                    <p className="text-sm text-muted-foreground">{t("page.subtitle")}</p>
+                </div>
+                <div className="flex shrink-0 flex-wrap items-center gap-2">
+                    <Button variant="outline" onClick={() => runExport("receivables")} disabled={exporting !== null}>
+                        {exporting === "receivables" ? <Loader2 className="animate-spin" /> : <FileSpreadsheet />}
+                        {t("page.exportReceivables")}
+                    </Button>
+                    <Button onClick={() => runExport("payments")} disabled={exporting !== null}>
+                        {exporting === "payments" ? <Loader2 className="animate-spin" /> : <Download />}
+                        {t("page.exportPayments")}
+                    </Button>
+                </div>
             </div>
 
             {/* Search on the left; period and filters on the right, as on every list. */}
             <div className="flex flex-wrap items-center justify-between gap-3">
-                <InputGroup className="w-full sm:w-auto sm:min-w-56 sm:max-w-80 sm:flex-1">
+                <InputGroup className="w-full sm:w-80">
                     <InputGroupInput placeholder={t("page.searchPlaceholder")} value={search} onChange={(e) => update(setSearch)(e.target.value)} />
                     <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
                 </InputGroup>
@@ -188,15 +201,6 @@ export function PaymentsPage() {
                         </SelectContent>
                     </Select>
                 </FilterPopover>
-                {/* Exports sit with the filters: they export what the filters show. */}
-                <Button variant="outline" onClick={() => runExport("receivables")} disabled={exporting !== null}>
-                    {exporting === "receivables" ? <Loader2 className="animate-spin" /> : <FileSpreadsheet />}
-                    {t("page.exportReceivables")}
-                </Button>
-                <Button onClick={() => runExport("payments")} disabled={exporting !== null}>
-                    {exporting === "payments" ? <Loader2 className="animate-spin" /> : <Download />}
-                    {t("page.exportPayments")}
-                </Button>
                 </div>
             </div>
 
