@@ -90,13 +90,12 @@ export function LoginForm({
 
                 <FieldGroup className="mt-7 gap-3.5">
                     <Field invalid={!!errors.email}>
-                        <FieldLabel htmlFor="email" className="text-[12.5px] font-semibold">{t("login.emailLabel")}</FieldLabel>
+                        <FieldLabel htmlFor="email">{t("login.emailLabel")}</FieldLabel>
                         <Input
                             id="email"
                             type="email"
                             autoComplete="username"
                             autoFocus
-                            className="h-11 rounded-[6px] px-3.5"
                             disabled={mutation.isPending}
                             aria-invalid={!!errors.email}
                             {...form.register("email")}
@@ -104,12 +103,11 @@ export function LoginForm({
                         <FieldError>{errors.email?.message}</FieldError>
                     </Field>
                     <Field invalid={!!errors.password}>
-                        <FieldLabel htmlFor="password" className="text-[12.5px] font-semibold">{t("login.passwordLabel")}</FieldLabel>
+                        <FieldLabel htmlFor="password">{t("login.passwordLabel")}</FieldLabel>
                         <Input
                             id="password"
                             type="password"
                             autoComplete="current-password"
-                            className="h-11 rounded-[6px] px-3.5"
                             disabled={mutation.isPending}
                             aria-invalid={!!errors.password}
                             {...form.register("password")}
@@ -135,7 +133,7 @@ export function LoginForm({
 
                 <Button
                     type="submit"
-                    className="mt-7 h-[52px] w-full rounded-2xl text-[15px] font-semibold"
+                    className="mt-7 w-full"
                     disabled={mutation.isPending}
                 >
                     {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
