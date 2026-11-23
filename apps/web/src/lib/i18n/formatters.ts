@@ -9,6 +9,15 @@ export type CompanySettings = {
 };
 
 const DEFAULT_CURRENCY = "KGS"; // matches Company.currency's own schema default
+
+/**
+ * Currencies shown by their sign rather than their ISO code. The som sign
+ * (U+20C0) is drawn by the 'Kerege Som' font in index.css, since few fonts
+ * have it. Anything not listed keeps its code ("USD").
+ */
+const CURRENCY_SIGNS: Record<string, string> = {
+    KGS: "\u20C0",
+};
 const DEFAULT_LOCALE = "ru-RU"; // primary target market language, not a browser guess
 
 /**
@@ -34,14 +43,15 @@ export function useFormatters(company?: CompanySettings) {
 
     return useMemo(() => {
         const number = new Intl.NumberFormat(locale);
-        // Money reads as "12,345 KGS": comma-grouped digits, then the ISO
-        // code. Built by hand because Intl's currency style puts the code
+        // Money reads as "12,345 ⃀": comma-grouped digits, then the
+        // currency's sign (or its ISO code when it has none listed). Built by hand because Intl's currency style puts the code
         // before the amount in some locales, and pinned to en-US because
         // ru-RU groups with spaces rather than commas.
         const amount = new Intl.NumberFormat("en-US", {
             maximumFractionDigits: 0,
         });
-        const money = (value: number) => `${amount.format(value)} ${currency}`;
+        const sign = CURRENCY_SIGNS[currency] ?? currency;
+        const money = (value: number) => `${amount.format(value)} ${sign}`;
         const area = new Intl.NumberFormat(locale, {maximumFractionDigits: 2});
         const time = new Intl.DateTimeFormat(locale, { timeStyle: "short" });
 
@@ -57,7 +67,7 @@ export function useFormatters(company?: CompanySettings) {
             // The bare ISO currency code (e.g. "KGS") - for labels like
             // "Deposit (KGS)" where a full Intl.NumberFormat call would be
             // overkill, but "$" regardless of the company's currency is wrong.
-            currencyCode: currency,
+            currencyCode: sign,
         };
     }, [locale, currency, sqm]);
 }
