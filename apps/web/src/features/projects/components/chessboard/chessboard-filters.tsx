@@ -1,8 +1,7 @@
 import {createListCollection} from "@ark-ui/react";
 import {ChevronsUpDown} from "lucide-react";
 import {Button} from "@/components/ui/button";
-import {Field} from "@/components/ui/field";
-import {FilterPopover} from "@/components/shared/filter-popover.tsx";
+import {Field, FieldGroup} from "@/components/ui/field";
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
 import {
@@ -32,10 +31,7 @@ export interface Filters {
 
 interface ChessboardFiltersProps {
     filters: Filters;
-    hasActiveFilters: boolean;
-    totalUnits: number;
     onFiltersChange(filters: Filters): void;
-    onClearFilters(): void;
 }
 
 /* Presets Data Definitions */
@@ -50,10 +46,7 @@ const ROOM_PRESETS = [
 
 export function ChessboardFilters({
                                       filters,
-                                      hasActiveFilters,
-                                      totalUnits,
                                       onFiltersChange,
-                                      onClearFilters,
                                   }: ChessboardFiltersProps) {
 
     const { t } = useTranslation("units");
@@ -110,23 +103,12 @@ export function ChessboardFilters({
         ],
     });
 
-    const activeCount =
-        Number(filters.status !== "all") +
-        Number(filters.type !== "all") +
-        Number(!!filters.rooms) +
-        Number(!!(filters.areaMin || filters.areaMax)) +
-        Number(!!(filters.priceMin || filters.priceMax));
-
-    // One "Filter" button, as on the list pages; the controls inside are
-    // the same ones that used to sit in a row above the board.
     return (
-        <div className="flex items-center gap-3">
-            {hasActiveFilters && (
-                <span className="text-sm text-muted-foreground">
-                    {t("filters.unitsFound", { count: totalUnits })}
-                </span>
-            )}
-            <FilterPopover activeCount={activeCount} onReset={onClearFilters}>
+        // The five filters share the full width; the found count and Clear
+        // sit in the header row above, with the block and entrance.
+        <div>
+            <FieldGroup>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
                     {/* Status Select */}
                     <Field>
                         <Select
@@ -381,7 +363,8 @@ export function ChessboardFilters({
                             </PopoverContent>
                         </Popover>
                     </Field>
-            </FilterPopover>
+                </div>
+            </FieldGroup>
         </div>
     );
 }

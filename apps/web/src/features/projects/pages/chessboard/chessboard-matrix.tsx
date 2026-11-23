@@ -2,7 +2,8 @@ import {useEffect, useMemo, useState} from "react";
 import {useNavigate, useParams, useSearchParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {getProjectChessboard} from "@/features/projects/api/projects.api";
-import {DoorOpen, Loader2Icon,} from "lucide-react";
+import {DoorOpen, Loader2Icon, XIcon} from "lucide-react";
+import {Button} from "@/components/ui/button.tsx";
 import {type Unit, type UnitStatus, type UnitType} from "@/features/units/types/unit.types";
 import type {Block} from "@/features/blocks/types/block.types";
 import type {Entrance} from "@/features/entrances/types/entrance.types";
@@ -230,14 +231,19 @@ export function ChessboardMatrix() {
                         onEntranceSelect={(id) => navigate(paths.projects.chessboard.entrance(projectId!, block.id, id) + search)}
                     />
                 </div>
-                <ChessboardFilters
-                    filters={filters}
-                    hasActiveFilters={hasActiveFilters}
-                    totalUnits={matrixData?.totalUnits || 0}
-                    onFiltersChange={setFilters}
-                    onClearFilters={clearFilters}
-                />
+                {hasActiveFilters && (
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">
+                            {t("units:filters.unitsFound", {count: matrixData?.totalUnits || 0})}
+                        </span>
+                        <Button variant="ghost" onClick={clearFilters}>
+                            <XIcon /> {t("units:filters.clearAll")}
+                        </Button>
+                    </div>
+                )}
             </div>
+
+            <ChessboardFilters filters={filters} onFiltersChange={setFilters} />
 
             {reserveFor && <ReservingForBanner clientId={reserveFor.clientId} onStop={stopReserving} />}
 
