@@ -202,7 +202,7 @@ export function PaymentsPage() {
             </div>
 
             {totals && (
-                <div className="space-y-3">
+                <>
                     {/* The same number cards as Home and Deals: label, big figure, tile. */}
                     <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
                         <KpiCard icon={BanknoteArrowDownIcon} accent="bg-emerald-500" label={t("page.totals.received")} value={formatCurrency(totals.received)} />
@@ -210,14 +210,7 @@ export function PaymentsPage() {
                         <KpiCard icon={WalletIcon} accent="bg-blue-500" label={t("page.totals.net")} value={formatCurrency(totals.net)} />
                         <KpiCard icon={ReceiptIcon} accent="bg-violet-500" label={t("page.totals.count")} value={String(totals.count)} />
                     </div>
-                    {totals.byMethod.some((m) => m.amount !== 0) && (
-                        <p className="flex flex-wrap gap-x-5 gap-y-1 px-1 text-xs text-muted-foreground">
-                            {totals.byMethod.filter((m) => m.amount !== 0).map((m) => (
-                                <span key={m.method}>{t(PAYMENT_METHOD_LABEL_KEYS[m.method])}: <span className="font-medium text-foreground tabular-nums">{formatCurrency(m.amount)}</span></span>
-                            ))}
-                        </p>
-                    )}
-                </div>
+                </>
             )}
 
             <DataTable
