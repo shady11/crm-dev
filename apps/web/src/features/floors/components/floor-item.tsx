@@ -25,9 +25,9 @@ export function FloorItem({
     const unitCount = floor.units?.length || 0;
 
     return (
-        // The unit table's first column lines up with the floor title:
-        // row padding 2.5 + chevron 4 + gap 3 + number tile 8 + gap 3 (spacing units).
-        <div className="overflow-hidden rounded-[6px] border bg-card [--unit-table-inset:calc(var(--spacing)*20.5)]">
+        // The unit table's first column lines up with the floor number tile:
+        // row padding 2.5 + chevron 4 + gap 3 (spacing units).
+        <div className="overflow-hidden rounded-[6px] border bg-card [--unit-table-inset:calc(var(--spacing)*9.5)]">
             <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-2.5 py-2">
                 <button
                     type="button"
