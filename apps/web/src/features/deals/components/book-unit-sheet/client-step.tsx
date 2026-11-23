@@ -21,17 +21,20 @@ export function ClientStep({ form, selectedClient, onSelectClient }: ClientStepP
     return (
         <SheetBody scrollFade>
             <FieldGroup className="gap-5 py-4">
-                <div className="flex gap-2">
+                {/* Existing or new client, as a segmented switch like the page tabs. */}
+                <div className="seg-surface flex gap-1 rounded-[8px] p-1">
                     <button
                         type="button"
-                        className={`flex-1 rounded-md border border-secondary p-2 text-sm font-medium ${clientMode === "existing" ? "bg-secondary text-secondary-foreground" : ""}`}
+                        aria-pressed={clientMode === "existing"}
+                        className={`flex-1 rounded-[6px] px-2 py-1.5 text-sm font-medium transition-colors ${clientMode === "existing" ? "seg-thumb text-foreground" : "text-muted-foreground hover:text-foreground"}`}
                         onClick={() => form.setValue("clientMode", "existing")}
                     >
                         {t("booking.existingClient")}
                     </button>
                     <button
                         type="button"
-                        className={`flex-1 rounded-md border border-secondary p-2 text-sm font-medium ${clientMode === "new" ? "bg-secondary text-secondary-foreground" : ""}`}
+                        aria-pressed={clientMode === "new"}
+                        className={`flex-1 rounded-[6px] px-2 py-1.5 text-sm font-medium transition-colors ${clientMode === "new" ? "seg-thumb text-foreground" : "text-muted-foreground hover:text-foreground"}`}
                         onClick={() => {
                             form.setValue("clientMode", "new");
                             onSelectClient(null);
