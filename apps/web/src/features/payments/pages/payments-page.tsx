@@ -2,13 +2,13 @@ import {useState} from "react";
 import {Link} from "react-router-dom";
 import {keepPreviousData, useQuery} from "@tanstack/react-query";
 import {createListCollection} from "@ark-ui/react";
-import {Download, FileSpreadsheet, Loader2, Search, WalletIcon} from "lucide-react";
+import {BanknoteArrowDownIcon, Download, FileSpreadsheet, Loader2, ReceiptIcon, Search, Undo2Icon, WalletIcon} from "lucide-react";
+import {KpiCard} from "@/features/dashboard/components/kpi-card.tsx";
 import {useAuth} from "@/features/auth/hooks/use-auth.ts";
 import {companyToday} from "@/lib/company-day.ts";
 import {useTranslation} from "react-i18next";
 import {blockLabel} from "@/features/units/utils/block-label.ts";
 import {Button} from "@/components/ui/button.tsx";
-import {Card, CardContent} from "@/components/ui/card.tsx";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
@@ -142,26 +142,14 @@ export function PaymentsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight">{t("page.title")}</h2>
-                    <p className="text-sm text-muted-foreground">{t("page.subtitle")}</p>
-                </div>
-                <div className="flex flex-wrap items-center gap-2">
-                    <Button variant="secondary" onClick={() => runExport("receivables")} disabled={exporting !== null}>
-                        {exporting === "receivables" ? <Loader2 className="animate-spin" /> : <FileSpreadsheet />}
-                        {t("page.exportReceivables")}
-                    </Button>
-                    <Button onClick={() => runExport("payments")} disabled={exporting !== null}>
-                        {exporting === "payments" ? <Loader2 className="animate-spin" /> : <Download />}
-                        {t("page.exportPayments")}
-                    </Button>
-                </div>
+            <div>
+                <h2 className="text-2xl font-bold tracking-tight">{t("page.title")}</h2>
+                <p className="text-sm text-muted-foreground">{t("page.subtitle")}</p>
             </div>
 
             {/* Search on the left; period and filters on the right, as on every list. */}
             <div className="flex flex-wrap items-center justify-between gap-3">
-                <InputGroup className="w-full sm:w-80">
+                <InputGroup className="w-full sm:w-auto sm:min-w-56 sm:max-w-80 sm:flex-1">
                     <InputGroupInput placeholder={t("page.searchPlaceholder")} value={search} onChange={(e) => update(setSearch)(e.target.value)} />
                     <InputGroupAddon><Search className="size-4" /></InputGroupAddon>
                 </InputGroup>
@@ -200,27 +188,35 @@ export function PaymentsPage() {
                         </SelectContent>
                     </Select>
                 </FilterPopover>
+                {/* Exports sit with the filters: they export what the filters show. */}
+                <Button variant="outline" onClick={() => runExport("receivables")} disabled={exporting !== null}>
+                    {exporting === "receivables" ? <Loader2 className="animate-spin" /> : <FileSpreadsheet />}
+                    {t("page.exportReceivables")}
+                </Button>
+                <Button onClick={() => runExport("payments")} disabled={exporting !== null}>
+                    {exporting === "payments" ? <Loader2 className="animate-spin" /> : <Download />}
+                    {t("page.exportPayments")}
+                </Button>
                 </div>
             </div>
 
             {totals && (
-                <Card className="border">
-                    <CardContent className="space-y-3">
-                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                            <Figure label={t("page.totals.received")} value={formatCurrency(totals.received)} />
-                            <Figure label={t("page.totals.refunded")} value={formatCurrency(totals.refunded)} className={totals.refunded > 0 ? "text-rose-600" : ""} />
-                            <Figure label={t("page.totals.net")} value={formatCurrency(totals.net)} />
-                            <Figure label={t("page.totals.count")} value={String(totals.count)} />
-                        </div>
-                        {totals.byMethod.some((m) => m.amount !== 0) && (
-                            <p className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                                {totals.byMethod.filter((m) => m.amount !== 0).map((m) => (
-                                    <span key={m.method}>{t(PAYMENT_METHOD_LABEL_KEYS[m.method])}: <span className="font-medium text-foreground tabular-nums">{formatCurrency(m.amount)}</span></span>
-                                ))}
-                            </p>
-                        )}
-                    </CardContent>
-                </Card>
+                <div className="space-y-3">
+                    {/* The same number cards as Home and Deals: label, big figure, tile. */}
+                    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+                        <KpiCard icon={BanknoteArrowDownIcon} accent="bg-emerald-500" label={t("page.totals.received")} value={formatCurrency(totals.received)} />
+                        <KpiCard icon={Undo2Icon} accent="bg-rose-400" label={t("page.totals.refunded")} value={formatCurrency(totals.refunded)} />
+                        <KpiCard icon={WalletIcon} accent="bg-blue-500" label={t("page.totals.net")} value={formatCurrency(totals.net)} />
+                        <KpiCard icon={ReceiptIcon} accent="bg-violet-500" label={t("page.totals.count")} value={String(totals.count)} />
+                    </div>
+                    {totals.byMethod.some((m) => m.amount !== 0) && (
+                        <p className="flex flex-wrap gap-x-5 gap-y-1 px-1 text-xs text-muted-foreground">
+                            {totals.byMethod.filter((m) => m.amount !== 0).map((m) => (
+                                <span key={m.method}>{t(PAYMENT_METHOD_LABEL_KEYS[m.method])}: <span className="font-medium text-foreground tabular-nums">{formatCurrency(m.amount)}</span></span>
+                            ))}
+                        </p>
+                    )}
+                </div>
             )}
 
             <DataTable
@@ -300,15 +296,6 @@ export function PaymentsPage() {
                 onPageChange={setPage}
                 onLimitChange={update(setLimit)}
             />
-        </div>
-    );
-}
-
-function Figure({label, value, className = ""}: {label: string; value: string; className?: string}) {
-    return (
-        <div>
-            <p className="text-xs text-muted-foreground">{label}</p>
-            <p className={`text-xl font-semibold tabular-nums ${className}`}>{value}</p>
         </div>
     );
 }
