@@ -1,9 +1,9 @@
-import {DoorOpenIcon, FileTextIcon} from "lucide-react";
+import {FileTextIcon} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
 import type {Floor} from "@/features/floors/types/floor.types.ts";
-import {type Unit, UNIT_STATUS_CLASSES, UNIT_STATUS_LABEL_KEYS, UNIT_TYPE_LABEL_KEYS} from "@/features/units/types/unit.types.ts";
-import {Badge} from "@/components/ui/badge.tsx";
+import {type Unit, UNIT_TYPE_LABEL_KEYS} from "@/features/units/types/unit.types.ts";
+import {UnitSummary} from "@/features/units/components/unit-summary.tsx";
 import {DealCard} from "@/features/deals/components/deal-card.tsx";
 import {UnitOverview} from "@/features/units/components/unit-overview.tsx";
 import {useUnit} from "@/features/units/hooks/use-unit.ts";
@@ -87,26 +87,16 @@ export function UnitDetailsSheet({
 
                 <SheetBody scrollFade>
                     {/* At a glance: the status colour, the price and the status. */}
-                    <div className="flex items-center gap-4 pt-4 pb-2">
-                        <span className={`icon-tile flex size-12 shrink-0 items-center justify-center ${UNIT_STATUS_CLASSES[unit.status]}`}>
-                            <DoorOpenIcon className="size-6" strokeWidth={1.75} />
-                        </span>
-                        <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                                <span className="text-2xl font-bold tabular-nums">{formatCurrency(parseFloat(unit.price))}</span>
-                                <Badge className={UNIT_STATUS_CLASSES[unit.status]}>
-                                    {t(UNIT_STATUS_LABEL_KEYS[unit.status])}
-                                </Badge>
-                            </div>
-                            <p className="truncate text-sm text-muted-foreground">
-                                {[
-                                    unit.rooms != null && t("chessboard.rooms", { count: unit.rooms }),
-                                    t(UNIT_TYPE_LABEL_KEYS[unit.type]),
-                                    formatArea(unit.area),
-                                ].filter(Boolean).join(" · ")}
-                            </p>
-                        </div>
-                    </div>
+                    <UnitSummary
+                        className="pt-4 pb-2"
+                        status={unit.status}
+                        price={parseFloat(unit.price)}
+                        details={[
+                            unit.rooms != null ? t("chessboard.rooms", { count: unit.rooms }) : null,
+                            t(UNIT_TYPE_LABEL_KEYS[unit.type]),
+                            formatArea(unit.area),
+                        ].filter((item): item is string => !!item)}
+                    />
                     {fullUnit?.pendingPriceRequest ? (
                         // SH-2: the unit keeps its price until an approver decides.
                         <Alert variant="warning" className="mt-4">
