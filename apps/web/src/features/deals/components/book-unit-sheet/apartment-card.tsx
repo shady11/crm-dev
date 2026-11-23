@@ -5,12 +5,13 @@ import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters
 import {useTranslation} from "react-i18next";
 
 /** The unit being booked, shown as in the unit sheet. */
-export function ApartmentCard({ apartment }: { apartment: ApartmentSummary }) {
+export function ApartmentCard({ apartment, className }: { apartment: ApartmentSummary; className?: string }) {
     const { t } = useTranslation("deals");
     const { formatArea } = useCompanyFormatters();
 
     return (
         <UnitSummary
+            className={className}
             status={apartment.status as UnitStatus}
             price={apartment.price}
             details={[

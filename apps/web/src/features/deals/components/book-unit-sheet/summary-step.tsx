@@ -37,7 +37,7 @@ export function SummaryStep({ values, apartment, selectedClient, managerName }: 
     return (
         <SheetBody scrollFade>
             <div className="flex flex-col gap-4 py-4">
-                <ApartmentCard apartment={apartment} />
+                <ApartmentCard apartment={apartment} className="pb-2" />
 
                 <DataList className="divide-y">
                     <DataListItem>
