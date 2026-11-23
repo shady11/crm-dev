@@ -243,7 +243,6 @@ export function ChessboardMatrix() {
                 )}
             </div>
 
-            <ChessboardFilters filters={filters} onFiltersChange={setFilters} />
 
             {reserveFor && <ReservingForBanner clientId={reserveFor.clientId} onStop={stopReserving} />}
 
@@ -257,6 +256,7 @@ export function ChessboardMatrix() {
                     hasActiveFilters={hasActiveFilters}
                     unitMatchesFilters={unitMatchesFilters}
                     onUnitClick={(floor, unit) => actions.openDetails(unit, floor)}
+                    toolbar={<ChessboardFilters filters={filters} onFiltersChange={setFilters} />}
                 />
             ) : (
                 <Empty>

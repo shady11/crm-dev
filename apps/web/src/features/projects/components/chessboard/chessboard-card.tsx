@@ -1,5 +1,5 @@
 import {ChevronLeftIcon, ChevronRightIcon, Dot} from "lucide-react";
-import {useEffect, useRef, useState} from "react";
+import {type ReactNode, useEffect, useRef, useState} from "react";
 import {createListCollection} from "@ark-ui/react";
 import {Badge} from "@/components/ui/badge";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
@@ -24,6 +24,8 @@ interface ChessboardCardProps {
     hasActiveFilters?: boolean;
     unitMatchesFilters?(unit: Unit): boolean;
     onUnitClick(floor: Floor, unit: Unit): void;
+    /** Controls shown between the header and the grid, e.g. the filters. */
+    toolbar?: ReactNode;
 }
 
 export function ChessboardCard({
@@ -35,6 +37,7 @@ export function ChessboardCard({
                                    hasActiveFilters,
                                    unitMatchesFilters,
                                    onUnitClick,
+                                   toolbar,
                                }: ChessboardCardProps) {
     const { t } = useTranslation("units");
     const scroller = useRef<HTMLDivElement>(null);
@@ -98,6 +101,8 @@ export function ChessboardCard({
                     </Badge>
                 </div>
             </CardHeader>
+
+            {toolbar && <div className="border-b px-4 py-4 sm:px-6">{toolbar}</div>}
 
             <CardContent className="gap-0 p-4 sm:p-6">
                 {/* Floor numbers stay put while the units scroll sideways. */}
