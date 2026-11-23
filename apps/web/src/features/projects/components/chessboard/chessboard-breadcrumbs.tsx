@@ -98,7 +98,7 @@ export function ChessboardBreadcrumbs({
                     </nav>
                 ) : (
                     blocks.length <= 1 && (
-                        <p className="text-base font-semibold">
+                        <p className="text-lg font-semibold">
                             {namedLabel(t, "chessboard.blockLabel", block.name)} · {namedLabel(t, "chessboard.entranceLabel", entrance.name)}
                         </p>
                     )
