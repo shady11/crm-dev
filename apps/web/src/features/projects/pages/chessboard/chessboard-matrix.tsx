@@ -206,37 +206,40 @@ export function ChessboardMatrix() {
 
     return (
         <div className="space-y-6">
-            <ChessboardBreadcrumbs
-                block={block}
-                entrance={entrance}
-                blocks={blocks}
-                blockEntrances={blockEntrances}
-                // Back to the entrance list, or to the block list when this
-                // block has only the one entrance.
-                onBack={() => navigate(
-                    (blockEntrances.length > 1
-                        ? paths.projects.chessboard.block(projectId!, block.id)
-                        : paths.projects.chessboard.root(projectId!)) + search,
-                    {state: BROWSE_STATE},
-                )}
-                onBlockSelect={(id) => {
-                    const first = blocks.find((b) => b.id === id)?.entrances?.[0];
-                    navigate((first
-                        ? paths.projects.chessboard.entrance(projectId!, id, first.id)
-                        : paths.projects.chessboard.block(projectId!, id)) + search);
-                }}
-                onEntranceSelect={(id) => navigate(paths.projects.chessboard.entrance(projectId!, block.id, id) + search)}
-            />
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                    <ChessboardBreadcrumbs
+                        block={block}
+                        entrance={entrance}
+                        blocks={blocks}
+                        blockEntrances={blockEntrances}
+                        // Back to the entrance list, or to the block list when this
+                        // block has only the one entrance.
+                        onBack={() => navigate(
+                            (blockEntrances.length > 1
+                                ? paths.projects.chessboard.block(projectId!, block.id)
+                                : paths.projects.chessboard.root(projectId!)) + search,
+                            {state: BROWSE_STATE},
+                        )}
+                        onBlockSelect={(id) => {
+                            const first = blocks.find((b) => b.id === id)?.entrances?.[0];
+                            navigate((first
+                                ? paths.projects.chessboard.entrance(projectId!, id, first.id)
+                                : paths.projects.chessboard.block(projectId!, id)) + search);
+                        }}
+                        onEntranceSelect={(id) => navigate(paths.projects.chessboard.entrance(projectId!, block.id, id) + search)}
+                    />
+                </div>
+                <ChessboardFilters
+                    filters={filters}
+                    hasActiveFilters={hasActiveFilters}
+                    totalUnits={matrixData?.totalUnits || 0}
+                    onFiltersChange={setFilters}
+                    onClearFilters={clearFilters}
+                />
+            </div>
 
             {reserveFor && <ReservingForBanner clientId={reserveFor.clientId} onStop={stopReserving} />}
-
-            <ChessboardFilters
-                filters={filters}
-                hasActiveFilters={hasActiveFilters}
-                totalUnits={matrixData?.totalUnits || 0}
-                onFiltersChange={setFilters}
-                onClearFilters={clearFilters}
-            />
 
             {matrixData && matrixData.floors.length > 0 ? (
                 <ChessboardCard

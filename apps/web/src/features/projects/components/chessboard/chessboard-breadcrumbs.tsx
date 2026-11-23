@@ -29,8 +29,8 @@ function Pill({active, muted, onClick, children}: {active: boolean; muted?: bool
             aria-pressed={active}
             onClick={onClick}
             className={cn(
-                "shrink-0 rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors",
-                active ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground hover:bg-secondary/70",
+                "shrink-0 rounded-[6px] px-3 py-1.5 text-sm font-medium whitespace-nowrap transition-colors",
+                active ? "seg-thumb text-foreground" : "text-muted-foreground hover:text-foreground",
                 // Not on sale yet: viewable, visibly not bookable.
                 muted && !active && "border border-dashed border-muted-foreground/40 bg-transparent text-muted-foreground",
             )}
@@ -71,16 +71,16 @@ export function ChessboardBreadcrumbs({
         <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-2">
             <Button
                 variant="outline"
-                size="icon-sm"
+                size="icon-lg"
                 className={cn("col-start-1 row-start-1", singleRow ? "self-center" : "mt-0.5 self-start")}
                 onClick={onBack}
                 aria-label={t("common:actions.back")}
             >
-                <ArrowLeftIcon className="size-3" />
+                <ArrowLeftIcon />
             </Button>
-            <div className="col-start-2 row-start-1 flex min-w-0 flex-col gap-2">
+            <div className={cn("col-start-2 row-start-1 flex min-w-0 flex-col gap-2", singleRow && "self-center")}>
                 {blocks.length > 1 && (
-                    <nav className="flex gap-1.5 overflow-x-auto pb-0.5" aria-label={t("chessboard.blocksNav")}>
+                    <nav className="seg-surface flex w-fit max-w-full gap-1 overflow-x-auto rounded-[8px] p-1" aria-label={t("chessboard.blocksNav")}>
                         {blocks.map((item) => (
                             <Pill key={item.id} active={item.id === block.id} muted={!isBlockBookable(item.salesStatus)} onClick={() => onBlockSelect(item.id)}>
                                 {namedLabel(t, "chessboard.blockLabel", item.name)}
@@ -89,7 +89,7 @@ export function ChessboardBreadcrumbs({
                     </nav>
                 )}
                 {blockEntrances.length > 1 ? (
-                    <nav className="flex gap-1.5 overflow-x-auto pb-0.5" aria-label={t("chessboard.entrancesNav")}>
+                    <nav className="seg-surface flex w-fit max-w-full gap-1 overflow-x-auto rounded-[8px] p-1" aria-label={t("chessboard.entrancesNav")}>
                         {blockEntrances.map((item) => (
                             <Pill key={item.id} active={item.id === entrance.id} onClick={() => onEntranceSelect(item.id)}>
                                 {namedLabel(t, "chessboard.entranceLabel", item.name)}
@@ -98,7 +98,7 @@ export function ChessboardBreadcrumbs({
                     </nav>
                 ) : (
                     blocks.length <= 1 && (
-                        <p className="text-sm font-medium">
+                        <p className="text-base font-semibold">
                             {namedLabel(t, "chessboard.blockLabel", block.name)} · {namedLabel(t, "chessboard.entranceLabel", entrance.name)}
                         </p>
                     )

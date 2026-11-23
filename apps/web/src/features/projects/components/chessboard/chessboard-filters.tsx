@@ -1,7 +1,8 @@
 import {createListCollection} from "@ark-ui/react";
-import {ChevronsUpDown, XIcon} from "lucide-react";
+import {ChevronsUpDown} from "lucide-react";
 import {Button} from "@/components/ui/button";
-import {Field, FieldGroup} from "@/components/ui/field";
+import {Field} from "@/components/ui/field";
+import {FilterPopover} from "@/components/shared/filter-popover.tsx";
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue,} from "@/components/ui/select";
 import {
@@ -109,10 +110,23 @@ export function ChessboardFilters({
         ],
     });
 
+    const activeCount =
+        Number(filters.status !== "all") +
+        Number(filters.type !== "all") +
+        Number(!!filters.rooms) +
+        Number(!!(filters.areaMin || filters.areaMax)) +
+        Number(!!(filters.priceMin || filters.priceMax));
+
+    // One "Filter" button, as on the list pages; the controls inside are
+    // the same ones that used to sit in a row above the board.
     return (
-        <div className="flex items-center">
-            <FieldGroup>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
+        <div className="flex items-center gap-3">
+            {hasActiveFilters && (
+                <span className="text-sm text-muted-foreground">
+                    {t("filters.unitsFound", { count: totalUnits })}
+                </span>
+            )}
+            <FilterPopover activeCount={activeCount} onReset={onClearFilters}>
                     {/* Status Select */}
                     <Field>
                         <Select
@@ -367,18 +381,7 @@ export function ChessboardFilters({
                             </PopoverContent>
                         </Popover>
                     </Field>
-
-                    {hasActiveFilters && (
-                        <div className="flex items-center justify-between">
-                            <span className="text-xs font-medium text-muted-foreground">
-                                {t("filters.unitsFound", { count: totalUnits })}
-                            </span>
-                            <Button variant="ghost" size="sm" onClick={onClearFilters}>
-                                <XIcon className="size-3" /> {t("filters.clearAll")}</Button>
-                        </div>
-                    )}
-                </div>
-            </FieldGroup>
+            </FilterPopover>
         </div>
     );
 }
