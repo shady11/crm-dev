@@ -143,12 +143,9 @@ export function PaymentsPage() {
     return (
         <div className="space-y-6">
             {/* Title on the left, the two Excel exports top right. */}
-            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                <div className="min-w-0">
-                    <h2 className="text-2xl font-bold tracking-tight">{t("page.title")}</h2>
-                    <p className="text-sm text-muted-foreground">{t("page.subtitle")}</p>
-                </div>
-                <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-2xl font-bold tracking-tight">{t("page.title")}</h2>
+                <div className="flex flex-wrap items-center gap-2">
                     <Button variant="outline" onClick={() => runExport("receivables")} disabled={exporting !== null}>
                         {exporting === "receivables" ? <Loader2 className="animate-spin" /> : <FileSpreadsheet />}
                         {t("page.exportReceivables")}
