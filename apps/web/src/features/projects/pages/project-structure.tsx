@@ -94,19 +94,24 @@ export function ProjectStructure() {
         ) + 1;
 
     return (
-        <div className="space-y-2">
-            <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold">{t("structure.heading")}</h2>
-                <div className="flex items-center gap-2">
+        <div className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 className="text-base font-semibold">{t("structure.heading")}</h2>
+                    <p className="text-sm text-muted-foreground">
+                        {t("counts.blocksLabel")}: {tree.blocks.length}
+                    </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
                     <ImportUnitsButton projectId={projectId!} />
                     {canCreateBlock && (
-                        <Button size="sm" variant="default" onClick={() => setOpen(true)}>
-                            <Plus className="size-3" /> {t("actions.addBlock", { ns: "blocks" })}</Button>
+                        <Button onClick={() => setOpen(true)}>
+                            <Plus /> {t("actions.addBlock", { ns: "blocks" })}</Button>
                     )}
                 </div>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
                 {tree.blocks.length > 0 ? (
                     tree.blocks.map((block: Block) => (
                         <BlockItem

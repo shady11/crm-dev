@@ -2,7 +2,6 @@ import {useState} from "react";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {MoreVertical} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
-import {Card, CardContent} from "@/components/ui/card.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
@@ -95,9 +94,9 @@ export function UnitTable({ units }: UnitTableProps) {
     });
 
     return (
-        <div className="px-6">
-            <Card className="border border-t-0 rounded-none rounded-b-lg ring-0">
-                <CardContent>
+        // Sits inside the floor row, under its header.
+        <div className="border-t">
+            <div className="overflow-x-auto [&_td:first-child]:ps-4 [&_th:first-child]:ps-4 [&_td:last-child]:pe-3 [&_th:last-child]:pe-3">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -167,8 +166,7 @@ export function UnitTable({ units }: UnitTableProps) {
                             ))}
                         </TableBody>
                     </Table>
-                </CardContent>
-            </Card>
+            </div>
 
             {/* Unit Form Sheet (Edit) */}
             {unitSheet && (

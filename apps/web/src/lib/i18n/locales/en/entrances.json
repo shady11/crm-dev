@@ -21,7 +21,8 @@
     "floors_one": "{{count}} floor",
     "floors_few": "{{count}} floors",
     "floors_many": "{{count}} floors",
-    "floors_other": "{{count}} floors"
+    "floors_other": "{{count}} floors",
+    "noFloors": "No floors yet"
   },
   "delete": {
     "title": "Delete entrance?",

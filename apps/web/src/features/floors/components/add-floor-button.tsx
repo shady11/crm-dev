@@ -59,7 +59,9 @@ export function AddFloorButton({ entrance }: AddFloorButtonProps) {
                 variant="outline"
                 onClick={() => setOpen(true)}
             >
-                <Plus className="size-3" /> {t("actions.addFloor")}</Button>
+                <Plus className="size-3" />
+                {/* Icon only on phones, where the row has no room for the label. */}
+                <span className="max-sm:sr-only">{t("actions.addFloor")}</span></Button>
 
             <Sheet
                 onOpenChange={({ open: isOpen }) => setOpen(isOpen)}

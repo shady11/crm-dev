@@ -52,7 +52,9 @@ export function AddFloorsBulkButton({
                 variant="outline"
                 onClick={() => setOpen(true)}
             >
-                <Layers2 className="size-3"/> {t("actions.bulkFloors")}</Button>
+                <Layers2 className="size-3"/>
+                {/* Icon only on phones, where the row has no room for the label. */}
+                <span className="max-sm:sr-only">{t("actions.bulkFloors")}</span></Button>
 
             <Sheet
                 onOpenChange={({ open: isOpen }) => setOpen(isOpen)}

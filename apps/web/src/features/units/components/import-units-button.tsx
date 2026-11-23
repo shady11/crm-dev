@@ -166,8 +166,8 @@ export function ImportUnitsButton({projectId}: Props) {
 
     return (
         <>
-            <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
-                <UploadIcon className="size-3" />
+            <Button variant="outline" onClick={() => setOpen(true)}>
+                <UploadIcon />
                 {t("import.trigger")}
             </Button>
             <input ref={fileInputRef} type="file" accept=".csv,.xlsx" className="hidden" onChange={handleFileSelected} />
