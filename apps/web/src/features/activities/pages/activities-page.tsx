@@ -112,7 +112,7 @@ export function ActivitiesPage() {
                     {!ownOnly && (
                         <Toggle
                             variant="outline"
-                            size="lg"
+                            size="md"
                             pressed={mineOnly}
                             onPressedChange={(pressed) => {
                                 setMineOnly(pressed);
