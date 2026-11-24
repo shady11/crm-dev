@@ -1,4 +1,3 @@
-import {RoleCardsGrid} from "@/features/users/components/role-cards-grid.tsx";
 import {UsersToolbar} from "@/features/users/components/users-toolbar.tsx";
 import {UsersTable} from "@/features/users/components/users-table.tsx";
 import {UsersPagination} from "@/features/users/components/users-pagination.tsx";
@@ -16,7 +15,6 @@ export function UsersPage() {
         pagination,
         table,
         selection,
-        roleCards,
         form,
         actions,
         deactivateDialog,
@@ -29,8 +27,6 @@ export function UsersPage() {
             <div className="flex items-start justify-between gap-4">
                 <h2 className="text-2xl font-bold tracking-tight">{t("page.title")}</h2>
             </div>
-
-            <RoleCardsGrid roles={visibleRoles} membersByRole={roleCards.membersByRole} />
 
             <div className="space-y-4">
                 <UsersToolbar

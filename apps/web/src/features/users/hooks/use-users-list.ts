@@ -9,7 +9,6 @@ import {
     type CreateUserPayload,
     deactivateUser,
     deleteUser,
-    getUserRoleSummary,
     getUsers,
     transferUserBranch,
     updateUser,
@@ -18,7 +17,6 @@ import {
     type UserSortField,
 } from "@/features/users/api/users.api.ts";
 import type {User} from "@/features/users/types/user.types";
-import {initials} from "@/features/users/utils/format.ts";
 import {useTranslation} from "react-i18next";
 import {useSort} from "@/hooks/use-sort.ts";
 import {useDebouncedValue} from "@/hooks/use-debounced-value.ts";
@@ -65,11 +63,6 @@ export function useUsersList() {
                 sortBy,
                 sortOrder,
             }),
-    });
-
-    const roleSummaryQuery = useQuery({
-        queryKey: ["users", "role-summary"],
-        queryFn: getUserRoleSummary,
     });
 
     const createMutation = useMutation({
@@ -174,22 +167,6 @@ export function useUsersList() {
     });
 
     const clearSelection = () => setSelectedIds(new Set());
-
-    const membersByRole = useMemo(() => {
-        const map = new Map<string, { count: number; initials: string[] }>(
-            visibleRoles.map((role) => [role.id, { count: 0, initials: [] }]),
-        );
-
-        for (const item of roleSummaryQuery.data ?? []) {
-            if (!map.has(item.roleId)) continue;
-            map.set(item.roleId, {
-                count: item.count,
-                initials: item.sample.map((u) => initials(u.fullName)),
-            });
-        }
-
-        return map;
-    }, [roleSummaryQuery.data, visibleRoles]);
 
     const openCreateForm = () => {
         setEditingUser(null);
@@ -296,10 +273,6 @@ export function useUsersList() {
             clear: clearSelection,
             bulkDeactivate: () => bulkDeactivateMutation.mutate(Array.from(selectedIds)),
             isBulkDeactivating: bulkDeactivateMutation.isPending,
-        },
-
-        roleCards: {
-            membersByRole,
         },
 
         form: {

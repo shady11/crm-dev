@@ -1,15 +1,13 @@
-import {Status} from "@/components/ui/status.tsx";
+import {Badge} from "@/components/ui/badge.tsx";
 import {useTranslation} from "react-i18next";
 
+/** Active or inactive, as a soft pill with a dot like the other status badges. */
 export function UserStatusDot({ isActive }: { isActive: boolean }) {
     const { t } = useTranslation("users");
 
     return (
-        <div className="flex items-center gap-1.5 text-sm font-medium">
-            <Status size="sm" variant="default" className={isActive ? "bg-emerald-500" : "bg-gray-400"} />
-            <span className={isActive ? "text-emerald-600" : "text-muted-foreground"}>
-                {isActive ? t("status.active") : t("status.inactive")}
-            </span>
-        </div>
+        <Badge className={isActive ? "bg-emerald-500" : "bg-gray-400"}>
+            {isActive ? t("status.active") : t("status.inactive")}
+        </Badge>
     );
 }
