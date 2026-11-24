@@ -137,12 +137,7 @@ export function PriceChangesPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-2xl font-bold tracking-tight">{t("priceChanges.title")}</h2>
-                <p className="text-sm text-muted-foreground">
-                    {canApprove ? t("priceChanges.descriptionApprover") : t("priceChanges.descriptionRequester")}
-                </p>
-            </div>
+            <h2 className="text-2xl font-bold tracking-tight">{t("priceChanges.title")}</h2>
 
             <Tabs value={view} onValueChange={({value}) => { setView(value as View); setPage(1); }}>
                 <TabsList>
