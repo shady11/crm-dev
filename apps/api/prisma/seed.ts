@@ -111,6 +111,7 @@ async function ensureDefaultRolePermissions(prisma: PrismaClient): Promise<void>
 const USAGE = `Usage:
   npx tsx prisma/seed.ts
       Local demo data (admin@crm.dev / password123). Development only.
+      DEMO_LOCALE=ru seeds it in Russian (default: Kyrgyz).
 
   npx tsx prisma/seed.ts --mode provision-tenant \\
       --company "Bishkek Dev" --admin-email admin@bishkekdev.kg --admin-name "Aibek Kendirbaev" \\
@@ -203,6 +204,58 @@ function monthsAgo(months: number): Date {
     return date;
 }
 
+// The demo's own words, in the language it is shown in. DEMO_LOCALE=ru seeds
+// a Russian-speaking company (and sets its UI default to Russian); anything
+// else gives the Kyrgyz one. People's and projects' names are the same in both.
+const DEMO_LOCALE: "ky" | "ru" = process.env.DEMO_LOCALE === "ru" ? "ru" : "ky";
+
+const DEMO_TEXT = {
+    ky: {
+        locale: "ky-KG",
+        companyAddress: "Бишкек ш., Чүй пр., 150, 4-кабат",
+        legalName: "«Бишкек Дев Курулуш» ЖЧК",
+        signatoryTitle: "Башкы директор",
+        bankName: "«Демо Банк» ААК",
+        orionAddress: "Бишкек ш., Ахунбаев көч., 98",
+        tooShamalyAddress: "Бишкек ш., Жал кичи району, 31",
+        jashylBakAddress: "Ош ш., Масалиев пр., 12",
+        branches: [
+            {name: "Бишкек, борбордук кеңсе", city: "Бишкек", address: "Чүй пр., 150"},
+            {name: "Ош филиалы", city: "Ош", address: "Ленин көч., 45"},
+        ],
+        cancelReason: "Кардар баш тартты: ипотека бекитилген жок",
+        priceRejection: "10% арзандатуу өтө көп: 5% чейин гана мүмкүн",
+        taskTitles: [
+            "Кардарга чалып, келишимдин шарттарын талкуулоо", "Төлөм боюнча эскертүү жөнөтүү",
+            "Брондоо документтерин даярдоо", "Объектти көргөндөн кийин кайра чалуу",
+            "Паспорттун көчүрмөсүн алуу", "Батирди көрсөтүүгө убакыт белгилөө",
+            "Бөлүп төлөөнүн түшкөнүн текшерүү", "Кардарга курулуштун жүрүшү тууралуу кабарлоо",
+        ],
+    },
+    ru: {
+        locale: "ru-RU",
+        companyAddress: "г. Бишкек, пр. Чуй, 150, 4 этаж",
+        legalName: "ОсОО «Бишкек Дев Курулуш»",
+        signatoryTitle: "Генеральный директор",
+        bankName: "ОАО «Демо Банк»",
+        orionAddress: "г. Бишкек, ул. Ахунбаева, 98",
+        tooShamalyAddress: "г. Бишкек, мкр. Джал, 31",
+        jashylBakAddress: "г. Ош, пр. Масалиева, 12",
+        branches: [
+            {name: "Бишкек, центральный офис", city: "Бишкек", address: "пр. Чуй, 150"},
+            {name: "Филиал в Оше", city: "Ош", address: "ул. Ленина, 45"},
+        ],
+        cancelReason: "Клиент отказался: ипотеку не одобрили",
+        priceRejection: "Скидка 10% слишком большая: допустимо до 5%",
+        taskTitles: [
+            "Обсудить с клиентом условия договора", "Отправить напоминание о платеже",
+            "Подготовить документы на бронь", "Перезвонить после просмотра объекта",
+            "Получить копию паспорта", "Назначить показ квартиры",
+            "Проверить поступление платежа по рассрочке", "Рассказать клиенту о ходе строительства",
+        ],
+    },
+}[DEMO_LOCALE];
+
 /**
  * Demo data for local development only.
  *
@@ -242,15 +295,15 @@ async function seedDemo() {
     const companyDetails = {
         name: "Bishkek Dev",
         phone: "+996 312 900 100",
-        address: "Бишкек ш., Чүй пр., 150, 4-кабат",
+        address: DEMO_TEXT.companyAddress,
         currency: "KGS",
         timezone: "Asia/Bishkek",
-        locale: "ky-KG",
-        legalName: "«Бишкек Дев Курулуш» ЖЧК",
+        locale: DEMO_TEXT.locale,
+        legalName: DEMO_TEXT.legalName,
         taxId: "02405202610015",
         signatoryName: "Осмонов Азамат Бакытович",
-        signatoryTitle: "Башкы директор",
-        bankName: "«Демо Банк» ААК",
+        signatoryTitle: DEMO_TEXT.signatoryTitle,
+        bankName: DEMO_TEXT.bankName,
         bankAccount: "1240020001234567",
         bankBic: "124002",
     };
@@ -350,7 +403,7 @@ const DEMO_PROJECTS: DemoProject[] = [
     {
         key: "orion",
         name: "ЖК Орион",
-        address: "Бишкек ш., Ахунбаев көч., 98",
+        address: DEMO_TEXT.orionAddress,
         status: ProjectStatus.ACTIVE,
         handoverDate: new Date("2027-12-20"),
         pricePerSqm: 105_000,
@@ -376,7 +429,7 @@ const DEMO_PROJECTS: DemoProject[] = [
     {
         key: "tooShamaly",
         name: "ЖК Тоо Шамалы",
-        address: "Бишкек ш., Жал кичи району, 31",
+        address: DEMO_TEXT.tooShamalyAddress,
         // Off-plan pre-sales: bookable, construction not started.
         status: ProjectStatus.PLANNING,
         handoverDate: new Date("2028-09-30"),
@@ -403,7 +456,7 @@ const DEMO_PROJECTS: DemoProject[] = [
     {
         key: "jashylBak",
         name: "ЖК Жашыл Бак",
-        address: "Ош ш., Масалиев пр., 12",
+        address: DEMO_TEXT.jashylBakAddress,
         // Built and handed over; the last flats are still on sale.
         status: ProjectStatus.COMPLETED,
         handoverDate: new Date("2025-12-20"),
@@ -538,10 +591,10 @@ async function seedDemoTenantData(args: {
 
     const branches = await Promise.all([
         prisma.branch.create({
-            data: {companyId: company.id, name: "Бишкек, борбордук кеңсе", city: "Бишкек", address: "Чүй пр., 150", phone: "+996700000010"},
+            data: {companyId: company.id, ...DEMO_TEXT.branches[0], phone: "+996700000010"},
         }),
         prisma.branch.create({
-            data: {companyId: company.id, name: "Ош филиалы", city: "Ош", address: "Ленин көч., 45", phone: "+996700000011"},
+            data: {companyId: company.id, ...DEMO_TEXT.branches[1], phone: "+996700000011"},
         }),
     ]);
 
@@ -763,7 +816,7 @@ async function seedDemoTenantData(args: {
                     contractDate: status === DealStatus.CONTRACT_SIGNED || status === DealStatus.ACTIVE || status === DealStatus.COMPLETED
                         ? createdAt : undefined,
                     cancelledAt: status === DealStatus.CANCELLED ? monthsAgo(1) : undefined,
-                    cancelReason: status === DealStatus.CANCELLED ? "Кардар баш тартты: ипотека бекитилген жок" : undefined,
+                    cancelReason: status === DealStatus.CANCELLED ? DEMO_TEXT.cancelReason : undefined,
                     createdAt,
                 },
             });
@@ -919,12 +972,7 @@ async function seedDemoTenantData(args: {
     await numberUnnumberedPayments(prisma);
 
     // --- Tasks (mix of overdue, due today, upcoming, done) --------------
-    const taskTitles = [
-        "Кардарга чалып, келишимдин шарттарын талкуулоо", "Төлөм боюнча эскертүү жөнөтүү",
-        "Брондоо документтерин даярдоо", "Объектти көргөндөн кийин кайра чалуу",
-        "Паспорттун көчүрмөсүн алуу", "Батирди көрсөтүүгө убакыт белгилөө",
-        "Бөлүп төлөөнүн түшкөнүн текшерүү", "Кардарга курулуштун жүрүшү тууралуу кабарлоо",
-    ];
+    const taskTitles = DEMO_TEXT.taskTitles;
     const allAssignees = [...teams.map((t) => t.head), ...teams.flatMap((t) => t.managers), {id: financeUser.id, fullName: financeUser.fullName}];
     const taskStatuses = [TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE];
     const taskDueOffsets = [-3, -1, 0, 0, 1, 3, 7, -2];
@@ -967,7 +1015,7 @@ async function seedDemoTenantData(args: {
         {change: 1.05, status: UnitPriceRequestStatus.PENDING},
         {change: 0.97, status: UnitPriceRequestStatus.PENDING},
         {change: 1.04, status: UnitPriceRequestStatus.APPROVED},
-        {change: 0.9, status: UnitPriceRequestStatus.REJECTED, rejectionReason: "10% арзандатуу өтө көп: 5% чейин гана мүмкүн"},
+        {change: 0.9, status: UnitPriceRequestStatus.REJECTED, rejectionReason: DEMO_TEXT.priceRejection},
     ];
     for (const [r, request] of priceRequests.entries()) {
         const unit = takeUnit("orion");

@@ -19,6 +19,7 @@ and the web app (Vite) with source bind-mounted, so edits hot-reload.
 ```bash
 docker compose up --build                     # first run (later: docker compose up)
 docker compose exec api npx prisma db seed    # demo data: admin@crm.dev / password123
+docker compose exec -e DEMO_LOCALE=ru api npx prisma db seed   # the same demo data in Russian (on an empty database)
 ```
 
 | Service | URL |
