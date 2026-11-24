@@ -21,6 +21,7 @@ const ROUTE_LABEL_KEYS: Record<string, string> = {
     users: "nav.users",
     companies: "nav.companies",
     overview: "nav.overview",
+    analytics: "nav.analytics",
     builder: "nav.builder",
     sales: "nav.sales",
     branches: "nav.branches",

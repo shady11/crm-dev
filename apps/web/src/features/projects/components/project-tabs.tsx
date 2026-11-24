@@ -13,6 +13,8 @@ export function ProjectTabs() {
         // Editing blocks, floors and units; the chessboard is the read view.
         ...(hasPermission(user, "inventory.manage") ? [{ label: t("nav.builder"), to: "builder" }] : []),
         { label: t("nav.chessboard"), to: "chessboard" },
+        // Sales figures need the same permission the dashboard does.
+        ...(hasPermission(user, "dashboard.view") ? [{ label: t("nav.analytics"), to: "analytics" }] : []),
         // "sales" is routed but still a "coming soon" placeholder, so it stays out of the tabs until it exists.
     ];
 

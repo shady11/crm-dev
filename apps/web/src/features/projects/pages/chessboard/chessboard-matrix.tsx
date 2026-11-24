@@ -2,7 +2,8 @@ import {useEffect, useMemo, useState} from "react";
 import {useNavigate, useParams, useSearchParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {getProjectChessboard} from "@/features/projects/api/projects.api";
-import {DoorOpen, Loader2Icon,} from "lucide-react";
+import {DoorOpen, Loader2Icon, XIcon} from "lucide-react";
+import {Button} from "@/components/ui/button.tsx";
 import {type Unit, type UnitStatus, type UnitType} from "@/features/units/types/unit.types";
 import type {Block} from "@/features/blocks/types/block.types";
 import type {Entrance} from "@/features/entrances/types/entrance.types";
@@ -206,37 +207,44 @@ export function ChessboardMatrix() {
 
     return (
         <div className="space-y-6">
-            <ChessboardBreadcrumbs
-                block={block}
-                entrance={entrance}
-                blocks={blocks}
-                blockEntrances={blockEntrances}
-                // Back to the entrance list, or to the block list when this
-                // block has only the one entrance.
-                onBack={() => navigate(
-                    (blockEntrances.length > 1
-                        ? paths.projects.chessboard.block(projectId!, block.id)
-                        : paths.projects.chessboard.root(projectId!)) + search,
-                    {state: BROWSE_STATE},
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                    <ChessboardBreadcrumbs
+                        block={block}
+                        entrance={entrance}
+                        blocks={blocks}
+                        blockEntrances={blockEntrances}
+                        // Back to the entrance list, or to the block list when this
+                        // block has only the one entrance.
+                        onBack={() => navigate(
+                            (blockEntrances.length > 1
+                                ? paths.projects.chessboard.block(projectId!, block.id)
+                                : paths.projects.chessboard.root(projectId!)) + search,
+                            {state: BROWSE_STATE},
+                        )}
+                        onBlockSelect={(id) => {
+                            const first = blocks.find((b) => b.id === id)?.entrances?.[0];
+                            navigate((first
+                                ? paths.projects.chessboard.entrance(projectId!, id, first.id)
+                                : paths.projects.chessboard.block(projectId!, id)) + search);
+                        }}
+                        onEntranceSelect={(id) => navigate(paths.projects.chessboard.entrance(projectId!, block.id, id) + search)}
+                    />
+                </div>
+                {hasActiveFilters && (
+                    <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">
+                            {t("units:filters.unitsFound", {count: matrixData?.totalUnits || 0})}
+                        </span>
+                        <Button variant="ghost" onClick={clearFilters}>
+                            <XIcon /> {t("units:filters.clearAll")}
+                        </Button>
+                    </div>
                 )}
-                onBlockSelect={(id) => {
-                    const first = blocks.find((b) => b.id === id)?.entrances?.[0];
-                    navigate((first
-                        ? paths.projects.chessboard.entrance(projectId!, id, first.id)
-                        : paths.projects.chessboard.block(projectId!, id)) + search);
-                }}
-                onEntranceSelect={(id) => navigate(paths.projects.chessboard.entrance(projectId!, block.id, id) + search)}
-            />
+            </div>
+
 
             {reserveFor && <ReservingForBanner clientId={reserveFor.clientId} onStop={stopReserving} />}
-
-            <ChessboardFilters
-                filters={filters}
-                hasActiveFilters={hasActiveFilters}
-                totalUnits={matrixData?.totalUnits || 0}
-                onFiltersChange={setFilters}
-                onClearFilters={clearFilters}
-            />
 
             {matrixData && matrixData.floors.length > 0 ? (
                 <ChessboardCard
@@ -248,6 +256,7 @@ export function ChessboardMatrix() {
                     hasActiveFilters={hasActiveFilters}
                     unitMatchesFilters={unitMatchesFilters}
                     onUnitClick={(floor, unit) => actions.openDetails(unit, floor)}
+                    toolbar={<ChessboardFilters filters={filters} onFiltersChange={setFilters} />}
                 />
             ) : (
                 <Empty>

@@ -214,7 +214,8 @@ export function BookUnitSheet({ unit, floor, projectId, managers, presetClientId
                     {step === 0 && (
                         <>
                             <div className="px-6">
-                                <ApartmentCard apartment={apartment} />
+                                {/* Same spacing as the unit sheet's summary. */}
+                                <ApartmentCard apartment={apartment} className="pt-4 pb-2" />
                             </div>
                             <ClientStep form={form} selectedClient={selectedClient} onSelectClient={setSelectedClient} />
                         </>

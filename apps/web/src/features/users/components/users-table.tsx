@@ -111,7 +111,6 @@ export function UsersTable({
                             onCheckedChange={(details) => onToggleAll(details.checked === true)}
                         />
                     </TableHead>
-                    <TableHead>{t("table.headers.userId")}</TableHead>
                     <SortableTableHead field="fullName" sortBy={sortBy} sortOrder={sortOrder} onSort={onSort}>
                         {t("table.headers.name")}
                     </SortableTableHead>
@@ -138,9 +137,6 @@ export function UsersTable({
                                     onCheckedChange={(details) => onToggleOne(user.id, details.checked === true)}
                                 />
                             </TableCell>
-                            <TableCell className="text-muted-foreground">
-                                #{user.id.slice(0, 4).toUpperCase()}
-                            </TableCell>
                             <TableCell>
                                 <div className="flex items-center gap-3">
                                     <div>
@@ -151,10 +147,7 @@ export function UsersTable({
                             </TableCell>
                             <TableCell>{roleLabel(t, user.role.name)}</TableCell>
                             <TableCell className="text-muted-foreground">{user.branch?.name ?? "—"}</TableCell>
-                            <TableCell>
-                                <p>{created.date}</p>
-                                <p className="text-xs text-muted-foreground">{created.time}</p>
-                            </TableCell>
+                            <TableCell>{created.date}</TableCell>
                             <TableCell>
                                 <UserStatusDot isActive={user.isActive} />
                             </TableCell>

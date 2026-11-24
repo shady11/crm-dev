@@ -21,7 +21,8 @@
     "entrances_one": "{{count}} подъезд",
     "entrances_few": "{{count}} подъезда",
     "entrances_many": "{{count}} подъездов",
-    "entrances_other": "{{count}} подъезда"
+    "entrances_other": "{{count}} подъезда",
+    "noEntrances": "Подъездов пока нет"
   },
   "delete": {
     "title": "Удалить блок?",

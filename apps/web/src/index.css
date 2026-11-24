@@ -1,5 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap');
 
+/* The Kyrgyz som sign (⃀, U+20C0). Onest and most system fonts have no glyph
+   for it, so these tiny fonts carry just that character, drawn from Onest's
+   own "C" over a bar. unicode-range keeps them to that one character. */
+@font-face {
+    font-family: 'Kerege Som';
+    src: url('./assets/fonts/som/kerege-som-regular.woff2') format('woff2');
+    font-weight: 100 549;
+    font-display: swap;
+    unicode-range: U+20C0;
+}
+@font-face {
+    font-family: 'Kerege Som';
+    src: url('./assets/fonts/som/kerege-som-semibold.woff2') format('woff2');
+    font-weight: 550 900;
+    font-display: swap;
+    unicode-range: U+20C0;
+}
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -26,7 +44,7 @@
 
 @theme inline {
     --font-heading: var(--font-sans);
-    --font-sans: 'Onest', sans-serif;
+    --font-sans: 'Kerege Som', 'Onest', sans-serif;
     --color-shell: var(--shell);
     --color-background: var(--background);
     --color-foreground: var(--foreground);

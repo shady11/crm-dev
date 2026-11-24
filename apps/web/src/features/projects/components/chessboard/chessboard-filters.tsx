@@ -1,5 +1,5 @@
 import {createListCollection} from "@ark-ui/react";
-import {ChevronsUpDown, XIcon} from "lucide-react";
+import {ChevronsUpDown} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Field, FieldGroup} from "@/components/ui/field";
 import {Popover, PopoverContent, PopoverTrigger,} from "@/components/ui/popover";
@@ -31,10 +31,7 @@ export interface Filters {
 
 interface ChessboardFiltersProps {
     filters: Filters;
-    hasActiveFilters: boolean;
-    totalUnits: number;
     onFiltersChange(filters: Filters): void;
-    onClearFilters(): void;
 }
 
 /* Presets Data Definitions */
@@ -49,10 +46,7 @@ const ROOM_PRESETS = [
 
 export function ChessboardFilters({
                                       filters,
-                                      hasActiveFilters,
-                                      totalUnits,
                                       onFiltersChange,
-                                      onClearFilters,
                                   }: ChessboardFiltersProps) {
 
     const { t } = useTranslation("units");
@@ -110,9 +104,11 @@ export function ChessboardFilters({
     });
 
     return (
-        <div className="flex items-center">
+        // The five filters share the full width; the found count and Clear
+        // sit in the header row above, with the block and entrance.
+        <div>
             <FieldGroup>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-6">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-5">
                     {/* Status Select */}
                     <Field>
                         <Select
@@ -367,16 +363,6 @@ export function ChessboardFilters({
                             </PopoverContent>
                         </Popover>
                     </Field>
-
-                    {hasActiveFilters && (
-                        <div className="flex items-center justify-between">
-                            <span className="text-xs font-medium text-muted-foreground">
-                                {t("filters.unitsFound", { count: totalUnits })}
-                            </span>
-                            <Button variant="ghost" size="sm" onClick={onClearFilters}>
-                                <XIcon className="size-3" /> {t("filters.clearAll")}</Button>
-                        </div>
-                    )}
                 </div>
             </FieldGroup>
         </div>

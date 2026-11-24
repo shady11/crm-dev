@@ -1,10 +1,9 @@
 import {roleLabel} from "@/features/rbac/utils/role-label.ts";
 import {useTranslation} from "react-i18next";
-import {EllipsisVertical, FolderCog, Lock} from "lucide-react";
+import {EllipsisVertical, FolderCog} from "lucide-react";
 import {Card, CardContent} from "@/components/ui/card.tsx";
 import {Avatar, AvatarFallback, AvatarGroupCount} from "@/components/ui/avatar.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {Badge} from "@/components/ui/badge.tsx";
 import {Menu, MenuContent, MenuItem, MenuTrigger} from "@/components/ui/menu.tsx";
 import {initials} from "@/features/users/utils/format";
 import type {Role} from "../types/rbac.types";
@@ -58,22 +57,16 @@ export function RoleCard({
     const extra = role.userCount - shown.length;
 
     return (
-        <Card className="border">
-            <CardContent className="flex flex-col gap-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+        // Full height of its grid row, with members and the button pinned to the bottom, so
+        // cards line up however long the role name is.
+        <Card className="h-full border">
+            <CardContent className="flex flex-1 flex-col gap-4">
+                <div className="flex items-start justify-between gap-2">
+                    <div className="flex min-w-0 items-center gap-3">
                         <div className={`icon-tile flex size-7 shrink-0 items-center justify-center ${ICON_COLORS[colorIndex % ICON_COLORS.length]}`}>
                             <FolderCog size={16} strokeWidth={2} />
                         </div>
-                        <div className="flex items-center gap-2">
-                            <h3 className="font-medium">{roleLabel(t, role.name)}</h3>
-                            {role.isSystem && (
-                                <Badge variant="outline" className="gap-1 text-xs">
-                                    <Lock className="size-3" />
-                                    {t("badges.system")}
-                                </Badge>
-                            )}
-                        </div>
+                        <h3 className="font-medium">{roleLabel(t, role.name)}</h3>
                     </div>
 
                     <Menu>
@@ -105,7 +98,7 @@ export function RoleCard({
                     </Menu>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="mt-auto flex items-center gap-2">
                     {/* A 4px overlap keeps both initials visible on a 24px avatar (CA-11). */}
                     <div className="flex -space-x-1">
                         {shown.map((user) => (

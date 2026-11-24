@@ -21,7 +21,8 @@
     "entrances_one": "{{count}} entrance",
     "entrances_few": "{{count}} entrances",
     "entrances_many": "{{count}} entrances",
-    "entrances_other": "{{count}} entrances"
+    "entrances_other": "{{count}} entrances",
+    "noEntrances": "No entrances yet"
   },
   "delete": {
     "title": "Delete block?",

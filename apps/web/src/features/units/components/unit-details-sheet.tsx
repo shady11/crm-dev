@@ -1,9 +1,9 @@
 import {FileTextIcon} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
 import {Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle} from "@/components/ui/sheet.tsx";
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
 import type {Floor} from "@/features/floors/types/floor.types.ts";
-import {type Unit,} from "@/features/units/types/unit.types.ts";
+import {type Unit, UNIT_TYPE_LABEL_KEYS} from "@/features/units/types/unit.types.ts";
+import {UnitSummary} from "@/features/units/components/unit-summary.tsx";
 import {DealCard} from "@/features/deals/components/deal-card.tsx";
 import {UnitOverview} from "@/features/units/components/unit-overview.tsx";
 import {useUnit} from "@/features/units/hooks/use-unit.ts";
@@ -44,7 +44,7 @@ export function UnitDetailsSheet({
 
     const { t } = useTranslation("units");
     const { user } = useAuth();
-    const { formatCurrency } = useCompanyFormatters();
+    const { formatCurrency, formatArea } = useCompanyFormatters();
     const unitDetailsQuery = useUnit(open ? unit?.id : undefined);
     const fullUnit = unitDetailsQuery.data ?? unit;
 
@@ -86,6 +86,17 @@ export function UnitDetailsSheet({
                 </SheetHeader>
 
                 <SheetBody scrollFade>
+                    {/* At a glance: the status colour, the price and the status. */}
+                    <UnitSummary
+                        className="pt-4 pb-2"
+                        status={unit.status}
+                        price={parseFloat(unit.price)}
+                        details={[
+                            unit.rooms != null ? t("chessboard.rooms", { count: unit.rooms }) : null,
+                            t(UNIT_TYPE_LABEL_KEYS[unit.type]),
+                            formatArea(unit.area),
+                        ].filter((item): item is string => !!item)}
+                    />
                     {fullUnit?.pendingPriceRequest ? (
                         // SH-2: the unit keeps its price until an approver decides.
                         <Alert variant="warning" className="mt-4">
@@ -107,31 +118,24 @@ export function UnitDetailsSheet({
                             </AlertDescription>
                         </Alert>
                     ) : null}
-                    <div className="py-4">
-                        <Tabs defaultValue="overview" className="gap-6">
-                            <TabsList>
-                                <TabsTrigger value="overview">{t("details.overviewTab")}</TabsTrigger>
-                                <TabsTrigger value="deals">
-                                    {t("details.dealsTab")}{deals.length > 0 && ` (${deals.length})`}
-                                </TabsTrigger>
-                            </TabsList>
+                    {/* Details, then the unit's deals underneath. */}
+                    <div className="space-y-6 py-4">
+                        <UnitOverview unit={unit} floor={floor} />
 
-                            <TabsContent value="overview">
-                                <UnitOverview unit={unit} floor={floor} />
-                            </TabsContent>
-
-                            <TabsContent value="deals">
-                                {deals.length === 0 ? (
-                                    <p className="py-6 text-center text-sm text-muted-foreground">{t("details.noDeals")}</p>
-                                ) : (
-                                    <div className="flex flex-col gap-2">
-                                        {deals.map((deal) => (
-                                            <DealCard key={deal.id} deal={deal} />
-                                        ))}
-                                    </div>
-                                )}
-                            </TabsContent>
-                        </Tabs>
+                        <section className="space-y-3">
+                            <h3 className="text-sm font-semibold">
+                                {t("details.dealsTab")}{deals.length > 0 && ` (${deals.length})`}
+                            </h3>
+                            {deals.length === 0 ? (
+                                <p className="rounded-lg border border-dashed py-6 text-center text-sm text-muted-foreground">{t("details.noDeals")}</p>
+                            ) : (
+                                <div className="flex flex-col gap-2">
+                                    {deals.map((deal) => (
+                                        <DealCard key={deal.id} deal={deal} />
+                                    ))}
+                                </div>
+                            )}
+                        </section>
                     </div>
                     {unit.status === "AVAILABLE" && canBook && bookingClosedReason && (
                         <p className="pb-4 text-sm text-muted-foreground">{bookingClosedReason}</p>

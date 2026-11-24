@@ -12,11 +12,12 @@ import {
     PencilIcon,
     Phone,
     PlayCircle,
-    Plus
+    Plus,
+    Search
 } from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {Input} from "@/components/ui/input.tsx";
+import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {Card, CardAction, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
@@ -101,31 +102,32 @@ export function BranchesPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-start justify-between gap-4">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
-                </div>
+            <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
 
-                <div className="flex items-center gap-2">
-                    <Input
+            {/* Search on the left, the add button on the right, as on the other list pages. */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <InputGroup className="w-full sm:w-80">
+                    <InputGroupInput
                         placeholder={t("page.searchPlaceholder")}
                         aria-label={t("page.searchPlaceholder")}
                         value={search}
                         onChange={(event) => setSearch(event.target.value)}
-                        className="max-w-sm"
                     />
-                    {canCreate && (
-                        <Button
-                            onClick={() => {
-                                setEditing(null);
-                                setFormOpen(true);
-                            }}
-                        >
-                            <Plus className="size-4" />
-                            {t("page.newBranch")}
-                        </Button>
-                    )}
-                </div>
+                    <InputGroupAddon>
+                        <Search className="size-4" />
+                    </InputGroupAddon>
+                </InputGroup>
+                {canCreate && (
+                    <Button
+                        onClick={() => {
+                            setEditing(null);
+                            setFormOpen(true);
+                        }}
+                    >
+                        <Plus className="size-4" />
+                        {t("page.newBranch")}
+                    </Button>
+                )}
             </div>
 
             {branches.isLoading ? (
@@ -151,12 +153,20 @@ export function BranchesPage() {
 
                         return (
                             <Card key={branch.id} className={deactivated ? "opacity-60" : undefined}>
-                                <CardHeader className="flex justify-between items-center">
-                                    <CardTitle>{branch.name}</CardTitle>
+                                <CardHeader className="flex items-start justify-between">
+                                    <div className="flex min-w-0 items-center gap-3">
+                                        <span className="icon-tile flex size-9 shrink-0 items-center justify-center bg-primary">
+                                            <Building2 className="size-4.5" strokeWidth={1.75} />
+                                        </span>
+                                        {/* Name, then its status underneath, so a long name keeps its room. */}
+                                        <div className="min-w-0 space-y-1">
+                                            <CardTitle className="truncate">{branch.name}</CardTitle>
+                                            <Badge variant="default" className={BRANCH_STATUS_BADGE_CLASSES[deactivated ? 1 : 0]}>
+                                                {deactivated ? t("status.deactivated") : t("status.active")}
+                                            </Badge>
+                                        </div>
+                                    </div>
                                     <CardAction className="flex items-center gap-3">
-                                        <Badge variant="default" className={BRANCH_STATUS_BADGE_CLASSES[deactivated ? 1 : 0]}>
-                                            {deactivated ? t("status.deactivated") : t("status.active")}
-                                        </Badge>
                                         <Menu>
                                             <MenuTrigger asChild>
                                                 <Button size="icon-xs" variant="ghost" aria-label={tCommon("actions.moreActions")}>

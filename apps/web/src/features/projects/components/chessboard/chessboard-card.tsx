@@ -1,5 +1,5 @@
 import {ChevronLeftIcon, ChevronRightIcon, Dot} from "lucide-react";
-import {useEffect, useRef, useState} from "react";
+import {type ReactNode, useEffect, useRef, useState} from "react";
 import {createListCollection} from "@ark-ui/react";
 import {Badge} from "@/components/ui/badge";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
@@ -24,6 +24,8 @@ interface ChessboardCardProps {
     hasActiveFilters?: boolean;
     unitMatchesFilters?(unit: Unit): boolean;
     onUnitClick(floor: Floor, unit: Unit): void;
+    /** Controls shown between the header and the grid, e.g. the filters. */
+    toolbar?: ReactNode;
 }
 
 export function ChessboardCard({
@@ -35,6 +37,7 @@ export function ChessboardCard({
                                    hasActiveFilters,
                                    unitMatchesFilters,
                                    onUnitClick,
+                                   toolbar,
                                }: ChessboardCardProps) {
     const { t } = useTranslation("units");
     const scroller = useRef<HTMLDivElement>(null);
@@ -73,10 +76,10 @@ export function ChessboardCard({
     });
 
     return (
-        <Card className="border p-0 gap-0">
-            <CardHeader className="gap-0 border-b py-6">
+        <Card className="gap-0 overflow-hidden p-0">
+            <CardHeader className="gap-0 border-b py-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                    <h3 className="font-medium">{namedLabel(t, "chessboard.entranceLabel", entranceName)}</h3>
+                    <h3 className="font-semibold">{namedLabel(t, "chessboard.entranceLabel", entranceName)}</h3>
 
                     <div className="flex flex-wrap items-center gap-4">
                         {statusCollection.items.map((status) => (
@@ -99,41 +102,65 @@ export function ChessboardCard({
                 </div>
             </CardHeader>
 
-            <CardContent className="gap-0 p-6">
-                <div className="relative">
-                    <div ref={scroller} className="w-full overflow-x-auto pb-2">
-                        <ChessboardGrid
-                            floors={floors}
-                            selectedUnit={selectedUnit}
-                            hasActiveFilters={hasActiveFilters}
-                            unitMatchesFilters={unitMatchesFilters}
-                            onUnitClick={onUnitClick}
-                        />
+            {toolbar && <div className="border-b px-4 py-4 sm:px-6">{toolbar}</div>}
+
+            <CardContent className="gap-0 p-4 sm:p-6">
+                {/* Floor numbers stay put while the units scroll sideways. */}
+                <div className="flex gap-3">
+                    <div className="flex shrink-0 flex-col gap-3 py-1">
+                        {floors.map((floor) => (
+                            <span
+                                key={floor.id}
+                                className="flex h-22 w-11 items-center justify-center rounded-[8px] border bg-card text-sm font-semibold tabular-nums text-muted-foreground"
+                            >
+                                {floor.number}
+                            </span>
+                        ))}
                     </div>
-                    {more.left ? (
-                        <div className="pointer-events-none absolute inset-y-0 left-11 z-20 flex w-16 items-center justify-start bg-gradient-to-r from-card to-transparent">
-                            <button
-                                type="button"
-                                aria-label={t("chessboard.scrollLeft")}
-                                onClick={() => scrollBy(-1)}
-                                className="pointer-events-auto flex size-9 items-center justify-center rounded-full border bg-card shadow-sm hover:bg-secondary"
-                            >
-                                <ChevronLeftIcon className="size-4" />
-                            </button>
+                    <div className="relative min-w-0 flex-1">
+                        {/* Units running off either edge fade out rather than being cut. */}
+                        <div
+                            ref={scroller}
+                            className="w-full overflow-x-auto px-1 pt-1 pb-3"
+                            style={{
+                                maskImage: more.left || more.right
+                                    ? `linear-gradient(to right, ${more.left ? "transparent, black 4rem" : "black"}, ${more.right ? "black calc(100% - 4rem), transparent" : "black"})`
+                                    : undefined,
+                            }}
+                        >
+                            <ChessboardGrid
+                                floors={floors}
+                                selectedUnit={selectedUnit}
+                                hasActiveFilters={hasActiveFilters}
+                                unitMatchesFilters={unitMatchesFilters}
+                                onUnitClick={onUnitClick}
+                            />
                         </div>
-                    ) : null}
-                    {more.right ? (
-                        <div className="pointer-events-none absolute inset-y-0 right-0 z-20 flex w-16 items-center justify-end bg-gradient-to-l from-card to-transparent">
-                            <button
-                                type="button"
-                                aria-label={t("chessboard.scrollRight")}
-                                onClick={() => scrollBy(1)}
-                                className="pointer-events-auto flex size-9 items-center justify-center rounded-full border bg-card shadow-sm hover:bg-secondary"
-                            >
-                                <ChevronRightIcon className="size-4" />
-                            </button>
-                        </div>
-                    ) : null}
+                        {more.left ? (
+                            <div className="pointer-events-none absolute inset-y-0 left-0 z-20 flex w-16 items-center justify-start">
+                                <button
+                                    type="button"
+                                    aria-label={t("chessboard.scrollLeft")}
+                                    onClick={() => scrollBy(-1)}
+                                    className="pointer-events-auto flex size-9 items-center justify-center rounded-full border bg-card shadow-sm hover:bg-secondary"
+                                >
+                                    <ChevronLeftIcon className="size-4" />
+                                </button>
+                            </div>
+                        ) : null}
+                        {more.right ? (
+                            <div className="pointer-events-none absolute inset-y-0 right-0 z-20 flex w-16 items-center justify-end">
+                                <button
+                                    type="button"
+                                    aria-label={t("chessboard.scrollRight")}
+                                    onClick={() => scrollBy(1)}
+                                    className="pointer-events-auto flex size-9 items-center justify-center rounded-full border bg-card shadow-sm hover:bg-secondary"
+                                >
+                                    <ChevronRightIcon className="size-4" />
+                                </button>
+                            </div>
+                        ) : null}
+                    </div>
                 </div>
             </CardContent>
         </Card>

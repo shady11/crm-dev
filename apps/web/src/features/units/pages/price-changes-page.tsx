@@ -102,7 +102,11 @@ export function PriceChangesPage() {
 
     const status = (r: UnitPriceRequest) => (
         <div className="space-y-0.5">
-            <Badge variant={r.status === "REJECTED" ? "destructive" : r.status === "PENDING" ? "outline" : "secondary"}>
+            {/* Pending amber, approved green (soft tones with a dot), rejected red. */}
+            <Badge
+                variant={r.status === "REJECTED" ? "destructive" : "secondary"}
+                className={r.status === "PENDING" ? "bg-amber-500" : r.status === "APPROVED" ? "bg-emerald-500" : undefined}
+            >
                 {t(`priceChanges.status.${r.status}`)}
             </Badge>
             {r.status !== "PENDING" && r.decidedBy && r.decidedBy.id !== r.requestedBy?.id ? (
@@ -137,12 +141,7 @@ export function PriceChangesPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-2xl font-bold tracking-tight">{t("priceChanges.title")}</h2>
-                <p className="text-sm text-muted-foreground">
-                    {canApprove ? t("priceChanges.descriptionApprover") : t("priceChanges.descriptionRequester")}
-                </p>
-            </div>
+            <h2 className="text-2xl font-bold tracking-tight">{t("priceChanges.title")}</h2>
 
             <Tabs value={view} onValueChange={({value}) => { setView(value as View); setPage(1); }}>
                 <TabsList>

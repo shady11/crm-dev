@@ -2,8 +2,9 @@ import {useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {createListCollection} from "@ark-ui/react";
-import {History, UserRoundIcon} from "lucide-react";
+import {History} from "lucide-react";
 import {Toggle} from "@/components/ui/toggle.tsx";
+import {FilterPopover} from "@/components/shared/filter-popover.tsx";
 import {DateField} from "@/components/shared/date-field.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
@@ -104,135 +105,140 @@ export function ActivitiesPage() {
 
     return (
         <div className="space-y-6">
-            <div>
+            {/* Title, then "my actions" and the filters together on the right. */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-2xl font-bold tracking-tight">{ownOnly ? t("page.headingOwn") : t("page.heading")}</h2>
-                <p className="text-muted-foreground text-sm">
-                    {ownOnly
-                        ? t("page.descriptionOwn")
-                        : isCompanyWide ? t("page.descriptionCompanyAdmin") : t("page.descriptionBranchScoped")}
-                </p>
-            </div>
-
-            <div className="flex flex-wrap items-end gap-3">
-                {isCompanyWide ? (
-                    <label className="block space-y-1.5">
-                        <span className="text-sm font-medium">{t("page.filters.branch")}</span>
-                        <Select
-                            collection={branchCollection}
-                            value={[branchId || "ALL"]}
-                            onValueChange={(item) => {
-                                setBranchId(item.value[0] === "ALL" ? "" : item.value[0]);
-                                // The person may not be in the new branch.
-                                setUserId("");
+                <div className="flex flex-wrap items-center gap-2">
+                    {!ownOnly && (
+                        <Toggle
+                            variant="outline"
+                            size="md"
+                            pressed={mineOnly}
+                            onPressedChange={(pressed) => {
+                                setMineOnly(pressed);
+                                if (pressed) setUserId("");
                                 setPage(1);
                             }}
                         >
-                            <SelectTrigger className="w-64">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {branchCollection.items.map((item) => (
-                                    <SelectItem key={item.value} item={item}>
-                                        {item.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </label>
-                ) : null}
-
-                {!ownOnly ? (
-                    <label className="block space-y-1.5">
-                        <span className="text-sm font-medium">{t("page.filters.user")}</span>
-                        <Select
-                            collection={userCollection}
-                            value={[userId || "ALL"]}
-                            onValueChange={(item) => {
-                                setUserId(item.value[0] === "ALL" ? "" : item.value[0]);
-                                setMineOnly(false);
-                                setPage(1);
-                            }}
-                        >
-                            <SelectTrigger className="w-52">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {userCollection.items.map((item) => (
-                                    <SelectItem key={item.value} item={item}>
-                                        {item.label}
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-                    </label>
-                ) : null}
-
-                <label className="block space-y-1.5">
-                    <span className="text-sm font-medium">{t("page.filters.subject")}</span>
-                    <Select
-                        collection={subjectCollection}
-                        value={[subject || "ALL"]}
-                        onValueChange={(item) => {
-                            setSubject(item.value[0] === "ALL" ? "" : (item.value[0] as ActivitySubject));
+                            {t("page.filters.mineOnly")}
+                        </Toggle>
+                    )}
+                    <FilterPopover
+                        activeCount={[!ownOnly && isCompanyWide && branchId, !ownOnly && userId, subject, dateFrom, dateTo].filter(Boolean).length}
+                        onReset={() => {
+                            setBranchId("");
+                            setUserId("");
+                            setSubject("");
+                            setDateFrom("");
+                            setDateTo("");
                             setPage(1);
                         }}
                     >
-                        <SelectTrigger className="w-44">
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {subjectCollection.items.map((item) => (
-                                <SelectItem key={item.value} item={item}>
-                                    {item.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </label>
+                        {isCompanyWide ? (
+                            <label className="block space-y-1.5">
+                                <span className="text-sm font-medium">{t("page.filters.branch")}</span>
+                                <Select
+                                    collection={branchCollection}
+                                    value={[branchId || "ALL"]}
+                                    onValueChange={(item) => {
+                                        setBranchId(item.value[0] === "ALL" ? "" : item.value[0]);
+                                        // The person may not be in the new branch.
+                                        setUserId("");
+                                        setPage(1);
+                                    }}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {branchCollection.items.map((item) => (
+                                            <SelectItem key={item.value} item={item}>
+                                                {item.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </label>
+                        ) : null}
 
-                <div className="space-y-1.5">
-                    <span className="text-sm font-medium">{t("page.filters.dateFrom")}</span>
-                    <DateField
-                        className="w-44"
-                        clearable
-                        value={dateFrom}
-                        max={dateTo}
-                        onChange={(value) => {
-                            setDateFrom(value);
-                            setPage(1);
-                        }}
-                    />
+                        {!ownOnly ? (
+                            <label className="block space-y-1.5">
+                                <span className="text-sm font-medium">{t("page.filters.user")}</span>
+                                <Select
+                                    collection={userCollection}
+                                    value={[userId || "ALL"]}
+                                    onValueChange={(item) => {
+                                        setUserId(item.value[0] === "ALL" ? "" : item.value[0]);
+                                        setMineOnly(false);
+                                        setPage(1);
+                                    }}
+                                >
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {userCollection.items.map((item) => (
+                                            <SelectItem key={item.value} item={item}>
+                                                {item.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </label>
+                        ) : null}
+
+                        <label className="block space-y-1.5">
+                            <span className="text-sm font-medium">{t("page.filters.subject")}</span>
+                            <Select
+                                collection={subjectCollection}
+                                value={[subject || "ALL"]}
+                                onValueChange={(item) => {
+                                    setSubject(item.value[0] === "ALL" ? "" : (item.value[0] as ActivitySubject));
+                                    setPage(1);
+                                }}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {subjectCollection.items.map((item) => (
+                                        <SelectItem key={item.value} item={item}>
+                                            {item.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </label>
+
+                        <div className="space-y-1.5">
+                            <span className="text-sm font-medium">{t("page.filters.dateFrom")}</span>
+                            <DateField
+                                className="w-full"
+                                clearable
+                                value={dateFrom}
+                                max={dateTo}
+                                onChange={(value) => {
+                                    setDateFrom(value);
+                                    setPage(1);
+                                }}
+                            />
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <span className="text-sm font-medium">{t("page.filters.dateTo")}</span>
+                            <DateField
+                                className="w-full"
+                                clearable
+                                value={dateTo}
+                                min={dateFrom}
+                                onChange={(value) => {
+                                    setDateTo(value);
+                                    setPage(1);
+                                }}
+                            />
+                        </div>
+                    </FilterPopover>
                 </div>
-
-                <div className="space-y-1.5">
-                    <span className="text-sm font-medium">{t("page.filters.dateTo")}</span>
-                    <DateField
-                        className="w-44"
-                        clearable
-                        value={dateTo}
-                        min={dateFrom}
-                        onChange={(value) => {
-                            setDateTo(value);
-                            setPage(1);
-                        }}
-                    />
-                </div>
-
-                {!ownOnly && (
-                    <Toggle
-                        variant="outline"
-                        size="lg"
-                        pressed={mineOnly}
-                        onPressedChange={(pressed) => {
-                            setMineOnly(pressed);
-                            if (pressed) setUserId("");
-                            setPage(1);
-                        }}
-                    >
-                        <UserRoundIcon className="size-4" />
-                        {t("page.filters.mineOnly")}
-                    </Toggle>
-                )}
             </div>
 
             {activitiesQuery.isLoading ? (

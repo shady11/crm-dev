@@ -4,7 +4,7 @@ import {
     PROJECT_STATUS_BADGE_CLASSES,
     PROJECT_STATUS_LABEL_KEYS
 } from "@/features/projects/types/project.types.ts";
-import {Building2} from "lucide-react";
+import {Building2, CalendarIcon, MapPinIcon} from "lucide-react";
 import {Link} from "react-router-dom";
 import {paths} from "@/routes/paths.ts";
 import {
@@ -18,8 +18,8 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog.tsx";
 import {useState} from "react";
-import {Item, ItemContent, ItemDescription, ItemMedia, ItemTitle} from "@/components/ui/item";
-import {Separator} from "@/components/ui/separator.tsx";
+import {Card, CardContent} from "@/components/ui/card.tsx";
+import {formatDay} from "@/utils/date-formatter.ts";
 import {useTranslation} from "react-i18next";
 
 type Props = {
@@ -36,35 +36,55 @@ export function ProjectCard({project, onDelete, isDeleting}: Props) {
 
     return (
         <>
-            <Item variant="default" className="border border-secondary p-4">
-                <Link to={paths.projects.detail(project.id)} className="flex w-full flex-col gap-4">
-                    <div className="flex w-full items-center gap-4">
-                        <ItemMedia variant="icon">
-                            <Building2 className="size-10" strokeWidth={1} />
-                        </ItemMedia>
-                        <ItemContent className="gap-0">
-                            <ItemTitle className="text-lg">{project.name}</ItemTitle>
-                            <ItemDescription className="text-xs">{project.address}</ItemDescription>
-                        </ItemContent>
-                        <Badge variant="default"
-                               className={PROJECT_STATUS_BADGE_CLASSES[project.status]}>
-                            {t(PROJECT_STATUS_LABEL_KEYS[project.status])}
-                        </Badge>
-                    </div>
-                    <Separator/>
-                    <div className="flex items-center gap-4 text-sm *:[div]:space-y-1">
-                        <div>
-                            <p className="font-medium leading-none">{t("counts.blocksLabel")}</p>
-                            <p className="text-muted-foreground">{project._count?.blocks}</p>
+            {/* Same card language as the rest of the app: a brand tile, the
+                name, a status pill, then the counts large. */}
+            <Link
+                to={paths.projects.detail(project.id)}
+                className="group block rounded-[9px] outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+                <Card className="h-full gap-5 transition-[transform,box-shadow] duration-200 group-hover:-translate-y-0.5 group-hover:shadow-[0_14px_30px_-18px_rgb(35_42_77/0.35)]">
+                    <CardContent className="flex flex-col gap-5">
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="flex min-w-0 items-center gap-3">
+                                <span className="icon-tile flex size-10 shrink-0 items-center justify-center bg-primary">
+                                    <Building2 className="size-5" strokeWidth={1.75} />
+                                </span>
+                                <div className="min-w-0">
+                                    <p className="truncate text-base font-semibold">{project.name}</p>
+                                    {project.address && (
+                                        <p className="flex items-center gap-1 truncate text-xs text-muted-foreground">
+                                            <MapPinIcon className="size-3 shrink-0" />
+                                            <span className="truncate">{project.address}</span>
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                            <Badge className={`shrink-0 ${PROJECT_STATUS_BADGE_CLASSES[project.status]}`}>
+                                {t(PROJECT_STATUS_LABEL_KEYS[project.status])}
+                            </Badge>
                         </div>
-                        <Separator orientation="vertical" />
-                        <div>
-                            <p className="font-medium leading-none">{t("counts.unitsLabel")}</p>
-                            <p className="text-muted-foreground">{project._count?.units}</p>
+
+                        <div className="grid grid-cols-2 gap-3">
+                            <div className="rounded-md bg-muted/60 px-3 py-2.5">
+                                <p className="text-xs text-muted-foreground">{t("counts.blocksLabel")}</p>
+                                <p className="mt-0.5 text-2xl font-semibold tracking-tight tabular-nums">{project._count?.blocks ?? 0}</p>
+                            </div>
+                            <div className="rounded-md bg-muted/60 px-3 py-2.5">
+                                <p className="text-xs text-muted-foreground">{t("counts.unitsLabel")}</p>
+                                <p className="mt-0.5 text-2xl font-semibold tracking-tight tabular-nums">{project._count?.units ?? 0}</p>
+                            </div>
                         </div>
-                    </div>
-                </Link>
-            </Item>
+
+                        {project.handoverDate && (
+                            <p className="flex items-center gap-1.5 border-t pt-4 text-xs text-muted-foreground">
+                                <CalendarIcon className="size-3.5 shrink-0" />
+                                {t("form.handoverDateLabel")}:
+                                <span className="font-medium text-foreground">{formatDay(project.handoverDate)}</span>
+                            </p>
+                        )}
+                    </CardContent>
+                </Card>
+            </Link>
             <AlertDialog
                 open={deleteOpen}
                 onOpenChange={({ open }) => setDeleteOpen(open)}

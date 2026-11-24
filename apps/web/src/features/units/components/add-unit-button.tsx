@@ -37,7 +37,9 @@ export function AddUnitButton({
                 variant="outline"
                 onClick={() => setOpen(true)}
             >
-                <Plus className="size-3" /> {t("actions.addUnit")}</Button>
+                <Plus className="size-3" />
+                {/* Icon only on phones, where the row has no room for the label. */}
+                <span className="max-sm:sr-only">{t("actions.addUnit")}</span></Button>
 
             <Sheet
                 open={open}

@@ -73,7 +73,7 @@ export function LoginForm({
             {/* One frosted card, as in the reference design's sign-in dialog. */}
             <form
                 className={cn(
-                    "flex flex-col p-8",
+                    "flex flex-col px-8 py-10",
                     "rounded-[12px] border border-glass-border",
                     "bg-white/75 dark:bg-[rgb(20_25_52/0.74)] backdrop-blur-[48px] backdrop-saturate-200",
                     "shadow-[0_2px_6px_0_rgb(35_42_77/0.06),0_30px_70px_-26px_rgb(35_42_77/0.4)]",
@@ -86,17 +86,16 @@ export function LoginForm({
                     <KeregeLogo className="h-5" />
                 </div>
 
-                <h1 className="mt-4 text-center text-[30px] leading-tight font-semibold tracking-[-0.025em]">{t("login.title")}</h1>
+                <h1 className="mt-2 text-center text-[22px] leading-tight font-semibold tracking-[-0.02em]">{t("login.title")}</h1>
 
-                <FieldGroup className="mt-7 gap-3.5">
+                <FieldGroup className="mt-9 gap-6">
                     <Field invalid={!!errors.email}>
-                        <FieldLabel htmlFor="email" className="text-[12.5px] font-semibold">{t("login.emailLabel")}</FieldLabel>
+                        <FieldLabel htmlFor="email">{t("login.emailLabel")}</FieldLabel>
                         <Input
                             id="email"
                             type="email"
                             autoComplete="username"
                             autoFocus
-                            className="h-11 rounded-[6px] px-3.5"
                             disabled={mutation.isPending}
                             aria-invalid={!!errors.email}
                             {...form.register("email")}
@@ -104,12 +103,11 @@ export function LoginForm({
                         <FieldError>{errors.email?.message}</FieldError>
                     </Field>
                     <Field invalid={!!errors.password}>
-                        <FieldLabel htmlFor="password" className="text-[12.5px] font-semibold">{t("login.passwordLabel")}</FieldLabel>
+                        <FieldLabel htmlFor="password">{t("login.passwordLabel")}</FieldLabel>
                         <Input
                             id="password"
                             type="password"
                             autoComplete="current-password"
-                            className="h-11 rounded-[6px] px-3.5"
                             disabled={mutation.isPending}
                             aria-invalid={!!errors.password}
                             {...form.register("password")}
@@ -119,7 +117,7 @@ export function LoginForm({
                 </FieldGroup>
 
                 {mutation.isError && (
-                    <Alert variant="destructive" className="mt-5">
+                    <Alert variant="destructive" className="mt-6">
                         <TriangleAlert />
                         {/* SA-12: a suspended company's users are told so, not "wrong password". */}
                         <AlertTitle>
@@ -135,7 +133,7 @@ export function LoginForm({
 
                 <Button
                     type="submit"
-                    className="mt-7 h-[52px] w-full rounded-2xl text-[15px] font-semibold"
+                    className="mt-9 w-full"
                     disabled={mutation.isPending}
                 >
                     {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

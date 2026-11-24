@@ -20,15 +20,11 @@ export function ChessboardFloorRow({
                                        onUnitClick,
                                    }: Props) {
     return (
-        <div className="flex min-h-15 rounded-md">
-            {/* Pinned, so the floor stays named while the row scrolls sideways. */}
-            <div className="sticky left-0 z-10 flex flex-col justify-center py-2 min-w-11 pr-3 bg-card">
-                <span className="font-medium text-muted-foreground">{floor.number}</span>
-            </div>
-
+        // Fixed height, so the floor labels beside the scrolling grid line up.
+        <div className="flex h-22 rounded-md">
             <div
                 className={cn(
-                    "flex-1 flex flex-wrap gap-3"
+                    "flex flex-1 gap-3"
                 )}
             >
                 {floor.units.map((unit) => (

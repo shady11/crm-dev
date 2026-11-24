@@ -21,7 +21,8 @@
     "floors_one": "{{count}} кабат",
     "floors_few": "{{count}} кабат",
     "floors_many": "{{count}} кабат",
-    "floors_other": "{{count}} кабат"
+    "floors_other": "{{count}} кабат",
+    "noFloors": "Кабаттар азырынча жок"
   },
   "delete": {
     "title": "Кире беришти өчүрөсүзбү?",

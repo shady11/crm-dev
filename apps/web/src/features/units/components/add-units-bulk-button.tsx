@@ -51,7 +51,9 @@ export function AddUnitsBulkButton({
                 variant="outline"
                 onClick={() => setOpen(true)}
             >
-                <LayoutGrid className="size-3" /> {t("actions.bulkUnits")}</Button>
+                <LayoutGrid className="size-3" />
+                {/* Icon only on phones, where the row has no room for the label. */}
+                <span className="max-sm:sr-only">{t("actions.bulkUnits")}</span></Button>
 
             <Sheet
                 onOpenChange={({ open: isOpen }) => setOpen(isOpen)}

@@ -21,7 +21,8 @@
     "floors_one": "{{count}} этаж",
     "floors_few": "{{count}} этажа",
     "floors_many": "{{count}} этажей",
-    "floors_other": "{{count}} этажа"
+    "floors_other": "{{count}} этажа",
+    "noFloors": "Этажей пока нет"
   },
   "delete": {
     "title": "Удалить подъезд?",

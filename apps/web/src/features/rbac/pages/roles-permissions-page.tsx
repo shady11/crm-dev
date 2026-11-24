@@ -118,11 +118,8 @@ export function RolesPermissionsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-start justify-between gap-4">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
-                    <p className="text-muted-foreground text-sm">{t("page.breadcrumb")}</p>
-                </div>
+            <div className="flex items-center justify-between gap-4">
+                <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
                 <Button
                     onClick={() => {
                         setEditing(null);

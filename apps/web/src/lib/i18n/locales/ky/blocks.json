@@ -21,7 +21,8 @@
     "entrances_one": "{{count}} кире бериш",
     "entrances_few": "{{count}} кире бериш",
     "entrances_many": "{{count}} кире бериш",
-    "entrances_other": "{{count}} кире бериш"
+    "entrances_other": "{{count}} кире бериш",
+    "noEntrances": "Кире бериштер азырынча жок"
   },
   "delete": {
     "title": "Блокту өчүрөсүзбү?",

@@ -18,6 +18,7 @@ export function formatDate(iso: string, locale = "ru-RU") {
     const date = new Date(iso);
     return {
         date: formatDay(date),
-        time: date.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" }),
+        // 24-hour, to go with the dd/mm/yyyy dates (some locales gave "11:04 PM").
+        time: date.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", hourCycle: "h23" }),
     };
 }

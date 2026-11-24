@@ -1,32 +1,24 @@
-import {HouseIcon} from "lucide-react";
 import type {ApartmentSummary} from "@/features/deals/types/booking.types.ts";
-import {Separator} from "@/components/ui/separator.tsx";
+import {UnitStatus} from "@/features/units/types/unit.types.ts";
+import {UnitSummary} from "@/features/units/components/unit-summary.tsx";
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {useTranslation} from "react-i18next";
 
-export function ApartmentCard({ apartment }: { apartment: ApartmentSummary }) {
+/** The unit being booked, shown as in the unit sheet. */
+export function ApartmentCard({ apartment, className }: { apartment: ApartmentSummary; className?: string }) {
     const { t } = useTranslation("deals");
-    const { formatCurrency, formatArea } = useCompanyFormatters();
+    const { formatArea } = useCompanyFormatters();
 
     return (
-        <div className="flex items-center gap-3 rounded-lg border border-secondary p-3">
-            <div className="rounded-lg bg-muted p-2.5">
-                <HouseIcon size={24} strokeWidth={1.25} className="text-primary" />
-            </div>
-            <div className="flex-1">
-                <div className="flex items-center gap-2">
-                    <h4 className="font-medium">{t("unitCard.unitNumber", { number: apartment.number })}</h4>
-                </div>
-                <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                    {t("unitCard.floor", { floor: apartment.floor })}
-                    <Separator className="h-2.5 bg-muted-foreground/50" orientation="vertical" />
-                    {t("booking.rooms", { count: apartment.rooms })}
-                    <Separator className="h-2.5 bg-muted-foreground/50" orientation="vertical" />
-                    {formatArea(apartment.area)}
-                    <Separator className="h-2.5 bg-muted-foreground/50" orientation="vertical" />
-                    {formatCurrency(apartment.price)}
-                </div>
-            </div>
-        </div>
+        <UnitSummary
+            className={className}
+            status={apartment.status as UnitStatus}
+            price={apartment.price}
+            details={[
+                t("unitCard.floor", { floor: apartment.floor }),
+                t("booking.rooms", { count: apartment.rooms }),
+                formatArea(apartment.area),
+            ]}
+        />
     );
 }
