@@ -2,7 +2,8 @@ import {useMemo, useRef, useState} from "react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {createListCollection} from "@ark-ui/react";
-import {RotateCcw, TriangleAlert} from "lucide-react";
+import {EllipsisVertical, RotateCcw, TriangleAlert} from "lucide-react";
+import {Menu, MenuContent, MenuItem, MenuTrigger} from "@/components/ui/menu.tsx";
 import {Alert, AlertDescription, AlertTitle} from "@/components/ui/alert.tsx";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
@@ -141,28 +142,62 @@ export function DocumentTemplatesPage() {
 
     return (
         <div className="space-y-6">
-            <div>
+            {/* Title with the save actions, always in view above the long editor. */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-2xl font-bold tracking-tight">{t("templates.page.heading")}</h2>
-                <p className="text-muted-foreground text-sm">{t("templates.page.description")}</p>
+                {!editorQuery.isLoading && data && draft && (
+                    <div className="flex items-center gap-2">
+                        {/* On phones the two secondary actions fold into a ⋮ menu. */}
+                        <Button
+                            variant="ghost"
+                            className="max-sm:hidden"
+                            onClick={() => setHtml(data.defaultHtml)}
+                            disabled={draft.html === data.defaultHtml}
+                        >
+                            {t("templates.actions.startFromDefault")}
+                        </Button>
+                        <Button variant="outline" className="max-sm:hidden" disabled={!isDirty || save.isPending} onClick={discardDraft}>
+                            {t("templates.actions.discard")}
+                        </Button>
+                        <Menu>
+                            <MenuTrigger asChild>
+                                <Button variant="outline" size="icon-lg" className="sm:hidden" aria-label={t("common:actions.moreActions")}>
+                                    <EllipsisVertical />
+                                </Button>
+                            </MenuTrigger>
+                            <MenuContent>
+                                <MenuItem value="default" disabled={draft.html === data.defaultHtml} onClick={() => setHtml(data.defaultHtml)}>
+                                    {t("templates.actions.startFromDefault")}
+                                </MenuItem>
+                                <MenuItem value="discard" disabled={!isDirty || save.isPending} onClick={discardDraft}>
+                                    {t("templates.actions.discard")}
+                                </MenuItem>
+                            </MenuContent>
+                        </Menu>
+                        <Button
+                            disabled={!isDirty || save.isPending || draft.name.trim().length < 2}
+                            isLoading={save.isPending}
+                            onClick={() => save.mutate()}
+                        >
+                            {t("templates.actions.save")}
+                        </Button>
+                    </div>
+                )}
             </div>
 
-            <Tabs value={type} onValueChange={({value}) => setType(value as TemplateType)}>
-                <TabsList variant="page" className="max-w-full justify-start overflow-x-auto">
-                    {TEMPLATE_TYPES.map((value) => (
-                        <TabsTrigger key={value} value={value} className="grow-0 px-3">
-                            {t(TYPE_LABEL_KEYS[value])}
-                            {drafts[value] && <span className="bg-primary size-1.5 rounded-full" aria-label={t("templates.unsaved")} />}
-                        </TabsTrigger>
-                    ))}
-                </TabsList>
-            </Tabs>
-
-            {editorQuery.isLoading || !data || !draft ? (
-                <div className="flex h-64 items-center justify-center">
-                    <Spinner />
-                </div>
-            ) : (
-                <>
+            {/* Document type tabs, with this template's status and versions beside them. */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <Tabs value={type} onValueChange={({value}) => setType(value as TemplateType)}>
+                    <TabsList variant="page" className="max-w-full justify-start overflow-x-auto">
+                        {TEMPLATE_TYPES.map((value) => (
+                            <TabsTrigger key={value} value={value} className="grow-0 px-3">
+                                {t(TYPE_LABEL_KEYS[value])}
+                                {drafts[value] && <span className="bg-primary size-1.5 rounded-full" aria-label={t("templates.unsaved")} />}
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
+                </Tabs>
+                {!editorQuery.isLoading && data && draft && (
                     <StatusBar
                         data={data}
                         locale={i18n.language}
@@ -170,7 +205,15 @@ export function DocumentTemplatesPage() {
                         onReset={() => reset.mutate()}
                         isResetting={reset.isPending}
                     />
+                )}
+            </div>
 
+            {editorQuery.isLoading || !data || !draft ? (
+                <div className="flex h-64 items-center justify-center">
+                    <Spinner />
+                </div>
+            ) : (
+                <>
                     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
                         <div className="flex min-w-0 flex-col gap-4">
                             <label className="block space-y-1.5">
@@ -245,26 +288,6 @@ export function DocumentTemplatesPage() {
                                     <p className="text-muted-foreground text-xs">{t("templates.preview.hint")}</p>
                                 </>
                             )}
-
-                            <div className="flex flex-wrap items-center gap-2">
-                                <Button
-                                    disabled={!isDirty || save.isPending || draft.name.trim().length < 2}
-                                    isLoading={save.isPending}
-                                    onClick={() => save.mutate()}
-                                >
-                                    {t("templates.actions.save")}
-                                </Button>
-                                <Button variant="outline" disabled={!isDirty || save.isPending} onClick={discardDraft}>
-                                    {t("templates.actions.discard")}
-                                </Button>
-                                <Button
-                                    variant="ghost"
-                                    onClick={() => setHtml(data.defaultHtml)}
-                                    disabled={draft.html === data.defaultHtml}
-                                >
-                                    {t("templates.actions.startFromDefault")}
-                                </Button>
-                            </div>
                         </div>
 
                         <aside className="space-y-2 self-start rounded-lg border p-3 xl:sticky xl:top-4">
@@ -331,7 +354,7 @@ function StatusBar({
     });
 
     return (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border px-4 py-3">
+        <div className="flex flex-wrap items-center gap-3">
             <div className="flex flex-wrap items-center gap-2 text-sm">
                 {current ? (
                     <>
