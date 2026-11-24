@@ -149,10 +149,7 @@ export function CompanySettingsPage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
-                <p className="text-sm text-muted-foreground">{t("page.description")}</p>
-            </div>
+            <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
 
             <SettingsLayout
                 sections={[
@@ -183,7 +180,8 @@ export function CompanySettingsPage() {
                             onChange={set("name")}
                         />
 
-                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        {/* Locale names are the longest ("Kyrgyz (Kyrgyzstan) (ky-KG)"), so their column gets more room. */}
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1.5fr_0.8fr]">
                             <SelectField label={t("fields.currency")}>
                                 <SettingOptionSelect
                                     type="CURRENCY"
