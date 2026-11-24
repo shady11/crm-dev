@@ -2,7 +2,7 @@ import {useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {createListCollection} from "@ark-ui/react";
-import {History, UserRoundIcon} from "lucide-react";
+import {History} from "lucide-react";
 import {Toggle} from "@/components/ui/toggle.tsx";
 import {FilterPopover} from "@/components/shared/filter-popover.tsx";
 import {DateField} from "@/components/shared/date-field.tsx";
@@ -120,7 +120,6 @@ export function ActivitiesPage() {
                                 setPage(1);
                             }}
                         >
-                            <UserRoundIcon className="size-4" />
                             {t("page.filters.mineOnly")}
                         </Toggle>
                     )}
