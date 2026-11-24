@@ -63,6 +63,8 @@
     "notFound": "Долбоор табылган жок",
     "details": "Маалымат",
     "units_one": "{{count}} жай",
+    "units_few": "{{count}} жай",
+    "units_many": "{{count}} жай",
     "units_other": "{{count}} жай",
     "unitsTotal": "Жайлар",
     "noBlocks": "Азырынча блоктор жок."

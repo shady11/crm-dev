@@ -63,6 +63,8 @@
     "notFound": "Project not found",
     "details": "Details",
     "units_one": "{{count}} unit",
+    "units_few": "{{count}} units",
+    "units_many": "{{count}} units",
     "units_other": "{{count}} units",
     "unitsTotal": "Units",
     "noBlocks": "No blocks yet."
