@@ -35,6 +35,7 @@ import * as bcrypt from "bcrypt";
 import {
     ActivityAction,
     ActivityType,
+    BlockSalesStatus,
     DealStatus,
     DiscountApprovalStatus,
     FinancingType,
@@ -46,6 +47,7 @@ import {
     PrismaClient,
     ProjectStatus,
     TaskStatus,
+    UnitPriceRequestStatus,
     UnitStatus,
     UnitType,
 } from "@/generated/prisma/client";
@@ -159,19 +161,30 @@ function assertEmailLike(email: string, flagName: string): void {
 // below (branches, users per role, leads, clients, deals, payments, tasks).
 // Not cryptographically random — this is fixture data, not secrets.
 
-const FIRST_NAMES = [
-    "Aibek", "Nurlan", "Aidana", "Cholpon", "Bakyt", "Gulnara", "Ermek", "Zarina",
-    "Talant", "Aizada", "Ruslan", "Nazira", "Marat", "Elvira", "Tilek", "Sabina",
-    "Azamat", "Dinara", "Kanat", "Meerim", "Ulan", "Aigerim", "Bekzat", "Nasiba",
+// Kyrgyz names in Cyrillic, as a Bishkek sales team would type them. Surnames
+// are stored in their masculine form; a woman's takes the feminine ending
+// (Жумабеков → Жумабекова), so the first name and surname always agree.
+const MALE_FIRST_NAMES = [
+    "Айбек", "Нурлан", "Бакыт", "Эрмек", "Талант", "Руслан", "Марат", "Тилек",
+    "Азамат", "Канат", "Улан", "Бекзат", "Нурбек", "Эрлан", "Мирлан", "Дастан",
 ];
-const LAST_NAMES = [
-    "Zhumabekov", "Sadykov", "Toktogulova", "Isaev", "Bekova", "Moldalieva",
-    "Kadyrov", "Asanova", "Tashiev", "Orozova", "Baiysheva", "Dzhumaliev",
-    "Kydyrov", "Sultanova", "Rysbekov", "Mamytova", "Turgunbaev", "Alieva",
+const FEMALE_FIRST_NAMES = [
+    "Айдана", "Чолпон", "Гүлнара", "Зарина", "Айзада", "Назира", "Эльвира", "Сабина",
+    "Динара", "Мээрим", "Айгерим", "Насиба", "Жылдыз", "Бермет", "Асель", "Нургүл",
+];
+const SURNAMES = [
+    "Жумабеков", "Садыков", "Токтогулов", "Исаев", "Бекболотов", "Молдалиев",
+    "Кадыров", "Асанов", "Ташиев", "Орозов", "Байышев", "Джумалиев",
+    "Кыдыров", "Султанов", "Рысбеков", "Мамытов", "Турганбаев", "Алиев",
+    "Осмонов", "Абдыкадыров", "Сыдыков", "Эшимов", "Бообеков", "Шамшиев",
 ];
 
 function personName(seed: number): string {
-    return `${FIRST_NAMES[seed % FIRST_NAMES.length]} ${LAST_NAMES[(seed * 7) % LAST_NAMES.length]}`;
+    const female = seed % 2 === 1;
+    const firstNames = female ? FEMALE_FIRST_NAMES : MALE_FIRST_NAMES;
+    const first = firstNames[Math.floor(seed / 2) % firstNames.length];
+    const surname = SURNAMES[(seed * 7) % SURNAMES.length];
+    return `${first} ${female ? `${surname}а` : surname}`;
 }
 
 function pick<T>(items: T[], seed: number): T {
@@ -223,18 +236,33 @@ async function seedDemo() {
 
     const passwordHash = await bcrypt.hash("password123", 10);
 
+    // Legal details filled in, so the dashboard's setup checklist is complete
+    // and contracts and receipts can be generated straight away. All of it is
+    // invented: the tax ID and bank account are not real ones.
+    const companyDetails = {
+        name: "Bishkek Dev",
+        phone: "+996 312 900 100",
+        address: "Бишкек ш., Чүй пр., 150, 4-кабат",
+        currency: "KGS",
+        timezone: "Asia/Bishkek",
+        locale: "ky-KG",
+        legalName: "«Бишкек Дев Курулуш» ЖЧК",
+        taxId: "02405202610015",
+        signatoryName: "Осмонов Азамат Бакытович",
+        signatoryTitle: "Башкы директор",
+        bankName: "«Демо Банк» ААК",
+        bankAccount: "1240020001234567",
+        bankBic: "124002",
+    };
+
     const company = await prisma.company.upsert({
         where: {
             id: "local-company-id",
         },
-        update: {},
+        update: companyDetails,
         create: {
             id: "local-company-id",
-            name: "Bishkek Dev",
-            phone: "+996700000000",
-            address: "Bishkek",
-            timezone: "UTC+6",
-            locale: "ky-KG"
+            ...companyDetails,
         },
     });
 
@@ -244,7 +272,7 @@ async function seedDemo() {
         },
         update: {},
         create: {
-            fullName: "Admin User",
+            fullName: "Азамат Осмонов",
             email: "admin@crm.dev",
             phone: "+996700000001",
             passwordHash,
@@ -253,72 +281,231 @@ async function seedDemo() {
         },
     });
 
-    const project = await prisma.project.create({
-        data: {
-            name: "ЖК Орион",
-            address: "Бишкек",
-            // Open for sales: the demo deals below live on this project, and
-            // a DRAFT project refuses new bookings (ensureProjectOpenForSales).
-            status: ProjectStatus.ACTIVE,
-            companyId: company.id,
-        },
-    });
-
-    const block = await prisma.block.create({
-        data: {
-            name: "A",
-            order: 1,
-            projectId: project.id,
-        },
-    });
-
-    const entrance = await prisma.entrance.create({
-        data: {
-            name: "1",
-            order: 1,
-            projectId: project.id,
-            blockId: block.id,
-        },
-    });
-
-    const units: {id: string; price: number; projectId: string}[] = [];
-
-    for (let floorNumber = 1; floorNumber <= 9; floorNumber++) {
-        const floor = await prisma.floor.create({
-            data: {
-                number: floorNumber,
-                order: floorNumber,
-                projectId: project.id,
-                blockId: block.id,
-                entranceId: entrance.id,
-            },
-        });
-
-        for (let unitIndex = 1; unitIndex <= 6; unitIndex++) {
-            const price = 42000 + unitIndex * 3500;
-            const unit = await prisma.unit.create({
-                data: {
-                    number: `${floorNumber}${unitIndex.toString().padStart(2, "0")}`,
-                    type: UnitType.APARTMENT,
-                    status: UnitStatus.AVAILABLE,
-                    rooms: unitIndex % 3 === 0 ? 3 : unitIndex % 2 === 0 ? 2 : 1,
-                    area: 42 + unitIndex * 4,
-                    price,
-                    projectId: project.id,
-                    blockId: block.id,
-                    entranceId: entrance.id,
-                    floorId: floor.id,
-                },
-            });
-            units.push({id: unit.id, price, projectId: project.id});
-        }
+    // Re-running the seed used to add another copy of the demo project every
+    // time. Inventory, like the rest of the demo data, is created once.
+    const existingProjects = await prisma.project.count({where: {companyId: company.id}});
+    if (existingProjects > 0) {
+        console.log("Demo projects already present — skipping inventory and sales data.");
+    } else {
+        const units = await seedDemoInventory(company.id);
+        await seedDemoTenantData({company, units});
     }
-
-    await seedDemoTenantData({company, units});
 
     console.log("Database seeded successfully");
     console.log("Admin login: admin@crm.dev");
     console.log("Admin password: password123");
+}
+
+type DemoProjectKey = "orion" | "tooShamaly" | "jashylBak";
+
+type DemoUnit = {
+    id: string;
+    price: number;
+    projectId: string;
+    project: DemoProjectKey;
+    // False for units in a block whose sales haven't opened yet, which
+    // refuses bookings (ensureBlockOpenForSales).
+    bookable: boolean;
+};
+
+type UnitLayout = {type: UnitType; rooms?: number; area: number};
+
+const apartment = (rooms: number, area: number): UnitLayout => ({type: UnitType.APARTMENT, rooms, area});
+const commercial = (area: number): UnitLayout => ({type: UnitType.COMMERCIAL, area});
+
+type DemoBlock = {
+    name: string;
+    salesStatus: BlockSalesStatus;
+    completionDate?: Date;
+    floors: number;
+    // The units on a floor, in door order. A function of the floor number,
+    // so the ground floor can hold shops instead of flats.
+    layout: (floor: number) => UnitLayout[];
+};
+
+type DemoProject = {
+    key: DemoProjectKey;
+    name: string;
+    address: string;
+    status: ProjectStatus;
+    handoverDate: Date;
+    // Base list price per m², in som. Bishkek new builds sell for roughly
+    // 90–130 thousand som per m²; Osh for less.
+    pricePerSqm: number;
+    blocks: DemoBlock[];
+};
+
+/**
+ * List price for one unit: base price per m², plus 1% per floor above the
+ * first (views and quiet), a ground-floor flat 5% cheaper, and commercial
+ * space at a 40% premium. Rounded to the nearest 10,000 som, as a developer's
+ * price list would be.
+ */
+function demoUnitPrice(project: DemoProject, layout: UnitLayout, floor: number): number {
+    const floorFactor = layout.type === UnitType.COMMERCIAL ? 1.4 : floor === 1 ? 0.95 : 1 + (floor - 1) * 0.01;
+    return Math.round((layout.area * project.pricePerSqm * floorFactor) / 10_000) * 10_000;
+}
+
+const DEMO_PROJECTS: DemoProject[] = [
+    {
+        key: "orion",
+        name: "ЖК Орион",
+        address: "Бишкек ш., Ахунбаев көч., 98",
+        status: ProjectStatus.ACTIVE,
+        handoverDate: new Date("2027-12-20"),
+        pricePerSqm: 105_000,
+        blocks: [
+            {
+                name: "A",
+                salesStatus: BlockSalesStatus.ON_SALE,
+                completionDate: new Date("2027-09-30"),
+                floors: 9,
+                layout: () => [apartment(1, 42), apartment(2, 58), apartment(3, 82), apartment(1, 45), apartment(2, 62), apartment(3, 86)],
+            },
+            {
+                name: "B",
+                salesStatus: BlockSalesStatus.ON_SALE,
+                completionDate: new Date("2027-12-20"),
+                floors: 12,
+                layout: (floor) => floor === 1
+                    ? [commercial(95), commercial(120), commercial(150)]
+                    : [apartment(1, 40), apartment(2, 64), apartment(2, 68), apartment(3, 90)],
+            },
+        ],
+    },
+    {
+        key: "tooShamaly",
+        name: "ЖК Тоо Шамалы",
+        address: "Бишкек ш., Жал кичи району, 31",
+        // Off-plan pre-sales: bookable, construction not started.
+        status: ProjectStatus.PLANNING,
+        handoverDate: new Date("2028-09-30"),
+        pricePerSqm: 89_000,
+        blocks: [
+            {
+                name: "1",
+                salesStatus: BlockSalesStatus.ON_SALE,
+                completionDate: new Date("2028-06-30"),
+                floors: 14,
+                layout: () => [apartment(1, 38), apartment(2, 56), apartment(2, 61), apartment(3, 78)],
+            },
+            {
+                // Second phase, released for sale later: shows the "sales not
+                // open yet" state on the chessboard and the unit sheet.
+                name: "2",
+                salesStatus: BlockSalesStatus.UPCOMING,
+                completionDate: new Date("2028-09-30"),
+                floors: 10,
+                layout: () => [apartment(1, 38), apartment(2, 56), apartment(2, 61), apartment(3, 78)],
+            },
+        ],
+    },
+    {
+        key: "jashylBak",
+        name: "ЖК Жашыл Бак",
+        address: "Ош ш., Масалиев пр., 12",
+        // Built and handed over; the last flats are still on sale.
+        status: ProjectStatus.COMPLETED,
+        handoverDate: new Date("2025-12-20"),
+        pricePerSqm: 72_000,
+        blocks: [
+            {
+                name: "A",
+                salesStatus: BlockSalesStatus.COMPLETED,
+                completionDate: new Date("2025-12-20"),
+                floors: 6,
+                layout: () => [apartment(1, 44), apartment(2, 63), apartment(3, 85), apartment(2, 66)],
+            },
+        ],
+    },
+];
+
+/**
+ * Three projects at different stages: one under construction and on sale,
+ * one sold off-plan with a second phase not yet released, and one finished
+ * in Osh with its last flats left. Each unit's number is its floor and door
+ * (`905` is floor 9, door 5), unique within its block.
+ */
+async function seedDemoInventory(companyId: string): Promise<DemoUnit[]> {
+    const units: DemoUnit[] = [];
+
+    for (const spec of DEMO_PROJECTS) {
+        const project = await prisma.project.create({
+            data: {
+                name: spec.name,
+                address: spec.address,
+                status: spec.status,
+                handoverDate: spec.handoverDate,
+                companyId,
+            },
+        });
+
+        for (const [blockIndex, blockSpec] of spec.blocks.entries()) {
+            const block = await prisma.block.create({
+                data: {
+                    name: blockSpec.name,
+                    order: blockIndex + 1,
+                    salesStatus: blockSpec.salesStatus,
+                    completionDate: blockSpec.completionDate,
+                    projectId: project.id,
+                },
+            });
+
+            const entrance = await prisma.entrance.create({
+                data: {name: "1", order: 1, projectId: project.id, blockId: block.id},
+            });
+
+            for (let floorNumber = 1; floorNumber <= blockSpec.floors; floorNumber++) {
+                const floor = await prisma.floor.create({
+                    data: {
+                        number: floorNumber,
+                        order: floorNumber,
+                        projectId: project.id,
+                        blockId: block.id,
+                        entranceId: entrance.id,
+                    },
+                });
+
+                for (const [doorIndex, layout] of blockSpec.layout(floorNumber).entries()) {
+                    const price = demoUnitPrice(spec, layout, floorNumber);
+                    const unit = await prisma.unit.create({
+                        data: {
+                            number: `${floorNumber}${String(doorIndex + 1).padStart(2, "0")}`,
+                            type: layout.type,
+                            status: UnitStatus.AVAILABLE,
+                            rooms: layout.rooms,
+                            area: layout.area,
+                            price,
+                            projectId: project.id,
+                            blockId: block.id,
+                            entranceId: entrance.id,
+                            floorId: floor.id,
+                        },
+                    });
+                    units.push({
+                        id: unit.id,
+                        price,
+                        projectId: project.id,
+                        project: spec.key,
+                        bookable: blockSpec.salesStatus !== BlockSalesStatus.UPCOMING,
+                    });
+                }
+            }
+        }
+    }
+
+    return units;
+}
+
+/**
+ * The same units in a fixed but scattered order, so sold and booked units
+ * spread across floors on the chessboard instead of filling floor 1 first.
+ */
+function scatter<T>(items: T[]): T[] {
+    return items
+        .map((item, i) => ({item, key: (i * 2654435761) % 4294967296}))
+        .sort((a, b) => a.key - b.key)
+        .map(({item}) => item);
 }
 
 /**
@@ -331,7 +518,7 @@ async function seedDemo() {
  */
 async function seedDemoTenantData(args: {
     company: {id: string};
-    units: {id: string; price: number; projectId: string}[];
+    units: DemoUnit[];
 }) {
     const {company, units} = args;
 
@@ -351,16 +538,16 @@ async function seedDemoTenantData(args: {
 
     const branches = await Promise.all([
         prisma.branch.create({
-            data: {companyId: company.id, name: "Bishkek Central", city: "Bishkek", address: "Chuy Ave 123", phone: "+996700000010"},
+            data: {companyId: company.id, name: "Бишкек, борбордук кеңсе", city: "Бишкек", address: "Чүй пр., 150", phone: "+996700000010"},
         }),
         prisma.branch.create({
-            data: {companyId: company.id, name: "Osh Branch", city: "Osh", address: "Lenin St 45", phone: "+996700000011"},
+            data: {companyId: company.id, name: "Ош филиалы", city: "Ош", address: "Ленин көч., 45", phone: "+996700000011"},
         }),
     ]);
 
     const financeUser = await prisma.user.create({
         data: {
-            fullName: "Nurgul Baktybekova",
+            fullName: "Нургүл Бактыбекова",
             email: "finance@crm.dev",
             phone: "+996700000020",
             passwordHash,
@@ -436,6 +623,7 @@ async function seedDemoTenantData(args: {
     // OTHER needs a note, so the seed sticks to the named reasons.
     const lostReasons = Object.values(LeadLostReason).filter((reason) => reason !== LeadLostReason.OTHER);
     const leadSources = ["Website", "Instagram", "Referral", "Walk-in", "Phone"];
+    const projectIds = [...new Set(units.map((u) => u.projectId))];
     let leadSeed = 0;
 
     for (const team of teams) {
@@ -470,9 +658,10 @@ async function seedDemoTenantData(args: {
                     ...(leadSeed % 4 === 3
                         ? {}
                         : {
-                              budget: 40000 + (leadSeed % 5) * 6000,
+                              // 4.0–8.8 million som: a one- to three-room flat.
+                              budget: 4_000_000 + (leadSeed % 5) * 1_200_000,
                               rooms: 1 + (leadSeed % 3),
-                              preferredProjectId: units[0]?.projectId,
+                              preferredProjectId: pick(projectIds, leadSeed),
                               financingType: pick(Object.values(FinancingType), leadSeed),
                           }),
                 },
@@ -482,29 +671,43 @@ async function seedDemoTenantData(args: {
     }
 
     // --- Deals, payment schedules and payments -------------------------
-    const dealPlan: {status: DealStatus; count: number}[] = [
-        {status: DealStatus.RESERVED, count: 6},
-        {status: DealStatus.CONTRACT_SIGNED, count: 5},
-        {status: DealStatus.ACTIVE, count: 6},
-        {status: DealStatus.COMPLETED, count: 4},
-        {status: DealStatus.CANCELLED, count: 2},
-        {status: DealStatus.EXPIRED, count: 1},
+    // Which project each deal is on, in order. The finished Osh project is
+    // mostly paid-up sales; the off-plan one has bookings and fresh contracts.
+    const O: DemoProjectKey = "orion", T: DemoProjectKey = "tooShamaly", J: DemoProjectKey = "jashylBak";
+    const dealPlan: {status: DealStatus; projects: DemoProjectKey[]}[] = [
+        {status: DealStatus.RESERVED, projects: [O, O, T, O, T, O]},
+        {status: DealStatus.CONTRACT_SIGNED, projects: [O, T, O, T, O]},
+        {status: DealStatus.ACTIVE, projects: [O, O, T, O, J, O, T]},
+        {status: DealStatus.COMPLETED, projects: [J, J, J, J, J, J, J, J, J, J, O, O]},
+        {status: DealStatus.CANCELLED, projects: [O, T]},
+        {status: DealStatus.EXPIRED, projects: [O]},
     ];
+    const unitPools = new Map<DemoProjectKey, DemoUnit[]>(
+        (["orion", "tooShamaly", "jashylBak"] as const).map((key) => [
+            key,
+            scatter(units.filter((u) => u.project === key && u.bookable)),
+        ]),
+    );
+    const takeUnit = (key: DemoProjectKey): DemoUnit => {
+        const unit = unitPools.get(key)!.shift();
+        if (!unit) throw new Error(`seed: ran out of units in ${key}`);
+        return unit;
+    };
 
     const financingTypes = Object.values(FinancingType);
     const paymentMethods = Object.values(PaymentMethod);
 
-    let unitCursor = 0;
     let dealSeq = 1;
     let dealSeed = 0;
 
-    for (const {status, count} of dealPlan) {
-        for (let i = 0; i < count; i++) {
-            const unit = units[unitCursor];
-            unitCursor += 1;
-            const team = teams[dealSeed % teams.length];
+    for (const {status, projects} of dealPlan) {
+        for (const [i, projectKey] of projects.entries()) {
+            const unit = takeUnit(projectKey);
+            // Osh sells the Osh project; Bishkek projects go to either branch.
+            const team = projectKey === "jashylBak" ? teams[1] : teams[dealSeed % teams.length];
             const manager = pick(team.managers, dealSeed);
-            const client = clients[dealSeed % clients.length];
+            const branchClients = clients.filter((c) => c.branchId === team.branchId);
+            const client = branchClients[dealSeed % branchClients.length];
 
             const listPrice = unit.price;
             const hasDiscount = dealSeed % 8 === 0;
@@ -560,7 +763,7 @@ async function seedDemoTenantData(args: {
                     contractDate: status === DealStatus.CONTRACT_SIGNED || status === DealStatus.ACTIVE || status === DealStatus.COMPLETED
                         ? createdAt : undefined,
                     cancelledAt: status === DealStatus.CANCELLED ? monthsAgo(1) : undefined,
-                    cancelReason: status === DealStatus.CANCELLED ? "Client withdrew" : undefined,
+                    cancelReason: status === DealStatus.CANCELLED ? "Кардар баш тартты: ипотека бекитилген жок" : undefined,
                     createdAt,
                 },
             });
@@ -717,9 +920,10 @@ async function seedDemoTenantData(args: {
 
     // --- Tasks (mix of overdue, due today, upcoming, done) --------------
     const taskTitles = [
-        "Call client about contract terms", "Send payment reminder", "Prepare reservation documents",
-        "Follow up after site visit", "Collect passport copy", "Schedule apartment viewing",
-        "Confirm installment payment", "Update client on construction progress",
+        "Кардарга чалып, келишимдин шарттарын талкуулоо", "Төлөм боюнча эскертүү жөнөтүү",
+        "Брондоо документтерин даярдоо", "Объектти көргөндөн кийин кайра чалуу",
+        "Паспорттун көчүрмөсүн алуу", "Батирди көрсөтүүгө убакыт белгилөө",
+        "Бөлүп төлөөнүн түшкөнүн текшерүү", "Кардарга курулуштун жүрүшү тууралуу кабарлоо",
     ];
     const allAssignees = [...teams.map((t) => t.head), ...teams.flatMap((t) => t.managers), {id: financeUser.id, fullName: financeUser.fullName}];
     const taskStatuses = [TaskStatus.TODO, TaskStatus.IN_PROGRESS, TaskStatus.DONE];
@@ -754,7 +958,41 @@ async function seedDemoTenantData(args: {
         });
     }
 
-    console.log(`Extended demo data: ${branches.length} branches, ${teams.reduce((n, t) => n + 1 + t.managers.length, 0) + 1} additional users, ${clients.length} clients, ${leadSeed} leads, ${dealSeq - 1} deals, 18 tasks.`);
+    // --- List-price change requests (SH-2) -----------------------------
+    // A Sales Head can't change a list price alone; it waits for someone with
+    // units.approve_price. Two wait on the Price changes page, one went
+    // through (the unit already carries the new price) and one was turned down.
+    const admin = await prisma.user.findUniqueOrThrow({where: {email: "admin@crm.dev"}, select: {id: true}});
+    const priceRequests: {change: number; status: UnitPriceRequestStatus; rejectionReason?: string}[] = [
+        {change: 1.05, status: UnitPriceRequestStatus.PENDING},
+        {change: 0.97, status: UnitPriceRequestStatus.PENDING},
+        {change: 1.04, status: UnitPriceRequestStatus.APPROVED},
+        {change: 0.9, status: UnitPriceRequestStatus.REJECTED, rejectionReason: "10% арзандатуу өтө көп: 5% чейин гана мүмкүн"},
+    ];
+    for (const [r, request] of priceRequests.entries()) {
+        const unit = takeUnit("orion");
+        const requestedPrice = Math.round((unit.price * request.change) / 10_000) * 10_000;
+        const decided = request.status !== UnitPriceRequestStatus.PENDING;
+        await prisma.unitPriceRequest.create({
+            data: {
+                companyId: company.id,
+                unitId: unit.id,
+                status: request.status,
+                currentPrice: unit.price,
+                requestedPrice,
+                requestedById: pick(teams, r).head.id,
+                decidedById: decided ? admin.id : undefined,
+                decidedAt: decided ? daysFromNow(-r) : undefined,
+                rejectionReason: request.rejectionReason,
+                createdAt: daysFromNow(-(r + 1)),
+            },
+        });
+        if (request.status === UnitPriceRequestStatus.APPROVED) {
+            await prisma.unit.update({where: {id: unit.id}, data: {price: requestedPrice}});
+        }
+    }
+
+    console.log(`Extended demo data: ${branches.length} branches, ${teams.reduce((n, t) => n + 1 + t.managers.length, 0) + 1} additional users, ${clients.length} clients, ${leadSeed} leads, ${dealSeq - 1} deals, 18 tasks, ${priceRequests.length} price requests.`);
     console.log("Sales Head login: sales.head.1@crm.dev / password123");
     console.log("Sales Manager login: sales.manager.1.1@crm.dev / password123");
     console.log("Finance login: finance@crm.dev / password123");
