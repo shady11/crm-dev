@@ -14,6 +14,7 @@ import {useTaskActions} from "@/features/tasks/hooks/use-task-actions.ts";
 import type {Task, TaskPayload} from "@/features/tasks/api/tasks.api.ts";
 import {TASK_TERMINAL_STATUSES, type TaskStatus} from "@/features/tasks/types/task.types.ts";
 import {useTranslation} from "react-i18next";
+import {useQueryClient} from "@tanstack/react-query";
 
 type TasksView = "table" | "board";
 
@@ -27,6 +28,7 @@ export function TasksPage() {
     const [editingTask, setEditingTask] = useState<Task | null>(null);
     const [viewingTask, setViewingTask] = useState<Task | null>(null);
     const [detailsOpen, setDetailsOpen] = useState(false);
+    const queryClient = useQueryClient();
     const [pendingClose, setPendingClose] = useState<{ taskId: string; status: TaskStatus } | null>(null);
 
     const openDetails = (task: Task) => { setViewingTask(task); setDetailsOpen(true); };
@@ -142,7 +144,11 @@ export function TasksPage() {
                 open={!!pendingClose}
                 status={pendingClose?.status ?? null}
                 isSubmitting={actions.changeStatus.isPending}
-                onCancel={() => setPendingClose(null)}
+                onCancel={() => {
+                    // The board already moved the card optimistically; put it back.
+                    setPendingClose(null);
+                    void queryClient.invalidateQueries({ queryKey: ["tasks"] });
+                }}
                 onConfirm={confirmClose}
             />
         </div>
