@@ -3,7 +3,8 @@ import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {PROJECT_STATUS_BADGE_CLASSES, PROJECT_STATUS_LABEL_KEYS} from "@/features/projects/types/project.types.ts";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
-import {ArrowLeft, Loader2, Pen, Trash2} from "lucide-react";
+import {ArrowLeft, Pen, Trash2} from "lucide-react";
+import {Spinner} from "@/components/ui/spinner.tsx";
 import {useState} from "react";
 import {
     AlertDialog,
@@ -76,7 +77,7 @@ export function ProjectPage() {
     if (projectQuery.isLoading) {
         return (
             <div className="flex h-48 items-center justify-center">
-                <Loader2 className="h-6 w-6 animate-spin text-gray-500"/>
+                <Spinner className="size-6 text-muted-foreground" />
             </div>
         );
     }
@@ -92,7 +93,7 @@ export function ProjectPage() {
         <div className="space-y-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-4">
-                    <h1 className="text-3xl font-bold">{project.name}</h1>
+                    <h1 className="text-2xl font-bold tracking-tight">{project.name}</h1>
                     <Badge variant="default" className={PROJECT_STATUS_BADGE_CLASSES[project.status]}>
                         {t(PROJECT_STATUS_LABEL_KEYS[project.status])}
                     </Badge>

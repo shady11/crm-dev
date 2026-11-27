@@ -259,7 +259,7 @@ export function DealDetailsPage() {
             <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex min-w-0 flex-col gap-1.5">
                     <div className="flex flex-wrap items-center gap-2.5">
-                        <h1 className="text-2xl font-semibold">{t("detailsPage.dealNumber", { number: deal.dealNumber })}</h1>
+                        <h1 className="text-2xl font-bold tracking-tight">{t("detailsPage.dealNumber", { number: deal.dealNumber })}</h1>
                         <Badge className={`${visual?.bg} text-white`}>{visual && t(visual.headingKey)}</Badge>
                     </div>
                     <p className="truncate text-sm text-muted-foreground">

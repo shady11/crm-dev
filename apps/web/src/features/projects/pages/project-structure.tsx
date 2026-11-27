@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {Building2, Loader2, Plus} from "lucide-react";
+import {Building2, Plus} from "lucide-react";
+import {Spinner} from "@/components/ui/spinner.tsx";
 import { Button } from "@/components/ui/button.tsx";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet.tsx";
 import { type BlockPayload, createBlock } from "@/features/blocks/api/blocks.api";
@@ -76,7 +77,7 @@ export function ProjectStructure() {
     if (treeQuery.isLoading) {
         return (
             <div className="flex h-48 items-center justify-center">
-                <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
+                <Spinner className="size-6 text-muted-foreground" />
             </div>
         );
     }

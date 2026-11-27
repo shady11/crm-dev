@@ -112,7 +112,7 @@ export function ClientDetailsPage() {
                             <AvatarFallback className="text-base">{initials(client.fullName)}</AvatarFallback>
                         </Avatar>
                         <div>
-                            <h1 className="text-2xl font-semibold">{client.fullName}</h1>
+                            <h1 className="text-2xl font-bold tracking-tight">{client.fullName}</h1>
                             <p className="text-sm text-muted-foreground">
                                 {t("detail.clientSince", { date: formatDay(client.createdAt) })}
                             </p>

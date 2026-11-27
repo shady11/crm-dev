@@ -1,7 +1,8 @@
 import type {ReactNode} from "react";
 import {useParams} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
-import {Building2, CalendarIcon, CheckCircle2Icon, DoorOpenIcon, Loader2, MapPinIcon, TimerIcon} from "lucide-react";
+import {Building2, CalendarIcon, CheckCircle2Icon, DoorOpenIcon, MapPinIcon, TimerIcon} from "lucide-react";
+import {Spinner} from "@/components/ui/spinner.tsx";
 import {useTranslation} from "react-i18next";
 
 import {getProject, getProjectChessboard} from "../api/projects.api";
@@ -55,7 +56,7 @@ export function ProjectOverview() {
     if (projectQuery.isLoading) {
         return (
             <div className="flex h-48 items-center justify-center">
-                <Loader2 className="h-6 w-6 animate-spin text-gray-500"/>
+                <Spinner className="size-6 text-muted-foreground" />
             </div>
         );
     }
