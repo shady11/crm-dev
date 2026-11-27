@@ -7,13 +7,12 @@ import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
-import {Spinner} from "@/components/ui/spinner.tsx";
+import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
+import {DataTable} from "@/components/shared/data-table.tsx";
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
 import {formatDate} from "@/utils/date-formatter.ts";
-import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
 import {createCompany, type CreateCompanyPayload, type CreateCompanyResult, getCompanies} from "../api/companies.api";
-import {isSuspended} from "../types/company.types";
+import {type Company, isSuspended} from "../types/company.types";
 import {CompanyFormSheet} from "../components/company-form-sheet";
 import {GeneratedPassword} from "../components/generated-password";
 import {useCompanyActions} from "../hooks/use-company-actions";
@@ -59,13 +58,97 @@ export function CompaniesPage() {
 
     const items = companies.data?.items ?? [];
 
+    const nameCell = (company: Company) =>
+        company.deletedAt ? (
+            company.name
+        ) : (
+            <Link className="hover:underline" to={`/companies/${company.id}`}>
+                {company.name}
+            </Link>
+        );
+
+    const statusBadge = (company: Company) => {
+        if (company.deletedAt) {
+            return (
+                <Badge variant="outline">
+                    {t("status.deletedOn", {date: formatDate(company.deletedAt, i18n.language).date})}
+                </Badge>
+            );
+        }
+        const suspended = isSuspended(company);
+        return (
+            <Badge variant={suspended ? "destructive" : "secondary"} className={suspended ? undefined : "bg-emerald-500"}>
+                {suspended ? t("status.suspended") : t("status.active")}
+            </Badge>
+        );
+    };
+
+    const rowActions = (company: Company) => {
+        const suspended = isSuspended(company);
+        const deleted = Boolean(company.deletedAt);
+        return (
+            <div className="flex justify-end gap-1">
+            {deleted ? (
+                <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => actions.request("restore", company)}
+                >
+                    <RotateCcw className="size-3.5" />
+                    {t("page.rowActions.restore")}
+                </Button>
+            ) : (
+                <>
+            <Button
+                size="icon-sm"
+                variant="ghost"
+                aria-label={t("page.rowActions.edit", {name: company.name})}
+                onClick={() => actions.request("edit", company)}
+            >
+                <Pencil className="size-3.5" />
+            </Button>
+            <Button
+                size="icon-sm"
+                variant="ghost"
+                aria-label={
+                    suspended
+                        ? t("page.rowActions.resume", {name: company.name})
+                        : t("page.rowActions.suspend", {name: company.name})
+                }
+                onClick={() => actions.request(suspended ? "resume" : "suspend", company)}
+            >
+                {suspended ? (
+                    <PlayCircle className="size-3.5" />
+                ) : (
+                    <PauseCircle className="size-3.5" />
+                )}
+            </Button>
+            <Button
+                size="icon-sm"
+                variant="ghost"
+                // SA-3: only a suspended company can be deleted.
+                disabled={!suspended}
+                aria-label={
+                    suspended
+                        ? t("page.rowActions.delete", {name: company.name})
+                        : t("page.rowActions.deleteNeedsSuspend", {name: company.name})
+                }
+                title={suspended ? undefined : t("page.rowActions.deleteNeedsSuspend", {name: company.name})}
+                onClick={() => actions.request("delete", company)}
+            >
+                <Trash2 className="text-destructive size-3.5" />
+            </Button>
+                </>
+            )}
+            </div>
+        );
+    };
+
     return (
         <div className="space-y-6">
-            <div className="flex items-start justify-between gap-4">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
-                </div>
-                <div className="flex gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
+                <div className="flex flex-wrap gap-2">
                     <Button variant="secondary" asChild>
                         <Link to="/setting-options">
                             <SlidersHorizontal className="size-4" />
@@ -129,136 +212,54 @@ export function CompaniesPage() {
                 </Tabs>
             </div>
 
-            {companies.isLoading ? (
-                <div className="flex h-48 items-center justify-center">
-                    <Spinner />
-                </div>
-            ) : items.length === 0 ? (
-                <Empty>
-                    <EmptyHeader>
-                        <EmptyMedia variant="icon">
-                            <Building2 />
-                        </EmptyMedia>
-                        <EmptyTitle>{view === "deleted" ? t("page.empty.deletedTitle") : t("page.empty.title")}</EmptyTitle>
-                        <EmptyDescription>
-                            {view === "deleted" ? t("page.empty.deletedDescription") : t("page.empty.description")}
-                        </EmptyDescription>
-                    </EmptyHeader>
-                </Empty>
-            ) : (
-                <div className="table-card">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>{t("page.table.headers.name")}</TableHead>
-                                <TableHead>{t("page.table.headers.status")}</TableHead>
-                                <TableHead>{t("page.table.headers.currency")}</TableHead>
-                                <TableHead className="text-right">{t("page.table.headers.users")}</TableHead>
-                                <TableHead className="text-right">
-                                    {t("page.table.headers.projects")}
-                                </TableHead>
-                                <TableHead className="w-0" />
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {items.map((company) => {
-                                const suspended = isSuspended(company);
-                                const deleted = Boolean(company.deletedAt);
-
-                                return (
-                                    <TableRow key={company.id} className={suspended ? "opacity-60" : undefined}>
-                                        <TableCell className="font-medium">
-                                            {deleted ? (
-                                                company.name
-                                            ) : (
-                                                <Link className="hover:underline" to={`/companies/${company.id}`}>
-                                                    {company.name}
-                                                </Link>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            {deleted ? (
-                                                <Badge variant="outline">
-                                                    {t("status.deletedOn", {
-                                                        date: formatDate(company.deletedAt!, i18n.language).date,
-                                                    })}
-                                                </Badge>
-                                            ) : (
-                                                <Badge variant={suspended ? "destructive" : "secondary"} className={suspended ? undefined : "bg-emerald-500"}>
-                                                    {suspended ? t("status.suspended") : t("status.active")}
-                                                </Badge>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>{company.currency ?? "—"}</TableCell>
-                                        <TableCell className="text-right tabular-nums">
-                                            {company._count?.users ?? 0}
-                                        </TableCell>
-                                        <TableCell className="text-right tabular-nums">
-                                            {company._count?.projects ?? 0}
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className="flex justify-end gap-1">
-                                                {deleted ? (
-                                                    <Button
-                                                        size="sm"
-                                                        variant="outline"
-                                                        onClick={() => actions.request("restore", company)}
-                                                    >
-                                                        <RotateCcw className="size-3.5" />
-                                                        {t("page.rowActions.restore")}
-                                                    </Button>
-                                                ) : (
-                                                    <>
-                                                <Button
-                                                    size="icon-sm"
-                                                    variant="ghost"
-                                                    aria-label={t("page.rowActions.edit", {name: company.name})}
-                                                    onClick={() => actions.request("edit", company)}
-                                                >
-                                                    <Pencil className="size-3.5" />
-                                                </Button>
-                                                <Button
-                                                    size="icon-sm"
-                                                    variant="ghost"
-                                                    aria-label={
-                                                        suspended
-                                                            ? t("page.rowActions.resume", {name: company.name})
-                                                            : t("page.rowActions.suspend", {name: company.name})
-                                                    }
-                                                    onClick={() => actions.request(suspended ? "resume" : "suspend", company)}
-                                                >
-                                                    {suspended ? (
-                                                        <PlayCircle className="size-3.5" />
-                                                    ) : (
-                                                        <PauseCircle className="size-3.5" />
-                                                    )}
-                                                </Button>
-                                                <Button
-                                                    size="icon-sm"
-                                                    variant="ghost"
-                                                    // SA-3: only a suspended company can be deleted.
-                                                    disabled={!suspended}
-                                                    aria-label={
-                                                        suspended
-                                                            ? t("page.rowActions.delete", {name: company.name})
-                                                            : t("page.rowActions.deleteNeedsSuspend", {name: company.name})
-                                                    }
-                                                    title={suspended ? undefined : t("page.rowActions.deleteNeedsSuspend", {name: company.name})}
-                                                    onClick={() => actions.request("delete", company)}
-                                                >
-                                                    <Trash2 className="text-destructive size-3.5" />
-                                                </Button>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                </div>
-            )}
+            <DataTable
+                isLoading={companies.isLoading}
+                isEmpty={items.length === 0}
+                emptyIcon={<Building2 />}
+                emptyTitle={view === "deleted" ? t("page.empty.deletedTitle") : t("page.empty.title")}
+                emptyDescription={view === "deleted" ? t("page.empty.deletedDescription") : t("page.empty.description")}
+                cards={items.map((company) => (
+                    <div key={company.id} className={`rounded-lg border border-secondary p-4 ${isSuspended(company) ? "opacity-60" : ""}`}>
+                        <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0 space-y-1.5">
+                                <p className="truncate font-medium">{nameCell(company)}</p>
+                                {statusBadge(company)}
+                            </div>
+                            {rowActions(company)}
+                        </div>
+                        <p className="mt-2 text-xs text-muted-foreground">
+                            {[
+                                company.currency,
+                                `${t("page.table.headers.users")}: ${company._count?.users ?? 0}`,
+                                `${t("page.table.headers.projects")}: ${company._count?.projects ?? 0}`,
+                            ].filter(Boolean).join(" · ")}
+                        </p>
+                    </div>
+                ))}
+            >
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>{t("page.table.headers.name")}</TableHead>
+                        <TableHead>{t("page.table.headers.status")}</TableHead>
+                        <TableHead>{t("page.table.headers.currency")}</TableHead>
+                        <TableHead className="text-right">{t("page.table.headers.users")}</TableHead>
+                        <TableHead className="text-right">{t("page.table.headers.projects")}</TableHead>
+                        <TableHead className="w-0" />
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {items.map((company) => (
+                        <TableRow key={company.id} className={isSuspended(company) ? "opacity-60" : undefined}>
+                            <TableCell className="font-medium">{nameCell(company)}</TableCell>
+                            <TableCell>{statusBadge(company)}</TableCell>
+                            <TableCell>{company.currency ?? "—"}</TableCell>
+                            <TableCell className="text-right tabular-nums">{company._count?.users ?? 0}</TableCell>
+                            <TableCell className="text-right tabular-nums">{company._count?.projects ?? 0}</TableCell>
+                            <TableCell>{rowActions(company)}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </DataTable>
 
             <CompanyFormSheet
                 open={formOpen}

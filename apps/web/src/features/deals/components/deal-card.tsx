@@ -89,45 +89,4 @@ export function DealCard({ deal }: { deal: UnitDealHistoryEntry }) {
             </div>
         </div>
     );
-
-    // return (
-    //     <div className={`flex flex-col gap-2.5 rounded-xl border p-3.5 ${visual?.bg}`}>
-    //         <div className="flex items-center gap-3">
-    //             <div className={`flex size-9 shrink-0 items-center justify-center rounded-full ${visual?.bg}`}>
-    //                 <Icon size={16} className={visual?.iconColor} />
-    //             </div>
-    //             <div className="min-w-0 flex-1">
-    //                 <p className={`text-sm font-semibold ${visual?.text}`}>{visual?.heading}</p>
-    //                 <p className="truncate text-sm text-muted-foreground">{deal.client.fullName}</p>
-    //             </div>
-    //             <div className="shrink-0 text-right">
-    //                 <p className={`font-semibold ${visual?.text}`}>
-    //                     {parseFloat(deal.salePrice).toLocaleString("en-US")} $
-    //                 </p>
-    //                 {daysLeft !== null && (
-    //                     <p className="text-xs text-muted-foreground">
-    //                         {daysLeft > 0 ? `${daysLeft}d left` : daysLeft === 0 ? "Expires today" : "Expired"}
-    //                     </p>
-    //                 )}
-    //             </div>
-    //         </div>
-    //
-    //         <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-current/10 pt-2 text-xs text-muted-foreground">
-    //             {deal.manager && <span>Manager: {deal.manager.fullName}</span>}
-    //             {deal.client.phone && <span>{deal.client.phone}</span>}
-    //             {deal.reservedAt && <span>Reserved {new Date(deal.reservedAt).toLocaleDateString()}</span>}
-    //             {deal.status !== "RESERVED" && deal.reservationExpiresAt && (
-    //                 <span>Was due {new Date(deal.reservationExpiresAt).toLocaleDateString()}</span>
-    //             )}
-    //             {deal.contractDate && <span>Contract {new Date(deal.contractDate).toLocaleDateString()}</span>}
-    //             {deal.status === "CANCELLED" && deal.cancelledAt && (
-    //                 <span>Cancelled {new Date(deal.cancelledAt).toLocaleDateString()}</span>
-    //             )}
-    //         </div>
-    //
-    //         {deal.status === "CANCELLED" && deal.cancelReason && (
-    //             <p className="text-xs italic text-muted-foreground">"{deal.cancelReason}"</p>
-    //         )}
-    //     </div>
-    // );
 }
