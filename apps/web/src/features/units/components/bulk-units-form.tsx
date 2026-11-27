@@ -168,9 +168,9 @@ export function BulkUnitsForm({
             <SheetBody scrollFade>
                 <FieldGroup className="gap-5 py-4">
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
                             <h3 className="text-sm font-medium">{t("bulk.unitsHeading")}</h3>
-                            <div className="flex gap-2">
+                            <div className="flex flex-wrap gap-2">
                                 <Popover onOpenChange={({ open: isOpen }) => setAutoGenOpen(isOpen)} open={open}>
                                     <PopoverTrigger asChild>
                                         <Button
