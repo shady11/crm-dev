@@ -6,9 +6,8 @@ import {ScrollText} from "lucide-react";
 import {Toggle} from "@/components/ui/toggle.tsx";
 import {FilterPopover} from "@/components/shared/filter-popover.tsx";
 import {DateField} from "@/components/shared/date-field.tsx";
-import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
-import {Spinner} from "@/components/ui/spinner.tsx";
-import {Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle} from "@/components/ui/empty.tsx";
+import {TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
+import {DataTable} from "@/components/shared/data-table.tsx";
 import {Pagination, PaginationItems, PaginationNext, PaginationPrevious} from "@/components/ui/pagination.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import {formatDate} from "@/utils/date-formatter";
@@ -76,6 +75,20 @@ export function AuditLogPage() {
 
     const items = logs.data?.items ?? [];
     const total = logs.data?.meta.total ?? 0;
+
+    const when = (createdAt: string) => {
+        const {date, time} = formatDate(createdAt, i18n.language);
+        return `${date} ${time}`;
+    };
+
+    const target = (entry: (typeof items)[number]) =>
+        entry.targetName ?? (
+            // A target that no longer resolves keeps its short id.
+            <span className="text-muted-foreground text-xs">
+                {entry.targetType}
+                {entry.targetId ? ` #${entry.targetId.slice(0, 8)}` : ""}
+            </span>
+        );
 
     return (
         <div className="space-y-6">
@@ -183,60 +196,47 @@ export function AuditLogPage() {
                 </div>
             </div>
 
-            {logs.isLoading ? (
-                <div className="flex h-48 items-center justify-center">
-                    <Spinner />
-                </div>
-            ) : items.length === 0 ? (
-                <Empty>
-                    <EmptyHeader>
-                        <EmptyMedia variant="icon">
-                            <ScrollText />
-                        </EmptyMedia>
-                        <EmptyTitle>{t("page.empty.title")}</EmptyTitle>
-                        <EmptyDescription>{t("page.empty.description")}</EmptyDescription>
-                    </EmptyHeader>
-                </Empty>
-            ) : (
-                <div className="table-card">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>{t("page.table.headers.timestamp")}</TableHead>
-                                <TableHead>{t("page.table.headers.actor")}</TableHead>
-                                <TableHead>{t("page.table.headers.action")}</TableHead>
-                                <TableHead>{t("page.table.headers.target")}</TableHead>
-                                <TableHead>{t("page.table.headers.company")}</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {items.map((entry) => {
-                                const {date, time} = formatDate(entry.createdAt, i18n.language);
-
-                                return (
-                                    <TableRow key={entry.id}>
-                                        <TableCell className="text-muted-foreground whitespace-nowrap text-xs">
-                                            {date} {time}
-                                        </TableCell>
-                                        <TableCell>{entry.actorEmail}</TableCell>
-                                        <TableCell>{t(`page.actions.${entry.action}`)}</TableCell>
-                                        <TableCell>
-                                            {entry.targetName ?? (
-                                                // A target that no longer resolves keeps its short id.
-                                                <span className="text-muted-foreground text-xs">
-                                                    {entry.targetType}
-                                                    {entry.targetId ? ` #${entry.targetId.slice(0, 8)}` : ""}
-                                                </span>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>{entry.company?.name ?? "—"}</TableCell>
-                                    </TableRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                </div>
-            )}
+            <DataTable
+                isLoading={logs.isLoading}
+                isEmpty={items.length === 0}
+                emptyIcon={<ScrollText />}
+                emptyTitle={t("page.empty.title")}
+                emptyDescription={t("page.empty.description")}
+                // On phones a card per entry, as on Login activity.
+                cards={items.map((entry) => (
+                    <div key={entry.id} className="space-y-1 rounded-lg border bg-card p-4 text-sm">
+                        <div className="flex items-baseline justify-between gap-3">
+                            <p className="min-w-0 truncate font-medium">{t(`page.actions.${entry.action}`)}</p>
+                            <span className="shrink-0 text-xs text-muted-foreground tabular-nums">{when(entry.createdAt)}</span>
+                        </div>
+                        <p className="truncate">{target(entry)}</p>
+                        <p className="truncate text-xs text-muted-foreground">
+                            {[entry.actorEmail, entry.company?.name].filter(Boolean).join(" · ")}
+                        </p>
+                    </div>
+                ))}
+            >
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>{t("page.table.headers.timestamp")}</TableHead>
+                        <TableHead>{t("page.table.headers.actor")}</TableHead>
+                        <TableHead>{t("page.table.headers.action")}</TableHead>
+                        <TableHead>{t("page.table.headers.target")}</TableHead>
+                        <TableHead>{t("page.table.headers.company")}</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {items.map((entry) => (
+                        <TableRow key={entry.id}>
+                            <TableCell className="text-muted-foreground whitespace-nowrap text-xs tabular-nums">{when(entry.createdAt)}</TableCell>
+                            <TableCell>{entry.actorEmail}</TableCell>
+                            <TableCell>{t(`page.actions.${entry.action}`)}</TableCell>
+                            <TableCell>{target(entry)}</TableCell>
+                            <TableCell>{entry.company?.name ?? "—"}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </DataTable>
 
             {total > limit ? (
                 <Pagination
