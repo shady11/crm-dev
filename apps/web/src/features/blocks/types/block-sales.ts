@@ -12,6 +12,13 @@ export const BLOCK_SALES_STATUS_LABEL_KEYS: Record<BlockSalesStatus, string> = {
     COMPLETED: "blocks:salesStatus.completed",
 };
 
+/** Badge colours: upcoming amber, on sale green, completed neutral. */
+export const BLOCK_SALES_STATUS_CLASSES: Record<BlockSalesStatus, string> = {
+    UPCOMING: "bg-amber-500",
+    ON_SALE: "bg-emerald-500",
+    COMPLETED: "bg-gray-400",
+};
+
 /** Units can be booked unless the block hasn't opened for sales yet. */
 export function isBlockBookable(salesStatus: BlockSalesStatus | null | undefined) {
     return salesStatus !== BlockSalesStatus.UPCOMING;

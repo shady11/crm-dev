@@ -9,7 +9,7 @@ import {Badge} from "@/components/ui/badge.tsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
 import {KpiCard} from "@/features/dashboard/components/kpi-card.tsx";
 import {PROJECT_STATUS_BADGE_CLASSES, PROJECT_STATUS_LABEL_KEYS} from "@/features/projects/types/project.types.ts";
-import {BLOCK_SALES_STATUS_LABEL_KEYS, completionQuarter} from "@/features/blocks/types/block-sales.ts";
+import {BLOCK_SALES_STATUS_CLASSES, BLOCK_SALES_STATUS_LABEL_KEYS, completionQuarter} from "@/features/blocks/types/block-sales.ts";
 import {UNIT_STATUS_CLASSES, UNIT_STATUS_LABEL_KEYS, UnitStatus} from "@/features/units/types/unit.types.ts";
 import {formatDay} from "@/utils/date-formatter.ts";
 
@@ -143,7 +143,7 @@ export function ProjectOverview() {
                                                 </div>
                                             </div>
                                             {block.salesStatus && (
-                                                <Badge variant="secondary" className="shrink-0">
+                                                <Badge variant="secondary" className={`shrink-0 ${BLOCK_SALES_STATUS_CLASSES[block.salesStatus]}`}>
                                                     {t(BLOCK_SALES_STATUS_LABEL_KEYS[block.salesStatus])}
                                                 </Badge>
                                             )}

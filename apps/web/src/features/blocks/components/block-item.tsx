@@ -9,7 +9,7 @@ import {AddEntranceButton} from "@/features/entrances/components/add-entrance-bu
 import {EntranceItem} from "@/features/entrances/components/entrance-item.tsx";
 import {DuplicateBlockButton} from "@/features/blocks/components/duplicate-block-button.tsx";
 import {useTranslation} from "react-i18next";
-import {BLOCK_SALES_STATUS_LABEL_KEYS, completionQuarter} from "@/features/blocks/types/block-sales.ts";
+import {BLOCK_SALES_STATUS_CLASSES, BLOCK_SALES_STATUS_LABEL_KEYS, completionQuarter} from "@/features/blocks/types/block-sales.ts";
 import {cn} from "@/lib/utils.ts";
 
 interface BlockItemProps {
@@ -48,7 +48,7 @@ export function BlockItem({ block, isExpanded, onToggle }: BlockItemProps) {
                     <div className="flex flex-wrap items-center gap-2">
                         <p className="truncate font-semibold">{t("item.titleWithName", { name: block.name })}</p>
                         {block.salesStatus && (
-                            <Badge variant="secondary">{t(BLOCK_SALES_STATUS_LABEL_KEYS[block.salesStatus])}</Badge>
+                            <Badge variant="secondary" className={BLOCK_SALES_STATUS_CLASSES[block.salesStatus]}>{t(BLOCK_SALES_STATUS_LABEL_KEYS[block.salesStatus])}</Badge>
                         )}
                     </div>
                     <p className="mt-0.5 truncate text-xs text-muted-foreground">

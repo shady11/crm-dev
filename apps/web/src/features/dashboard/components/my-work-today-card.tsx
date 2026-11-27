@@ -4,7 +4,7 @@ import {paths} from "@/routes/paths.ts";
 import {Badge} from "@/components/ui/badge.tsx";
 import type {MyWorkToday} from "@/features/dashboard/api/dashboard.api.ts";
 import {useTranslation} from "react-i18next";
-import {DEAL_STATUS_LABEL_KEYS, DealStatus} from "@/features/deals/types/deal.types.ts";
+import {DEAL_STATUS_LABEL_KEYS, DEAL_STATUS_VISUALS, DealStatus} from "@/features/deals/types/deal.types.ts";
 import {useTaskTitle} from "@/features/tasks/hooks/use-task-title.ts";
 import {formatDay} from "@/utils/date-formatter.ts";
 
@@ -76,7 +76,7 @@ export function MyWorkTodayCard({data}: {data: MyWorkToday}) {
                                         <p className="truncate font-medium">{deal.client.fullName}</p>
                                         <p className="text-xs text-muted-foreground">№{deal.unit.number}</p>
                                     </div>
-                                    <Badge variant="secondary">{t(DEAL_STATUS_LABEL_KEYS[deal.status as DealStatus])}</Badge>
+                                    <Badge variant="secondary" className={DEAL_STATUS_VISUALS[deal.status]?.bg}>{t(DEAL_STATUS_LABEL_KEYS[deal.status as DealStatus])}</Badge>
                                 </Link>
                             ))}
                         </div>

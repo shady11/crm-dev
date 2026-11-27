@@ -2,11 +2,11 @@ import {useState} from "react";
 import {Link} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
-import {Building2, PauseCircle, Pencil, PlayCircle, Plus, RotateCcw, SlidersHorizontal, Trash2} from "lucide-react";
+import {Building2, PauseCircle, Pencil, PlayCircle, Plus, RotateCcw, Search, SlidersHorizontal, Trash2} from "lucide-react";
 import {Badge} from "@/components/ui/badge.tsx";
 import {Button} from "@/components/ui/button.tsx";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card.tsx";
-import {Input} from "@/components/ui/input.tsx";
+import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs.tsx";
@@ -108,20 +108,26 @@ export function CompaniesPage() {
                 </Card>
             ) : null}
 
-            <Tabs value={view} onValueChange={({value}) => setView(value as View)}>
-                <TabsList>
-                    <TabsTrigger value="current">{t("page.views.current")}</TabsTrigger>
-                    <TabsTrigger value="deleted">{t("page.views.deleted")}</TabsTrigger>
-                </TabsList>
-            </Tabs>
-
-            <Input
-                placeholder={t("page.searchPlaceholder")}
-                aria-label={t("page.searchPlaceholder")}
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                className="max-w-sm"
-            />
+            {/* Search on the left, the current/deleted switch on the right, as on the other list pages. */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <InputGroup className="w-full sm:w-80">
+                    <InputGroupInput
+                        placeholder={t("page.searchPlaceholder")}
+                        aria-label={t("page.searchPlaceholder")}
+                        value={search}
+                        onChange={(event) => setSearch(event.target.value)}
+                    />
+                    <InputGroupAddon>
+                        <Search className="size-4" />
+                    </InputGroupAddon>
+                </InputGroup>
+                <Tabs value={view} onValueChange={({value}) => setView(value as View)}>
+                    <TabsList>
+                        <TabsTrigger value="current">{t("page.views.current")}</TabsTrigger>
+                        <TabsTrigger value="deleted">{t("page.views.deleted")}</TabsTrigger>
+                    </TabsList>
+                </Tabs>
+            </div>
 
             {companies.isLoading ? (
                 <div className="flex h-48 items-center justify-center">
@@ -178,7 +184,7 @@ export function CompaniesPage() {
                                                     })}
                                                 </Badge>
                                             ) : (
-                                                <Badge variant={suspended ? "destructive" : "secondary"}>
+                                                <Badge variant={suspended ? "destructive" : "secondary"} className={suspended ? undefined : "bg-emerald-500"}>
                                                     {suspended ? t("status.suspended") : t("status.active")}
                                                 </Badge>
                                             )}

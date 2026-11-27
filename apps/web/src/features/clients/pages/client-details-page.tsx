@@ -20,7 +20,7 @@ import {
 import {ClientHistoryCard} from "@/features/clients/components/client-history-card.tsx";
 import {ClientTasksCard} from "@/features/tasks/components/client-tasks-card.tsx";
 import {DEAL_STATUS_LABEL_KEYS, DEAL_STATUS_VISUALS} from "@/features/deals/types/deal.types.ts";
-import {LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
+import {LEAD_STATUS_CLASSES, LEAD_STATUS_LABEL_KEYS} from "@/features/leads/types/lead.types.ts";
 import {paths} from "@/routes/paths.ts";
 import {EntityDocumentsCard} from "@/features/documents/components/entity-documents-card.tsx";
 import {WhatsAppLink} from "@/components/shared/whatsapp-link.tsx";
@@ -275,7 +275,7 @@ export function ClientDetailsPage() {
                                                 <p className="font-medium">{lead.fullName}</p>
                                                 {lead.source && <p className="text-xs text-muted-foreground">{lead.source}</p>}
                                             </div>
-                                            <Badge variant="secondary">{t(LEAD_STATUS_LABEL_KEYS[lead.status])}</Badge>
+                                            <Badge variant="secondary" className={LEAD_STATUS_CLASSES[lead.status]}>{t(LEAD_STATUS_LABEL_KEYS[lead.status])}</Badge>
                                         </div>
                                     ))}
                                 </div>
