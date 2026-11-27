@@ -135,15 +135,15 @@ export function AppHeader() {
                 {user?.companyId ? <NotificationBell /> : null}
                 <LanguageDropdown
                     trigger={
-                        <Button variant="ghost" size="icon-lg" className="rounded-xl border border-glass-border bg-control backdrop-blur-md hover:bg-accent" title={t("language.switchLabel")}>
+                        <Button variant="ghost" size="icon-md" className="rounded-lg border border-glass-border bg-control backdrop-blur-md hover:bg-accent" title={t("language.switchLabel")}>
                             <Languages />
                         </Button>
                     }
                 />
                 <Button
                     variant="ghost"
-                    size="icon-lg"
-                    className="rounded-xl border border-glass-border bg-control backdrop-blur-md hover:bg-accent"
+                    size="icon-md"
+                    className="rounded-lg border border-glass-border bg-control backdrop-blur-md hover:bg-accent"
                     onClick={toggleTheme}
                     title={theme === "dark" ? t("theme.switchToLight") : t("theme.switchToDark")}
                 >
