@@ -1,4 +1,5 @@
 import {useMemo, useRef, useState} from "react";
+import {ScrollArea} from "@/components/ui/scroll-area.tsx";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {createListCollection} from "@ark-ui/react";
@@ -276,15 +277,17 @@ export function DocumentTemplatesPage() {
 
                             {mode === "preview" && (
                                 <>
-                                    <div className="bg-muted/50 max-h-[52rem] overflow-auto rounded-lg border p-4 sm:p-6">
-                                        {/* sandbox="" : no scripts, no forms, no navigation. */}
-                                        <iframe
-                                            title={t("templates.preview.title")}
-                                            sandbox=""
-                                            srcDoc={previewQuery.data ? withHeadMarkup(previewQuery.data, `<style>${data.font.css}</style>`) : ""}
-                                            className="mx-auto block h-[60rem] w-full max-w-[794px] bg-white shadow-sm"
-                                        />
-                                    </div>
+                                    <ScrollArea className="bg-muted/50 max-h-[52rem] rounded-lg border [&>[data-slot=scroll-area-viewport]]:max-h-[inherit]">
+                                        <div className="p-4 sm:p-6">
+                                            {/* sandbox="" : no scripts, no forms, no navigation. */}
+                                            <iframe
+                                                title={t("templates.preview.title")}
+                                                sandbox=""
+                                                srcDoc={previewQuery.data ? withHeadMarkup(previewQuery.data, `<style>${data.font.css}</style>`) : ""}
+                                                className="mx-auto block h-[60rem] w-full max-w-[794px] bg-white shadow-sm"
+                                            />
+                                        </div>
+                                    </ScrollArea>
                                     <p className="text-muted-foreground text-xs">{t("templates.preview.hint")}</p>
                                 </>
                             )}
@@ -301,7 +304,8 @@ export function DocumentTemplatesPage() {
                             <p className="text-muted-foreground text-xs">
                                 {mode === "preview" ? t("templates.placeholders.hintPreview") : t("templates.placeholders.hint")}
                             </p>
-                            <ul className="max-h-[36rem] divide-y overflow-y-auto">
+                            <ScrollArea className="max-h-[36rem] [&>[data-slot=scroll-area-viewport]]:max-h-[inherit]">
+                            <ul className="divide-y">
                                 {placeholders.map((placeholder) => (
                                     <li key={placeholder.token}>
                                         <button
@@ -318,6 +322,7 @@ export function DocumentTemplatesPage() {
                                     </li>
                                 ))}
                             </ul>
+                            </ScrollArea>
                         </aside>
                     </div>
                 </>

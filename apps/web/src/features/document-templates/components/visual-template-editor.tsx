@@ -1,4 +1,5 @@
 import {type RefObject, useCallback, useEffect, useImperativeHandle, useRef, useState} from "react";
+import {ScrollArea} from "@/components/ui/scroll-area.tsx";
 import {useTranslation} from "react-i18next";
 import {
     Bold,
@@ -407,16 +408,18 @@ export function VisualTemplateEditor({
                 <Separator orientation="vertical" className="mx-1 h-5" />
                 {toolButton({command: "removeFormat", icon: RemoveFormatting, labelKey: "templates.toolbar.clearFormatting"})}
             </div>
-            <div className="bg-muted/50 max-h-[52rem] overflow-auto p-4 sm:p-6">
-                <iframe
-                    ref={frameRef}
-                    title={t("templates.modes.visual")}
-                    sandbox="allow-same-origin"
-                    srcDoc={srcDoc}
-                    onLoad={onLoad}
-                    className="mx-auto block min-h-[600px] w-full max-w-[794px] bg-white shadow-sm"
-                />
-            </div>
+            <ScrollArea className="bg-muted/50 max-h-[52rem] [&>[data-slot=scroll-area-viewport]]:max-h-[inherit]">
+                <div className="p-4 sm:p-6">
+                    <iframe
+                        ref={frameRef}
+                        title={t("templates.modes.visual")}
+                        sandbox="allow-same-origin"
+                        srcDoc={srcDoc}
+                        onLoad={onLoad}
+                        className="mx-auto block min-h-[600px] w-full max-w-[794px] bg-white shadow-sm"
+                    />
+                </div>
+            </ScrollArea>
         </div>
     );
 }

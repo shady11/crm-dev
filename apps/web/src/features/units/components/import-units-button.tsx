@@ -15,6 +15,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog.tsx";
+import {ScrollArea} from "@/components/ui/scroll-area.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {toast} from "@/components/ui/toast.tsx";
 import {useImportUnits, usePreviewImportUnits} from "@/features/units/hooks/use-import-units.ts";
@@ -197,7 +198,7 @@ export function ImportUnitsButton({projectId}: Props) {
                                 {(preview.priceChanges?.length ?? 0) > 0 && (
                                     <section className="space-y-2">
                                         <h3 className="text-sm font-medium">{t("import.preview.priceChangesTitle")}</h3>
-                                        <div className="max-h-56 overflow-y-auto rounded-md border">
+                                        <ScrollArea className="max-h-56 rounded-md border [&>[data-slot=scroll-area-viewport]]:max-h-[inherit]">
                                             <Table>
                                                 <TableHeader>
                                                     <TableRow>
@@ -223,14 +224,14 @@ export function ImportUnitsButton({projectId}: Props) {
                                                     ))}
                                                 </TableBody>
                                             </Table>
-                                        </div>
+                                        </ScrollArea>
                                     </section>
                                 )}
 
                                 {preview.errors.length > 0 && (
                                     <section className="space-y-2">
                                         <h3 className="text-sm font-medium">{t("import.preview.errorsTitle")}</h3>
-                                        <div className="max-h-56 overflow-y-auto rounded-md border">
+                                        <ScrollArea className="max-h-56 rounded-md border [&>[data-slot=scroll-area-viewport]]:max-h-[inherit]">
                                             <Table>
                                                 <TableHeader>
                                                     <TableRow>
@@ -251,7 +252,7 @@ export function ImportUnitsButton({projectId}: Props) {
                                                     ))}
                                                 </TableBody>
                                             </Table>
-                                        </div>
+                                        </ScrollArea>
                                     </section>
                                 )}
                             </DialogBody>
@@ -296,7 +297,7 @@ export function ImportUnitsButton({projectId}: Props) {
                                     <section className="space-y-2">
                                         <h3 className="text-sm font-medium">{t("import.kept.title")}</h3>
                                         <p className="text-muted-foreground text-xs">{t("import.kept.hint")}</p>
-                                        <div className="max-h-56 overflow-y-auto rounded-md border">
+                                        <ScrollArea className="max-h-56 rounded-md border [&>[data-slot=scroll-area-viewport]]:max-h-[inherit]">
                                             <Table>
                                                 <TableHeader>
                                                     <TableRow>
@@ -322,14 +323,14 @@ export function ImportUnitsButton({projectId}: Props) {
                                                     ))}
                                                 </TableBody>
                                             </Table>
-                                        </div>
+                                        </ScrollArea>
                                     </section>
                                 )}
 
                                 {result.errors.length > 0 && (
                                     <section className="space-y-2">
                                         <h3 className="text-sm font-medium">{t("import.errorsTitle")}</h3>
-                                        <div className="max-h-56 overflow-y-auto rounded-md border">
+                                        <ScrollArea className="max-h-56 rounded-md border [&>[data-slot=scroll-area-viewport]]:max-h-[inherit]">
                                             <Table>
                                                 <TableHeader>
                                                     <TableRow>
@@ -350,7 +351,7 @@ export function ImportUnitsButton({projectId}: Props) {
                                                     ))}
                                                 </TableBody>
                                             </Table>
-                                        </div>
+                                        </ScrollArea>
                                     </section>
                                 )}
                             </DialogBody>

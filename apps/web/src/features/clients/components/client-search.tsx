@@ -1,4 +1,5 @@
 import {useState} from "react";
+import {ScrollArea} from "@/components/ui/scroll-area.tsx";
 import {Loader2Icon, SearchIcon, UserPlusIcon} from "lucide-react";
 import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group";
 import {Button} from "@/components/ui/button";
@@ -44,16 +45,18 @@ export function ClientSearch({ selectedClientId, onSelect, onCreateNew }: Client
                 </p>
             )}
 
-            <div className="flex max-h-64 flex-col gap-2 overflow-y-auto">
-                {clients.map((client) => (
-                    <ClientCard
-                        key={client.id}
-                        client={client}
-                        selected={client.id === selectedClientId}
-                        onClick={() => onSelect(client)}
-                    />
-                ))}
-            </div>
+            <ScrollArea className="max-h-64 [&>[data-slot=scroll-area-viewport]]:max-h-[inherit]">
+                <div className="flex flex-col gap-2">
+                    {clients.map((client) => (
+                        <ClientCard
+                            key={client.id}
+                            client={client}
+                            selected={client.id === selectedClientId}
+                            onClick={() => onSelect(client)}
+                        />
+                    ))}
+                </div>
+            </ScrollArea>
 
             <Button type="button" variant="outline" onClick={onCreateNew}>
                 <UserPlusIcon className="size-4" />

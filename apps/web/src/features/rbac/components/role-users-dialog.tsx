@@ -1,4 +1,6 @@
 import {roleLabel} from "@/features/rbac/utils/role-label.ts";
+import {ScrollArea} from "@/components/ui/scroll-area.tsx";
+import {InputGroup, InputGroupAddon, InputGroupInput} from "@/components/ui/input-group.tsx";
 import {useMemo, useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
@@ -11,7 +13,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog.tsx";
-import {Input} from "@/components/ui/input.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
 import {getRoleMembers} from "../api/rbac.api";
 import type {Role} from "../types/rbac.types";
@@ -50,15 +51,17 @@ export function RoleUsersDialog({role, onOpenChange}: {role: Role | null; onOpen
                 </DialogHeader>
 
                 <DialogBody className="space-y-3">
-                    <div className="relative">
-                        <Search className="text-muted-foreground absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
-                        <Input
-                            className="pl-8"
+                    <InputGroup>
+                        <InputGroupInput
                             placeholder={t("usersDialog.searchPlaceholder")}
+                            aria-label={t("usersDialog.searchPlaceholder")}
                             value={search}
                             onChange={(event) => setSearch(event.target.value)}
                         />
-                    </div>
+                        <InputGroupAddon>
+                            <Search className="size-4" />
+                        </InputGroupAddon>
+                    </InputGroup>
 
                     {membersQuery.isLoading ? (
                         <div className="flex h-32 items-center justify-center">
@@ -67,17 +70,19 @@ export function RoleUsersDialog({role, onOpenChange}: {role: Role | null; onOpen
                     ) : filteredMembers.length === 0 ? (
                         <p className="text-muted-foreground py-6 text-center text-sm">{t("usersDialog.empty")}</p>
                     ) : (
-                        <div className="max-h-80 space-y-1 overflow-y-auto">
-                            {filteredMembers.map((member) => (
-                                <div
-                                    key={member.id}
-                                    className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm"
-                                >
-                                    <span className="flex-1">{member.fullName}</span>
-                                    <span className="text-muted-foreground text-xs">{member.email}</span>
-                                </div>
-                            ))}
-                        </div>
+                        <ScrollArea className="max-h-80 [&>[data-slot=scroll-area-viewport]]:max-h-[inherit]">
+                            <div className="space-y-1">
+                                {filteredMembers.map((member) => (
+                                    <div
+                                        key={member.id}
+                                        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm"
+                                    >
+                                        <span className="flex-1">{member.fullName}</span>
+                                        <span className="text-muted-foreground text-xs">{member.email}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </ScrollArea>
                     )}
                 </DialogBody>
             </DialogContent>
