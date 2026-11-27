@@ -221,7 +221,7 @@
     "project": "Проект",
     "address": "Адрес",
     "location": "Расположение",
-    "floor": "{{number}} этаж",
+    "floor": "{{number}}-этаж",
     "type": "Тип",
     "rooms": "Комнат",
     "area": "Площадь",

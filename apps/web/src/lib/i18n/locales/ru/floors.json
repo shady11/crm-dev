@@ -16,7 +16,7 @@
     "numberPositive": "Номер этажа должен быть положительным"
   },
   "item": {
-    "titleWithNumber": "Этаж {{number}}",
+    "titleWithNumber": "{{number}}-этаж",
     "units_one": "{{count}} помещение",
     "units_few": "{{count}} помещения",
     "units_many": "{{count}} помещений",
