@@ -3,7 +3,8 @@ import {useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {createListCollection} from "@ark-ui/react";
 import {ScrollText} from "lucide-react";
-import {Switch} from "@/components/ui/switch.tsx";
+import {Toggle} from "@/components/ui/toggle.tsx";
+import {FilterPopover} from "@/components/shared/filter-popover.tsx";
 import {DateField} from "@/components/shared/date-field.tsx";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {Spinner} from "@/components/ui/spinner.tsx";
@@ -78,99 +79,108 @@ export function AuditLogPage() {
 
     return (
         <div className="space-y-6">
-            <div>
+            {/* Title, then the sign-ins toggle and the filters together on the right, as on the Activity log. */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
-                <p className="text-muted-foreground text-sm">{t("page.description")}</p>
-            </div>
-
-            <div className="flex flex-wrap items-end gap-3">
-                <label className="block space-y-1.5">
-                    <span className="text-sm font-medium">{t("page.filters.company")}</span>
-                    <Select
-                        collection={companyCollection}
-                        value={[companyId || "ALL"]}
-                        onValueChange={(item) => {
-                            setCompanyId(item.value[0] === "ALL" ? "" : (item.value[0] ?? ""));
-                            setPage(1);
-                        }}
-                    >
-                        <SelectTrigger className="w-64" aria-label={t("page.filters.company")}>
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {companyCollection.items.map((item) => (
-                                <SelectItem key={item.value} item={item}>
-                                    {item.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </label>
-
-                <label className="block space-y-1.5">
-                    <span className="text-sm font-medium">{t("page.filters.action")}</span>
-                    <Select
-                        collection={actionCollection}
-                        value={[action ?? "ALL"]}
-                        onValueChange={(item) => {
-                            setAction(item.value[0] === "ALL" ? undefined : (item.value[0] as AuditAction));
-                            setPage(1);
-                        }}
-                    >
-                        <SelectTrigger className="w-64" aria-label={t("page.filters.action")}>
-                            <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {actionCollection.items.map((item) => (
-                                <SelectItem key={item.value} item={item}>
-                                    {item.label}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </label>
-
-                <div className="space-y-1.5">
-                    <span className="text-sm font-medium">{t("page.filters.dateFrom")}</span>
-                    <DateField
-                        className="w-44"
-                        clearable
-                        value={dateFrom}
-                        max={dateTo}
-                        onChange={(value) => {
-                            setDateFrom(value);
-                            setPage(1);
-                        }}
-                    />
-                </div>
-
-                <div className="space-y-1.5">
-                    <span className="text-sm font-medium">{t("page.filters.dateTo")}</span>
-                    <DateField
-                        className="w-44"
-                        clearable
-                        value={dateTo}
-                        min={dateFrom}
-                        onChange={(value) => {
-                            setDateTo(value);
-                            setPage(1);
-                        }}
-                    />
-                </div>
-
-                <label className="flex h-9 items-center gap-2 text-sm">
-                    <Switch
-                        checked={hideLogins}
+                <div className="flex flex-wrap items-center gap-2">
+                    <Toggle
+                        variant="outline"
+                        size="md"
+                        pressed={hideLogins}
                         // Picking a sign-in action shows sign-ins whatever this says.
                         disabled={action === "LOGIN_SUCCEEDED" || action === "LOGIN_FAILED"}
-                        onCheckedChange={({checked}) => {
-                            setHideLogins(checked);
+                        onPressedChange={(pressed) => {
+                            setHideLogins(pressed);
                             setPage(1);
                         }}
-                        aria-label={t("page.filters.hideLogins")}
-                    />
-                    {t("page.filters.hideLogins")}
-                </label>
+                    >
+                        {t("page.filters.hideLogins")}
+                    </Toggle>
+                    <FilterPopover
+                        activeCount={[companyId, action, dateFrom, dateTo].filter(Boolean).length}
+                        onReset={() => {
+                            setCompanyId("");
+                            setAction(undefined);
+                            setDateFrom("");
+                            setDateTo("");
+                            setPage(1);
+                        }}
+                    >
+                        <label className="block space-y-1.5">
+                            <span className="text-sm font-medium">{t("page.filters.company")}</span>
+                            <Select
+                                collection={companyCollection}
+                                value={[companyId || "ALL"]}
+                                onValueChange={(item) => {
+                                    setCompanyId(item.value[0] === "ALL" ? "" : (item.value[0] ?? ""));
+                                    setPage(1);
+                                }}
+                            >
+                                <SelectTrigger className="w-full" aria-label={t("page.filters.company")}>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {companyCollection.items.map((item) => (
+                                        <SelectItem key={item.value} item={item}>
+                                            {item.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </label>
+
+                        <label className="block space-y-1.5">
+                            <span className="text-sm font-medium">{t("page.filters.action")}</span>
+                            <Select
+                                collection={actionCollection}
+                                value={[action ?? "ALL"]}
+                                onValueChange={(item) => {
+                                    setAction(item.value[0] === "ALL" ? undefined : (item.value[0] as AuditAction));
+                                    setPage(1);
+                                }}
+                            >
+                                <SelectTrigger className="w-full" aria-label={t("page.filters.action")}>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {actionCollection.items.map((item) => (
+                                        <SelectItem key={item.value} item={item}>
+                                            {item.label}
+                                        </SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </label>
+
+                        <div className="space-y-1.5">
+                            <span className="text-sm font-medium">{t("page.filters.dateFrom")}</span>
+                            <DateField
+                                className="w-full"
+                                clearable
+                                value={dateFrom}
+                                max={dateTo}
+                                onChange={(value) => {
+                                    setDateFrom(value);
+                                    setPage(1);
+                                }}
+                            />
+                        </div>
+
+                        <div className="space-y-1.5">
+                            <span className="text-sm font-medium">{t("page.filters.dateTo")}</span>
+                            <DateField
+                                className="w-full"
+                                clearable
+                                value={dateTo}
+                                min={dateFrom}
+                                onChange={(value) => {
+                                    setDateTo(value);
+                                    setPage(1);
+                                }}
+                            />
+                        </div>
+                    </FilterPopover>
+                </div>
             </div>
 
             {logs.isLoading ? (

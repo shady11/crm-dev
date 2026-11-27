@@ -22,10 +22,7 @@ export function ProfilePage() {
 
     return (
         <div className="space-y-6">
-            <div>
-                <h2 className="text-2xl font-bold tracking-tight">{t("profile.page.heading")}</h2>
-                <p className="text-sm text-muted-foreground">{t("profile.page.description")}</p>
-            </div>
+            <h2 className="text-2xl font-bold tracking-tight">{t("profile.page.heading")}</h2>
 
             <SettingsLayout
                 sections={[

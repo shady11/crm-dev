@@ -1,4 +1,4 @@
-import {formatDay} from "@/utils/date-formatter.ts";
+import {formatDate} from "@/utils/date-formatter.ts";
 
 export function initials(fullName: string) {
     return fullName
@@ -25,12 +25,9 @@ export function isoToDay(iso: string | null | undefined) {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
+/** dd/mm/yyyy and a 24-hour time, as everywhere else in the app. */
 export function formatCreatedAt(iso: string, locale = "ru-RU") {
-    const date = new Date(iso);
-    return {
-        date: formatDay(date),
-        time: date.toLocaleTimeString(locale, { hour: "numeric", minute: "2-digit" }),
-    };
+    return formatDate(iso, locale);
 }
 
 /** Whole calendar days from today to a timestamp's local day (negative = past). */

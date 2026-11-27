@@ -32,11 +32,8 @@ export function SuperAdminDashboardPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex items-start justify-between gap-4">
-                <div>
-                    <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
-                    <p className="text-muted-foreground text-sm">{t("page.description")}</p>
-                </div>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="text-2xl font-bold tracking-tight">{t("page.heading")}</h2>
                 <Button variant="secondary" asChild>
                     <Link to="/companies">{t("page.manageCompanies")}</Link>
                 </Button>
