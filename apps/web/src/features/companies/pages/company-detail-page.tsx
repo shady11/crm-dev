@@ -362,9 +362,9 @@ function Stat({label, value, hint}: {label: string; value: number; hint?: string
 
 function Row({label, value}: {label: string; value: string | null}) {
     return (
-        <DataListItem className="justify-between py-2">
+        <DataListItem className="py-2">
             <DataListItemLabel>{label}</DataListItemLabel>
-            <DataListItemValue className="flex-none">{value || "—"}</DataListItemValue>
+            <DataListItemValue className="text-right">{value || "—"}</DataListItemValue>
         </DataListItem>
     );
 }
