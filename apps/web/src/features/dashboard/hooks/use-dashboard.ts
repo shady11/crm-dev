@@ -2,16 +2,17 @@ import {useQuery} from "@tanstack/react-query";
 import {
     getAttentionItems,
     getBranchComparison,
-    getDashboardKpis,
     getFinanceOverview,
     getFunnel,
-    getMyPerformance,
+    getInventoryByProject,
+    getManagerPerformance,
+    getSalesSummary,
     getMyWorkToday,
     getRecentActivity,
     getRevenueTrend,
     getTeamPerformance,
     getTeamSnapshot,
-    getUnitsSummary
+    type DashboardPeriod,
 } from "@/features/dashboard/api/dashboard.api.ts";
 import {getDealStatusSummary} from "@/features/deals/api/deals.api.ts";
 
@@ -19,9 +20,7 @@ import {getDealStatusSummary} from "@/features/deals/api/deals.api.ts";
 // can split by manager.
 export function useDashboard(projectId?: string, branchId?: string, funnelManagerId?: string) {
     return {
-        kpis: useQuery({ queryKey: ["dashboard", "kpis", { projectId, branchId }], queryFn: () => getDashboardKpis(projectId, branchId) }),
         revenueTrend: useQuery({ queryKey: ["dashboard", "revenue-trend", { projectId, branchId }], queryFn: () => getRevenueTrend(projectId, branchId) }),
-        unitsSummary: useQuery({ queryKey: ["dashboard", "units-summary", { projectId }], queryFn: () => getUnitsSummary(projectId) }),
         attention: useQuery({ queryKey: ["dashboard", "attention", { projectId, branchId }], queryFn: () => getAttentionItems(projectId, branchId) }),
         recentActivity: useQuery({ queryKey: ["dashboard", "recent-activity", { projectId, branchId }], queryFn: () => getRecentActivity(projectId, branchId) }),
         // mine: true — a self-scoped viewer (SALES_MANAGER) sees only their
@@ -74,20 +73,36 @@ export function useMyWorkToday(enabled: boolean) {
     });
 }
 
-// SM-D1, SALES_MANAGER only.
-export function useMyPerformance(enabled: boolean, days = 30) {
-    return useQuery({
-        queryKey: ["dashboard", "my-performance", days],
-        queryFn: () => getMyPerformance(days),
-        enabled,
-    });
-}
-
 // FIN-A1, FINANCE only — same reasoning as useBranchComparison above.
 export function useFinanceOverview(enabled: boolean, branchId?: string, projectId?: string) {
     return useQuery({
         queryKey: ["dashboard", "finance-overview", { branchId, projectId }],
         queryFn: () => getFinanceOverview(branchId, projectId),
+        enabled,
+    });
+}
+
+// The period headline numbers and collections, scoped like the KPIs.
+export function useSalesSummary(period: DashboardPeriod, projectId?: string, branchId?: string) {
+    return useQuery({
+        queryKey: ["dashboard", "sales-summary", { period, projectId, branchId }],
+        queryFn: () => getSalesSummary(period, projectId, branchId),
+    });
+}
+
+// Company-wide stock per project (BR-C1).
+export function useInventoryByProject(projectId?: string) {
+    return useQuery({
+        queryKey: ["dashboard", "inventory-by-project", { projectId }],
+        queryFn: () => getInventoryByProject(projectId),
+    });
+}
+
+// Team lead / owner only.
+export function useManagerPerformance(enabled: boolean, period: DashboardPeriod, projectId?: string, branchId?: string) {
+    return useQuery({
+        queryKey: ["dashboard", "manager-performance", { period, projectId, branchId }],
+        queryFn: () => getManagerPerformance(period, projectId, branchId),
         enabled,
     });
 }

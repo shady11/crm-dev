@@ -1,3 +1,4 @@
+import type {ReactNode} from "react";
 import type {LucideIcon} from "lucide-react";
 import {Link} from "react-router-dom";
 import {Card, CardContent} from "@/components/ui/card.tsx";
@@ -7,7 +8,7 @@ interface KpiCardProps {
     label: string;
     value: string;
     accent: string;
-    subtext?: string;
+    subtext?: ReactNode;
     /** Where the number leads, e.g. the list it counts. */
     to?: string;
 }
@@ -20,7 +21,7 @@ export function KpiCard({ icon: Icon, label, value, accent, subtext, to }: KpiCa
                     <p className="text-xs text-muted-foreground sm:text-sm">{label}</p>
                     {/* One line always; long amounts ("1,234,567 KGS") a size smaller so they fit. */}
                     <p className={`mt-1.5 font-semibold tracking-tight whitespace-nowrap tabular-nums ${value.length > 9 ? "text-2xl" : "text-3xl"}`}>{value}</p>
-                    {subtext && <p className="mt-1 text-xs text-muted-foreground">{subtext}</p>}
+                    {subtext ? <div className="mt-1 text-xs text-muted-foreground">{subtext}</div> : null}
                 </div>
                 <div className={`icon-tile flex size-7 shrink-0 items-center justify-center ${accent}`}>
                     <Icon size={16} strokeWidth={2} />

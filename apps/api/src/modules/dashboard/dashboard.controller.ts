@@ -7,7 +7,7 @@ import {PermissionsGuard} from "@/common/guards/permissions.guard";
 import {RequirePermissions} from "@/common/decorators/permissions.decorator";
 import {CurrentUser} from "@/common/decorators/current-user.decorator";
 import {AuthUser} from "@/common/types/auth-user.type";
-import {DashboardService} from "./dashboard.service";
+import {DashboardService, parseDashboardPeriod} from "./dashboard.service";
 
 // No BranchGuard here — branch filtering is applied conditionally inside the
 // service (BR-B1 auto-filter, BR-B3 optional branchId param), not via a
@@ -34,6 +34,36 @@ export class DashboardController {
         @Query("branchId") branchId?: string,
     ) {
         return this.dashboardService.getRevenueTrend(user, projectId, branchId);
+    }
+
+    // Headline numbers for a period against the same stretch of the previous one.
+    @Get("sales-summary")
+    getSalesSummary(
+        @CurrentUser() user: AuthUser,
+        @Query("period") period?: string,
+        @Query("projectId") projectId?: string,
+        @Query("branchId") branchId?: string,
+    ) {
+        return this.dashboardService.getSalesSummary(user, parseDashboardPeriod(period), projectId, branchId);
+    }
+
+    // Units are company-wide (BR-C1), so no branch param.
+    @Get("inventory-by-project")
+    getInventoryByProject(@CurrentUser() user: AuthUser, @Query("projectId") projectId?: string) {
+        return this.dashboardService.getInventoryByProject(user, projectId);
+    }
+
+    // Per-manager results: a team lead's own branch, or the owner's
+    // company (both read team rows already, by the snapshot above).
+    @RequirePermissions("dashboard.team_snapshot", "dashboard.branch_comparison")
+    @Get("manager-performance")
+    getManagerPerformance(
+        @CurrentUser() user: AuthUser,
+        @Query("period") period?: string,
+        @Query("projectId") projectId?: string,
+        @Query("branchId") branchId?: string,
+    ) {
+        return this.dashboardService.getManagerPerformance(user, parseDashboardPeriod(period), projectId, branchId);
     }
 
     @Get("units-summary")

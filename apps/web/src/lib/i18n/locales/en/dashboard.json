@@ -1,16 +1,80 @@
 {
   "title": "Dashboard",
   "allProjects": "All projects",
-  "kpi": {
-    "revenueThisMonth": "Revenue this month",
-    "activeDeals": "Active deals",
-    "availableUnits": "Available units",
-    "unitsOfTotal": "of {{total}} total",
-    "overdueTasks": "Overdue tasks"
+  "period": {
+    "label": "Period",
+    "month": "Month",
+    "quarter": "Quarter",
+    "year": "Year"
   },
-  "revenueTrend": {
-    "title": "Revenue, last 6 months",
-    "seriesLabel": "Revenue"
+  "compare": {
+    "month": "vs {{value}} same days last month",
+    "quarter": "vs {{value}} same point last quarter",
+    "year": "vs {{value}} same point last year",
+    "new": "new",
+    "noChange": "no change"
+  },
+  "sales": {
+    "contractsSigned": "Contracts signed",
+    "salesVolume": "Sales volume",
+    "cashCollected": "Cash collected",
+    "newLeads": "New leads",
+    "conversion": "{{percent}} already have a deal"
+  },
+  "salesTrend": {
+    "title": "Sales and cash collected, last 6 months",
+    "salesVolume": "Sales volume",
+    "cashCollected": "Cash collected"
+  },
+  "collections": {
+    "title": "Collections",
+    "collectedOfDue": "Collected of installments due so far",
+    "paidOfDue": "{{paid}} of {{due}}",
+    "nothingDueYet": "No installments have fallen due yet this period.",
+    "duePeriod": {
+      "month": "Still due this month",
+      "quarter": "Still due this quarter",
+      "year": "Still due this year"
+    },
+    "installments_one": "{{count}} installment",
+    "installments_few": "{{count}} installments",
+    "installments_many": "{{count}} installments",
+    "installments_other": "{{count}} installments",
+    "overdue": "Overdue now",
+    "overdueDeals_one": "on {{count}} deal",
+    "overdueDeals_few": "on {{count}} deals",
+    "overdueDeals_many": "on {{count}} deals",
+    "overdueDeals_other": "on {{count}} deals",
+    "noOverdue": "Nothing overdue",
+    "outstanding": "Still owed on all deals"
+  },
+  "inventory": {
+    "title": "Inventory by project",
+    "listPriceNote": "Unit counts and value at the current list price.",
+    "emptyTitle": "No units yet",
+    "emptyDescription": "Add projects and units to see what's left to sell.",
+    "columns": {
+      "project": "Project",
+      "units": "Units",
+      "soldShare": "% sold"
+    },
+    "total": "Total"
+  },
+  "managerPerformance": {
+    "title": "Manager performance",
+    "you": "{{name}} (you)",
+    "emptyTitle": "No managers yet",
+    "emptyDescription": "Managers who sell in this branch show up here.",
+    "columns": {
+      "manager": "Manager",
+      "contracts": "Contracts",
+      "salesVolume": "Sales volume",
+      "cash": "Collected",
+      "newLeads": "New leads",
+      "conversion": "Conversion",
+      "overdue": "Overdue"
+    },
+    "total": "Total"
   },
   "unitsInventory": {
     "title": "Unit inventory",
@@ -108,12 +172,6 @@
     "dealsHeading": "Deals waiting on the client ({{count}})",
     "dealsEmpty": "No deals waiting on a client.",
     "noDate": "No date"
-  },
-  "myPerformance": {
-    "title": "My performance, last {{days}} days",
-    "leadsAssigned": "Leads assigned",
-    "dealsWon": "Contracts signed",
-    "conversionRate": "Conversion rate"
   },
   "financeOverview": {
     "title": "Finance overview",

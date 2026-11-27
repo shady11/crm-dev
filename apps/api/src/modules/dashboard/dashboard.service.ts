@@ -115,28 +115,45 @@ export class DashboardService {
         sixMonthsAgo.setDate(1);
         sixMonthsAgo.setHours(0, 0, 0, 0);
 
-        const payments = await this.prisma.payment.findMany({
-            where: {
-                deal: { companyId: user.companyId, projectId, branchId: effectiveBranchId, ...selfScoped },
-                paidAt: { gte: sixMonthsAgo },
-                deletedAt: null,
-            },
-            select: { amount: true, paidAt: true },
-        });
+        const [payments, contracts] = await Promise.all([
+            this.prisma.payment.findMany({
+                where: {
+                    deal: { companyId: user.companyId, projectId, branchId: effectiveBranchId, ...selfScoped },
+                    paidAt: { gte: sixMonthsAgo },
+                    deletedAt: null,
+                },
+                select: { amount: true, paidAt: true },
+            }),
+            // Sales volume: contracts signed in the month, at their sale price.
+            this.prisma.deal.findMany({
+                where: {
+                    companyId: user.companyId, projectId, branchId: effectiveBranchId, ...selfScoped,
+                    deletedAt: null,
+                    status: { in: WON_DEAL_STATUSES },
+                    contractDate: { gte: sixMonthsAgo },
+                },
+                select: { salePrice: true, contractDate: true },
+            }),
+        ]);
 
-        const buckets = new Map<string, number>();
+        const monthKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+        const buckets = new Map<string, { revenue: number; salesVolume: number }>();
         for (let i = 0; i < 6; i++) {
             const d = new Date(sixMonthsAgo);
             d.setMonth(d.getMonth() + i);
-            buckets.set(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`, 0);
+            buckets.set(monthKey(d), { revenue: 0, salesVolume: 0 });
         }
 
         for (const payment of payments) {
-            const key = `${payment.paidAt.getFullYear()}-${String(payment.paidAt.getMonth() + 1).padStart(2, "0")}`;
-            if (buckets.has(key)) buckets.set(key, buckets.get(key)! + Number(payment.amount));
+            const bucket = buckets.get(monthKey(payment.paidAt));
+            if (bucket) bucket.revenue += Number(payment.amount);
+        }
+        for (const deal of contracts) {
+            const bucket = deal.contractDate ? buckets.get(monthKey(deal.contractDate)) : undefined;
+            if (bucket) bucket.salesVolume += Number(deal.salePrice);
         }
 
-        return Array.from(buckets.entries()).map(([month, revenue]) => ({ month, revenue }));
+        return Array.from(buckets.entries()).map(([month, values]) => ({ month, ...values }));
     }
 
     async getUnitsSummary(user: AuthUser, projectId?: string) {
@@ -847,6 +864,252 @@ export class DashboardService {
     }
 
     /**
+     * The dashboard's headline numbers for a period (this month / quarter /
+     * year, to date) against the same stretch of the previous period:
+     * contracts signed and their sale value, cash collected, new leads and
+     * how many of them already have a deal. Plus collections: installments
+     * due so far this period against what was paid on them, what's overdue
+     * now and the balance still owed. Same scoping as getKpis: branch-pinned
+     * for a branch-scoped role, own pipeline only for a self-scoped one.
+     */
+    async getSalesSummary(user: AuthUser, period: DashboardPeriod, projectId?: string, branchId?: string) {
+        if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
+        const companyId = user.companyId;
+        const effectiveBranchId = this.resolveBranchId(user, branchId);
+        const selfScoped = this.isSelfScoped(user);
+        const managerScope = selfScoped ? { managerId: user.id } : {};
+        const bounds = periodBounds(period);
+
+        const dealScope: Prisma.DealWhereInput = { companyId, projectId, branchId: effectiveBranchId, ...managerScope };
+        const leadScope: Prisma.LeadWhereInput = {
+            companyId,
+            branchId: effectiveBranchId,
+            ...managerScope,
+            deletedAt: null,
+            ...(projectId ? { preferredProjectId: projectId } : {}),
+        };
+
+        const metrics = async (from: Date, to: Date) => {
+            const [contracts, cash, newLeads, leadsWithDeal] = await Promise.all([
+                this.prisma.deal.aggregate({
+                    where: { ...dealScope, deletedAt: null, status: { in: WON_DEAL_STATUSES }, contractDate: { gte: from, lt: to } },
+                    _sum: { salePrice: true },
+                    _count: { _all: true },
+                }),
+                this.prisma.payment.aggregate({
+                    where: { deal: dealScope, paidAt: { gte: from, lt: to }, deletedAt: null },
+                    _sum: { amount: true },
+                }),
+                this.prisma.lead.count({ where: { ...leadScope, createdAt: { gte: from, lt: to } } }),
+                this.prisma.lead.count({
+                    where: {
+                        ...leadScope,
+                        createdAt: { gte: from, lt: to },
+                        client: { deals: { some: { deletedAt: null, projectId } } },
+                    },
+                }),
+            ]);
+            return {
+                contractsSigned: contracts._count._all,
+                salesVolume: Number(contracts._sum.salePrice ?? 0),
+                cashCollected: Number(cash._sum.amount ?? 0),
+                newLeads,
+                leadsWithDeal,
+                conversionRate: newLeads > 0 ? leadsWithDeal / newLeads : 0,
+            };
+        };
+
+        const scheduleScope: Prisma.PaymentScheduleWhereInput = { deletedAt: null, deal: { ...dealScope, deletedAt: null } };
+        const unscheduledWhere: Prisma.DealWhereInput = { ...dealScope, ...dealAttentionWhere("schedule_needed") };
+
+        const [current, previous, dueToDate, duePeriod, overdueByDeal, outstanding, unscheduledPrice, unscheduledPaid] = await Promise.all([
+            metrics(bounds.start, bounds.now),
+            metrics(bounds.previousStart, bounds.previousEnd),
+            this.prisma.paymentSchedule.aggregate({
+                where: { ...scheduleScope, dueDate: { gte: bounds.start, lt: bounds.now } },
+                _sum: { amount: true, paidAmount: true },
+                _count: { _all: true },
+            }),
+            this.prisma.paymentSchedule.aggregate({
+                where: { ...scheduleScope, dueDate: { gte: bounds.start, lt: bounds.end } },
+                _sum: { amount: true, paidAmount: true },
+                _count: { _all: true },
+            }),
+            this.prisma.paymentSchedule.groupBy({
+                by: ["dealId"],
+                where: { ...OVERDUE_INSTALLMENT_WHERE, deal: { ...dealScope, ...dealAttentionWhere("overdue_payments") } },
+                _sum: { amount: true, paidAmount: true },
+            }),
+            this.prisma.paymentSchedule.aggregate({
+                where: {
+                    ...scheduleScope,
+                    status: { in: [PaymentScheduleStatus.PENDING, PaymentScheduleStatus.PARTIAL, PaymentScheduleStatus.OVERDUE] },
+                },
+                _sum: { amount: true, paidAmount: true },
+            }),
+            this.prisma.deal.aggregate({ where: unscheduledWhere, _sum: { salePrice: true } }),
+            this.prisma.payment.aggregate({ where: { deal: unscheduledWhere, deletedAt: null }, _sum: { amount: true } }),
+        ]);
+
+        const sum = (value: Prisma.Decimal | null | undefined) => Number(value ?? 0);
+        const unscheduled = Math.max(0, sum(unscheduledPrice._sum.salePrice) - sum(unscheduledPaid._sum.amount));
+
+        return {
+            period,
+            start: bounds.start,
+            end: bounds.end,
+            previousStart: bounds.previousStart,
+            previousEnd: bounds.previousEnd,
+            current,
+            previous,
+            collections: {
+                dueToDate: { amount: sum(dueToDate._sum.amount), paid: sum(dueToDate._sum.paidAmount), installments: dueToDate._count._all },
+                duePeriod: { amount: sum(duePeriod._sum.amount), paid: sum(duePeriod._sum.paidAmount), installments: duePeriod._count._all },
+                overdue: {
+                    amount: overdueByDeal.reduce((total, row) => total + sum(row._sum.amount) - sum(row._sum.paidAmount), 0),
+                    deals: overdueByDeal.length,
+                },
+                outstanding: sum(outstanding._sum.amount) - sum(outstanding._sum.paidAmount) + unscheduled,
+            },
+        };
+    }
+
+    /**
+     * Stock per project: how many units are available, reserved, sold and
+     * off the market, and what they're worth at today's list price. Units
+     * are company-wide (BR-C1), and so is this; values are list prices,
+     * not sale prices, so no branch's takings leak through it.
+     */
+    async getInventoryByProject(user: AuthUser, projectId?: string) {
+        if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
+        const companyId = user.companyId;
+
+        const [projects, groups] = await Promise.all([
+            this.prisma.project.findMany({
+                where: { companyId, id: projectId, deletedAt: null },
+                select: { id: true, name: true, status: true },
+                orderBy: { name: "asc" },
+            }),
+            this.prisma.unit.groupBy({
+                by: ["projectId", "status"],
+                where: { project: { companyId, id: projectId }, deletedAt: null },
+                _count: { _all: true },
+                _sum: { price: true },
+            }),
+        ]);
+
+        return projects
+            .map((project) => {
+                const slice = (status: UnitStatus) => {
+                    const row = groups.find((g) => g.projectId === project.id && g.status === status);
+                    return { count: row?._count._all ?? 0, value: Number(row?._sum.price ?? 0) };
+                };
+                const available = slice(UnitStatus.AVAILABLE);
+                const reserved = slice(UnitStatus.RESERVED);
+                const sold = slice(UnitStatus.SOLD);
+                const unavailable = slice(UnitStatus.UNAVAILABLE);
+                const total = available.count + reserved.count + sold.count + unavailable.count;
+                return {
+                    project,
+                    total,
+                    available,
+                    reserved,
+                    sold,
+                    unavailable,
+                    soldShare: total > 0 ? sold.count / total : 0,
+                };
+            })
+            .filter((row) => row.total > 0);
+    }
+
+    /**
+     * Each manager's results over a dashboard period (to date): contracts
+     * signed and their value, cash collected on their deals, new leads and
+     * conversion, and what's overdue on their deals now. A team lead sees
+     * their own branch, themselves included; a company-wide viewer every
+     * branch's managers, or one branch's.
+     */
+    async getManagerPerformance(user: AuthUser, period: DashboardPeriod, projectId?: string, branchId?: string) {
+        if (!user.companyId) throw new ForbiddenException("User does not belong to a company");
+        const companyId = user.companyId;
+        const companyWide = !user.isBranchScoped;
+        if (!companyWide && !user.branchId) throw new ForbiddenException("User is not assigned to a branch");
+        const effectiveBranchId = companyWide ? branchId : user.branchId!;
+        const { start, now } = periodBounds(period);
+
+        const people = companyWide
+            ? (await this.findTeamManagers(companyId, effectiveBranchId)).map((m) => ({ ...m, isViewer: false }))
+            : await this.findTeamPeople(companyId, effectiveBranchId!, user);
+        const ids = people.map((p) => p.id);
+        if (ids.length === 0) return { period, managers: [] };
+
+        const dealScope = { companyId, branchId: effectiveBranchId, projectId };
+
+        const [contracts, leads, leadsWithDeal, cash, overdue] = await Promise.all([
+            this.prisma.deal.groupBy({
+                by: ["managerId"],
+                where: {
+                    ...dealScope, managerId: { in: ids }, deletedAt: null,
+                    status: { in: WON_DEAL_STATUSES }, contractDate: { gte: start, lt: now },
+                },
+                _count: { _all: true },
+                _sum: { salePrice: true },
+            }),
+            this.prisma.lead.groupBy({
+                by: ["managerId"],
+                where: {
+                    companyId, branchId: effectiveBranchId, managerId: { in: ids }, deletedAt: null,
+                    createdAt: { gte: start, lt: now },
+                    ...(projectId ? { preferredProjectId: projectId } : {}),
+                },
+                _count: { _all: true },
+            }),
+            this.prisma.lead.groupBy({
+                by: ["managerId"],
+                where: {
+                    companyId, branchId: effectiveBranchId, managerId: { in: ids }, deletedAt: null,
+                    createdAt: { gte: start, lt: now },
+                    ...(projectId ? { preferredProjectId: projectId } : {}),
+                    client: { deals: { some: { deletedAt: null, projectId } } },
+                },
+                _count: { _all: true },
+            }),
+            // Payment has no managerId of its own; summed via its deal.
+            Promise.all(ids.map((managerId) => this.prisma.payment.aggregate({
+                where: { deal: { ...dealScope, managerId }, paidAt: { gte: start, lt: now }, deletedAt: null },
+                _sum: { amount: true },
+            }))),
+            Promise.all(ids.map((managerId) => this.prisma.paymentSchedule.aggregate({
+                where: { ...OVERDUE_INSTALLMENT_WHERE, deal: { ...dealScope, managerId, ...dealAttentionWhere("overdue_payments") } },
+                _sum: { amount: true, paidAmount: true },
+            }))),
+        ]);
+
+        const count = (rows: { managerId: string | null; _count: { _all: number } }[], id: string) =>
+            rows.find((r) => r.managerId === id)?._count._all ?? 0;
+
+        return {
+            period,
+            managers: people.map((person, index) => {
+                const won = contracts.find((r) => r.managerId === person.id);
+                const newLeads = count(leads, person.id);
+                const converted = count(leadsWithDeal, person.id);
+                return {
+                    manager: { id: person.id, fullName: person.fullName },
+                    branch: companyWide ? person.branch : null,
+                    isViewer: person.isViewer,
+                    contractsSigned: won?._count._all ?? 0,
+                    salesVolume: Number(won?._sum.salePrice ?? 0),
+                    cashCollected: Number(cash[index]._sum.amount ?? 0),
+                    newLeads,
+                    conversionRate: newLeads > 0 ? converted / newLeads : 0,
+                    overdueAmount: Number(overdue[index]._sum.amount ?? 0) - Number(overdue[index]._sum.paidAmount ?? 0),
+                };
+            }),
+        };
+    }
+
+    /**
      * Lead → deal → won conversion funnel, the first thing a pilot sponsor
      * asks a CRM for and — until now — the one number this dashboard
      * couldn't produce (getKpis/getMyPerformance only ever counted a single
@@ -961,6 +1224,30 @@ export class DashboardService {
  * later month (recorded before the API refused future dates) isn't counted
  * as collected now.
  */
+export const DASHBOARD_PERIODS = ["month", "quarter", "year"] as const;
+export type DashboardPeriod = (typeof DASHBOARD_PERIODS)[number];
+
+export function parseDashboardPeriod(value?: string): DashboardPeriod {
+    return DASHBOARD_PERIODS.includes(value as DashboardPeriod) ? (value as DashboardPeriod) : "month";
+}
+
+/**
+ * A calendar period (this month / quarter / year) up to now, and the same
+ * stretch of the previous one: 1–27 November against 1–27 October, so a
+ * period that's barely begun isn't measured against a whole one.
+ */
+export function periodBounds(period: DashboardPeriod, now: Date = new Date()) {
+    const months = period === "month" ? 1 : period === "quarter" ? 3 : 12;
+    const firstMonth = period === "month" ? now.getMonth() : period === "quarter" ? Math.floor(now.getMonth() / 3) * 3 : 0;
+    const start = new Date(now.getFullYear(), firstMonth, 1);
+    const end = new Date(now.getFullYear(), firstMonth + months, 1);
+    const previousStart = new Date(now.getFullYear(), firstMonth - months, 1);
+    const elapsed = now.getTime() - start.getTime();
+    // Never past the previous period's own end (31 March vs a 28-day February).
+    const previousEnd = new Date(Math.min(previousStart.getTime() + elapsed, start.getTime()));
+    return { start, end, now, previousStart, previousEnd };
+}
+
 function currentMonthBounds(now: Date = new Date()) {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
