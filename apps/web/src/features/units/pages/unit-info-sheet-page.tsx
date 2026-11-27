@@ -23,6 +23,7 @@ import {UNIT_STATUS_LABEL_KEYS, UNIT_TYPE_LABEL_KEYS} from "@/features/units/typ
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {KeregeLogo} from "@/components/shared/kerege-logo.tsx";
 import {formatDay} from "@/utils/date-formatter.ts";
+import {namedLabel} from "@/lib/i18n/named-label.ts";
 
 const INTERVALS = [1, 3, 6] as const;
 
@@ -128,7 +129,7 @@ export function UnitInfoSheetPage() {
         ...(unit.project?.address ? [{label: t("infoSheet.address"), value: unit.project.address}] : []),
         {
             label: t("infoSheet.location"),
-            value: [unit.block?.name, unit.entrance?.name, unit.floor && t("infoSheet.floor", {number: unit.floor.number})]
+            value: [unit.block?.name, unit.entrance && namedLabel(t, "chessboard.entranceLabel", unit.entrance.name), unit.floor && t("infoSheet.floor", {number: unit.floor.number})]
                 .filter(Boolean)
                 .join(" / ") || "—",
         },
