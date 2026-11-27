@@ -17,6 +17,7 @@ import {getDeal} from "@/features/deals/api/deals.api.ts";
 import {getCompany} from "@/features/companies/api/companies.api.ts";
 import {getBranch} from "@/features/branches/api/branches.api.ts";
 import type {Block} from "@/features/blocks/types/block.types.ts";
+import {namedLabel} from "@/lib/i18n/named-label.ts";
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -89,7 +90,7 @@ export function AppHeader() {
     if (companyId && companyQuery.data) entityNames[companyId] = companyQuery.data.name;
     if (branchId && branchQuery.data) entityNames[branchId] = branchQuery.data.name;
     if (blockId && block) entityNames[blockId] = block.name;
-    if (entranceId && entrance) entityNames[entranceId] = entrance.name;
+    if (entranceId && entrance) entityNames[entranceId] = namedLabel(t, "units:chessboard.entranceLabel", entrance.name);
 
     // Matches the sidebar: "My activity" for someone who only sees their own.
     const breadcrumbs = getBreadcrumbs(
@@ -135,15 +136,15 @@ export function AppHeader() {
                 {user?.companyId ? <NotificationBell /> : null}
                 <LanguageDropdown
                     trigger={
-                        <Button variant="ghost" size="icon-lg" className="rounded-xl border border-glass-border bg-control backdrop-blur-md hover:bg-accent" title={t("language.switchLabel")}>
+                        <Button variant="ghost" size="icon-md" className="rounded-lg border border-glass-border bg-control backdrop-blur-md hover:bg-accent" title={t("language.switchLabel")}>
                             <Languages />
                         </Button>
                     }
                 />
                 <Button
                     variant="ghost"
-                    size="icon-lg"
-                    className="rounded-xl border border-glass-border bg-control backdrop-blur-md hover:bg-accent"
+                    size="icon-md"
+                    className="rounded-lg border border-glass-border bg-control backdrop-blur-md hover:bg-accent"
                     onClick={toggleTheme}
                     title={theme === "dark" ? t("theme.switchToLight") : t("theme.switchToDark")}
                 >

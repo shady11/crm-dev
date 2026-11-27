@@ -1,8 +1,14 @@
 import {useSearchParams, useParams} from "react-router-dom";
 import {createListCollection} from "@ark-ui/react";
 import {useTranslation} from "react-i18next";
-import {PrinterIcon, LinkIcon} from "lucide-react";
+import {LinkIcon, PrinterIcon, TriangleAlertIcon} from "lucide-react";
 import {Button} from "@/components/ui/button.tsx";
+import {Card, CardContent, CardFooter, CardHeader, CardTitle} from "@/components/ui/card.tsx";
+import {Checkbox} from "@/components/ui/checkbox.tsx";
+import {Alert, AlertTitle} from "@/components/ui/alert.tsx";
+import {DataList, DataListItem, DataListItemLabel, DataListItemValue} from "@/components/ui/data-list.tsx";
+import {Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
+import {UnitSummary} from "@/features/units/components/unit-summary.tsx";
 import {Input} from "@/components/ui/input.tsx";
 import {Field, FieldLabel} from "@/components/ui/field.tsx";
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
@@ -17,6 +23,7 @@ import {UNIT_STATUS_LABEL_KEYS, UNIT_TYPE_LABEL_KEYS} from "@/features/units/typ
 import {useCompanyFormatters} from "@/features/auth/hooks/use-company-formatters.ts";
 import {KeregeLogo} from "@/components/shared/kerege-logo.tsx";
 import {formatDay} from "@/utils/date-formatter.ts";
+import {namedLabel} from "@/lib/i18n/named-label.ts";
 
 const INTERVALS = [1, 3, 6] as const;
 
@@ -117,206 +124,214 @@ export function UnitInfoSheetPage() {
     const regular = plan.rows[0]?.amount ?? 0;
     const last = plan.rows[plan.rows.length - 1];
 
+    // The unit sheet's own way of listing facts: label column, value column.
+    const specs: {label: string; value: string}[] = [
+        ...(unit.project?.address ? [{label: t("infoSheet.address"), value: unit.project.address}] : []),
+        {
+            label: t("infoSheet.location"),
+            value: [unit.block?.name, unit.entrance && namedLabel(t, "chessboard.entranceLabel", unit.entrance.name), unit.floor && t("infoSheet.floor", {number: unit.floor.number})]
+                .filter(Boolean)
+                .join(" / ") || "—",
+        },
+        // Clients weigh a finished block against one due later.
+        ...(unit.block?.completionDate || unit.block?.salesStatus === BlockSalesStatus.COMPLETED
+            ? [{
+                label: t("infoSheet.completion"),
+                value: (unit.block.salesStatus === BlockSalesStatus.COMPLETED
+                    ? [t(BLOCK_SALES_STATUS_LABEL_KEYS.COMPLETED), completionQuarter(t, unit.block.completionDate)].filter(Boolean).join(" · ")
+                    : completionQuarter(t, unit.block.completionDate)) || "—",
+            }]
+            : []),
+        {label: t("infoSheet.type"), value: t(UNIT_TYPE_LABEL_KEYS[unit.type])},
+        {label: t("infoSheet.rooms"), value: unit.rooms != null ? String(unit.rooms) : "—"},
+        {label: t("infoSheet.area"), value: formatArea(unit.area)},
+        {label: t("infoSheet.pricePerSqm"), value: formatPricePerSqm(pricePerSqm)},
+    ];
+
     return (
-        <div className="mx-auto max-w-2xl p-8">
-            <div className="mb-6 space-y-4 rounded-lg border border-secondary p-4 print:hidden">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                    <h2 className="font-semibold">{t("offer.settings")}</h2>
-                    <div className="flex gap-2">
+        <div className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-8 sm:px-6 print:max-w-none print:p-0">
+            <Card className="print:hidden">
+                <CardHeader className="flex flex-wrap items-center justify-between gap-3">
+                    <CardTitle className="text-lg font-semibold">{t("offer.settings")}</CardTitle>
+                    <div className="flex flex-wrap gap-2">
                         <Button variant="secondary" size="sm" onClick={copyLink}>
-                            <LinkIcon className="size-4" />
+                            <LinkIcon />
                             {t("actions.copyLink", {ns: "common"})}
                         </Button>
                         <Button size="sm" onClick={() => window.print()}>
-                            <PrinterIcon className="size-4" />
+                            <PrinterIcon />
                             {t("infoSheet.printButton")}
                         </Button>
                     </div>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                    <Field>
-                        <FieldLabel>{t("offer.client")}</FieldLabel>
-                        <Input value={offer.client} placeholder={t("offer.clientPlaceholder")} onChange={(e) => setParam("client", e.target.value)} />
-                    </Field>
-                    <Field>
-                        <FieldLabel>{t("offer.validUntil")}</FieldLabel>
-                        <DateField value={offer.validUntil} onChange={(value) => setParam("valid", value)} />
-                    </Field>
-                </div>
-                <label className="flex items-center gap-2 text-sm font-medium">
-                    <input
-                        type="checkbox"
-                        className="size-4 accent-primary"
-                        checked={offer.showPlan}
-                        onChange={(e) => setParam("plan", e.target.checked ? "" : "0")}
-                    />
-                    {t("offer.includePlan")}
-                </label>
-                {offer.showPlan && (
-                    <div className="grid gap-3 sm:grid-cols-4">
+                </CardHeader>
+                <CardContent className="flex flex-col gap-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
                         <Field>
-                            <FieldLabel>{t("offer.downPayment")}</FieldLabel>
-                            <Input type="number" inputMode="numeric" min={0} max={100} value={offer.downPercent} onChange={(e) => setParam("down", e.target.value)} />
+                            <FieldLabel>{t("offer.client")}</FieldLabel>
+                            <Input value={offer.client} placeholder={t("offer.clientPlaceholder")} onChange={(e) => setParam("client", e.target.value)} />
                         </Field>
                         <Field>
-                            <FieldLabel>{t("offer.installments")}</FieldLabel>
-                            <Input type="number" inputMode="numeric" min={1} max={120} value={offer.installments} onChange={(e) => setParam("n", e.target.value)} />
-                        </Field>
-                        <Field>
-                            <FieldLabel>{t("offer.interval")}</FieldLabel>
-                            <Select
-                                collection={intervalCollection}
-                                value={[String(offer.intervalMonths)]}
-                                onValueChange={({value}) => setParam("every", value[0] ?? "1")}
-                            >
-                                <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    {intervalCollection.items.map((item) => (
-                                        <SelectItem key={item.value} item={item}>{item.label}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                        </Field>
-                        <Field>
-                            <FieldLabel>{t("offer.firstPayment")}</FieldLabel>
-                            <DateField value={offer.firstPaymentDay} onChange={(value) => setParam("first", value)} />
+                            <FieldLabel>{t("offer.validUntil")}</FieldLabel>
+                            <DateField value={offer.validUntil} onChange={(value) => setParam("valid", value)} />
                         </Field>
                     </div>
-                )}
-                {unit.status !== "AVAILABLE" && (
-                    <p className="text-sm text-warning-foreground">{t("offer.notAvailable", {status: t(UNIT_STATUS_LABEL_KEYS[unit.status])})}</p>
-                )}
-            </div>
+                    <div className="flex items-center gap-2">
+                        <Checkbox
+                            ids={{hiddenInput: "offer-include-plan"}}
+                            checked={offer.showPlan}
+                            onCheckedChange={({checked}) => setParam("plan", checked === true ? "" : "0")}
+                        />
+                        <label htmlFor="offer-include-plan" className="cursor-pointer text-sm font-medium">
+                            {t("offer.includePlan")}
+                        </label>
+                    </div>
+                    {offer.showPlan && (
+                        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+                            <Field>
+                                <FieldLabel>{t("offer.downPayment")}</FieldLabel>
+                                <Input type="number" inputMode="numeric" min={0} max={100} value={offer.downPercent} onChange={(e) => setParam("down", e.target.value)} />
+                            </Field>
+                            <Field>
+                                <FieldLabel>{t("offer.installments")}</FieldLabel>
+                                <Input type="number" inputMode="numeric" min={1} max={120} value={offer.installments} onChange={(e) => setParam("n", e.target.value)} />
+                            </Field>
+                            <Field>
+                                <FieldLabel>{t("offer.interval")}</FieldLabel>
+                                <Select
+                                    collection={intervalCollection}
+                                    value={[String(offer.intervalMonths)]}
+                                    onValueChange={({value}) => setParam("every", value[0] ?? "1")}
+                                >
+                                    <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        {intervalCollection.items.map((item) => (
+                                            <SelectItem key={item.value} item={item}>{item.label}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </Field>
+                            <Field>
+                                <FieldLabel>{t("offer.firstPayment")}</FieldLabel>
+                                <DateField value={offer.firstPaymentDay} onChange={(value) => setParam("first", value)} />
+                            </Field>
+                        </div>
+                    )}
+                    {unit.status !== "AVAILABLE" && (
+                        <Alert variant="warning">
+                            <TriangleAlertIcon />
+                            <AlertTitle className="font-normal">
+                                {t("offer.notAvailable", {status: t(UNIT_STATUS_LABEL_KEYS[unit.status])})}
+                            </AlertTitle>
+                        </Alert>
+                    )}
+                </CardContent>
+            </Card>
 
-            <div className="rounded-lg border border-secondary p-8">
-                <div className="mb-8 border-b pb-6">
+            {/* The offer itself. On paper it drops the card chrome but keeps
+                the status colours, so it prints as one clean sheet. */}
+            <Card className="gap-6 print:gap-5 print:rounded-none print:border-0 print:bg-none print:py-0 print:shadow-none print:[print-color-adjust:exact] print:[--space:0px]">
+                <CardHeader className="flex items-center justify-between gap-4 border-b pb-6">
                     <KeregeLogo className="h-7" />
-                </div>
-                <div className="mb-6 flex items-start justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-semibold">{t("infoSheet.title", {number: unit.number})}</h1>
-                        {unit.project && <p className="text-muted-foreground">{unit.project.name}</p>}
-                    </div>
                     <div className="text-right text-xs text-muted-foreground">
                         <p>{t("infoSheet.generatedAt", {date: generatedAt})}</p>
                         {offer.client.trim() && <p>{t("offer.preparedFor", {name: offer.client.trim()})}</p>}
                     </div>
-                </div>
+                </CardHeader>
 
-                <dl className="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
-                    {unit.project?.address && (
-                        <div className="col-span-2">
-                            <dt className="text-muted-foreground">{t("infoSheet.address")}</dt>
-                            <dd className="font-medium">{unit.project.address}</dd>
-                        </div>
-                    )}
-                    <div>
-                        <dt className="text-muted-foreground">{t("infoSheet.location")}</dt>
-                        <dd className="font-medium">
-                            {[unit.block?.name, unit.entrance?.name, unit.floor && t("infoSheet.floor", {number: unit.floor.number})]
-                                .filter(Boolean)
-                                .join(" / ") || "—"}
-                        </dd>
-                    </div>
-                    {/* Clients weigh a finished block against one due later. */}
-                    {(unit.block?.completionDate || unit.block?.salesStatus === BlockSalesStatus.COMPLETED) && (
+                <CardContent className="flex flex-col gap-6 print:gap-5">
+                    <div className="flex flex-col gap-4">
                         <div>
-                            <dt className="text-muted-foreground">{t("infoSheet.completion")}</dt>
-                            <dd className="font-medium">
-                                {unit.block.salesStatus === BlockSalesStatus.COMPLETED
-                                    ? [t(BLOCK_SALES_STATUS_LABEL_KEYS.COMPLETED), completionQuarter(t, unit.block.completionDate)].filter(Boolean).join(" · ")
-                                    : completionQuarter(t, unit.block.completionDate)}
-                            </dd>
+                            <h1 className="text-2xl font-semibold">{t("infoSheet.title", {number: unit.number})}</h1>
+                            {unit.project && <p className="text-sm text-muted-foreground">{unit.project.name}</p>}
                         </div>
+                        <UnitSummary
+                            status={unit.status}
+                            price={price}
+                            details={[
+                                t(UNIT_TYPE_LABEL_KEYS[unit.type]),
+                                formatArea(unit.area),
+                                formatPricePerSqm(pricePerSqm),
+                            ]}
+                        />
+                    </div>
+
+                    <div className="rounded-lg border border-secondary px-4 py-2">
+                        <DataList className="divide-y">
+                            {specs.map((spec) => (
+                                <DataListItem key={spec.label}>
+                                    <DataListItemLabel>{spec.label}</DataListItemLabel>
+                                    <DataListItemValue>{spec.value}</DataListItemValue>
+                                </DataListItem>
+                            ))}
+                        </DataList>
+                    </div>
+
+                    {hasPlan && (
+                        <section className="flex flex-col gap-4 break-inside-avoid">
+                            <h2 className="font-semibold">{t("offer.paymentOptions")}</h2>
+                            <div className="grid gap-3 sm:grid-cols-2 print:grid-cols-2">
+                                <div className="flex flex-col gap-1 rounded-lg border border-secondary p-4">
+                                    <p className="text-sm text-muted-foreground">{t("offer.fullPayment")}</p>
+                                    <p className="text-xl font-semibold tabular-nums">{formatCurrency(price)}</p>
+                                </div>
+                                <div className="flex flex-col gap-1 rounded-lg border border-secondary p-4">
+                                    <p className="text-sm text-muted-foreground">{t("offer.installmentPlan")}</p>
+                                    <p>
+                                        <span className="text-xl font-semibold tabular-nums">{formatCurrency(regular)}</span>{" "}
+                                        <span className="text-sm text-muted-foreground">{t("offer.perInstallment")}</span>
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                        {t("offer.planSummary", {
+                                            down: formatCurrency(plan.downPayment),
+                                            percent: offer.downPercent,
+                                            count: plan.rows.length,
+                                            every: t("offer.every", {count: offer.intervalMonths}).toLowerCase(),
+                                        })}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="rounded-lg border border-secondary px-4">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-12">№</TableHead>
+                                            <TableHead>{t("offer.dueDate")}</TableHead>
+                                            <TableHead className="text-right">{t("offer.amount")}</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody className="tabular-nums">
+                                        {plan.downPayment > 0 && (
+                                            <TableRow>
+                                                <TableCell>—</TableCell>
+                                                <TableCell>{t("offer.downPaymentRow")}</TableCell>
+                                                <TableCell className="text-right font-medium">{formatCurrency(plan.downPayment)}</TableCell>
+                                            </TableRow>
+                                        )}
+                                        {plan.rows.map((row) => (
+                                            <TableRow key={row.order}>
+                                                <TableCell>{row.order}</TableCell>
+                                                <TableCell>{shortDay(row.dueDay)}</TableCell>
+                                                <TableCell className="text-right">{formatCurrency(row.amount)}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                    <TableFooter className="bg-transparent">
+                                        <TableRow>
+                                            <TableCell colSpan={2} className="font-semibold">{t("offer.total")}</TableCell>
+                                            <TableCell className="text-right font-semibold tabular-nums">{formatCurrency(price)}</TableCell>
+                                        </TableRow>
+                                    </TableFooter>
+                                </Table>
+                            </div>
+                            {last && last.amount !== regular && (
+                                <p className="-mt-2 text-xs text-muted-foreground">{t("offer.lastDiffers")}</p>
+                            )}
+                        </section>
                     )}
-                    <div>
-                        <dt className="text-muted-foreground">{t("infoSheet.type")}</dt>
-                        <dd className="font-medium">{t(UNIT_TYPE_LABEL_KEYS[unit.type])}</dd>
-                    </div>
-                    <div>
-                        <dt className="text-muted-foreground">{t("infoSheet.rooms")}</dt>
-                        <dd className="font-medium">{unit.rooms ?? "—"}</dd>
-                    </div>
-                    <div>
-                        <dt className="text-muted-foreground">{t("infoSheet.area")}</dt>
-                        <dd className="font-medium">{formatArea(unit.area)}</dd>
-                    </div>
-                    <div>
-                        <dt className="text-muted-foreground">{t("infoSheet.status")}</dt>
-                        <dd className="font-medium">{t(UNIT_STATUS_LABEL_KEYS[unit.status])}</dd>
-                    </div>
-                    <div>
-                        <dt className="text-muted-foreground">{t("infoSheet.pricePerSqm")}</dt>
-                        <dd className="font-medium">{formatPricePerSqm(pricePerSqm)}</dd>
-                    </div>
-                    <div className="col-span-2 mt-2 border-t pt-4">
-                        <dt className="text-muted-foreground">{t("infoSheet.price")}</dt>
-                        <dd className="text-2xl font-semibold">{formatCurrency(price)}</dd>
-                    </div>
-                </dl>
+                </CardContent>
 
-                {hasPlan && (
-                    <section className="mt-6 border-t pt-4 break-inside-avoid">
-                        <h2 className="mb-3 font-semibold">{t("offer.paymentOptions")}</h2>
-                        <div className="grid gap-3 text-sm sm:grid-cols-2 print:grid-cols-2">
-                            <div className="rounded-md border p-3">
-                                <p className="text-muted-foreground">{t("offer.fullPayment")}</p>
-                                <p className="text-lg font-semibold">{formatCurrency(price)}</p>
-                            </div>
-                            <div className="rounded-md border p-3">
-                                <p className="text-muted-foreground">{t("offer.installmentPlan")}</p>
-                                <p>
-                                    <span className="text-lg font-semibold">{formatCurrency(regular)}</span>{" "}
-                                    <span className="text-muted-foreground">{t("offer.perInstallment")}</span>
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                    {t("offer.planSummary", {
-                                        down: formatCurrency(plan.downPayment),
-                                        percent: offer.downPercent,
-                                        count: plan.rows.length,
-                                        every: t("offer.every", {count: offer.intervalMonths}).toLowerCase(),
-                                    })}
-                                </p>
-                            </div>
-                        </div>
-                        <table className="mt-4 w-full text-sm">
-                            <thead>
-                                <tr className="border-b text-left text-xs text-muted-foreground">
-                                    <th className="py-1.5 font-normal">№</th>
-                                    <th className="py-1.5 font-normal">{t("offer.dueDate")}</th>
-                                    <th className="py-1.5 text-right font-normal">{t("offer.amount")}</th>
-                                </tr>
-                            </thead>
-                            <tbody className="tabular-nums">
-                                {plan.downPayment > 0 && (
-                                    <tr className="border-b">
-                                        <td className="py-1.5">—</td>
-                                        <td className="py-1.5">{t("offer.downPaymentRow")}</td>
-                                        <td className="py-1.5 text-right font-medium">{formatCurrency(plan.downPayment)}</td>
-                                    </tr>
-                                )}
-                                {plan.rows.map((row) => (
-                                    <tr key={row.order} className="border-b last:border-0">
-                                        <td className="py-1.5">{row.order}</td>
-                                        <td className="py-1.5">{shortDay(row.dueDay)}</td>
-                                        <td className="py-1.5 text-right">{formatCurrency(row.amount)}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                            <tfoot>
-                                <tr className="border-t font-semibold">
-                                    <td className="py-1.5" colSpan={2}>{t("offer.total")}</td>
-                                    <td className="py-1.5 text-right">{formatCurrency(price)}</td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                        {last && last.amount !== regular && (
-                            <p className="mt-1 text-xs text-muted-foreground">{t("offer.lastDiffers")}</p>
-                        )}
-                    </section>
-                )}
-
-                <footer className="mt-6 space-y-3 border-t pt-4 text-sm">
+                <CardFooter className="flex-col items-stretch gap-3 bg-transparent text-sm">
                     {user && (
                         <div>
                             <p className="text-xs text-muted-foreground">{t("offer.yourManager")}</p>
@@ -327,8 +342,8 @@ export function UnitInfoSheetPage() {
                     <p className="text-xs text-muted-foreground">
                         {t("offer.validNote", {date: longDate(dayToDate(offer.validUntil))})}
                     </p>
-                </footer>
-            </div>
+                </CardFooter>
+            </Card>
         </div>
     );
 }

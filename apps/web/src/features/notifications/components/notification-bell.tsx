@@ -51,7 +51,7 @@ export function NotificationBell() {
     return (
         <>
             <div className="relative">
-                <Button variant="ghost" size="icon-lg" className="relative rounded-xl border border-glass-border bg-control backdrop-blur-md hover:bg-accent" onClick={() => setOpen(true)} aria-label={t("bell.title")}>
+                <Button variant="ghost" size="icon-md" className="relative rounded-lg border border-glass-border bg-control backdrop-blur-md hover:bg-accent" onClick={() => setOpen(true)} aria-label={t("bell.title")}>
                     <BellIcon />
                 </Button>
                 {unreadCount > 0 && (

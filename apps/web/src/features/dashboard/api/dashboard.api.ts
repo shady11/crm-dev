@@ -9,7 +9,8 @@ export type DashboardKpis = {
     overdueTasksCount: number;
 };
 
-export type RevenueTrendPoint = { month: string; revenue: number };
+/** revenue = cash collected in the month; salesVolume = contracts signed in it, at sale price. */
+export type RevenueTrendPoint = { month: string; revenue: number; salesVolume?: number };
 export type UnitsSummaryItem = { status: UnitStatus; count: number };
 
 export type AttentionDeal = {
@@ -246,4 +247,76 @@ export async function downloadFunnelExport(projectId?: string, branchId?: string
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
+}
+export type DashboardPeriod = "month" | "quarter" | "year";
+
+export type SalesMetrics = {
+    contractsSigned: number;
+    salesVolume: number;
+    cashCollected: number;
+    newLeads: number;
+    leadsWithDeal: number;
+    conversionRate: number;
+};
+
+type Installments = { amount: number; paid: number; installments: number };
+
+// The period to date against the same stretch of the previous period.
+export type SalesSummary = {
+    period: DashboardPeriod;
+    start: string;
+    end: string;
+    previousStart: string;
+    previousEnd: string;
+    current: SalesMetrics;
+    previous: SalesMetrics;
+    collections: {
+        /** Installments due from the period's start up to now, and what's been paid on them. */
+        dueToDate: Installments;
+        /** Installments due in the whole period. */
+        duePeriod: Installments;
+        overdue: { amount: number; deals: number };
+        outstanding: number;
+    };
+};
+
+type InventorySlice = { count: number; value: number };
+export type InventoryByProjectRow = {
+    project: { id: string; name: string; status: string };
+    total: number;
+    available: InventorySlice;
+    reserved: InventorySlice;
+    sold: InventorySlice;
+    unavailable: InventorySlice;
+    soldShare: number;
+};
+
+export type ManagerPerformanceRow = {
+    manager: { id: string; fullName: string };
+    branch: { id: string; name: string } | null;
+    isViewer: boolean;
+    contractsSigned: number;
+    salesVolume: number;
+    cashCollected: number;
+    newLeads: number;
+    conversionRate: number;
+    overdueAmount: number;
+};
+
+export async function getSalesSummary(period: DashboardPeriod, projectId?: string, branchId?: string) {
+    const response = await api.get<SalesSummary>("/dashboard/sales-summary", { params: { period, projectId, branchId } });
+    return response.data;
+}
+
+export async function getInventoryByProject(projectId?: string) {
+    const response = await api.get<InventoryByProjectRow[]>("/dashboard/inventory-by-project", { params: { projectId } });
+    return response.data;
+}
+
+export async function getManagerPerformance(period: DashboardPeriod, projectId?: string, branchId?: string) {
+    const response = await api.get<{ period: DashboardPeriod; managers: ManagerPerformanceRow[] }>(
+        "/dashboard/manager-performance",
+        { params: { period, projectId, branchId } },
+    );
+    return response.data;
 }

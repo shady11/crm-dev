@@ -22,7 +22,7 @@
   "unitCard": {
     "title": "Помещение",
     "unitNumber": "Помещение №{{number}}",
-    "floor": "{{floor}} этаж"
+    "floor": "{{floor}}-этаж"
   },
   "page": {
     "title": "Сделки"

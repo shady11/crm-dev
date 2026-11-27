@@ -1,8 +1,12 @@
+import {memo} from "react";
 import {useDraggable} from "@dnd-kit/core";
 import {Card} from "@/components/ui/card.tsx";
 import {TaskKanbanCardContent} from "./task-kanban-card-content.tsx";
 import type {Task} from "@/features/tasks/api/tasks.api.ts";
 import {cn} from "@/lib/utils";
+
+// Shared with the drag overlay so the card doesn't change size when picked up.
+export const TASK_KANBAN_CARD_CLASS = "py-4 gap-3 border border-secondary shadow-none";
 
 interface TaskKanbanCardProps {
     task: Task;
@@ -10,7 +14,7 @@ interface TaskKanbanCardProps {
     onClick(task: Task): void;
 }
 
-export function TaskKanbanCard({ task, canMove, onClick }: TaskKanbanCardProps) {
+export const TaskKanbanCard = memo(function TaskKanbanCard({ task, canMove, onClick }: TaskKanbanCardProps) {
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: task.id, disabled: !canMove });
 
     return (
@@ -22,12 +26,14 @@ export function TaskKanbanCard({ task, canMove, onClick }: TaskKanbanCardProps) 
             {...(canMove ? { ...listeners, ...attributes } : {})}
             onClick={() => onClick(task)}
             className={cn(
-                "py-4 gap-3 border border-secondary shadow-none",
+                TASK_KANBAN_CARD_CLASS,
+                "transition-opacity duration-150",
                 canMove ? "cursor-grab touch-none active:cursor-grabbing" : "cursor-pointer",
-                isDragging ? "opacity-0" : "opacity-100",
+                // Leave a faint placeholder where the card was picked up.
+                isDragging && "border-dashed border-primary/40 opacity-40",
             )}
         >
             <TaskKanbanCardContent task={task} />
         </Card>
     );
-}
+});

@@ -1,16 +1,80 @@
 {
   "title": "Дашборд",
   "allProjects": "Бардык долбоорлор",
-  "kpi": {
-    "revenueThisMonth": "Айлык кирешe",
-    "activeDeals": "Активдүү бүтүмдөр",
-    "availableUnits": "Бош жайлар",
-    "unitsOfTotal": "жалпы {{total}} ичинен",
-    "overdueTasks": "Мөөнөтү өткөн тапшырмалар"
+  "period": {
+    "label": "Мезгил",
+    "month": "Ай",
+    "quarter": "Чейрек",
+    "year": "Жыл"
   },
-  "revenueTrend": {
-    "title": "Акыркы 6 айдагы киреше",
-    "seriesLabel": "Киреше"
+  "compare": {
+    "month": "өткөн айдын ушул күндөрүндө {{value}} болгон",
+    "quarter": "өткөн чейректин ушул мезгилинде {{value}} болгон",
+    "year": "өткөн жылдын ушул мезгилинде {{value}} болгон",
+    "new": "жаңы",
+    "noChange": "өзгөрүүсүз"
+  },
+  "sales": {
+    "contractsSigned": "Кол коюлган келишимдер",
+    "salesVolume": "Сатуу көлөмү",
+    "cashCollected": "Түшкөн акча",
+    "newLeads": "Жаңы лиддер",
+    "conversion": "{{percent}} бүтүмгө өттү"
+  },
+  "salesTrend": {
+    "title": "Акыркы 6 айдагы сатуу жана түшүүлөр",
+    "salesVolume": "Сатуу көлөмү",
+    "cashCollected": "Түшкөн акча"
+  },
+  "collections": {
+    "title": "Төлөмдөрдү чогултуу",
+    "collectedOfDue": "Мөөнөтү келген төлөмдөрдөн чогултулганы",
+    "paidOfDue": "{{due}} ичинен {{paid}}",
+    "nothingDueYet": "Бул мезгилде азырынча мөөнөтү келген төлөм жок.",
+    "duePeriod": {
+      "month": "Бул айда дагы төлөнүшү керек",
+      "quarter": "Бул чейректе дагы төлөнүшү керек",
+      "year": "Бул жылы дагы төлөнүшү керек"
+    },
+    "installments_one": "{{count}} төлөм",
+    "installments_few": "{{count}} төлөм",
+    "installments_many": "{{count}} төлөм",
+    "installments_other": "{{count}} төлөм",
+    "overdue": "Азыр мөөнөтү өткөн",
+    "overdueDeals_one": "{{count}} бүтүм боюнча",
+    "overdueDeals_few": "{{count}} бүтүм боюнча",
+    "overdueDeals_many": "{{count}} бүтүм боюнча",
+    "overdueDeals_other": "{{count}} бүтүм боюнча",
+    "noOverdue": "Мөөнөтү өткөн жок",
+    "outstanding": "Бардык бүтүмдөр боюнча калган карыз"
+  },
+  "inventory": {
+    "title": "Долбоорлор боюнча калдык",
+    "listPriceNote": "Жайлардын саны жана учурдагы прайс боюнча наркы.",
+    "emptyTitle": "Жайлар азырынча жок",
+    "emptyDescription": "Калдыкты көрүү үчүн долбоорлорду жана жайларды кошуңуз.",
+    "columns": {
+      "project": "Долбоор",
+      "units": "Бардыгы",
+      "soldShare": "Сатылды, %"
+    },
+    "total": "Жыйынтык"
+  },
+  "managerPerformance": {
+    "title": "Менеджерлердин натыйжалары",
+    "you": "{{name}} (сиз)",
+    "emptyTitle": "Менеджерлер азырынча жок",
+    "emptyDescription": "Бул филиалда сатуучу менеджерлер ушул жерде көрүнөт.",
+    "columns": {
+      "manager": "Менеджер",
+      "contracts": "Келишимдер",
+      "salesVolume": "Сатуу көлөмү",
+      "cash": "Түшкөнү",
+      "newLeads": "Жаңы лиддер",
+      "conversion": "Конверсия",
+      "overdue": "Мөөнөтү өткөн"
+    },
+    "total": "Жыйынтык"
   },
   "unitsInventory": {
     "title": "Жайлардын калдыгы",
@@ -108,12 +172,6 @@
     "dealsHeading": "Клиентти күтүп жаткан бүтүмдөр ({{count}})",
     "dealsEmpty": "Клиентти күтүп жаткан бүтүм жок.",
     "noDate": "Дата жок"
-  },
-  "myPerformance": {
-    "title": "Акыркы {{days}} күндөгү менин натыйжам",
-    "leadsAssigned": "Дайындалган лиддер",
-    "dealsWon": "Кол коюлган келишимдер",
-    "conversionRate": "Конверсия"
   },
   "financeOverview": {
     "title": "Финансылык обзор",

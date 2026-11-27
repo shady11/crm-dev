@@ -21,6 +21,9 @@ export const DataList = (props: DataListProps) => {
       className={cn(
         "group/data-list",
         "flex flex-col gap-1",
+        // Horizontal: one shared label column sized to the longest label, so
+        // every row's value starts at the same x (items join it via subgrid).
+        "data-[orientation=horizontal]:grid data-[orientation=horizontal]:grid-cols-[auto_minmax(0,1fr)] data-[orientation=horizontal]:gap-x-0",
         "text-sm",
         className
       )}
@@ -40,7 +43,7 @@ export const DataListItem = (props: React.ComponentProps<typeof ark.div>) => {
     <ark.div
       className={cn(
         "flex gap-4 py-2",
-        "group-data-[orientation=horizontal]/data-list:flex-row group-data-[orientation=horizontal]/data-list:items-center",
+        "group-data-[orientation=horizontal]/data-list:col-span-2 group-data-[orientation=horizontal]/data-list:grid group-data-[orientation=horizontal]/data-list:grid-cols-subgrid group-data-[orientation=horizontal]/data-list:gap-x-4 group-data-[orientation=horizontal]/data-list:items-center",
         "group-data-[orientation=vertical]/data-list:flex-col group-data-[orientation=vertical]/data-list:gap-1",
         className
       )}

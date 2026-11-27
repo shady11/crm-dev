@@ -2,7 +2,7 @@ import {ForbiddenException} from '@nestjs/common';
 import * as XLSX from 'xlsx';
 import {DealStatus, LeadStatus, Prisma, UnitStatus} from '@/generated/prisma/client';
 import {AuthUser} from '@/common/types/auth-user.type';
-import {DashboardService} from './dashboard.service';
+import {DashboardService, parseDashboardPeriod, periodBounds} from './dashboard.service';
 
 /**
  * DashboardService is read-only aggregation, but three things are worth
@@ -67,6 +67,7 @@ describe('DashboardService', () => {
             user: {findMany: jest.fn().mockResolvedValue([])},
             lead: {count: jest.fn().mockResolvedValue(0), findMany: jest.fn().mockResolvedValue([]), groupBy: jest.fn().mockResolvedValue([])},
             unitPriceRequest: {findMany: jest.fn().mockResolvedValue([]), count: jest.fn().mockResolvedValue(0)},
+            project: {findMany: jest.fn().mockResolvedValue([])},
         };
 
         const rbacService = {findRoleIdsWithPermission: jest.fn().mockResolvedValue(['role-sales-manager'])};
@@ -775,6 +776,104 @@ describe('DashboardService', () => {
 
             const workbook = XLSX.read(buffer, {type: 'buffer'});
             expect(workbook.SheetNames).toEqual(['Leads by status', 'Deals by status', 'Summary']);
+        });
+    });
+
+    describe('periodBounds', () => {
+        it('compares a month to date with the same days of the previous month', () => {
+            const now = new Date(2026, 10, 27, 12);
+            const b = periodBounds('month', now);
+            expect(b.start).toEqual(new Date(2026, 10, 1));
+            expect(b.end).toEqual(new Date(2026, 11, 1));
+            expect(b.previousStart).toEqual(new Date(2026, 9, 1));
+            expect(b.previousEnd).toEqual(new Date(2026, 9, 27, 12));
+        });
+
+        it('never runs the previous stretch past the start of this period', () => {
+            const b = periodBounds('month', new Date(2026, 2, 31, 10));
+            expect(b.previousStart).toEqual(new Date(2026, 1, 1));
+            expect(b.previousEnd).toEqual(new Date(2026, 2, 1));
+        });
+
+        it('uses calendar quarters and years', () => {
+            const now = new Date(2026, 10, 27);
+            expect(periodBounds('quarter', now).start).toEqual(new Date(2026, 9, 1));
+            expect(periodBounds('quarter', now).previousStart).toEqual(new Date(2026, 6, 1));
+            expect(periodBounds('year', now).start).toEqual(new Date(2026, 0, 1));
+            expect(periodBounds('year', now).previousStart).toEqual(new Date(2025, 0, 1));
+        });
+
+        it('falls back to month for an unknown period', () => {
+            expect(parseDashboardPeriod('decade')).toBe('month');
+            expect(parseDashboardPeriod(undefined)).toBe('month');
+            expect(parseDashboardPeriod('year')).toBe('year');
+        });
+    });
+
+    describe('getSalesSummary', () => {
+        it('scopes deals, payments and leads to the caller for a self-scoped viewer', async () => {
+            const {service, prisma} = build();
+            await service.getSalesSummary(selfScopedUser, 'month', undefined, 'branch-other');
+
+            const dealWhere = prisma.deal.aggregate.mock.calls[0][0].where;
+            expect(dealWhere).toMatchObject({companyId: 'company-1', branchId: 'branch-1', managerId: 'self-1'});
+            expect(prisma.payment.aggregate.mock.calls[0][0].where.deal).toMatchObject({branchId: 'branch-1', managerId: 'self-1'});
+            expect(prisma.lead.count.mock.calls[0][0].where).toMatchObject({branchId: 'branch-1', managerId: 'self-1'});
+        });
+
+        it('returns a zero conversion rate when there are no new leads', async () => {
+            const {service} = build();
+            const result = await service.getSalesSummary(adminUser, 'quarter');
+            expect(result.current.conversionRate).toBe(0);
+            expect(result.previous.conversionRate).toBe(0);
+        });
+
+        it('adds up overdue per deal and counts the deals', async () => {
+            const {service, prisma} = build();
+            prisma.paymentSchedule.groupBy.mockResolvedValue([
+                {dealId: 'd1', _sum: {amount: new Prisma.Decimal(1000), paidAmount: new Prisma.Decimal(200)}},
+                {dealId: 'd2', _sum: {amount: new Prisma.Decimal(500), paidAmount: null}},
+            ]);
+            const result = await service.getSalesSummary(adminUser, 'month');
+            expect(result.collections.overdue).toEqual({amount: 1300, deals: 2});
+        });
+    });
+
+    describe('getInventoryByProject', () => {
+        it('stays company-wide and splits counts and list value by status', async () => {
+            const {service, prisma} = build();
+            prisma.project.findMany.mockResolvedValue([{id: 'p1', name: 'Alpha', status: 'ACTIVE'}, {id: 'p2', name: 'Empty', status: 'DRAFT'}]);
+            prisma.unit.groupBy.mockResolvedValue([
+                {projectId: 'p1', status: UnitStatus.AVAILABLE, _count: {_all: 3}, _sum: {price: new Prisma.Decimal(300)}},
+                {projectId: 'p1', status: UnitStatus.SOLD, _count: {_all: 1}, _sum: {price: new Prisma.Decimal(100)}},
+            ]);
+
+            const rows = await service.getInventoryByProject(branchUser);
+
+            expect(prisma.unit.groupBy.mock.calls[0][0].where).not.toHaveProperty('branchId');
+            expect(rows).toHaveLength(1);
+            expect(rows[0]).toMatchObject({total: 4, available: {count: 3, value: 300}, sold: {count: 1, value: 100}, soldShare: 0.25});
+        });
+    });
+
+    describe('getManagerPerformance', () => {
+        it('pins a team lead to their own branch and includes their own row', async () => {
+            const {service, prisma} = build();
+            prisma.user.findMany.mockResolvedValue([{id: 'manager-1', fullName: 'M', email: 'm@x', branch: null}]);
+            prisma.deal.groupBy.mockResolvedValue([{managerId: 'manager-1', _count: {_all: 2}, _sum: {salePrice: new Prisma.Decimal(5000)}}]);
+
+            const result = await service.getManagerPerformance(salesHeadUser, 'month', undefined, 'branch-other');
+
+            expect(prisma.user.findMany.mock.calls[0][0].where.branchId).toBe('branch-1');
+            expect(prisma.deal.groupBy.mock.calls[0][0].where.branchId).toBe('branch-1');
+            expect(result.managers.map((m) => m.manager.id)).toEqual(['manager-1', 'head-1']);
+            expect(result.managers[0]).toMatchObject({contractsSigned: 2, salesVolume: 5000, conversionRate: 0});
+        });
+
+        it('lets a company-wide viewer narrow to one branch', async () => {
+            const {service, prisma} = build();
+            await service.getManagerPerformance(adminUser, 'year', undefined, 'branch-2');
+            expect(prisma.user.findMany.mock.calls[0][0].where.branchId).toBe('branch-2');
         });
     });
 });

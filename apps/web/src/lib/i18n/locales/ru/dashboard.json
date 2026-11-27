@@ -1,16 +1,80 @@
 {
   "title": "Дашборд",
   "allProjects": "Все проекты",
-  "kpi": {
-    "revenueThisMonth": "Выручка за месяц",
-    "activeDeals": "Активные сделки",
-    "availableUnits": "Свободные помещения",
-    "unitsOfTotal": "из {{total}} всего",
-    "overdueTasks": "Просроченные задачи"
+  "period": {
+    "label": "Период",
+    "month": "Месяц",
+    "quarter": "Квартал",
+    "year": "Год"
   },
-  "revenueTrend": {
-    "title": "Выручка за последние 6 месяцев",
-    "seriesLabel": "Выручка"
+  "compare": {
+    "month": "к {{value}} за те же дни прошлого месяца",
+    "quarter": "к {{value}} на ту же дату прошлого квартала",
+    "year": "к {{value}} на ту же дату прошлого года",
+    "new": "впервые",
+    "noChange": "без изменений"
+  },
+  "sales": {
+    "contractsSigned": "Подписано договоров",
+    "salesVolume": "Объём продаж",
+    "cashCollected": "Поступления",
+    "newLeads": "Новые лиды",
+    "conversion": "{{percent}} уже со сделкой"
+  },
+  "salesTrend": {
+    "title": "Продажи и поступления за 6 месяцев",
+    "salesVolume": "Объём продаж",
+    "cashCollected": "Поступления"
+  },
+  "collections": {
+    "title": "Сбор платежей",
+    "collectedOfDue": "Собрано из платежей, срок которых наступил",
+    "paidOfDue": "{{paid}} из {{due}}",
+    "nothingDueYet": "В этом периоде платежей к оплате ещё не было.",
+    "duePeriod": {
+      "month": "Ещё к оплате в этом месяце",
+      "quarter": "Ещё к оплате в этом квартале",
+      "year": "Ещё к оплате в этом году"
+    },
+    "installments_one": "{{count}} платёж",
+    "installments_few": "{{count}} платежа",
+    "installments_many": "{{count}} платежей",
+    "installments_other": "{{count}} платежа",
+    "overdue": "Просрочено сейчас",
+    "overdueDeals_one": "по {{count}} сделке",
+    "overdueDeals_few": "по {{count}} сделкам",
+    "overdueDeals_many": "по {{count}} сделкам",
+    "overdueDeals_other": "по {{count}} сделкам",
+    "noOverdue": "Просрочек нет",
+    "outstanding": "Остаток долга по всем сделкам"
+  },
+  "inventory": {
+    "title": "Остатки по проектам",
+    "listPriceNote": "Количество помещений и их стоимость по текущему прайсу.",
+    "emptyTitle": "Помещений пока нет",
+    "emptyDescription": "Добавьте проекты и помещения, чтобы видеть остатки.",
+    "columns": {
+      "project": "Проект",
+      "units": "Всего",
+      "soldShare": "Продано, %"
+    },
+    "total": "Итого"
+  },
+  "managerPerformance": {
+    "title": "Результаты менеджеров",
+    "you": "{{name}} (вы)",
+    "emptyTitle": "Менеджеров пока нет",
+    "emptyDescription": "Здесь появятся менеджеры, которые продают в этом филиале.",
+    "columns": {
+      "manager": "Менеджер",
+      "contracts": "Договоры",
+      "salesVolume": "Объём продаж",
+      "cash": "Поступления",
+      "newLeads": "Новые лиды",
+      "conversion": "Конверсия",
+      "overdue": "Просрочка"
+    },
+    "total": "Итого"
   },
   "unitsInventory": {
     "title": "Остатки помещений",
@@ -108,12 +172,6 @@
     "dealsHeading": "Сделки в ожидании клиента ({{count}})",
     "dealsEmpty": "Нет сделок в ожидании клиента.",
     "noDate": "Без даты"
-  },
-  "myPerformance": {
-    "title": "Моя эффективность за последние {{days}} дн.",
-    "leadsAssigned": "Назначено лидов",
-    "dealsWon": "Подписано договоров",
-    "conversionRate": "Конверсия"
   },
   "financeOverview": {
     "title": "Финансовый обзор",

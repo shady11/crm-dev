@@ -258,9 +258,9 @@ function Stat({label, value}: {label: string; value: number}) {
 
 function Row({label, value}: {label: string; value: string | null}) {
     return (
-        <DataListItem className="justify-between py-2">
+        <DataListItem className="py-2">
             <DataListItemLabel>{label}</DataListItemLabel>
-            <DataListItemValue className="flex-none">{value || "—"}</DataListItemValue>
+            <DataListItemValue className="text-right">{value || "—"}</DataListItemValue>
         </DataListItem>
     );
 }

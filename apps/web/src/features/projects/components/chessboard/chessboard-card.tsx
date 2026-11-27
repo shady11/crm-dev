@@ -4,6 +4,7 @@ import {createListCollection} from "@ark-ui/react";
 import {Badge} from "@/components/ui/badge";
 import {Card, CardContent, CardHeader} from "@/components/ui/card";
 import {Status} from "@/components/ui/status";
+import {ScrollArea} from "@/components/ui/scroll-area";
 import {ChessboardGrid} from "@/features/projects/components/chessboard/chessboard-grid.tsx";
 import type {Floor} from "@/features/floors/types/floor.types";
 import {
@@ -40,7 +41,10 @@ export function ChessboardCard({
                                    toolbar,
                                }: ChessboardCardProps) {
     const { t } = useTranslation("units");
-    const scroller = useRef<HTMLDivElement>(null);
+    // Wraps the ScrollArea; the element that actually scrolls is its viewport.
+    const scrollFrame = useRef<HTMLDivElement>(null);
+    const viewport = () =>
+        scrollFrame.current?.querySelector<HTMLElement>("[data-slot=scroll-area-viewport]") ?? null;
     const [more, setMore] = useState({left: false, right: false});
 
     // Whether units are off to either side. A floor stays on one row, so a
@@ -48,7 +52,7 @@ export function ChessboardCard({
     // no sign that more were there (macOS and many browsers hide scrollbars
     // until you scroll).
     useEffect(() => {
-        const el = scroller.current;
+        const el = viewport();
         if (!el) return;
         const update = () => setMore({
             left: el.scrollLeft > 1,
@@ -58,15 +62,18 @@ export function ChessboardCard({
         el.addEventListener("scroll", update, {passive: true});
         const observer = new ResizeObserver(update);
         observer.observe(el);
-        if (el.firstElementChild) observer.observe(el.firstElementChild);
+        const grid = el.querySelector("[data-slot=scroll-area-content]")?.firstElementChild;
+        if (grid) observer.observe(grid);
         return () => {
             el.removeEventListener("scroll", update);
             observer.disconnect();
         };
     }, [floors]);
 
-    const scrollBy = (direction: 1 | -1) =>
-        scroller.current?.scrollBy({left: direction * scroller.current.clientWidth * 0.8, behavior: "smooth"});
+    const scrollBy = (direction: 1 | -1) => {
+        const el = viewport();
+        el?.scrollBy({left: direction * el.clientWidth * 0.8, behavior: "smooth"});
+    };
 
     const statusCollection = createListCollection({
         items: UNIT_STATUS_VALUES.map((status) => ({
@@ -117,25 +124,18 @@ export function ChessboardCard({
                             </span>
                         ))}
                     </div>
-                    <div className="relative min-w-0 flex-1">
-                        {/* Units running off either edge fade out rather than being cut. */}
-                        <div
-                            ref={scroller}
-                            className="w-full overflow-x-auto px-1 pt-1 pb-3"
-                            style={{
-                                maskImage: more.left || more.right
-                                    ? `linear-gradient(to right, ${more.left ? "transparent, black 4rem" : "black"}, ${more.right ? "black calc(100% - 4rem), transparent" : "black"})`
-                                    : undefined,
-                            }}
-                        >
-                            <ChessboardGrid
-                                floors={floors}
-                                selectedUnit={selectedUnit}
-                                hasActiveFilters={hasActiveFilters}
-                                unitMatchesFilters={unitMatchesFilters}
-                                onUnitClick={onUnitClick}
-                            />
-                        </div>
+                    <div ref={scrollFrame} className="relative min-w-0 flex-1">
+                        <ScrollArea>
+                            <div className="px-1 pt-1 pb-3">
+                                <ChessboardGrid
+                                    floors={floors}
+                                    selectedUnit={selectedUnit}
+                                    hasActiveFilters={hasActiveFilters}
+                                    unitMatchesFilters={unitMatchesFilters}
+                                    onUnitClick={onUnitClick}
+                                />
+                            </div>
+                        </ScrollArea>
                         {more.left ? (
                             <div className="pointer-events-none absolute inset-y-0 left-0 z-20 flex w-16 items-center justify-start">
                                 <button
